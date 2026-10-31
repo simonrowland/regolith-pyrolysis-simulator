@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -58,10 +56,13 @@ def _table_context(document: dict, number: str) -> dict:
 
 def _table_i_grid(document: dict) -> list[tuple[str, ...]]:
     rows = []
-    for observation in document["species"]["V2O5"]["observations"]:
-        values = observation["values"]
-        if values.get("quantity") != "mass_loss_fraction":
+    for context in document["species"]["V2O5"]["context"]:
+        if context.get("observation_id") not in {
+            "shyrokykh_2021_csv1_text_extraction_bound",
+            "shyrokykh_2021_csv2_text_extraction_bound",
+        }:
             continue
+        values = context["values"]
         composition = values["initial_composition_as_printed"]
         rows.append(
             (
@@ -147,22 +148,27 @@ def test_render_and_extract_cell_mutations_fail_table_binding() -> None:
         assert _table_ii_grid(changed_extract) == TABLE_II_RENDER
 
 
-def test_text_bounds_keep_source_cells_and_migrate_as_typed_refusals() -> None:
-    document = _document()
-    observations = document["species"]["V2O5"]["observations"]
-    expected_bounds = {"CSV1": "77", "CSV2": "45"}
-    for observation in observations:
-        values = observation["values"]
-        sample = values["sample_id"]
+def _assert_text_bounds_remain_context(document: dict) -> None:
+    expected_bounds = {
+        "shyrokykh_2021_csv1_text_extraction_bound": "77",
+        "shyrokykh_2021_csv2_text_extraction_bound": "45",
+    }
+    context_rows = {
+        item["observation_id"]: item
+        for item in document["species"]["V2O5"]["context"]
+        if item.get("observation_id") in expected_bounds
+    }
+    assert set(context_rows) == set(expected_bounds)
+    for observation_id, expected_bound in expected_bounds.items():
+        item = context_rows[observation_id]
+        assert item["type"] == "printed_data_context"
+        values = item["values"]
         assert values["mass_loss_pct"] == {
             "kind": "bound",
             "bound_operator": ">",
-            "bound_value": expected_bounds[sample],
+            "bound_value": expected_bound,
         }
-        assert values["admission_status"] == "typed_refusal"
-        assert values["status"] == "typed_refusal"
-        assert "no quantity token for species removal" in values["reason"]
-        assert "unavailable_reason" not in values
+        sample = "CSV1" if "csv1" in observation_id else "CSV2"
         composition = values["initial_composition_as_printed"]
         assert (
             sample,
@@ -170,31 +176,26 @@ def test_text_bounds_keep_source_cells_and_migrate_as_typed_refusals() -> None:
             composition["SiO2_wt_pct"],
             composition["V2O5_wt_pct"],
         ) == next(row for row in TABLE_I_RENDER if row[0] == sample)
-        assert observation["quench_statement"]["preservation"] == "not_stated"
-        assert observation["point_conditions"]["oxygen_partial_pressure"]["state"]["tag"] == "unknown"
+        assert item["quench_statement"]["preservation"] == "not_stated"
+        assert item["point_conditions"]["oxygen_partial_pressure"]["state"]["tag"] == "unknown"
+
+
+def test_text_bounds_remain_context_without_migrated_observations() -> None:
+    document = _document()
+    _assert_text_bounds_remain_context(document)
+
+    mutated = deepcopy(document)
+    next(
+        item
+        for item in mutated["species"]["V2O5"]["context"]
+        if item.get("observation_id") == "shyrokykh_2021_csv1_text_extraction_bound"
+    )["values"]["mass_loss_pct"]["bound_value"] = "99"
+    with pytest.raises(AssertionError):
+        _assert_text_bounds_remain_context(mutated)
 
     migrator = _migrate()
-    rows = list(migrator.result.observations.values())
-    assert len(rows) == 2
+    assert list(migrator.result.observations.values()) == []
     assert not migrator.result.validation.hard_issues
-    expected_mass_loss_bounds = {
-        "shyrokykh_2021_csv1_text_extraction_bound": Decimal("0.77"),
-        "shyrokykh_2021_csv2_text_extraction_bound": Decimal("0.45"),
-    }
-    for row in rows:
-        assert row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
-        assert row.admission.status is AdmissionStatus.REJECTED
-        assert "species removal" in row.admission.reason
-        assert row.identity.species.formula == "V2O5"
-        assert row.identity.species.phase.value is Phase.L
-        assert row.identity.temperature_K.value == 1873
-        assert row.point_conditions is not None
-        assert len(row.point_conditions) == 8
-        assert all(item.locator is not None for item in row.point_conditions.values())
-        assert row.value.kind is ValueKind.BOUND
-        assert row.value.bound_operator == ">"
-        local_id = row.observation_id.rsplit("::", 1)[-1]
-        assert row.value.bound_value == expected_mass_loss_bounds[local_id]
 
     figures = [
         item

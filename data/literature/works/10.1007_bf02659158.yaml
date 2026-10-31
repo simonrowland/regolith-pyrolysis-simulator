@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:rego-1988-silicate-na2o-activities
       role: pdf
@@ -30,7 +30,42 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1007/bf02659158
-experiments: []
+experiments:
+- experiment_id: 10.1007/bf02659158::rego-1988-silicate-na2o-activities
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/bf02659158
+  locator:
+    page: 3
+    published_page: 657
+    pdf_page_index: 2
+    figure: '3'
+    note: 600 dpi page pixels. Read 1 NCC centre (3879.72, 511.34). Read 2 stroke-bbox centre (3877.00, 511.00). Printed log
+      a(Na2O) = -7.02.; series=-7.02; marker_symbol=open square
 context:
 - observation_id: rego_1988_abstract_na2o_activity_range
   type: measurement_summary
@@ -155,8 +190,7 @@ context:
     printed_quantity: log a_Na2O
     method_class: figure_only
     evidence_class: figure_only
-    status: typed_refusal
-    reason: figure_not_digitized
+    status: digitised
     species: Na2O
     system_as_published: Na2O-CaO-SiO2
     axes_as_printed: Na2O mol pct and CaO mol pct in a ternary diagram
@@ -165,31 +199,29 @@ context:
     series:
     - activity_label_as_published: '-7.02'
       marker: open square
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.53'
       marker: open triangle
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.56'
       marker: open circle
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.72'
       marker: open diamond
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.97'
       marker: open inverted triangle
-      marker_count: 5
-    composition_state: unknown
-    composition_unknown_reason: Full per-marker melt compositions occur only as plotted positions; coordinates were not read
-      because figure digitisation is deferred.
+      marker_count: 6
+    composition_state: digitised
     activity_label_attribution: The text states that the isoactivity values are from earlier measurements in the binary Na2O-SiO2
       system, reference [2].
     attribution: Melt compositions measured in this work; activity labels attributed to D. N. Rego, G. K. Sigworth, and W.
       O. Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].
     uncertainty_as_published: not stated
-    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
-      are inferred.
-    digitisation: deferred to a figure pass
-    numeric_points: none
+    digitisation: 'Marker centres read at 600 dpi. Six markers on each of the five isoactivity curves. Axis titles say mol
+      pct; tick numerals 0.1 to 0.5 are mole fractions and are stored as mole fractions. Stored compositions are the first
+      read, rounded to 2 significant figures, with SiO2 closed as the remainder. Audit: rego-1988-silicate-na2o-activities-figure-audit.csv.'
+    numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
   context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig3_na2o_cao_sio2_isoactivity
   work_id: 10.1007/bf02659158
   source_id: rego-1988-silicate-na2o-activities
@@ -240,7 +272,7 @@ context:
     - activity_label_as_published: '0.4'
       marker_count: 0
     attribution: This work; Gibbs-Duhem integration
-    digitisation: deferred to a figure pass
+    digitisation: curves only, Gibbs-Duhem model, no discrete nodes, not sampled
     numeric_points: none
   context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig4_sio2_isoactivity_model
   work_id: 10.1007/bf02659158
@@ -262,8 +294,7 @@ context:
     printed_quantity: log a_Na2O
     method_class: figure_only
     evidence_class: figure_only
-    status: typed_refusal
-    reason: figure_not_digitized
+    status: digitised
     species: Na2O
     system_as_published: Na2O-MgO-SiO2
     axes_as_printed: Na2O mol pct and MgO mol pct in a ternary diagram
@@ -272,30 +303,30 @@ context:
     series:
     - activity_label_as_published: '-7.02'
       marker: open square
-      marker_count: 5
+      marker_count: 7
     - activity_label_as_published: '-7.53'
       marker: open triangle
-      marker_count: 5
+      marker_count: 4
     - activity_label_as_published: '-7.56'
       marker: open circle
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.72'
       marker: open diamond
-      marker_count: 5
+      marker_count: 6
     - activity_label_as_published: '-7.97'
       marker: open inverted triangle
-      marker_count: 5
-    composition_state: unknown
-    composition_unknown_reason: Full per-marker melt compositions occur only as plotted positions; coordinates were not read
-      because figure digitisation is deferred.
+      marker_count: 6
+    composition_state: digitised
     activity_label_attribution: The activity levels are taken from earlier measurements in the binary Na2O-SiO2 system, reference
       [2].
     attribution: Melt compositions measured in this work; activity labels attributed to reference [2] as printed.
     uncertainty_as_published: not stated
-    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
-      are inferred.
-    digitisation: deferred to a figure pass
-    numeric_points: none
+    digitisation: 'Marker centres read at 600 dpi. Counts are open square 7, open triangle 4, open circle 6, open diamond
+      6, and open inverted triangle 6. The circle rows near y 3616 and y 3951 have no marker-sized upright triangle. One open
+      square is centered on the Na2O-SiO2 edge and stored X_MgO is 0. The dashed 1400 C liquidus is drawn; a point is not
+      assigned to one side of it. Axis titles say mol pct; tick numerals 0.1 to 0.5 are mole fractions and are stored as mole
+      fractions. Audit: rego-1988-silicate-na2o-activities-figure-audit.csv.'
+    numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
   context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig5_na2o_mgo_sio2_isoactivity
   work_id: 10.1007/bf02659158
   source_id: rego-1988-silicate-na2o-activities
@@ -316,8 +347,7 @@ context:
     printed_quantity: log a_Na2O
     method_class: figure_only
     evidence_class: figure_only
-    status: typed_refusal
-    reason: figure_not_digitized
+    status: digitised
     species: Na2O
     system_as_published: Na2O-CaO-SiO2-Al2O3 blast-furnace-type slags
     axes_as_printed: X_CaO/(X_CaO + X_SiO2) and X_Na2O/(X_Na2O + X_SiO2); Al2O3 content series are 10 and 20 wt pct.
@@ -356,17 +386,16 @@ context:
       Al2O3_content_as_published: 20 wt pct
       marker: filled triangle
       marker_count: 0
-    composition_state: unknown
-    composition_unknown_reason: Full per-marker compositions are not printed as a table; the two axes and Al2O3 series do
-      not define every melt composition without digitising marker coordinates.
+    composition_state: digitised
     activity_label_attribution: Isoactivity values are assigned from the earlier binary-system measurements cited as reference
       [2].
     attribution: Melt compositions measured in this work; activity labels attributed to reference [2] as printed.
     uncertainty_as_published: not stated
-    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
-      are inferred.
-    digitisation: deferred to a figure pass
-    numeric_points: none
+    digitisation: 'Marker centres read at 600 dpi. Open markers are 10 wt pct Al2O3 and filled markers are 20 wt pct Al2O3.
+      Counts stay 4, 4, 4, 4, 4, 4, 2, and 0. No filled triangle is drawn for log a(Na2O) = -7.97. The axes are the printed
+      ratios X_CaO/(X_CaO + X_SiO2) and X_Na2O/(X_Na2O + X_SiO2). The four-oxide mole fraction is closed from those ratios
+      and the series Al2O3 weight percent. Audit: rego-1988-silicate-na2o-activities-figure-audit.csv.'
+    numeric_points: rego-1988-silicate-na2o-activities-figure-audit.csv
   context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig6_na2o_blast_furnace_slag_isoactivity
   work_id: 10.1007/bf02659158
   source_id: rego-1988-silicate-na2o-activities

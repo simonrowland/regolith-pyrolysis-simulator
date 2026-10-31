@@ -139,13 +139,23 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
     mutated["species"]["CO"]["observations"][0]["values"]["partial_pressure_pa"] = "101"
     assert check_all_fidelity_samples_match(mutated, label=SOURCE_ID)
 
+    _assert_nacl_context_preserved(document)
+    mutated_nacl = deepcopy(document)
+    next(
+        item
+        for item in mutated_nacl["species"]["NaCl"]["context"]
+        if item["observation_id"] == "beerkens_2001_text_extra_nacl_evaporated_fraction"
+    )["values"]["mass_loss_pct"] = 99
+    with pytest.raises(AssertionError):
+        _assert_nacl_context_preserved(mutated_nacl)
+
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
     rows = tuple(migrator.result.observations.values())
-    assert len(rows) == 5
-    assert {row.identity.species.formula for row in rows} == {"CO", "NaCl"}
+    assert len(rows) == 4
+    assert {row.identity.species.formula for row in rows} == {"CO"}
     assert all(row.admission.status.value == "admitted" for row in rows)
 
     co_rows = sorted(
@@ -176,14 +186,19 @@ def test_species_conditions_fidelity_and_isolated_migration() -> None:
         # The paper gives partial pressures, not a total furnace pressure.
         assert "total_pressure_Pa" not in row.point_conditions
 
-    salt = next(row for row in rows if row.identity.species.formula == "NaCl")
-    assert salt.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
-    assert salt.value.point == Decimal("0.5")
-    assert salt.value.approximate is True
-    assert salt.identity.temperature_K is not None
-    assert salt.identity.temperature_K.is_unknown
-    assert salt.point_conditions is not None
-    for condition in ("temperature_C", "fO2_Pa", "composition"):
-        assert salt.point_conditions[condition].state.is_unknown
-    # Do not infer total pressure from the separately printed gas pressures.
-    assert "total_pressure_Pa" not in salt.point_conditions
+
+def _assert_nacl_context_preserved(document: dict) -> None:
+    assert document["species"]["NaCl"]["observations"] == []
+    row = next(
+        item
+        for item in document["species"]["NaCl"]["context"]
+        if item["observation_id"] == "beerkens_2001_text_extra_nacl_evaporated_fraction"
+    )
+    assert row["type"] == "printed_data_context"
+    values = row["values"]
+    assert values["mass_loss_pct"] == 50
+    assert values["approximate"] is True
+    assert values["denominator_as_printed"] == (
+        "extra NaCl added above the 0.200 g NaCl per ton glass background"
+    )
+    assert values["method_class"] == "quoted_attributed"

@@ -1,0 +1,65 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621
+  citation: Pickrell, G. R. (1994). High temperature alkali corrosion kinetics of low expansion ceramics. PhD dissertation,
+    Virginia Polytechnic Institute and State University.
+  source_ids:
+  - pickrell-1994-gaseous-alkali-corrosion
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:pickrell-1994-gaseous-alkali-corrosion
+      role: pdf
+      path: raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
+      sha256:
+        tag: value
+        value: 2dc30aaa5ad48a14d03759fa10a68d236740a4e6306e6b14893e554118290493
+    - asset_id: pdftotext:pickrell-1994-gaseous-alkali-corrosion
+      role: pdftotext
+      path: text/pickrell-1994-gaseous-alkali-corrosion
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:pickrell-1994-gaseous-alkali-corrosion
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'sodium_nitrate_vapor_corrosion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: Alkali reaction kinetics of Si3N4; 4 printed temperature rows.

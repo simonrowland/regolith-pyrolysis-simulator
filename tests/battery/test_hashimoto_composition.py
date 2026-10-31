@@ -44,7 +44,7 @@ def test_hashimoto_all_runs_carry_printed_nominal_run_pressure() -> None:
         }
         assert pressure["locator"] == {
             "published_page": 118,
-            "pdf_page_index": 8,
+            "pdf_page_index": 7,
             "section": "RESULTS AND DISCUSSION",
             "note": "Printed vacuum level about 10^{-4} Torr during the experiments; unit conversion only",
         }

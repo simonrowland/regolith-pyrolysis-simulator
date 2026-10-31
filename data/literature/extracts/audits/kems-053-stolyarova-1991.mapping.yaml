@@ -1,0 +1,163 @@
+source_id: kems-053-stolyarova-1991
+table: Ia
+locator:
+  pdf_page: 2
+  published_page: 3711
+printed_caption: 'Table Ia. The partial pressures of components (atm) over the CaO-SiO2 system at 1993 K obtained by the complete evaporation method (1) and the ion comparison method (2).'
+printed_row_count: 11
+stored_pressure_cell_count: 44
+mapping:
+  row_axis:
+    printed_column: 1
+    source_field: SiO2 mole fraction
+    stored_field: values.points[].composition_mol
+  data_columns:
+    - printed_column: 2
+      header: 'P_Ca · 10^7'
+      printed_unit: atm
+      species: Ca(g)
+      method: complete evaporation (1)
+      output: partial_pressure
+      uncertainty_field: values.points[].sigma
+    - printed_column: 3
+      header: 'P_Ca · 10^7'
+      printed_unit: atm
+      species: Ca(g)
+      method: ion comparison (2)
+      output: partial_pressure
+      uncertainty_field: values.points[].sigma
+    - printed_column: 4
+      header: 'P_CaO · 10^8'
+      printed_unit: atm
+      species: CaO(g)
+      method: complete evaporation (1)
+      output: partial_pressure
+      uncertainty_field: values.points[].sigma
+    - printed_column: 5
+      header: 'P_CaO · 10^8'
+      printed_unit: atm
+      species: CaO(g)
+      method: ion comparison (2)
+      output: partial_pressure
+      uncertainty_field: values.points[].sigma
+  conditions:
+    temperature: 1993 K, printed in caption
+    composition: SiO2 mole fraction per row; CaO is the binary complement documented by the extract
+    total_pressure: unknown; paper reports effusion under vacuum but no numeric in-cell pressure
+  evidence: measured_direct
+uncertainty:
+  scope: per-cell for all 44 pressure cells
+  printed_form: '±' width in each Table Ia pressure cell
+  printed_cell_field: values.points[].P_Ca_times_10^7_atm_as_printed or values.points[].P_CaO_times_10^8_atm_as_printed
+  migrator_field: values.points[].sigma
+  unit: atm; sigma is the physical pressure width represented by the table header scale
+  locator: PDF page 2, published page 3711, Table Ia, stored on each observation locator
+  confidence_level: not stated
+  unit_resolution: unit='atm' on the observation locator is read by simulator/battery/score.py::_uncertainty_unit
+  field_owner: simulator/battery/migrate.py::Migrator._emit_exploded_point
+  band_reader: simulator/battery/score.py::_printed_uncertainty_band
+  no_uncertainty_rows: []
+cell_audit:
+  machine_reads:
+    mineru_table: p002-t01, absolute PDF page 2
+    pdftotext: pdftotext-layout.txt, absolute PDF page 2
+    digit_agreement: 59/59 numeric cells (1.000)
+    disposition: all 44 stored pressure cells agree in digits, sign, exponent, and uncertainty mark; no cell mismatch
+  render_check:
+    page: 2
+    resolution_dpi: 160
+    checked: table caption, eleven composition rows, and assignment of the four pressure columns
+    resolution: MinerU index label 1A is a lettering error; the render prints Table Ia
+  rows:
+    - SiO2: '0.50'
+      read: a
+      Ca_method_1: '2.2 ± 0.2'
+      Ca_method_2: '2.5 ± 0.3'
+      CaO_method_1: '5.9 ± 0.4'
+      CaO_method_2: '6.0 ± 0.5'
+    - SiO2: '0.49'
+      read: a
+      Ca_method_1: '3.5 ± 0.3'
+      Ca_method_2: '3.9 ± 0.4'
+      CaO_method_1: '8.8 ± 0.5'
+      CaO_method_2: '8.9 ± 0.6'
+    - SiO2: '0.47'
+      read: a
+      Ca_method_1: '5.1 ± 0.3'
+      Ca_method_2: '5.1 ± 0.4'
+      CaO_method_1: '11.9 ± 0.5'
+      CaO_method_2: '11.9 ± 0.8'
+    - SiO2: '0.44'
+      read: a
+      Ca_method_1: '9.6 ± 0.4'
+      Ca_method_2: '10.3 ± 0.5'
+      CaO_method_1: '20.8 ± 1.0'
+      CaO_method_2: '18.2 ± 1.5'
+    - SiO2: '0.41'
+      read: a
+      Ca_method_1: '17.6 ± 1.0'
+      Ca_method_2: '22.9 ± 1.5'
+      CaO_method_1: '23.0 ± 2.0'
+      CaO_method_2: '26.9 ± 3.0'
+    - SiO2: '0.40'
+      read: a
+      Ca_method_1: '27.6 ± 1.0'
+      Ca_method_2: '29.4 ± 2.0'
+      CaO_method_1: '41.2 ± 3.0'
+      CaO_method_2: '35.6 ± 4.0'
+    - SiO2: '0.39'
+      read: a
+      Ca_method_1: '36.3 ± 2.0'
+      Ca_method_2: '38.7 ± 3.0'
+      CaO_method_1: '41.3 ± 3.0'
+      CaO_method_2: '35.7 ± 4.0'
+    - SiO2: '0.38'
+      read: a
+      Ca_method_1: '37.1 ± 3.0'
+      Ca_method_2: '41.6 ± 4.0'
+      CaO_method_1: '49.6 ± 4.0'
+      CaO_method_2: '48.6 ± 5.0'
+    - SiO2: '0.36'
+      read: a
+      Ca_method_1: '49.6 ± 4.0'
+      Ca_method_2: '48.7 ± 5.0'
+      CaO_method_1: '61.7 ± 4.0'
+      CaO_method_2: '60.5 ± 5.0'
+    - SiO2: '0.33'
+      read: a
+      Ca_method_1: '50.1 ± 4.0'
+      Ca_method_2: '49.2 ± 5.0'
+      CaO_method_1: '75.8 ± 5.0'
+      CaO_method_2: '73.4 ± 6.0'
+    - SiO2: '0.25'
+      read: a
+      Ca_method_1: '49.9 ± 4.0'
+      Ca_method_2: '50.9 ± 5.0'
+      CaO_method_1: '78.8 ± 5.0'
+      CaO_method_2: '79.5 ± 6.0'
+phase_normalization:
+  printed_phase_phrase: CaO-SiO2 liquid oxide melt
+  stored_as_printed_field: phase_as_printed
+  identity_phase_token: l
+  token_owner: simulator/battery/enums.py::Phase.L
+  source_series_count: 7
+  migrated_observation_count: 59
+  row_count: 54 table activity points plus 5 Figure 3 points
+  source_locators:
+    tables:
+      page: 2
+      published_page: 3711
+      table_numbers: [IIa, IIb]
+    figure:
+      page: 4
+      published_page: 3713
+      figure_number: '3'
+  rule: >-
+    Store phase=l on the six activity series and Figure 3 Gibbs-integral series;
+    retain the source phrase in phase_as_printed. Gas partial-pressure
+    observations retain their measured gas phase.
+table_compare:
+  output: kems-053-stolyarova-1991.compare.csv
+  summary: matched=0, no-match=76, locator-error=173, unverifiable=62
+  table_ia_resolution: The 44 Table Ia no-match entries compare the stored physical pressure in atm with the table mantissa before its printed ×10^7 or ×10^8 scale. All 44 mantissas and ± widths agree between MinerU and pdftotext, and the rendered page confirms their row and column assignments. The source values were not re-extracted or changed.
+  locator_resolution: The draft index reads the caption as 1A; the render prints Table Ia. Its Table II locator labels are also machine-index limitations. Existing Table Ib, Table IIa, Table IIb and Table III cells outside this uncertainty pass were not changed.

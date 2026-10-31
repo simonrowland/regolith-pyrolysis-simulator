@@ -15,3 +15,7 @@ The notice that establishes a mode carries the same `fo2_mode` token.
 Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
+
+The `composition_binary_complement` notice records a binary composition
+derived as the complement of a printed caption mole percent. Such residuals
+remain visible in the `binary-complement-composition` flagged stratum.

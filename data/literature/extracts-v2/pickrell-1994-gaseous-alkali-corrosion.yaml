@@ -1,0 +1,5049 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+observations:
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_activation_energy
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_corrosion_activation_energy'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'alkali_corrosion_activation_energy'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      activation_energy_uncertainty_kJ_per_mol: 5
+      note: Standard deviation is approximately 5 kJ/mol; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 77
+    published_page: 65
+    section: 4.1.3
+    note: Arrhenius-derived activation energy and stated standard deviation.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1323.15:h=bb70cd3bf532
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1373.15:h=c7d1bb48451f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1423.15:h=e93b9475d6ac
+  derivation:
+    relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1323.15:h=bb70cd3bf532
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1373.15:h=c7d1bb48451f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1423.15:h=e93b9475d6ac
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1323.15:h=bb70cd3bf532
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 75
+    published_page: 63
+    section: 4.1.3
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 75
+        published_page: 63
+        figure: '14'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1373.15:h=c7d1bb48451f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 75
+    published_page: 63
+    section: 4.1.3
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 75
+        published_page: 63
+        figure: '14'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_reaction_rate::T=1423.15:h=e93b9475d6ac
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 75
+    published_page: 63
+    section: 4.1.3
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1150'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1150'
+          approximate: false
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 75
+        published_page: 63
+        figure: '14'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_alumina_thickness_bound::T=1323.15:h=0fc68936dda6
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alumina_reaction_layer_thickness_upper_bound_um'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 75
+    published_page: 63
+    section: 4.1.3
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 75
+              published_page: 63
+              section: 4.1.3
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 75
+        published_page: 63
+        section: 4.1.3
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_aluminum_titanate_dimensional_change
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'aluminum_titanate_dimensional_change_percent'
+    species:
+      formula: Al2TiO5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'aluminum_titanate_dimensional_change_percent';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+    note: Approximately 25 percent dimensional change after short exposure at 950 C; it is not a reaction rate.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+        note: Approximately 25 percent dimensional change after short exposure at 950 C; it is not a reaction rate.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+              note: Approximately 25 percent dimensional change after short exposure at 950 C; it is not a reaction rate.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+              note: Approximately 25 percent dimensional change after short exposure at 950 C; it is not a reaction rate.
+        output_unit: K
+        references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_cordierite_linear_reaction_rate::T=1223.15:h=2377dcefc158
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Mg2Al4Si5O18
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 90
+        published_page: 78
+        figure: '21'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_cordierite_linear_reaction_rate::T=1273.15:h=556fc2c3d330
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Mg2Al4Si5O18
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 90
+        published_page: 78
+        figure: '21'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_cordierite_parabolic_reaction_rate::T=1323.15:h=492a2f19fa4c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_squared_rate_mm2_per_h'
+    species:
+      formula: Mg2Al4Si5O18
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Parabolic reaction-rate constants reduced from measured squared-layer-thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: mm^2/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 92
+        published_page: 80
+        figure: '23'
+        note: Underlying squared-thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_cordierite_parabolic_reaction_rate::T=1373.15:h=c071367871a2
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_squared_rate_mm2_per_h'
+    species:
+      formula: Mg2Al4Si5O18
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Parabolic reaction-rate constants reduced from measured squared-layer-thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: mm^2/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 92
+        published_page: 80
+        figure: '23'
+        note: Underlying squared-thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_activation_energy
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_corrosion_activation_energy'
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'alkali_corrosion_activation_energy'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      activation_energy_uncertainty_kJ_per_mol: 20
+      note: Associated standard deviation is approximately 20 kJ/mol; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 88
+    published_page: 76
+    section: 4.1.4
+    note: Arrhenius-derived activation energy and stated standard deviation.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1223.15:h=845c2ec902e1
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1273.15:h=ab572483db22
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1323.15:h=d2b25ec0d59c
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1373.15:h=ca362a62c623
+  derivation:
+    relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1223.15:h=845c2ec902e1
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1273.15:h=ab572483db22
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1323.15:h=d2b25ec0d59c
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1373.15:h=ca362a62c623
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1223.15:h=845c2ec902e1
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 85
+    published_page: 73
+    section: 4.1.4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 85
+        published_page: 73
+        figure: '18'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1273.15:h=ab572483db22
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 85
+    published_page: 73
+    section: 4.1.4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 85
+        published_page: 73
+        figure: '18'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1323.15:h=d2b25ec0d59c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 85
+    published_page: 73
+    section: 4.1.4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 85
+        published_page: 73
+        figure: '18'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_mullite_reaction_rate::T=1373.15:h=ca362a62c623
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Al6Si2O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 85
+    published_page: 73
+    section: 4.1.4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              published_page: 73
+              section: 4.1.4
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 85
+        published_page: 73
+        section: 4.1.4
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 85
+        published_page: 73
+        figure: '18'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_activation_energy
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_corrosion_activation_energy'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'alkali_corrosion_activation_energy'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 97
+    published_page: 85
+    section: 4.1.6
+    note: Arrhenius-derived activation energy.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1223.15:h=a383e0e4a9eb
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1273.15:h=a72b854f10c9
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1323.15:h=f6b5dd5000cd
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1373.15:h=5e80cf28e5ae
+  derivation:
+    relation: Arrhenius fit of the reaction-rate constants versus reciprocal temperature.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1223.15:h=a383e0e4a9eb
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1273.15:h=a72b854f10c9
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1323.15:h=f6b5dd5000cd
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1373.15:h=5e80cf28e5ae
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes::T=1273.15:h=611a994d1c43
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_free_thermal_thickness_change_mm'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 97
+    published_page: 85
+    section: 4.1.6
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 97
+              published_page: 85
+              section: 4.1.6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 97
+              published_page: 85
+              section: 4.1.6
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+    atmosphere:
+      state:
+        tag: value
+        value: without alkalis present
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_alkali_free_blank_thickness_changes::T=1273.15:h=8ad874669330
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_free_thermal_thickness_change_mm'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 97
+    published_page: 85
+    section: 4.1.6
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 97
+              published_page: 85
+              section: 4.1.6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 97
+              published_page: 85
+              section: 4.1.6
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+    atmosphere:
+      state:
+        tag: value
+        value: without alkalis present
+      locator:
+        page: 97
+        published_page: 85
+        section: 4.1.6
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1223.15:h=a383e0e4a9eb
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 95
+        published_page: 83
+        figure: '25'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1273.15:h=a72b854f10c9
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 95
+        published_page: 83
+        figure: '25'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1323.15:h=f6b5dd5000cd
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 95
+        published_page: 83
+        figure: '25'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_reaction_rate::T=1373.15:h=5e80cf28e5ae
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 132
+    published_page: 120
+    section: '5'
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 132
+              published_page: 120
+              section: '5'
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 132
+        published_page: 120
+        section: '5'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Linear reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 95
+        published_page: 83
+        figure: '25'
+        note: Underlying thickness-time points are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_thickness_after_15h
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_mm'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_layer_thickness_mm'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 95
+    published_page: 83
+    section: 4.1.6
+    note: Measured reaction-layer thickness after 15 h at 950 C.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 95
+        published_page: 83
+        section: 4.1.6
+        note: Measured reaction-layer thickness after 15 h at 950 C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 95
+              published_page: 83
+              section: 4.1.6
+              note: Measured reaction-layer thickness after 15 h at 950 C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 95
+              published_page: 83
+              section: 4.1.6
+              note: Measured reaction-layer thickness after 15 h at 950 C.
+        output_unit: K
+        references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_prose_ttz_zero_thickness_under_8h
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_below_8h_mm'
+    species:
+      formula: transformation_toughened_zirconia_TTZ
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_layer_thickness_below_8h_mm'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 95
+    published_page: 83
+    section: 4.1.6
+    note: For all times below 8 h the measured reaction-layer thickness was zero; no temperature is assigned to this statement.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_activation_energy
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_corrosion_activation_energy'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'alkali_corrosion_activation_energy'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      activation_energy_uncertainty_kJ_per_mol: 15
+      note: The source reports a standard deviation of approximately 15 kJ/mol; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: Activation energy printed in Table 1; method in the text on PDF page 51.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1223.15:row=1:h=a6341b36b87f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1273.15:row=2:h=49059f2bc93e
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1323.15:row=3:h=bb72361379d0
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1373.15:row=4:h=d28ea637d88e
+  derivation:
+    relation: Arrhenius fit of the natural logarithm of the reaction-rate constant versus reciprocal temperature.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1223.15:row=1:h=a6341b36b87f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1273.15:row=2:h=49059f2bc93e
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1323.15:row=3:h=bb72361379d0
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1373.15:row=4:h=d28ea637d88e
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1223.15:row=1:h=a6341b36b87f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: row=1; table_row_number=2; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 50
+        published_page: 38
+        table: '1'
+        note: row=1; table_row_number=2; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=1; table_row_number=2; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=1; table_row_number=2; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 50
+        table: '1'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 51
+        published_page: 39
+        figure: '4'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1273.15:row=2:h=49059f2bc93e
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: row=2; table_row_number=3; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 50
+        published_page: 38
+        table: '1'
+        note: row=2; table_row_number=3; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=2; table_row_number=3; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=2; table_row_number=3; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 50
+        table: '1'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 51
+        published_page: 39
+        figure: '4'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1323.15:row=3:h=bb72361379d0
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: row=3; table_row_number=4; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 50
+        published_page: 38
+        table: '1'
+        note: row=3; table_row_number=4; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=3; table_row_number=4; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=3; table_row_number=4; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 50
+        table: '1'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 51
+        published_page: 39
+        figure: '4'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_reaction_rate::T=1373.15:row=4:h=d28ea637d88e
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: row=4; table_row_number=5; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 50
+        published_page: 38
+        table: '1'
+        note: row=4; table_row_number=5; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=4; table_row_number=5; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 50
+              published_page: 38
+              table: '1'
+              note: row=4; table_row_number=5; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 50
+        table: '1'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 51
+        published_page: 39
+        figure: '4'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table1_si3n4_silicate_layer_ratio
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_silicate_layer_SiO2_to_Na2O_molar_ratio'
+    species:
+      formula: Si3N4
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_silicate_layer_SiO2_to_Na2O_molar_ratio';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value_uncertainty: '0.64'
+      note: Printed as ±0.64; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 50
+    published_page: 38
+    table: '1'
+    note: Average SiO2/Na2O molar ratio by atomic absorption analysis.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_activation_energy
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'alkali_corrosion_activation_energy'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'alkali_corrosion_activation_energy'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      activation_energy_uncertainty_kJ_per_mol: 15
+      note: The source reports a standard deviation of approximately 15 kJ/mol; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: Activation energy printed in Table 2; method in the text on PDF page 68.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1223.15:row=1:h=cce84fbb4138
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1273.15:row=2:h=c3760e6f5d9c
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1323.15:row=3:h=b2f3f24aa2fc
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1373.15:row=4:h=95c292ec4bc3
+  derivation:
+    relation: Arrhenius fit of the natural logarithm of the reaction-rate constant versus reciprocal temperature.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1223.15:row=1:h=cce84fbb4138
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1273.15:row=2:h=c3760e6f5d9c
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1323.15:row=3:h=b2f3f24aa2fc
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1373.15:row=4:h=95c292ec4bc3
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1223.15:row=1:h=cce84fbb4138
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1223.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: row=1; table_row_number=2; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1223.15'
+      locator:
+        page: 67
+        published_page: 55
+        table: '2'
+        note: row=1; table_row_number=2; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '950'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=1; table_row_number=2; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=1; table_row_number=2; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '950'
+          approximate: false
+      locator:
+        page: 67
+        table: '2'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 66
+        published_page: 54
+        figure: '10'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1273.15:row=2:h=c3760e6f5d9c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: row=2; table_row_number=3; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        page: 67
+        published_page: 55
+        table: '2'
+        note: row=2; table_row_number=3; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=2; table_row_number=3; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=2; table_row_number=3; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        page: 67
+        table: '2'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 66
+        published_page: 54
+        figure: '10'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1323.15:row=3:h=b2f3f24aa2fc
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: row=3; table_row_number=4; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 67
+        published_page: 55
+        table: '2'
+        note: row=3; table_row_number=4; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=3; table_row_number=4; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=3; table_row_number=4; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1050'
+          approximate: false
+      locator:
+        page: 67
+        table: '2'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 66
+        published_page: 54
+        figure: '10'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_reaction_rate::T=1373.15:row=4:h=95c292ec4bc3
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_layer_thickness_growth_rate_um_per_h'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: row=4; table_row_number=5; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 67
+        published_page: 55
+        table: '2'
+        note: row=4; table_row_number=5; table_phase_column=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=4; table_row_number=5; table_phase_column=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 67
+              published_page: 55
+              table: '2'
+              note: row=4; table_row_number=5; table_phase_column=2
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1100'
+          approximate: false
+      locator:
+        page: 67
+        table: '2'
+    atmosphere:
+      state:
+        tag: value
+        value: air with approximately 1.0 +/- 0.1 vol% sodium nitrate vapor; Figure 10 caption reports 0.98 vol% for the same
+          campaign
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: numerical oxygen partial pressure is not reported
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+    alkali_partial_pressure_Pa:
+      state:
+        tag: unknown
+        reason: only vapor concentration is reported; total pressure is not printed
+      locator:
+        page: 39
+        published_page: 27
+        section: '3.3'
+  derivation:
+    relation: Reaction-rate constants reduced from measured corrosion-layer thickness-versus-time data.
+    inputs: []
+    parameters: []
+    output_unit: um/h
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 66
+        published_page: 54
+        figure: '10'
+        note: Underlying thickness-time measurements are plotted and not transcribed as numeric inputs.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table2_sic_silicate_layer_ratio
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_silicate_layer_SiO2_to_Na2O_molar_ratio'
+    species:
+      formula: SiC
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_silicate_layer_SiO2_to_Na2O_molar_ratio';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value_uncertainty: '0.45'
+      note: Printed as ±0.45; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 67
+    published_page: 55
+    table: '2'
+    note: Average SiO2/Na2O molar ratio by atomic absorption analysis.
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=1:h=8564d5cca32c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=1; table_row_number=2; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=2:h=fcfeec23ef7c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=2; table_row_number=3; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=3:h=8d2c03ab09cd
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=3; table_row_number=4; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=4:h=ff9f937d2eac
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=4; table_row_number=5; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=5:h=816dd50aa078
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=5; table_row_number=6; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=6:h=7329f59c7655
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=6; table_row_number=7; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_product_analysis::points:row=7:h=47fe9d721865
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_alkali_product_molar_amounts_and_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=7; table_row_number=8; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=1:h=a8d0f0c7204c
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=1; table_row_number=2; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=2:h=6231dd3984e1
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=2; table_row_number=3; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=3:h=7ccb55ba378d
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=3; table_row_number=4; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=4:h=e809eddab67e
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=4; table_row_number=5; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=5:h=7f8fc152bd9f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=5; table_row_number=6; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=6:h=d55f45618f79
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=6; table_row_number=7; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table3_alumina_soda_molar_ratio::points:row=7:h=ca0e69064ef1
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'etched_alumina_to_soda_molar_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 79
+    published_page: 67
+    table: '3'
+    note: row=7; table_row_number=8; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derivation:
+    relation: Authors' printed ratio from underlying measured alumina and soda amounts; the exact unrounded inputs are not
+      printed.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless ratio
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 79
+        published_page: 67
+        table: '3'
+        note: The table prints rounded mole columns that do not reproduce the last ratio rows.
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=1; table_row_number=2; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=2; table_row_number=3; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=3; table_row_number=4; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=4; table_row_number=5; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=5; table_row_number=6; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=6; table_row_number=7; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=7; table_row_number=8; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_and_alumina_xrd_peak_areas'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=8; table_row_number=9; table_phase_column=2
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=1:h=7633b54d3141
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=1; table_row_number=2; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=2:h=dd81e348117f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=2; table_row_number=3; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=3:h=1d0cbc050ef0
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=3; table_row_number=4; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=4:h=b0ccc9152c58
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=4; table_row_number=5; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=5:h=a5a264cb4b5f
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=5; table_row_number=6; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=6:h=8984b9e165b2
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=6; table_row_number=7; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio::points:row=7:h=a2c3d01e9fb7
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: row=7; table_row_number=8; table_phase_column=4
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion
+  derived_from:
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+  - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+  derivation:
+    relation: Beta-alumina peak area divided by alumina peak area for each etch-time row.
+    inputs:
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=1:h=d6e969855c53
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=2:h=12cc7519dc5f
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=3:h=827f7b8071e5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=4:h=924c635bae82
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=5:h=aa7e719ee5f5
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=6:h=cf4625ca6232
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=7:h=70f2a84d87a7
+    - pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_measurements::points:row=8:h=4bd761c24b73
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: pickrell-1994-gaseous-alkali-corrosion::pickrell_1994_table4_beta_alumina_peak_area_ratio_after_26h_etch
+  experiment_id: fcc45ab6e0780b71c258eb05c38f56d276302763ddcc0998f7e2fa85f1a6d621::pickrell-1994-gaseous-alkali-corrosion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'beta_alumina_to_alumina_xrd_peak_area_ratio';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Authors report a ratio of zero in Table 4 while the alumina peak-area cell is printed as dashes.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: pickrell-1994-gaseous-alkali-corrosion
+  locator:
+    page: 81
+    published_page: 69
+    table: '4'
+    note: The printed ratio is zero; alumina peak area is shown as dashes.; row=8
+  read_from: pdf:pickrell-1994-gaseous-alkali-corrosion

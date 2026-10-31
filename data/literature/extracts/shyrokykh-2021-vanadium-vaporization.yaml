@@ -17,20 +17,20 @@ extraction:
   worker: fam17-1019
   table_disposition:
     Table I: CSV1/CSV2 starting compositions are bound to the corresponding text-reported yield bounds
-      by sample ID; CSV3 remains context because its outcomes are figure-only. The text-reported >77
-      and >45 mass pct yields migrate as mass-loss fraction bounds.
+      by sample ID; CSV3 remains context because its outcomes are figure-only. The >77 and >45 mass pct
+      yields are printed context because their denominator is V2O5 extracted from the starting slag.
     Table II: Treatment matrix retained in context; it contains conditions but no measured outcome column.
     Table III: All 25 selected-element EDX atomic-percent cells retained in context because no token fits
       this partial elemental composition table.
 review_status: draft
 fidelity_samples:
-- path: species.V2O5.observations[shyrokykh_2021_csv1_text_extraction_bound].values.mass_loss_pct
+- path: species.V2O5.context[shyrokykh_2021_csv1_text_extraction_bound].values.mass_loss_pct
   value:
     kind: bound
     bound_operator: '>'
     bound_value: '77'
   note: Textual lower bound, physical PDF page 3; Figure 5 is separately deferred.
-- path: species.V2O5.observations[shyrokykh_2021_csv2_text_extraction_bound].values.mass_loss_pct
+- path: species.V2O5.context[shyrokykh_2021_csv2_text_extraction_bound].values.mass_loss_pct
   value:
     kind: bound
     bound_operator: '>'
@@ -39,9 +39,10 @@ fidelity_samples:
     deferred.
 species:
   V2O5:
-    observations:
+    observations: []
+    context:
     - observation_id: shyrokykh_2021_csv1_text_extraction_bound
-      type: mass_loss
+      type: printed_data_context
       locator: &id003
         page: 3
         pdf_page_index: 2
@@ -131,10 +132,8 @@ species:
           section: Experimental Procedure
           note: No quench/cooling procedure is stated in the reported procedure.
       values:
-        quantity: mass_loss_fraction
+        quantity: V2O5 extraction fraction from the starting slag
         method_class: measured_direct
-        admission_status: typed_refusal
-        status: typed_refusal
         reason: >-
           The extract has no quantity token for species removal; the printed
           V2O5 extraction fraction is not total sample mass loss.
@@ -153,7 +152,7 @@ species:
           bound_value: '77'
         value_as_printed: more than 77 mass pct V2O5 extracted
     - observation_id: shyrokykh_2021_csv2_text_extraction_bound
-      type: mass_loss
+      type: printed_data_context
       locator: &id006
         page: 3
         pdf_page_index: 2
@@ -243,10 +242,8 @@ species:
           section: Experimental Procedure
           note: No quench/cooling procedure is stated in the reported procedure.
       values:
-        quantity: mass_loss_fraction
+        quantity: V2O5 extraction fraction from the starting slag
         method_class: measured_direct
-        admission_status: typed_refusal
-        status: typed_refusal
         reason: >-
           The extract has no quantity token for species removal; the printed
           V2O5 extraction fraction is not total sample mass loss.
@@ -264,7 +261,6 @@ species:
           bound_operator: '>'
           bound_value: '45'
         value_as_printed: more than 45 mass pct V2O5 extracted
-    context:
     - observation_id: shyrokykh_2021_table1_csv3_starting_composition_context
       type: measured_table_context
       locator:

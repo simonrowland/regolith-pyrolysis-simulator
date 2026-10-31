@@ -2927,7 +2927,7 @@ def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> 
             ), (panel, row.get("observation_id"), identity_x0)
 
 
-def test_markova_1983_initial_charge_maps_remain_context_only(
+def test_markova_1983_initial_charge_maps_reach_their_own_rows(
     tmp_path: Path,
 ) -> None:
     source_path = (
@@ -2938,20 +2938,18 @@ def test_markova_1983_initial_charge_maps_remain_context_only(
         / "kems-025-markova-1983.yaml"
     )
     source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
-    expected_by_temperature: dict[Decimal, dict[str, Decimal]] = {}
-    for block in (source.get("species") or {}).values():
-        for source_observation in block.get("observations") or []:
-            values = source_observation.get("values") or {}
-            for point in values.get("points") or []:
-                printed = point.get("composition_wt_pct")
-                if not isinstance(printed, dict):
-                    continue
-                temperature_k = as_decimal(point["T_C"]) + as_decimal("273.15")
-                expected_by_temperature[temperature_k] = {
-                    str(oxide): as_decimal(value)
-                    for oxide, value in printed.items()
-                }
-    assert len(expected_by_temperature) == 25
+    samples = {
+        int(sample["sample_number"]): {
+            str(oxide): as_decimal(amount)
+            for oxide, amount in sample["oxides_wt_pct"].items()
+        }
+        for block in (source.get("species") or {}).values()
+        for source_observation in block.get("observations") or []
+        for sample in (source_observation.get("values") or {}).get("samples") or []
+        if source_observation.get("observation_id")
+        == "markova_1983_initial_compositions_table"
+    }
+    assert set(samples) == {1, 2, 3, 4}
 
     result = _migrate_real_extract(tmp_path, source_path.name, write=False)
     rows = [
@@ -2965,26 +2963,36 @@ def test_markova_1983_initial_charge_maps_remain_context_only(
         row["identity"]["quantity"]["value"] for row in rows
     } == {"p_partial"}
 
-    mismatches: list[str] = []
+    row_by_temperature_k: dict[Decimal, dict] = {}
     for row in rows:
-        identity = row["identity"]
-        temperature_k = as_decimal(identity["temperature_K"]["value"])
-        expected_wt = expected_by_temperature[temperature_k]
         printed_wt = _printed_wt_map(row)
-        if printed_wt != expected_wt:
-            mismatches.append(f"{row['observation_id']}: printed map differs from source")
-            continue
-        composition = identity["composition"]
-        point = row["point_conditions"]["composition"]["state"]
-        if (
-            composition["tag"] != "unknown"
-            or point["tag"] != "unknown"
-            or "per-run composition is not published" not in composition["reason"]
-        ):
-            mismatches.append(
-                f"{row['observation_id']}: initial charge became datum composition"
-            )
-    assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
+        expected_sample = next(
+            sample_number
+            for sample_number, sample_map in samples.items()
+            if sample_map == printed_wt
+        )
+        point = row["point_conditions"]["composition"]
+        assert point["state"]["tag"] == "unknown"
+        assert "per-run composition is not published" in point["state"]["reason"]
+        assert point["locator"]["published_page"] == 461
+        assert point["locator"]["figure"] == str(expected_sample)
+
+        identity = row["identity"]["composition"]
+        assert identity["tag"] == "unknown"
+        assert "per-run composition is not published" in identity["reason"]
+        assert printed_wt == samples[expected_sample]
+        temperature_k = as_decimal(row["identity"]["temperature_K"]["value"])
+        row_by_temperature_k[temperature_k] = row
+
+    assert len(row_by_temperature_k) == 25
+    pinned_samples = {
+        as_decimal("1906.20"): 2,
+        as_decimal("1889.56"): 3,
+        as_decimal("1777.11"): 4,
+    }
+    for temperature_k, sample_number in pinned_samples.items():
+        row = row_by_temperature_k[temperature_k]
+        assert samples[sample_number] == _printed_wt_map(row)
 
 
 def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
@@ -3102,7 +3110,14 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         assert temperature["tag"] == "unknown"
         assert temperature["reason"] == "no single temperature_K mapped from source"
         assert "value" not in temperature
-        assert (row.get("point_conditions") or {}).get("temperature_K") is None
+        temperature_condition = row["point_conditions"]["temperature_K"]
+        assert temperature_condition["state"]["tag"] == "unknown"
+        assert temperature_condition["state"]["reason"] == (
+            "T=0 denotes the initial charge and is not a run temperature."
+        )
+        assert temperature_condition["locator"]["published_page"] == 510
+        assert temperature_condition["locator"]["pdf_page_index"] == 1
+        assert temperature_condition["locator"]["table"] == "2"
     assert {
         Decimal(row["value"]["point"])
         for row in mass_loss_rows.values()

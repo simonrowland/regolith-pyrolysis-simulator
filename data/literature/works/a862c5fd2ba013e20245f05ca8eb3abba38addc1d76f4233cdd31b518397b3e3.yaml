@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:rys-2007-alkali-oxide-thermodynamics
       role: pdf
@@ -30,6 +30,41 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
+- experiment_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3::experiment::rys-2007-kems-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  locator:
+    page: 49
+    published_page: 37
+    pdf_page_index: 48
+    section: 4.1 Knudsen effusion mass spectrometry (KEMS)
+    note: 'Section heading: Knudsen effusion mass spectrometry (KEMS)'
+  bench_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3::bench::rys-2007-kems-cell
 - experiment_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3::rys-2007-alkali-oxide-thermodynamics
   kind: literature
   method:
@@ -63,6 +98,36 @@ experiments:
     published_page: 70
     pdf_page_index: 81
     table: '7'
+benches:
+- id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3::bench::rys-2007-kems-cell
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  identity:
+    basis: described_in_this_work
+  cell_materials:
+  - state:
+      tag: value
+      value: Ir
+    locator:
+      page: 49
+      published_page: 37
+      pdf_page_index: 48
+      section: 4.1.1 Apparatus
+      note: '"The effusion orifice of the Knudsen cell was 0.3mm. The cell was made of iridium."'
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0003'
+          approximate: false
+      locator:
+        page: 49
+        published_page: 37
+        pdf_page_index: 48
+        section: 4.1.1 Apparatus
+        note: '"The effusion orifice of the Knudsen cell was 0.3mm. The cell was made of iridium."'
+  other_facts: []
 context:
 - observation_id: rys_2007_appendix_table1_kp_r39_r40
   type: thermodynamic_example

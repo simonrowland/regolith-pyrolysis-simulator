@@ -1,0 +1,1272 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ja02200a004
+  citation: 'Paul Niggli (1913). The phenomena of equilibria between silica and the alkali carbonates. Journal of the American
+    Chemical Society 35(11): 1693–1727.'
+  source_ids:
+  - niggli-1913-silica-alkali-carbonate-equilibria
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+      role: pdf
+      path: raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
+      sha256:
+        tag: value
+        value: 34f8a5bc2def64305d0c7b304b16f363bf21524b1821fe5bfe3f8f61a45e7ecd
+    - asset_id: pdftotext:niggli-1913-silica-alkali-carbonate-equilibria
+      role: pdftotext
+      path: text/niggli-1913-silica-alkali-carbonate-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:niggli-1913-silica-alkali-carbonate-equilibria
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/ja02200a004
+experiments:
+- experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja02200a004
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: Niggli's potassium carbonate melting-point determination
+    section: Behavior of the Melts
+context:
+- observation_id: niggli_1913_k2si2o5_melting_bracket
+  type: transition_bracket_inputs
+  locator:
+    page: 18
+    pdf_page_index: 17
+    published_page: 1710
+    paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+  units: °C
+  values:
+    quantity: printed_melting_point_bracket_inputs
+    sample_as_printed: Purest crystalline K2Si2O5 samples with little glass.
+    solid_at_T_C: '1005'
+    all_melted_at_T_C: '1025'
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_k2si2o5_melting_bracket
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: K2Si2O5
+- observation_id: niggli_1913_lebeau_pure_carbonate_pressure
+  type: historical_context
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 1706
+    paragraph: Lebeau results quoted in the K2CO3 dissociation discussion
+  units: °C and mm, as printed
+  values:
+    quantity: equilibrium_pressure_unit_ambiguous_as_printed
+    method_class: quoted_attributed
+    attribution: P. Lebeau, Compt. rend., 137, 1756 (1903).
+    pressure_unit_as_printed: mm
+    temperature_field: T_C
+    pressure_field: equilibrium_pressure_as_printed
+    rows:
+    - T_C: '790'
+      equilibrium_pressure_as_printed: '0.5'
+    - T_C: '810'
+      equilibrium_pressure_as_printed: '1'
+    - T_C: '890'
+      equilibrium_pressure_as_printed: '3'
+    - T_C: '960'
+      equilibrium_pressure_as_printed: '5'
+    - T_C: '970'
+      equilibrium_pressure_as_printed: '9'
+    - T_C: '1000'
+      equilibrium_pressure_as_printed: '12'
+    note: The printed abbreviation is mm; it is not expanded to mmHg.
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_lebeau_pure_carbonate_pressure
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: K2CO3
+- observation_id: niggli_1913_mallard_soda_displacement
+  type: table_context
+  locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 1725
+    paragraph: Mallard results following Table VIII
+  units: mol CO2 displaced per 100 mol SiO2, as printed
+  values:
+    quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+    method_class: quoted_attributed
+    attribution: Mallard, Ann. chim. phys., [4] 28, 250 (1873).
+    schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+    system_as_printed: Na2CO3 + SiO2
+    temperature_labels_as_printed:
+    - At dark red heat
+    - At red heat
+    - At a higher temp.
+    rows:
+    - - '20.0'
+      - '107'
+      - '129'
+      - '148'
+    - - '8.7'
+      - '116'
+      - '143'
+      - null
+    temperature_context_as_printed: The mean temperature was somewhat below 900 °C; highest temperature about 950 °C.
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_mallard_soda_displacement
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: Na2CO3
+- observation_id: niggli_1913_potassium_mixture_thermal_effect
+  type: descriptive_context
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 1709
+    section: Behavior of the Melts
+  units: °C, as printed
+  values:
+    quantity: potassium_carbonate_silica_thermal_effect_unassigned
+    text_as_printed: Mixtures containing little silica exhibit a thermal effect about 880° on heating.
+    system_as_printed: K2CO3 + little SiO2; source does not give an exact mixture composition.
+    interpretation: Niggli could not ascertain whether this was approximately the K2CO3-K2SiO3 eutectic.
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_potassium_mixture_thermal_effect
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: K2CO3
+- observation_id: niggli_1913_sodium_eutectic_context
+  type: descriptive_context
+  locator:
+    page: 25
+    pdf_page_index: 24
+    published_page: 1717
+    section: Properties of Sodium Metasilicate
+  units: qualitative, as printed
+  values:
+    quantity: sodium_carbonate_silicate_eutectic_qualitative_context
+    statement_as_printed: The eutectic must lie very close to pure Na2CO3.
+    numeric_temperature: not_printed
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_sodium_eutectic_context
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: Na2CO3
+- observation_id: niggli_1913_table_ii_co2_displaced_schema_gap
+  type: thermodynamic_context
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 1700
+    table: II
+  units: 'Table II column (a): mol per cent of the initial CO2 content; column (b): mol CO2 displaced per 100 mol SiO2, as
+    printed'
+  values:
+    quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+    source_status: Niggli's present measurements
+    reduction_note: Columns (a) and (b) are calculated from measured gravimetric CO2 loss, as described on PDF page 7; rowwise
+      raw weights are not tabulated.
+    column_headers_as_printed:
+      column_a: loss expressed in mol per cent of the initial CO2 content
+      column_b: number of mols CO2 displaced by 100 mols SiO2
+    schema_gap: 'No exact token represents either printed basis: column (a) is mol per cent of initial CO2 content lost, and
+      column (b) is mol CO2 per 100 mol SiO2. See the extract-level schema_gaps record.'
+    points:
+    - row: I
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '89.6'
+      co2_loss_mol_percent_initial_as_printed: '6.6'
+      SiO2_mol_percent_as_printed: '6.9'
+      initial_mixture_as_printed: 96.9 wt% K2CO3 + 3.1 wt% SiO2; 6.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '96.9'
+        SiO2: '3.1'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: I
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: I
+    - row: II
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '92.9'
+      co2_loss_mol_percent_initial_as_printed: '8.3'
+      SiO2_mol_percent_as_printed: '8.2'
+      initial_mixture_as_printed: 96.2 wt% K2CO3 + 3.8 wt% SiO2; 8.2 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '96.2'
+        SiO2: '3.8'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: II
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: II
+    - row: III
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '85.5'
+      co2_loss_mol_percent_initial_as_printed: '9.7'
+      SiO2_mol_percent_as_printed: '10.2'
+      initial_mixture_as_printed: 95.3 wt% K2CO3 + 4.7 wt% SiO2; 10.2 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '95.3'
+        SiO2: '4.7'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: III
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: III
+    - row: IV
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '85.4'
+      co2_loss_mol_percent_initial_as_printed: '10.5'
+      SiO2_mol_percent_as_printed: '10.9'
+      initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '94.9'
+        SiO2: '5.1'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: IV
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: IV
+    - row: IV
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '90.9'
+      co2_loss_mol_percent_initial_as_printed: '11.1'
+      SiO2_mol_percent_as_printed: '10.9'
+      initial_mixture_as_printed: 94.9 wt% K2CO3 + 5.1 wt% SiO2; 10.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '94.9'
+        SiO2: '5.1'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: IV
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: IV
+    - row: V
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '82.4'
+      co2_loss_mol_percent_initial_as_printed: '15.4'
+      SiO2_mol_percent_as_printed: '15.7'
+      initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '92.5'
+        SiO2: '7.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: V
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: V
+    - row: V
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '88.9'
+      co2_loss_mol_percent_initial_as_printed: '16.6'
+      SiO2_mol_percent_as_printed: '15.7'
+      initial_mixture_as_printed: 92.5 wt% K2CO3 + 7.5 wt% SiO2; 15.7 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '92.5'
+        SiO2: '7.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: V
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: V
+    - row: VI
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '83.1'
+      co2_loss_mol_percent_initial_as_printed: '20.5'
+      SiO2_mol_percent_as_printed: '19.8'
+      initial_mixture_as_printed: 90.3 wt% K2CO3 + 9.7 wt% SiO2; 19.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '90.3'
+        SiO2: '9.7'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VI
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VI
+    - row: VII
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '79.2'
+      co2_loss_mol_percent_initial_as_printed: '24.7'
+      SiO2_mol_percent_as_printed: '23.8'
+      initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '88.1'
+        SiO2: '11.9'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VII
+    - row: VII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '86.4'
+      co2_loss_mol_percent_initial_as_printed: '26.9'
+      SiO2_mol_percent_as_printed: '23.8'
+      initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '88.1'
+        SiO2: '11.9'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VII
+    - row: VII
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '91.7'
+      co2_loss_mol_percent_initial_as_printed: '28.6'
+      SiO2_mol_percent_as_printed: '23.8'
+      initial_mixture_as_printed: 88.1 wt% K2CO3 + 11.9 wt% SiO2; 23.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '88.1'
+        SiO2: '11.9'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VII
+    - row: VIII
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '77.3'
+      co2_loss_mol_percent_initial_as_printed: '36.2'
+      SiO2_mol_percent_as_printed: '31.9'
+      initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '83.1'
+        SiO2: '16.9'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VIII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VIII
+    - row: VIII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '83.4'
+      co2_loss_mol_percent_initial_as_printed: '38.9'
+      SiO2_mol_percent_as_printed: '31.9'
+      initial_mixture_as_printed: 83.1 wt% K2CO3 + 16.9 wt% SiO2; 31.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '83.1'
+        SiO2: '16.9'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: VIII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: VIII
+    - row: IX
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '75.5'
+      co2_loss_mol_percent_initial_as_printed: '42.6'
+      SiO2_mol_percent_as_printed: '36.1'
+      initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '80.4'
+        SiO2: '19.6'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: IX
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: IX
+    - row: IX
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '82.1'
+      co2_loss_mol_percent_initial_as_printed: '46.3'
+      SiO2_mol_percent_as_printed: '36.1'
+      initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '80.4'
+        SiO2: '19.6'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: IX
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: IX
+    - row: IX
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '86.2'
+      co2_loss_mol_percent_initial_as_printed: '48.6'
+      SiO2_mol_percent_as_printed: '36.1'
+      initial_mixture_as_printed: 80.4 wt% K2CO3 + 19.6 wt% SiO2; 36.1 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '80.4'
+        SiO2: '19.6'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: IX
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: IX
+    - row: X
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '75.5'
+      co2_loss_mol_percent_initial_as_printed: '44.8'
+      SiO2_mol_percent_as_printed: '37.3'
+      initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '79.5'
+        SiO2: '20.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: X
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: X
+    - row: X
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '81.9'
+      co2_loss_mol_percent_initial_as_printed: '48.6'
+      SiO2_mol_percent_as_printed: '37.3'
+      initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '79.5'
+        SiO2: '20.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: X
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: X
+    - row: X
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '86.4'
+      co2_loss_mol_percent_initial_as_printed: '51.4'
+      SiO2_mol_percent_as_printed: '37.3'
+      initial_mixture_as_printed: 79.5 wt% K2CO3 + 20.5 wt% SiO2; 37.3 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '79.5'
+        SiO2: '20.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: X
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: X
+    - row: XI
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '69.7'
+      co2_loss_mol_percent_initial_as_printed: '66.7'
+      SiO2_mol_percent_as_printed: '48.8'
+      initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '70.7'
+        SiO2: '29.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XI
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XI
+    - row: XI
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '74.5'
+      co2_loss_mol_percent_initial_as_printed: '71.3'
+      SiO2_mol_percent_as_printed: '48.8'
+      initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '70.7'
+        SiO2: '29.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XI
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XI
+    - row: XI
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '79.4'
+      co2_loss_mol_percent_initial_as_printed: '75.9'
+      SiO2_mol_percent_as_printed: '48.8'
+      initial_mixture_as_printed: 70.7 wt% K2CO3 + 29.3 wt% SiO2; 48.8 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '70.7'
+        SiO2: '29.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XI
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XI
+    - row: XII
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '68.5'
+      co2_loss_mol_percent_initial_as_printed: '68.4'
+      SiO2_mol_percent_as_printed: '49.9'
+      initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '69.7'
+        SiO2: '30.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XII
+    - row: XII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '73.2'
+      co2_loss_mol_percent_initial_as_printed: '73.0'
+      SiO2_mol_percent_as_printed: '49.9'
+      initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '69.7'
+        SiO2: '30.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XII
+    - row: XII
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '77.8'
+      co2_loss_mol_percent_initial_as_printed: '77.7'
+      SiO2_mol_percent_as_printed: '49.9'
+      initial_mixture_as_printed: 69.7 wt% K2CO3 + 30.3 wt% SiO2; 49.9 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '69.7'
+        SiO2: '30.3'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XII
+    - row: XIII
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '67.4'
+      co2_loss_mol_percent_initial_as_printed: '74.8'
+      SiO2_mol_percent_as_printed: '52.6'
+      initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '67.5'
+        SiO2: '32.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XIII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XIII
+    - row: XIII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '71.4'
+      co2_loss_mol_percent_initial_as_printed: '79.3'
+      SiO2_mol_percent_as_printed: '52.6'
+      initial_mixture_as_printed: 67.5 wt% K2CO3 + 32.5 wt% SiO2; 52.6 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '67.5'
+        SiO2: '32.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XIII
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XIII
+    - row: XIV
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '63.7'
+      co2_loss_mol_percent_initial_as_printed: '91.9'
+      SiO2_mol_percent_as_printed: '59.1'
+      initial_mixture_as_printed: 61.5 wt% K2CO3 + 38.5 wt% SiO2; 59.1 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '61.5'
+        SiO2: '38.5'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XIV
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XIV
+    - row: XV
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '61.9'
+      co2_loss_mol_percent_initial_as_printed: '91.4'
+      SiO2_mol_percent_as_printed: '59.6'
+      initial_mixture_as_printed: 61.0 wt% K2CO3 + 39.0 wt% SiO2; 59.6 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '61.0'
+        SiO2: '39.0'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: XV
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: XV
+    - row: unnumbered-3
+      T_C: '998'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '50.0'
+      co2_loss_mol_percent_initial_as_printed: '100.0'
+      SiO2_mol_percent_as_printed: '66.7'
+      initial_mixture_as_printed: 53.4 wt% K2CO3 + 46.6 wt% SiO2; 66.7 mol% SiO2
+      composition_wt_percent_as_printed:
+        K2CO3: '53.4'
+        SiO2: '46.6'
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1700
+        table: II
+        row: unnumbered-3
+      point_conditions:
+        CO2_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 8
+            pdf_page_index: 7
+            published_page: 1700
+            table: II
+            row: unnumbered-3
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_table_ii_co2_displaced_schema_gap
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: K2CO3
+- observation_id: niggli_1913_table_vi_co2_displaced_schema_gap
+  type: table_context
+  locator:
+    page: 23
+    pdf_page_index: 22
+    published_page: 1715
+    table: VI
+  units: 'Table VI displacement: mol CO2 per 100 mol SiO2; CO2 loss: mol percentage loss, both as printed'
+  values:
+    quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+    source_status: Niggli's present equilibrium determinations
+    reduction_note: Niggli reports the CO2 loss and displaced-mole values from observed weight loss; rowwise raw weights are
+      not tabulated.
+    column_headers_as_printed:
+      displaced_CO2: mols CO2 displaced by 100 mols SiO2
+      CO2_loss: Mol percentage loss of CO2
+    schema_gap: 'No exact token represents either printed basis: the 956 °C loss values are mol percentage loss of CO2, and
+      the displaced-mole values are mol CO2 per 100 mol SiO2. See the extract-level schema_gaps record.'
+    system_as_printed: Na2CO3 + SiO2
+    conditions_as_printed: The system was investigated at 898 °C and 956 °C under one atmosphere of carbon dioxide (PDF page
+      22).
+    points:
+    - row: I
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '174'
+      SiO2_mol_percent_as_printed: '7.1'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: I
+    - row: II
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '165'
+      SiO2_mol_percent_as_printed: '8.0'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: II
+    - row: II
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '182'
+      SiO2_mol_percent_as_printed: '8.0'
+      co2_loss_mol_percent_initial_as_printed: '15.8'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: II
+    - row: III
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '151'
+      SiO2_mol_percent_as_printed: '10.1'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: III
+    - row: III
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '169'
+      SiO2_mol_percent_as_printed: '10.1'
+      co2_loss_mol_percent_initial_as_printed: '19.1'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: III
+    - row: IV
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '139'
+      SiO2_mol_percent_as_printed: '12.3'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: IV
+    - row: V
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '137'
+      SiO2_mol_percent_as_printed: '12.5'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: V
+    - row: V
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '160'
+      SiO2_mol_percent_as_printed: '12.5'
+      co2_loss_mol_percent_initial_as_printed: '22.8'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: V
+    - row: VI
+      T_C: '898'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '135'
+      SiO2_mol_percent_as_printed: '16.1'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: VI
+    - row: VII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '144'
+      SiO2_mol_percent_as_printed: '22.3'
+      co2_loss_mol_percent_initial_as_printed: '41.7'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: VII
+    - row: VIII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '140'
+      SiO2_mol_percent_as_printed: '23.2'
+      co2_loss_mol_percent_initial_as_printed: '42.6'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: VIII
+    - row: IX
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '141'
+      SiO2_mol_percent_as_printed: '25.6'
+      co2_loss_mol_percent_initial_as_printed: '48.6'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: IX
+    - row: X
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '138'
+      SiO2_mol_percent_as_printed: '26.1'
+      co2_loss_mol_percent_initial_as_printed: '50.0'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: X
+    - row: XI
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '135'
+      SiO2_mol_percent_as_printed: '30.0'
+      footnote: Mean of two experiments.
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: XI
+    - row: XII
+      T_C: '956'
+      co2_displaced_mol_per_100_mol_sio2_as_printed: '134'
+      SiO2_mol_percent_as_printed: '33.1'
+      co2_loss_mol_percent_initial_as_printed: '66.4'
+      locator:
+        page: 23
+        pdf_page_index: 22
+        published_page: 1715
+        table: VI
+        row: XII
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_table_vi_co2_displaced_schema_gap
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: Na2CO3
+- observation_id: niggli_1913_table_viii_k_comparison
+  type: table_context
+  locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 1725
+    table: VIII
+  units: mol CO2 displaced per 100 mol SiO2, as printed
+  values:
+    quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+    method_class: quoted_attributed
+    attribution: Scheerer (outer columns, in part recalculated) and Niggli (956 °C comparison column), Table VIII.
+    schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+    system_as_printed: K2CO3 + SiO2
+    columns_as_printed:
+    - Original silica content mol per cent
+    - Rotglut, Scheerer
+    - 956°, Niggli
+    - Gelbglut, Scheerer
+    rows:
+    - - '3.0'
+      - '114'
+      - '96'
+      - '129'
+    - - '14.3'
+      - '94'
+      - '89'
+      - '107'
+    - - '20.0'
+      - '89'
+      - '87'
+      - '104'
+    - - '33.3'
+      - '81'
+      - '83'
+      - '99'
+    - - '50.0'
+      - '76'
+      - '73'
+      - '83'
+    - - '60.0'
+      - '61'
+      - '61.5'
+      - null
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_table_viii_k_comparison
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: K2CO3
+- observation_id: niggli_1913_table_viii_na_comparison
+  type: table_context
+  locator:
+    page: 33
+    pdf_page_index: 32
+    published_page: 1725
+    table: VIII
+  units: mol CO2 displaced per 100 mol SiO2, as printed
+  values:
+    quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+    method_class: quoted_attributed
+    attribution: Scheerer (outer columns, in part recalculated) and Niggli (956 °C comparison column), Table VIII.
+    schema_gap: No exact quantity token accepts mol CO2 per 100 mol SiO2; see the extract-level schema_gaps record.
+    system_as_printed: Na2CO3 + SiO2
+    columns_as_printed:
+    - Original silica content mol per cent
+    - Rotglut, Scheerer
+    - 956°, Niggli
+    - Gelbglut, Scheerer
+    rows:
+    - - '3.0'
+      - null
+      - '193'
+      - '197'
+    - - '9.9'
+      - null
+      - '171'
+      - '186'
+    - - '14.3'
+      - '150'
+      - '156'
+      - '178'
+    - - '20.0'
+      - '135'
+      - '145'
+      - '168'
+    - - '33.3'
+      - '110'
+      - '134'
+      - '138'
+    - - '50'
+      - '99'
+      - '100'
+      - '100'
+    - - '60'
+      - All displaced
+      - All displaced
+      - All displaced
+  context_id: niggli-1913-silica-alkali-carbonate-equilibria::context::niggli_1913_table_viii_na_comparison
+  work_id: 10.1021/ja02200a004
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  species: Na2CO3

@@ -1,0 +1,140 @@
+source_id: niggli-1913-silica-alkali-carbonate-equilibria
+source:
+  citation: 'Paul Niggli (1913), J. Am. Chem. Soc. 35(11), 1693–1727, DOI 10.1021/ja02200a004'
+mapping_status: manual_transcription
+reason: >-
+  The table draft compare utility only recognizes value, pressure, activity, gamma, and T_m_K fields
+  (tools/mineru_table_draft.py::_numeric_points); it does not recognize descriptive context fields for the
+  printed CO2-loss bases. The table mapping is recorded here and numeric transcription was checked
+  against rendered source pages.
+tables:
+  - printed_table: II
+    draft_table_key: p008-t04
+    draft_table_index: 4
+    pdf_page: 8
+    published_page: 1700
+    printed_body_rows: 18
+    row_assignment: >-
+      Column 1 is the printed row label; columns 2–4 are initial K2CO3/SiO2 composition in wt% and
+      mol% SiO2. Columns 5/7/9 are the loss in mol per cent of the initial CO2 content at 898/956/998 °C
+      (column (a)); columns 6/8/10 are CO2 displaced per 100 mol SiO2 (column (b)).
+    retained:
+      - column: 5/7/9
+        target: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap].values.points[].co2_loss_mol_percent_initial_as_printed
+        descriptive_quantity: mol_per_cent_of_initial_CO2_content_lost_as_printed
+        printed_basis: mol per cent of the initial CO2 content
+        reason: Niggli's present measurements, calculated from observed weight loss; this is not the mass fraction of the sample.
+      - column: 6/8/10
+        target: species.K2CO3.context[niggli_1913_table_ii_co2_displaced_schema_gap]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        reason: no exact quantity/unit token for the printed mol/100 mol SiO2 basis.
+    excluded:
+      - columns: 11/12
+        reason: theoretical calculated loss for 1 mol SiO2 displacing 1 mol CO2, not a measurement.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 8
+      note: >-
+        MinerU table QA digit agreement was 0.625; the page render settles all stored numeric cells and
+        confirms the multirow headers and row/column assignment. The row-by-row values are listed in
+        the audit report.
+  - printed_table: VI
+    draft_table_key: p023-t11
+    draft_table_index: 11
+    pdf_page: 23
+    published_page: 1715
+    printed_body_rows: 14
+    row_assignment: >-
+      The table reports initial mixture mol% SiO2, CO2 displaced per 100 mol SiO2 at 898/956 °C, and
+      mol percentage loss of CO2 at 956 °C. The additional equilibrium-species columns are derived allocations.
+    retained:
+      - target: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        reason: no exact quantity/unit token for the printed mol/100 mol SiO2 basis.
+      - column: 956 °C Mol percentage loss of CO2
+        target: species.Na2CO3.context[niggli_1913_table_vi_co2_displaced_schema_gap].values.points[].co2_loss_mol_percent_initial_as_printed
+        descriptive_quantity: co2_loss_mol_percent_initial_as_printed
+        values_by_row:
+          II: '15.8'
+          III: '19.1'
+          V: '22.8'
+          VII: '41.7'
+          VIII: '42.6'
+          IX: '48.6'
+          X: '50.0'
+          XII: '66.4'
+        blank_rows:
+          - XI
+        printed_basis: Mol percentage loss of CO2
+        reason: Retained as context on Niggli's printed CO2-loss basis; it is not mass loss from the sample.
+    excluded:
+      - reason: Stoichiometric equilibrium-species columns are calculations, not measured liquid speciation.
+      - reason: Table VI row XIV's 100/100 endpoint is a derived metasilicate construction, not an additional measured run.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 23
+      note: MinerU table QA digit agreement was 0.564; every retained numeric cell was checked on the render.
+  - printed_table: VIII
+    draft_table_key: p033-t13
+    draft_table_index: 13
+    pdf_page: 33
+    published_page: 1725
+    printed_body_rows: 14
+    retained:
+      - target: historical literature values in context
+        evidence_class: quoted_attributed
+        reason: values are attributed in the table to earlier workers.
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 33
+      note: >-
+        Render confirms all numeric cells, the 14 body rows including the system divider, the comparison columns,
+        historical values, qualitative labels, and printed row labels. The Niggli column is retained as comparison
+        context and is not asserted to be a separate experiment series.
+  - printed_table: none
+    draft_table_key: p033-t14
+    draft_table_index: 14
+    pdf_page: 33
+    published_page: 1725
+    printed_body_rows: 2
+    row_assignment: >-
+      This adjacent quoted-results table has composition in column 1 and Mallard's dark-red-heat, red-heat, and
+      higher-temperature results in columns 2–4.
+    retained:
+      - target: species.Na2CO3.context[niggli_1913_mallard_soda_displacement]
+        descriptive_quantity: co2_displaced_mol_per_100_mol_sio2_as_printed
+        evidence_class: quoted_attributed
+        attribution: Mallard, Ann. chim. phys., [4] 28, 250 (1873).
+    audit:
+      method: rendered_pdf_page
+      pdf_page: 33
+      note: Render confirms both rows, all five numeric cells, and the missing final cell in the 8.7 mol% row.
+prose_values:
+  - pdf_page: 14
+    published_page: 1706
+    locator: Lebeau results quoted in the K2CO3 dissociation discussion
+    target: species.K2CO3.context[niggli_1913_lebeau_pure_carbonate_pressure]
+    quantity_as_printed: equilibrium pressure in mm
+    disposition: context; the source's mm unit is not expanded to mmHg.
+  - pdf_page: 17
+    published_page: 1709
+    locator: Behavior of the Melts; potassium carbonate melting comparison
+    target: species.K2CO3.observations[]
+    quantity: transition_temperature
+    property_kind: melting_point
+    disposition: Niggli's measured 891 °C and six separately attributed comparison values.
+  - pdf_page: 18
+    published_page: 1710
+    locator: potassium disilicate melting bracket
+    target: species.K2Si2O5.observations[niggli_1913_k2si2o5_melting_point]
+    quantity: transition_temperature
+    evidence_class: author_estimate
+    model: Midpoint estimate from the printed bracket; solid at 1005 °C and fully melted at 1025 °C.
+    disposition: Niggli's 1015 ± 10 °C estimate from the 1005/1025 °C bracket; the bracket remains context.
+  - pdf_page: 25
+    published_page: 1717
+    locator: Properties of Sodium Metasilicate
+    target: species.Na2CO3.observations[] and species.Na2SiO3.observations[]
+    quantity: transition_temperature
+    property_kind: melting_point
+    disposition: Quoted values 853 °C (Na2CO3) and 1018 °C (Na2SiO3); eutectic remains qualitative.

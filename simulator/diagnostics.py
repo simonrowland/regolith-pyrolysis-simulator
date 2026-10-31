@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
@@ -1067,6 +1068,14 @@ def _plain_value(value: Any) -> Any:
         return [_plain_value(item) for item in value]
     if isinstance(value, float):
         return value if math.isfinite(value) else str(value)
+    # The JSON probe below is validation only for these native scalar values;
+    # its encoded string is discarded and the original value is returned.
+    if value is None or isinstance(value, (str, bool)):
+        return value
+    if type(value) is int and value.bit_length() < 2048:
+        # This bound stays below Python's minimum integer-to-string digit
+        # limit, so oversized integers still take the existing JSON check.
+        return value
     try:
         json.dumps(value, allow_nan=False)
     except (TypeError, ValueError):

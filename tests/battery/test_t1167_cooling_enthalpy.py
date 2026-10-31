@@ -82,7 +82,13 @@ def test_zigo_table_fit_and_composite_rows_use_existing_quantities() -> None:
     )
     assert all(point.value.kind is ValueKind.UNAVAILABLE for point in table4_cooling)
     assert all(point.evidence.class_.value is EvidenceClass.MEASURED_DIRECT for point in table4_cooling)
-    assert all(point.locator.page == 177 and point.locator.table == "4" for point in table4_cooling)
+    assert all(
+        point.locator.page == 7
+        and point.locator.published_page == 177
+        and point.locator.pdf_page_index == 6
+        and point.locator.table == "4"
+        for point in table4_cooling
+    )
     expected_temperatures = {
         Decimal("1873"), Decimal("1888"), Decimal("1908"), Decimal("1932"), Decimal("1948")
     }

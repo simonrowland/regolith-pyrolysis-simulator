@@ -2882,7 +2882,7 @@ observations:
     table: '3'
     note: row=1495
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1276:h=04689d4e1890
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1549.15:row=1276:h=55ec892282e7
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -2946,9 +2946,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1549.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -2969,7 +2968,70 @@ observations:
     table: '3'
     note: row=1276
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1318:h=07e4ff801be0
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1549.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1276
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1276'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1276
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1276
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '80'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1276'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1276
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1276
+    output_unit: K
+    references: []
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1591.15:row=1318:h=f8d17a0a027f
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -3033,9 +3095,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1591.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -3056,7 +3117,70 @@ observations:
     table: '3'
     note: row=1318
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1410:h=ddec67739e53
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1591.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1318
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1318'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1318
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1318
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '70'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1318'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1318
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1318
+    output_unit: K
+    references: []
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1683.15:row=1410:h=0eb634b951f3
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -3120,9 +3244,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1683.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -3143,7 +3266,70 @@ observations:
     table: '3'
     note: row=1410
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1440:h=f5af9eb8e32d
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1683.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1410
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1410'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1410
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1410
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '54'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1410'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1410
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1410
+    output_unit: K
+    references: []
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1713.15:row=1440:h=4fdc7cc6a9e5
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -3207,9 +3393,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1713.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -3230,7 +3415,70 @@ observations:
     table: '3'
     note: row=1440
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1465:h=9433aae03fcd
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1713.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1440
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1440'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1440
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1440
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '47.5'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1440'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1440
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1440
+    output_unit: K
+    references: []
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1738.15:row=1465:h=fc77f9f59cb1
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -3294,9 +3542,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1738.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -3317,7 +3564,70 @@ observations:
     table: '3'
     note: row=1465
   read_from: tables:kems-190-wu-1993
-- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::rows:row=1495:h=35dc5dfd66ea
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1738.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1465
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1465'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1465
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1465
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '45'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1465'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1465
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1465
+    output_unit: K
+    references: []
+- observation_id: kems-190-wu-1993::wu_1993_table3_reported_solidus_points::T=1768.15:row=1495:h=56a74a221fc7
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
@@ -3381,9 +3691,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
-      locator, printed_quote'
+    kind: point
+    point: '1768.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -3404,3 +3713,66 @@ observations:
     table: '3'
     note: row=1495
   read_from: tables:kems-190-wu-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1768.15'
+      locator:
+        published_page: 33
+        table: '3'
+        note: row=1495
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1495'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1495
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '3'
+              note: row=1495
+        output_unit: K
+        references: []
+    Fe2SiO4_wt_pct:
+      state:
+        tag: value
+        value: '41'
+      locator:
+        published_page: 33
+        table: '3'
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - tables:kems-190-wu-1993
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1495'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1495
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          published_page: 33
+          table: '3'
+          note: row=1495
+    output_unit: K
+    references: []

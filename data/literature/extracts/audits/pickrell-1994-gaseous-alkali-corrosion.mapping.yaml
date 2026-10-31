@@ -1,0 +1,68 @@
+source_id: pickrell-1994-gaseous-alkali-corrosion
+source: ../regolith-corpus/raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
+extraction_mode: machine_text_with_render_audit
+mappings:
+  - table: '1'
+    page: 50
+    columns: [Temp (°C), Reaction rate (μm/h), Activation energy, Average SiO2/Na2O molar ratio]
+    disposition: typed refusal with printed values retained
+    reason: The reaction-rate unit is thickness/time, not mass loss; no exact quantity token represents it. Activation energy and the printed molar ratio also lack exact quantity tokens.
+    rows: 4
+  - table: '2'
+    page: 67
+    columns: [Temp (°C), Reaction rate (μm/h), Activation energy, Average SiO2/Na2O molar ratio]
+    disposition: typed refusal with printed values retained
+    reason: The reaction-rate unit is thickness/time, not mass loss; no exact quantity token represents it. Activation energy and the printed molar ratio also lack exact quantity tokens.
+    rows: 4
+  - table: '3'
+    page: 79
+    columns: [Cumulative Etch Time (h), Alumina (moles), Soda (moles), Alumina/Soda Molar Ratio]
+    disposition: typed refusal with printed values retained
+    reason: The extracted moles are etched reaction-product amounts, not composition fractions or residue-component composition; no exact quantity token represents these outputs.
+    rows: 7
+  - table: '4'
+    page: 81
+    columns: [Cumulative Etch Time, Beta-Alumina Peak Area, Alumina Peak Area, Beta-Alumina/Alumina Peak Area Ratio]
+    disposition: typed refusal with printed values retained
+    reason: Semiquantitative XRD peak areas and their quotient are not a closed concentration or composition quantity; no exact quantity token represents this observable.
+    rows: 8
+  - table: '5'
+    pages: [104, 105, 106]
+    caption: Phase Analysis of the Soda-Cordierite System
+    disposition: inventory only
+    reason: Batch reactions of mixed cordierite and sodium carbonate; not gaseous alkali exposure corrosion.
+  - table: '6'
+    page: 108
+    caption: Solidus Temperature and High-Low Inversion Temperature of Carnegieite Solid Solution
+    disposition: inventory only
+    reason: Phase-transition temperatures of soda-bearing cordierite batches; not vapor-corrosion kinetics.
+  - table: '7'
+    pages: [110, 111]
+    caption: Phase Analysis of the Potassia-Cordierite System
+    disposition: inventory only
+    reason: Batch reactions of mixed cordierite and potassium carbonate; not gaseous alkali exposure corrosion.
+  - table: '8'
+    page: 112
+    caption: Solidus Temperature of the Potassia-Cordierite System
+    disposition: inventory only
+    reason: Solidus temperatures of potassium-bearing cordierite batches; not vapor-corrosion kinetics.
+  - table: '9'
+    pages: [114, 115, 116]
+    caption: Phase Analysis of the Soda-Zirconia System
+    disposition: inventory only
+    reason: Batch reactions of mixed zirconia and sodium carbonate; not gaseous alkali exposure corrosion.
+  - table: '10'
+    pages: [118, 119]
+    caption: Phase Analysis of the Soda-CSZ System
+    disposition: inventory only
+    reason: Batch reactions of mixed calcia-stabilized zirconia and sodium carbonate; not gaseous alkali exposure corrosion.
+  - table: '11'
+    pages: [121, 122, 123]
+    caption: Phase Analysis of the Soda-Aluminum Titanate System
+    disposition: inventory only
+    reason: Batch reactions of mixed aluminum titanate and sodium carbonate; not gaseous alkali exposure corrosion.
+  - table: '12'
+    pages: [125, 126, 127, 128, 129]
+    caption: Phase Analysis of the Soda-Alumina-Titania System
+    disposition: inventory only
+    reason: Batch reactions of mixed oxides and sodium carbonate; not gaseous alkali exposure corrosion.

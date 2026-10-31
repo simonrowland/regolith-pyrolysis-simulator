@@ -1675,8 +1675,15 @@ class PyrolysisRun:
             lambda: _json_safe(_degraded_path_engagement(sim)),
             section="degraded_path_engagement",
         )
+        per_hour_summary_cache: dict[str, list[Any]] = {}
         pO2_enforcement_by_hour = _safe_failure_value(
-            lambda: _execution_pO2_enforcement_by_hour(execution),
+            lambda: _execution_pO2_enforcement_by_hour(
+                execution,
+                per_hour_summary=_cached_execution_per_hour_summary(
+                    execution,
+                    per_hour_summary_cache,
+                ),
+            ),
             section="pO2_enforcement_by_hour",
         )
         status, reason, error_message = _status_with_mass_balance_invariant(
@@ -1702,7 +1709,10 @@ class PyrolysisRun:
             unresolved_wall_deposit_species_mol,
         )
         per_hour_summary = _safe_failure_value(
-            lambda: _json_safe(list(execution.per_hour)),
+            lambda: _cached_execution_per_hour_summary(
+                execution,
+                per_hour_summary_cache,
+            ),
             section="per_hour_summary",
         )
         if self.include_wall_deposit_rate_diagnostics:
@@ -5688,6 +5698,19 @@ def _execution_per_hour_summary(execution: RunExecution | None) -> list[Any]:
     return _json_safe(list(getattr(execution, "per_hour", ()) or ()))
 
 
+def _cached_execution_per_hour_summary(
+    execution: RunExecution | None,
+    cache: dict[str, list[Any]],
+) -> list[Any]:
+    """Reuse one detached per-hour projection for its two report consumers."""
+
+    rows = cache.get("rows")
+    if rows is None:
+        rows = _execution_per_hour_summary(execution)
+        cache["rows"] = rows
+    return rows
+
+
 def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
     if execution is None:
         return []
@@ -5696,9 +5719,17 @@ def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
 
 def _execution_pO2_enforcement_by_hour(
     execution: RunExecution | None,
+    *,
+    per_hour_summary: list[Any] | None = None,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for row in _execution_per_hour_summary(execution):
+    summary_rows = (
+        _execution_per_hour_summary(execution)
+        if per_hour_summary is None
+        else per_hour_summary
+    )
+    # Read the shared projection, then build a detached pO2 tree for callers.
+    for row in summary_rows:
         if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping):
             rows.append(dict(row["pO2_enforcement"]))
     return _json_safe(rows)
@@ -5877,6 +5908,24 @@ def _runner_failure_result(
         if error_message_override is not None
         else f"RunnerError: {error}"
     )
+    per_hour_summary_cache: dict[str, list[Any]] = {}
+    pO2_enforcement_by_hour = _safe_failure_value(
+        lambda: _execution_pO2_enforcement_by_hour(
+            execution,
+            per_hour_summary=_cached_execution_per_hour_summary(
+                execution,
+                per_hour_summary_cache,
+            ),
+        ),
+        section="pO2_enforcement_by_hour",
+    )
+    per_hour_summary = _safe_failure_value(
+        lambda: _cached_execution_per_hour_summary(
+            execution,
+            per_hour_summary_cache,
+        ),
+        section="per_hour_summary",
+    )
     payload = {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "run_metadata": run_metadata,
@@ -5964,14 +6013,8 @@ def _runner_failure_result(
         "melt_redox_gate_floor_fallback_engagement": (
             melt_redox_gate_floor_fallback_engagement
         ),
-        "pO2_enforcement_by_hour": _safe_failure_value(
-            lambda: _execution_pO2_enforcement_by_hour(execution),
-            section="pO2_enforcement_by_hour",
-        ),
-        "per_hour_summary": _safe_failure_value(
-            lambda: _execution_per_hour_summary(execution),
-            section="per_hour_summary",
-        ),
+        "pO2_enforcement_by_hour": pO2_enforcement_by_hour,
+        "per_hour_summary": per_hour_summary,
         "shadow_trace": _safe_failure_value(
             lambda: _execution_shadow_trace(execution),
             section="shadow_trace",

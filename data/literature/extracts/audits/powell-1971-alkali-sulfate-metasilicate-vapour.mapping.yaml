@@ -1,0 +1,18 @@
+source_id: powell-1971-alkali-sulfate-metasilicate-vapour
+draft_table_keys_are_block_references_only: true
+tables:
+  '1': {page: 79, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'orifice area/cm2': orifice_area_cm2}, species: Li2SO4, method: knudsen_effusion}
+  '2': {page: 81, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'orifice area/cm': orifice_area_cm2}, species: Na2SO4, method: knudsen_effusion}
+  '3': {page: 83, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'Orifice area/cm2': orifice_area_cm2}, species: K2SO4, method: knudsen_effusion}
+  '4': {page: 85, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'orifice area/cm': orifice_area_cm2}, species: Rb2SO4, method: knudsen_effusion}
+  '5': {page: 87, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'orifice area/cm2': orifice_area_cm2}, species: Cs2SO4, method: knudsen_effusion}
+  '6': {page: 92, source_fields: {Salt: salt_and_fit_segment, 'ΔH/kJ mol-1': delta_H_kJ_mol_gas, 'ΔH/kcal mol-1': delta_H_kcal_mol_gas}, species: named_salt, method: second_and_third_law_pressure_fits}
+  '7': {page: 104, source_fields: {T/K: T_K, 'P/torr': total_pressure_torr_as_printed}, species: Li2SO4, method: torsion_effusion}
+  '8': {page: 106, source_fields: {T/K: T_K, 'P/torr': total_pressure_torr_as_printed}, species: Cs2SO4, method: torsion_effusion}
+  '9': {page: 116, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'Orifice area/cm2': orifice_area_cm2}, species: MgSO4, method: knudsen_effusion}
+  '10': {page: 119, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'Orifice area/cm2': orifice_area_cm2}, species: CaSO4, method: knudsen_effusion}
+  '11': {page: 131, source_fields: {T/K: T_K, 'P/torr': total_pressure_torr_as_printed}, species: MgSO4, method: torsion_effusion}
+  '12': {page: 136, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'Orifice area/cm2': orifice_area_cm2}, species: Na2O2, method: knudsen_effusion}
+  '13': {page: 142, source_fields: {T/K: T_K, 'Rate of wt. loss /mg min-1': mass_loss_rate_as_printed, "P'/torr": apparent_pressure_as_printed, 'Orifice area/cm2': orifice_area_cm2}, species: Na2SiO3, method: knudsen_effusion}
+  comparison_literature: {pages: [45, 46, 47], source_fields: {temperature: T_C_or_T_K_as_printed, pressure: quoted_pressure_as_printed, log_Kp: log10_K_reaction}}
+  equilibrium_calculations: {pages: [100, 101], source_fields: {temperature: T_K, positive_Kp: Kp_atm_3_2_as_printed, dissociation: alpha_as_printed}}

@@ -28,6 +28,7 @@ _TARGET_SIDS = (
     "nakano-hashimoto-2020-bubbles-to-chondrites-i",
     "kems-031-halwax-2024",
     "kems-133-costa-2017",
+    "kems-023-demaria-1973",
     "kems-025-markova-1983",
     "kems-007-costa-2015",
 )
@@ -154,6 +155,48 @@ def test_existing_high_temperature_points_keep_printed_value_and_temperature(
         temperature_K=temperature_K,
         value=value,
     )
+
+
+@pytest.mark.parametrize(
+    ("source_id", "id_fragment", "temperature_K", "value"),
+    [
+        (
+            "kems-023-demaria-1973",
+            "demaria_1973_na_psat_table1_quoted_demaria_1971::T=1300.0:row=12065",
+            "1300.0",
+            "0.0004053",
+        ),
+        (
+            "kems-023-demaria-1973",
+            "demaria_1973_tio_psat_table1_quoted_demaria_1971::T=2100.0:row=12065",
+            "2100.0",
+            "0.00911925",
+        ),
+        (
+            "kems-133-costa-2017",
+            "costa_2017_solidus",
+            "2050.0",
+            "2050.0",
+        ),
+    ],
+)
+def test_printed_approximate_points_keep_value_temperature_and_qualifier(
+    migrated_targets, source_id, id_fragment, temperature_K, value
+) -> None:
+    observations = [
+        observation
+        for observation in _source_observations(migrated_targets, source_id)
+        if id_fragment in observation.observation_id
+        and observation.value.kind is ValueKind.POINT
+        and observation.value.point == Decimal(value)
+    ]
+    assert len(observations) == 1, (source_id, id_fragment, value)
+    observation = observations[0]
+    assert observation.value.approximate is True
+    temperature = observation.point_conditions["temperature_K"]
+    assert temperature.state.is_value
+    assert temperature.state.value == Decimal(temperature_K)
+    assert temperature.locator is not None
 
 
 def test_demaria_table4_points_keep_printed_values_and_temperatures(migrated_targets) -> None:

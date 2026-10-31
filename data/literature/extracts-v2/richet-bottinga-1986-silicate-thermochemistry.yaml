@@ -1073,7 +1073,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=K2Si2O5; column=ΔS_f
+        note: row=K2Si2O5; column=T_f (K)
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
@@ -1191,7 +1191,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=K2Si2O5; column=ΔH_f
+        note: row=K2Si2O5; column=T_f (K)
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2si2o5_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1390,7 +1390,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=K2SiO3; column=ΔS_f
+        note: row=K2SiO3; column=T_f (K)
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
@@ -1508,7 +1508,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=K2SiO3; column=ΔH_f
+        note: row=K2SiO3; column=T_f (K)
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_k2sio3_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1626,7 +1626,7 @@ observations:
       reason: profile entropy_of_fusion does not use per
     temperature_K:
       tag: unknown
-      reason: no single temperature_K mapped from source
+      reason: temperature value is not numeric
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile entropy_of_fusion does not use standard_pressure_Pa
@@ -1696,6 +1696,17 @@ observations:
     table: '4'
     note: row=MgSiO3; column=ΔS_f
   read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        page: 15
+        published_page: 15
+        pdf_page_index: 14
+        table: '4'
+        note: row=MgSiO3; column=T_f (K)
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_heat_of_fusion_table4
   derivation:
@@ -1730,7 +1741,7 @@ observations:
       reason: profile heat_of_fusion does not use per
     temperature_K:
       tag: unknown
-      reason: no single temperature_K mapped from source
+      reason: temperature value is not numeric
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -1800,6 +1811,17 @@ observations:
     table: '4'
     note: row=MgSiO3; column=ΔH_f
   read_from: pdf:richet-bottinga-1986-silicate-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        page: 15
+        published_page: 15
+        pdf_page_index: 14
+        table: '4'
+        note: row=MgSiO3; column=T_f (K)
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_mgsio3_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:
@@ -1997,7 +2019,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=Na2Si2O5; column=ΔS_f
+        note: row=Na2Si2O5; column=T_f (K)
   derived_from:
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_heat_of_fusion_table4
   - richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
@@ -2115,7 +2137,7 @@ observations:
         published_page: 15
         pdf_page_index: 14
         table: '4'
-        note: row=Na2Si2O5; column=ΔH_f
+        note: row=Na2Si2O5; column=T_f (K)
 - observation_id: richet-bottinga-1986-silicate-thermochemistry::rb86_1986_na2si2o5_transition_table4
   experiment_id: 10.1029/rg024i001p00001::richet-bottinga-1986-silicate-thermochemistry
   identity:

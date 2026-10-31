@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 697
-  extracts: 695
+  sources: 715
+  extracts: 713
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 74
+  extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 695
+  extracts_without_pdf: 713
   alias_groups_needing_resolution: 78
 gaps:
   pdfs_without_extract: []
@@ -52,6 +52,8 @@ gaps:
   - baldwin-2001-metal-oxide-mitigation-sodium
   - banchor-matsui-naito-1986
   - banya-2004-sulphide-capacity-cao-al2o3
+  - banya-chiba-hikosaka-1980-feto-binary-solid-iron
+  - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
   - banya-watanabe-1977-feto-p2o5-solid-iron
   - barcza-1979-mn-slag-metal-equilibrium
   - basu-2008-feo-steelmaking
@@ -113,6 +115,7 @@ gaps:
   - costa-jacobson-2015
   - cottrell-2009-iron-xanes
   - dachs-geiger-2006-pyrope-grossular
+  - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   - darken-gurry-1946-iron-oxygen-ii
   - datz-1961-na2cl2
   - datz-and-smith-1961
@@ -213,6 +216,7 @@ gaps:
   - kassis-frischat-1981-silicate-glass-vapour
   - kawashima-1984-soda-flux-chemical-sensors
   - kayahara-1981-liquid-cu-o
+  - kelley-1953-alkali-aluminosilicate-thermodynamics
   - kemori-1980-oxygen-liquid-copper
   - kems-001-homma-1966
   - kems-002-ohno-1967
@@ -315,13 +319,18 @@ gaps:
   - klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity
   - konar-2018-alkali-cmas-thesis
   - kor-1967-thesis-sulphur-oxides-slags
+  - kozhina-2000-na-glassforming-thermodynamics
   - kramer-1991-glass-basicity-gas-solubility
   - krawczynski-grove-2012-high-ti-lunar-melts
   - kress-carmichael-1988-iron-oxidation-stoichiometry
   - kress-carmichael-1991-iron-redox-calibration
   - kroger-fingas-1935-alkali-silicate-equilibria
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry
   - kropf-2009-alkalis-chondrules-thesis
   - kume-2000-cao-activities
+  - kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  - kushiro-1971-apollo12-phase-equilibria
   - lamoreaux-hildenbrand-1984
   - lamoreaux-hildenbrand-hildenbrand-1987
   - le-losq-2023-alkali-aluminosilicate-glasses
@@ -408,9 +417,11 @@ gaps:
   - nasa-cea-thermo
   - nasa-tm-2024-simulant-guide
   - nazarov-2015-dhofar-silicides
+  - nbs-1981-tn270-8-alkali-thermochemistry
   - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
   - neubert-2025-vanadium-slag-evaporation
   - neuman-2026-levitation-k-isotopes
+  - niggli-1913-silica-alkali-carbonate-equilibria
   - nist-srd69-p4
   - nist-webbook
   - no27-fegley-cameron-1987-epsl
@@ -447,8 +458,11 @@ gaps:
   - pending-pages-wo3-polymer-vp
   - pending-re2o7-second-series
   - pending-teo2-vp
+  - pickrell-1994-gaseous-alkali-corrosion
+  - powell-1971-alkali-sulfate-metasilicate-vapour
   - qi-1987-fe-c-v-interaction
   - raberg-2007-salt-stability-na2s-thermochemistry-thesis
+  - ramteke-2026-alkali-vapor-corrosion-spinels
   - rau-1974-se-vp
   - rb86-capobianco-navrotsky-1982
   - rb86-neuvonen-1952
@@ -501,6 +515,7 @@ gaps:
   - schreiber-1986-oxygen-diffusion-redox
   - schreiber-1996-fe-mn-cr-redox-interactions
   - schreiber-haskin-1976-plsc7-chromium-in-basalts
+  - schumm-1981-alkali-aluminosilicate-thermochemical-tables
   - seki-2011-ca-o-solubility-fe-cao-al2o3
   - semkow-haskin-1984-redox-diopsidic-melt
   - senior-1991-solar-heating-jbis
@@ -599,6 +614,7 @@ gaps:
   - shornikov-2026-hatrurite-evaporation
   - shornikov-2026-wollastonite-kems
   - shornikova-2019-perovskite-thermodynamics
+  - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - shugurov-2024-gaseous-cerates-si
   - shugurov-2026-ceo2-tio2-kems
   - shults-1994-mullite-evaporation
@@ -624,6 +640,7 @@ gaps:
   - street-2010-thermal-properties-simulants
   - su-2024-lunar-volatiles-thesis
   - sublimation-kinetics-2023-minerals
+  - sugawara-2024-na-silicate-molybdate-miscibility
   - sugawara-akaogi-2003-ni-co-fusion
   - sugawara-akaogi-2004-liquid-calorimetry
   - sugie-2021-sioc-mixed-bond-calorimetry
@@ -697,6 +714,7 @@ gaps:
   - yakovlev-2017-cai-acidity
   - yakovlev-2021-chondrule-alkali
   - yakovlev-2024-cai-vaporization
+  - yakovleva-2022-alkali-chondrule-evaporation
   - yam1983
   - yamaguchi-1984-na2o-activity-sodium-beta-alumina
   - yan-2009-cr-ti-nb-v-slag-thermodynamics-review
@@ -721,10 +739,12 @@ gaps:
   - ammin-73-470-oneill-1988
   - ammin-75-781-hemingway-1990
   - ammin-76-904
+  - beerkens-2003-sulfate-decomposition-na2o-activity
   - bencze-yazhenskikh-2016
   - boulliung-2025-mercury-volatile-metals-magmatic
   - boulliung-wood-2022-so2-solubility-silicate-melts
   - busemann-2024-noble-gases-ryugu-bennu
+  - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   - day-2020-trinitite-volatility
   - fegley-2023-chemical-equilibrium-calculations-bu
   - filiberto-lpsc2011-2064-volatiles
@@ -781,11 +801,13 @@ gaps:
   - rusiecka-2026-chlorine-data
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   - shornikov-2013-potassium-silicate-thermodynamics
+  - shtenberg-2020-alkaline-oxide-thermodynamic-regression
   - smales-1971-lpsc-12022
   - stebbins-carmichael-weill-1983
   - ta-badro-2021
   - ta-flemetakis-2024
   - thomas-2022-chlorine-bonding-silicate-melts
+  - van-limpt-2006-sodium-evaporation
   - vickerfalt-2024-al-si-v-phase-diagram
   - wetzel-gail-2013-sio-arrhenius
   - yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy
@@ -794,95 +816,95 @@ gaps:
   sidecars_missing_fields:
   - source_id: ivtan-cro2-g
     sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-    missing_fields: &id001
+    missing_fields:
     - doi
   - source_id: kems-003-pound-1972
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-    missing_fields: &id002
+    missing_fields:
     - retrieval_url
   - source_id: kems-005-fedkin-2006
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-    missing_fields: &id003
+    missing_fields:
     - retrieval_url
   - source_id: kems-011-wetzel-gail-2013
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-    missing_fields: &id004
+    missing_fields:
     - retrieved_date
     - retrieval_url
   - source_id: kems-012-sossi-2019
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-    missing_fields: &id005
+    missing_fields: &id001
     - sha256
     - retrieved_date
   - source_id: kems-014-drowart-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-    missing_fields: &id006
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-022-demaria-1971
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-    missing_fields: &id007
+    missing_fields: &id002
     - doi
   - source_id: kems-035-sauerborn-2005
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-    missing_fields: &id008
+    missing_fields:
     - doi
   - source_id: kems-036-sesko-2024
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-    missing_fields: &id009
+    missing_fields:
     - sha256
     - retrieval_url
   - source_id: kems-041-sossi-fegley-2018
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-    missing_fields: &id010
+    missing_fields: &id003
     - retrieval_url
   - source_id: kems-042-plante-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-    missing_fields: &id011
+    missing_fields:
     - sha256
   - source_id: kems-050-gorokhov-1977
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-    missing_fields: &id012
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-093-piacente-1975
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-    missing_fields: &id013
+    missing_fields:
     - doi
   - source_id: kems-103-fraser-1983
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-    missing_fields: &id014
+    missing_fields:
     - sha256
   - source_id: kems-114-nichols-1995
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-    missing_fields: &id015
+    missing_fields:
     - doi
   - source_id: kems-133-costa-2017
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-    missing_fields: &id016
+    missing_fields: &id004
     - sha256
   - source_id: kems-140-heck-2025
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-    missing_fields: &id017
+    missing_fields:
     - sha256
   - source_id: kems-184-behrens-1979
     sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-    missing_fields: &id018
+    missing_fields:
     - doi
     - sha256
   - source_id: kems-ms2000-044
     sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-    missing_fields: &id019
+    missing_fields:
     - doi
     - retrieval_url
   - source_id: smales-1971-lpsc-12022
     sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-    missing_fields: &id020
+    missing_fields:
     - doi
     - retrieved_date
   - source_id: stebbins-carmichael-weill-1983
     sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-    missing_fields: &id021
+    missing_fields:
     - doi
     - retrieved_date
   source_id_collisions:
@@ -1819,7 +1841,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-03'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: aithala-2026-magmatic-iron-redox-to-2100c
   aliases: []
   citation: Aithala, S. P., Macris, C. A., and Hirschmann, M. M. (2026). Temperature dependence of magmatic
@@ -2227,7 +2249,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: anand-2024-sioc-carbothermal-stability
   aliases: []
   citation: Anand, R. and Lu, K. (2024). Understanding thermodynamic stability and carbothermal reduction
@@ -3279,6 +3301,122 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: banya-chiba-hikosaka-1980-feto-binary-solid-iron
+  aliases: []
+  citation: Ban-ya, S., Chiba, A., and Hikosaka, A. (1980), “Thermodynamics of FetO-MxOy binary melts
+    in equilibrium with solid iron”, Tetsu-to-Hagane 66(10), 1484–1493.
+  doi: 10.2355/tetsutohagane1955.66.1484
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.66.1484
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml
+    review_status: draft
+    rows: 207
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/banya-chiba-hikosaka-1980-feto-binary-solid-iron.pdf
+      present: true
+      sha256: 4abb87d929458374cce293bf9566ff6e7d67f78c024fa91d2db85854560a2b83
+      matches_simulator: null
+    sidecar:
+      path: raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/sidecar.yaml
+      present: true
+    text:
+      path: text/banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      exists: true
+      file_count: 79
+    tables:
+      path: tables/banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+  aliases: []
+  citation: Ban-ya, S., Hino, M. and Yuge, N. (1985), ‘Activity of the Constituents in FetO-SiO2-MnO Slags
+    in Equilibrium with Solid Iron’, Tetsu-to-Hagane 71(7), 853–860.
+  doi: 10.2355/tetsutohagane1955.71.7_853
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.71.7_853
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml
+    review_status: draft
+    rows: 60
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.pdf
+      present: true
+      sha256: 6cd7d347d07e20e50211cd93c00b40036d1c438b3a89844ff23ce762a5533e27
+      matches_simulator: null
+    sidecar:
+      path: raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+      exists: true
+      file_count: 115
+    tables:
+      path: tables/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   aliases: []
   citation: Ban-ya, S. and Watanabe, T. (1977), "Thermodynamics of FetO-P2O5 Slags Saturated with Solid
@@ -3535,7 +3673,7 @@ sources:
   extracts:
   - path: data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml
     review_status: draft
-    rows: 5
+    rows: 4
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -3568,7 +3706,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: beerkens-2003-sulfate-decomposition-na2o-activity
   aliases: []
   citation: Beerkens, R. G. C. (2003). "Sulfate Decomposition and Sodium Oxide Activity in Soda–Lime–Silica
@@ -3593,7 +3731,8 @@ sources:
   extracts:
   - path: data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml
     review_status: draft
-    rows: 0
+    rows: 1
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -3626,7 +3765,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: behrens-rosenblatt-1972
   aliases: []
   citation: Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190
@@ -5671,7 +5810,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   aliases: []
   citation: Cacciatore EE, Zajacz Z (2026). Supplementary Data for Experimental calibration of V–Sc oxybarometers
@@ -6106,7 +6245,7 @@ sources:
   extracts:
   - path: data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml
     review_status: draft
-    rows: 35
+    rows: 48
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -6132,14 +6271,14 @@ sources:
     extract:
       path: extracts/cho-suito-1994-cas-slag-activities.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/cho-suito-1994-cas-slag-activities.yaml
       present: true
       error: null
       last_stage: extracted
       date: '2026-10-04'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: colson-colson-1995-chromium-dimer-lpsc
   aliases: []
   citation: 'Colson RO, Colson MC (1995). Chromium, a dimer in silicate melts?: Implications for redox
@@ -6841,6 +6980,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  aliases: []
+  citation: D’Ans, J. and Löffler, J. (1930). Untersuchungen im System Na2O-SiO2-ZrO2. Zeitschrift für
+    anorganische und allgemeine Chemie 191(1–2):1–35.
+  doi: 10.1002/zaac.19301910102
+  report_number: null
+  identifier: 10.1002/zaac.19301910102
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml
+    review_status: draft
+    rows: 167
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+      present: true
+      sha256: f5d967609078e9239376dc7e981ee23573dae003abe95cdec33d380562f8a98c
+      matches_simulator: null
+    sidecar:
+      path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/sidecar.yaml
+      present: true
+    text:
+      path: text/dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      exists: true
+      file_count: 47
+    tables:
+      path: tables/dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: darken-gurry-1946-iron-oxygen-ii
   aliases: []
   citation: 'Darken, L. S. & Gurry, R. W. (1946), "The System Iron-Oxygen. II. Equilibrium and Thermodynamics
@@ -7547,7 +7745,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: dong-2009-cr-v-slag-activities
   aliases: []
   citation: Dong, P., Seetharaman, S. and Wang, X. (2009), “Thermodynamic Activity of Chromium, Vanadium
@@ -8182,14 +8380,14 @@ sources:
     extract:
       path: extracts/fegley-2016-rock-steam-solubility.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2016-rock-steam-solubility.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: fegley-2023-chemical-equilibrium-calculations-bu
   aliases: []
   citation: Fegley, B., Jr., Lodders, K., and Jacobson, N. S. (2023). Chemical Equilibrium Calculations
@@ -10644,7 +10842,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: holzheid-lodders-2001-copper-solubility
   aliases: []
   citation: Holzheid, A. and Lodders, K. (2001). Solubility of copper in silicate melts as function of
@@ -11364,7 +11562,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-cro2-g.md
-  sidecar_missing_fields: *id001
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/ivtan-cro2-g.yaml
@@ -11756,7 +11955,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: janz-1979-nsrds61-part2-molten-salt-properties
   aliases: []
   citation: 'Janz, G. J., Allen, C. B., Bansal, N. P., Murphy, R. M., and Tomkins, R. P. T. (1979). Physical
@@ -11990,7 +12189,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: jeon-lindberg-2025-mgo-refractory-slag-interface
   aliases: []
   citation: Jeon, Junmo, and Daniel Lindberg (2025). Interfacial reaction between different MgO-based
@@ -12697,6 +12896,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+  aliases: []
+  citation: Kelley, K. K., Todd, S. S., Orr, R. L., King, E. G., and Bonnickson, K. R. (1953), Thermodynamic
+    Properties of Sodium-Aluminum and Potassium-Aluminum Silicates, U.S. Bureau of Mines Report of Investigations
+    4955.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+    review_status: draft
+    rows: 55
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kelley-1953-alkali-aluminosilicate-thermodynamics/kelley-1953-alkali-aluminosilicate-thermodynamics.pdf
+      present: true
+      sha256: 121b4ea4d78ae0d8f2246725b9a134d610bb5e558478b88e78c11f480657902a
+      matches_simulator: null
+    sidecar:
+      path: raw/kelley-1953-alkali-aluminosilicate-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/kelley-1953-alkali-aluminosilicate-thermodynamics
+      exists: true
+      file_count: 106
+    tables:
+      path: tables/kelley-1953-alkali-aluminosilicate-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kemori-1980-oxygen-liquid-copper
   aliases: []
   citation: Kemori N, Katayama I, Kozuka Z (1980). Thermodynamic Study of Oxygen in Liquid Copper. Transactions
@@ -12882,7 +13140,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-003-pound-1972.md
-  sidecar_missing_fields: *id002
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-003-pound-1972.yaml
@@ -12939,7 +13198,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-005-fedkin-2006.md
-  sidecar_missing_fields: *id003
+  sidecar_missing_fields:
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-005-fedkin-2006.yaml
@@ -13273,7 +13533,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-011-wetzel-gail-2013
   aliases:
   - wetzel-gail-2013-sio-arrhenius
@@ -13288,7 +13548,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-011-wetzel-gail-2013.md
-  sidecar_missing_fields: *id004
+  sidecar_missing_fields:
+  - retrieved_date
+  - retrieval_url
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-011-wetzel-gail-2013.yaml
@@ -13342,7 +13604,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.md
-  sidecar_missing_fields: *id005
+  sidecar_missing_fields: *id001
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-012-sossi-2019.yaml
@@ -13381,7 +13643,7 @@ sources:
       error: null
       last_stage: transcribed
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-014-drowart-2005
   aliases: []
   citation: 'Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), "High-temperature mass spectrometry:
@@ -13397,7 +13659,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md
-  sidecar_missing_fields: *id006
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-014-drowart-2005.yaml
@@ -13490,7 +13754,7 @@ sources:
       error: null
       last_stage: battery
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-016-stolyarova-1992
   aliases: []
   citation: Stolyarova, V., Shornikov, S., Ivanov, G. & Shultz, M. (1992), "High temperature mass spectrometric
@@ -13548,7 +13812,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-017-stolyarova-2013
   aliases: []
   citation: Stolyarova, V.L. (2013), review/compilation on high-temperature mass spectrometry of oxide
@@ -13766,7 +14030,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-021-plante-1992-feo
   aliases: []
   citation: Plante, E. R., Hastie, J. W. & Kowalska, M. (1992), "Activity of FeO in the FeO-MgO-SiO2 System
@@ -13839,7 +14103,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.md
-  sidecar_missing_fields: *id007
+  sidecar_missing_fields: *id002
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
@@ -13878,7 +14142,7 @@ sources:
       error: null
       last_stage: transcribed
       date: '2026-09-26'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-023-demaria-1973
   aliases: []
   citation: De Maria, G. & Piacente, V. (1973), "Vaporization Study of Selected Lunar Samples", Lunar
@@ -13936,7 +14200,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-12'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-024-gibson-hubbard-1972
   aliases: []
   citation: Gibson, E. K., Jr. and Hubbard, N. J. (1972). Thermal volatilization studies on lunar samples.
@@ -14113,7 +14377,7 @@ sources:
       error: null
       last_stage: transcribed
       date: '2026-09-26'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-027-plante-hastie-1983
   aliases: []
   citation: 'Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1983), NBSIR 83-2731, "Vaporization of Simulated
@@ -14225,7 +14489,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-12'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-029-yakovlev-shornikov-2011
   aliases: []
   citation: Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions",
@@ -14479,7 +14743,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.md
-  sidecar_missing_fields: *id008
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
@@ -14535,7 +14800,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md
-  sidecar_missing_fields: *id009
+  sidecar_missing_fields:
+  - sha256
+  - retrieval_url
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-036-sesko-2024.yaml
@@ -14829,7 +15096,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-041-sossi-fegley-2018.md
-  sidecar_missing_fields: *id010
+  sidecar_missing_fields: *id003
   access_status: held
   extracts:
   - path: data/literature/extracts/kems-041-sossi-fegley-2018.yaml
@@ -14868,7 +15135,7 @@ sources:
       error: null
       last_stage: extracted_3
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-042-plante-1979
   aliases:
   - kems-042-nbs-sp561-v1-hastie-1979
@@ -14886,7 +15153,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.md
-  sidecar_missing_fields: *id011
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-042-plante-1979.yaml
@@ -15300,7 +15568,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-050-gorokhov-1977.md
-  sidecar_missing_fields: *id012
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-050-gorokhov-1977.yaml
@@ -15397,7 +15667,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-26'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-053-stolyarova-1991
   aliases: []
   citation: Stolyarova, V. L., Shornikov, S. I., Ivanov, G. G. and Shultz, M. M. (1991), "High Temperature
@@ -15456,7 +15726,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-26'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-055-kambayashi-1983
   aliases: []
   citation: Kambayashi, S. and Kato, E. (1983), “A thermodynamic study of (magnesium oxide + silicon dioxide)
@@ -15572,7 +15842,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-058-ohara-1987
   aliases: []
   citation: Ohara, N., Nunoue, S. and Kato, E. (1987), "Mass Spectrometric Determination of Interaction
@@ -15631,7 +15901,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-066-ichise-1977
   aliases: []
   citation: Ichise, E., Yamauchi, T. & Mori, T. (1977), "Knudsen Cell-Mass Spectrometric Study of the
@@ -15689,7 +15959,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-067-yamada-1980
   aliases: []
   citation: Yamada, K., Abe, H. & Kato, E. (1980), "Mass Spectrometric Study of the Activity in Liquid
@@ -15806,7 +16076,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-087-yamada-kato-1980
   aliases: []
   citation: Yamada, K. & Kato, E. (1980), "Mass Spectrometric Study of the Activity of Phosphorus in Iron-Phosphorus
@@ -15937,7 +16207,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-093-piacente-1975.md
-  sidecar_missing_fields: *id013
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-093-piacente-1975.yaml
@@ -16033,7 +16304,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-097-ikeda-1978
   aliases: []
   citation: Ikeda, Y., Tamaki, M. & Matsumoto, G. (1978), "A Mass Spectrometric Study of Vaporization
@@ -16101,7 +16372,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-103-fraser-1983.md
-  sidecar_missing_fields: *id014
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-103-fraser-1983.yaml
@@ -16198,7 +16470,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-111-ichise-1982
   aliases: []
   citation: Ichise, E., Maruo, T., Sasho, H., Ueshima, Y. and Mori, T. (1982), "Knudsen Cell-mass Spectrometric
@@ -16224,7 +16496,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-111-ichise-1982.yaml
     review_status: draft
-    rows: 16
+    rows: 33
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -16257,7 +16529,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-112-ichise-1989
   aliases: []
   citation: Ichise, E. and Horikawa, K. (1989), "Thermodynamic Study of Fe-Ta and Fe-Nb Alloys by Means
@@ -16330,7 +16602,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.md
-  sidecar_missing_fields: *id015
+  sidecar_missing_fields:
+  - doi
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-114-nichols-1995.yaml
@@ -16727,7 +17000,7 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md
-  sidecar_missing_fields: *id016
+  sidecar_missing_fields: *id004
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-133-costa-2017.yaml
@@ -16765,7 +17038,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-137-bischof-2023
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Determination
@@ -16939,7 +17212,8 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md
-  sidecar_missing_fields: *id017
+  sidecar_missing_fields:
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-140-heck-2025.yaml
@@ -17051,7 +17325,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md
-  sidecar_missing_fields: *id018
+  sidecar_missing_fields:
+  - doi
+  - sha256
   access_status: OA
   extracts:
   - path: data/literature/extracts/kems-184-behrens-1979.yaml
@@ -17147,7 +17423,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-13'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-189-bischof-2021
   aliases: []
   citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2021), "Vaporisation
@@ -17261,7 +17537,7 @@ sources:
       error: null
       last_stage: scored
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-198-ichise-ueshima-1989
   aliases: []
   citation: Ichise, E., Ueshima, Y. & Yamana, H. (1989), "Ion Intensity Thermal Analysis of Ag-Mn Alloy",
@@ -17612,7 +17888,7 @@ sources:
       error: null
       last_stage: acquired
       date: '2026-10-04'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kems-218-schneider-1981-nbsir-81-2306
   aliases: []
   citation: Schneider, S. J. (Project Manager) (1981). MHD Materials—Seed/Slag Interactions and Effects,
@@ -17686,7 +17962,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.md
-  sidecar_missing_fields: *id019
+  sidecar_missing_fields:
+  - doi
+  - retrieval_url
   access_status: unknown
   extracts:
   - path: data/literature/extracts/kems-ms2000-044.yaml
@@ -18544,6 +18822,64 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kozhina-2000-na-glassforming-thermodynamics
+  aliases: []
+  citation: Kozhina, Elena L.; Shultz, Mikhail M. (2000). Thermodynamic Properties of Sodium-Containing
+    Glassforming Oxide Melts. Ceramics–Silikáty 44(3):91–97.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kozhina-2000-na-glassforming-thermodynamics/kozhina-2000-na-glassforming-thermodynamics.pdf
+      present: true
+      sha256: 570afa76000acf3811f15c909dc06edfe8bbffad5a2cbee70e569a9222185e00
+      matches_simulator: null
+    sidecar:
+      path: raw/kozhina-2000-na-glassforming-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/kozhina-2000-na-glassforming-thermodynamics
+      exists: true
+      file_count: 34
+    tables:
+      path: tables/kozhina-2000-na-glassforming-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kozhina-2000-na-glassforming-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kramer-1991-glass-basicity-gas-solubility
   aliases: []
   citation: Krämer FW (1991). Contribution to basicity of technical glass melts in relation to redox equilibria
@@ -18837,6 +19173,123 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  aliases: []
+  citation: Carl Kröger, Wilhelm Janetzko and Gerhard Kreitlow (1958), “Der Wärmebedarf der Silikatglasbildung”,
+    Glastechnische Berichte 31(6), 221–228. DOI 10.34657/16750 is the modern TIB repository deposit, not
+    a historical journal DOI.
+  doi: 10.34657/16750
+  report_number: null
+  identifier: 10.34657/16750
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+    review_status: draft
+    rows: 35
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/kroger-janetzko-kreitlow-1958-glass-formation-heat.pdf
+      present: true
+      sha256: 3c32489409a9344b005cd4018c8839fda9c0f1f82e7082b380faa4853980d722
+      matches_simulator: null
+    sidecar:
+      path: raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/sidecar.yaml
+      present: true
+    text:
+      path: text/kroger-janetzko-kreitlow-1958-glass-formation-heat
+      exists: true
+      file_count: 54
+    tables:
+      path: tables/kroger-janetzko-kreitlow-1958-glass-formation-heat
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  aliases: []
+  citation: Kröger, C. & Kreitlow, G. (1956), Die Lösungs- und Bildungswärmen der Natronkalksilikate,
+    Glastechnische Berichte, 29(10), 393–400.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+    review_status: draft
+    rows: 36
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.pdf
+      present: true
+      sha256: 4cf6b850d5171dd3589142bfac1400471bb6420d02e2992fe0f264a600e7ce34
+      matches_simulator: null
+    sidecar:
+      path: raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/sidecar.yaml
+      present: true
+    text:
+      path: text/kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+      exists: true
+      file_count: 69
+    tables:
+      path: tables/kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: kropf-2009-alkalis-chondrules-thesis
   aliases: []
   citation: Kropf A. (2009), Alkalien in Chondren – offenes oder geschlossenes System? Doctoral dissertation,
@@ -18953,6 +19406,124 @@ sources:
       last_stage: extracted
       date: '2026-10-03'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  aliases: []
+  citation: Kupčák, J. and Mališ, A. (1992). Use of oxygen probes in the study of thermodynamic properties
+    of the system Na2O-SiO2 and the effect of electron conductivity of solid electrolyte on EMF of the
+    concentration cell. Ceramics-Silikáty 36(1):1–6.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+    review_status: draft
+    rows: 21
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.pdf
+      present: true
+      sha256: c3a19ffc1425901c8c812556b7ed92427b988648e85073476e2c29f981b6c169
+      matches_simulator: null
+    sidecar:
+      path: raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/sidecar.yaml
+      present: true
+    text:
+      path: text/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      exists: true
+      file_count: 26
+    tables:
+      path: tables/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: kushiro-1971-apollo12-phase-equilibria
+  aliases: []
+  citation: Kushiro, I., Nakamura, Y., Kitayama, K. & Akimoto, S. (1971). Petrology of some Apollo 12
+    crystalline rocks. Proceedings of the Second Lunar Science Conference, Vol. 1, pp. 481–495. The M.I.T.
+    Press.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kushiro-1971-apollo12-phase-equilibria/kushiro-1971-apollo12-phase-equilibria.pdf
+      present: true
+      sha256: b81f2de95e243041a6179d99e71781e308d255c322ed8f3cabe1c4703129527c
+      matches_simulator: null
+    sidecar:
+      path: raw/kushiro-1971-apollo12-phase-equilibria/sidecar.yaml
+      present: true
+    text:
+      path: text/kushiro-1971-apollo12-phase-equilibria
+      exists: true
+      file_count: 37
+    tables:
+      path: tables/kushiro-1971-apollo12-phase-equilibria
+      exists: true
+      file_count: 10
+    extract:
+      path: extracts/kushiro-1971-apollo12-phase-equilibria.yaml
+      present: true
+      matches_simulator: false
+    ledger:
+      path: ledger/kushiro-1971-apollo12-phase-equilibria.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-03'
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: lamoreaux-hildenbrand-1984
   aliases:
   - ref-052-k-o-gas
@@ -24000,6 +24571,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  aliases: []
+  citation: 'Wagman, D. D., Evans, W. H., Parker, V. B., Schumm, R. H. & Nuttall, R. L. (1981), Selected
+    Values of Chemical Thermodynamic Properties: Compounds of Uranium, Protactinium, Thorium, Actinium,
+    and the Alkali Metals, NBS Technical Note 270-8.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+    review_status: draft
+    rows: 51
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nbs-1981-tn270-8-alkali-thermochemistry/nbs-1981-tn270-8-alkali-thermochemistry.pdf
+      present: true
+      sha256: 2ba4a03d541ce2db7cf6803fa0aa5fc9388cd824fa9bdd4270f0b374adee8825
+      matches_simulator: null
+    sidecar:
+      path: raw/nbs-1981-tn270-8-alkali-thermochemistry/sidecar.yaml
+      present: true
+    text:
+      path: text/nbs-1981-tn270-8-alkali-thermochemistry
+      exists: true
+      file_count: 180
+    tables:
+      path: tables/nbs-1981-tn270-8-alkali-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
   aliases: []
   citation: E. Nekhoroshev, M. Shevchenko, Siyu Cheng, D. Shishin, E. Jak (2024), Thermodynamic re-optimization
@@ -24179,6 +24809,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  aliases: []
+  citation: 'Paul Niggli (1913). The phenomena of equilibria between silica and the alkali carbonates.
+    Journal of the American Chemical Society 35(11): 1693–1727.'
+  doi: 10.1021/ja02200a004
+  report_number: null
+  identifier: 10.1021/ja02200a004
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
+      present: true
+      sha256: 34f8a5bc2def64305d0c7b304b16f363bf21524b1821fe5bfe3f8f61a45e7ecd
+      matches_simulator: null
+    sidecar:
+      path: raw/niggli-1913-silica-alkali-carbonate-equilibria/sidecar.yaml
+      present: true
+    text:
+      path: text/niggli-1913-silica-alkali-carbonate-equilibria
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/niggli-1913-silica-alkali-carbonate-equilibria
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: nist-janaf-4th
   aliases: []
   citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data
@@ -24674,7 +25362,7 @@ sources:
   extracts:
   - path: data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml
     review_status: draft
-    rows: 11
+    rows: 140
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -24707,7 +25395,7 @@ sources:
       error: null
       last_stage: acquired
       date: '2026-10-04'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: ohta-suito-1995-mno-activity-slags
   aliases: []
   citation: Ohta H. and Suito H. (1995). Activities of MnO in CaO–SiO2–Al2O3–MnO(<10Pct)–FetO(<3Pct) slags
@@ -26338,6 +27026,122 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: pickrell-1994-gaseous-alkali-corrosion
+  aliases: []
+  citation: Pickrell, G. R. (1994). High temperature alkali corrosion kinetics of low expansion ceramics.
+    PhD dissertation, Virginia Polytechnic Institute and State University.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
+      present: true
+      sha256: 2dc30aaa5ad48a14d03759fa10a68d236740a4e6306e6b14893e554118290493
+      matches_simulator: null
+    sidecar:
+      path: raw/pickrell-1994-gaseous-alkali-corrosion/sidecar.yaml
+      present: true
+    text:
+      path: text/pickrell-1994-gaseous-alkali-corrosion
+      exists: true
+      file_count: 108
+    tables:
+      path: tables/pickrell-1994-gaseous-alkali-corrosion
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pickrell-1994-gaseous-alkali-corrosion.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: powell-1971-alkali-sulfate-metasilicate-vapour
+  aliases: []
+  citation: Powell, D. G. (1971), A thermodynamic study of the sulphates and related compounds of alkali
+    and alkaline earth metals at high temperatures, PhD thesis, University of St Andrews.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+    review_status: draft
+    rows: 290
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/powell-1971-alkali-sulfate-metasilicate-vapour/powell-1971-alkali-sulfate-metasilicate-vapour.pdf
+      present: true
+      sha256: ec7903145cf9fa2d21f1b35f68a6183c4c2e7978dcf0fa23942f9720c843ad74
+      matches_simulator: null
+    sidecar:
+      path: raw/powell-1971-alkali-sulfate-metasilicate-vapour/sidecar.yaml
+      present: true
+    text:
+      path: text/powell-1971-alkali-sulfate-metasilicate-vapour
+      exists: true
+      file_count: 320
+    tables:
+      path: tables/powell-1971-alkali-sulfate-metasilicate-vapour
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: qi-1987-fe-c-v-interaction
   aliases: []
   citation: Qi, G., Ji, C. and Che, Y. (1987), “Thermodynamic Activity Interaction Coefficients in Fe-C-V
@@ -26454,6 +27258,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: ramteke-2026-alkali-vapor-corrosion-spinels
+  aliases: []
+  citation: Ramteke, Rajat Durgesh, James G. Hemrick, and Manoj K. Mahapatra (2026). Alkali Vapor Corrosion
+    of Spinel (MgAl2O4) and Gahnite (ZnAl2O4) Refractories—A Comparative Study. Journal of the American
+    Ceramic Society 109, e70773.
+  doi: 10.1111/jace.70773
+  report_number: null
+  identifier: 10.1111/jace.70773
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+      present: true
+      sha256: 05ddb5c929da0c3badc1d95e380500c8f11fe7779ba4a6fe1c48f1a6edeeddf5
+      matches_simulator: null
+    sidecar:
+      path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/sidecar.yaml
+      present: true
+    text:
+      path: text/ramteke-2026-alkali-vapor-corrosion-spinels
+      exists: true
+      file_count: 64
+    tables:
+      path: tables/ramteke-2026-alkali-vapor-corrosion-spinels
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: rau-1974-se-vp
   aliases: []
   citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation
@@ -27530,7 +28393,7 @@ sources:
   extracts:
   - path: data/literature/extracts/rego-1988-silicate-na2o-activities.yaml
     review_status: draft
-    rows: 0
+    rows: 85
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -27563,7 +28426,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: reiss-2019-thermal-extraction-nulht2m
   aliases: []
   citation: 'Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar
@@ -28204,7 +29067,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: rzehak-2021-ti-isotope-redox-lunar-melts
   aliases: []
   citation: Rzehak L.J.A., Kommescher S., Kurzweil F., Sprung P., Leitzke F.P. and Fonseca R.O.C. (2021).
@@ -29488,6 +30351,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: schumm-1981-alkali-aluminosilicate-thermochemical-tables
+  aliases: []
+  citation: Schumm, R. H. (1981). Thermodynamic Properties of Solid Alkali Aluminosilicates at Elevated
+    Temperatures. NBSIR 81-2343. National Bureau of Standards.
+  doi: 10.6028/NBS.IR.81-2343
+  report_number: NBSIR 81-2343
+  identifier: 10.6028/NBS.IR.81-2343
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+    review_status: draft
+    rows: 52
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables.pdf
+      present: true
+      sha256: 288183b38d160b917cf44b57c915a5178b35f7e9da53467afc2f568cae440fa0
+      matches_simulator: null
+    sidecar:
+      path: raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/sidecar.yaml
+      present: true
+    text:
+      path: text/schumm-1981-alkali-aluminosilicate-thermochemical-tables
+      exists: true
+      file_count: 106
+    tables:
+      path: tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
   aliases: []
   citation: I. Seki, K. Nagata, T. Ashino, and J. Tanabe, Solubility of Calcium and Oxygen in Molten Iron
@@ -30129,14 +31050,14 @@ sources:
     extract:
       path: extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/shilov-1998-sno-zno-p2o5-vaporization.yaml
       present: false
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shilov-2025-sro-al2o3-sio2-kems-supplement
   aliases: []
   citation: Shilov, A. L., Vorozhtcov, V. A., Stolyarova, V. L., Fedorova, A. V., Lopatin, S. I., Shugurov,
@@ -30607,7 +31528,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shornikov-1998-silica-vaporization
   aliases: []
   citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (1998). Mass Spectrometric Study of
@@ -31182,7 +32103,7 @@ sources:
     text:
       path: text/shornikov-2001-mgalumina-silica-vaporization
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/shornikov-2001-mgalumina-silica-vaporization
       exists: false
@@ -31197,7 +32118,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shornikov-2002-alumina-silica-melt-thermodynamics
   aliases: []
   citation: Shornikov, S. I., and Archakov, I. Yu. (2002), "A Mass Spectrometric Determination of the
@@ -33183,7 +34104,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shornikov-2018-thermodynamic-evaporation-model
   aliases: []
   citation: Shornikov, S. I. (2018). Thermodynamic Modelling of Evaporation Processes of Lunar and Meteoritic
@@ -34663,7 +35584,7 @@ sources:
   extracts:
   - path: data/literature/extracts/shornikov-2025-ca-al-inclusion-kems.yaml
     review_status: draft
-    rows: 0
+    rows: 8
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -34696,7 +35617,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shornikov-2025-ca-al-inclusion-thermodynamics
   aliases: []
   citation: Shornikov, S. I. (2025). Thermodynamic Properties of Oxide Compounds Occurring in Ca–Al-Rich
@@ -35221,6 +36142,66 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  aliases: []
+  citation: Shtenberg, M. V., Bychinsky, V. A., Tupitsyn, A. A., and Koroleva, O. N. (2020). Evaluation
+    of Thermodynamic Properties of Alkaline Borogermanates and Germanosilicates Using the Regression Analysis
+    Method. International Journal of Thermodynamics, 23(4), 252–258.
+  doi: 10.5541/ijot.764760
+  report_number: null
+  identifier: 10.5541/ijot.764760
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+    review_status: draft
+    rows: 46
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+      present: true
+      sha256: 885a2505deb465f8a43bb9e85a1420095d6c2a240b8cfcf5d5b18424d0460aa4
+      matches_simulator: null
+    sidecar:
+      path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/sidecar.yaml
+      present: true
+    text:
+      path: text/shtenberg-2020-alkaline-oxide-thermodynamic-regression
+      exists: true
+      file_count: 40
+    tables:
+      path: tables/shtenberg-2020-alkaline-oxide-thermodynamic-regression
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: shugurov-2024-gaseous-cerates-si
   aliases: []
   citation: 'Shugurov SM, Lopatin SI, Zhinkina OA, Panin AI, Panina NS (2024). Thermodynamics of gaseous
@@ -35482,7 +36463,7 @@ sources:
   extracts:
   - path: data/literature/extracts/shyrokykh-2021-vanadium-vaporization.yaml
     review_status: draft
-    rows: 2
+    rows: 0
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -35515,7 +36496,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: simeonov-sano-1985-na-bearing-mno-activities
   aliases: []
   citation: Simeonov, S. R. & Sano, N. (1985), “Manganese Equilibrium Distribution between Carbon-saturated
@@ -35822,7 +36803,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
-  sidecar_missing_fields: *id020
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
@@ -36114,7 +37097,9 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
-  sidecar_missing_fields: *id021
+  sidecar_missing_fields:
+  - doi
+  - retrieved_date
   access_status: OA
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
@@ -36354,7 +37339,7 @@ sources:
   extracts:
   - path: data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml
     review_status: draft
-    rows: 25
+    rows: 88
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -36372,7 +37357,7 @@ sources:
     text:
       path: text/stolyarova-1996-cao-alumina-silica-kems
       exists: true
-      file_count: 2
+      file_count: 3
     tables:
       path: tables/stolyarova-1996-cao-alumina-silica-kems
       exists: true
@@ -36387,7 +37372,7 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-10-05'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: stolyarova-2021-ti-al-kems-ru
   aliases: []
   citation: Stolyarova, V. L., Vorozhtsov, V. A., Shemchuk, D. V., Lopatin, S. I., & Bogdanov, O. A. (2021).
@@ -36446,7 +37431,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement
   aliases: []
   citation: Stolyarova VL, Vorozhtcov VA, Lopatin SI, Selyutin AA, Shugurov SM, Shilov AL, Stolyarov VA,
@@ -36505,7 +37490,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: street-2010-thermal-properties-simulants
   aliases: []
   citation: Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal
@@ -36682,6 +37667,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  aliases: []
+  citation: Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and
+    thermodynamic analysis of liquid-liquid immiscibility in the system SiO2-Na2O-MoO3. Journal of Thermal
+    Analysis and Calorimetry, 150, 7199-7206.
+  doi: 10.1007/s10973-024-13659-7
+  report_number: null
+  identifier: 10.1007/s10973-024-13659-7
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+    review_status: draft
+    rows: 48
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
+      present: true
+      sha256: 196ffb5b0cc0f95232106dfa7397b4666f5cf9d5d38c408087eebee0a9e1453b
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-2024-na-silicate-molybdate-miscibility/sidecar.yaml
+      present: true
+    text:
+      path: text/sugawara-2024-na-silicate-molybdate-miscibility
+      exists: true
+      file_count: 28
+    tables:
+      path: tables/sugawara-2024-na-silicate-molybdate-miscibility
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: sugawara-akaogi-2003-ni-co-fusion
   aliases: []
   citation: Sugawara T. and Akaogi M. (2003). Calorimetric measurements of fusion enthalpies for Ni2SiO4
@@ -39224,7 +40268,8 @@ sources:
   extracts:
   - path: data/literature/extracts/van-limpt-2006-sodium-evaporation.yaml
     review_status: draft
-    rows: 0
+    rows: 4
+    locator_status: private_path
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -39257,7 +40302,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: vanbuchem-2023-lavatmos
   aliases: []
   citation: 'van Buchem, C. P. A., Miguel, Y., Zilinskas, M. & van Westenen, W. (2023), "LavAtmos: An
@@ -39692,7 +40737,7 @@ sources:
   extracts:
   - path: data/literature/extracts/visscher-fegley-2013-debris-disks.yaml
     review_status: draft
-    rows: 13
+    rows: 12
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -39725,7 +40770,7 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: volovetskii-2012-iron-redox
   aliases: []
   citation: Volovetskii M.V., Lukanin O.A., Rusakov V.S., and Kargal'tsev A.A. (2012). Influence of Oxygen
@@ -40401,7 +41446,7 @@ sources:
   extracts:
   - path: data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml
     review_status: draft
-    rows: 0
+    rows: 7
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -40434,7 +41479,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: woermann-1969-mg-fe-ti-oxides
   aliases: []
   citation: E. Woermann, B. Brežný, and A. Muan (1969), ‘Phase Equilibria in the System MgO-Iron Oxide-TiO2
@@ -41007,6 +42052,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: yakovleva-2022-alkali-chondrule-evaporation
+  aliases: []
+  citation: Yakovleva, O.I. and Shornikov, S.I. (2022), Effect of Acid-Base Interaction at the Evaporation
+    of Alkaline Components from Chondrule Melts, Geochemistry International 60(5):401-410.
+  doi: 10.1134/S0016702922050111
+  report_number: null
+  identifier: 10.1134/S0016702922050111
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/yakovleva-2022-alkali-chondrule-evaporation/yakovleva-2022-alkali-chondrule-evaporation.pdf
+      present: true
+      sha256: 62db512fea4b54ae9f70e141e8aec0a045e8c5e8a558466a7ffee48b015dffaf
+      matches_simulator: null
+    sidecar:
+      path: raw/yakovleva-2022-alkali-chondrule-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/yakovleva-2022-alkali-chondrule-evaporation
+      exists: true
+      file_count: 25
+    tables:
+      path: tables/yakovleva-2022-alkali-chondrule-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/yakovleva-2022-alkali-chondrule-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: yam1983
   aliases: []
   citation: Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-SiO2
@@ -41651,7 +42754,7 @@ sources:
       error: null
       last_stage: null
       date: null
-    commit: 499a0fd386c3dd006f98398a85ae897c53586288
+    commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
 - source_id: zaitsev-2000-ms2000-045
   aliases: []
   citation: Zaitsev, A. I. (2000). "Knudsen Cell Mass Spectrometry of Slags and Silicates." Proc. VI International

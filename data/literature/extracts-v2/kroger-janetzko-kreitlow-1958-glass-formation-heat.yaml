@@ -1,0 +1,4531 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+observations:
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_bleikristallglas
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 2.9
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Bleikristallglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: '11'
+    note: Bleikristallglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '62.0'
+          - - Na2O
+            - '1.17'
+          - - K2O
+            - '12.99'
+          - - BaO
+            - '3.89'
+          - - PbO
+            - '19.05'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: printed Bleikristallglas composition
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Bleikristallglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Bleikristallglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Bleikristallglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Bleikristallglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_brown_bottle
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.6
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Braunes Flaschenglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: 8a
+    note: Braunes Flaschenglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.9'
+          - - Na2O
+            - '14.6'
+          - - K2O
+            - '0.62'
+          - - CaO
+            - '9.86'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '2.51'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed brown glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Braunes Flaschenglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Braunes Flaschenglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Braunes Flaschenglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_chromgreen_bottle
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.2
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Chromgrünes Flaschenglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: 8a
+    note: Chromgrünes Flaschenglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '72.2'
+          - - Na2O
+            - '15.2'
+          - - K2O
+            - '0.62'
+          - - CaO
+            - '9.75'
+          - - SO3
+            - '0.3'
+          - - Cr2O3
+            - '0.29'
+          - - R2O3
+            - '1.84'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed chrom-green glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Chromgrünes Flaschenglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Chromgrünes Flaschenglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Chromgrünes Flaschenglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Chromgrünes Flaschenglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_fourcault_delog_oxidising
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.8
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Delog), oxydierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 222
+    pdf_page_index: 1
+    note: Fourcaultglas (Delog), oxydierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.11'
+          - - Na2O
+            - '14.34'
+          - - CaO
+            - '7.97'
+          - - MgO
+            - '4.43'
+          - - SO3
+            - '0.47'
+          - - K2O
+            - '0.91'
+          - - R2O3
+            - '0.77'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Delog glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Delog), oxydierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Delog), oxydierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Fourcaultglas (Delog), oxydierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Fourcaultglas (Delog), oxydierend
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_fourcault_detag
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.8
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Detag)
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 222
+    pdf_page_index: 1
+    note: Fourcaultglas (Detag)
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.5'
+          - - Na2O
+            - '15.3'
+          - - CaO
+            - '7.9'
+          - - MgO
+            - '4.2'
+          - - SO3
+            - '0.4'
+          - - K2O
+            - '0.1'
+          - - R2O3
+            - '0.44'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Detag glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Detag)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Fourcaultglas (Detag)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Fourcaultglas (Detag)
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_geraeteglas
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 2.4
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Geräteglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: '11'
+    note: Geräteglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '79.26'
+          Na2O: '5.91'
+          B2O3: '8.41'
+          CaO: '0.89'
+          Al2O3: '5.53'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: printed Geräteglas composition
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Geräteglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Geräteglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Geräteglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Geräteglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_green_bottle_table8a
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.9
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Grünes Flaschenglas, Table 8a
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: 8a
+    note: Grünes Flaschenglas, Table 8a
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '68.90'
+          - - Na2O
+            - '13.80'
+          - - K2O
+            - '1.2'
+          - - CaO
+            - '8.78'
+          - - MgO
+            - '3.3'
+          - - SO3
+            - '0.3'
+          - - Mn2O3
+            - '0.45'
+          - - R2O3
+            - '6.57'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed green glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Grünes Flaschenglas, Table 8a; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Grünes Flaschenglas, Table 8a
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Grünes Flaschenglas, Table 8a
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Grünes Flaschenglas, Table 8a
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_kristallglas
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.8
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Kristallglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: '11'
+    note: Kristallglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '75.0'
+          - - Na2O
+            - '9.06'
+          - - K2O
+            - '7.19'
+          - - CaO
+            - '5.04'
+          - - BaO
+            - '3.89'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: printed Kristallglas composition
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Kristallglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '11'
+        note: Kristallglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Kristallglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '11'
+              note: Kristallglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_libbey_owens_oxidising
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.4
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 222
+        pdf_page_index: 1
+        note: Libbey-Owens-Glas (Delog), oxydierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 222
+    pdf_page_index: 1
+    note: Libbey-Owens-Glas (Delog), oxydierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.21'
+          - - Na2O
+            - '12.93'
+          - - CaO
+            - '9.12'
+          - - MgO
+            - '3.05'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '0.85'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Libbey-Owens glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Libbey-Owens-Glas (Delog), oxydierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Libbey-Owens-Glas (Delog), oxydierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Libbey-Owens-Glas (Delog), oxydierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              note: Libbey-Owens-Glas (Delog), oxydierend
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_rohrenglas_I
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.7
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 225
+    pdf_page_index: 4
+    table: '9'
+    note: Röhrenglas I
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '69.3'
+          - - Na2O
+            - '16.6'
+          - - K2O
+            - '2.39'
+          - - CaO
+            - '6.9'
+          - - R2O3
+            - '4.6'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: analysed tube glass I
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas I
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas I
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_rohrenglas_II
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 3.1
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas II
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 225
+    pdf_page_index: 4
+    table: '9'
+    note: Röhrenglas II
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '70.2'
+          - - Na2O
+            - '12.5'
+          - - K2O
+            - '1.76'
+          - - CaO
+            - '5.78'
+          - - MgO
+            - '3.42'
+          - - BaO
+            - '1.55'
+          - - ZnO
+            - '1.31'
+          - - R2O3
+            - '3.38'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: analysed tube glass II
+    calculated_composition:
+      state:
+        tag: value
+        value:
+          Na2SO4: '0.14'
+          Sb2O3: '0.05'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: calculated [%] column; analysed Na2SO4 and Sb2O3 cells are —
+    analysed_composition_dashes:
+      state:
+        tag: value
+        value:
+          Na2SO4: —
+          Sb2O3: —
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: analysed [%] column; both cells are printed as em dashes
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas II; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas II
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas II
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas II
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_speiser_wirtschaftsglas
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 2.8
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: '10'
+        note: Speiser-Wirtschaftsglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: '10'
+    note: Speiser-Wirtschaftsglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.4'
+          - - Na2O
+            - '14.06'
+          - - K2O
+            - '1.73'
+          - - CaO
+            - '8.04'
+          - - R2O3
+            - '2.77'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '10'
+        note: analysed Speiser glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '10'
+        note: Speiser-Wirtschaftsglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: '10'
+        note: Speiser-Wirtschaftsglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '10'
+              note: Speiser-Wirtschaftsglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: '10'
+              note: Speiser-Wirtschaftsglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_sulfatglas_I
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 3.8
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas I
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: 12a
+    note: Sulfatglas I
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '67.85'
+          Na2O: '11.56'
+          Na2SO4: '2.6'
+          CaO: '15.2'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: printed Sulfatglas I glass composition; caption gives kilograms
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas I; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas I
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas I
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas I
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_sulfatglas_II
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 4.3
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas II
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: 12a
+    note: Sulfatglas II
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '74.15'
+          Na2O: '12.43'
+          Na2SO4: '3'
+          CaO: '11.22'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: printed Sulfatglas II glass composition; caption gives kilograms
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas II; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas II
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas II
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas II
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_sulfatglas_III
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 3.3
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas III
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 226
+    pdf_page_index: 5
+    table: 12a
+    note: Sulfatglas III
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '68.34'
+          Na2O: '13.4'
+          Na2SO4: '3.5'
+          CaO: '13.76'
+          Al2O3·2SiO2: '3.56'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: printed Sulfatglas III glass composition; caption gives kilograms
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas III; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 226
+        pdf_page_index: 5
+        table: 12a
+        note: Sulfatglas III
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas III
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 226
+              pdf_page_index: 5
+              table: 12a
+              note: Sulfatglas III
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_white_bottle
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.5
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Weißes Flaschenglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: 8a
+    note: Weißes Flaschenglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '72.5'
+          - - Na2O
+            - '15.5'
+          - - K2O
+            - '0.4'
+          - - CaO
+            - '6.3'
+          - - BaO
+            - '0.5'
+          - - R2O3
+            - '1.2'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed white glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Weißes Flaschenglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8a
+        note: Weißes Flaschenglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Weißes Flaschenglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: 8a
+              note: Weißes Flaschenglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_reduced_fourcault_delog
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Fourcaultglas (Delog), reduzierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 222
+    pdf_page_index: 1
+    equation: '3'
+    note: Fourcaultglas (Delog), reduzierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.11'
+          - - Na2O
+            - '14.34'
+          - - CaO
+            - '7.97'
+          - - MgO
+            - '4.43'
+          - - SO3
+            - '0.47'
+          - - K2O
+            - '0.91'
+          - - R2O3
+            - '0.77'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Delog glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Fourcaultglas (Delog), reduzierend; the paper gives no quench/preservation statement for this glass
+    atmosphere:
+      state:
+        tag: value
+        value: reducing; corrected from direct calorimetry
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: reducing-furnace correction
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Fourcaultglas (Delog), reduzierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              equation: '3'
+              note: Fourcaultglas (Delog), reduzierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              equation: '3'
+              note: Fourcaultglas (Delog), reduzierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_fourcault_delog_oxidising
+  derivation:
+    relation: author correction from oxidising bomb calorimetry to reducing furnace reaction using printed carbon reaction
+      (3)
+    inputs:
+    - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_fourcault_delog_oxidising
+    parameters: []
+    output_unit: cal/g
+    references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_reduced_libbey_owens
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Libbey-Owens-Glas (Delog), reduzierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 222
+    pdf_page_index: 1
+    equation: '3'
+    note: Libbey-Owens-Glas (Delog), reduzierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.21'
+          - - Na2O
+            - '12.93'
+          - - CaO
+            - '9.12'
+          - - MgO
+            - '3.05'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '0.85'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Libbey-Owens glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 222
+        pdf_page_index: 1
+        note: Libbey-Owens-Glas (Delog), reduzierend; the paper gives no quench/preservation statement for this glass
+    atmosphere:
+      state:
+        tag: value
+        value: reducing; corrected from direct calorimetry
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: reducing-furnace correction
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        equation: '3'
+        note: Libbey-Owens-Glas (Delog), reduzierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              equation: '3'
+              note: Libbey-Owens-Glas (Delog), reduzierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 222
+              pdf_page_index: 1
+              equation: '3'
+              note: Libbey-Owens-Glas (Delog), reduzierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_libbey_owens_oxidising
+  derivation:
+    relation: author correction from oxidising bomb calorimetry to reducing furnace reaction using printed carbon reaction
+      (3)
+    inputs:
+    - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_direct_libbey_owens_oxidising
+    parameters: []
+    output_unit: cal/g
+    references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_dolomite
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: solution_component
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.1
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Dolomit
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '4'
+    note: Dolomit
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Dolomit
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Dolomit
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Dolomit
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_feldspar
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: solution_component
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.9
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Feldspat
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '4'
+    note: Feldspat
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Feldspat
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Feldspat
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Feldspat
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_brown_bottle
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Braunes Flaschenglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 228
+    pdf_page_index: 7
+    table: '16'
+    note: Braunes Flaschenglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.9'
+          - - Na2O
+            - '14.6'
+          - - K2O
+            - '0.62'
+          - - CaO
+            - '9.86'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '2.51'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed brown glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Braunes Flaschenglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 228
+              pdf_page_index: 7
+              table: '16'
+              note: Braunes Flaschenglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 228
+              pdf_page_index: 7
+              table: '16'
+              note: Braunes Flaschenglas
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_brown
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_delog_oxidising
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), oxydierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: '7'
+    note: Fourcaultglas (Delog), oxydierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.11'
+          - - Na2O
+            - '14.34'
+          - - CaO
+            - '7.97'
+          - - MgO
+            - '4.43'
+          - - SO3
+            - '0.47'
+          - - K2O
+            - '0.91'
+          - - R2O3
+            - '0.77'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Delog glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), oxydierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), oxydierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Delog), oxydierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Delog), oxydierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_delog
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_feldspar
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_dolomite
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfate
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_delog_reducing
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), reduzierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: '7'
+    note: Fourcaultglas (Delog), reduzierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.11'
+          - - Na2O
+            - '14.34'
+          - - CaO
+            - '7.97'
+          - - MgO
+            - '4.43'
+          - - SO3
+            - '0.47'
+          - - K2O
+            - '0.91'
+          - - R2O3
+            - '0.77'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Delog glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), reduzierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Delog), reduzierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Delog), reduzierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Delog), reduzierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_delog_oxidising
+  derivation:
+    relation: Reducing-furnace correction from the oxidising solution-calorimetry row using printed carbon reaction (3).
+    inputs:
+    - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_delog_oxidising
+    parameters: []
+    output_unit: kcal/100 kg glass
+    references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_detag
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Detag)
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: '7'
+    note: Fourcaultglas (Detag)
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.5'
+          - - Na2O
+            - '15.3'
+          - - CaO
+            - '7.9'
+          - - MgO
+            - '4.2'
+          - - SO3
+            - '0.4'
+          - - K2O
+            - '0.1'
+          - - R2O3
+            - '0.44'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Detag glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Fourcaultglas (Detag)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Detag)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Fourcaultglas (Detag)
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_detag
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_feldspar
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_dolomite
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfate
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_libbey_oxidising
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, oxydierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: '7'
+    note: Libbey-Owens-Glas, oxydierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.21'
+          - - Na2O
+            - '12.93'
+          - - CaO
+            - '9.12'
+          - - MgO
+            - '3.05'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '0.85'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Libbey-Owens glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, oxydierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, oxydierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Libbey-Owens-Glas, oxydierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Libbey-Owens-Glas, oxydierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_libbey
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_feldspar
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_dolomite
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfate
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_libbey_reducing
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, reduzierend
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    table: '7'
+    note: Libbey-Owens-Glas, reduzierend
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.21'
+          - - Na2O
+            - '12.93'
+          - - CaO
+            - '9.12'
+          - - MgO
+            - '3.05'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '0.85'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Libbey-Owens glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, reduzierend; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: '7'
+        note: Libbey-Owens-Glas, reduzierend
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Libbey-Owens-Glas, reduzierend
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              table: '7'
+              note: Libbey-Owens-Glas, reduzierend
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_libbey_oxidising
+  derivation:
+    relation: Reducing-furnace correction from the oxidising solution-calorimetry row using printed carbon reaction (3).
+    inputs:
+    - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_libbey_oxidising
+    parameters: []
+    output_unit: kcal/100 kg glass
+    references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_formation_rohrenglas_I
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_glass_formation_from_batch'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_glass_formation_from_batch'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the measured reaction heat for batch → glass + gas. Quantity.DELTA_FH
+      is formation from elements, not this batch reaction; retained as typed-refused data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Röhrenglas I
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 228
+    pdf_page_index: 7
+    table: '16'
+    note: Röhrenglas I
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '69.3'
+          - - Na2O
+            - '16.6'
+          - - K2O
+            - '2.39'
+          - - CaO
+            - '6.9'
+          - - R2O3
+            - '4.6'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: analysed tube glass I
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        table: '16'
+        note: Röhrenglas I
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 228
+              pdf_page_index: 7
+              table: '16'
+              note: Röhrenglas I
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 228
+              pdf_page_index: 7
+              table: '16'
+              note: Röhrenglas I
+        output_unit: K
+        references: []
+  derived_from:
+  - kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_rohr1
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_brown
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.9
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 224
+        pdf_page_index: 3
+        note: Braunes Flaschenglas
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 224
+    pdf_page_index: 3
+    note: Braunes Flaschenglas
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.9'
+          - - Na2O
+            - '14.6'
+          - - K2O
+            - '0.62'
+          - - CaO
+            - '9.86'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '2.51'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        table: 8b
+        note: analysed brown glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 224
+        pdf_page_index: 3
+        note: Braunes Flaschenglas; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 224
+        pdf_page_index: 3
+        note: Braunes Flaschenglas
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              note: Braunes Flaschenglas
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 224
+              pdf_page_index: 3
+              note: Braunes Flaschenglas
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_delog
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.4
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Delog)
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '5'
+    note: Fourcaultglas (Delog)
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.11'
+          - - Na2O
+            - '14.34'
+          - - CaO
+            - '7.97'
+          - - MgO
+            - '4.43'
+          - - SO3
+            - '0.47'
+          - - K2O
+            - '0.91'
+          - - R2O3
+            - '0.77'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Delog glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Delog); the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Delog)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Fourcaultglas (Delog)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Fourcaultglas (Delog)
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_detag
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.4
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Detag)
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '5'
+    note: Fourcaultglas (Detag)
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '71.5'
+          - - Na2O
+            - '15.3'
+          - - CaO
+            - '7.9'
+          - - MgO
+            - '4.2'
+          - - SO3
+            - '0.4'
+          - - K2O
+            - '0.1'
+          - - R2O3
+            - '0.44'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Fourcault Detag glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Detag); the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Fourcaultglas (Detag)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Fourcaultglas (Detag)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Fourcaultglas (Detag)
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_libbey
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 0.9
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Libbey-Owens-Glas (Delog)
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '5'
+    note: Libbey-Owens-Glas (Delog)
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '73.21'
+          - - Na2O
+            - '12.93'
+          - - CaO
+            - '9.12'
+          - - MgO
+            - '3.05'
+          - - SO3
+            - '0.47'
+          - - R2O3
+            - '0.85'
+      locator:
+        page: 222
+        pdf_page_index: 1
+        table: '3'
+        note: analyzed Libbey-Owens glass
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Libbey-Owens-Glas (Delog); the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '5'
+        note: Libbey-Owens-Glas (Delog)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Libbey-Owens-Glas (Delog)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '5'
+              note: Libbey-Owens-Glas (Delog)
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_glass_rohr1
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: silicate_glass
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.0
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 225
+    pdf_page_index: 4
+    table: '9'
+    note: Röhrenglas I
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    printed_composition:
+      state:
+        tag: value
+        value:
+          basis: as printed
+          amount_basis: mass_percent
+          components:
+          - - SiO2
+            - '69.3'
+          - - Na2O
+            - '16.6'
+          - - K2O
+            - '2.39'
+          - - CaO
+            - '6.9'
+          - - R2O3
+            - '4.6'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: analysed tube glass I
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I; the paper gives no quench/preservation statement for this glass
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 225
+        pdf_page_index: 4
+        table: '9'
+        note: Röhrenglas I
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas I
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 225
+              pdf_page_index: 4
+              table: '9'
+              note: Röhrenglas I
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfate
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: solution_component
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfat
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '4'
+    note: Natriumsulfat
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfat
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfat
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfat
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfide
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: solution_component
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ± 1.1
+      confidence_level: not_stated
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfid
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '4'
+    note: Natriumsulfid
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfid
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfid
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfid
+        output_unit: K
+        references: []
+- observation_id: kroger-janetzko-kreitlow-1958-glass-formation-heat::kroger_1958_solution_sulfite
+  experiment_id: 10.34657/16750::kroger-janetzko-kreitlow-1958-glass-formation-heat
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution_as_printed'
+    species:
+      formula: solution_component
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution_as_printed'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty printed for this reported value.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact battery quantity token represents the separately measured dissolution heat; the printed value is retained
+      as typed-refused input data.
+    decided_by:
+      worker: w1028naE2-kroger58-glass
+      date: '2026-10-28'
+      evidence:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfit
+  notices: []
+  source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
+  locator:
+    page: 223
+    pdf_page_index: 2
+    table: '4'
+    note: Natriumsulfit
+  read_from: pdf:kroger-janetzko-kreitlow-1958-glass-formation-heat
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 228
+        pdf_page_index: 7
+        section: '8'
+        note: reference temperature stated in section 8
+    temperature_K:
+      state:
+        tag: value
+        value: '293.15'
+      locator:
+        page: 223
+        pdf_page_index: 2
+        table: '4'
+        note: Natriumsulfit
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfit
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 223
+              pdf_page_index: 2
+              table: '4'
+              note: Natriumsulfit
+        output_unit: K
+        references: []

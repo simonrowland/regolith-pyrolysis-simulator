@@ -192,6 +192,34 @@ observations:
         section: 3.1 Element loss as a function of time; equation (1)
         note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure measurement.
         source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 13
+              section: 3.1 Element loss as a function of time; equation (1)
+              note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure
+                measurement.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 13
+              section: 3.1 Element loss as a function of time; equation (1)
+              note: The paper calculates p(Hg) with the ideal gas law, assuming monoatomic Hg0; this is not a direct pressure
+                measurement.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        output_unit: K
+        references: []
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
   - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
@@ -260,6 +288,34 @@ observations:
         note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate calculation
           table.
         source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              pdf_page_index: 20
+              section: 4. Conclusions
+              note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate
+                calculation table.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 20
+              section: 4. Conclusions
+              note: The conclusion states the result for about 40 ppb Hg at 1400 C; the supplied PDF does not print a separate
+                calculation table.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        output_unit: K
+        references: []
   derived_from:
   - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_starting_material_hg_and_trace_doping
   - boulliung-2025-mercury-volatile-metals-magmatic::context::boulliung_2025_ssas_apparatus_and_run_conditions
@@ -327,6 +383,34 @@ observations:
         section: 3.1 Element loss as a function of time
         note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
         source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 13
+              figure: 2A
+              section: 3.1 Element loss as a function of time
+              note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 13
+              figure: 2A
+              section: 3.1 Element loss as a function of time
+              note: The article prints the values in prose; Figure 2 curves are only guides for the eyes and were not digitised.
+              source_path: corpus/raw/boulliung-2025-mercury-volatile-metals-magmatic/boulliung-2025-mercury-volatile-metals-magmatic.pdf
+        output_unit: K
+        references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation
   experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
   identity:

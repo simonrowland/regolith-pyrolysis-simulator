@@ -1,0 +1,292 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/zaac.19301910102
+  citation: D’Ans, J. and Löffler, J. (1930). Untersuchungen im System Na2O-SiO2-ZrO2. Zeitschrift für anorganische und allgemeine
+    Chemie 191(1–2):1–35.
+  source_ids:
+  - dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      role: pdf
+      path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+      sha256:
+        tag: value
+        value: f5d967609078e9239376dc7e981ee23573dae003abe95cdec33d380562f8a98c
+    - asset_id: pdftotext:dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      role: pdftotext
+      path: text/dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1002/zaac.19301910102
+experiments:
+- experiment_id: 10.1002/zaac.19301910102::dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1002/zaac.19301910102
+  locator:
+    page: 9
+    pdf_page_index: 8
+    table: '1'
+    note: Thermal effect on heating/cooling curve.; row=experiment 1; run 135/6; column=7; table_row_number=4; table_column_number=7
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+context:
+- type: table_record
+  observation_id: dans1930_pure_compound_summary_row_without_melting_temperature
+  units: °C for melting temperature; no temperature printed
+  locator:
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+    pdf_page_index: 33
+    page: 34
+    row: Na2ZrSi2O7
+    table_row_number: 8
+    table_column_number: 2
+  note: The seventh pure-compound summary row has no melting point printed.
+  values:
+    formula: Na2ZrSi2O7
+    melting_temperature: —
+  context_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria::context::dans1930_pure_compound_summary_row_without_melting_temperature
+  work_id: 10.1002/zaac.19301910102
+  source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  species: Na2O
+- type: table_record
+  observation_id: dans1930_table2_compilation_context
+  units: temperature °C; oxide compositions mol% as printed
+  locator:
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+    pdf_page_index: 11
+    page: 12
+    table: '2'
+    row: all rows
+  note: Table 2 compiles Morey and Bowen values together with the authors’ results, without row-wise attribution; retained
+    as context, not scored observations.
+  values:
+    printed_count: 12
+    composition_basis_as_published: Mol-%
+    rows:
+    - row: 1
+      description: Na2O melting point
+      temperature_C: 850?
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 2
+      description: eutectic Na2O–Na4SiO4
+      temperature_C: (800)?
+      Na2O_mol_pct: '?'
+      SiO2_mol_pct: '?'
+    - row: 3
+      description: alpha-Na4SiO4 melting point
+      temperature_C: '1083'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 4
+      description: alpha-beta Na4SiO4 transition
+      temperature_C: '960'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 5
+      description: eutectic alpha-Na4SiO4–Na6Si2O7
+      temperature_C: '1000'
+      Na2O_mol_pct: 63,5
+      SiO2_mol_pct: 36,5
+    - row: 6
+      description: Na6Si2O7 melting point
+      temperature_C: '1122'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 7
+      description: eutectic Na6Si2O7–mixed-crystal Na2SiO3
+      temperature_C: '1015'
+      Na2O_mol_pct: 54,5
+      SiO2_mol_pct: 45,5
+    - row: 8
+      description: Na2SiO3 melting point
+      temperature_C: '1088'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 9
+      description: eutectic Na2SiO3–Na2Si2O5
+      temperature_C: '840'
+      Na2O_mol_pct: 38,5
+      SiO2_mol_pct: 61,5
+    - row: 10
+      description: Na2Si2O5 melting point
+      temperature_C: '874'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+    - row: 11
+      description: eutectic Na2Si2O5–quartz
+      temperature_C: '793'
+      Na2O_mol_pct: 25,9
+      SiO2_mol_pct: 74,1
+    - row: 12
+      description: cristobalite melting point
+      temperature_C: '1710'
+      Na2O_mol_pct: —
+      SiO2_mol_pct: —
+  context_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria::context::dans1930_table2_compilation_context
+  work_id: 10.1002/zaac.19301910102
+  source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  species: Na2O
+- type: table_record
+  observation_id: dans1930_table4_point12_run15_17_continuation
+  units: oxide composition mol% and thermal effects °C as printed
+  locator:
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+    pdf_page_index: 17
+    page: 18
+    table: '4'
+    row: 12 continuation
+    column: Vers.-Nr.
+    table_row_number: 5
+    table_column_number: 2
+  note: The second printed line for point 12 lists runs 15–17 and dashes for composition and thermal effects.
+  values:
+    point_as_printed: '12'
+    run_as_printed: 15–17
+    composition_as_printed: —
+    thermal_effects_as_printed:
+    - —
+    - —
+    - —
+    - —
+  context_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria::context::dans1930_table4_point12_run15_17_continuation
+  work_id: 10.1002/zaac.19301910102
+  source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  species: Na2O
+- type: table_record
+  observation_id: dans1930_table4_point_N_without_temperature
+  units: oxide composition mol% as printed
+  locator:
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+    pdf_page_index: 17
+    page: 18
+    table: '4'
+    row: N
+    table_row_number: 13
+    table_column_number: 1
+  note: Table 4 row N prints the composition but no thermal-effect temperature.
+  values:
+    composition_as_published: Na2O 34,5 mol%; SiO2 34,5 mol%; ZrO2 31,0 mol%
+    composition_mol_percent:
+      Na2O: '34.5'
+      SiO2: '34.5'
+      ZrO2: '31.0'
+    thermal_effect: —
+  context_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria::context::dans1930_table4_point_N_without_temperature
+  work_id: 10.1002/zaac.19301910102
+  source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  species: Na2O
+- type: table_record
+  observation_id: dans1930_table6_no_detectable_transition_rows
+  units: oxide composition mol% as printed; no temperature detected
+  locator:
+    source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+    pdf_page_index: 27
+    page: 28
+    table: '6'
+    row: rows 39, 40, 44, 46
+  note: Four printed Table 6 rows report no detectable or no temperature effect; compositions are retained without inventing
+    a temperature.
+  values:
+    printed_count: 4
+    rows:
+    - row_as_printed: '39'
+      run_note: not detectable; run 212
+      composition_as_published: Na2O 47,5 mol%; SiO2 20,0 mol%; ZrO2 32,5 mol%
+      composition_mol_percent:
+        Na2O: '47.5'
+        SiO2: '20.0'
+        ZrO2: '32.5'
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 27
+        page: 28
+        table: '6'
+        row: '39'
+        table_row_number: 10
+        table_column_number: 6
+    - row_as_printed: '40'
+      run_note: not detectable
+      composition_as_published: Na2O 47,5 mol%; SiO2 25,0 mol%; ZrO2 27,5 mol%
+      composition_mol_percent:
+        Na2O: '47.5'
+        SiO2: '25.0'
+        ZrO2: '27.5'
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 27
+        page: 28
+        table: '6'
+        row: '40'
+        table_row_number: 12
+        table_column_number: 6
+    - row_as_printed: '44'
+      run_note: not detectable
+      composition_as_published: Na2O 46,5 mol%; SiO2 28,5 mol%; ZrO2 25,0 mol%
+      composition_mol_percent:
+        Na2O: '46.5'
+        SiO2: '28.5'
+        ZrO2: '25.0'
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 27
+        page: 28
+        table: '6'
+        row: '44'
+        table_row_number: 16
+        table_column_number: 6
+    - row_as_printed: '46'
+      run_note: not detectable
+      composition_as_published: Na2O 41,3 mol%; SiO2 32,3 mol%; ZrO2 26,3 mol%
+      composition_mol_percent:
+        Na2O: '41.3'
+        SiO2: '32.3'
+        ZrO2: '26.3'
+      locator:
+        source_path: raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
+        pdf_page_index: 27
+        page: 28
+        table: '6'
+        row: '46'
+        table_row_number: 18
+        table_column_number: 6
+  context_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria::context::dans1930_table6_no_detectable_transition_rows
+  work_id: 10.1002/zaac.19301910102
+  source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+  species: Na2O

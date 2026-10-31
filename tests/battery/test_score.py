@@ -1084,6 +1084,78 @@ def test_admitted_figure_only_kems_partial_pressure_scores_with_apparatus_flag()
     )
 
 
+@pytest.mark.parametrize(
+    ("source", "standard_field", "standard", "auxiliary_fields"),
+    (
+        (
+            "Ostrovski 2000",
+            "reference_substance",
+            "Gold 99.999 wt% and anhydrous CaF2 99.9 wt%",
+            ("multiplier_isotope_corrections",),
+        ),
+        (
+            "Shults 1994",
+            "reference_substance",
+            "silver and gold vapors",
+            ("ionization_cross_sections", "multiplier_or_isotope_corrections"),
+        ),
+        (
+            "Shults 1995",
+            "reference_substances",
+            "pure CaO and Al2O3 oxides; I0 currents measured in vapor over those oxides",
+            ("pressure_conversion",),
+        ),
+    ),
+)
+def test_auxiliary_unpublished_calibration_does_not_flag_printed_standard(
+    source: str,
+    standard_field: str,
+    standard: str,
+    auxiliary_fields: tuple[str, ...],
+) -> None:
+    experiment = F.kems_experiment(calibrated=False)
+    assert experiment.apparatus is not None
+    calibration = {
+        standard_field: Located(
+            State.of(standard), locator=F.loc(page=4)
+        ),
+        **{
+            field: Located(State.unknown("not_published"), locator=F.loc(page=4))
+            for field in auxiliary_fields
+        },
+    }
+    experiment = replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, calibration=calibration),
+    )
+    reference = _uncalibrated_kems_partial_row(
+        experiment,
+        f"{source.casefold().replace(' ', '-')}-partial-pressure",
+        Decimal("1"),
+    )
+
+    def must_not_predict(*_args, **_kwargs):
+        pytest.fail(
+            "an auxiliary not_published reason must not waive calibration refusal"
+        )
+
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        predict=must_not_predict,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert residual.refusal.detail["primary_check"] == "kems_calibration"
+    assert not any(
+        notice.reason.startswith("calibration_not_grounded:")
+        for notice in residual.notices
+    )
+
+
 def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
@@ -5165,6 +5237,181 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     )] == [("catalogue-composition", 1)]
 
 
+@pytest.mark.parametrize(
+    ("relation", "scores"),
+    (
+        ("binary_complement", True),
+        ("printed_mole_fraction", False),
+        ("extract_inference", False),
+    ),
+)
+def test_only_binary_complement_point_compositions_score_and_flag(
+    relation: str, scores: bool
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        flagged_strata,
+    )
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="binary_complement",
+        components=(("SrO", Decimal("0.33")), ("Al2O3", Decimal("0.67"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    inference = Derivation(
+        relation=relation,
+        inputs=("caption: 33 mol% SrO",),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    identity = replace(
+        _partial_identity(),
+        composition=State.unknown("composition is recorded on the source point"),
+    )
+    reference = replace(
+        F.observation(
+            f"binary-complement-{relation}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="binary-complement-source",
+        ),
+        point_conditions={
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="S7", note="sample 1 caption: 33 mol% SrO"),
+                inference=inference,
+            )
+        },
+    )
+    prediction = (
+        replace(
+            _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+            requested_composition=State.of(composition),
+        )
+        if scores
+        else _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=prediction,
+    )
+
+    complement_notices = tuple(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.COMPOSITION_BINARY_COMPLEMENT
+    )
+    if scores:
+        assert residual.status is not ResidualStatus.REFUSED
+        assert residual.numeric is not None
+        assert len(complement_notices) == 1
+        assert (
+            "complement of the caption mole percent"
+            in complement_notices[0].reason
+        )
+        assert flagged_strata(residual.notices) == (
+            FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        )
+        payload_notice = next(
+            notice
+            for notice in residual_to_plain(residual)["notices"]
+            if notice["kind"] == "composition_binary_complement"
+        )
+        assert payload_notice["kind"] == "composition_binary_complement"
+    else:
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        assert complement_notices == ()
+
+
+@pytest.mark.parametrize(
+    ("quantity", "effusion_refusal"),
+    ((Quantity.ION_INTENSITY, False), (Quantity.P_PARTIAL, True)),
+)
+def test_binary_complement_notice_requires_composition_consumption(
+    quantity: Quantity, effusion_refusal: bool
+) -> None:
+    composition = Composition(
+        basis="binary_complement",
+        components=(("SrO", Decimal("0.33")), ("Al2O3", Decimal("0.67"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    inference = Derivation(
+        relation="binary_complement",
+        inputs=("caption: 33 mol% SrO",),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+
+    def point_observation(experiment, observation_id, identity, value):
+        reference = F.observation(
+            observation_id,
+            experiment.experiment_id,
+            identity,
+            value,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="binary-complement-source",
+        )
+        return replace(
+            reference,
+            point_conditions={
+                "composition": Located(
+                    State.of(composition),
+                    locator=F.loc(table="S7", note="sample 1 caption: 33 mol% SrO"),
+                    inference=inference,
+                )
+            },
+        )
+
+    experiment = (
+        F.kems_experiment(orifice_area=None, clausing=None, kn=None, calibrated=False)
+        if effusion_refusal
+        else F.tabulation_experiment()
+    )
+    identity = replace(
+        _partial_identity(),
+        quantity=quantity,
+        composition=State.unknown("composition is recorded on the source point"),
+        total_pressure_Pa=(
+            State.of(Decimal("1e-6")) if effusion_refusal else None
+        ),
+    )
+    reference = point_observation(
+        experiment,
+        "binary-complement-effusion-refusal"
+        if effusion_refusal
+        else "binary-complement-ion-intensity",
+        identity,
+        Decimal("11") if effusion_refusal else Decimal("1"),
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(
+            F.work(), experiment, reference, review="reviewed"
+        ),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is (
+        RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        if effusion_refusal
+        else RefusalReason.UNSUPPORTED
+    )
+    if not effusion_refusal:
+        assert residual.refusal.detail["reason"] == "not_a_vapour_quantity"
+    assert all(
+        notice.kind is not NoticeKind.COMPOSITION_BINARY_COMPLEMENT
+        for notice in residual.notices
+    )
+
+
 def test_hastie_initial_charge_notice_reaches_residual() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -5657,8 +5904,10 @@ def _context_for_sibling_oxygen(
     The regenerated sibling is ``quoted_attributed`` and its observation
     ids match a fresh migration of ``extract_name``. Anything else is
     stale: ``model_derived``, or a quoted relabel that kept the previous
-    ``:h=`` ids (stable_ids.py hashes the extract row). Series stems,
-    that suffix stripped, must still match.
+    ``:h=`` ids (stable_ids.py hashes the extract row). Every store
+    series stem, that suffix stripped, must still be in the fresh
+    migration. A fresh stem the store does not have is allowed only when
+    every observation on it is figure-only evidence.
     """
     from simulator.battery.migrate import load_migrated_context
     from tests.battery.test_migrate import _migrate_real_extract
@@ -5691,9 +5940,22 @@ def _context_for_sibling_oxygen(
         and set(fresh.observations) == set(context.observations)
     ):
         return context
-    assert {_series_stem(observation_id) for observation_id in fresh.observations} == {
+    store_stems = {
         _series_stem(observation_id) for observation_id in context.observations
     }
+    fresh_stems = {
+        _series_stem(observation_id) for observation_id in fresh.observations
+    }
+    missing = store_stems - fresh_stems
+    assert not missing, missing
+    extra = fresh_stems - store_stems
+    for observation_id, observation in fresh.observations.items():
+        if _series_stem(observation_id) not in extra:
+            continue
+        evidence = observation.evidence.class_
+        assert (
+            evidence.is_value and evidence.value is EvidenceClass.FIGURE_ONLY
+        ), observation_id
     validation = validate_corpus(
         context.works,
         context.experiments,
@@ -6014,14 +6276,16 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
             for notice in residual.notices
         )
     }
+    # The :h= suffixes moved when the Table 2 run conditions were recorded.
+    # len(selected) is 29 and the slope below is still 5.19.
     assert unverified_keys == {
-        "h=2b0d96585c1f",
-        "h=70d0b48ae622",
-        "h=77e8a8961618",
-        "h=8e2834e7ce16",
-        "h=8fb519888bcb",
-        "h=9482b6cd970a",
-        "h=b8e8d996ef46",
+        "h=15e3aebeca85",
+        "h=1b65d2b9485a",
+        "h=29181d3aa8bb",
+        "h=306f8c55d11e",
+        "h=485a267bf37a",
+        "h=63f27b05b715",
+        "h=e37db2ee7220",
     }
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
@@ -6118,6 +6382,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
@@ -6141,6 +6406,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
             NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
             "catalogue_composition:probe",
+        ),
+        (
+            FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+            NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            "composition_binary_complement:probe",
         ),
         (
             FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -6190,6 +6460,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
 def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
@@ -6210,6 +6481,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
         (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
         (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
+        (
+            NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            "composition_binary_complement:probe",
+        ),
         (NoticeKind.SOURCE_DISAGREEMENT, "source_internally_inconsistent:probe"),
         (NoticeKind.IMCC_COMPLEX_SATURATION, "imcc_complex_saturation:probe"),
         (
@@ -6242,6 +6517,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
@@ -15677,6 +15953,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             use_repository_index_row=True,
         )
         for source_id in (
+            "kems-051-allibert-1981",
             "kems-053-stolyarova-1991",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova-1996-cao-alumina-silica-kems",
@@ -16063,17 +16340,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             )
             for row in allibert_cao_rows
         )
+        # a5c006e43 added printed row/column coordinates to each point; the
+        # migrator hashes the full point, so these seven admitted rows changed IDs.
         unprinted_cao_references = {
             "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h="
             + suffix
             for suffix in (
-                "089e4f903141",
-                "0a68381c8d07",
-                "3816d169fbf5",
-                "803c6b10f6a7",
-                "98d5192921f6",
-                "b3b06405be2e",
-                "d5945aa87c1c",
+                "0a9ee70de0a3",
+                "0e32f4985ad8",
+                "537d124817e3",
+                "5c0602c60016",
+                "a124fa850837",
+                "b03402915fb9",
+                "c6f2b8a83874",
             )
         }
         affected_cao_rows = [

@@ -249,6 +249,7 @@ class NoticeKind(StrEnum):
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
+    COMPOSITION_BINARY_COMPLEMENT = "composition_binary_complement"
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"

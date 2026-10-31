@@ -1,0 +1,286 @@
+schema_version: literature_extract.v1
+source_id: ramteke-2026-alkali-vapor-corrosion-spinels
+source:
+  citation: Ramteke, Rajat Durgesh, James G. Hemrick, and Manoj K. Mahapatra (2026). Alkali Vapor
+    Corrosion of Spinel (MgAl2O4) and Gahnite (ZnAl2O4) Refractories—A Comparative Study. Journal
+    of the American Ceramic Society 109, e70773.
+  doi: 10.1111/jace.70773
+  url: https://doi.org/10.1111/jace.70773
+  year: 2026
+  provenance_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+extraction:
+  method: Transcribed from the born-digital pdftotext layout and MinerU table blocks. MinerU table
+    drafts were compared with pdftotext; each relevant printed table layout was checked against its
+    PDF page render. Figures were not digitized. Only MgAl2O4 and ZnAl2O4 results are in scope;
+    mixed Mg-Zn spinel rows are audited as out of scope.
+  date: '2026-10-28'
+  worker: w1028naE-ramteke26-spinel
+  note: The paper reports no specimen mass-change measurement. Its abstract and conclusions state
+    approximately 1371 C, while Experimental Procedures describes an initial 1361 C test that
+    dislodged the specimen, then says a modified schedule was adopted for subsequent tests. The
+    source does not explicitly tie the reported table results to one of those temperatures, so no
+    single exposure temperature is assigned. It reports a 24 h dwell and Na2CO3 alkali source.
+    No gas atmosphere or test total pressure is specified for the reported corrosion results. The
+    approximately 155027 Pa value is a calculated pressure for the failed initial assembly and is
+    not used as an exposure condition. Corrosion/infiltration depth and EDS at% have no fitting
+    stored observation quantity/basis; phase identifications are categorical reaction products,
+    not a transition-temperature observation. See the committed audit for the closed-token checks.
+review_status: draft
+corrections: []
+species:
+  MgAl2O4:
+    observations: []
+    context:
+    - observation_id: ramteke_2026_mgal2o4_test_conditions
+      type: exposure_test_conditions
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 2
+        section: 2.2 Test Setup
+      phase: refractory_specimen
+      regime: sodium_carbonate_vapor_attack
+      units: as printed
+      values:
+        method_class: measured_direct
+        standard: ASTM C987-10
+        alkali_source: anhydrous sodium carbonate powder, Na2CO3
+        dwell: 24 h
+        first_test_temperature_C: '1361'
+        modified_schedule: intermittent dwells at approximately 816 C for 0.5 h and approximately
+          917 C for 1 h, then the corrosion-test schedule shown in Figure 1C
+        abstract_and_conclusion_temperature_C: approximately 1371
+        reported_test_temperature_state: unknown_due_to_source_disagreement
+        gas_atmosphere: not_reported
+        total_pressure: not_reported_for_reported_results
+        calculated_pressure_for_failed_initial_test_Pa: approximately 155027
+        note: The 1361 C experiment is explicitly described as the initial test that dislodged the
+          specimen. The text does not unambiguously state the setpoint for the subsequent specimens
+          whose corrosion results are reported. The calculated internal pressure belongs to the
+          failed initial assembly and is not an experimental pressure condition for these results.
+    - observation_id: ramteke_2026_mgal2o4_corrosion_depths
+      type: penetration_depth_measurement
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 9
+        table: '4'
+        row_label: MgAl2O4
+      phase: refractory_specimen
+      regime: sodium_carbonate_vapor_attack
+      units: micrometre
+      values:
+        method_class: measured_direct
+        corrosion_depth_as_printed: 254 ± 47
+        infiltration_depth_as_printed: 416 ± 15
+        corrosion_depth_definition: thickness completely lost due to corrosion
+        infiltration_depth_definition: corroded layer plus adjacent refractory with cracks, pores,
+          or other microstructural damage
+        uncertainty_notice: confidence level not stated
+        measurement_reference: original refractory surface, identified from initial specimen height
+          and unaffected edges
+        schema_gap: Quantity in simulator/battery/enums.py:62-111 has no corrosion_depth or
+          infiltration_depth member; wall_deposit_mass is mass, not depth.
+        note: Printed Table 4 values are retained without converting the printed uncertainty width.
+    - observation_id: ramteke_2026_mgal2o4_surface_eds_table1
+      type: surface_eds_composition
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 6
+        table: '1'
+      phase: corroded_surface_features
+      regime: sodium_carbonate_vapor_attack
+      units: at% as printed
+      values:
+        method_class: measured_direct
+        uncertainty_notice: confidence level not stated
+        basis_as_printed: atomic percent; standardless EDS, averages of a minimum of five spots and
+          five selected areas
+        features: [P, Q1, Q2, Q3, R]
+        measurements:
+          O: ['54 ± 1.3', '56.9 ± 0.2', '62.9 ± 1.2', '61.3 ± 1.2', '58.8 ± 1']
+          Na: ['3.3 ± 0.2', '22.7 ± 0.7', '24 ± 2.9', '29.9 ± 1.3', '22.4 ± 1.6']
+          Mg: ['42.3 ± 1.5', '0.6 ± 0.4', '2.6 ± 2.4', '1.8 ± 0.8', '12.5 ± 2.9']
+          Al: ['0.3 ± 0.05', '18.9 ± 0.6', '0.6 ± 0.5', '3 ± 1.3', '2.5 ± 0.3']
+          Ca: ['0', '0.1 ± 0', '9.7 ± 2.6', '3.8 ± 1.6', '3.8 ± 1.3']
+        reported_compounds: [MgO at P, NaAlO2 at Q1]
+        layer_width_mm: ['17.1 ± 0.1', '0.8 ± 0.2', '0.8 ± 0.2', '0.5 ± 0.2', '4.3 ± 1']
+        schema_gap: PHASE_BASIS_TOKENS in simulator/battery/enums.py:663 has no at_percent basis.
+          The available equilibrium_phase_composition quantity is not this standardless EDS
+          composition of reacted solid surface features.
+    - observation_id: ramteke_2026_mgal2o4_cross_section_eds_table5
+      type: cross_section_eds_composition
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 10
+        table: '5'
+      phase: corroded_cross_section_features
+      regime: sodium_carbonate_vapor_attack
+      units: at% as printed
+      values:
+        method_class: measured_direct
+        uncertainty_notice: confidence level not stated
+        basis_as_printed: atomic percent; standardless EDS, averages of a minimum of five spots and
+          five selected areas
+        features: [Pcs, U_feature_1, U_feature_2, V_feature_3, V_feature_4]
+        measurements:
+          O: ['57.7 ± 1.0', '60 ± 1.8', '56 ± 7', '62.8 ± 0.9', '63.5 ± 2.9']
+          Na: ['5.7 ± 1.2', '27.4 ± 7.4', '21.2 ± 2.5', '1.5 ± 0.1', '17 ± 5']
+          Mg: ['32.6 ± 3.3', '0', '1.2 ± 0.7', '12.1 ± 0.3', '5.4 ± 2.9']
+          Al: ['2.9 ± 0.9', '5.4 ± 4.5', '17 ± 6', '22.7 ± 0.6', '12.6 ± 5.6']
+          Ca: ['0', '0', '0.8 ± 0.4', '0', '1.1 ± 0.9']
+        reported_compounds: [MgO at Pcs, NaAlO2 at U feature 2, MgAl2O4 at V feature 3]
+        layer_thickness_um:
+          Pcs: 40.9 ± 3.2
+          U_features_1_and_2_combined: 287.3 ± 14.7
+          V_features_3_and_4_combined: 92.9 ± 38.4
+        schema_gap: PHASE_BASIS_TOKENS in simulator/battery/enums.py:663 has no at_percent basis.
+          The available equilibrium_phase_composition quantity is not this standardless EDS
+          composition of reacted solid cross-section features.
+    - observation_id: ramteke_2026_mgal2o4_phase_products
+      type: corrosion_phase_identification
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 4
+        figure: '3'
+        section: 3.1.1 XRD Analysis
+      phase: corroded_surface
+      regime: sodium_carbonate_vapor_attack
+      units: categorical phase names; no numerical unit
+      values:
+        method_class: measured_direct
+        technique: X-ray diffraction
+        detected_corrosion_products: [MgO, orthorhombic NaAlO2]
+        remaining_unidentified_peaks: true
+        mass_change: not_reported
+        schema_gap: OBSERVATION_TYPES in tools/validate_literature_extracts.py:79-100 has no
+          corrosion_phase_identification type; categorical products are not transition_temperature
+          data or a PHASE_MAP sample phase.
+  ZnAl2O4:
+    observations: []
+    context:
+    - observation_id: ramteke_2026_znal2o4_test_conditions
+      type: exposure_test_conditions
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 2
+        section: 2.2 Test Setup
+      phase: refractory_specimen
+      regime: sodium_carbonate_vapor_attack
+      units: as printed
+      values:
+        method_class: measured_direct
+        standard: ASTM C987-10
+        alkali_source: anhydrous sodium carbonate powder, Na2CO3
+        dwell: 24 h
+        first_test_temperature_C: '1361'
+        modified_schedule: intermittent dwells at approximately 816 C for 0.5 h and approximately
+          917 C for 1 h, then the corrosion-test schedule shown in Figure 1C
+        abstract_and_conclusion_temperature_C: approximately 1371
+        reported_test_temperature_state: unknown_due_to_source_disagreement
+        gas_atmosphere: not_reported
+        total_pressure: not_reported_for_reported_results
+        calculated_pressure_for_failed_initial_test_Pa: approximately 155027
+        note: The 1361 C experiment is explicitly described as the initial test that dislodged the
+          specimen. The text does not unambiguously state the setpoint for the subsequent specimens
+          whose corrosion results are reported. The calculated internal pressure belongs to the
+          failed initial assembly and is not an experimental pressure condition for these results.
+    - observation_id: ramteke_2026_znal2o4_corrosion_depths
+      type: penetration_depth_measurement
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 9
+        table: '4'
+        row_label: ZnAl2O4
+      phase: refractory_specimen
+      regime: sodium_carbonate_vapor_attack
+      units: micrometre
+      values:
+        method_class: measured_direct
+        corrosion_depth_as_printed: 847 ± 264
+        infiltration_depth_as_printed: 1223 ± 60
+        corrosion_depth_more_precise_as_printed: 846.8 ± 263.9
+        corrosion_depth_more_precise_locator: page 13, section 4 Discussion
+        infiltration_depth_definition: corroded layer plus adjacent refractory with cracks, pores,
+          or other microstructural damage
+        uncertainty_notice: confidence level not stated
+        measurement_reference: original refractory surface, identified from initial specimen height
+          and unaffected edges
+        schema_gap: Quantity in simulator/battery/enums.py:62-111 has no corrosion_depth or
+          infiltration_depth member; wall_deposit_mass is mass, not depth.
+        note: Table 4 prints rounded values, while the discussion gives the corrosion depth at higher
+          precision; both are retained as printed. Uncertainty confidence level is not stated.
+    - observation_id: ramteke_2026_znal2o4_surface_eds_table2
+      type: surface_eds_composition
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 7
+        table: '2'
+      phase: corroded_surface_features
+      regime: sodium_carbonate_vapor_attack
+      units: at% as printed
+      values:
+        method_class: measured_direct
+        uncertainty_notice: confidence level not stated
+        basis_as_printed: atomic percent; standardless EDS, averages of a minimum of five spots and
+          five selected areas
+        features: [P, Q1, Q2, R]
+        measurements:
+          O: ['54.9 ± 1.6', '53.9 ± 1.2', '61.1 ± 2.1', '64.6 ± 0.8']
+          Na: ['3.5 ± 0.7', '15.8 ± 1.0', '4.3 ± 2.4', '1.56 ± 0.7']
+          Zn: ['39.8 ± 1.6', '0.6 ± 0.4', '26.9 ± 3.6', '11.5 ± 0.6']
+          Al: ['0.2 ± 0', '12.9 ± 1.2', '5.2 ± 2.2', '20.7 ± 0.3']
+          Ca: ['0.2 ± 0', '1.1 ± 0.2', '0.1 ± 0.1', '0.1 ± 0']
+        reported_compounds: [ZnO at P, NaAlO2 at Q1, NaAlO2 plus ZnO at Q2]
+        grain_size_um: ['65 ± 32', not_reported, '3.3 ± 1', '3.7 ± 1.2']
+        layer_width_mm: ['18.4 ± 1.8', '1.4 ± 0.1', '1.31 ± 0.1', '3.23 ± 1.5']
+        schema_gap: PHASE_BASIS_TOKENS in simulator/battery/enums.py:663 has no at_percent basis.
+          The available equilibrium_phase_composition quantity is not this standardless EDS
+          composition of reacted solid surface features.
+    - observation_id: ramteke_2026_znal2o4_cross_section_eds_table6
+      type: cross_section_eds_composition
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 12
+        table: '6'
+      phase: corroded_cross_section_features
+      regime: sodium_carbonate_vapor_attack
+      units: at% as printed
+      values:
+        method_class: measured_direct
+        uncertainty_notice: confidence level not stated
+        basis_as_printed: atomic percent; standardless EDS, averages of a minimum of five spots and
+          five selected areas
+        features: [Pcs, U1_feature_1, U1_feature_2, U2_feature_3, V_feature_4, V_feature_5]
+        measurements:
+          O: ['56.2 ± 1.7', '59.6 ± 9.3', '65.9 ± 6.2', '65.5 ± 2.5', '63.2 ± 0.8', '61.9 ± 4.1']
+          Na: ['0', '0', '18.9 ± 11.6', '30.6 ± 3.9', '0', '4.2 ± 1.3']
+          Zn: ['42.5 ± 1.2', '36.8 ± 9.6', '0.6 ± 0', '0.2 ± 0.1', '11.9 ± 0.5', '12 ± 1']
+          Al: ['0.6 ± 0.1', '0.5 ± 0.2', '6.6 ± 6.4', '3.2 ± 2.2', '24.2 ± 0.3', '21.8 ± 1.6']
+          Ca: ['0.1 ± 0', '0.1 ± 0', '0.64 ± 0.4', '0.1 ± 0', '0', '0.2 ± 0']
+        reported_compounds: [ZnO at Pcs, ZnO at U1 feature 1, ZnAl2O4 at V feature 4]
+        layer_thickness_um:
+          Pcs: 16 ± 6
+          U1_features_1_and_2_combined: 332 ± 24
+          U2_feature_3: 355 ± 16
+          V_features_4_and_5_combined: 137 ± 62
+        schema_gap: PHASE_BASIS_TOKENS in simulator/battery/enums.py:663 has no at_percent basis.
+          The available equilibrium_phase_composition quantity is not this standardless EDS
+          composition of reacted solid cross-section features.
+    - observation_id: ramteke_2026_znal2o4_phase_products
+      type: corrosion_phase_identification
+      locator:
+        source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+        page: 4
+        figure: '3'
+        section: 3.1.1 XRD Analysis
+      phase: corroded_surface
+      regime: sodium_carbonate_vapor_attack
+      units: categorical phase names; no numerical unit
+      values:
+        method_class: measured_direct
+        technique: X-ray diffraction
+        detected_corrosion_products: [ZnO, orthorhombic NaAlO2]
+        remaining_unidentified_peaks: true
+        mass_change: not_reported
+        schema_gap: OBSERVATION_TYPES in tools/validate_literature_extracts.py:79-100 has no
+          corrosion_phase_identification type; categorical products are not transition_temperature
+          data or a PHASE_MAP sample phase.

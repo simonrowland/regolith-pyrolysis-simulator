@@ -70,6 +70,17 @@ source_tables:
         γFeO/γ"FeO" is the activity coefficient relative to stoichiometric FeO divided by the activity coefficient
         relative to wüstite; the ratio is 1.66 at 1600°C.
       locator: {page: 30, section: '4.1 Activity coefficients'}
+    wustite_stoichiometry:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: {page: 31, section: '4.1 Activity coefficients'}
+      note: >-
+        The paper does not print Fe0.947O or a numeric value of x. Page 31 states that the FeO standard state
+        chosen is "FeO"-wüstite(l), contrasted with stoichiometric FeO(l). Equation 9 on page 30 is the free
+        energy of that wüstite liquid, used in Equation 4. The printed Barin (1989) ratio of the stoichiometric
+        FeO activity coefficient to the wüstite activity coefficient is 1.94 at 1400°C (page 31), 2.02 at 1300°C
+        and 1.66 at 1600°C (page 30).
 extraction:
   method: layout-preserving pdftotext manual transcription; source tables and prose reviewed
   date: '2026-09-20'
@@ -3440,6 +3451,14 @@ species:
         log_fO2_scale_and_control:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        metal_Fe_wt_pct:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: {page: 23, table: '2'}
+          note: >-
+            Table 2 does not print the Fe assay of the metal. Alloy rows are recalculated to pure-metal
+            equilibria (page 25). The melt Fe assay is the printed XFeO mole percent on each row.
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
         alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
         series:
@@ -5257,6 +5276,14 @@ species:
         log_fO2_scale_and_control:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        metal_Fe_wt_pct:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: {page: 24, table: '2'}
+          note: >-
+            Table 2 does not print the Fe assay of the metal. Alloy rows are recalculated to pure-metal
+            equilibria (page 25). The melt Fe assay is the printed XFeO mole percent on each row.
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
         alloy_note: The source warns that alloy composition and alloy activity-coefficient uncertainty add uncertainty after recalculation to pure metals.
         series:
@@ -7019,6 +7046,15 @@ species:
         log_fO2_scale_and_control:
           state: unknown
           reason: not_published; pages 22-25 and 29-30 searched, log fO2 scale and imposition/measurement not specified
+        metal_Fe_wt_pct:
+          state:
+            tag: unknown
+            reason: not_published
+          locator: {page: 25, table: '2'}
+          note: >-
+            Table 2 does not print the Fe assay of the metal. These rows are Co,Ni metal experiments
+            recalculated toward pure-metal equilibria (page 25). The melt Fe assay is the printed XFeO
+            mole percent on each row.
         FeO_calculation_metal_standard: pure Fe reference metal in the section 3 equilibrium calculation, page 30
         series:
         - run: BK 50 a
@@ -7702,7 +7738,7 @@ species:
           FeO_wt_pct: 26.0
           FeO_sd_pct: 5
           MgO_wt_pct: 4.87
-          MgO_sd_pct: 5
+          MgO_sd_pct: 1
           gamma_CoO: 1.65
           gamma_NiO: 3.68
           gamma: 1.72
@@ -7794,7 +7830,7 @@ species:
           FeO_wt_pct: 20.8
           FeO_sd_pct: 5
           MgO_wt_pct: 6.83
-          MgO_sd_pct: 5
+          MgO_sd_pct: 1
           gamma_CoO: 1.75
           gamma_NiO: 4.35
           gamma: 1.83
@@ -7886,7 +7922,7 @@ species:
           FeO_wt_pct: 7.15
           FeO_sd_pct: 5
           MgO_wt_pct: 9.73
-          MgO_sd_pct: 5
+          MgO_sd_pct: 1
           gamma_CoO: 1.51
           gamma_NiO: 3.82
           gamma: 1.62
@@ -7978,7 +8014,7 @@ species:
           FeO_wt_pct: 15.5
           FeO_sd_pct: 5
           MgO_wt_pct: 15.3
-          MgO_sd_pct: 5
+          MgO_sd_pct: 1
           gamma_CoO: 2.68
           gamma_NiO: 4.87
           gamma: 2.47
@@ -8070,7 +8106,7 @@ species:
           FeO_wt_pct: 15.8
           FeO_sd_pct: 5
           MgO_wt_pct: 15.8
-          MgO_sd_pct: 5
+          MgO_sd_pct: 1
           gamma_CoO: 2.89
           gamma_NiO: 4.34
           gamma: 3.44

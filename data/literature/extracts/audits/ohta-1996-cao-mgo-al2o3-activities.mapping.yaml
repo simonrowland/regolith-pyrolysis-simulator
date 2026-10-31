@@ -1,0 +1,31 @@
+source_id: ohta-1996-cao-mgo-al2o3-activities
+table: '1'
+locator: {published_page: 984, page: 2, pdf_page_index: 1}
+printed_row_count: 10
+rows_by_temperature: {1873_K: 6, 1823_K: 4}
+observation_encoding:
+  metal:
+    phase_label: metal
+    quantity: equilibrium_phase_composition
+    basis: ppm_mass
+    columns: [Al_sol, Al_insol, Mg, Ca, Mn, O, S]
+    numeric_rows: 65
+    censored_cells: '[Ca] values printed <0.01 ppm; retained verbatim in the existing full-table context, with no invented numeric value.'
+  slag:
+    phase_label: slag
+    quantity: equilibrium_phase_composition
+    basis_by_column:
+      slag_S: ppm_mass
+      CaO: wt_percent
+      MgO: wt_percent
+      Al2O3: wt_percent
+      MnO: wt_percent
+      Fe_tO: wt_percent
+    columns: [slag_S, CaO, MgO, Al2O3, MnO, Fe_tO]
+    numeric_rows: 60
+column_alignment:
+  source_order: '[Al] soluble, [Al] insoluble, [Mg], [Ca], [Mn], [O], [S], slag (S), (CaO), (MgO), (Al2O3), (MnO), (Fe_tO)'
+  render_check: 'All 13 data columns aligned against the page render; each row has 7 metal and 6 slag cells.'
+  mineru: 'Table HTML agrees with the render for all stored cells.'
+  pdftotext: 'Text-layer digits differ in multiple cells (comma/dot and spacing); not used as the sole cell authority.'
+cell_audit: ohta-1996-cao-mgo-al2o3-activities.cells.csv

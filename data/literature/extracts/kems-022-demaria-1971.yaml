@@ -37,6 +37,14 @@ benches:
       published_page: 1368
       pdf_page_index: 2
       paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+  geometry:
+    orifice_diameter_m:
+      state: {tag: value, value: {kind: point, point: '0.0023'}}
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        note: The printed diameter is 2.3 mm; converted to metres.
 experiments:
 - experiment_id: demaria-1971-na-figure1
   bench_id: demaria-1971-re-kems
@@ -54,6 +62,14 @@ experiments:
     pdf_page_index: 4
     figure: '2'
     note: Figure-only K pressure readings over samples 12022 and 12065.
+- experiment_id: demaria-1971-main-kems
+  bench_id: demaria-1971-re-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1368
+    pdf_page_index: 2
+    paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    note: Main-cell pressure measurements over the lunar specimens.
 source_caveats:
 - locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
@@ -1243,6 +1259,7 @@ species:
   Al2O:
     observations:
     - observation_id: demaria_1971_al2o_psat_table4
+      experiment: demaria-1971-main-kems
       type: psat_series
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
@@ -1474,6 +1491,7 @@ species:
   AlO:
     observations:
     - observation_id: demaria_1971_alo_psat_table4
+      experiment: demaria-1971-main-kems
       type: psat_series
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
@@ -1697,6 +1715,7 @@ species:
   Al:
     observations:
     - observation_id: demaria_1971_al_monatomic_figure7
+      experiment: demaria-1971-main-kems
       type: rate_series
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
@@ -1752,6 +1771,7 @@ species:
   O:
     observations:
     - observation_id: demaria_1971_o_atomic_psat_table5
+      experiment: demaria-1971-main-kems
       type: psat_series
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md

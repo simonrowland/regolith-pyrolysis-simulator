@@ -1,0 +1,384 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml
+observations:
+- observation_id: beerkens-2003-sulfate-decomposition-na2o-activity::beerkens_2003_float_glass_activity_at_1673K
+  experiment_id: 10.1111/j.1151-2916.2003.tb03578.x::beerkens-2003-sulfate-decomposition-na2o-activity
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: unknown
+            reason: Source does not identify the specific Na2O phase.
+          polymorph:
+            tag: unknown
+            reason: Source does not identify a Na2O polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.7212321703995182163965610544'
+        - - Na2O
+          - '0.1297636248391307182437973734'
+        - - CaO
+          - '0.1016783137802867136915562863'
+        - - MgO
+          - '0.03276151920166133390067209129'
+        - - Al2O3
+          - '0.008829794701524729680132244985'
+        - - K2O
+          - '0.005734577077878288087280949865'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000017'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: beerkens-2003-sulfate-decomposition-na2o-activity::beerkens_2003_float_glass_activity_at_1673K
+  source_id: beerkens-2003-sulfate-decomposition-na2o-activity
+  locator:
+    page: 6
+    published_page: 1898
+    pdf_page_index: 5
+    section: VI. Results for the Sodium Oxide Activity
+    note: Final paragraph of §VI before the §VII heading.
+    source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+  read_from: pdf:beerkens-2003-sulfate-decomposition-na2o-activity
+  point_conditions:
+    pO2_Pa:
+      state:
+        tag: value
+        value: '33000'
+      locator:
+        page: 6
+        published_page: 1898
+        pdf_page_index: 5
+        section: VI. Results for the Sodium Oxide Activity
+        note: p(O2) = 0.33 bar as printed; converted to Pa.
+        source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.33'
+            locator:
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: VI. Results for the Sodium Oxide Activity
+              note: p(O2) = 0.33 bar as printed; converted to Pa.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: VI. Results for the Sodium Oxide Activity
+              note: p(O2) = 0.33 bar as printed; converted to Pa.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        output_unit: Pa
+        references: []
+    pSO2_Pa:
+      state:
+        tag: value
+        value: '66600'
+      locator:
+        page: 6
+        published_page: 1898
+        pdf_page_index: 5
+        section: VI. Results for the Sodium Oxide Activity
+        note: p(SO2) = 0.666 bar as printed; converted to Pa.
+        source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.666'
+            locator:
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: VI. Results for the Sodium Oxide Activity
+              note: p(SO2) = 0.666 bar as printed; converted to Pa.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 6
+              published_page: 1898
+              pdf_page_index: 5
+              section: VI. Results for the Sodium Oxide Activity
+              note: p(SO2) = 0.666 bar as printed; converted to Pa.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        output_unit: Pa
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.7212321703995182163965610544'
+          - - Na2O
+            - '0.1297636248391307182437973734'
+          - - CaO
+            - '0.1016783137802867136915562863'
+          - - MgO
+            - '0.03276151920166133390067209129'
+          - - Al2O3
+            - '0.008829794701524729680132244985'
+          - - K2O
+            - '0.005734577077878288087280949865'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1896
+        pdf_page_index: 3
+        section: III(1)
+        note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+        source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '72.2'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '13.4'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.5'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.2'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.9'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 4
+              published_page: 1896
+              pdf_page_index: 3
+              section: III(1)
+              note: Float-glass composition reported on p. 1896; the activity point is for float glass.
+              source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 6
+        published_page: 1898
+        pdf_page_index: 5
+        section: VI. Results for the Sodium Oxide Activity
+        note: Final paragraph of §VI before the §VII heading.
+        source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf

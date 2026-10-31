@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:ohta-1996-cao-mgo-al2o3-activities
       role: pdf
@@ -95,16 +95,18 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.2355/isijinternational.36.983
   locator:
+    page: 5
     published_page: 987
-    pdf_page_index: 5
+    pdf_page_index: 4
     section: 3.3 Iso-activity Line for Al2O3
 context:
 - observation_id: ohta_1996_bearing_steel_example_conditions
   type: method
   locator:
     published_page: 989
-    pdf_page_index: 7
+    pdf_page_index: 6
     section: 4. Deoxidation Equilibria of Al, Mg, and Ca
+    page: 7
   units: mass%; K; mass ppm
   values:
     quantity: bearing_steel_example_composition_and_oxygen_range
@@ -128,8 +130,9 @@ context:
   type: method
   locator:
     published_page: 987
-    pdf_page_index: 5
+    pdf_page_index: 4
     equation: '6'
+    page: 5
   units: equation as printed
   values:
     quantity: CaO_activity_assessment_relation
@@ -144,8 +147,9 @@ context:
   type: method
   locator:
     published_page: 987
-    pdf_page_index: 5
+    pdf_page_index: 4
     section: 3.2 Iso-activity Line for CaO
+    page: 5
   units: dimensionless activity
   values:
     quantity: iso_activity_relation
@@ -161,8 +165,9 @@ context:
   type: method
   locator:
     published_page: 988
-    pdf_page_index: 6
+    pdf_page_index: 5
     section: 3.4 Iso-activity Line for MgO
+    page: 6
   units: mass%
   values:
     quantity: CaO_solubility_in_MgO_phase
@@ -178,8 +183,9 @@ context:
   type: method
   locator:
     published_page: 986
-    pdf_page_index: 4
+    pdf_page_index: 3
     section: 3.2 Iso-activity Line for CaO
+    page: 4
   units: mass%
   values:
     quantity: CaS_solubility_limit_in_CaO_Al2O3_slag
@@ -196,8 +202,9 @@ context:
   type: method
   locator:
     published_page: 987
-    pdf_page_index: 5
+    pdf_page_index: 4
     figure: '6'
+    page: 5
   units: none
   values:
     quantity: iso_activity_lines_of_CaO
@@ -213,8 +220,9 @@ context:
   type: method
   locator:
     published_page: 986
-    pdf_page_index: 4
+    pdf_page_index: 3
     section: '3.1'
+    page: 4
   units: dimensionless ratio
   values:
     quantity: manganese_distribution_ratio
@@ -234,6 +242,7 @@ context:
     published_page: 983
     pdf_page_index: 0
     section: Synopsis / Introduction
+    page: 1
   units: K; mass%
   values:
     quantity: slag_metal_equilibration_method_and_activity_assessment_scope
@@ -267,8 +276,9 @@ context:
   type: method
   locator:
     published_page: 988
-    pdf_page_index: 6
+    pdf_page_index: 5
     section: 3.4 Iso-activity Line for MgO
+    page: 6
   units: as printed
   values:
     quantity: cited_Mg_equilibrium_comparators
@@ -292,8 +302,9 @@ context:
   type: method
   locator:
     published_page: 988
-    pdf_page_index: 6
+    pdf_page_index: 5
     section: 3.4 Iso-activity Line for MgO
+    page: 6
   units: log10 K_Mg
   values:
     quantity: Mg_equilibrium_constant_activity_ratio
@@ -313,8 +324,9 @@ context:
   type: method
   locator:
     published_page: 987
-    pdf_page_index: 5
+    pdf_page_index: 4
     section: 3.2 Iso-activity Line for CaO
+    page: 5
   units: mass%
   values:
     quantity: MgO_solubility_in_CaO_phase

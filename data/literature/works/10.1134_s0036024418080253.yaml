@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:shornikov-2018-spinel-solid-solutions
       role: pdf
@@ -215,6 +215,17 @@ experiments:
           section: Experimental
           note: ''
   bench_id: 10.1134/s0036024418080253::bench::shornikov_2018_mo_mi1201
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 1450
+        pdf_page_index: 3
+        section: Experimental
+        note: Stationary evaporation is stated, but no total run duration is reported.
 benches:
 - id: 10.1134/s0036024418080253::bench::shornikov_2018_mo_mi1201
   work_id: 10.1134/s0036024418080253
@@ -497,7 +508,7 @@ context:
   type: method
   locator:
     page: 5
-    published_page: 1452
+    published_page: 1451
     pdf_page_index: 4
     section: Results
   units: as printed
@@ -518,28 +529,28 @@ context:
         using the Gibbs–Duhem equation [23].
       locator:
         page: 5
-        published_page: 1452
+        published_page: 1451
         pdf_page_index: 4
         section: Results
     - statement: It was clearly even better to calculate the aMgO and aAl2O3 values according to Belton and Fruehan method
         [24] using the equations.
       locator:
         page: 5
-        published_page: 1452
+        published_page: 1451
         pdf_page_index: 4
         section: Results
     - statement: Considering the proportionality of the partial pressures (pi) of the gas phase components to the corresponding
         intensities of the ion currents (Ii), Eqs. (37) and (40) can be transformed into Eqs. (41) and (42).
       locator:
         page: 8
-        published_page: 1453
+        published_page: 1454
         pdf_page_index: 7
         section: Results
     - statement: We thereby avoid the need for additional thermodynamic data [11] in Eqs. (27), (28) and exclude the non-systematic
         errors of the experiment when calculating the gas-phase component partial pressures required in Eqs. (27)–(29).
       locator:
         page: 8
-        published_page: 1453
+        published_page: 1454
         pdf_page_index: 7
         section: Results
     - statement: Where aMgO* is the activity of magnesium oxide in a stoichiometric spinel (x*Al2O3 = 0.5) at a given temperature;
@@ -547,7 +558,7 @@ context:
         solutions and the MgAl2O4 (solid solution) + Al2O3 region at the considered temperature.
       locator:
         page: 8
-        published_page: 1453
+        published_page: 1454
         pdf_page_index: 7
         section: Results
     - statement: 'Printed equations (1)–(50), transcribed as printed: (1) [MgAl2O4]=(Mg)+1/2(O2)+[Al2O3]; (2) aMgO=pMg/pMg°;
@@ -580,7 +591,7 @@ context:
         thermodynamics and the phase boundary.
       locator:
         page: 8
-        published_page: 1453
+        published_page: 1454
         pdf_page_index: 7
         section: Results
     - statement: The printed ion-current ratio is available at 66.79 ± 0.20 mol % Al2O3 and 2100 K. The paper says that pressure-to-current
@@ -588,7 +599,7 @@ context:
         proxies here, not the pointwise ion-current observations integrated by the authors.
       locator:
         page: 8
-        published_page: 1453
+        published_page: 1454
         pdf_page_index: 7
         section: Results
   context_id: shornikov-2018-spinel-solid-solutions::context::shornikov_2018_activity_reduction_relations
@@ -1054,7 +1065,7 @@ context:
         oxygen.”
       locator:
         page: 1
-        published_page: 1448
+        published_page: 1447
         pdf_page_index: 0
         section: Introduction
   context_id: shornikov-2018-spinel-solid-solutions::context::shornikov_2018_prior_experiments
@@ -1065,7 +1076,7 @@ context:
   type: thermodynamic_example
   locator:
     page: 1
-    published_page: 1448
+    published_page: 1447
     pdf_page_index: 0
     section: Introduction
   units: as printed
@@ -1079,7 +1090,7 @@ context:
         10^2–10^3 times lower.
       locator:
         page: 1
-        published_page: 1448
+        published_page: 1447
         pdf_page_index: 0
         section: Introduction
     - statement: However, the approach using Eq. (2) is not completely correct, since it assumes equality between the partial
@@ -1087,7 +1098,7 @@ context:
         This is not confirmed by our experimental data [1].
       locator:
         page: 1
-        published_page: 1448
+        published_page: 1447
         pdf_page_index: 0
         section: Introduction
     - statement: The aMgO value extrapolated to the boundary of the region of spinel solid solutions with corundum (Fig. 1a)
@@ -1096,14 +1107,14 @@ context:
         in [2, 13].
       locator:
         page: 1
-        published_page: 1448
+        published_page: 1447
         pdf_page_index: 0
         section: Introduction
     - statement: Using Knudsen effusion mass spectrometric method, Petric and Chatillon [14] also determined the aMgO activity
         at a temperature of 1773 K for the heterogeneous reaction [MgO] = (Mg) + 1/2(O2) in the MgAl2O4 + Al2O3 region.
       locator:
         page: 1
-        published_page: 1448
+        published_page: 1447
         pdf_page_index: 0
         section: Introduction
   context_id: shornikov-2018-spinel-solid-solutions::context::shornikov_2018_prior_pressures_and_activity_comparisons

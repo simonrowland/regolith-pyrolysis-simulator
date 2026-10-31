@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:visscher-fegley-2013-debris-disks
       role: pdf
@@ -62,3 +62,25 @@ experiments:
   locator:
     published_page: 2
     table: '1'
+context:
+- observation_id: visscher_2013_o2_vapor_fraction
+  type: printed_data_context
+  quote: Visscher and Fegley (2013), MAGMA equilibrium calculation
+  locator:
+    published_page: 3
+    figure: '2'
+    section: '3.1'
+  phase: saturated_silicate_vapor
+  regime: MAGMA_IMCC_equilibrium
+  units: mole fraction
+  values:
+    quantity: O2 mole fraction in saturated silicate vapor
+    method_class: quoted_attributed
+    generator: Visscher and Fegley (2013), MAGMA equilibrium calculation
+    mole_fraction_range_as_printed: 20-30%
+    note: O2 mole fraction is described as relatively temperature-independent across all melt compositions.
+  uncertainty: no model uncertainty reported
+  context_id: visscher-fegley-2013-debris-disks::context::visscher_2013_o2_vapor_fraction
+  work_id: 10.1088/2041-8205/767/1/l12
+  source_id: visscher-fegley-2013-debris-disks
+  species: O2

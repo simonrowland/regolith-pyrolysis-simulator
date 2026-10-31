@@ -1,0 +1,164 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "fastchem-v3-1-3",
+  "source": {
+    "database": "FastChem v3.1.3 gas and condensate equilibrium-constant fits",
+    "citation": "FastChem project contributors. FastChem v3.1.3 standard gas and condensate equilibrium-constant fit coefficients, tag commit 51857a84e2b25d4246624c978cdebe988789a729. Repository https://github.com/NewStrangeWorlds/FastChem.",
+    "version": "v3.1.3 tag commit 51857a84e2b25d4246624c978cdebe988789a729",
+    "official_url": "https://github.com/NewStrangeWorlds/FastChem",
+    "tag_commit": "51857a84e2b25d4246624c978cdebe988789a729",
+    "corpus_source_id": "fastchem-v3-1-3-gas-condensate-coefficients",
+    "licence": "Repository GPL-3 (licence.md). Upstream thermochemical compilations named on each record keep their own rights; the GPL text does not relicense them.",
+    "path": "data/literature/compilations/fastchem-v3-1-3/source/logK_extended.dat",
+    "sha256": "9bc4f8dd1d7d4cd29c4b7b33ab7bb00bb3f16d5fe39dedea5465939532064a3d"
+  },
+  "compilation_role": {
+    "kind": "fit",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "mass_action_lnK_fit_not_a_closed_quantity",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "FC-X-0038",
+  "record_kind": "mass_action_lnK_fit",
+  "method_class": "fit",
+  "evaluation_class": "compiled",
+  "symbol_as_published": "Ga1++",
+  "name_as_published": "Gallium_ion",
+  "formula": "Ga++",
+  "phase": "gas",
+  "phase_as_published": {
+    "kind": "unknown",
+    "reason": "gas file prints no phase token"
+  },
+  "charge": 2,
+  "stoichiometry_as_published": [
+    {
+      "element": "Ga",
+      "count_as_published": "1"
+    },
+    {
+      "element": "e-",
+      "count_as_published": "-2"
+    }
+  ],
+  "fit_basis": {
+    "form_as_published": "#logK = a1/T + a2 ln T + a3 + a4 T + a5 T^2 for FastChem:",
+    "log_basis": "ln",
+    "temperature_unit": "K",
+    "standard_pressure": "1 bar",
+    "coefficient_order": [
+      "a1",
+      "a2",
+      "a3",
+      "a4",
+      "a5"
+    ],
+    "documentation_column_aliases_not_applied": [
+      "a0",
+      "a1",
+      "b0",
+      "b1",
+      "b2"
+    ],
+    "paper_names_applied": false,
+    "coefficients_inverted": false,
+    "reaction_direction_status": "not_resolved",
+    "authorities": {
+      "gas": {
+        "citation": "Stock, J. W.; Kitzmann, D.; Patzer, A. B. C. (2022). FastChem 2. arXiv:2206.08247v2 preprint, pages as printed on the PDF; related MNRAS 517, 4070. Corpus raw/stock-2022-fastchem2-methods/stock-2022-fastchem2-methods.pdf.",
+        "form_page": "preprint p. 3, Eq. (8)",
+        "form_quote": "The temperature dependent mass action constants for each molecule or ion are fitted as before ln Kbar_i(T) = a0/T + a1 ln T + b0 + b1 T + b2 T^2, with the five fit coefficients a0, a1, b0, b1, and b2.",
+        "log_basis_and_pressure_page": "preprint p. 3, Eq. (9)",
+        "log_basis_and_pressure_quote": "The natural logarithm of the dimensionless mass action constants are related to the change in the Gibbs free energy of the dissociation reaction (1) with respect to the standard-state pressure p\u00b0 = 1 bar (= 10^5 Pa)",
+        "mass_action_page": "preprint p. 2, Eq. (5)",
+        "mass_action_quote": "can be calculated using the law of mass action (Guldberg & Waage 1864, 1867, 1879)",
+        "mass_action_where": "where n_i is the number density of species i and K_i the temperature dependent mass action constant",
+        "mass_action_equation_transcription": "n_i = K_i * product_j n_j**nu_ij, for all i in S excluding the elements",
+        "dissociation_page": "preprint p. 2, Eq. (1)",
+        "dissociation_quote": "dissociative equilibrium is assumed, where the dissociation reaction"
+      },
+      "condensed": {
+        "citation": "Kitzmann, D.; Stock, J. W.; Patzer, A. B. C. (2024). FastChem Cond. arXiv:2309.02337v2 preprint, pages as printed on the PDF; related MNRAS 527, 7263. Corpus raw/kitzmann-2024-fastchem-cond-methods/kitzmann-2024-fastchem-cond-methods.pdf.",
+        "pressure_page": "preprint p. 16, after Eq. (A5)",
+        "pressure_quote": "For the data used in the FastChem code, p\u00b0 is equal to 1 bar.",
+        "form_page": "preprint p. 16, Eq. (A6)",
+        "form_quote": "As stated by Stock et al. (2018), we parameterise ln Kbar_c as a function of the temperature T in form of the polynomial ln Kbar_c(T) = a0/T + a1 ln T + b0 + b1 T + b2 T^2, where a_i and b_i are the corresponding fit coefficients that are tabulated in the FastChem input file for each species.",
+        "gibbs_page": "preprint p. 15, Eq. (A1)\u2013(A3)",
+        "gibbs_quote": "The dimension-less equilibrium constant Kbar_c(T) for a specific condensate c is calculated from the Gibbs free energy of reaction",
+        "dissociation_quote": "where Delta_r G_c is the change of Gibbs free energy for the dissociation reaction",
+        "into_elements_quote": "of a condensate species into its elements",
+        "eq_A3_transcription": "G_c(T) - sum_j nu_cj * G_j(T)",
+        "not_janaf_lnK_quote": "Thus, the ln Kbar used in FastChem and given in Table A1 should not be confused with the corresponding ln Kbar tabulated in thermochemical databases, such as the JANAF tables."
+      }
+    }
+  },
+  "source_form": "#logK = a1/T + a2 ln T + a3 + a4 T + a5 T^2 for FastChem:",
+  "coefficients": [
+    [
+      "-3.0778030856332171e+05",
+      "4.3312963996335769e+00",
+      "-2.4358886594497005e+01",
+      "1.7124593962788737e-04",
+      "-6.8103321326780789e-09"
+    ]
+  ],
+  "coefficients_as_published": [
+    [
+      "-3.0778030856332171e+05",
+      "4.3312963996335769e+00",
+      "-2.4358886594497005e+01",
+      "1.7124593962788737e-04",
+      "-6.8103321326780789e-09"
+    ]
+  ],
+  "T_min_K": {
+    "kind": "unknown",
+    "reason": "gas file prints no per-species temperature bound"
+  },
+  "T_max_K": {
+    "kind": "unknown",
+    "reason": "gas file prints no per-species temperature bound"
+  },
+  "temperature_limit_rule": "not_printed",
+  "intervals": [
+    {
+      "index": 0,
+      "T_low_K": {
+        "kind": "unknown",
+        "reason": "gas file prints no per-species temperature bound"
+      },
+      "T_high_K": {
+        "kind": "unknown",
+        "reason": "gas file prints no per-species temperature bound"
+      },
+      "coefficients_as_published": [
+        "-3.0778030856332171e+05",
+        "4.3312963996335769e+00",
+        "-2.4358886594497005e+01",
+        "1.7124593962788737e-04",
+        "-6.8103321326780789e-09"
+      ],
+      "source_line": 1601
+    }
+  ],
+  "lineage_citation_as_published": "based on Saha equation with partition functions from Kurucz/NIST & ionisation energies from NIST",
+  "source_locator": {
+    "path": "data/literature/compilations/fastchem-v3-1-3/source/logK_extended.dat",
+    "header_line": 1600,
+    "coefficient_lines": [
+      1601
+    ],
+    "end_line": 1601
+  },
+  "source_text": {
+    "header_line": "Ga1++ Gallium_ion : Ga 1 e- -2 # based on Saha equation with partition functions from Kurucz/NIST & ionisation energies from NIST",
+    "coefficient_lines": [
+      "  -3.0778030856332171e+05   4.3312963996335769e+00  -2.4358886594497005e+01   1.7124593962788737e-04  -6.8103321326780789e-09"
+    ],
+    "phase_line": null,
+    "limits_line": null
+  },
+  "ambiguities": []
+}

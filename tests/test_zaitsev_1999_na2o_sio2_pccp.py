@@ -1,9 +1,26 @@
+import re
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import (
+    Engine,
+    NoticeKind,
+    Phase,
+    Quantity,
+    ResidualStatus,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import Uncertainty
+from simulator.battery.score import (
+    ScoreContext,
+    _printed_uncertainty_band,
+    score_store,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -171,3 +188,180 @@ def test_zaitsev_1999_partial_enthalpy_and_element_formation_signs():
         and "J/(mol K)" in observation["locator"]["note"]
         for observation in source_entropies
     )
+
+
+def test_zaitsev_1999_table1_error_scope_and_scored_bands():
+    document, migrator = _migrate()
+    migrated = tuple(migrator.result.observations.values())
+    activities = [
+        observation
+        for observation in migrated
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activities) == 102
+    assert all(observation.identity.quantity.is_value for observation in migrated)
+    assert all(
+        observation.identity.species is None
+        or observation.identity.species.phase.is_value
+        for observation in migrated
+    )
+    assert all(
+        observation.identity.species is not None
+        and observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+        for observation in activities
+    )
+    assert sum(
+        observation.value.kind is ValueKind.UNAVAILABLE
+        for observation in migrated
+    ) == 0
+
+    table1_na = [
+        observation
+        for observation in activities
+        if "::zaitsev_1999_table1_na2o_activity::" in observation.observation_id
+    ]
+    table1_sio2 = [
+        observation
+        for observation in activities
+        if "::zaitsev_1999_table1_sio2_activity::" in observation.observation_id
+    ]
+    table4 = [
+        observation
+        for observation in activities
+        if "::zaitsev_1999_table4_" in observation.observation_id
+    ]
+    assert len(table1_na) == len(table1_sio2) == 29
+    assert len(table4) == 44
+    table1 = table1_na + table1_sio2
+    assert all(
+        observation.uncertainty.kind is UncertaintyKind.PRINTED
+        and observation.uncertainty.verbatim["value"] == 3
+        and observation.uncertainty.verbatim["units"] == "%"
+        and observation.uncertainty.verbatim["confidence_level"] == "not_stated"
+        and observation.uncertainty.verbatim["locator"]["published_page"] == 1903
+        for observation in table1
+    )
+    assert all(
+        observation.uncertainty.kind is UncertaintyKind.NONE
+        for observation in table4
+    )
+
+    table1_na_by_row = {}
+    for observation in table1_na:
+        match = re.search(r"row=(\d+):", observation.observation_id)
+        assert match is not None
+        table1_na_by_row[int(match.group(1))] = observation
+    render_values = {1: "7.19e-10", 2: "2.61e-9", 3: "5.29e-11"}
+    # Table 1 cells rendered on p. 1901, checked after isolated migration.
+    for row, value in render_values.items():
+        observation = table1_na_by_row[row]
+        assert observation.value.point == Decimal(value)
+        assert observation.locator.page == 3
+        assert observation.locator.published_page == 1901
+        assert observation.locator.pdf_page_index == 2
+        assert observation.locator.table == "1"
+
+    for row, expected_temperature, expected_x_na2o in (
+        (1, "1473", "0.195"),
+        (2, "1573", "0.195"),
+        (3, "1273", "0.247"),
+    ):
+        identity = table1_na_by_row[row].identity
+        assert identity.temperature_K.value == Decimal(expected_temperature)
+        assert identity.composition.value.as_map() == {
+            "Na2O": Decimal(expected_x_na2o),
+            "SiO2": Decimal(1) - Decimal(expected_x_na2o),
+        }
+        assert identity.total_pressure_Pa.is_unknown
+        assert identity.fO2_Pa.is_unknown
+
+    table4_present_render_pin = next(
+        observation
+        for observation in table4
+        if observation.identity.temperature_K.value == Decimal("1430")
+        and observation.identity.composition.value.as_map()["Na2O"]
+        == Decimal("0.103")
+        and "table4_present_na2o_activity" in observation.observation_id
+    )
+    assert table4_present_render_pin.value.point == Decimal(
+        "4.036453929676049704380262802E-10"
+    )
+    assert table4_present_render_pin.locator.page == 6
+    assert table4_present_render_pin.locator.published_page == 1904
+    assert table4_present_render_pin.locator.pdf_page_index == 5
+    assert table4_present_render_pin.locator.table == "4"
+
+    parsed_table1_bands = [
+        _printed_uncertainty_band(
+            Quantity.ACTIVITY,
+            observation.uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        ).band
+        for observation in table1
+    ]
+    assert len(parsed_table1_bands) == 58
+    assert all(band is not None for band in parsed_table1_bands)
+    assert all(
+        Decimal("0.013") < band.value < Decimal("0.014")
+        for band in parsed_table1_bands
+        if band is not None
+    )
+
+    scored = [table1_na_by_row[row] for row in range(1, 11)]
+    context = ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations={
+            observation.observation_id: observation for observation in scored
+        },
+        extract_review={document["source_id"]: document.get("review_status")},
+        benches=migrator.result.benches,
+        root=ROOT,
+    )
+    without_uncertainty = replace(
+        context,
+        observations={
+            observation_id: replace(
+                observation,
+                uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+            )
+            for observation_id, observation in context.observations.items()
+        },
+    )
+    before, _ = score_store(
+        without_uncertainty,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=False,
+    )
+    after, _ = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=False,
+    )
+    before_by_reference = {residual.reference: residual for residual in before}
+    after_by_reference = {residual.reference: residual for residual in after}
+    assert len(before_by_reference) == len(after_by_reference) == 10
+    assert set(before_by_reference) == set(after_by_reference)
+    for reference in before_by_reference:
+        before_residual = before_by_reference[reference]
+        after_residual = after_by_reference[reference]
+        assert before_residual.numeric is not None
+        assert after_residual.numeric is not None
+        assert before_residual.status is ResidualStatus.NO_BAND
+        assert before_residual.numeric.decision_band is None
+        assert after_residual.status is ResidualStatus.NO_BAND
+        assert after_residual.numeric.decision_band is None
+        assert after_residual.numeric.metric_uncertainty is not None
+        assert after_residual.numeric.metric_uncertainty.kind is UncertaintyKind.PRINTED
+        assert before_residual.numeric.value == after_residual.numeric.value
+        assert any(
+            notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+            for notice in after_residual.notices
+        )
+        assert any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            for notice in after_residual.notices
+        )

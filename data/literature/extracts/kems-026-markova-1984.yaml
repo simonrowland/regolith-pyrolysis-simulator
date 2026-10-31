@@ -86,14 +86,14 @@ fidelity_samples:
   locator:
     table: '1'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: Table 1 sample I (anorthite) SiO2 = 42.94
 - path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.composition_wt_pct.SiO2
   value: 52.32
   locator:
     table: '2'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: Table 2 right panel T=0 SiO2 = 52.32 (composition V)
 - species: Na
   observable: model_output_context
@@ -102,39 +102,39 @@ fidelity_samples:
   value: 14.0
   locator:
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     paragraph: dissipation for SiO-2%, K-3%, Na-14%
 - path: species.SiO2.context[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
   value: 70.0
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: The temperature step was 70, duration of the temperature step 15 min
 - path: species.SiO2.observations[markova_1984_table2_residual_melt_VI_lherzolite].values.series[1].MgO_wt_pct
   value: 36.92
   locator:
     table: '2'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: Table 2 left panel (VI), T=1475 C, MgO column = 36.92
 - path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.series[4].MgO_wt_pct
   value: 8.11
   locator:
     table: '2'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: Table 2 right panel (V), T=1719 C, MgO column = 8.11
 benches:
 - id: markova-1984-kems
   identity: {basis: described_in_this_work}
   apparatus_family:
     state: {tag: value, value: Knudsen-cell mass spectrometry}
-    locator: {published_page: 509, pdf_page_index: 1, section: experimental method}
+    locator: {published_page: 509, pdf_page_index: 0, section: experimental method}
   cell_material_and_liner:
     state: {tag: unknown, reason: not_published}
     locator:
       published_page: 509
-      pdf_page_index: 1
+      pdf_page_index: 0
       section: experimental method
       note: The abstract does not print the cell material; no material is inferred from Yakovlev 1983.
 experiments:
@@ -143,7 +143,7 @@ experiments:
   method: knudsen_effusion
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: experimental method
     note: Stepwise-heating run for sample VI (lherzolite), reported in Table 2.
   sample:
@@ -151,35 +151,35 @@ experiments:
       state: {tag: unknown, reason: not_published}
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: The abstract names the samples but gives no charge mass.
     printed_composition:
       state:
         tag: value
         value: {SiO2: 44.02, Al2O3: 4.56, FeO: 8.04, MgO: 36.44, CaO: 6.95}
-      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample VI (lherzolite), wt%'}
+      locator: {published_page: 510, pdf_page_index: 1, table: '2', note: 'Table 2 printed starting charge for sample VI (lherzolite), wt%'}
   apparatus:
     geometry:
       orifice_area_m2:
         state: {tag: unknown, reason: not_published}
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
   thermal_schedule:
@@ -187,50 +187,86 @@ experiments:
       state: {tag: value, value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps}
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
     total_duration_s:
       state: {tag: unknown, reason: not_published}
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports vapor total pressure as a result, not the experimental total pressure.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+        note: No carrier or sweep gas is stated.
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 - experiment_id: V
   bench_id: markova-1984-kems
   method: knudsen_effusion
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: experimental method
     note: Stepwise-heating run for sample V (alumina basalt), reported in Table 2.
   sample:
     mass_kg:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names the samples but gives no charge mass.}
+      locator: {published_page: 509, pdf_page_index: 0, section: experimental method, note: The abstract names the samples but gives no charge mass.}
     printed_composition:
       state:
         tag: value
         value: {SiO2: 52.32, Al2O3: 19.13, FeO: 9.37, MgO: 6.25, CaO: 12.93}
-      locator: {published_page: 510, pdf_page_index: 2, table: '2', note: 'Table 2 printed starting charge for sample V (alumina basalt), wt%'}
+      locator: {published_page: 510, pdf_page_index: 1, table: '2', note: 'Table 2 printed starting charge for sample V (alumina basalt), wt%'}
   apparatus:
     geometry:
       orifice_area_m2:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+        locator: {published_page: 509, pdf_page_index: 0, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+        locator: {published_page: 509, pdf_page_index: 0, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
-        locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
+        locator: {published_page: 509, pdf_page_index: 0, section: experimental method, note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.}
   thermal_schedule:
     method:
       state: {tag: value, value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps}
-      locator: {published_page: 509, pdf_page_index: 1, section: experimental method}
+      locator: {published_page: 509, pdf_page_index: 0, section: experimental method}
     total_duration_s:
       state: {tag: unknown, reason: not_published}
-      locator: {published_page: 509, pdf_page_index: 1, section: experimental method, note: 'A duration is printed for each temperature step, but the number of steps and total duration are not printed.'}
+      locator: {published_page: 509, pdf_page_index: 0, section: experimental method, note: 'A duration is printed for each temperature step, but the number of steps and total duration are not printed.'}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports vapor total pressure as a result, not the experimental total pressure.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+        note: No carrier or sweep gas is stated.
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 species:
   SiO2:
     observations:
@@ -239,13 +275,10 @@ species:
       locator:
         table: '1'
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page
           2
-      T_range_K:
-      - 1748.15
-      - 2564.15
-      phase: starting_silicate_samples_I_to_VII
+      phase: condensed_solid
       condensed_form:
         state: solid_starting_material
         metastable: false
@@ -373,11 +406,11 @@ species:
           99.25, 96.30, 100.10, 95.9, 97.17) and are not recomputed here.
     - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
       experiment: VI
-      type: rate_series
+      type: composition_series
       locator:
         table: '2'
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
           2; 400 dpi pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
       phase: l
@@ -410,17 +443,62 @@ species:
           locator:
             table: '2'
             published_page: 510
-            pdf_page_index: 2
+            pdf_page_index: 1
         T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
         series:
         - mass_loss_pct: 0
+          point_conditions: &markova_initial_point_conditions
+            temperature_K:
+              state:
+                tag: unknown
+                reason: T=0 denotes the initial charge and is not a run temperature.
+              locator:
+                published_page: 510
+                pdf_page_index: 1
+                table: '2'
+            pressure_kind: &markova_pressure_kind_unknown
+              state:
+                tag: unknown
+                reason: No vacuum, Knudsen-cell interior pressure, or carrier-gas pressure condition is stated.
+              locator:
+                published_page: 509
+                pdf_page_index: 0
+                section: experimental method
+            fO2_Pa: &markova_oxygen_unknown
+              state:
+                tag: unknown
+                reason: No point p(O2), fO2, buffer, or gas mix is printed; p(O2) is listed as a result, not an imposed condition.
+              locator:
+                published_page: 509
+                pdf_page_index: 0
+                section: experimental method
+            duration_h:
+              state:
+                tag: unknown
+                reason: The initial-charge row is not a temperature step.
+              locator:
+                published_page: 510
+                pdf_page_index: 1
+                table: '2'
           T_C_is_initial_composition: true
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), printed T=0 / M%=0 initial charge
         - T_C: 1475
+          point_conditions: &markova_temperature_step_point_conditions
+            pressure_kind: *markova_pressure_kind_unknown
+            fO2_Pa: *markova_oxygen_unknown
+            duration_h:
+              state:
+                tag: value
+                value: 0.25
+              locator:
+                published_page: 509
+                pdf_page_index: 0
+                section: experimental method
+                note: 15 minutes for each printed temperature step.
           mass_loss_pct: 1.46
           SiO2_wt_pct: 44.4
           Al2O3_wt_pct: 4.62
@@ -430,9 +508,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1475 C; oxide wt% and mass-loss row
         - T_C: 1492
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 4.16
           SiO2_wt_pct: 44.9
           Al2O3_wt_pct: 4.75
@@ -442,9 +521,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1492 C; oxide wt% and mass-loss row
         - T_C: 1632
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 9.74
           SiO2_wt_pct: 44.9
           Al2O3_wt_pct: 5.05
@@ -454,9 +534,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1632 C; oxide wt% and mass-loss row
         - T_C: 1726
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 21.8
           SiO2_wt_pct: 41.77
           Al2O3_wt_pct: 5.83
@@ -466,9 +547,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1726 C; oxide wt% and mass-loss row
         - T_C: 1796
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 38.35
           SiO2_wt_pct: 35.57
           Al2O3_wt_pct: 7.39
@@ -478,9 +560,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1796 C; oxide wt% and mass-loss row
         - T_C: 1883
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 65.21
           SiO2_wt_pct: 13.6
           Al2O3_wt_pct: 13.09
@@ -490,9 +573,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1883 C; oxide wt% and mass-loss row
         - T_C: 1960
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 86.05
           SiO2_wt_pct: 1.17
           Al2O3_wt_pct: 32.64
@@ -502,9 +586,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=1960 C; oxide wt% and mass-loss row
         - T_C: 2038
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 89.25
           SiO2_wt_pct: 1.09
           Al2O3_wt_pct: 42.1
@@ -514,9 +599,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=2038 C; oxide wt% and mass-loss row
         - T_C: 2118
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 91.81
           SiO2_wt_pct: 0.23
           Al2O3_wt_pct: 53.05
@@ -526,9 +612,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=2118 C; oxide wt% and mass-loss row
         - T_C: 2207
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 95.51
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 79.28
@@ -538,9 +625,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=2207 C; oxide wt% and mass-loss row
         - T_C: 2291
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 98.34
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 74.65
@@ -550,7 +638,7 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 left panel (composition VI), T=2291 C; oxide wt% and mass-loss row
         row_sum_note: Most VI rows close to 100 wt% on the five printed oxides after the FeO and CaO glyph corrections. The T=1883 C row sums to 91.43 as printed and was not renormalized. The T=1960 C row sums to 95.01 as printed after the M% correction and was not renormalized.
       uncertainty:
@@ -561,7 +649,7 @@ species:
       locator:
         table: '2'
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
           2; 400 dpi pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
       phase: l
@@ -594,17 +682,19 @@ species:
           locator:
             table: '2'
             published_page: 510
-            pdf_page_index: 2
+            pdf_page_index: 1
         T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
         series:
         - mass_loss_pct: 0
+          point_conditions: *markova_initial_point_conditions
           T_C_is_initial_composition: true
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), printed T=0 / M%=0 initial charge
         - T_C: 1476
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 1.17
           SiO2_wt_pct: 52.4
           Al2O3_wt_pct: 19.15
@@ -614,9 +704,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1476 C; oxide wt% and mass-loss row
         - T_C: 1544
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 4.39
           SiO2_wt_pct: 52.74
           Al2O3_wt_pct: 20.12
@@ -626,9 +717,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1544 C; oxide wt% and mass-loss row
         - T_C: 1640
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 14.41
           SiO2_wt_pct: 50.9
           Al2O3_wt_pct: 22.35
@@ -638,9 +730,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1640 C; oxide wt% and mass-loss row
         - T_C: 1719
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 37.17
           SiO2_wt_pct: 40.46
           Al2O3_wt_pct: 29.51
@@ -650,9 +743,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1719 C; oxide wt% and mass-loss row
         - T_C: 1790
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 53.53
           SiO2_wt_pct: 22.94
           Al2O3_wt_pct: 41.13
@@ -662,9 +756,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1790 C; oxide wt% and mass-loss row
         - T_C: 1809
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 66.01
           SiO2_wt_pct: 4.43
           Al2O3_wt_pct: 56.29
@@ -674,9 +769,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1809 C; oxide wt% and mass-loss row
         - T_C: 1957
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 69.35
           SiO2_wt_pct: 0.15
           Al2O3_wt_pct: 62.13
@@ -686,9 +782,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=1957 C; oxide wt% and mass-loss row
         - T_C: 2030
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 71.33
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 65.62
@@ -698,9 +795,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=2030 C; oxide wt% and mass-loss row
         - T_C: 2119
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 76.19
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 74.21
@@ -710,9 +808,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=2119 C; oxide wt% and mass-loss row
         - T_C: 2200
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 83.68
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 81.43
@@ -722,9 +821,10 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=2200 C; oxide wt% and mass-loss row
         - T_C: 2255
+          point_conditions: *markova_temperature_step_point_conditions
           mass_loss_pct: 97.99
           SiO2_wt_pct: 0.0
           Al2O3_wt_pct: 79.49
@@ -734,7 +834,7 @@ species:
           locator:
             published_page: 510
             table: '2'
-            pdf_page_index: 2
+            pdf_page_index: 1
             note: Table 2 right panel (composition V), T=2255 C; oxide wt% and mass-loss row
         row_sum_note: Most V rows close to 100 wt% on the five printed oxides after the MgO glyph correction. The T=1476 C row sums to 99.37 as printed (FeO 8.63 kept; not forced to 9.26). The T=2030 C CaO is printed to one decimal (34.3).
       uncertainty:
@@ -743,7 +843,7 @@ species:
       type: rate_series
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         paragraph: During the vaporization of the basalt at T= 1600 -1700 C (mass losses 15-35%) the residual
           compositions crosses the ANT field
       T_range_K:
@@ -781,7 +881,7 @@ species:
       locator:
         figure: '1'
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         note: THE TRENDS OF THE COMPOSITIONAL EVOLUTION DURING THE VAPORIZATION IN COMPARISON WITH THE
           COMPOSITION OF LUNAR HIGHLAND ROCKS
       T_range_K:
@@ -827,7 +927,7 @@ species:
         type: method_context
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           paragraph: The experiments were carried out in the step-wise heating regime till the complete
             vaporization of the sample under study
         T_range_K:
@@ -880,7 +980,7 @@ species:
         class_tag: model
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
             less than ~1%
         quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the
@@ -914,7 +1014,7 @@ species:
         class_tag: model
         locator:
           published_page: 510
-          pdf_page_index: 2
+          pdf_page_index: 1
           paragraph: dissipation for SiO-2%, K-3%, Na-14%
         quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
         T_range_K:
@@ -948,7 +1048,7 @@ species:
         locator:
           figure: '2'
           published_page: 510
-          pdf_page_index: 2
+          pdf_page_index: 1
           note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON
             TEMPERATURE FOR THE LUNAR MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
         T_range_K:
@@ -997,7 +1097,7 @@ species:
       type: psat_series
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         paragraph: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica is
           partially in vapor as Mg is completely in melt
       T_range_K:
@@ -1034,7 +1134,7 @@ species:
       type: psat_series
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         paragraph: silica is partially in vapor as Mg is completely in melt
       T_range_K:
       - 1773.15
@@ -1068,7 +1168,7 @@ species:
       type: rate_series
       locator:
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         paragraph: As the experiments show, iron is more volatile than silica, but we haven't any signs
           of its depletion
       T_range_K:
@@ -1102,7 +1202,7 @@ species:
       type: rate_series
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         paragraph: the residual melts are depleted in Na, K, Fe and Si and are enriched in Ca, Ti and
           Al
       T_range_K:
@@ -1143,13 +1243,13 @@ deepening:
   table_inventory:
   - table: '1'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     completeness: partial
     note: 'Seven starting compositions I–VII. Unreadable typewriter cells omitted: Al2O3 I, Al2O3 II,
       TiO2 I, FeO IV. Printed column totals retained.'
   - table: '2'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     completeness: full_with_glyph_corrections
     note: Twelve rows each for residual melts of composition VI (left) and V (right). T=0 is the initial
       five-oxide recast. Six damaged-glyph cells corrected against independent printed-page constraints

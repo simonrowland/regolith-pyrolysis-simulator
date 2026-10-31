@@ -1,0 +1,190 @@
+source_id: kems-010-richter-2007
+source:
+  citation: Richter et al. (2007), Geochimica et Cosmochimica Acta 71, 5544-5564
+  doi: 10.1016/j.gca.2007.09.005
+scope: condition recovery for the existing extraction; measured series values are preserved
+machine_table_audit:
+  tool: tools/mineru_table_qa.py
+  comparisons:
+    - draft_file: p006-t01.csv
+      page: 6
+      published_page: 5549
+      printed_table: '1'
+      numeric_cells: 468
+      pdftotext_digit_agreement: '1.000'
+      layout_check: render verified; 36 run rows plus the Starting material row
+    - draft_file: p007-t02.csv
+      page: 7
+      published_page: 5550
+      printed_table: '1'
+      numeric_cells: 205
+      pdftotext_digit_agreement: '1.000'
+      layout_check: render verified; 15 continued run rows
+    - draft_file: p016-t03.csv
+      page: 16
+      published_page: 5559
+      printed_table: '2'
+      numeric_cells: 19
+      pdftotext_digit_agreement: '1.000'
+      layout_check: render verified; table remains existing context
+  invented_chart_tables:
+    count: 11
+    disposition: ignored
+    reason: MinerU details blocks are figure readings, not printed tables
+  cell_audit:
+    numeric_cells_checked: 692
+    method: MinerU and pdftotext agree on digits; renders checked row and column assignment
+    mismatched_cells: 0
+    individual_render_cell_checks: 0
+    render_reason: no cell mismatch or flagged number; render verifies table layout and row placement
+  printed_row_count:
+    table: '1'
+    experimental_runs: 51
+    starting_material_rows: 1
+    pages:
+      - page: 6
+        published_page: 5549
+        run_rows: 36
+      - page: 7
+        published_page: 5550
+        run_rows: 15
+table_mappings:
+  - printed_table: '1'
+    drafts:
+      - p006-t01.csv
+      - p007-t02.csv
+    row_key: Sample
+    condition_columns:
+      - column: temperature heading and row group
+        destination: experiment.conditions.temperature_K
+        source_form: T_C
+        locator: row-specific Table 1 location
+      - column: Run time (min)
+        destination: experiment.thermal_schedule.total_duration_s
+        source_form: minutes converted by the migration path
+        locator: row-specific Table 1 location
+      - column: Starting material oxide columns
+        destination: experiment.sample.initial_composition
+        source_form: printed wt% oxides
+        locator:
+          page: 6
+          published_page: 5549
+          row: Starting material
+    existing_value_columns:
+      - MgO
+      - SiO2
+      - Al2O3
+      - CaO
+      - Mass loss
+      - Mg loss
+      - JMg
+      - JSi
+      - delta25Mg
+    value_change: none
+  - printed_table: '2'
+    draft: p016-t03.csv
+    destination: existing context records
+    value_change: none
+table_tool_emit:
+  disposition: not_run
+  reason: this tool version has convert and compare but no emit mode; the task changes conditions only
+condition_mapping:
+  apparatus:
+    source: Section 3.1
+    locator:
+      page: 5
+      published_page: 5548
+    value: high-temperature vacuum furnace with 0.25 mm iridium wire loops and a partially molten free surface
+    method: langmuir_free_evaporation
+  atmosphere:
+    source: Section 3.1 and Table 1 caption
+    state: vacuum
+    locator:
+      page: 5
+      published_page: 5548
+  total_pressure:
+    printed: '<10^-6 Torr outside the heating elements and heat shields surrounding the sample'
+    stored_as: upper bound converted to Pa
+    locator:
+      page: 5
+      published_page: 5548
+    sample_surface_pressure: typed unknown; an exact local value is not reported
+    cell_internal_pressure: typed unknown; not reported
+  oxygen_condition:
+    state: typed unknown
+    reason: the 2007 vacuum runs do not report point fO2, pO2, a buffer, or a gas ratio
+    locator:
+      page: 5
+      published_page: 5548
+  sweep_gas:
+    state: unknown
+    reason: not reported
+    locator:
+      page: 5
+      published_page: 5548
+  run_duration:
+    source: Table 1 Run time (min)
+    destination: experiment.thermal_schedule.total_duration_s
+    scope: row-specific for all 51 experimental runs
+  starting_composition:
+    source: Table 1 Starting material row
+    destination: experiment.sample.initial_composition
+    locator:
+      page: 6
+      published_page: 5549
+      table: '1'
+      row: Starting material
+phase_mapping:
+  run_state: l
+  residue_state: glass
+  quench_state: not_stated
+  code_tokens:
+    - simulator/battery/enums.py::Phase
+    - simulator/battery/enums.py::QuenchState
+    - simulator/battery/enums.py::PhaseRole
+  locator:
+    page: 5
+    published_page: 5548
+    section: 3.1 Starting materials and experimental procedure
+  source_statement: residues cooled to room temperature and quenched to glass; preservation or alteration is not stated
+  values_changed: false
+schema_gaps:
+  code_sets_checked:
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    - simulator/battery/migrate.py::QUANTITY_ALIASES
+    - simulator/battery/migrate.py::TYPE_QUANTITY
+    - simulator/battery/enums.py::Quantity
+    - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+    - simulator/battery/enums.py::PhaseRole
+  existing_composition_paths:
+    equilibrium_phase_composition: data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml
+    residue_component_composition: data/literature/extracts/georges-2000-potassium-evaporation-thesis.yaml
+  quantity_unknown_rows:
+    - source_quantity: vacuum_evaporation_flux_J_Mg_vs_T
+      rows: 1
+      reason: figure-only quantity; no point value was extracted and no exact quantity token exists
+    - source_quantity: sample_surface_area_series
+      rows: 8
+      reason: printed surface-area series has no exact observation quantity token
+    - source_quantity: published_mass_loss_and_reduced_flux_time_series
+      rows: 51
+      reason: composite mass-loss and molar areal flux series has no exact single quantity token
+    - source_quantity: published_reduced_silicon_flux_time_series
+      rows: 32
+      reason: calculated molar areal flux has no exact quantity token; evaporation_rate and mass_loss_rate are mass per time
+    - source_quantity: qualitative_non_loss_bound
+      rows: 4
+      reason: qualitative no-significant-loss bound has no exact quantitative quantity token
+    total_rows: 96
+  refusal_check: descriptive non-token quantities remain quantity_unknown rather than inferring from rate_series
+scoring_engine_pin:
+  declared_openimcc_revision: 66ec4a3
+  imported_module: openimcc/__init__.py
+  python_source_tree_hash: 308672269d6e
+evidence_class_review:
+  mass_loss_percent: measured_direct
+  residue_composition: measured_direct
+  flux_columns: measured_reduced
+  flux_reason: the paper calls JMg and JSi calculated evaporation rates derived from run mass, surface area, composition, and time
+  change_scope: existing table values and their legacy method_class fields were not re-extracted or rewritten in this condition census
+compare_output: kems-010-richter-2007.compare.csv

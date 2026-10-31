@@ -20,6 +20,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '2173.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -43,6 +46,39 @@ observations:
     paragraph: Because aluminum is very refractory and does not evaporate during the experiments
     section: '4.1'
   read_from: pdf:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 13
+        paragraph: Because aluminum is very refractory and does not evaporate during the experiments
+        section: '4.1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 13
+              paragraph: Because aluminum is very refractory and does not evaporate during the experiments
+              section: '4.1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 13
+              paragraph: Because aluminum is very refractory and does not evaporate during the experiments
+              section: '4.1'
+        output_unit: K
+        references: []
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_ca_non_loss
   experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
   identity:
@@ -61,6 +97,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '2173.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -84,6 +123,39 @@ observations:
     paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
     section: '4.1'
   read_from: pdf:mendybaev-2017-fun-cai-lab-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 13
+        paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
+        section: '4.1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 13
+              paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
+              section: '4.1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 13
+              paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
+              section: '4.1'
+        output_unit: K
+        references: []
 - observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_shared_starting_and_standard
   experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
   identity:
@@ -102,6 +174,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '2173.15'
     composition:
       tag: value
       value:
@@ -146,6 +221,38 @@ observations:
     paragraph: FUNC-5
   read_from: pdf:mendybaev-2017-fun-cai-lab-evaporation
   point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        pdf_page_index: 39
+        table: '1'
+        paragraph: FUNC-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 39
+              table: '1'
+              paragraph: FUNC-5
+        output_unit: K
+        references: []
     composition:
       state:
         tag: value
