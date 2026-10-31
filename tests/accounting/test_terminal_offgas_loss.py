@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.yield_disposition import _ACCOUNT_TO_BIN
+from simulator.state import CondensationTrain
 from simulator.three_product_report import classify_products
 
 
@@ -12,17 +13,23 @@ def test_terminal_offgas_is_excluded_from_product_and_capture_totals():
         "terminal.offgas": {"Fe": 20.0, "Na": 3.0, "H2O": 2.0},
         "process.condensation_train": {"Fe": 5.0, "Na": 1.0},
     }
+    train = CondensationTrain.create_default()
     sim = SimpleNamespace(
         atom_ledger=SimpleNamespace(project_account_kg=lambda account: accounts.get(account, {})),
         _unspent_additive_reagents_kg=lambda: {},
-        train=SimpleNamespace(stages=[]),
+        train=train,
+        _stage_collection_kg_by_source={
+            ("process.condensation_train", 1, "Fe"): 5.0,
+            ("process.condensation_train", 4, "Na"): 1.0,
+        },
     )
     sim.product_ledger = lambda: AccountingQueries(sim).product_ledger()
 
     assert sim.product_ledger() == {"Fe": 5.0, "Na": 1.0, "H2O": 0.0}
     classified = classify_products(sim)
     assert classified["metals_plus_O2"]["metals_kg"] == {"Fe": 5.0, "Na": 1.0}
-    assert classified["captured_volatiles"]["kg_by_species"] == {"Fe": 5.0, "Na": 1.0}
+    assert classified["captured_volatiles"]["kg_by_species"] == {}
+    assert classified["unclassified"]["total_kg"] == 0.0
     # Existing loss vocabulary still owns the escaped account; no mass moves.
     assert _ACCOUNT_TO_BIN["terminal.offgas"] == "offgas_vented"
     assert sim.atom_ledger.project_account_kg("terminal.offgas") == accounts["terminal.offgas"]
