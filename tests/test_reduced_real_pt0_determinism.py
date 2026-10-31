@@ -360,7 +360,8 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # Two in-process evaluations and the cross-process test pin determinism.
     # 2026-10-31 b-929: gate replay keys now embed the owner freeze-gate cache
     # key so inert membership, water, and formula identity cannot alias curves.
-    assert key_hash == "f460549321df39ccd76ddad95505f4c8f65eba6fa0c0888893afdcb8feb26b50"
+    # Paired base/candidate run on Studio-2 confirmed this canonical digest.
+    assert key_hash == "9392021e2f9eb29198293ce38e74f7c4f15d2c5df8c18851a55bdeed3642b43d"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -1101,7 +1102,8 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
     # b-929 changes the gate key bytes by including the owner freeze-gate key;
-    # the equilibrium key below remains unchanged.
+    # the equilibrium key below remains unchanged. Studio-2 confirmed the
+    # canonical post-change gate length and digest.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1118,9 +1120,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 2221
+    assert len(magemin_bytes) == 2220
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "cee6defee87036c727fe284541e982d5d6138ef5ee0ad657ed05f07da6d13c07"
+        "8b1411ae7a83404ae1012d3093f86d642285a4c7f008e9a53724ecff22ada7ac"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1194,11 +1196,59 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
     legacy_store._store(
         "freeze_gate_curve",
         legacy_identity(sodium_inert_key),
-        {"curve": {"status": "in_range"}},
+        {
+            "curve": {
+                "source": "gate_liquid_fraction:legacy",
+                "status": "in_range",
+                "solidus_T_C": 1000.0,
+                "liquidus_T_C": 1200.0,
+            }
+        },
         repair_notices=(),
     )
+    legacy_replay = legacy_store._clone_for_context(
+        "replay",
+        persistent_cache=False,
+    )
+    legacy_replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    replay_sim = build_sim()
+    replay_sim.inventory.inert_melt_components_kg.clear()
+    replay_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    assert legacy_identity(gate_key(replay_sim)) == legacy_identity(
+        sodium_inert_key
+    )
     with pytest.raises(PT0CacheMiss):
-        legacy_store._lookup("freeze_gate_curve", sodium_inert_key)
+        legacy_replay.replay_gate_curve(replay_sim, fO2_log=-9.0)
+
+    current_store = PT0DeterminismStore("capture")
+    sodium_curve = {
+        "source": "gate_liquid_fraction:test-sodium-inert",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1200.0,
+    }
+    current_store._store(
+        "freeze_gate_curve",
+        sodium_inert_key,
+        {"curve": sodium_curve},
+        repair_notices=(),
+    )
+    current_replay = current_store._clone_for_context(
+        "replay",
+        persistent_cache=False,
+    )
+    current_replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    silica_replay_sim = build_sim()
+    silica_replay_sim.inventory.inert_melt_components_kg.clear()
+    silica_replay_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    assert legacy_identity(gate_key(silica_replay_sim)) == legacy_identity(
+        sodium_inert_key
+    )
+    with pytest.raises(PT0CacheMiss):
+        current_replay.replay_gate_curve(
+            silica_replay_sim,
+            fO2_log=-9.0,
+        )
+    assert len(current_replay.misses) == 1
 
     water_sim = build_sim()
     water_sim._chem_registry = None
