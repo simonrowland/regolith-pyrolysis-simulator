@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:jeon-lindberg-2023-mg-ca-zn-oxide-equilibria
       role: pdf
@@ -255,6 +255,14 @@ experiments:
         published_page: 12738
         pdf_page_index: 3
         table: '1'
+      inference:
+        relation: extract_inference
+        inputs:
+        - table blank = same as above
+        - 'source locator: Table 1 row 12'
+        parameters: []
+        output_unit: mole_fraction
+        references: []
   conditions:
     temperature_K:
       state:
@@ -307,6 +315,14 @@ experiments:
         published_page: 12738
         pdf_page_index: 3
         table: '1'
+      inference:
+        relation: extract_inference
+        inputs:
+        - table blank = same as above
+        - 'source locator: Table 1 row 12'
+        parameters: []
+        output_unit: mole_fraction
+        references: []
   conditions:
     temperature_K:
       state:
@@ -359,6 +375,14 @@ experiments:
         published_page: 12738
         pdf_page_index: 3
         table: '1'
+      inference:
+        relation: extract_inference
+        inputs:
+        - table blank = same as above
+        - 'source locator: Table 1 row 12'
+        parameters: []
+        output_unit: mole_fraction
+        references: []
   conditions:
     temperature_K:
       state:
@@ -411,6 +435,14 @@ experiments:
         published_page: 12738
         pdf_page_index: 3
         table: '1'
+      inference:
+        relation: extract_inference
+        inputs:
+        - table blank = same as above
+        - 'source locator: Table 1 row 12'
+        parameters: []
+        output_unit: mole_fraction
+        references: []
   conditions:
     temperature_K:
       state:

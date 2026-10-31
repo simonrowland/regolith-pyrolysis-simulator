@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:stolyarova-2021-ti-al-kems-ru
       role: pdf
@@ -65,6 +65,23 @@ experiments:
     pdf_page_index: 5
     table: '3'
     note: row=1
+  bench_id: 10.31857/s0044460x21100115::bench::stolyarova-2021-double-knudsen-cell
+benches:
+- id: 10.31857/s0044460x21100115::bench::stolyarova-2021-double-knudsen-cell
+  work_id: 10.31857/s0044460x21100115
+  identity:
+    basis: described_in_this_work
+  cell_materials:
+  - state:
+      tag: value
+      value: W
+    locator:
+      page: 8
+      published_page: 1565
+      pdf_page_index: 7
+      section: Experimental part
+      note: 'The paper states: "Образцы испаряли из сдвоенной эффузионной камеры Кнудсена, изготовленной из вольфрама."'
+  other_facts: []
 context:
 - observation_id: stolyarova_2021_excess_gibbs_energy_fit_context
   type: model_fit_context

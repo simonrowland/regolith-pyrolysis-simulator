@@ -80,7 +80,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_ag_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_ag_logKstar_table3_quoted_20260906::T=1573.15:h=221f8d0471bd
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -120,7 +120,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_ag_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_ag_logKstar_table3_quoted_20260906::T=1573.15:h=221f8d0471bd
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -183,9 +183,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-2.23'
     approximate: false
   uncertainty:
     kind: printed
@@ -206,10 +205,7 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Ag | AgO0.5(l) = Ag(g) + ¼O2 | 1 | 0 | -2.23 |  |  | \nN |  |  |  | 1 |  |  |"
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
   point_conditions:
@@ -220,10 +216,7 @@ observations:
       locator:
         page: 56
         table: '3'
-        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
-          \ K\nAg | AgO0.5(l) = Ag(g) + ¼O2 | 1 | 0 | -2.23 |  |  | \nN |  |  |  | 1 |  |  |"
+        note: Table 3 column 1573.15 K.
         source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
@@ -593,7 +586,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_cd_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_cd_logKstar_table3_quoted_20260906::T=1573.15:h=7374a0df9747
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -633,7 +626,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_cd_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_cd_logKstar_table3_quoted_20260906::T=1573.15:h=7374a0df9747
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -696,9 +689,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-2.48'
     approximate: false
   uncertainty:
     kind: printed
@@ -719,10 +711,7 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Cd | CdO(l) = Cd(g) + ½O2 | 2 | 0 | -2.48 |  |  | \nN |  |  |  | 1 |  |  |"
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
   point_conditions:
@@ -733,10 +722,7 @@ observations:
       locator:
         page: 56
         table: '3'
-        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
-          \ K\nCd | CdO(l) = Cd(g) + ½O2 | 2 | 0 | -2.48 |  |  | \nN |  |  |  | 1 |  |  |"
+        note: Table 3 column 1573.15 K.
         source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
@@ -1106,7 +1092,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906::T=1673.15:h=eff4261f06fc
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -1146,7 +1132,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906::T=1673.15:h=eff4261f06fc
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -1170,8 +1156,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -1209,9 +1195,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-2.7'
     approximate: false
   uncertainty:
     kind: printed
@@ -1241,17 +1226,253 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Cr | CrO(l) + ½O2 = CrO2(g) | -2 | 0 |  | -2.70 | -2.40±0.03 | -2.29
-
-      N |  |  |  |  | 1 | 2 | 1'
+    note: Table 3 log K-star cell at 1673.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906::T=1773.15:h=7a81145868d6
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1773.15':
+          log10_K_star_SD: '0.03'
+          quote: -2.40±0.03
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.40±0.03'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_cr_logKstar_table3_CrO_ox_quoted_20260906::T=1823.15:h=c6954fe5acca
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Cr
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1773.15':
+          log10_K_star_SD: '0.03'
+          quote: -2.40±0.03
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.40±0.03'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -1489,7 +1710,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906::T=1673.15:h=55b6e158e290
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -1529,7 +1750,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906::T=1573.15:h=1521c7d05fd1
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -1553,8 +1774,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -1592,9 +1813,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-4.09'
     approximate: false
   uncertainty:
     kind: printed
@@ -1642,17 +1862,424 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Cu | CuO0.5(l) = Cu(g) + ¼O2 | 1 | 0 | -4.09±0.12 | -3.70±0.10 | -3.13±0.06 | -2.90
-
-      N |  |  |  | 3 | 3 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906::T=1673.15:h=55b6e158e290
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.12'
+          quote: -4.09±0.12
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -4.09±0.12'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.70±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.13±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.13±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906::T=1773.15:h=888689669ee0
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.13'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.12'
+          quote: -4.09±0.12
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -4.09±0.12'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.70±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.13±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.13±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_cu_logKstar_table3_quoted_20260906::T=1823.15:h=ca8642a9489c
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.12'
+          quote: -4.09±0.12
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -4.09±0.12'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.70±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.13±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.13±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -2852,7 +3479,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906::T=1673.15:h=ef8d15ef6b43
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -2892,7 +3519,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906::T=1673.15:h=ef8d15ef6b43
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -2916,8 +3543,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -2955,9 +3582,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-5.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -2996,17 +3622,271 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Ga | GaO1.5(l) = GaO(g) + ¼O2 | 1 | 0 |  | -5.10±0.26 | -4.45±0.04 | -4.16
-
-      N |  |  |  |  | 3 | 2 | 1'
+    note: Table 3 log K-star cell at 1673.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906::T=1773.15:h=e5e3eddcc097
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-4.45'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.26'
+          quote: -5.10±0.26
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -5.10±0.26'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.04'
+          quote: -4.45±0.04
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -4.45±0.04'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_GaO_g_quoted_20260906::T=1823.15:h=7697bfc38f1b
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-4.16'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.26'
+          quote: -5.10±0.26
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -5.10±0.26'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.04'
+          quote: -4.45±0.04
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -4.45±0.04'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -3097,7 +3977,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906::T=1673.15:h=7d2e3c25963f
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -3137,7 +4017,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906::T=1673.15:h=7d2e3c25963f
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -3161,8 +4041,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -3200,9 +4080,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-9.92'
     approximate: false
   uncertainty:
     kind: printed
@@ -3241,17 +4120,271 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Ga | GaO1.5(l) = Ga(g) + ¾O2 | 3 | 0 |  | -9.92±0.32 | -8.42±0.07 | -7.76
-
-      N |  |  |  |  | 3 | 2 | 1'
+    note: Table 3 log K-star cell at 1673.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906::T=1773.15:h=94aa372b5e56
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-8.42'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.32'
+          quote: -9.92±0.32
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -9.92±0.32'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.07'
+          quote: -8.42±0.07
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -8.42±0.07'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ga_logKstar_table3_Ga_g_quoted_20260906::T=1823.15:h=2fd9b3a79983
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ga
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-7.76'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.32'
+          quote: -9.92±0.32
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -9.92±0.32'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.07'
+          quote: -8.42±0.07
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -8.42±0.07'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -12601,7 +13734,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906::T=1673.15:h=f1afe25f5b30
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -12641,7 +13774,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906::T=1573.15:h=e9cd26b700cf
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -12665,8 +13798,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -12704,9 +13837,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-5.04'
     approximate: false
   uncertainty:
     kind: printed
@@ -12754,17 +13886,424 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Ge | GeO2(l) = GeO(g) + ½O2 | 2 | 10.4 | -5.04±0.13 | -3.70±0.06 | -2.71±0.13 | -2.29
-
-      N |  |  |  | 3 | 4 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906::T=1673.15:h=f1afe25f5b30
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ge
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.13'
+          quote: -5.04±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.04±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.70±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.13'
+          quote: -2.71±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.71±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906::T=1773.15:h=c10041cb1852
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ge
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.71'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.13'
+          quote: -5.04±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.04±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.70±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.13'
+          quote: -2.71±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.71±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_ge_logKstar_table3_quoted_20260906::T=1823.15:h=c6954fe5acca
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Ge
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.13'
+          quote: -5.04±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.04±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.06'
+          quote: -3.70±0.06
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.70±0.06'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.13'
+          quote: -2.71±0.13
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.71±0.13'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -23914,7 +25453,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906::T=1673.15:h=2097eff0363d
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -23954,7 +25493,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_LiO_g_quoted_20260906::T=1673.15:h=2097eff0363d
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -24017,9 +25556,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-3.39'
     approximate: false
   uncertainty:
     kind: printed
@@ -24049,10 +25587,7 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Li | LiO0.5(l) + ¼O2 = LiO(g) | -1 | 0 |  | -3.39±0.07 |  | \nN |  |  |  |  | 2 |  |"
+    note: Table 3 log K-star cell at 1673.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
   point_conditions:
@@ -24063,10 +25598,7 @@ observations:
       locator:
         page: 56
         table: '3'
-        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
-          \ K\nLi | LiO0.5(l) + ¼O2 = LiO(g) | -1 | 0 |  | -3.39±0.07 |  | \nN |  |  |  |  | 2 |  |"
+        note: Table 3 column 1673.15 K.
         source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
@@ -24158,7 +25690,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g_quoted_20260906::T=1673.15:h=f42364ca5baa
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -24198,7 +25730,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g_quoted_20260906::T=1673.15:h=f42364ca5baa
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -24261,9 +25793,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-5.36'
     approximate: false
   uncertainty:
     kind: printed
@@ -24293,10 +25824,7 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Li | LiO0.5(l) = Li(g) + ¼O2 | 1 | 0 |  | -5.36±0.05 |  | \nN |  |  |  |  | 2 |  |"
+    note: Table 3 log K-star cell at 1673.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
   point_conditions:
@@ -24307,10 +25835,7 @@ observations:
       locator:
         page: 56
         table: '3'
-        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
-          \ K\nLi | LiO0.5(l) = Li(g) + ¼O2 | 1 | 0 |  | -5.36±0.05 |  | \nN |  |  |  |  | 2 |  |"
+        note: Table 3 column 1673.15 K.
         source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
@@ -51506,7 +53031,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906::T=1673.15:h=013c7d931386
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -51546,7 +53071,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906::T=1573.15:h=32152af108fe
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -51570,8 +53095,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -51609,9 +53134,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-2.87'
     approximate: false
   uncertainty:
     kind: printed
@@ -51650,17 +53174,397 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Mo | MoO  2(l) + ½O  2 = MoO 3(g) | -2 | 0 | -2.87 | -2.86±0.00 | -2.48±0.01 | -2.39
-
-      N |  |  |  | 1 | 2 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906::T=1673.15:h=013c7d931386
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.86'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -2.86±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -2.86±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -2.48±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.48±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906::T=1773.15:h=ffdbdc111bfa
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.48'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -2.86±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -2.86±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -2.48±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.48±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO2_ox_quoted_20260906::T=1823.15:h=a5c14266c7ed
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.39'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -2.86±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -2.86±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -2.48±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.48±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -51751,7 +53655,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906::T=1673.15:h=5f112b174d94
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -51791,7 +53695,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906::T=1573.15:h=1df52d09fe02
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -51815,8 +53719,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -51854,9 +53758,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-4.67'
     approximate: false
   uncertainty:
     kind: printed
@@ -51895,17 +53798,397 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Mo | MoO3(l) = MoO3(g) | 0 | 0 | -4.67 | -4.34±0.00 | -3.64±0.01 | -3.41
-
-      N |  |  |  | 1 | 2 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906::T=1673.15:h=5f112b174d94
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-4.34'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -4.34±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -4.34±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -3.64±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.64±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906::T=1773.15:h=7acbeffab555
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.64'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -4.34±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -4.34±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -3.64±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.64±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_mo_logKstar_table3_MoO3_congruent_quoted_20260906::T=1823.15:h=6a9438053850
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Mo
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.41'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0'
+          quote: -4.34±0.00
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -4.34±0.00'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.01'
+          quote: -3.64±0.01
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -3.64±0.01'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -52426,7 +54709,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906::T=1673.15:h=df437ef2fe32
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -52466,7 +54749,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906::T=1573.15:h=876e8fc3a6ea
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -52490,8 +54773,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -52529,9 +54812,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-2.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -52561,12 +54843,136 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Pb | PbO(l) = PbO(g) | 0 | 0 | -2.90±0.12 | -2.00 |  | \nN |  |  |  | 2 | 1 |  |"
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g_quoted_20260906::T=1673.15:h=df437ef2fe32
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Pb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.12'
+          quote: -2.90±0.12
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -2.90±0.12'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -52655,7 +55061,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906::T=1673.15:h=ce17b4289574
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -52695,7 +55101,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906::T=1573.15:h=7e573582d264
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -52719,8 +55125,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -52758,9 +55164,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-4.47'
     approximate: false
   uncertainty:
     kind: printed
@@ -52790,12 +55195,136 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
-      \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
-      \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K\n\
-      Pb | PbO(l) = Pb(g) + ½O2 | 2 | 0 | -4.47±0.19 | -3.49 |  | \nN |  |  |  | 2 | 1 |  |"
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_Pb_g_quoted_20260906::T=1673.15:h=ce17b4289574
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Pb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.49'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.19'
+          quote: -4.47±0.19
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -4.47±0.19'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -53761,7 +56290,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906::T=1673.15:h=26aaff70c919
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -53801,7 +56330,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906::T=1573.15:h=a866a160c812
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -53825,8 +56354,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -53864,9 +56393,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-4.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -53905,17 +56433,397 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Rb | RbO0.5(l) = Rb(g) + ¼O2 | 1 | 14.4 | -4.15 | -3.12±0.10 | -2.63±0.02 | -2.26
-
-      N |  |  |  | 1 | 3 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906::T=1673.15:h=26aaff70c919
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.12±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.12±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.02'
+          quote: -2.63±0.02
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.63±0.02'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906::T=1773.15:h=0307351d1eed
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.63'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.12±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.12±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.02'
+          quote: -2.63±0.02
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.63±0.02'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_rb_logKstar_table3_quoted_20260906::T=1823.15:h=9a91df948461
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Rb
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.26'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1673.15':
+          log10_K_star_SD: '0.1'
+          quote: -3.12±0.10
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.12±0.10'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.02'
+          quote: -2.63±0.02
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.63±0.02'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:
@@ -108498,7 +111406,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906
+    superseded_by: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906::T=1673.15:h=fe514ec1e1a1
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -108538,7 +111446,7 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906
+- observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906::T=1573.15:h=565fd8b06b07
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
     quantity:
@@ -108562,8 +111470,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile log10_K_star does not use standard_pressure_Pa
@@ -108601,9 +111509,8 @@ observations:
       tag: not_applicable
       reason: profile log10_K_star does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped log10_K_star field selected; source fields: system_class, derived_from, derivation, quantity,
-      evidence_class, method_class, reaction, n_electrons, t0_min, log10_K_star_by_T_K, gas_species'
+    kind: point
+    point: '-5.06'
     approximate: false
   uncertainty:
     kind: printed
@@ -108651,17 +111558,424 @@ observations:
   locator:
     page: 56
     table: '3'
-    note: 'Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;
-      quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares
-      fit to the experimental data.
-
-      Element | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K
-
-      Zn | ZnO(l) = Zn(g) + ½O2 | 2 | 9.0 | -5.06±0.09 | -3.96±0.09 | -2.92±0.17 | -2.57
-
-      N |  |  |  | 3 | 4 | 2 | 1'
+    note: Table 3 log K-star cell at 1573.15 K.
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1573.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906::T=1673.15:h=fe514ec1e1a1
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-3.96'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.09'
+          quote: -5.06±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.06±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.09'
+          quote: -3.96±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.96±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.17'
+          quote: -2.92±0.17
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.92±0.17'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1673.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1673.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906::T=1773.15:h=a9d8bd565adf
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.92'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.09'
+          quote: -5.06±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.06±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.09'
+          quote: -3.96±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.96±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.17'
+          quote: -2.92±0.17
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.92±0.17'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1773.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1773.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  derived_from:
+  - tables:kems-012-sossi-2019
+  derivation:
+    relation: The authors state Table 3 log K* values and reaction stoichiometries were found by non-linear least-squares
+      fit to the experimental data (Table 3; §3.2, Eq. 8).
+    inputs:
+    - tables:kems-012-sossi-2019
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kems-012-sossi-2019::sossi_2019_zn_logKstar_table3_quoted_20260906::T=1823.15:h=42eb204dc749
+  experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
+  identity:
+    quantity:
+      tag: value
+      value: log10_K_star
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile log10_K_star does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile log10_K_star does not use per
+    temperature_K:
+      tag: value
+      value: '1823.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile log10_K_star does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier equilibrium_fit does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile log10_K_star does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile log10_K_star does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile log10_K_star does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile log10_K_star does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile log10_K_star does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile log10_K_star does not use wall
+  value:
+    kind: point
+    point: '-2.57'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for cells without an uncertainty; no zero imputation.
+      by_T_K:
+        '1573.15':
+          log10_K_star_SD: '0.09'
+          quote: -5.06±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1573.15 K: -5.06±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1673.15':
+          log10_K_star_SD: '0.09'
+          quote: -3.96±0.09
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1673.15 K: -3.96±0.09'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+        '1773.15':
+          log10_K_star_SD: '0.17'
+          quote: -2.92±0.17
+          locator:
+            source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+            page: 56
+            table: '3'
+            quote: '1773.15 K: -2.92±0.17'
+            note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-012-sossi-2019
+  locator:
+    page: 56
+    table: '3'
+    note: Table 3 log K-star cell at 1823.15 K.
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+  read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 56
+        table: '3'
+        note: Table 3 column 1823.15 K.
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   derived_from:
   - tables:kems-012-sossi-2019
   derivation:

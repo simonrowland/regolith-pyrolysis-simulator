@@ -1,0 +1,2026 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+observations:
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p45
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.55'
+        - - SiO2
+          - '0.45'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.45; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.55'
+          - - SiO2
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p50
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.5'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.50; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.5'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p55
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.55; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p60
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.4'
+        - - SiO2
+          - '0.6'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.60; reference melt row
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.4'
+          - - SiO2
+            - '0.6'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p65
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.35'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.65; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.35'
+          - - SiO2
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p70
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.3'
+        - - SiO2
+          - '0.7'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.70; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.3'
+          - - SiO2
+            - '0.7'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_enthalpy_x0p75
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: value
+      value: partial_molar_enthalpy
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - SiO2
+          - '0.75'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile partial_molar_enthalpy does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, quantity_label, method_class,
+      status, admission_status, reason, composition_basis, composition_mol, value_as_printed, confidence_interval_95_as_printed,
+      derivation_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar enthalpy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.75; partial molar enthalpy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar enthalpy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - SiO2
+            - '0.75'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p45
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.55'
+        - - SiO2
+          - '0.45'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.45; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.55'
+          - - SiO2
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p50
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.5'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.50; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.5'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p55
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.55; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p60
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.4'
+        - - SiO2
+          - '0.6'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.60; reference melt row
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.4'
+          - - SiO2
+            - '0.6'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p65
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.35'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.65; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.35'
+          - - SiO2
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p70
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.3'
+        - - SiO2
+          - '0.7'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.70; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.3'
+          - - SiO2
+            - '0.7'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_entropy_x0p75
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - SiO2
+          - '0.75'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; no partial-molar entropy quantity token exists in the schema.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar entropy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.75; partial molar entropy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar entropy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - SiO2
+            - '0.75'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p45
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.55'
+        - - SiO2
+          - '0.45'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.45; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.55'
+          - - SiO2
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.45
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p50
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.5'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.50; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.5'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.50
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p55
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.55; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.55
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p60
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.4'
+        - - SiO2
+          - '0.6'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.60; reference melt row
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60; reference melt row
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.4'
+          - - SiO2
+            - '0.6'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.60
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p65
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.35'
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.65; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.35'
+          - - SiO2
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.65
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p70
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.3'
+        - - SiO2
+          - '0.7'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.70; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.3'
+          - - SiO2
+            - '0.7'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.70
+- observation_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::kupcak_1992_table2_partial_gibbs_x0p75
+  experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+    composition:
+      tag: value
+      value:
+        basis: printed_binary_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - SiO2
+          - '0.75'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: Relative partial molar value; the absolute reference activity is not printed in this source.
+    decided_by:
+      worker: codex
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar Gibbs energy relative to the reference melt
+  notices: []
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.75; partial molar Gibbs energy relative to the reference melt
+  read_from: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75; partial molar Gibbs energy relative to the reference melt
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_binary_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - SiO2
+            - '0.75'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        table: II
+        note: x(SiO2)=0.75

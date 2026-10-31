@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:beerkens-2001-industrial-glass-evaporation
       role: pdf
@@ -977,6 +977,67 @@ context:
   work_id: 10.34657/13064
   source_id: beerkens-2001-industrial-glass-evaporation
   species: Na2O
+- observation_id: beerkens_2001_text_extra_nacl_evaporated_fraction
+  type: printed_data_context
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 255
+    section: Evaporation of other species from glass melts
+    figure: '10'
+    note: The prose gives an approximate fraction for extra NaCl input, not a digitized figure point.
+  units: '%'
+  values:
+    quantity: fraction of extra NaCl added to the batch that evaporated
+    method_class: quoted_attributed
+    mass_loss_pct: 50
+    approximate: true
+    value_as_published: about 50% of the extra NaCl added to the batch evaporates
+    attribution: Beek, A. R. M. ter and Thole, E. J. M. C. (1992), reference 37.
+    denominator_as_printed: extra NaCl added above the 0.200 g NaCl per ton glass background
+    background_absorption_as_printed: The first 0.200 g NaCl per ton glass is almost completely absorbed in the melt.
+    products_as_printed: HCl and sodium sulfate dust
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The prose does not state the furnace temperature for this cited test.
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 255
+        section: Evaporation of other species from glass melts
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: No numeric oxygen pressure is stated for the cited test.
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 255
+        section: Evaporation of other species from glass melts
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Total pressure is not stated for the cited test.
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 255
+        section: Evaporation of other species from glass melts
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names float glass and changing soda quality but gives no complete melt composition.
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 255
+        section: Evaporation of other species from glass melts
+  context_id: beerkens-2001-industrial-glass-evaporation::context::beerkens_2001_text_extra_nacl_evaporated_fraction
+  work_id: 10.34657/13064
+  source_id: beerkens-2001-industrial-glass-evaporation
+  species: NaCl
 - observation_id: beerkens_2001_text_laboratory_sodium_flux
   type: measured_and_model_text_context
   locator:

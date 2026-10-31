@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:beerkens-2003-sulfate-decomposition-na2o-activity
       role: pdf
@@ -30,7 +30,42 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1111/j.1151-2916.2003.tb03578.x
-experiments: []
+experiments:
+- experiment_id: 10.1111/j.1151-2916.2003.tb03578.x::beerkens-2003-sulfate-decomposition-na2o-activity
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1151-2916.2003.tb03578.x
+  locator:
+    page: 6
+    published_page: 1898
+    pdf_page_index: 5
+    section: VI. Results for the Sodium Oxide Activity
+    note: Final paragraph of §VI before the §VII heading.
+    source_path: corpus/raw/beerkens-2003-sulfate-decomposition-na2o-activity/beerkens-2003-sulfate-decomposition-na2o-activity.pdf
 context:
 - observation_id: beerkens_2003_activity_and_equilibrium_fits_context
   type: model_parameters
@@ -39,6 +74,7 @@ context:
     page: 5
     published_page: 1897
     pdf_page_index: 4
+    section: VI. Results for the Sodium Oxide Activity
     note: 'Author-reported temperature relations; the article also gives the measured activity ranges in Figure 5. Candidate
       tokens checked: activity_coefficient_temperature_fit does not fit these activities, and log10_K_star does not fit Kcon/Kpc;
       these are not activity-coefficient or equilibrium-constant K* parameters.'
@@ -256,8 +292,8 @@ context:
     species: Na2O
     phase: soda–lime–silica glass melt
     temperature_as_printed: about 1600–1800 K; plotted axis 1550–1850 K
-    standard_state: pure liquid Na2O at the same temperature; ideal gas standard is 1 bar. The Na2O reference is liquid throughout
-      the plotted range.
+    standard_state: Pure sodium oxide in its most stable phase at the same temperature, following the general activity convention
+      on PDF p. 1 / published p. 1893, §II. The source does not name the specific Na2O phase.
     axes_as_printed:
       x: temperature K
       y: chemical activity Na2O in melt
@@ -349,15 +385,16 @@ context:
     page: 6
     published_page: 1898
     pdf_page_index: 5
-    note: 'The text prints about 1.7×10^-8 for the float-glass Na2O activity at 1673 K. It is derived using Ka, a(Na2SO4)=1,
-      p(SO2)=0.666 bar, and p(O2)=0.33 bar; the derivation also depends on the Kpc determination. Candidate token: activity.
-      Kpc values are figure data or temperature fits rather than stored rows; no corpus TABLE_CSV asset exists for the inputs.
-      Retained pending the required TABLE_CSV lineage (controller t-1382). The paper estimates a maximum error of 30–40% for
-      the derived activity.'
+    section: VI. Results for the Sodium Oxide Activity
+    note: The final paragraph of §VI prints about 1.7 × 10^-8 for the float-glass Na2O activity at 1673 K. It states that
+      the value uses Ka from Eq. (3), a(Na2SO4) = 1, p(SO2) = 0.666 bar, and p(O2) = 0.33 bar. The relative error components
+      are about 15%–20% for Kpc and 15% for maximum sulfate solubility; the estimated maximum error is 30%–40%. The paper's
+      general pure-phase activity convention is on PDF p. 1 / published p. 1893, §II, without naming a specific Na2O phase.
+      The inputs are derivation context and point conditions, not separate observations or parent records.
   units: dimensionless activity
   values:
-    quantity: sodium_oxide_activity
-    method_class: measured_reduced
+    quantity: activity
+    method_class: measured_tabulated
     formula: Na2O
     temperature_K: 1673
     value_as_published: about 1.7 × 10^-8
@@ -365,13 +402,15 @@ context:
       sodium_sulfate_activity: 1
       sulfur_dioxide_partial_pressure_bar: '0.666'
       oxygen_partial_pressure_bar: '0.33'
-      equilibrium_constant: Ka from Eq. (3); Kpc determination as described in the paper
-    standard_state: Pure liquid sodium oxide at the experiment temperature; the paper defines oxide and sulfate activities
-      relative to pure phases at the same temperature. At 1673 K, pure Na2O is liquid above the JANAF Na-012 alpha-to-liquid
-      transition at 1405.2 K (inferred stable phase).
-    standard_state_inferred: true
-    standard_state_basis: JANAF Na-012, alpha-to-liquid transition at 1405.2 K; 1673 K is above the pure oxide melting transition.
-    derivation_pending: corpus TABLE_CSV asset (controller, t-1382)
+      equilibrium_constant: Ka from Eq. (3)
+    standard_state: Pure sodium oxide in its most stable phase at the experiment temperature, following the source's general
+      activity convention on PDF p. 1 / published p. 1893, §II. The specific phase is not named.
+    standard_state_inferred: false
+    standard_state_basis: The source says pure sodium oxide in its most stable phase at the same temperature; it does not
+      name the specific phase.
+    estimated_maximum_error_as_published: 30%–40%
+    estimated_error_component_1_as_published: about 15%–20%
+    estimated_error_component_2_as_published: 15%
   context_id: beerkens-2003-sulfate-decomposition-na2o-activity::context::beerkens_2003_sodium_oxide_activity_1673K_context
   work_id: 10.1111/j.1151-2916.2003.tb03578.x
   source_id: beerkens-2003-sulfate-decomposition-na2o-activity

@@ -349,8 +349,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '27.6'
     approximate: false
   uncertainty:
     kind: printed
@@ -363,9 +363,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Bottinga and Richet (1978), one of the two CaSiO3 heat-of-fusion values reported in their survey.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -373,6 +378,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -437,8 +452,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '50.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -452,9 +467,14 @@ observations:
     attribution: Adams and Cohen (1966), derived from the decrease of the CaSiO3 solidification point in the CaSiO3–BaSiO3
       system.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -462,6 +482,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -526,8 +556,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '56.1'
     approximate: false
   uncertainty:
     kind: printed
@@ -541,9 +571,14 @@ observations:
     attribution: Tables [3]–[6]; the authors say table [6] reports Kelley’s calculation from Allen and White data for the
       CaSiO3–MgSiO3 system.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -551,6 +586,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -615,8 +660,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '59'
     approximate: false
   uncertainty:
     kind: printed
@@ -630,9 +675,14 @@ observations:
     attribution: Bottinga and Richet (1978), calculated from the CaSiO3 heat of devitrification at 298 K and heat-capacity
       data.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -640,6 +690,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -704,8 +764,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '68.2'
     approximate: false
   uncertainty:
     kind: printed
@@ -718,9 +778,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Bottinga and Richet (1978), calculated using the Clapeyron equation.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -728,6 +793,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -792,8 +867,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    kind: point
+    point: '82.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -806,9 +881,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Bottinga and Richet (1978), the other CaSiO3 heat-of-fusion value reported in their survey.
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 7
@@ -816,6 +896,16 @@ observations:
     pdf_page_index: 6
     section: Discussion
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: fusion temperature not stated with this prior value
+      locator:
+        page: 7
+        published_page: 199
+        pdf_page_index: 6
+        section: Discussion
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
   identity:
@@ -1170,23 +1260,13 @@ observations:
   read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
   derived_from:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Add the Eq. (3) fitted cooling enthalpy and mean solution enthalpy from Eq. (5) under the Eq. (1) reference-state
       definition.
     inputs:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -1984,12 +2064,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2000,12 +2075,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -2071,12 +2141,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2087,12 +2152,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -2158,12 +2218,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2174,12 +2229,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -2245,12 +2295,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2261,12 +2306,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -2332,12 +2372,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2348,12 +2383,7 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
@@ -2419,12 +2449,7 @@ observations:
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
   - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   derivation:
     relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
       heat.
@@ -2435,16 +2460,11 @@ observations:
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
     - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
-    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
   experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
   identity:
     quantity:
@@ -2466,292 +2486,7 @@ observations:
       value: '298'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      reported_status: printed
-      individual_points: not_reported
-      mean_kJ_mol-1: '1.8'
-      confidence: reliability coefficient (1−α) = 0.95
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: adamkovicova-1980-casio3-heat-of-fusion
-  locator:
-    page: 4
-    published_page: 196
-    pdf_page_index: 3
-    table: II
-  read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298'
-      locator:
-        page: 4
-        published_page: 196
-        pdf_page_index: 3
-        table: II
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_solution'
-    species:
-      formula: CaSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
-      polymorph:
-        tag: value
-        value: pseudowollastonite
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      reported_status: printed
-      individual_points: not_reported
-      mean_kJ_mol-1: '1.8'
-      confidence: reliability coefficient (1−α) = 0.95
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: adamkovicova-1980-casio3-heat-of-fusion
-  locator:
-    page: 4
-    published_page: 196
-    pdf_page_index: 3
-    table: II
-  read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298'
-      locator:
-        page: 4
-        published_page: 196
-        pdf_page_index: 3
-        table: II
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_solution'
-    species:
-      formula: CaSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
-      polymorph:
-        tag: value
-        value: pseudowollastonite
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      reported_status: printed
-      individual_points: not_reported
-      mean_kJ_mol-1: '1.8'
-      confidence: reliability coefficient (1−α) = 0.95
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: adamkovicova-1980-casio3-heat-of-fusion
-  locator:
-    page: 4
-    published_page: 196
-    pdf_page_index: 3
-    table: II
-  read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298'
-      locator:
-        page: 4
-        published_page: 196
-        pdf_page_index: 3
-        table: II
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_solution'
-    species:
-      formula: CaSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
-      polymorph:
-        tag: value
-        value: pseudowollastonite
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      reported_status: printed
-      individual_points: not_reported
-      mean_kJ_mol-1: '1.8'
-      confidence: reliability coefficient (1−α) = 0.95
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: adamkovicova-1980-casio3-heat-of-fusion
-  locator:
-    page: 4
-    published_page: 196
-    pdf_page_index: 3
-    table: II
-  read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298'
-      locator:
-        page: 4
-        published_page: 196
-        pdf_page_index: 3
-        table: II
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_solution'
-    species:
-      formula: CaSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
-      polymorph:
-        tag: value
-        value: pseudowollastonite
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      reported_status: printed
-      individual_points: not_reported
-      mean_kJ_mol-1: '1.8'
-      confidence: reliability coefficient (1−α) = 0.95
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: adamkovicova-1980-casio3-heat-of-fusion
-  locator:
-    page: 4
-    published_page: 196
-    pdf_page_index: 3
-    table: II
-  read_from: pdf:adamkovicova-1980-casio3-heat-of-fusion
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '298'
-      locator:
-        page: 4
-        published_page: 196
-        pdf_page_index: 3
-        table: II
-- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'heat_of_solution'
-    species:
-      formula: CaSiO3
-      phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
-      polymorph:
-        tag: value
-        value: pseudowollastonite
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '298'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

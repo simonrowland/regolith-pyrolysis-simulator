@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:witthohn-2000-coal-slag-alkali-vaporisation
       role: pdf
@@ -30,7 +30,40 @@ work:
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
-experiments: []
+experiments:
+- experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  locator:
+    page: 17
+    figure: '4'
+    note: Quasi-binary Na2O-SiO2 comparison; experimental points attributed in the legend to prior studies. No numeric table
+      is printed.
 context:
 - observation_id: witthohn_2000_figure1_apparatus
   type: figure
@@ -599,6 +632,9 @@ context:
     calibration_as_printed: The calibration constant K was determined with pure silver as a reference.
     inputs_as_printed: The isotopic abundance a_i and ionisation cross-section sigma_i are taken from data collections. Samples
       were heated in steps of about 50 K, each followed by signal registration.
+    section_heading_locator:
+      page: 4
+      section: Experimental
   context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_kems_calibration_and_pressure_relation
   work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
   source_id: witthohn-2000-coal-slag-alkali-vaporisation
@@ -612,7 +648,7 @@ context:
   units: mass fraction [%] as printed; temperature in °C
   values:
     quantity: bulk coal-ash and plant-slag chemical composition
-    method_class: measured_direct
+    method_class: measured_tabulated
     admission_status: typed_unavailable
     candidate_quantity_tokens:
     - equilibrium_phase_composition
@@ -630,7 +666,7 @@ context:
 
       Temperature 1) [°C] | 450 | 450 | 450 | 550 | 575 | ≈1500 | ≈1400
 
-      Ash content 2) | 9.6 | 12.6 | 9.9 | 6.2 | 8.4 | – | –
+      Ash content 2) | ad 9.6 | ad 12.6 | ad 9.9 | ad 6.2 | ad 8.4 | – | –
 
       SiO2 2) | 42.4 | 46.7 | 36.4 | 12.7 | 38.3 | 42.0 | 40.9
 
@@ -664,3 +700,227 @@ context:
   work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
   source_id: witthohn-2000-coal-slag-alkali-vaporisation
   species: Na2O
+- observation_id: witthohn_2000_table1_sample_A_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Lignite Rheinland laboratory ash; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: A
+    sample_group: lignites_Rheinland
+    sample_form: laboratory_ash
+    sample_temperature_as_published: 450 °C
+    ash_content_as_published: ad 9.6
+    SiO2_mass_fraction_percent: '42.4'
+    Al2O3_mass_fraction_percent: '2.8'
+    Fe2O3_mass_fraction_percent: '8.9'
+    CaO_mass_fraction_percent: '19.3'
+    MgO_mass_fraction_percent: '3.0'
+    Na2O_mass_fraction_percent: <0.1
+    K2O_mass_fraction_percent: '0.3'
+    SO3_mass_fraction_percent: '12.5'
+    P2O5_mass_fraction_percent: <0.1
+    CO2_mass_fraction_percent: '5.9'
+    Cl_mass_fraction_percent: '0.3'
+    Rest_mass_fraction_percent: '1.8'
+    Sum_mass_fraction_percent: '97.2'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_A_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_B_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Lignite Rheinland laboratory ash; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: B
+    sample_group: lignites_Rheinland
+    sample_form: laboratory_ash
+    sample_temperature_as_published: 450 °C
+    ash_content_as_published: ad 12.6
+    SiO2_mass_fraction_percent: '46.7'
+    Al2O3_mass_fraction_percent: '3.1'
+    Fe2O3_mass_fraction_percent: '7.0'
+    CaO_mass_fraction_percent: '15.5'
+    MgO_mass_fraction_percent: '4.3'
+    Na2O_mass_fraction_percent: '0.5'
+    K2O_mass_fraction_percent: '0.4'
+    SO3_mass_fraction_percent: '15.0'
+    P2O5_mass_fraction_percent: <0.1
+    CO2_mass_fraction_percent: '3.0'
+    Cl_mass_fraction_percent: '0.1'
+    Rest_mass_fraction_percent: '0.8'
+    Sum_mass_fraction_percent: '96.4'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_B_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_C_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Lignite Rheinland laboratory ash; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: C
+    sample_group: lignites_Rheinland
+    sample_form: laboratory_ash
+    sample_temperature_as_published: 450 °C
+    ash_content_as_published: ad 9.9
+    SiO2_mass_fraction_percent: '36.4'
+    Al2O3_mass_fraction_percent: '4.2'
+    Fe2O3_mass_fraction_percent: '10.2'
+    CaO_mass_fraction_percent: '17.4'
+    MgO_mass_fraction_percent: '7.6'
+    Na2O_mass_fraction_percent: '1.5'
+    K2O_mass_fraction_percent: '0.5'
+    SO3_mass_fraction_percent: '11.6'
+    P2O5_mass_fraction_percent: <0.1
+    CO2_mass_fraction_percent: '5.1'
+    Cl_mass_fraction_percent: '0.3'
+    Rest_mass_fraction_percent: '1.2'
+    Sum_mass_fraction_percent: '96.0'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_C_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_D_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Lignite Rheinland laboratory ash; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: D
+    sample_group: lignites_Rheinland
+    sample_form: laboratory_ash
+    sample_temperature_as_published: 550 °C
+    ash_content_as_published: ad 6.2
+    SiO2_mass_fraction_percent: '12.7'
+    Al2O3_mass_fraction_percent: '2.1'
+    Fe2O3_mass_fraction_percent: '11.1'
+    CaO_mass_fraction_percent: '38.1'
+    MgO_mass_fraction_percent: '3.5'
+    Na2O_mass_fraction_percent: '0.3'
+    K2O_mass_fraction_percent: '0.1'
+    SO3_mass_fraction_percent: '14.4'
+    P2O5_mass_fraction_percent: '0.1'
+    CO2_mass_fraction_percent: not analyzed
+    Cl_mass_fraction_percent: '0.5'
+    Rest_mass_fraction_percent: '0.5'
+    Sum_mass_fraction_percent: '83.4'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_D_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_E_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Hard coal Saar laboratory ash; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: E
+    sample_group: hard_coal_Saar
+    sample_form: laboratory_ash
+    sample_temperature_as_published: 575 °C
+    ash_content_as_published: ad 8.4
+    SiO2_mass_fraction_percent: '38.3'
+    Al2O3_mass_fraction_percent: '18.3'
+    Fe2O3_mass_fraction_percent: '11.4'
+    CaO_mass_fraction_percent: '8.5'
+    MgO_mass_fraction_percent: '2.8'
+    Na2O_mass_fraction_percent: '1.1'
+    K2O_mass_fraction_percent: '1.7'
+    SO3_mass_fraction_percent: '9.2'
+    P2O5_mass_fraction_percent: '0.2'
+    CO2_mass_fraction_percent: '12.5'
+    Cl_mass_fraction_percent: <0.1
+    Rest_mass_fraction_percent: '2.8'
+    Sum_mass_fraction_percent: '106.8'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_E_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_F_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Hard coal Saar plant slag; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: F
+    sample_group: hard_coal_Saar
+    sample_form: plant_slag
+    sample_temperature_as_published: ≈1500 °C
+    ash_content_as_published: '-'
+    SiO2_mass_fraction_percent: '42.0'
+    Al2O3_mass_fraction_percent: '24.3'
+    Fe2O3_mass_fraction_percent: '14.9'
+    CaO_mass_fraction_percent: '9.4'
+    MgO_mass_fraction_percent: '2.6'
+    Na2O_mass_fraction_percent: '1.2'
+    K2O_mass_fraction_percent: '1.7'
+    SO3_mass_fraction_percent: <0.1
+    P2O5_mass_fraction_percent: '0.3'
+    CO2_mass_fraction_percent: <0.1
+    Cl_mass_fraction_percent: '-'
+    Rest_mass_fraction_percent: '1.4'
+    Sum_mass_fraction_percent: '97.8'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_F_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na
+- observation_id: witthohn_2000_table1_sample_G_composition
+  type: composition
+  locator:
+    page: 15
+    table: '1'
+    note: Hard coal Saar plant slag; mass fraction [%] as printed.
+  units: as printed
+  values:
+    quantity: coal_ash_and_slag_composition_table1
+    method_class: measured_tabulated
+    sample: G
+    sample_group: hard_coal_Saar
+    sample_form: plant_slag
+    sample_temperature_as_published: ≈1400 °C
+    ash_content_as_published: '-'
+    SiO2_mass_fraction_percent: '40.9'
+    Al2O3_mass_fraction_percent: '24.3'
+    Fe2O3_mass_fraction_percent: '11.2'
+    CaO_mass_fraction_percent: '9.7'
+    MgO_mass_fraction_percent: '3.0'
+    Na2O_mass_fraction_percent: '1.5'
+    K2O_mass_fraction_percent: '1.7'
+    SO3_mass_fraction_percent: <0.1
+    P2O5_mass_fraction_percent: '0.3'
+    CO2_mass_fraction_percent: <0.1
+    Cl_mass_fraction_percent: '-'
+    Rest_mass_fraction_percent: '2.1'
+    Sum_mass_fraction_percent: '94.7'
+  context_id: witthohn-2000-coal-slag-alkali-vaporisation::context::witthohn_2000_table1_sample_G_composition
+  work_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  species: Na

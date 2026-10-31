@@ -154,6 +154,36 @@ observations:
         table: '1'
         note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_01_a0_1400_printed_log_input
   derivation:
@@ -358,6 +388,36 @@ observations:
         table: '1'
         note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_02_a0_1500_printed_log_input
   derivation:
@@ -562,6 +622,36 @@ observations:
         table: '1'
         note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_03_b0_1400_printed_log_input
   derivation:
@@ -766,6 +856,36 @@ observations:
         table: '1'
         note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_04_b0_1500_printed_log_input
   derivation:
@@ -970,6 +1090,36 @@ observations:
         table: '1'
         note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_05_c0_1400_printed_log_input
   derivation:
@@ -1174,6 +1324,36 @@ observations:
         table: '1'
         note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_06_c0_1500_printed_log_input
   derivation:
@@ -1378,6 +1558,36 @@ observations:
         table: '1'
         note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_07_d0_1400_printed_log_input
   derivation:
@@ -1582,6 +1792,36 @@ observations:
         table: '1'
         note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_08_d0_1500_printed_log_input
   derivation:
@@ -1790,6 +2030,36 @@ observations:
         table: '1'
         note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_09_a1_1400_printed_log_input
   derivation:
@@ -1998,6 +2268,36 @@ observations:
         table: '1'
         note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_10_a2_1400_printed_log_input
   derivation:
@@ -2206,6 +2506,36 @@ observations:
         table: '1'
         note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_11_b1_1400_printed_log_input
   derivation:
@@ -2414,6 +2744,36 @@ observations:
         table: '1'
         note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_12_b2_1400_printed_log_input
   derivation:
@@ -2622,6 +2982,36 @@ observations:
         table: '1'
         note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_13_b3_1400_printed_log_input
   derivation:
@@ -2830,6 +3220,36 @@ observations:
         table: '1'
         note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_14_c1_1400_printed_log_input
   derivation:
@@ -3038,6 +3458,36 @@ observations:
         table: '1'
         note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_15_c2_1400_printed_log_input
   derivation:
@@ -3246,6 +3696,36 @@ observations:
         table: '1'
         note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_16_c3_1400_printed_log_input
   derivation:
@@ -3454,6 +3934,36 @@ observations:
         table: '1'
         note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_17_c4_1400_printed_log_input
   derivation:
@@ -3662,6 +4172,36 @@ observations:
         table: '1'
         note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_18_c5_1400_printed_log_input
   derivation:
@@ -3870,6 +4410,36 @@ observations:
         table: '1'
         note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_19_d1_1400_printed_log_input
   derivation:
@@ -4078,6 +4648,36 @@ observations:
         table: '1'
         note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_20_d2_1400_printed_log_input
   derivation:
@@ -4286,6 +4886,36 @@ observations:
         table: '1'
         note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_21_d3_1400_printed_log_input
   derivation:
@@ -4494,6 +5124,36 @@ observations:
         table: '1'
         note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2;
+                printed temperature column'
+        output_unit: K
+        references: []
   derived_from:
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_22_d4_1400_printed_log_input
   derivation:
@@ -4688,6 +5348,34 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+        output_unit: K
+        references: []
 - observation_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_yamaguchi_reference_1500
   experiment_id: 6ec4ed77ba83437be2b009725e2f8ef2300515109f372f391e8e9face37fc732::pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   identity:
@@ -4830,3 +5518,31 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
+        output_unit: K
+        references: []

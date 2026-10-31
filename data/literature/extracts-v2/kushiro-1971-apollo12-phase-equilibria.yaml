@@ -1,0 +1,1769 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml
+observations:
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_a_chromite_first_appearance_bracket
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-rock-12065-45
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: quantity, property_kind, phase_appearance_as_printed,
+      temperature_as_printed, method_class, sentence_as_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 13
+    published_page: 493
+    pdf_page_index: 12
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+        note: Rock 12065,45 composition is not printed in this paper.
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not print oxygen fugacity for rock 12065.
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-rock-12065-45
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: The 1 atm pressure applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1443.15'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_a_pigeonite_first_appearance_near_1170
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 13
+    published_page: 493
+    pdf_page_index: 12
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+        note: Rock 12065,45 composition is not printed in this paper.
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: The 10^-13 atm PO2 applies to the cited Mixture A experiments, not a printed condition for rock 12065.
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not print oxygen fugacity for rock 12065.
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+    temperature_K:
+      state:
+        tag: value
+        value: '1443.15'
+      locator:
+        page: 13
+        published_page: 493
+        pdf_page_index: 12
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1170'
+            locator:
+              page: 13
+              published_page: 493
+              pdf_page_index: 12
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: 493
+              pdf_page_index: 12
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_augite_plagioclase_first_appearance
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance_augite_and_plagioclase
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1403.15'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_augite_plagioclase_first_appearance
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '46'
+          Al2O3_wt_pct: '9.7'
+          TiO2_wt_pct: '3'
+          Cr2O3_wt_pct: '0.6'
+          FeO_wt_pct: '20'
+          MnO_wt_pct: '0.25'
+          MgO_wt_pct: '10.2'
+          CaO_wt_pct: '10'
+          Na2O_wt_pct: '0.27'
+          K2O_wt_pct: '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Mixture B starting composition; Table 3 column 2.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1403.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1130'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance_ca_poor_pyroxene
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1483.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_ca_poor_pyroxene_first_appearance
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '46'
+          Al2O3_wt_pct: '9.7'
+          TiO2_wt_pct: '3'
+          Cr2O3_wt_pct: '0.6'
+          FeO_wt_pct: '20'
+          MnO_wt_pct: '0.25'
+          MgO_wt_pct: '10.2'
+          CaO_wt_pct: '10'
+          Na2O_wt_pct: '0.27'
+          K2O_wt_pct: '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Mixture B starting composition; Table 3 column 2.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1483.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1210'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_chromite_liquidus
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4724353453388948299080951659'
+        - - Al2O3
+          - '0.0587053577595203470698230066'
+        - - TiO2
+          - '0.02317933212349928934318625876'
+        - - Cr2O3
+          - '0.002435985399019497420858995847'
+        - - FeO
+          - '0.1717812074349303809544355878'
+        - - MnO
+          - '0.002174718660914870213877686807'
+        - - MgO
+          - '0.1561666093724474128507875121'
+        - - CaO
+          - '0.1100402042455475256244844403'
+        - - Na2O
+          - '0.002688181526619951913766055143'
+        - - K2O
+          - '0.0003930581386058947006852911506'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1603.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_chromite_liquidus
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4724353453388948299080951659'
+          - - Al2O3
+            - '0.0587053577595203470698230066'
+          - - TiO2
+            - '0.02317933212349928934318625876'
+          - - Cr2O3
+            - '0.002435985399019497420858995847'
+          - - FeO
+            - '0.1717812074349303809544355878'
+          - - MnO
+            - '0.002174718660914870213877686807'
+          - - MgO
+            - '0.1561666093724474128507875121'
+          - - CaO
+            - '0.1100402042455475256244844403'
+          - - Na2O
+            - '0.002688181526619951913766055143'
+          - - K2O
+            - '0.0003930581386058947006852911506'
+          amount_basis: mole_fraction
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.7'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.2'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.06'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1603.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1330'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_ilmenite_first_appearance
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance_ilmenite
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1373.15'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_ilmenite_first_appearance
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '46'
+          Al2O3_wt_pct: '9.7'
+          TiO2_wt_pct: '3'
+          Cr2O3_wt_pct: '0.6'
+          FeO_wt_pct: '20'
+          MnO_wt_pct: '0.25'
+          MgO_wt_pct: '10.2'
+          CaO_wt_pct: '10'
+          Na2O_wt_pct: '0.27'
+          K2O_wt_pct: '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Mixture B starting composition; Table 3 column 2.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_olivine_first_appearance
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: first_appearance_olivine
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1553.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_olivine_first_appearance
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '46'
+          Al2O3_wt_pct: '9.7'
+          TiO2_wt_pct: '3'
+          Cr2O3_wt_pct: '0.6'
+          FeO_wt_pct: '20'
+          MnO_wt_pct: '0.25'
+          MgO_wt_pct: '10.2'
+          CaO_wt_pct: '10'
+          Na2O_wt_pct: '0.27'
+          K2O_wt_pct: '0.06'
+      locator:
+        page: 10
+        published_page: 490
+        pdf_page_index: 9
+        table: '3'
+        note: Mixture B starting composition; Table 3 column 2.
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1553.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1280'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []
+- observation_id: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_solidus
+  experiment_id: 48a769f6641198cc4aae453153086dfbac6ba9c0b9b19e7dc51901342c15acf4::experiment::kushiro-1971-mixture-b
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4724353453388948299080951659'
+        - - Al2O3
+          - '0.0587053577595203470698230066'
+        - - TiO2
+          - '0.02317933212349928934318625876'
+        - - Cr2O3
+          - '0.002435985399019497420858995847'
+        - - FeO
+          - '0.1717812074349303809544355878'
+        - - MnO
+          - '0.002174718660914870213877686807'
+        - - MgO
+          - '0.1561666093724474128507875121'
+        - - CaO
+          - '0.1100402042455475256244844403'
+        - - Na2O
+          - '0.002688181526619951913766055143'
+        - - K2O
+          - '0.0003930581386058947006852911506'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1343.15'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kushiro-1971-apollo12-phase-equilibria::kushiro_1971_mixture_b_solidus
+  source_id: kushiro-1971-apollo12-phase-equilibria
+  locator:
+    page: 12
+    published_page: 492
+    pdf_page_index: 11
+    section: Experiments and Their Application
+  read_from: pdf:kushiro-1971-apollo12-phase-equilibria
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4724353453388948299080951659'
+          - - Al2O3
+            - '0.0587053577595203470698230066'
+          - - TiO2
+            - '0.02317933212349928934318625876'
+          - - Cr2O3
+            - '0.002435985399019497420858995847'
+          - - FeO
+            - '0.1717812074349303809544355878'
+          - - MnO
+            - '0.002174718660914870213877686807'
+          - - MgO
+            - '0.1561666093724474128507875121'
+          - - CaO
+            - '0.1100402042455475256244844403'
+          - - Na2O
+            - '0.002688181526619951913766055143'
+          - - K2O
+            - '0.0003930581386058947006852911506'
+          amount_basis: mole_fraction
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.7'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '10.2'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.06'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: 10^-13
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source prints PO2, not oxygen fugacity, for the 1 atm quenching experiments.
+      locator:
+        page: 11
+        published_page: 491
+        pdf_page_index: 10
+        table: '4'
+        note: Table 4 caption states the runs are at 1 atm (10^-13 PO2) and high pressures; 1 atm converted to Pa.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 12
+        published_page: 492
+        pdf_page_index: 11
+        section: Experiments and Their Application
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 12
+              published_page: 492
+              pdf_page_index: 11
+              section: Experiments and Their Application
+        output_unit: K
+        references: []

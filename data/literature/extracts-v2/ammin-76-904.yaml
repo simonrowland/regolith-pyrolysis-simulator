@@ -151,8 +151,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1821'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -190,9 +190,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: method_class, quantity, enthalpy_of_fusion_kJ_per_mol,
-      fusion_temperature_K, attribution'
+    kind: point
+    point: '57.3'
     approximate: false
   uncertainty:
     kind: none
@@ -203,9 +202,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Adamkovicova et al. (1980)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
   source_id: ammin-76-904
   locator:
     published_page: 911
@@ -213,6 +217,16 @@ observations:
     note: pdf_page=8
     source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   read_from: pdf:ammin-76-904
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1821'
+      locator:
+        published_page: 911
+        section: Observations on incongruent melting and a preliminary crystallization study
+        note: pdf_page=8
+        source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
   experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
   identity:
@@ -238,8 +252,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1665'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -277,9 +291,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: method_class, quantity, enthalpy_of_fusion_kJ_per_mol,
-      fusion_temperature_K, attribution'
+    kind: point
+    point: '138.1'
     approximate: false
   uncertainty:
     kind: none
@@ -290,9 +303,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Stebbins et al. (1983)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
   source_id: ammin-76-904
   locator:
     published_page: 909
@@ -300,6 +318,16 @@ observations:
     note: pdf_page=6
     source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   read_from: pdf:ammin-76-904
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        published_page: 909
+        section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        note: pdf_page=6
+        source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
   experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
   identity:
@@ -325,8 +353,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1665'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -364,9 +392,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: method_class, quantity, enthalpy_of_fusion_kJ_per_mol,
-      fusion_temperature_K, attribution'
+    kind: point
+    point: '128'
     approximate: false
   uncertainty:
     kind: none
@@ -377,9 +404,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Ferrier (1968)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
   source_id: ammin-76-904
   locator:
     published_page: 909
@@ -387,6 +419,16 @@ observations:
     note: pdf_page=6
     source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   read_from: pdf:ammin-76-904
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        published_page: 909
+        section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        note: pdf_page=6
+        source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
   experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
   identity:
@@ -412,8 +454,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1665'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile heat_of_fusion does not use standard_pressure_Pa
@@ -451,9 +493,8 @@ observations:
       tag: not_applicable
       reason: profile heat_of_fusion does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped heat_of_fusion field selected; source fields: method_class, quantity, enthalpy_of_fusion_kJ_per_mol,
-      fusion_temperature_K, attribution'
+    kind: point
+    point: '137.7'
     approximate: false
   uncertainty:
     kind: none
@@ -464,9 +505,14 @@ observations:
     original_method_class: quoted_attributed
     attribution: Richet and Bottinga (1984)
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
   source_id: ammin-76-904
   locator:
     published_page: 909
@@ -474,6 +520,16 @@ observations:
     note: pdf_page=6
     source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
   read_from: pdf:ammin-76-904
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        published_page: 909
+        section: Final capacity of crystal and liquid, enthalpy of fusion, and analysis of error
+        note: pdf_page=6
+        source_path: corpus/raw/ammin-76-904/ammin-76-904.pdf
 - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
   experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
   identity:

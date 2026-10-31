@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:shornikov-1997-diopside-vaporization
       role: pdf
@@ -70,4 +70,47 @@ experiments:
     published_page: 174
     pdf_page_index: 0
     section: Experimental
-    note: The study used mass-spectrometric effusion Knudsen measurements on diopside in molybdenum cells.
+    note: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from
+      molybdenum cells.
+  bench_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::bench::shornikov-1997-mo-kems
+benches:
+- id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::bench::shornikov-1997-mo-kems
+  work_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: mass-spectrometric effusion Knudsen cell
+    locator:
+      published_page: 174
+      pdf_page_index: 0
+      paragraph: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside
+        from molybdenum cells.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 174
+      pdf_page_index: 0
+      paragraph: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside
+        from molybdenum cells.
+  geometry:
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>='
+          bound_value: '0.0025'
+          approximate: false
+      locator:
+        published_page: 174
+        pdf_page_index: 0
+        paragraph: 'In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside
+          from molybdenum cells with the area ratio between the effusion orifice and the vaporization surface not less than
+          1 : 400.'
+        section: Experimental
+        note: The printed lower bound is 1:400; typed as a lower bound on orifice area divided by vaporization surface area.
+  other_facts: []

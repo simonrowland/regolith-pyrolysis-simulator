@@ -1,0 +1,218 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f
+  citation: Kupčák, J. and Mališ, A. (1992). Use of oxygen probes in the study of thermodynamic properties of the system Na2O-SiO2
+    and the effect of electron conductivity of solid electrolyte on EMF of the concentration cell. Ceramics-Silikáty 36(1):1–6.
+  source_ids:
+  - kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      role: pdf
+      path: raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.pdf
+      sha256:
+        tag: value
+        value: c3a19ffc1425901c8c812556b7ed92427b988648e85073476e2c29f981b6c169
+    - asset_id: pdftotext:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      role: pdftotext
+      path: text/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::experiment::kupcak-malis-1992-na2o-sio2-cell-i
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'oxygen_probe_concentration_cell' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: composition varies by observation row
+      locator:
+        page: 3
+        table: I
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature varies by observation row
+      locator:
+        page: 3
+        table: I
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f
+  locator:
+    page: 2
+    section: Experimental
+    note: Concentration cell (I) with conversion using an oxygen probe with stabilized zirconia electrolyte.
+- experiment_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f::kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f
+  locator:
+    page: 4
+    table: II
+    note: x(SiO2)=0.45; partial molar Gibbs energy relative to the reference melt
+context:
+- observation_id: kupcak_1992_table1_emf_context
+  type: measured_emf_context
+  locator:
+    page: 3
+    table: I
+    note: Table I; measured EMF of concentration cell (I) relative to the 0.40 Na2O–0.60 SiO2 reference melt.
+  units: T in K and EMF in mV as printed; x(SiO2) is a mole fraction.
+  values:
+    cell_description_as_printed: Experimental values of EMF of a conversion concentration cell (I) for [(1−x)Na2O−xSiO2] melts
+      related to reference melt 0.40 Na2O−0.60 SiO2.
+    equation_3_as_printed: E = −(RT/2F) ln[a(Na2O)/a⁰(Na2O)]
+    reduction_note: Equation (3) defines the EMF in terms of the activity ratio a(Na2O)/a⁰(Na2O). The absolute reference activity
+      a⁰(Na2O) is taken from Yamaguchi S., Imai A. and Goto K.S., Scand. J. Metall. 11, 263 (1982), as cited in the paper,
+      and is not numerically printed here.
+    measurements_as_printed:
+    - x_SiO2_as_printed: '0.45'
+      pairs_as_printed:
+      - T_K: '1581'
+        EMF_mV: '-305'
+      - T_K: '1573'
+        EMF_mV: '-285'
+      - T_K: '1523'
+        EMF_mV: '-278'
+      - T_K: '1473'
+        EMF_mV: '-280'
+      - T_K: '1425'
+        EMF_mV: '-278'
+      - T_K: '1423'
+        EMF_mV: '-280'
+      - T_K: '1378'
+        EMF_mV: '-280'
+      - T_K: '1363'
+        EMF_mV: '-265'
+    - x_SiO2_as_printed: '0.50'
+      pairs_as_printed:
+      - T_K: '1523'
+        EMF_mV: '-210'
+      - T_K: '1516'
+        EMF_mV: '-190'
+      - T_K: '1473'
+        EMF_mV: '-180'
+      - T_K: '1423'
+        EMF_mV: '-175'
+      - T_K: '1418'
+        EMF_mV: '-170'
+    - x_SiO2_as_printed: '0.55'
+      pairs_as_printed:
+      - T_K: '1578'
+        EMF_mV: '-70'
+      - T_K: '1581'
+        EMF_mV: '-72'
+      - T_K: '1518'
+        EMF_mV: '-80'
+      - T_K: '1529'
+        EMF_mV: '-82'
+      - T_K: '1478'
+        EMF_mV: '-80'
+      - T_K: '1473'
+        EMF_mV: '-80'
+      - T_K: '1432'
+        EMF_mV: '-79'
+      - T_K: '1383'
+        EMF_mV: '-74'
+    - x_SiO2_as_printed: '0.65'
+      pairs_as_printed:
+      - T_K: '1563'
+        EMF_mV: '85'
+      - T_K: '1573'
+        EMF_mV: '90'
+      - T_K: '1531'
+        EMF_mV: '100'
+      - T_K: '1480'
+        EMF_mV: '90'
+      - T_K: '1463'
+        EMF_mV: '88'
+      - T_K: '1413'
+        EMF_mV: '105'
+      - T_K: '1598'
+        EMF_mV: '75'
+    - x_SiO2_as_printed: '0.70'
+      pairs_as_printed:
+      - T_K: '1573'
+        EMF_mV: '110'
+      - T_K: '1528'
+        EMF_mV: '125'
+      - T_K: '1491'
+        EMF_mV: '140'
+      - T_K: '1483'
+        EMF_mV: '120'
+      - T_K: '1433'
+        EMF_mV: '135'
+      - T_K: '1478'
+        EMF_mV: '128'
+    - x_SiO2_as_printed: '0.75'
+      pairs_as_printed:
+      - T_K: '1571'
+        EMF_mV: '153'
+      - T_K: '1526'
+        EMF_mV: '160'
+      - T_K: '1478'
+        EMF_mV: '170'
+      - T_K: '1573'
+        EMF_mV: '150'
+      - T_K: '1471'
+        EMF_mV: '180'
+      - T_K: '1423'
+        EMF_mV: '187'
+  context_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf::context::kupcak_1992_table1_emf_context
+  work_id: da168cea2a0c4cb5177aebc639c78a4ca75eb5adacdea56087121b4926dc701f
+  source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+  species: Na2O

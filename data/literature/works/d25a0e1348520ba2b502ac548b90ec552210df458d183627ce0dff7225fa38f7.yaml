@@ -1,0 +1,199 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d25a0e1348520ba2b502ac548b90ec552210df458d183627ce0dff7225fa38f7
+  citation: Kozhina, Elena L.; Shultz, Mikhail M. (2000). Thermodynamic Properties of Sodium-Containing Glassforming Oxide
+    Melts. Ceramics–Silikáty 44(3):91–97.
+  source_ids:
+  - kozhina-2000-na-glassforming-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:kozhina-2000-na-glassforming-thermodynamics
+      role: pdf
+      path: raw/kozhina-2000-na-glassforming-thermodynamics/kozhina-2000-na-glassforming-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 570afa76000acf3811f15c909dc06edfe8bbffad5a2cbee70e569a9222185e00
+    - asset_id: pdftotext:kozhina-2000-na-glassforming-thermodynamics
+      role: pdftotext
+      path: text/kozhina-2000-na-glassforming-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kozhina-2000-na-glassforming-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: kozhina_2000_equation_3_sign_note
+  type: method
+  locator:
+    page: 2
+    published_page: 92
+    pdf_page_index: 1
+    equation: '3'
+  units: as printed
+  values:
+    quantity: printed EMF relation and sign note
+    equation_as_printed: ΔE=RT/2F (ln aNa2O′ − ln aNa2O″) = −1/2F (μNa2O′ − μNa2O″)
+    note: The printed Eq. 3 sign is inconsistent between the activity and chemical-potential forms; its literal sign is preserved
+      and not corrected.
+  context_id: kozhina-2000-na-glassforming-thermodynamics::context::kozhina_2000_equation_3_sign_note
+  work_id: d25a0e1348520ba2b502ac548b90ec552210df458d183627ce0dff7225fa38f7
+  source_id: kozhina-2000-na-glassforming-thermodynamics
+  species: Na2O
+- observation_id: kozhina_2000_figure_2_partial_properties_candidate
+  type: figure_context
+  locator:
+    page: 3
+    published_page: 93
+    pdf_page_index: 2
+    figure: '2'
+  units: figure axes as printed; values not digitized
+  values:
+    quantity: partial chemical potential functions of Na2O
+    method_class: figure_only
+    digitisation: not performed; figure-only data are out of scope for this extraction
+    note: Figure 2 plots partial functions; retain as a figure-read candidate without digitized values.
+  context_id: kozhina-2000-na-glassforming-thermodynamics::context::kozhina_2000_figure_2_partial_properties_candidate
+  work_id: d25a0e1348520ba2b502ac548b90ec552210df458d183627ce0dff7225fa38f7
+  source_id: kozhina-2000-na-glassforming-thermodynamics
+  species: Na2O
+- observation_id: kozhina_2000_table_1_integral_thermochemistry
+  type: measured_table_context
+  locator:
+    page: 4
+    published_page: 94
+    pdf_page_index: 3
+    table: '1'
+  units: kJ/mol as printed; XNa2O is mole fraction
+  values:
+    quantity: integral binary-melt formation Gibbs energy and enthalpy from pure oxides
+    method_class: measured_reduced
+    reason: The literature observation schema has no scored quantity for integral binary-melt formation Gibbs energy and enthalpy;
+      retain the printed tabulation as context.
+    reference_state_as_printed: referred to the corresponding properties of the pure oxides
+    row_count_as_printed: 20
+    numeric_cell_count_as_printed: 40
+    column_headers_as_printed:
+    - XNa2O
+    - Na2O-SiO2 ΔGf
+    - Na2O-SiO2 ΔHf
+    - Na2O-B2O3 ΔGf
+    - Na2O-B2O3 ΔHf
+    - Na2O-GeO2 ΔGf
+    - Na2O-GeO2 ΔHf
+    - Na2O-P2O5 ΔGf
+    - Na2O-P2O5 ΔHf
+    table_temperature_as_printed: 1300 K, except Na2O-P2O5 at 1073 K
+    rows_as_published:
+    - system: Na2O-SiO2
+      XNa2O: '0.1'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-26.8'
+      delta_Hf_kJ_per_mol: '-18.4'
+    - system: Na2O-SiO2
+      XNa2O: '0.2'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-53.6'
+      delta_Hf_kJ_per_mol: '-43.1'
+    - system: Na2O-SiO2
+      XNa2O: '0.3'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-78.7'
+      delta_Hf_kJ_per_mol: '-73.3'
+    - system: Na2O-SiO2
+      XNa2O: '0.4'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-98.6'
+      delta_Hf_kJ_per_mol: '-99.2'
+    - system: Na2O-SiO2
+      XNa2O: '0.5'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-113.7'
+      delta_Hf_kJ_per_mol: '-120.6'
+    - system: Na2O-B2O3
+      XNa2O: '0.1'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-36.4'
+      delta_Hf_kJ_per_mol: '-38.9'
+    - system: Na2O-B2O3
+      XNa2O: '0.2'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-67.4'
+      delta_Hf_kJ_per_mol: '-76.2'
+    - system: Na2O-B2O3
+      XNa2O: '0.3'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-94.0'
+      delta_Hf_kJ_per_mol: '-98.8'
+    - system: Na2O-B2O3
+      XNa2O: '0.4'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-116.0'
+      delta_Hf_kJ_per_mol: '-110.1'
+    - system: Na2O-B2O3
+      XNa2O: '0.5'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-134.0'
+      delta_Hf_kJ_per_mol: '-113.9'
+    - system: Na2O-GeO2
+      XNa2O: '0.1'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-33.5'
+      delta_Hf_kJ_per_mol: '-27.6'
+    - system: Na2O-GeO2
+      XNa2O: '0.2'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-61.8'
+      delta_Hf_kJ_per_mol: '-55.7'
+    - system: Na2O-GeO2
+      XNa2O: '0.3'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-86.0'
+      delta_Hf_kJ_per_mol: '-81.6'
+    - system: Na2O-GeO2
+      XNa2O: '0.4'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-105.9'
+      delta_Hf_kJ_per_mol: '-107.2'
+    - system: Na2O-GeO2
+      XNa2O: '0.5'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-120.7'
+      delta_Hf_kJ_per_mol: '-129.8'
+    - system: Na2O-GeO2
+      XNa2O: '0.6'
+      T_K: '1300'
+      delta_Gf_kJ_per_mol: '-127.8'
+      delta_Hf_kJ_per_mol: '-137.3'
+    - system: Na2O-P2O5
+      XNa2O: '0.4'
+      T_K: '1073'
+      delta_Gf_kJ_per_mol: '-224.0'
+      delta_Hf_kJ_per_mol: '-186.7'
+    - system: Na2O-P2O5
+      XNa2O: '0.5'
+      T_K: '1073'
+      delta_Gf_kJ_per_mol: '-258.5'
+      delta_Hf_kJ_per_mol: '-224.4'
+    - system: Na2O-P2O5
+      XNa2O: '0.6'
+      T_K: '1073'
+      delta_Gf_kJ_per_mol: '-278.8'
+      delta_Hf_kJ_per_mol: '-254.1'
+    - system: Na2O-P2O5
+      XNa2O: '0.7'
+      T_K: '1073'
+      delta_Gf_kJ_per_mol: '-285.2'
+      delta_Hf_kJ_per_mol: '-272.3'
+  context_id: kozhina-2000-na-glassforming-thermodynamics::context::kozhina_2000_table_1_integral_thermochemistry
+  work_id: d25a0e1348520ba2b502ac548b90ec552210df458d183627ce0dff7225fa38f7
+  source_id: kozhina-2000-na-glassforming-thermodynamics
+  species: Na2O

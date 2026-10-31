@@ -43,7 +43,7 @@ observations:
     section: '4.6'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=6cb70d3994e3
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::T=1683.15:h=6cb70d3994e3
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
@@ -61,6 +61,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1683.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -83,7 +86,43 @@ observations:
     note: figure reading; measured markers kept separate from ASM model
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=84fd3a870a86
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1683.15'
+      locator:
+        page: 172
+        figure: '4.15'
+        note: figure reading; measured markers kept separate from ASM model
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1410'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::T=1683.15:h=d8554cf893da
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
@@ -101,6 +140,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1683.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -123,7 +165,43 @@ observations:
     note: figure reading; measured markers kept separate from ASM model
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=d8554cf893da
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1683.15'
+      locator:
+        page: 172
+        figure: '4.15'
+        note: figure reading; measured markers kept separate from ASM model
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1410'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::T=1783.15:h=84fd3a870a86
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
@@ -141,6 +219,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1783.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -163,6 +244,42 @@ observations:
     note: figure reading; measured markers kept separate from ASM model
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1783.15'
+      locator:
+        page: 172
+        figure: '4.15'
+        note: figure reading; measured markers kept separate from ASM model
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1510'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 172
+              figure: '4.15'
+              note: figure reading; measured markers kept separate from ASM model
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        output_unit: K
+        references: []
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig45_naoh_saturation_measured
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
@@ -204,7 +321,7 @@ observations:
     note: figure reading; measured markers only, approximate values from plotted points
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=71003fc4a080
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1573.15:h=d7cea0bc6a14
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -222,6 +339,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -244,7 +364,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=81052be4d82c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1573.15:h=de5c41eaa19d
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -262,6 +418,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -284,7 +443,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=ba080dd9fd64
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1673.15:h=ba080dd9fd64
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -302,6 +497,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -324,7 +522,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=d7cea0bc6a14
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=71003fc4a080
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -342,6 +576,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1735.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -364,7 +601,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=de5c41eaa19d
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1735.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1462'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=81052be4d82c
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -382,6 +655,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1735.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -404,7 +680,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=fcf10aea322b
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1735.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1462'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=fcf10aea322b
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -422,6 +734,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1735.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -444,7 +759,43 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output::rows:h=02d8f9bd07ef
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1735.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; measured markers only, approximate values
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1462'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; measured markers only, approximate values
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output::T=1735.15:h=02d8f9bd07ef
   experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
   identity:
     quantity:
@@ -462,6 +813,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1735.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -493,6 +847,42 @@ observations:
     note: figure reading; thermochemical-model marker kept separate from measured marker
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1735.15'
+      locator:
+        page: 156
+        figure: '4.6'
+        note: figure reading; thermochemical-model marker kept separate from measured marker
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1462'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; thermochemical-model marker kept separate from measured marker
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 156
+              figure: '4.6'
+              note: figure reading; thermochemical-model marker kept separate from measured marker
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured::rows:h=a3b93128c898
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
@@ -631,6 +1021,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: unknown
+      reason: temperature value is not numeric
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_sodium_evaporation_test_conditions';
@@ -653,6 +1046,15 @@ observations:
     section: 4.3.1
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        page: 153
+        section: 4.3.1
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table42_float_and_tableware_compositions
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
@@ -774,7 +1176,7 @@ observations:
     table: '4.3'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=2f44afb961d8
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1627.15:h=c3363335aa25
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -792,6 +1194,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1627.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -813,7 +1218,40 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=4068e4804bb5
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1627.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1354'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1629.15:h=e1531318d76b
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -831,6 +1269,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1629.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -852,7 +1293,40 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=7f8ea303e2ee
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1629.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1356'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1689.15:h=2f44afb961d8
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -870,6 +1344,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1689.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -891,7 +1368,40 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=c3363335aa25
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1689.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1416'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1710.15:h=d483eec90ed7
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -909,6 +1419,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1710.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -930,7 +1443,40 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=d483eec90ed7
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1710.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1437'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1712.15:h=7f8ea303e2ee
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -948,6 +1494,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1712.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -969,7 +1518,40 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=e1531318d76b
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1712.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1439'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1727.15:h=4068e4804bb5
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -987,6 +1569,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1727.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1008,3 +1593,36 @@ observations:
     table: '4.4'
     source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1727.15'
+      locator:
+        page: 158
+        table: '4.4'
+        source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1454'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 158
+              table: '4.4'
+              source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: K
+        references: []

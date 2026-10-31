@@ -362,7 +362,7 @@ observations:
       ~1 K of 3134 K handbook value)''}'
     record: normal_boiling_point
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=1000.0:h=c25655eac0c4
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -386,8 +386,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 1100.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -425,20 +425,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '103.112'
-    - - '500'
-      - '77.48'
-    - - '800'
-      - '42.135'
-    - - '1000'
-      - '19.67'
-    - - '1100'
-      - '8.685'
-    - - '1200'
-      - '0'
+    kind: point
+    point: '19.67'
     approximate: false
   uncertainty:
     kind: none
@@ -454,7 +442,7 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_P2_formation_tabulation
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=1000.0:h=c25655eac0c4
   source_id: janaf-4th
   locator:
     table: P-012
@@ -462,7 +450,549 @@ observations:
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF1998_P2_formation_tabulation
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=1100.0:h=02c00a52a3d9
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1100'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '8.685'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=1100.0:h=02c00a52a3d9
+  source_id: janaf-4th
+  locator:
+    table: P-012
+    note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+    source_path: https://janaf.nist.gov/tables/P-012.html
+    record: JANAF1998_P2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=1200.0:h=4a0e07cf8c9a
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '0'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=1200.0:h=4a0e07cf8c9a
+  source_id: janaf-4th
+  locator:
+    table: P-012
+    note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+    source_path: https://janaf.nist.gov/tables/P-012.html
+    record: JANAF1998_P2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=298.15:h=1478ec4b3c32
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '103.112'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=298.15:h=1478ec4b3c32
+  source_id: janaf-4th
+  locator:
+    table: P-012
+    note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+    source_path: https://janaf.nist.gov/tables/P-012.html
+    record: JANAF1998_P2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=500.0:h=59aa24d48cf1
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '77.48'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=500.0:h=59aa24d48cf1
+  source_id: janaf-4th
+  locator:
+    table: P-012
+    note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+    source_path: https://janaf.nist.gov/tables/P-012.html
+    record: JANAF1998_P2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P2_formation_tabulation::T=800.0:h=6af485507385
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '42.135'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation::T=800.0:h=6af485507385
+  source_id: janaf-4th
+  locator:
+    table: P-012
+    note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+    source_path: https://janaf.nist.gov/tables/P-012.html
+    record: JANAF1998_P2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF1998_P2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1000.0:h=24fe1c623d29
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -486,8 +1016,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 2500.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -525,24 +1055,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '-2669.711'
-    - - '500'
-      - '-2507.262'
-    - - '800'
-      - '-2264.308'
-    - - '1000'
-      - '-2103.459'
-    - - '1200'
-      - '-1939.372'
-    - - '1500'
-      - '-1638.004'
-    - - '1800'
-      - '-1340.429'
-    - - '2000'
-      - '-1143.821'
+    kind: point
+    point: '-2103.459'
     approximate: false
   uncertainty:
     kind: none
@@ -558,12 +1072,734 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1000.0:h=24fe1c623d29
   source_id: janaf-4th
   locator:
     note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
     record: JANAF1998_P4O10_gas_formation_tabulation
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1200.0:h=21886fc62297
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1939.372'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1200.0:h=21886fc62297
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1500.0:h=77af2ef78485
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1638.004'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1500.0:h=77af2ef78485
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1800.0:h=74fca8a78f31
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1340.429'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=1800.0:h=74fca8a78f31
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=2000.0:h=8d6c9f3613ae
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1143.821'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=2000.0:h=8d6c9f3613ae
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=298.15:h=e3da97181f25
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2669.711'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=298.15:h=e3da97181f25
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=500.0:h=044c6d056cef
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2507.262'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=500.0:h=044c6d056cef
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=800.0:h=db8fb3a1616a
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O10
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2264.308'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation::T=800.0:h=db8fb3a1616a
+  source_id: janaf-4th
+  locator:
+    note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+    record: JANAF1998_P4O10_gas_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
+        record: JANAF1998_P4O10_gas_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
 - observation_id: janaf-4th::JANAF1998_P4O10_pure_solid_sublimation_screening
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -605,7 +1841,7 @@ observations:
     note: Chase (1998) NIST-JANAF tables O-094 and O-095; screening arithmetic this work
     record: JANAF1998_P4O10_pure_solid_sublimation_screening
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1000.0:h=c75d17e20b63
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -629,8 +1865,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 2500.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -668,22 +1904,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '-2084.877'
-    - - '500'
-      - '-1993.955'
-    - - '1000'
-      - '-1766.085'
-    - - '1200'
-      - '-1671.22'
-    - - '1500'
-      - '-1472.52'
-    - - '1800'
-      - '-1276.387'
-    - - '2000'
-      - '-1146.82'
+    kind: point
+    point: '-1766.085'
     approximate: false
   uncertainty:
     kind: none
@@ -699,7 +1921,7 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1000.0:h=c75d17e20b63
   source_id: janaf-4th
   locator:
     table: O-087
@@ -707,7 +1929,654 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1200.0:h=fb433de071c5
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1671.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1200.0:h=fb433de071c5
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1500.0:h=81bc40e66d79
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1472.52'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1500.0:h=81bc40e66d79
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1800.0:h=1e84c872b428
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1276.387'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=1800.0:h=1e84c872b428
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=2000.0:h=ce2b359b63b0
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1146.82'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=2000.0:h=ce2b359b63b0
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=298.15:h=1b35b56b30e6
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2084.877'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=298.15:h=1b35b56b30e6
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=500.0:h=17ee19ab187c
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4O6
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1993.955'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN::T=500.0:h=17ee19ab187c
+  source_id: janaf-4th
+  locator:
+    table: O-087
+    note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+    source_path: https://janaf.nist.gov/tables/O-087.html
+    record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF1998_P4O6_formation_tabulation_UNCERTAIN
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=1000.0:h=c8d18e87ff1e
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -731,8 +2600,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 2500.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -770,24 +2639,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '24.416'
-    - - '500'
-      - '4.418'
-    - - '800'
-      - '-20.791'
-    - - '1000'
-      - '-35.907'
-    - - '1200'
-      - '-45.742'
-    - - '1500'
-      - '-1.956'
-    - - '1800'
-      - '41.372'
-    - - '2000'
-      - '70.045'
+    kind: point
+    point: '-35.907'
     approximate: false
   uncertainty:
     kind: none
@@ -803,7 +2656,7 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_P4_formation_tabulation
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=1000.0:h=c8d18e87ff1e
   source_id: janaf-4th
   locator:
     table: P-013
@@ -811,7 +2664,759 @@ observations:
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF1998_P4_formation_tabulation
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=1200.0:h=df2481a1a01f
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-45.742'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=1200.0:h=df2481a1a01f
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=1500.0:h=f6ebf62ff459
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1.956'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=1500.0:h=f6ebf62ff459
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=1800.0:h=ba2370bd09c0
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '41.372'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=1800.0:h=ba2370bd09c0
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=2000.0:h=1486168310d8
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '70.045'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=2000.0:h=1486168310d8
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=298.15:h=788f0271cf8a
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '24.416'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=298.15:h=788f0271cf8a
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=500.0:h=e82a14b526ca
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '4.418'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=500.0:h=e82a14b526ca
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_P4_formation_tabulation::T=800.0:h=75186ff24c1d
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: P4
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-20.791'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation::T=800.0:h=75186ff24c1d
+  source_id: janaf-4th
+  locator:
+    table: P-013
+    note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+    source_path: https://janaf.nist.gov/tables/P-013.html
+    record: JANAF1998_P4_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF1998_P4_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1000.0:h=526bff5ec743
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -835,8 +3440,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 2500.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -874,32 +3479,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '-316.748'
-    - - '500'
-      - '-317.214'
-    - - '800'
-      - '-316.546'
-    - - '1000'
-      - '-315.66'
-    - - '1200'
-      - '-313.451'
-    - - '1400'
-      - '-301.469'
-    - - '1500'
-      - '-295.497'
-    - - '1600'
-      - '-289.535'
-    - - '1800'
-      - '-277.636'
-    - - '2000'
-      - '-265.763'
-    - - '2200'
-      - '-253.906'
-    - - '2500'
-      - '-236.136'
+    kind: point
+    point: '-315.66'
     approximate: false
   uncertainty:
     kind: none
@@ -915,7 +3496,7 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_PO2_formation_tabulation
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1000.0:h=526bff5ec743
   source_id: janaf-4th
   locator:
     table: O-032
@@ -923,7 +3504,1179 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF1998_PO2_formation_tabulation
   read_from: unknown:janaf-4th
-- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1200.0:h=d8e107cce5ad
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-313.451'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1200.0:h=d8e107cce5ad
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1400.0:h=d06e607a4b24
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-301.469'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1400.0:h=d06e607a4b24
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1500.0:h=19e097307397
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-295.497'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1500.0:h=19e097307397
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1600.0:h=79d5a83cb28b
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-289.535'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1600.0:h=79d5a83cb28b
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1800.0:h=d6f239288659
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-277.636'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=1800.0:h=d6f239288659
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2000.0:h=110d3fba0d26
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-265.763'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2000.0:h=110d3fba0d26
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2200.0:h=6d06591fb646
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-253.906'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2200.0:h=6d06591fb646
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2500.0:h=bb61a9a26c5e
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-236.136'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=2500.0:h=bb61a9a26c5e
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=298.15:h=afb1315d15e9
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-316.748'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=298.15:h=afb1315d15e9
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=500.0:h=447731f5a1b8
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-317.214'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=500.0:h=447731f5a1b8
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO2_formation_tabulation::T=800.0:h=f52ec287e99a
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-316.546'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation::T=800.0:h=f52ec287e99a
+  source_id: janaf-4th
+  locator:
+    table: O-032
+    note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+    source_path: https://janaf.nist.gov/tables/O-032.html
+    record: JANAF1998_PO2_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF1998_PO2_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1000.0:h=cf9a745565ec
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
     quantity:
@@ -947,8 +4700,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 2500.0]; no midpoint invented
+      tag: value
+      value: '1000'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -986,32 +4739,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: series
-    series:
-    - - '298.15'
-      - '-47.139'
-    - - '500'
-      - '-62.24'
-    - - '800'
-      - '-83.354'
-    - - '1000'
-      - '-96.893'
-    - - '1200'
-      - '-109.04'
-    - - '1400'
-      - '-111.354'
-    - - '1500'
-      - '-112.512'
-    - - '1600'
-      - '-113.669'
-    - - '1800'
-      - '-115.982'
-    - - '2000'
-      - '-118.291'
-    - - '2200'
-      - '-120.594'
-    - - '2500'
-      - '-124.032'
+    kind: point
+    point: '-96.893'
     approximate: false
   uncertainty:
     kind: none
@@ -1027,7 +4756,7 @@ observations:
     affected_quantities:
     - delta_fG
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: janaf-4th::JANAF1998_PO_formation_tabulation
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1000.0:h=cf9a745565ec
   source_id: janaf-4th
   locator:
     table: O-004
@@ -1036,6 +4765,1201 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF1998_PO_formation_tabulation
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1200.0:h=87ee80d0faad
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-109.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1200.0:h=87ee80d0faad
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1400.0:h=5c75ad46f2d0
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-111.354'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1400.0:h=5c75ad46f2d0
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1500.0:h=1ecfc994d00f
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-112.512'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1500.0:h=1ecfc994d00f
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1600.0:h=b75ba475c8f4
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1600'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-113.669'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1600.0:h=b75ba475c8f4
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=1800.0:h=342f6b219c8e
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-115.982'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=1800.0:h=342f6b219c8e
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=2000.0:h=58b6ff43442e
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-118.291'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=2000.0:h=58b6ff43442e
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=2200.0:h=ae77fd2c56ed
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2200'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-120.594'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=2200.0:h=ae77fd2c56ed
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=2500.0:h=3156ab085de0
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-124.032'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=2500.0:h=3156ab085de0
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=298.15:h=c4259f13b832
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-47.139'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=298.15:h=c4259f13b832
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=500.0:h=e00eafa76ca6
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '500'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-62.24'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=500.0:h=e00eafa76ca6
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
+- observation_id: janaf-4th::JANAF1998_PO_formation_tabulation::T=800.0:h=5ea42a5fb3c9
+  experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: PO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-83.354'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation::T=800.0:h=5ea42a5fb3c9
+  source_id: janaf-4th
+  locator:
+    table: O-004
+    note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table O-004
+      (Phosphorus Oxide, PO, g), pp. ~1642
+    source_path: https://janaf.nist.gov/tables/O-004.html
+    record: JANAF1998_PO_formation_tabulation
+  read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF1998_PO_formation_tabulation
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - unknown:janaf-4th
+    parameters: []
+    output_unit: kJ_per_mol
+    references: []
 - observation_id: janaf-4th::KCl_melting_point
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3788,8 +8712,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '298.15'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -3827,8 +8751,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_fG_298_kJ_mol
+    kind: point
+    point: '103.112'
     approximate: false
   uncertainty:
     kind: printed
@@ -3839,9 +8763,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::janaf_P2_298_anchors
   source_id: janaf-4th
   locator:
     table: P-012
@@ -3849,6 +8778,16 @@ observations:
     source_path: https://janaf.nist.gov/tables/P-012.html
     record: JANAF P-012
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: P-012
+        note: Chase (1998) NIST-JANAF table P-012 (P2,g); Cox et al. (1984) CODATA Key Values for Thermodynamics
+        source_path: https://janaf.nist.gov/tables/P-012.html
+        record: JANAF P-012
 - observation_id: janaf-4th::janaf_P4O6_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3873,8 +8812,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '298.15'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -3912,8 +8851,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_fG_298_kJ_mol
+    kind: point
+    point: '-2084.877'
     approximate: false
   uncertainty:
     kind: printed
@@ -3924,9 +8863,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::janaf_P4O6_298_anchors
   source_id: janaf-4th
   locator:
     table: O-087
@@ -3934,6 +8878,16 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-087.html
     record: JANAF O-087
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-087
+        note: Chase (1998) NIST-JANAF 4th ed., table O-087 (Phosphorus Oxide, (P2O3)2 = P4O6, g), pp. ~1725
+        source_path: https://janaf.nist.gov/tables/O-087.html
+        record: JANAF O-087
 - observation_id: janaf-4th::janaf_P4_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -3958,8 +8912,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '298.15'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -3997,8 +8951,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_fG_298_kJ_mol
+    kind: point
+    point: '24.416'
     approximate: false
   uncertainty:
     kind: printed
@@ -4009,9 +8963,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::janaf_P4_298_anchors
   source_id: janaf-4th
   locator:
     table: P-013
@@ -4019,6 +8978,16 @@ observations:
     source_path: https://janaf.nist.gov/tables/P-013.html
     record: JANAF P-013
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: P-013
+        note: Chase (1998) NIST-JANAF table P-013 (P4,g); Cox et al. (1984) CODATA
+        source_path: https://janaf.nist.gov/tables/P-013.html
+        record: JANAF P-013
 - observation_id: janaf-4th::janaf_PO2_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -4043,8 +9012,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '298.15'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -4082,8 +9051,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_fG_298_kJ_mol
+    kind: point
+    point: '-316.748'
     approximate: false
   uncertainty:
     kind: none
@@ -4092,9 +9061,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::janaf_PO2_298_anchors
   source_id: janaf-4th
   locator:
     table: O-032
@@ -4102,6 +9076,16 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-032.html
     record: JANAF O-032
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-032
+        note: Chase (1998) NIST-JANAF 4th ed., table O-032 (Phosphorus Oxide, PO2, g), pp. ~1670
+        source_path: https://janaf.nist.gov/tables/O-032.html
+        record: JANAF O-032
 - observation_id: janaf-4th::janaf_PO_298_anchors
   experiment_id: ebbdedffacfcd145f0a7ddc25e89e3a3f6f96a3467c9c93f0c7f3f62d8fdff9b::janaf-4th
   identity:
@@ -4126,8 +9110,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '298.15'
     standard_pressure_Pa:
       tag: unknown
       reason: no standard_pressure_Pa mapped from source
@@ -4165,8 +9149,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: unsupported printed unit for delta_fG_298_kJ_mol
+    kind: point
+    point: '-47.139'
     approximate: false
   uncertainty:
     kind: none
@@ -4175,9 +9159,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::janaf_PO_298_anchors
   source_id: janaf-4th
   locator:
     table: O-004
@@ -4186,3 +9175,14 @@ observations:
     source_path: https://janaf.nist.gov/tables/O-004.html
     record: JANAF O-004
   read_from: unknown:janaf-4th
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        table: O-004
+        note: Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data Monograph 9, table
+          O-004 (Phosphorus Oxide, PO, g), pp. ~1642
+        source_path: https://janaf.nist.gov/tables/O-004.html
+        record: JANAF O-004

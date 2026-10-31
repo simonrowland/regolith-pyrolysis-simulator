@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 499a0fd386c3dd006f98398a85ae897c53586288
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
     files:
     - asset_id: pdf:kems-026-markova-1984
       role: pdf
@@ -48,7 +48,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: The abstract names the samples but gives no charge mass.
     initial_composition:
@@ -70,7 +70,7 @@ experiments:
           amount_basis: mole_fraction
       locator:
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -86,7 +86,7 @@ experiments:
               value: '19.13'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -96,7 +96,7 @@ experiments:
               value: '101.960077'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -106,7 +106,7 @@ experiments:
               value: '12.93'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -116,7 +116,7 @@ experiments:
               value: '56.077000000000005'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -126,7 +126,7 @@ experiments:
               value: '9.37'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -136,7 +136,7 @@ experiments:
               value: '71.844'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -146,7 +146,7 @@ experiments:
               value: '6.25'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -156,7 +156,7 @@ experiments:
               value: '40.304'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -166,7 +166,7 @@ experiments:
               value: '52.32'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -176,7 +176,7 @@ experiments:
               value: '60.083'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
@@ -193,7 +193,7 @@ experiments:
           CaO: '12.93'
       locator:
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         table: '2'
         note: Table 2 printed starting charge for sample V (alumina basalt), wt%
   conditions:
@@ -205,22 +205,28 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: The paper reports vapor total pressure as a result, not the experimental total pressure.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+        note: No carrier or sweep gas is stated.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: experimental method
     note: Stepwise-heating run for sample V (alumina basalt), reported in Table 2.
   apparatus:
@@ -231,7 +237,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_diameter_m:
@@ -240,7 +246,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_channel_length_m:
@@ -249,7 +255,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
   bench_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::bench::markova-1984-kems
@@ -260,7 +266,7 @@ experiments:
         value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
     total_duration_s:
       state:
@@ -268,7 +274,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
 - experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::experiment::VI
@@ -283,7 +289,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: The abstract names the samples but gives no charge mass.
     initial_composition:
@@ -305,7 +311,7 @@ experiments:
           amount_basis: mole_fraction
       locator:
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         table: '2'
         note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
           of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -321,7 +327,7 @@ experiments:
               value: '4.56'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -331,7 +337,7 @@ experiments:
               value: '101.960077'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -341,7 +347,7 @@ experiments:
               value: '6.95'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -351,7 +357,7 @@ experiments:
               value: '56.077000000000005'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -361,7 +367,7 @@ experiments:
               value: '8.04'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -371,7 +377,7 @@ experiments:
               value: '71.844'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -381,7 +387,7 @@ experiments:
               value: '36.44'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -391,7 +397,7 @@ experiments:
               value: '40.304'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -401,7 +407,7 @@ experiments:
               value: '44.02'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -411,7 +417,7 @@ experiments:
               value: '60.083'
             locator:
               published_page: 510
-              pdf_page_index: 2
+              pdf_page_index: 1
               table: '2'
               note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi
                 pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
@@ -428,7 +434,7 @@ experiments:
           CaO: '6.95'
       locator:
         published_page: 510
-        pdf_page_index: 2
+        pdf_page_index: 1
         table: '2'
         note: Table 2 printed starting charge for sample VI (lherzolite), wt%
   conditions:
@@ -440,22 +446,28 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: The paper reports vapor total pressure as a result, not the experimental total pressure.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+        note: No carrier or sweep gas is stated.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     section: experimental method
     note: Stepwise-heating run for sample VI (lherzolite), reported in Table 2.
   apparatus:
@@ -466,7 +478,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_diameter_m:
@@ -475,7 +487,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
       orifice_channel_length_m:
@@ -484,7 +496,7 @@ experiments:
           reason: not_published
         locator:
           published_page: 509
-          pdf_page_index: 1
+          pdf_page_index: 0
           section: experimental method
           note: The abstract names a Knudsen effusion cell but prints no orifice area or dimensions.
   bench_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::bench::markova-1984-kems
@@ -495,7 +507,7 @@ experiments:
         value: Stepwise heating to complete vaporization with 70-degree temperature increments and 15-minute steps
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
     total_duration_s:
       state:
@@ -503,7 +515,7 @@ experiments:
         reason: not_published
       locator:
         published_page: 509
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: experimental method
         note: A duration is printed for each temperature step, but the number of steps and total duration are not printed.
 - experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
@@ -536,7 +548,7 @@ experiments:
   work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
   locator:
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     table: '1'
     note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
 benches:
@@ -550,7 +562,7 @@ benches:
       value: Knudsen-cell mass spectrometry
     locator:
       published_page: 509
-      pdf_page_index: 1
+      pdf_page_index: 0
       section: experimental method
   cell_material_and_liner:
     state:
@@ -558,7 +570,7 @@ benches:
       reason: not_published
     locator:
       published_page: 509
-      pdf_page_index: 1
+      pdf_page_index: 0
       section: experimental method
       note: The abstract does not print the cell material; no material is inferred from Yakovlev 1983.
   other_facts: []
@@ -568,7 +580,7 @@ context:
   class_tag: model
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%
   quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the recent Moon is improbable.
     Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%.
@@ -602,7 +614,7 @@ context:
   class_tag: model
   locator:
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     paragraph: dissipation for SiO-2%, K-3%, Na-14%
   quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
   T_range_K:
@@ -640,7 +652,7 @@ context:
   locator:
     figure: '2'
     published_page: 510
-    pdf_page_index: 2
+    pdf_page_index: 1
     note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON TEMPERATURE FOR THE LUNAR
       MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
   T_range_K:
@@ -687,7 +699,7 @@ context:
   type: method_context
   locator:
     published_page: 509
-    pdf_page_index: 1
+    pdf_page_index: 0
     paragraph: The experiments were carried out in the step-wise heating regime till the complete vaporization of the sample
       under study
   T_range_K:

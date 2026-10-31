@@ -9339,6 +9339,244 @@ observations:
         note: Numerical optical absorption measurements used for this row series are not tabulated; spectra are shown in figures
           2–5.
     references: []
+- observation_id: leister-1999-fe-v-redox-2000c::leister_1999_table3_v5_valence_fraction::T=1873.15:row=6:h=f54015b70770
+  experiment_id: d8c9fe41465abfc2ee9b842d7c757449cee0cd9061faf623db9ca72bbebe86dd::leister-1999-fe-v-redox-2000c
+  identity:
+    quantity:
+      tag: value
+      value: valence_ratio
+    species:
+      formula: V
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile valence_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile valence_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile valence_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile valence_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile valence_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile valence_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile valence_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile valence_ratio does not use wall
+    valence_basis:
+      tag: value
+      value:
+        numerator_oxidation_states:
+        - 5
+        denominator_kind: total_element
+        value_form: fraction
+  value:
+    kind: bound
+    bound_operator: <
+    bound_value: '0.005'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: fam17-1019
+      date: '2026-10-19'
+      evidence:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+  notices: []
+  source_id: leister-1999-fe-v-redox-2000c
+  locator:
+    page: 5
+    published_page: 157
+    pdf_page_index: 4
+    table: '3'
+    note: row=6; column=V5+ (%)
+  read_from: pdf:leister-1999-fe-v-redox-2000c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+        note: row=6; column=V5+ (%)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              page: 5
+              published_page: 157
+              pdf_page_index: 4
+              table: '3'
+              note: row=6; column=V5+ (%)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 157
+              pdf_page_index: 4
+              table: '3'
+              note: row=6; column=V5+ (%)
+        output_unit: K
+        references: []
+    T_C:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: The paper reports the binary host and a separate oxide dopant amount, but not a complete normalized doped-glass
+          composition; the oxide components are not reconstructed.
+      locator:
+        page: 2
+        published_page: 154
+        pdf_page_index: 1
+        section: Experimental procedure
+    atmosphere:
+      state:
+        tag: value
+        value: reduced
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+    holding_time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+    oxygen_partial_pressure:
+      state:
+        tag: unknown
+        reason: No row-level numerical p(O2) is printed for this Table 2/3 sample; the paper reports oxygen pressures for
+          calculated equilibrium data separately.
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+  derivation:
+    relation: Valence fractions were determined from optical absorption spectra using Lambert-Beer analysis. ESR-constrained
+      V4+ coefficients were used and V5+/V3+ coefficients were estimated by difference; the numerical spectral inputs are
+      not tabulated.
+    inputs: []
+    parameters:
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 5
+          published_page: 157
+          pdf_page_index: 4
+          table: '3'
+          note: row=6; column=V5+ (%)
+    - - conversion
+      - state:
+          tag: unknown
+          reason: extractor transform does not state its original numeric input
+        inference:
+          relation: percent_to_fraction
+          inputs:
+          - x = pct / 100
+          - original_unit=percent
+          parameters:
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                page: 5
+                published_page: 157
+                pdf_page_index: 4
+                table: '3'
+                note: row=6; column=V5+ (%)
+          output_unit: dimensionless
+          references: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 157
+        pdf_page_index: 4
+        table: '3'
+        note: Numerical optical absorption measurements used for this row series are not tabulated; spectra are shown in figures
+          2–5.
+    references: []
 - observation_id: leister-1999-fe-v-redox-2000c::leister_1999_table3_v5_valence_fraction::T=1873.15:row=7:h=f09af4b2d8f3
   experiment_id: d8c9fe41465abfc2ee9b842d7c757449cee0cd9061faf623db9ca72bbebe86dd::leister-1999-fe-v-redox-2000c
   identity:

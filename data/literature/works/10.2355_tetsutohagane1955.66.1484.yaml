@@ -1,0 +1,5689 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  citation: Ban-ya, S., Chiba, A., and Hikosaka, A. (1980), “Thermodynamics of FetO-MxOy binary melts in equilibrium with
+    solid iron”, Tetsu-to-Hagane 66(10), 1484–1493.
+  source_ids:
+  - banya-chiba-hikosaka-1980-feto-binary-solid-iron
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      role: pdf
+      path: raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/banya-chiba-hikosaka-1980-feto-binary-solid-iron.pdf
+      sha256:
+        tag: value
+        value: 4abb87d929458374cce293bf9566ff6e7d67f78c024fa91d2db85854560a2b83
+    - asset_id: pdftotext:banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      role: pdftotext
+      path: text/banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:banya-chiba-hikosaka-1980-feto-binary-solid-iron
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/tetsutohagane1955.66.1484
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_10_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '14.68'
+          Fe2O3: '14.14'
+          FeO: '71.24'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-10; table_column_number=6; table_row_number=12; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-10
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.662'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_11_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '16.98'
+          Fe2O3: '11.87'
+          FeO: '70.7'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-11; table_column_number=6; table_row_number=14; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-11
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.617'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_12_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '16.27'
+          Fe2O3: '13.01'
+          FeO: '70.8'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-12; table_column_number=6; table_row_number=13; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-12
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.622'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_13_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '20.79'
+          Fe2O3: '12.92'
+          FeO: '66.49'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-13; table_column_number=6; table_row_number=16; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-13
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.57'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_14_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '19.32'
+          Fe2O3: '14.94'
+          FeO: '65.63'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-14; table_column_number=6; table_row_number=15; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-14
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.573'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_15_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '21.82'
+          Fe2O3: '12.91'
+          FeO: '64.92'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-15; table_column_number=6; table_row_number=17; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-15
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.531'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_16_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '22.45'
+          Fe2O3: '14.8'
+          FeO: '62.53'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-16; table_column_number=6; table_row_number=18; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-16
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.507'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_17_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '23.64'
+          Fe2O3: '15.22'
+          FeO: '61.39'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-17; table_column_number=6; table_row_number=19; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-17
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.493'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_18_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '27.57'
+          Fe2O3: '16.33'
+          FeO: '56.14'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-18; table_column_number=6; table_row_number=20; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-18
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.451'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_19_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '29.03'
+          Fe2O3: '17.02'
+          FeO: '53.96'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-19; table_column_number=6; table_row_number=21; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-19
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.41'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '4.33'
+          Fe2O3: '10.18'
+          FeO: '85.66'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-1; table_column_number=6; table_row_number=3; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.862'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_2_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '6.21'
+          Fe2O3: '10.28'
+          FeO: '83.73'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-2; table_column_number=6; table_row_number=4; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.841'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '8.08'
+          Fe2O3: '9.99'
+          FeO: '82.33'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-3; table_column_number=6; table_row_number=6; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.794'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_4_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '7.82'
+          Fe2O3: '10.47'
+          FeO: '82.17'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-4; table_column_number=6; table_row_number=5; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.809'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_5_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '8.65'
+          Fe2O3: '9.8'
+          FeO: '81.18'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-5; table_column_number=6; table_row_number=8; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.752'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_6_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.04'
+          Fe2O3: '10.54'
+          FeO: '78.98'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-6; table_column_number=6; table_row_number=7; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '9.761'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_7_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '12.04'
+          Fe2O3: '10.86'
+          FeO: '76.61'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-7; table_column_number=6; table_row_number=10; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-7
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.705'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_8_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '12'
+          Fe2O3: '10.01'
+          FeO: '78'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-8; table_column_number=6; table_row_number=9; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-8
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.708'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t1_c_b_9_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.73'
+          Fe2O3: '10.75'
+          FeO: '75.24'
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: row=heat C B-9; table_column_number=6; table_row_number=11; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 2
+    published_page: 1485
+    table: '1'
+    note: row=heat C B-9
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 2
+        published_page: 1485
+        table: '1'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.671'
+            approximate: false
+        locator:
+          page: 2
+          published_page: 1485
+          table: '1'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_10_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '4.87'
+          FeO: '74.69'
+          SiO2: '18.61'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-10; table_column_number=6; table_row_number=9; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-10
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.664'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_11_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '4.61'
+          FeO: '74.67'
+          SiO2: '20.36'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-11; table_column_number=6; table_row_number=8; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-11
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.669'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_12_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '3.22'
+          FeO: '72.54'
+          SiO2: '23.08'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-12; table_column_number=6; table_row_number=10; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-12
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.611'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_13_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '2.56'
+          FeO: '71.64'
+          SiO2: '25.25'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-13; table_column_number=6; table_row_number=11; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-13
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.569'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_14_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.35'
+          FeO: '69.91'
+          SiO2: '28.54'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-14; table_column_number=6; table_row_number=12; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-14
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.518'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_16_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '2.9'
+          FeO: '66.25'
+          SiO2: '30.69'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-16; table_column_number=6; table_row_number=13; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-16
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.469'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_18_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.99'
+          FeO: '63.02'
+          SiO2: '35.09'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-18; table_column_number=6; table_row_number=14; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-18
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.387'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '11.29'
+          FeO: '87.42'
+          SiO2: '1.37'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-1; table_column_number=6; table_row_number=3; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.876'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_2_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '9'
+          FeO: '82.23'
+          SiO2: '7.94'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-2; table_column_number=6; table_row_number=4; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.854'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '8.42'
+          FeO: '81.88'
+          SiO2: '8.26'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-3; table_column_number=6; table_row_number=5; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.838'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_6_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '5.52'
+          FeO: '77.73'
+          SiO2: '16.3'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-6; table_column_number=6; table_row_number=6; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.787'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t2_c_a_7_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '6.15'
+          FeO: '74.55'
+          SiO2: '18.36'
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: row=heat C A-7; table_column_number=6; table_row_number=7; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 3
+    published_page: 1486
+    table: '2'
+    note: row=heat C A-7
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 3
+        published_page: 1486
+        table: '2'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.717'
+            approximate: false
+        locator:
+          page: 3
+          published_page: 1486
+          table: '2'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_10_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.53'
+          FeO: '60.9'
+          TiO2: '38.81'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-10; table_column_number=6; table_row_number=18; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-10
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.487'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_11_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '59.23'
+          TiO2: '40.93'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-11; table_column_number=6; table_row_number=20; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-11
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.451'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_12_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '57.94'
+          TiO2: '42.14'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-12; table_column_number=6; table_row_number=21; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-12
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.44'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_13_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '56.45'
+          TiO2: '43.74'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-13; table_column_number=6; table_row_number=23; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-13
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.425'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_14_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.02'
+          FeO: '56.41'
+          TiO2: '43.55'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-14; table_column_number=6; table_row_number=24; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-14
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.416'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_15_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '55.35'
+          TiO2: '44.65'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-15; table_column_number=6; table_row_number=27; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-15
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.402'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_16_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0.13'
+          FeO: '55.21'
+          TiO2: '44.5'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-16; table_column_number=6; table_row_number=26; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-16
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.403'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_17_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '55.13'
+          TiO2: '44.97'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-17; table_column_number=6; table_row_number=29; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-17
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.389'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '8.55'
+          FeO: '86.77'
+          TiO2: '4.9'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-1; table_column_number=6; table_row_number=3; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.868'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_2_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '10.2'
+          FeO: '79.89'
+          TiO2: '10.35'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-2; table_column_number=6; table_row_number=5; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.793'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '7.87'
+          FeO: '78.03'
+          TiO2: '14.02'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-3; table_column_number=6; table_row_number=6; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.751'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_4_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '7.46'
+          FeO: '73.06'
+          TiO2: '19.45'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-4; table_column_number=6; table_row_number=8; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.699'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_5_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '6.38'
+          FeO: '70.44'
+          TiO2: '23.27'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-5; table_column_number=6; table_row_number=11; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.672'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_6_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '5.92'
+          FeO: '66.81'
+          TiO2: '27.23'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-6; table_column_number=6; table_row_number=13; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.649'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_8_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '3.63'
+          FeO: '62.68'
+          TiO2: '34.03'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-8; table_column_number=6; table_row_number=15; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-8
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.562'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_cc_9_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.12'
+          FeO: '62.88'
+          TiO2: '36.5'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat CC-9; table_column_number=6; table_row_number=17; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat CC-9
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.526'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_10_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '58.31'
+          TiO2: '42.41'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-10; table_column_number=6; table_row_number=19; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-10
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.459'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_11_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '57.96'
+          TiO2: '42.52'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-11; table_column_number=6; table_row_number=22; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-11
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.43'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_12_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '55.93'
+          TiO2: '44.66'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-12; table_column_number=6; table_row_number=25; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-12
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.404'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_13_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '55.32'
+          TiO2: '44.47'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-13; table_column_number=6; table_row_number=28; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-13
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.393'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '8.85'
+          FeO: '84.15'
+          TiO2: '6.48'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-1; table_column_number=6; table_row_number=4; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.858'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '8.83'
+          FeO: '76'
+          TiO2: '15.46'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-3; table_column_number=6; table_row_number=7; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.733'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_4_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '6.57'
+          FeO: '75.19'
+          TiO2: '18'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-4; table_column_number=6; table_row_number=9; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.698'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_5_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '4.13'
+          FeO: '69.73'
+          TiO2: '25.45'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-5; table_column_number=6; table_row_number=10; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.68'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_6_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '6.65'
+          FeO: '65.26'
+          TiO2: '27.69'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-6; table_column_number=6; table_row_number=12; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.659'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_8_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '1.75'
+          FeO: '62.42'
+          TiO2: '34.61'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-8; table_column_number=6; table_row_number=14; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-8
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.567'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t3_hc_9_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe2O3: '0'
+          FeO: '62.77'
+          TiO2: '34.63'
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: row=heat HC-9; table_column_number=6; table_row_number=16; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 4
+    published_page: 1487
+    table: '3'
+    note: row=heat HC-9
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 4
+        published_page: 1487
+        table: '3'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.536'
+            approximate: false
+        locator:
+          page: 4
+          published_page: 1487
+          table: '3'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '4.58'
+          Fe2O3: '12.96'
+          FeO: '82.35'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-1; table_column_number=6; table_row_number=7; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.844'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.88'
+          Fe2O3: '11.8'
+          FeO: '84.71'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-3; table_column_number=6; table_row_number=5; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.854'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_4_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '4.11'
+          Fe2O3: '11.76'
+          FeO: '84.35'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-4; table_column_number=6; table_row_number=6; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.852'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_5_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '7.24'
+          Fe2O3: '11.42'
+          FeO: '81.78'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-5; table_column_number=6; table_row_number=10; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.805'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_6_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '8.37'
+          Fe2O3: '11.67'
+          FeO: '80.15'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-6; table_column_number=6; table_row_number=11; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-6
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.786'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_c_d_7_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '12.24'
+          Fe2O3: '10.86'
+          FeO: '76.4'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat C D-7; table_column_number=6; table_row_number=13; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat C D-7
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.759'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_h_d_1_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '4.12'
+          Fe2O3: '11.37'
+          FeO: '83.91'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat H D-1; table_column_number=6; table_row_number=4; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat H D-1
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.858'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_h_d_2_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '3.49'
+          Fe2O3: '11.72'
+          FeO: '85.82'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat H D-2; table_column_number=6; table_row_number=3; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat H D-2
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.868'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_h_d_3_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '4.91'
+          Fe2O3: '12.05'
+          FeO: '83.09'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat H D-3; table_column_number=6; table_row_number=8; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat H D-3
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.831'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_h_d_4_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '6.72'
+          Fe2O3: '11.2'
+          FeO: '81.73'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat H D-4; table_column_number=6; table_row_number=9; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat H D-4
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.811'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+- experiment_id: 10.2355/tetsutohagane1955.66.1484::experiment::bch80_t4_h_d_5_run
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'H2-H2O gas equilibration with liquid FetO-based slag in contact with solid iron' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '10.24'
+          Fe2O3: '10.89'
+          FeO: '78.42'
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: row=heat H D-5; table_column_number=6; table_row_number=12; phase=liquid
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+        note: caption states 1400 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  locator:
+    page: 5
+    published_page: 1488
+    table: '4'
+    note: row=heat H D-5
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-H2O gas mixture; P_H2O/P_H2 as printed
+      locator:
+        page: 5
+        published_page: 1488
+        table: '4'
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.784'
+            approximate: false
+        locator:
+          page: 5
+          published_page: 1488
+          table: '4'
+      basis: partial_pressure
+context:
+- observation_id: bch80_table5_activity_grid
+  type: author_summary_table
+  locator:
+    page: 6
+    published_page: 1489
+    table: '5'
+  units: dimensionless activity; composition coordinate N_MxOy as printed
+  values:
+    label: Author summary of the four FetO-MxOy binary systems at 1400 °C; Table 5 gives no run IDs, gas ratios, or interpolation
+      method.
+    temperature_C_as_printed: 1400
+    activity_grid_as_printed:
+    - N_MxOy_as_printed: '0.05'
+      Fe_tO-CaO: '0.970'
+      Fe_tO-SiO2: '0.980'
+      Fe_tO-TiO2: '0.954'
+      Fe_tO-Al2O3*: '0.995'
+    - N_MxOy_as_printed: '0.10'
+      Fe_tO-CaO: '0.920'
+      Fe_tO-SiO2: '0.950'
+      Fe_tO-TiO2: '0.902'
+      Fe_tO-Al2O3*: '0.988'
+    - N_MxOy_as_printed: '0.15'
+      Fe_tO-CaO: '0.828'
+      Fe_tO-SiO2: '0.913'
+      Fe_tO-TiO2: '0.848'
+      Fe_tO-Al2O3*: '0.976'
+    - N_MxOy_as_printed: '0.20'
+      Fe_tO-CaO: '0.742'
+      Fe_tO-SiO2: '0.848'
+      Fe_tO-TiO2: '0.792'
+      Fe_tO-Al2O3*: '0.948'
+    - N_MxOy_as_printed: '0.25'
+      Fe_tO-CaO: '0.666'
+      Fe_tO-SiO2: '0.755'
+      Fe_tO-TiO2: '0.736'
+      Fe_tO-Al2O3*: '0.929'
+    - N_MxOy_as_printed: '0.30'
+      Fe_tO-CaO: '0.580'
+      Fe_tO-SiO2: '0.650'
+      Fe_tO-TiO2: '0.674'
+      Fe_tO-Al2O3*: '0.912'
+    - N_MxOy_as_printed: '0.35'
+      Fe_tO-CaO: '0.512'
+      Fe_tO-SiO2: '0.540'
+      Fe_tO-TiO2: '0.590'
+      Fe_tO-Al2O3*: '0.898'
+    - N_MxOy_as_printed: '0.40'
+      Fe_tO-CaO: '0.438'
+      Fe_tO-SiO2: '0.430'
+      Fe_tO-TiO2: '0.499'
+      Fe_tO-Al2O3*: '0.886'
+    - N_MxOy_as_printed: '0.45'
+      Fe_tO-CaO: '0.374'
+      Fe_tO-SiO2: null
+      Fe_tO-TiO2: '0.408'
+      Fe_tO-Al2O3*: null
+    - N_MxOy_as_printed: '0.50'
+      Fe_tO-CaO: '0.312'
+      Fe_tO-SiO2: null
+      Fe_tO-TiO2: '0.320'
+      Fe_tO-Al2O3*: null
+  context_id: banya-chiba-hikosaka-1980-feto-binary-solid-iron::context::bch80_table5_activity_grid
+  work_id: 10.2355/tetsutohagane1955.66.1484
+  source_id: banya-chiba-hikosaka-1980-feto-binary-solid-iron
+  species: Fe_tO

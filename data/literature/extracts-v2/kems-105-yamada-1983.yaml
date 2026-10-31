@@ -121,9 +121,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P_Al,
-      epsilon_P_Al_as_printed, T_C_as_printed, T_K, a_Fe_source, note'
+    kind: point
+    point: '4'
     approximate: false
   uncertainty:
     kind: printed
@@ -136,9 +135,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_Al_body_4p0_printed
   source_id: kems-105-yamada-1983
   locator:
     published_page: 53
@@ -147,6 +151,13 @@ observations:
     note: Body text value that disagrees with synopsis/Table 2/Fig. 2/conclusions
   read_from: pdf:kems-105-yamada-1983
   point_conditions:
+    solute:
+      state:
+        tag: value
+        value: Al
+      locator:
+        published_page: 53
+        section: 2. The Fe-P-Al Systems
     temperature_K:
       state:
         tag: value
@@ -220,9 +231,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source,
-      epsilon_P_Si, epsilon_P_Si_as_printed, T_C_as_printed, T_K, authors_comment'
+    kind: point
+    point: '12.6'
     approximate: false
   uncertainty:
     kind: printed
@@ -236,9 +246,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
   source_id: kems-105-yamada-1983
   locator:
     published_page: 53
@@ -247,6 +262,13 @@ observations:
     note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
   read_from: pdf:kems-105-yamada-1983
   point_conditions:
+    solute:
+      state:
+        tag: value
+        value: Si
+      locator:
+        published_page: 53
+        section: 1. The Fe-P-Si System
     temperature_K:
       state:
         tag: value
@@ -256,7 +278,36 @@ observations:
         pdf_page_index: 3
         section: 1. The Fe-P-Si System
         note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=2e093e5e18da
+  derivation:
+    relation: The authors recomputed epsilon_P^Si using Fruehan's Fe-Si iron activity value in equations (7)-(8); the paper
+      reports 12.6 +/- 0.6.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        published_page: 53
+        pdf_page_index: 3
+        section: 1. The Fe-P-Si System
+        equation: '7'
+        note: The numerical Fe activity from Fruehan is not printed in this paper.
+    method:
+      state:
+        tag: value
+        value: Interaction parameter from the activity-coefficient relation using Fruehan's Fe-Si activity value
+      locator:
+        page: 4
+        published_page: 53
+        pdf_page_index: 3
+        section: 1. The Fe-P-Si System
+        equation: '8'
+    references:
+    - R. J. Fruehan, Metallurgical Transactions 1 (1970), 865, ref. 4
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=02f0f1dcb01c
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -281,8 +332,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -320,9 +371,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '11.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -362,11 +412,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=3a2f6f3b2dd2
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Si
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=1029a2f46cc5
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -391,8 +453,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -430,9 +492,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '-4.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -472,11 +533,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=42ffdd4b4865
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: V
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=298b709221fd
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -501,8 +574,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -540,9 +613,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '-0.4'
     approximate: false
   uncertainty:
     kind: printed
@@ -582,11 +654,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=4ea4788da2bc
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Mo
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=2fd9bc41eda7
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -611,8 +695,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -650,9 +734,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '-5.4'
     approximate: false
   uncertainty:
     kind: printed
@@ -692,11 +775,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=79dedb27c3c5
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Nb
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=4c2aab74ec9c
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -721,8 +816,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -760,9 +855,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '-8'
     approximate: false
   uncertainty:
     kind: printed
@@ -802,11 +896,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=87d39fc22b83
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Ti
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=506ee24c4d81
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -831,8 +937,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -870,9 +976,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '0.7'
     approximate: false
   uncertainty:
     kind: printed
@@ -912,11 +1017,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=a5281233be84
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Ni
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=aa80e8b12e55
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -941,8 +1058,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -980,9 +1097,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '0.9'
     approximate: false
   uncertainty:
     kind: printed
@@ -1022,11 +1138,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=ac122eb9df56
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Co
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=bde051fc8f48
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -1051,8 +1179,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -1090,9 +1218,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '4.6'
     approximate: false
   uncertainty:
     kind: printed
@@ -1132,11 +1259,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=d946c6e9264f
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Al
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::T=1873.0:h=d87dc18c4fbd
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -1161,8 +1300,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -1200,9 +1339,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    kind: point
+    point: '-3.8'
     approximate: false
   uncertainty:
     kind: printed
@@ -1242,10 +1380,22 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
-          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Cr
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
 - observation_id: kems-105-yamada-1983::yamada_1983_fig1_Si_figure_only
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2157,7 +2307,7 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: Table 1. Source and purity of metals.
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=0d2dda43da54
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1788.15:h=134e82eb314c
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2182,8 +2332,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1788.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2221,9 +2371,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '14.2'
     approximate: false
   uncertainty:
     kind: printed
@@ -2249,13 +2398,26 @@ observations:
     temperature_K:
       state:
         tag: value
-        value: '1873'
+        value: '1788.15'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5092ac3a8fd2
+        note: Source prints 1515 C; Kelvin conversion
+    solute:
+      state:
+        tag: value
+        value: Si
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1873.0:h=0b3f301edcf5
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2280,8 +2442,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2319,9 +2481,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '0'
     approximate: false
   uncertainty:
     kind: printed
@@ -2350,10 +2511,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5853aa774969
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Ni
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1873.0:h=38c8e0e822c2
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2378,8 +2552,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2417,9 +2591,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '-6.3'
     approximate: false
   uncertainty:
     kind: printed
@@ -2448,10 +2621,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=6af031ac0e4e
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Cr
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1873.0:h=7e911e43a005
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2476,8 +2662,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2515,9 +2701,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '11'
     approximate: false
   uncertainty:
     kind: printed
@@ -2546,10 +2731,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=8ed286fcfb4f
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Si
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1873.0:h=9148f3507743
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2574,8 +2772,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2613,9 +2811,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '21'
     approximate: false
   uncertainty:
     kind: printed
@@ -2644,10 +2841,23 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=feff7bd123f9
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Si
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::T=1873.0:h=e6c05d1d9fed
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -2672,8 +2882,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2711,9 +2921,8 @@ observations:
       tag: not_applicable
       reason: profile interaction_parameter does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
-      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    kind: point
+    point: '18.8'
     approximate: false
   uncertainty:
     kind: printed
@@ -2742,6 +2951,19 @@ observations:
         value: '1873'
       locator:
         published_page: 54
-        pdf_page_index: 4
         table: '2'
-        note: Table 2 comparison rows that are not Present work
+        note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset
+    solute:
+      state:
+        tag: value
+        value: Cr
+      locator:
+        published_page: 54
+        table: '2'
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-105-yamada-1983
+    parameters: []
+    output_unit: dimensionless epsilon_P^i and e_P^i as published
+    references: []
