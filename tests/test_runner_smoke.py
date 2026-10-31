@@ -107,8 +107,12 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # studio-2 and studio-3 (gate config).
         # d-137 condenser (t-1217 law, Stage-1 plate, Stage-4 Na / 4b K split) +
         # t-1579 hot-face schedule: regenerated on studio-3, two passes identical.
+        # d-137 fix rounds (single product-accounting owner, band-integrated
+        # Stage-3 capture, typed saturation refusal): flux unchanged; the
+        # ledger digest moves with the additive unrecovered_metal_phase /
+        # source-account fields. Regenerated on studio-3 at b0b70903d.
         "flux_maps_sha256": "15c212d781da125be67e7f8e265450bcbfe4c11d8f8bfb8afc4a93f079d9bdf3",
-        "ledger_sha256": "1e94264f7342d1ac33a7b802188ffb184cc37a95b5a3cf7345fbbbae88b58e83",
+        "ledger_sha256": "958be30db7c2b1677301036473e8025d49cdd89480283bbd6bbf68071349978f",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",

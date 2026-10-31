@@ -2328,6 +2328,7 @@
     "classification": {
       "metals_plus_O2": {
         "metals_kg": {},
+        "source_accounts_by_species": {},
         "metals_total_kg": 0.0,
         "O2_kg": 0.0,
         "O2_partition_kg": {
@@ -2350,8 +2351,14 @@
       },
       "ingots_metals": {
         "species_kg": {},
+        "source_accounts_by_species": {},
         "class_total_kg": 0.0,
         "estimated_contributions": []
+      },
+      "unrecovered_metal_phase": {
+        "species_kg": {},
+        "source_accounts_by_species": {},
+        "class_total_kg": 0.0
       },
       "oxygen": {
         "O2_kg": 0.0,
@@ -16692,7 +16699,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -18986,7 +18993,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -21280,7 +21287,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -23574,7 +23581,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -25868,7 +25875,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -28162,7 +28169,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -30456,7 +30463,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -32750,7 +32757,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -35044,7 +35051,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -37338,7 +37345,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -39632,7 +39639,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -45369,7 +45376,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O",
