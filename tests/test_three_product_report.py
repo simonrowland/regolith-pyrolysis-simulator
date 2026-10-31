@@ -232,6 +232,27 @@ def test_stage_accepted_metals_are_products_and_phase_remainder_is_inventory():
     }
 
 
+def test_unrecovered_only_metal_is_not_duplicated_by_aggregate_projection():
+    sim = SimSession().start(_config(campaign='C0')).simulator
+    sim.atom_ledger.load_external_mol(
+        'process.metal_phase_float_layer',
+        {'Al': 4.0},
+        material_origin='feedstock',
+    )
+
+    account_projection = sim.atom_ledger.project_account_kg(
+        'process.metal_phase_float_layer'
+    )
+    aggregate_projection = sim.product_ledger()
+    assert aggregate_projection['Al'] == account_projection['Al']
+
+    result = classify_products(sim)
+    assert result['unrecovered_metal_phase']['species_kg']['Al'] == (
+        account_projection['Al']
+    )
+    assert result['unclassified']['kg_by_species'].get('Al', 0.0) == 0.0
+
+
 def test_c0_native_cleanup_does_not_produce_ingots_before_any_step():
     sim = SimSession().start(_config(campaign='C0')).simulator
     result = classify_products(sim)

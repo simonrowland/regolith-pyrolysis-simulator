@@ -473,13 +473,28 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         | set(spent_reductant_kg_by_species.keys())
         | set(rump_kg_by_species.keys())
     )
+    unrecovered_metal_account_kg_by_species = {
+        species: float(sum(
+            float(source.get('kg', 0.0))
+            for source in sources
+            if isinstance(source, Mapping)
+        ))
+        for species, sources in unrecovered_metal_sources.items()
+    }
     unclassified: dict[str, float] = dict(cleanup_native_kg)
     for species, kg in products.items():
-        if species in classified_species:
-            continue
         try:
             value = float(kg)
         except (TypeError, ValueError):
+            continue
+        # product_ledger() collapses several source accounts by species. Remove
+        # only metal-phase inventory already assigned to its own report class;
+        # a species-wide skip would also hide that element from other accounts.
+        value = max(
+            0.0,
+            value - unrecovered_metal_account_kg_by_species.get(species, 0.0),
+        )
+        if species in classified_species:
             continue
         if value > 0.0:
             unclassified[species] = value
