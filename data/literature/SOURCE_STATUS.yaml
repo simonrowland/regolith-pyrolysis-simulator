@@ -11,8 +11,8 @@ counts:
   sources: 2279
   by_stage:
     located: 209
-    inbox: 1285
-    in_progress: 195
+    inbox: 1268
+    in_progress: 212
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -3034,170 +3034,12 @@ sources:
   total_rows: 2
   inbox_exclusion_reason: null
 - source_id: banya-chiba-hikosaka-1980-feto-binary-solid-iron
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/.url
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/SOURCE.md
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/banya-chiba-hikosaka-1980-feto-binary-solid-iron.pdf
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/DONE
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/mineru.log
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/023f381c29188dddecaad5be789e3e1891bc033d8f9d7ade36816aab3dc8a36a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/172692f508488991528a154d572031ae031aaa5c90489c9b618652b359d3940e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/1be042c97e272e627c85c7d5debc76febd165808c319a635d4a513995b28ddd5.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/235aefeb54cc2e8261c77234e55776e87b738745cb4ea583d05bd18331ae7f60.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/26f26579c43b44771a1d5e6487372b721e3e9419bf94ddb211bc936c8dc5b114.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/27003b397f0596457ed81d25079bcae5ee425f61c8fd1b87a0c3cc566c650564.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/2834a6a4dc22a127e42790ba4a64fec56e2acd7c07e7df5ec54fba280d0c3bac.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/2ce4dfc417e12f28d88b1771a0d8f6ea21260db289a0e0e9eb70b5a0627aeede.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/30d8b05c193bc87d9a6cc52166b66584897499f08b586de9a94093d8b410ec55.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/32ba03274f0d97e9f95112e5a977a40fe072d49d95ec9ca161d991a5545e6e6c.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/3305b9a4a13ba69902b143c87098ad1bf2aa952b6347297c14a4b09bb5800c3c.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/3549d2399a4c14c93f049f9211824e3ba47e15c2d9c0ed3e840a88a4de9b3f21.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/357044daca141ad67aea2edba29c5aa0dfbaee6b4e430e1dd42106e2a981e40a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/366a53fafc23800f883acc37cc5c004ca1d6bcc59992f7526dbf31d45b8a6cf7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/366bc7d90087de668102f0fa62b5305affc675a2ea523ecbde95ab32c907191b.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/384ba34ee7712d12b75768d62212371c3ae899d595ef3ab84d90050660faae68.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/38a097376281304458166693d0ec008f98b4f0c1f8fa62ccc089259f663d1c37.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/3961c5b1543a70193a3c21691be7e9878c8b5004e4876ed8b84586b2fc4d2226.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/3f5b1e3eb2f13bd1e0bfc75d66dfd77de89cb7917bdfe4565f83e874ceedb398.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/4108ee39265b71142d86e2fe743e073674024c0de43a535ea0083c0828fad289.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/49c1e10bb6ce104268ff444b49d28c99e5d50ca5b25cc3ae9b8b9cf77cd81fb0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/4a126efda1a0b50432a046115745734d5f3838d45362d8b22dc68a443fd41409.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/4e9f736b4320f1a635d8714265ec3b04ed4723a9f59310b43337293d1403f7e5.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/5041f9019a83aaa2c84475562b943b30ed6d9bab164e81dedc25322f02340a6a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/51304917dc22c6f4855985394097243bc37589686bebb9bd047ac1149c0b82b7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/58b8c2f30b37cd1f7f73c641dee2e82961f6f6ac2ebea2c709a912802d213552.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/59f3531fc5de60fc42fc52f0b2e9ef053d5e1ff5b97d3fd56c405be496810e9d.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/5a03450358207baa3aef01698133278f8790507ce63ccd9f7db3a6ccca328bc0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/61493b657e0e5f4999e83732785399c376440a51a1958b37d5af2ea8fae0d73e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/641f37e19298506203b24558ee59d2964fcedddf89da869419826d3ee92f5019.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/7377e6ba29210d649ba31367ed83f273104266c751666fc75eec5da9b7ff9462.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/743de394edfa3f2f5a07a57646e457e40d71c4ee25e43724f1590f75c9b5b485.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/7b7d7c9b911468d95d961b591b0b03aa08cf323edc1e8b76dc48455a2bc465c6.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/7e1fbc078b4bb2692ea64e0ed09921fa31bda1ad038c5bff4712788322195600.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/7ef92d3f8af08a3947197978f69c1aad148e0c3d921e8f826e315ec13d49d5e0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/8132d8c9df90750a3335eb8abf9d00c99863ae28b26fa42f60417f5729e188b9.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/988e249bfa8b9c78bcf645825ef60d08b76a24f65a2162e4ff1f938e2e53a6b1.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a2887556dbcca28195eb8b0f9e5703afdef4e5b55310e97d68224986215ba718.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a3c2e86b9958ff8e1dd1a6340fcef2c4d45ff8f1efa19a703e5226f88c6dab09.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a535536940732da0858e25d330f7cf05be56d7a65cc298fff854af61c3199e0a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a70e7a6b01182b74fa74feddaf889c62435ff5fd269b4583b49ff88a5eb9e38a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a92010761924e571aba160f355c2c0ec5212581c6c27f3b43c69aca2ec5462be.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/a98a3301ca27598daf0d38b2f6e49e2dca4d8ca5a1dcb1adb9f63d98d2c305fe.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/abadb9502c9046a4359500ea97813dd6fbda57e7972e2ef6fd8bd7dc7195681e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/ac8a26004f9dd40c3b9cf7be224274a68e819e33c1dff60b867049fd1dde7e47.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/ae22d24ec4b881c54b56e1d3cb29ba39200a7de35d323d2997752228c64e0607.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/b31b3bc97e177526f57bc81415854653f814bd333d65959d02e072bbf6674c36.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/b44599c12ab4ea267dcb0636755aac0a16af1f97d3292b952fd1207ee4ad97c7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/b61433ece0f8d344a09c5dd03ef1ada068549cecb6d6c3cb81d76a662218d9d2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/b7bd688764ee99fc858c99cf14970c855c3bccb5bf550a2291cb07c7b8df306b.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/bd00067d36a80689f48c74308b198fb9b25610d09926637844a78c18b279c1ff.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/be750d9c2852c3fba0ceace74ab065827025f39adbbf04cd4b21ca9bd5bfb3ac.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/c0ea84c46a3f883cf6b1222a295f6937fb618245b5c7860e08513ed797d6f0f0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/c141ec95d14dc5b0301328313849b1560524d07c090ad714380953dd26818d46.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/c353d578642c177046ac0c79eef8500c0d8c1476b508067cafe94d76ae2ffbd2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/c58b392db37323d6998f2f028e4b71cea45a25b3db4a978c454f888c265dde4d.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/c5dc2fadca6c4b9acc1dcc56d1f420b02e58442377a7902ef2b42d6b6773e84a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/cedda72ca1cc991cfd277cb1796e77d6bbfd51100d1071c5bbf24ddd88942950.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/d03426bbddafc2b6b9df0faf931220d7648f815d083ba2f53e488020bfa9ea1f.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/d12293c75cca6edeb9e105c77ae38a7bb1260c1637589eeea2fe41d7817d9f83.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/d227d37eb162d0a8e31a21565f81a5bf4c0a3b5472dc13b33d6e14af9ba22e2a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/d8f78cca7e9a1ab6d09a28a05c24012eda5f9a1dc726284b20ab453933a00ea3.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/d9b6cfcb5aeed0ff58dc96800920d28491d4dfbcc309f051999c66b8f7164a28.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/db293aebc5f78fdf49feb08c3d09d7a01165ebeaef0cb29590971bdbe92a5e74.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/de61a25cbde885d768445d358d6920615522a703b59e6de7dc2270441b50d437.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/df9f09c0b889c51c57d5a6cdc810dd6a97566286eff97a84243df146744946b2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/e6a6dc2eaacbb4df9840cc65c7ab4ff73f9902a23cb6c325262ba466e8166bfc.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/ea3598f3d327b00e5db2f33c898718ee1755ac029d35226feaa52da1fd8f1294.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/eca3c454d72854c91a75256103c226eb8eb58911efa11f60d3177bad7d735268.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/f58c76661240ba2b6e81af06a56f3e668612bc32949e94a5493719683984c6a8.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/images/f7f74a0e31019408c7d933976546fcff287bc1c73245e73a6845e30e225ec0dd.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010.md
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010_content_list.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010_content_list_v2.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010_middle.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru/TetsuToHagane_66_1484/p001-p010/out/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010/vlm/src-banya-chiba-hikosaka-1980-feto-binary-solid-iron-p001-p010_model.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/DONE
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/mineru.log
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/023f381c29188dddecaad5be789e3e1891bc033d8f9d7ade36816aab3dc8a36a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/172692f508488991528a154d572031ae031aaa5c90489c9b618652b359d3940e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/1be042c97e272e627c85c7d5debc76febd165808c319a635d4a513995b28ddd5.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/235aefeb54cc2e8261c77234e55776e87b738745cb4ea583d05bd18331ae7f60.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/26f26579c43b44771a1d5e6487372b721e3e9419bf94ddb211bc936c8dc5b114.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/27003b397f0596457ed81d25079bcae5ee425f61c8fd1b87a0c3cc566c650564.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/2834a6a4dc22a127e42790ba4a64fec56e2acd7c07e7df5ec54fba280d0c3bac.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/2ce4dfc417e12f28d88b1771a0d8f6ea21260db289a0e0e9eb70b5a0627aeede.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/30d8b05c193bc87d9a6cc52166b66584897499f08b586de9a94093d8b410ec55.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/32ba03274f0d97e9f95112e5a977a40fe072d49d95ec9ca161d991a5545e6e6c.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/3305b9a4a13ba69902b143c87098ad1bf2aa952b6347297c14a4b09bb5800c3c.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/3549d2399a4c14c93f049f9211824e3ba47e15c2d9c0ed3e840a88a4de9b3f21.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/357044daca141ad67aea2edba29c5aa0dfbaee6b4e430e1dd42106e2a981e40a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/366a53fafc23800f883acc37cc5c004ca1d6bcc59992f7526dbf31d45b8a6cf7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/366bc7d90087de668102f0fa62b5305affc675a2ea523ecbde95ab32c907191b.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/384ba34ee7712d12b75768d62212371c3ae899d595ef3ab84d90050660faae68.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/38a097376281304458166693d0ec008f98b4f0c1f8fa62ccc089259f663d1c37.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/3961c5b1543a70193a3c21691be7e9878c8b5004e4876ed8b84586b2fc4d2226.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/3f5b1e3eb2f13bd1e0bfc75d66dfd77de89cb7917bdfe4565f83e874ceedb398.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/4108ee39265b71142d86e2fe743e073674024c0de43a535ea0083c0828fad289.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/49c1e10bb6ce104268ff444b49d28c99e5d50ca5b25cc3ae9b8b9cf77cd81fb0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/4a126efda1a0b50432a046115745734d5f3838d45362d8b22dc68a443fd41409.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/4e9f736b4320f1a635d8714265ec3b04ed4723a9f59310b43337293d1403f7e5.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/5041f9019a83aaa2c84475562b943b30ed6d9bab164e81dedc25322f02340a6a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/51304917dc22c6f4855985394097243bc37589686bebb9bd047ac1149c0b82b7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/58b8c2f30b37cd1f7f73c641dee2e82961f6f6ac2ebea2c709a912802d213552.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/59f3531fc5de60fc42fc52f0b2e9ef053d5e1ff5b97d3fd56c405be496810e9d.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/5a03450358207baa3aef01698133278f8790507ce63ccd9f7db3a6ccca328bc0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/61493b657e0e5f4999e83732785399c376440a51a1958b37d5af2ea8fae0d73e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/641f37e19298506203b24558ee59d2964fcedddf89da869419826d3ee92f5019.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/7377e6ba29210d649ba31367ed83f273104266c751666fc75eec5da9b7ff9462.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/743de394edfa3f2f5a07a57646e457e40d71c4ee25e43724f1590f75c9b5b485.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/7b7d7c9b911468d95d961b591b0b03aa08cf323edc1e8b76dc48455a2bc465c6.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/7e1fbc078b4bb2692ea64e0ed09921fa31bda1ad038c5bff4712788322195600.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/7ef92d3f8af08a3947197978f69c1aad148e0c3d921e8f826e315ec13d49d5e0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/8132d8c9df90750a3335eb8abf9d00c99863ae28b26fa42f60417f5729e188b9.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/988e249bfa8b9c78bcf645825ef60d08b76a24f65a2162e4ff1f938e2e53a6b1.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a2887556dbcca28195eb8b0f9e5703afdef4e5b55310e97d68224986215ba718.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a3c2e86b9958ff8e1dd1a6340fcef2c4d45ff8f1efa19a703e5226f88c6dab09.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a535536940732da0858e25d330f7cf05be56d7a65cc298fff854af61c3199e0a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a70e7a6b01182b74fa74feddaf889c62435ff5fd269b4583b49ff88a5eb9e38a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a92010761924e571aba160f355c2c0ec5212581c6c27f3b43c69aca2ec5462be.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/a98a3301ca27598daf0d38b2f6e49e2dca4d8ca5a1dcb1adb9f63d98d2c305fe.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/abadb9502c9046a4359500ea97813dd6fbda57e7972e2ef6fd8bd7dc7195681e.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/ac8a26004f9dd40c3b9cf7be224274a68e819e33c1dff60b867049fd1dde7e47.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/ae22d24ec4b881c54b56e1d3cb29ba39200a7de35d323d2997752228c64e0607.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/b31b3bc97e177526f57bc81415854653f814bd333d65959d02e072bbf6674c36.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/b44599c12ab4ea267dcb0636755aac0a16af1f97d3292b952fd1207ee4ad97c7.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/b61433ece0f8d344a09c5dd03ef1ada068549cecb6d6c3cb81d76a662218d9d2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/b7bd688764ee99fc858c99cf14970c855c3bccb5bf550a2291cb07c7b8df306b.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/bd00067d36a80689f48c74308b198fb9b25610d09926637844a78c18b279c1ff.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/be750d9c2852c3fba0ceace74ab065827025f39adbbf04cd4b21ca9bd5bfb3ac.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/c0ea84c46a3f883cf6b1222a295f6937fb618245b5c7860e08513ed797d6f0f0.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/c141ec95d14dc5b0301328313849b1560524d07c090ad714380953dd26818d46.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/c353d578642c177046ac0c79eef8500c0d8c1476b508067cafe94d76ae2ffbd2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/c58b392db37323d6998f2f028e4b71cea45a25b3db4a978c454f888c265dde4d.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/c5dc2fadca6c4b9acc1dcc56d1f420b02e58442377a7902ef2b42d6b6773e84a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/cedda72ca1cc991cfd277cb1796e77d6bbfd51100d1071c5bbf24ddd88942950.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/d03426bbddafc2b6b9df0faf931220d7648f815d083ba2f53e488020bfa9ea1f.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/d12293c75cca6edeb9e105c77ae38a7bb1260c1637589eeea2fe41d7817d9f83.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/d227d37eb162d0a8e31a21565f81a5bf4c0a3b5472dc13b33d6e14af9ba22e2a.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/d8f78cca7e9a1ab6d09a28a05c24012eda5f9a1dc726284b20ab453933a00ea3.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/d9b6cfcb5aeed0ff58dc96800920d28491d4dfbcc309f051999c66b8f7164a28.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/db293aebc5f78fdf49feb08c3d09d7a01165ebeaef0cb29590971bdbe92a5e74.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/de61a25cbde885d768445d358d6920615522a703b59e6de7dc2270441b50d437.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/df9f09c0b889c51c57d5a6cdc810dd6a97566286eff97a84243df146744946b2.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/e6a6dc2eaacbb4df9840cc65c7ab4ff73f9902a23cb6c325262ba466e8166bfc.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/ea3598f3d327b00e5db2f33c898718ee1755ac029d35226feaa52da1fd8f1294.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/eca3c454d72854c91a75256103c226eb8eb58911efa11f60d3177bad7d735268.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/f58c76661240ba2b6e81af06a56f3e668612bc32949e94a5493719683984c6a8.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/images/f7f74a0e31019408c7d933976546fcff287bc1c73245e73a6845e30e225ec0dd.jpg
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010.md
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010_content_list.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010_content_list_v2.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010_middle.json
-    - raw/banya-chiba-hikosaka-1980-feto-binary-solid-iron/mineru-TetsuToHagane_66_1484/p001-p010/out/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010/vlm/src--banya-chiba-hikosaka-1980-feto-binary-solid-iron--TetsuToHagane_66_1484-p001-p010_model.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -3212,139 +3054,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/SOURCE.md
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.pdf
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/DONE
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/mineru.log
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/01730b9583ed794b7c56bb4a0f976598633f7889fa2e1c18c37eab9de64e81b2.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/0bc02ffa0174b92a520c21a11a1928cda13e165ec19579ff1789e4c6c7aa3987.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/0c58025c327ecb22a502ff9c47ffbc8e187641e487bdb1d39958fa425fdd95bc.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/116d639bba222199f68ad67b0ab1134ee20fb6daf511463087ab4f140352fa71.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/12045ae78eda6035dd4a795e7604b06d7230e149751d1dd7089c9454d4b675c4.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/16c78a5144f611781f9fcad61353fff075a86e88c56b6963326ce8095606ff06.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/199a14b9ddb15772f9baf89936bbc063d148af8e9886a5747941e74558b1a816.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/209582ccce0468e0963a28aff555b8b097a79cc8ac0cfbbbd563607ddb810efb.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/212462c27e2ec24b6b91d08efaf2cf348b07aa3b5f02577f5bc543919f8a89b3.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/21b860ee6137857afefd87c88a7db29bc2589d04b92495a2e7a9d591fd8f63e2.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/2361b2cd21189386d8b24a576d1c1bbc5cfd433dca86226a3fc248f35463d59c.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/24deed0a0237e76452a59f5b2d7018b4f9bd489c623987ebd260b0d99ab87fcd.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/24edb3962458847b366e16cffc252f838c58f20a63960519e88ae11bcb5a684b.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/2f5996da8976081042d821a9ab5ad171d58e1adb14d1c7da484870640638ff44.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/34fc09a09f6e6f0a8bc2a5346571e8db2e1d896ae3b66e9eab6eb5d7540eba79.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/370b886cc8234ea51ecbc3d1d7920fb6a92bca37cb5dd3f4bb13663b93568d64.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/45ecd2520a0b4c653336d143f413c71d54cd698cd77fcc0442ed3afd58149764.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/4dc29c326cc7a2e2b7bb33cea7ea6b325b2a5a431f97cd7d46d3c50b198ed354.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/522e3aa7d8a7a3e834ebef0803699f4eedc6a0825306635d717824a1350bd5d8.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/54eec447c1cbb96b65f259fe20298c5c62a4da640d107a67a6e2d5f05bc748d8.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/584059480f93ebe3180230278418b52798a2a9ab60513fd38f875a40e61cf2fc.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/5acbfc28b524a5d91661da8b6b57075ece2f5a76786237f5a81d02ae3304dbd3.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/5dceca1e7677dce7d3a8cfd34f722c75266912a9391a387661b47372391b1609.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/5df10b1e7c3580160b776309120bdb69a7a49fa24e8ad01cb3e51a88f5fdd306.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/640312c9e990c3b1bf7e7aa57cec6c433f4096b1628f1d2bc043a1fe2889ad5a.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/648338b2440f0beb4c0d691d9aecd07a9d54e398d9ae33af003833011c328922.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/6605e6f76a7911b10ec9e902ea9179dc19760fb8560d96f9ec0375fe17107654.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/67ec7a6988c81e1559b1f3776735c6fc4596e219dfbc272c648eba9edcdbffb7.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/69ea77b4c4ff0e16109864dac9e7c45b2053ce7c9d1239e9cec0bcd31055f060.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/6a870265ce2e33d871cad3910b8a230c208f8ac2351cc742f0cce6a80586faea.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/6dcc967ae5010a5413b4de426ba7a4879fa84ad47ed19d7eca4ea2c12f442568.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/6f1fdff4ccfadc655ca273d9b1469d08e7cd3c4d99300b734b9c440b90e4b6d4.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/71aed6d06896cc4a52a2d36a38570a5dfde709efde3d799b86d64695f52bc5ac.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/7a178e88b2357fb78ec66bc171691e6bfbde8556f809b32598230d5c37181dc1.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/82f2cc5404a1f97260926f5f42f131d0aeedc30fc226a92d16f35098556fc402.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/8852f5bbf0f60bde04d418dc00485e339385f5326677cb1867b0dd2e390d4633.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/8b929cdaf77e9a7672c2cf24399be8bbf037ad6ab07711c4acd96ba8c0a060e3.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/92b7d51553a4ecf354af7e08b2ad527efd827988468f8239583ee2918bf3a883.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/9c10011ffc6335a29e5018ee489b7763f7e9f4aed689ec3e80cf80373245851f.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/a1ad708d5764e1e71f9318b0ea964a245125ad2724f9e7da0ac78dc817e46ddc.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/a28688fc2caf3e729200271ae1bde1005d6d24a150c66fe453d85a8fcf8f2141.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/aa4b0654f4839e6dcb438ec1ed7f97edef0aafa7c6e00c293b044ae661e44a7c.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/ac334548f07c0c8e358871e660466bd6bc8893cf7aa1a5f0c3bd3c026884fd87.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/acc29a5ddab3c5fa79ee32598e8fb306abfbad085c1ca8b3fad6aa2db8629f02.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/b28e48a2c9c297a18940836dc18a32fda199b1a75b966d20def0df51f0861864.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/b6da34bec2ba21122c4da073ecf2f0a8c71a320f9d3e77082f96017913e67f76.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/bf3eed3b333b8927a264c687f26a8aef2c910c4a87e8b7de6581b90b51fcfb1b.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/c210b2e9efddda98f6d64940293470ef974198650a3e66d53564ecd1c35ea6f8.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/c4605e80869c05d776b1aff28d8cf98fc29311cc7fa862f459880a0001f0bd2e.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/c859fb95ac2b048826d7c923696a625f8e425b6750bf8eb809c9fb3dbcf91183.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/cbf4727f9b600cd5b7cd3d3d61b008100da04a4fec60e6115fa295478170e564.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/ce090522c319bbf8dd91e141b962a6536dd0d053b4b5805d082e67be9afe46c0.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/e4b776ffbf247693ce4f8e0464f79a77ac8464074e409a97ba0ab6472eb4f6ea.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/e7114d5223d7ce52b413e520e60848db17bb051e919d4d585d24297eefcf1534.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/eb5e3ea9317bc50cbcdebafe892b8a1bfc105b9d6b6b813a83509d9b4ed70eab.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/ebe02f0e7ab04f627bb210a0e74ee5f5d75a40e02af7da45f336a322c7c56aee.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/ec9df5d1220e5e7eff393a9247873f0e56fa1ac0d5e443a1644572980b6681bc.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/f065752cc7505c0195a45e56992dc04122bd5ddf1162cc3151e346f9284385e2.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/f6463b36bbcf5fe3bd849a4afce6ac00a5952eb2976e2dc3eef5be6b1f8a0f95.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/f8d0697f40e36cf3a7214715fee8252e9604e194acf2caa659664b0e8c33d26e.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/images/fbd65917c9a62d39f9cab9f6374b8762505ecc4aed3266242c0065000d895741.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008.md
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008_content_list.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008_content_list_v2.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008_middle.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru/TetsuToHagane_71_853/p001-p008/out/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008/vlm/src-banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity-p001-p008_model.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/DONE
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/mineru.log
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/0bf5ffab3ddb4f81244c0a8d2e4b71fc5d36af8cddc17f72043f79d59cb19372.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/0c58025c327ecb22a502ff9c47ffbc8e187641e487bdb1d39958fa425fdd95bc.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/181a0923c9f9999af128eaf66d943967902ddea6a48c2e7534bfd88093161b1f.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/1c844a316bed178385bd208ba1121546815288cc13b10620f2ecb9f8b8a2890c.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/209582ccce0468e0963a28aff555b8b097a79cc8ac0cfbbbd563607ddb810efb.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/21b860ee6137857afefd87c88a7db29bc2589d04b92495a2e7a9d591fd8f63e2.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/22b39739c74b5d674cc2529cb634ae102d7df6b683a0a68663757e3e29b8418e.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/2361b2cd21189386d8b24a576d1c1bbc5cfd433dca86226a3fc248f35463d59c.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/24deed0a0237e76452a59f5b2d7018b4f9bd489c623987ebd260b0d99ab87fcd.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/2d1fca34752348d91a8267528c9ccdf92e3c0731114da55a643deecab2d39ad4.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/2f5996da8976081042d821a9ab5ad171d58e1adb14d1c7da484870640638ff44.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/3016776097aa505fc48277286e50f8f4222205e81a8d0a82cb77068c3e6d76fb.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/371253a7da38373c9e178202b6b1435f89997fa4b20c900ea55d0d23a6ab184a.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/3eaea9f69530ec59825e897b8042f7b1a456dbc505e2732eeed298e7f5c6cc51.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/45ecd2520a0b4c653336d143f413c71d54cd698cd77fcc0442ed3afd58149764.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/4cdcee550699c0705949664ec1665760ebf0dd83575ff038e1456485e84ab84a.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/4ce83af107adea08875cf6f237c3240eb72e6d7c025c7d357809c4d2eb571889.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/4dc29c326cc7a2e2b7bb33cea7ea6b325b2a5a431f97cd7d46d3c50b198ed354.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/5df10b1e7c3580160b776309120bdb69a7a49fa24e8ad01cb3e51a88f5fdd306.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/640312c9e990c3b1bf7e7aa57cec6c433f4096b1628f1d2bc043a1fe2889ad5a.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/6605e6f76a7911b10ec9e902ea9179dc19760fb8560d96f9ec0375fe17107654.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/6625c471f5883b9b36d59fdf15ad6ffbed38ed46e628f19d303edc91b38bf20b.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/66517ad64b72065f83f22110e229aa3664db6ba3f6769486817414e838249b48.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/6dcc967ae5010a5413b4de426ba7a4879fa84ad47ed19d7eca4ea2c12f442568.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/73f2310b78489057c6c04c4167237d157d6786ae9a7c0e3c532b980907bd2caa.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/7ee3c0e817ec57c23ff268ad0b03019c07b624bbe3f0934a9545ac58c98d0a1d.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/86189edbd1eb9901df5377d921c0beb63fa202042e198abdabc80324775d85cf.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/8b929cdaf77e9a7672c2cf24399be8bbf037ad6ab07711c4acd96ba8c0a060e3.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/9af24b7a831413e69a617870db021452973ab94d11986dcd0ff0b4abe6b059d3.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/9c10011ffc6335a29e5018ee489b7763f7e9f4aed689ec3e80cf80373245851f.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/a370a6667775ed21de53a19be8511204e4daa52d47d47dc80fb1c8621dd07834.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/ab6b0a4973f679c2e33c8576153c1cd76d8cf28a58e6a44be3542fd7e5edc798.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/b4db12f1b29f395030e27565d635a6df10042b47cb2b826cdc3886846f4c186d.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/b6da34bec2ba21122c4da073ecf2f0a8c71a320f9d3e77082f96017913e67f76.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/b9a8c541a0fad7369bafd17bc8289b636e2c8bdc8a6c079ce6ff64dccd0f74d5.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/ba47f5176ca5ab9929637efe90bd17a5ee206766c7f5623d4ecdfe139edfa487.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/bce77409606b6d8a69e1a70059c122c307e39bef709cf760af22149a3ade50bd.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/bf91cbd6f879e7e85b55f36a2d269aeecb65309a135d21cfd1c47d201c4714cb.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/c08ad8562964b1d40553f57f52dc4ca1221d64b5233b3058ff4162cc22546fac.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/c210b2e9efddda98f6d64940293470ef974198650a3e66d53564ecd1c35ea6f8.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/c4605e80869c05d776b1aff28d8cf98fc29311cc7fa862f459880a0001f0bd2e.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/c859fb95ac2b048826d7c923696a625f8e425b6750bf8eb809c9fb3dbcf91183.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/c8fc22b5fc9a2a4bd6bead7cdb8eacc08564727bfcf90afff7f0f952f9b62cc1.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/cbf4727f9b600cd5b7cd3d3d61b008100da04a4fec60e6115fa295478170e564.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/d55fc49e977977bf48e2983820cc5e1f3b4a23b052d74066b5915007f9c6a393.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/e5b5a8dc21e55ca133199821aa093463a833b5517bc0b34401765fdad5000de8.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/e7114d5223d7ce52b413e520e60848db17bb051e919d4d585d24297eefcf1534.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/eb5e3ea9317bc50cbcdebafe892b8a1bfc105b9d6b6b813a83509d9b4ed70eab.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/ebe02f0e7ab04f627bb210a0e74ee5f5d75a40e02af7da45f336a322c7c56aee.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/f0f57da03b3030585f97545f61afee17e26e907ea317942910321b7bbaea6e5b.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/images/fbd65917c9a62d39f9cab9f6374b8762505ecc4aed3266242c0065000d895741.jpg
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008.md
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008_content_list.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008_content_list_v2.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008_middle.json
-    - raw/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity/mineru-TetsuToHagane_71_853/p001-p008/out/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008/vlm/src--banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity--TetsuToHagane_71_853-p001-p008_model.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -7003,15 +6718,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/PAGE-MAP-AND-RENDER-PARITY.json
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/SOURCE.md
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.pdf
-    - raw/dans-loffler-1930-na-silicate-zirconia-phase-equilibria/original-issue-191-1-2.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -17202,22 +16914,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/SOURCE.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/kelley-1953-alkali-aluminosilicate-thermodynamics.pdf
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/final-custody.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/http-receipt.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley-access-provenance.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley1953-independent-review.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/kelley1953-qualification.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/parent-nepheline-entropy-conflict.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/pdf-review-receipt.json
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/schumm-kelley-nephelite-entropy-conflict.md
-    - raw/kelley-1953-alkali-aluminosilicate-thermodynamics/provenance/three-root-dedup.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20113,19 +19815,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kozhina-2000-na-glassforming-thermodynamics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kozhina-2000-na-glassforming-thermodynamics/SOURCE.md
-    - raw/kozhina-2000-na-glassforming-thermodynamics/kozhina-2000-na-glassforming-thermodynamics.pdf
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/download-receipt.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/exact-identity-recheck.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/independent-review.md
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/metadata-held-preflight.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/pdf-checks.json
-    - raw/kozhina-2000-na-glassforming-thermodynamics/provenance/three-store-byte-dedup.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20276,24 +19971,22 @@ sources:
   total_rows: 194
   inbox_exclusion_reason: null
 - source_id: kroger-janetzko-kreitlow-1958-glass-formation-heat
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/SOURCE.md
-    - raw/kroger-janetzko-kreitlow-1958-glass-formation-heat/kroger-janetzko-kreitlow-1958-glass-formation-heat.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/SOURCE.md
-    - raw/kroger-kreitlow-1956-soda-lime-silicate-calorimetry/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20388,13 +20081,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/SOURCE.md
-    - raw/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20444,7 +20136,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/kushiro-1971-apollo12-phase-equilibria.yaml
+    - data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -25383,13 +25075,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: nbs-1981-tn270-8-alkali-thermochemistry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/nbs-1981-tn270-8-alkali-thermochemistry/SOURCE.md
-    - raw/nbs-1981-tn270-8-alkali-thermochemistry/nbs-1981-tn270-8-alkali-thermochemistry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -25655,13 +25346,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: niggli-1913-silica-alkali-carbonate-equilibria
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/niggli-1913-silica-alkali-carbonate-equilibria/SOURCE.md
-    - raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27251,13 +26941,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: pickrell-1994-gaseous-alkali-corrosion
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/pickrell-1994-gaseous-alkali-corrosion/SOURCE.md
-    - raw/pickrell-1994-gaseous-alkali-corrosion/pickrell-1994-gaseous-alkali-corrosion.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27465,14 +27154,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: powell-1971-alkali-sulfate-metasilicate-vapour
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/SOURCE.md
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/powell-1971-alkali-sulfate-metasilicate-vapour.pdf
-    - raw/powell-1971-alkali-sulfate-metasilicate-vapour/receipt.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27629,14 +27316,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: ramteke-2026-alkali-vapor-corrosion-spinels
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/SOURCE.md
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
-    - raw/ramteke-2026-alkali-vapor-corrosion-spinels/supplement.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -31341,13 +31026,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: schumm-1981-alkali-aluminosilicate-thermochemical-tables
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/SOURCE.md
-    - raw/schumm-1981-alkali-aluminosilicate-thermochemical-tables/schumm-1981-alkali-aluminosilicate-thermochemical-tables.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -32999,13 +32683,12 @@ sources:
   total_rows: 119
   inbox_exclusion_reason: null
 - source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/SOURCE.md
-    - raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -34026,13 +33709,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: sugawara-2024-na-silicate-molybdate-miscibility
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/sugawara-2024-na-silicate-molybdate-miscibility/SOURCE.md
-    - raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -38062,12 +37744,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yakovleva-2022-alkali-chondrule-evaporation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/yakovleva-2022-alkali-chondrule-evaporation/yakovleva-2022-alkali-chondrule-evaporation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null

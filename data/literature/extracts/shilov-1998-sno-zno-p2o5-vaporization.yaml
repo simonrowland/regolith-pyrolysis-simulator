@@ -33,8 +33,8 @@ fidelity_samples:
   - path: species.PO.observations[shilov_1998_table2_PO_partial_pressures].values.points[1].p_atm
     value: 1.51e-7
     locator: {table: '2', published_page: 402, pdf_page_index: 2, note: '(PO), xSnO=40.0 mol %'}
-  - path: species.O.observations[shilov_1998_table4_atomic_oxygen_partial_pressures].values.points[0].pO_from_eq4_times_1e15_atm
-    value: 5.79
+  - path: species.O.observations[shilov_1998_table4_atomic_oxygen_partial_pressures].values.points[0].p_atm
+    value: 5.79e-15
     locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'xSnO=40.0 mol %, equation (4) column'}
   - path: species.SnO.observations[shilov_1998_table5_SnO_activities].values.points[0].activity
     value: 1.42e-4
@@ -261,15 +261,55 @@ species:
         regime: kems_effusion
         units: dimensionless activity as printed
         values:
-          quantity: oxide_activity
+          quantity: activity
           component_as_printed: SnO
           table_row_count: 6
           points:
-            - {xSnO_mol_pct: 40.0, activity: 1.42e-4, activity_as_printed: '1.42 × 10−4', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 46.7, activity: 2.39e-4, activity_as_printed: '2.39 × 10−4', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 53.3, activity: 2.64e-4, activity_as_printed: '2.64 × 10−4', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 60.0, activity: 2.69e-4, activity_as_printed: '2.69 × 10−4', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 66.7, activity: 3.46e-4, activity_as_printed: '3.46 × 10−4', source_as_printed: '[7]', method_class: quoted_attributed}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              activity: 1.42e-4
+              activity_as_printed: '1.42 × 10−4'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              activity: 2.39e-4
+              activity_as_printed: '2.39 × 10−4'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              activity: 2.64e-4
+              activity_as_printed: '2.64 × 10−4'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              activity: 2.69e-4
+              activity_as_printed: '2.69 × 10−4'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 66.7
+              T_K: 1300.0
+              activity: 3.46e-4
+              activity_as_printed: '3.46 × 10−4'
+              source_as_printed: '[7]'
+              method_class: quoted_attributed
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '66.7'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
           printed_dash_xSnO_mol_pct: [0.0]
     context:
       - observation_id: shilov_1998_experimental_method_cell_and_samples
@@ -599,49 +639,185 @@ species:
           xSnO_basis: mol %
           points:
             - xSnO_mol_pct: 40.0
-              pO_from_eq4_times_1e15_atm: 5.79
-              pO_from_eq4_as_printed: '5.79'
-              pO_from_eq8_times_1e15_atm: 4.62
-              pO_from_eq8_as_printed: '4.62'
-              pO_from_eq9_times_1e15_atm: 5.17
-              pO_from_eq9_as_printed: '5.17'
-              pO_from_eq10_times_1e15_atm: 4.96
-              pO_from_eq10_as_printed: '4.96'
-              pO_from_eq11_times_1e15_atm: 3.24
-              pO_from_eq11_as_printed: '3.24'
+              T_K: 1300.0
+              p_atm: 5.79e-15
+              pO_scaled_as_printed: '5.79'
+              equilibrium_equation_as_printed: '(4)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(4)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (4) column'}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              p_atm: 4.62e-15
+              pO_scaled_as_printed: '4.62'
+              equilibrium_equation_as_printed: '(8)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(8)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (8) column'}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              p_atm: 5.17e-15
+              pO_scaled_as_printed: '5.17'
+              equilibrium_equation_as_printed: '(9)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(9)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (9) column'}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              p_atm: 4.96e-15
+              pO_scaled_as_printed: '4.96'
+              equilibrium_equation_as_printed: '(10)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(10)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (10) column'}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              p_atm: 3.24e-15
+              pO_scaled_as_printed: '3.24'
+              equilibrium_equation_as_printed: '(11)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(11)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (11) column'}}
             - xSnO_mol_pct: 46.7
-              pO_from_eq4_times_1e15_atm: 4.09
-              pO_from_eq4_as_printed: '4.09'
-              pO_from_eq8_times_1e15_atm: 4.43
-              pO_from_eq8_as_printed: '4.43'
-              pO_from_eq9_times_1e15_atm: 4.26
-              pO_from_eq9_as_printed: '4.26'
-              pO_from_eq10_times_1e15_atm: 4.29
-              pO_from_eq10_as_printed: '4.29'
-              pO_from_eq11_times_1e15_atm: 4.65
-              pO_from_eq11_as_printed: '4.65'
+              T_K: 1300.0
+              p_atm: 4.09e-15
+              pO_scaled_as_printed: '4.09'
+              equilibrium_equation_as_printed: '(4)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(4)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (4) column'}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              p_atm: 4.43e-15
+              pO_scaled_as_printed: '4.43'
+              equilibrium_equation_as_printed: '(8)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(8)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (8) column'}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              p_atm: 4.26e-15
+              pO_scaled_as_printed: '4.26'
+              equilibrium_equation_as_printed: '(9)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(9)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (9) column'}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              p_atm: 4.29e-15
+              pO_scaled_as_printed: '4.29'
+              equilibrium_equation_as_printed: '(10)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(10)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (10) column'}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              p_atm: 4.65e-15
+              pO_scaled_as_printed: '4.65'
+              equilibrium_equation_as_printed: '(11)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(11)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (11) column'}}
             - xSnO_mol_pct: 53.3
-              pO_from_eq4_times_1e15_atm: 4.28
-              pO_from_eq4_as_printed: '4.28'
-              pO_from_eq8_times_1e15_atm: 4.87
-              pO_from_eq8_as_printed: '4.87'
-              pO_from_eq9_times_1e15_atm: 4.57
-              pO_from_eq9_as_printed: '4.57'
-              pO_from_eq10_times_1e15_atm: 4.64
-              pO_from_eq10_as_printed: '4.64'
-              pO_from_eq11_times_1e15_atm: 3.58
-              pO_from_eq11_as_printed: '3.58'
+              T_K: 1300.0
+              p_atm: 4.28e-15
+              pO_scaled_as_printed: '4.28'
+              equilibrium_equation_as_printed: '(4)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(4)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (4) column'}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              p_atm: 4.87e-15
+              pO_scaled_as_printed: '4.87'
+              equilibrium_equation_as_printed: '(8)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(8)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (8) column'}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              p_atm: 4.57e-15
+              pO_scaled_as_printed: '4.57'
+              equilibrium_equation_as_printed: '(9)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(9)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (9) column'}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              p_atm: 4.64e-15
+              pO_scaled_as_printed: '4.64'
+              equilibrium_equation_as_printed: '(10)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(10)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (10) column'}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              p_atm: 3.58e-15
+              pO_scaled_as_printed: '3.58'
+              equilibrium_equation_as_printed: '(11)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(11)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (11) column'}}
             - xSnO_mol_pct: 60.0
-              pO_from_eq4_times_1e15_atm: 4.80
-              pO_from_eq4_as_printed: '4.80'
-              pO_from_eq9_times_1e15_atm: 5.09
-              pO_from_eq9_as_printed: '5.09'
-              pO_from_eq10_times_1e15_atm: 5.17
-              pO_from_eq10_as_printed: '5.17'
-              pO_from_eq11_times_1e15_atm: 3.06
-              pO_from_eq11_as_printed: '3.06'
-              pO_from_eq8_times_1e15_atm: 5.41
-              pO_from_eq8_as_printed: '5.41'
+              T_K: 1300.0
+              p_atm: 4.80e-15
+              pO_scaled_as_printed: '4.80'
+              equilibrium_equation_as_printed: '(4)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(4)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (4) column'}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              p_atm: 5.41e-15
+              pO_scaled_as_printed: '5.41'
+              equilibrium_equation_as_printed: '(8)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(8)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (8) column'}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              p_atm: 5.09e-15
+              pO_scaled_as_printed: '5.09'
+              equilibrium_equation_as_printed: '(9)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(9)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (9) column'}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              p_atm: 5.17e-15
+              pO_scaled_as_printed: '5.17'
+              equilibrium_equation_as_printed: '(10)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(10)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (10) column'}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              p_atm: 3.06e-15
+              pO_scaled_as_printed: '3.06'
+              equilibrium_equation_as_printed: '(11)'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '4', published_page: 402, pdf_page_index: 2}}
+                equilibrium_equation_as_printed: {state: {tag: value, value: '(11)'}, locator: {table: '4', published_page: 402, pdf_page_index: 2, note: 'Table 4 equation (11) column'}}
   O2:
     observations:
       - observation_id: shilov_1998_table4_molecular_oxygen_partial_pressures
@@ -657,10 +833,34 @@ species:
           method_class: calculated
           gas_species_as_printed: pO2
           points:
-            - {xSnO_mol_pct: 40.0, pO2_times_1e16_atm: 8.68, pO2_as_printed: '8.68'}
-            - {xSnO_mol_pct: 46.7, pO2_times_1e16_atm: 6.00, pO2_as_printed: '6.00'}
-            - {xSnO_mol_pct: 53.3, pO2_times_1e16_atm: 6.94, pO2_as_printed: '6.94'}
-            - {xSnO_mol_pct: 60.0, pO2_times_1e16_atm: 8.63, pO2_as_printed: '8.63'}
+            - xSnO_mol_pct: 40.0
+              p_atm: 8.68e-16
+              pO2_as_printed: '8.68'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '40.0'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 46.7
+              p_atm: 6.00e-16
+              pO2_as_printed: '6.00'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '46.7'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 53.3
+              p_atm: 6.94e-16
+              pO2_as_printed: '6.94'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '53.3'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
+            - xSnO_mol_pct: 60.0
+              p_atm: 8.63e-16
+              pO2_as_printed: '8.63'
+              point_conditions:
+                xSnO_mol_pct:
+                  state: {tag: value, value: {kind: point, point: '60.0'}}
+                  locator: {table: '4', published_page: 402, pdf_page_index: 2}
   P2O5:
     observations:
       - observation_id: shilov_1998_table5_P2O5_activities
@@ -675,44 +875,109 @@ species:
         regime: kems_effusion
         units: dimensionless activity as printed
         values:
-          quantity: oxide_activity
+          quantity: activity
           component_as_printed: P2O5
           table_row_count: 6
           points:
             - xSnO_mol_pct: 0.0
+              T_K: 1300.0
+              activity: 2.61e-4
+              activity_as_printed: '2.61 × 10−4'
+              calculation_method_as_printed: equations 13 and 14
               method_class: quoted_attributed
-              activity_from_eq13_eq14: 2.61e-4
-              activity_from_eq13_eq14_as_printed: '2.61 × 10−4'
-              printed_dash_columns: [gibbs_duhem_eq19]
               source_as_printed: '[4]'
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '0.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equations 13 and 14}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
             - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              activity: 5.20e-8
+              activity_as_printed: '5.20 × 10−8'
+              calculation_method_as_printed: equations 13 and 14
               method_class: model_derived
-              activity_from_eq13_eq14: 5.20e-8
-              activity_from_eq13_eq14_as_printed: '5.20 × 10−8'
-              activity_from_gibbs_duhem_eq19: 4.67e-8
-              activity_from_gibbs_duhem_eq19_as_printed: '4.67 × 10−8'
               source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equations 13 and 14}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              activity: 4.67e-8
+              activity_as_printed: '4.67 × 10−8'
+              calculation_method_as_printed: equation 19
+              method_class: model_derived
+              source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equation 19}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
             - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              activity: 4.28e-8
+              activity_as_printed: '4.28 × 10−8'
+              calculation_method_as_printed: equations 13 and 14
               method_class: model_derived
-              activity_from_eq13_eq14: 4.28e-8
-              activity_from_eq13_eq14_as_printed: '4.28 × 10−8'
-              activity_from_gibbs_duhem_eq19: 5.70e-8
-              activity_from_gibbs_duhem_eq19_as_printed: '5.70 × 10−8'
               source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equations 13 and 14}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              activity: 5.70e-8
+              activity_as_printed: '5.70 × 10−8'
+              calculation_method_as_printed: equation 19
+              method_class: model_derived
+              source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equation 19}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
             - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              activity: 7.84e-8
+              activity_as_printed: '7.84 × 10−8'
+              calculation_method_as_printed: equations 13 and 14
               method_class: model_derived
-              activity_from_eq13_eq14: 7.84e-8
-              activity_from_eq13_eq14_as_printed: '7.84 × 10−8'
-              activity_from_gibbs_duhem_eq19: 6.25e-8
-              activity_from_gibbs_duhem_eq19_as_printed: '6.25 × 10−8'
               source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equations 13 and 14}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              activity: 6.25e-8
+              activity_as_printed: '6.25 × 10−8'
+              calculation_method_as_printed: equation 19
+              method_class: model_derived
+              source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equation 19}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
             - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              activity: 3.33e-7
+              activity_as_printed: '3.33 × 10−7'
+              calculation_method_as_printed: equations 13 and 14
               method_class: model_derived
-              activity_from_eq13_eq14: 3.33e-7
-              activity_from_eq13_eq14_as_printed: '3.33 × 10−7'
-              activity_from_gibbs_duhem_eq19: 2.10e-7
-              activity_from_gibbs_duhem_eq19_as_printed: '2.10 × 10−7'
               source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equations 13 and 14}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              activity: 2.10e-7
+              activity_as_printed: '2.10 × 10−7'
+              calculation_method_as_printed: equation 19
+              method_class: model_derived
+              source_as_printed: This work
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                calculation_method_as_printed: {state: {tag: value, value: equation 19}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
           printed_dash_xSnO_mol_pct: [66.7]
     context:
       - observation_id: shilov_1998_table5_activity_standard_state_and_row_count
@@ -740,13 +1005,53 @@ species:
         regime: kems_effusion
         units: dimensionless activity as printed
         values:
-          quantity: oxide_activity
+          quantity: activity
           component_as_printed: ZnO
           table_row_count: 6
           points:
-            - {xSnO_mol_pct: 0.0, activity: 4.45e-3, activity_as_printed: '4.45 × 10−3', source_as_printed: '[4]', method_class: quoted_attributed}
-            - {xSnO_mol_pct: 40.0, activity: 4.11e-5, activity_as_printed: '4.11 × 10−5', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 46.7, activity: 2.36e-5, activity_as_printed: '2.36 × 10−5', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 53.3, activity: 1.46e-5, activity_as_printed: '1.46 × 10−5', source_as_printed: This work, method_class: model_derived}
-            - {xSnO_mol_pct: 60.0, activity: 1.29e-5, activity_as_printed: '1.29 × 10−5', source_as_printed: This work, method_class: model_derived}
+            - xSnO_mol_pct: 0.0
+              T_K: 1300.0
+              activity: 4.45e-3
+              activity_as_printed: '4.45 × 10−3'
+              source_as_printed: '[4]'
+              method_class: quoted_attributed
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '0.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 40.0
+              T_K: 1300.0
+              activity: 4.11e-5
+              activity_as_printed: '4.11 × 10−5'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '40.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 46.7
+              T_K: 1300.0
+              activity: 2.36e-5
+              activity_as_printed: '2.36 × 10−5'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '46.7'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 53.3
+              T_K: 1300.0
+              activity: 1.46e-5
+              activity_as_printed: '1.46 × 10−5'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '53.3'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+            - xSnO_mol_pct: 60.0
+              T_K: 1300.0
+              activity: 1.29e-5
+              activity_as_printed: '1.29 × 10−5'
+              source_as_printed: This work
+              method_class: model_derived
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1300.0'}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
+                xSnO_mol_pct: {state: {tag: value, value: {kind: point, point: '60.0'}}, locator: {table: '5', published_page: 403, pdf_page_index: 3}}
           printed_dash_xSnO_mol_pct: [66.7]

@@ -1,0 +1,35 @@
+source_id: kems-051-allibert-1981
+# compare reports these activity points as mismatches because
+# tools/mineru_table_draft.py::_phase_matches_column does not accept the
+# canonical extract phase token "l". Numeric cells are audited independently
+# in kems-051-allibert-1981-table2-cells.csv against both machine reads and the
+# page render; the printed row/column assignments were visually checked.
+source:
+  citation: Allibert et al. (1981), Table II, activity data at 2060 K.
+extraction:
+  method: Manual transcription checked against pdftotext, MinerU, and the PDF render.
+  worker: kems051-allibert
+  date: '2026-10-29'
+review_status: draft
+tables:
+  - page: 3
+    published_page: 309
+    table_index: 2
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: measured_tabulated
+    unit: dimensionless activity
+    phase: l
+    rows: all
+    values:
+      - column: 2
+        species: CaO
+      - column: 3
+        species: Al2O3
+    conditions:
+      - key: temperature_K
+        state: {tag: value, value: '2060'}
+        locator:
+          page: 3
+          table: II
+          note: The table caption prints 2060 K.

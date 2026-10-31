@@ -1,0 +1,135 @@
+source_id: kems-026-markova-1984
+extraction:
+  method: Recover run conditions for the existing printed Table 2 rows; do not re-extract residual values.
+  review_status: draft
+  code_paths:
+    - simulator/battery/migrate.py::_point_condition_from_plain
+    - simulator/battery/migrate.py::Migrator._emit_exploded_point
+    - simulator/battery/migrate.py::Migrator._experiment_from_plain
+  source_reads:
+    pdftotext: Page 509 states step-rise heating to complete vaporization, 70-degree steps, 15 minutes per step, and names a Knudsen effusion cell.
+    mineru: The page 510 table block contains Table 1 and the two Table 2 panels; oxide headers in Table 2 are OCR-damaged.
+    render: PDF page 0 confirms the page 509 method text; PDF page 1 confirms the Table 1 and Table 2 captions, panel split, and row alignment.
+    qa: Table 1 has 64 mismatches of 66 numeric cells and Table 2 has 143 mismatches of 168 numeric cells against pdftotext. The render was used to confirm table layout; existing value cells were not rewritten in this conditions pass.
+  row_count:
+    table_1: 7 initial sample columns, I through VII; this is not a run table.
+    table_2:
+      panel_VI_left: 12 printed rows, including T=0 initial charge and 11 temperature steps.
+      panel_V_right: 12 printed rows, including T=0 initial charge and 11 temperature steps.
+      total_printed_rows: 24
+      migrated_observations: 134
+      migrated_mass_loss_fraction_rows: 24
+      migrated_residue_component_composition_rows: 110
+      locator:
+        published_page: 510
+        pdf_page_index: 1
+        table: '2'
+  conditions:
+    temperature:
+      source: Table 2 T_C column, p. 510.
+      mapping: T_C is retained as printed; the migrator emits temperature_K with the same page and table locator.
+      rows: 22 nonzero temperature rows; the two T=0 initial-charge records have typed unknown temperature because T=0 is not a run temperature.
+    pressure:
+      experiment_field: pressure_environment.total_pressure_Pa
+      state: unknown
+      reason: The paper reports total vapor pressure as a result, not experimental total pressure.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+      pressure_kind: Each row's point_conditions.pressure_kind is typed unknown at p. 509; the paper names the Knudsen cell but does not state whether an experimental total pressure refers to vacuum, cell interior, or carrier gas.
+      sweep_gas: Experiment pressure_environment.sweep_gas is typed unknown at p. 509; no carrier or sweep gas is stated.
+    oxygen:
+      field: point_conditions.fO2_Pa
+      state: unknown
+      reason: No point p(O2), fO2, buffer, or gas mixture is printed; p(O2) is reported as a result.
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+    apparatus:
+      method: knudsen_effusion
+      locator:
+        published_page: 509
+        pdf_page_index: 0
+        section: experimental method
+      geometry: The paper names a Knudsen effusion cell but gives no orifice area, diameter, or channel length; all three remain typed unknown at p. 509.
+    duration:
+      per_temperature_step: 0.25 h, converted from the printed 15 minutes at p. 509.
+      total_duration: Unknown; the paper does not state the total number or total duration of run steps.
+    composition:
+      point_fields: point_conditions.starting_composition links each point to its experiment's Table 2 T=0 map; point_conditions.composition carries the printed per-row residual composition.
+      locator:
+        published_page: 510
+        pdf_page_index: 1
+        table: '2'
+      sample_mass: Unknown at p. 509; no charge mass is printed.
+  render_verified:
+    - panel: VI_lherzolite
+      temperature_C: 1475
+      printed_mass_loss_percent: 1.46
+      migrated_mass_loss_fraction: 0.0146
+      locator: {published_page: 510, pdf_page_index: 1, table: '2'}
+    - panel: VI_lherzolite
+      temperature_C: 1492
+      printed_mass_loss_percent: 4.16
+      migrated_mass_loss_fraction: 0.0416
+      locator: {published_page: 510, pdf_page_index: 1, table: '2'}
+    - panel: V_alumina_basalt
+      temperature_C: 1640
+      printed_mass_loss_percent: 14.41
+      migrated_mass_loss_fraction: 0.1441
+      locator: {published_page: 510, pdf_page_index: 1, table: '2'}
+    - panel: V_alumina_basalt
+      temperature_C: 2255
+      printed_mass_loss_percent: 97.99
+      migrated_mass_loss_fraction: 0.9799
+      locator: {published_page: 510, pdf_page_index: 1, table: '2'}
+  full_cell_audit:
+    table: '2'
+    printed_page: 510
+    pdf_page_index: 1
+    numeric_cells: 168
+    audit_file: kems-026-markova-1984.cells.csv
+    method: Every temperature, mass-loss, and oxide cell in both 12-row panels was checked against the rendered table; all 168 printed numeric cells are recorded in the cell audit.
+    machine_read_reconciliation: The MinerU draft differs from the retained transcription at 10 cells; each was resolved against the render, with earlier damaged-glyph decisions retained in the extract correction ledger.
+    render: The render confirms the panel split and row/column assignment; printed Table 2 is on PDF page 1.
+  compare_tool_limit:
+    result: compare reports zero mapped cells because it reads values.points or scalar fields, not the existing values.series representation.
+    summary: matched=0 no-match=0 mismatch=0 presence-only=0 needs_mapping=0 locator-error=0 unverifiable=0 total=0
+    output: kems-026-markova-1984.compare.csv
+    scope: No Table 2 measurement values changed; numeric value comparison remains outside this conditions-only edit.
+  schema_gap:
+    observation: markova_1984_table1_initial_sample_compositions
+    quantity: starting_bulk_oxide_composition
+    decision: Leave the printed Table 1 bulk starting-composition record typed refused with its descriptive non-token quantity.
+    evidence: tools/validate_literature_extracts.py::OBSERVATION_TYPES permits composition_series but does not define measurement quantities. simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY contain no exact starting_bulk_oxide_composition token. simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION is for residual components and Quantity.EQUILIBRIUM_PHASE_COMPOSITION is for equilibrium phase composition; neither is the printed starting bulk quantity. The row's phase is condensed_solid, which the migrator maps to Phase.CR.
+  starting_composition_discrepancy:
+    status: resolved_by_controller_ruling
+    ruling: b-716 directs identity composition to each panel's Table 2 T=0 initial charge; the residual melt remains point_conditions.composition.
+    table_1_sample_V_wt_pct:
+      SiO2: 50.01
+      Al2O3: 11.29
+      FeO: 3.93
+      MgO: 5.95
+      CaO: 12.36
+    table_2_T0_sample_V_wt_pct:
+      SiO2: 52.32
+      Al2O3: 19.13
+      FeO: 9.37
+      MgO: 6.25
+      CaO: 12.93
+    table_1_sample_VI_wt_pct:
+      SiO2: 41.94
+      Al2O3: 4.34
+      FeO: 5.73
+      MgO: 34.72
+      CaO: 6.62
+    table_2_T0_sample_VI_wt_pct:
+      SiO2: 44.02
+      Al2O3: 4.56
+      FeO: 8.04
+      MgO: 36.44
+      CaO: 6.95
+    current_link: Every row starting_composition link uses its own panel's Table 2 T=0 composition; each residual melt remains point_conditions.composition.
+    note: Table 1's sample analyses differ from the Table 2 T=0 recasts. The controller ruling specifies the Table 2 T=0 charge for identity, so the Table 1 values remain a separate source record.

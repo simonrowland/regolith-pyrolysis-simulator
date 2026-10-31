@@ -1,0 +1,100 @@
+source_id: ramteke-2026-alkali-vapor-corrosion-spinels
+source_path: raw/ramteke-2026-alkali-vapor-corrosion-spinels/ramteke-2026-alkali-vapor-corrosion-spinels.pdf
+machine_inputs:
+  - text/ramteke-2026-alkali-vapor-corrosion-spinels/mineru/p002-p014/out/ramteke-2026-alkali-vapor-corrosion-spinels-p002-p014/vlm/ramteke-2026-alkali-vapor-corrosion-spinels-p002-p014_content_list.json
+  - text/ramteke-2026-alkali-vapor-corrosion-spinels/pdftotext-layout.txt
+table_audit:
+  method: MinerU table draft and mineru_table_qa digit agreement; pdftotext machine text; PDF render checked each relevant table's row and column assignment.
+  all_numeric_cells:
+    confirmation: MinerU and pdftotext digits, signs, and uncertainty marks agree; the rendered page confirms each table's row and column placement.
+    exceptions: none for included tables
+  tables:
+    '1':
+      page: 6
+      printed_rows: 7
+      included_rows: 7
+      scope: MgAl2O4 surface EDS, Table 1
+      render_checked: true
+      included_columns: [O, Na, Mg, Al, Ca, compound, layer_width_mm]
+    '2':
+      page: 7
+      printed_rows: 8
+      included_rows: 8
+      scope: ZnAl2O4 surface EDS, Table 2
+      render_checked: true
+      included_columns: [O, Na, Zn, Al, Ca, compound, grain_size_um, layer_width_mm]
+    '3':
+      page: 8
+      printed_rows: 9
+      included_rows: 0
+      scope: mixed Mg-Zn spinel, excluded by the requested MgAl2O4 and ZnAl2O4 scope
+    '4':
+      page: 9
+      printed_rows: 3
+      included_rows: 2
+      scope: corroded thickness and infiltration depth
+      render_checked: true
+      included_rows_by_species:
+        MgAl2O4: 1
+        ZnAl2O4: 1
+      excluded_rows: [Mg_xZn_1-xAl2O4 mixed spinel]
+    '5':
+      page: 10
+      printed_rows: 7
+      included_rows: 7
+      scope: MgAl2O4 polished cross-section EDS, Table 5
+      render_checked: true
+      included_columns: [O, Na, Mg, Al, Ca, compound, grouped_layer_thickness_um]
+    '6':
+      page: 12
+      printed_rows: 7
+      included_rows: 7
+      scope: ZnAl2O4 polished cross-section EDS, Table 6
+      render_checked: true
+      included_columns: [O, Na, Zn, Al, Ca, compound, grouped_layer_thickness_um]
+    '7':
+      page: 13
+      printed_rows: 8
+      included_rows: 0
+      scope: mixed Mg-Zn spinel, excluded by the requested MgAl2O4 and ZnAl2O4 scope
+  prose_cells:
+    - page: 2
+      section: 2.2 Test Setup
+      audit: 1361 C is attached to an initial test that dislodged the specimen; the modified schedule's final test setpoint is not stated there.
+    - page: 1
+      section: Abstract
+      audit: states 1371 C for the corrosion study; retained as a source disagreement, not assigned to individual result rows.
+    - page: 9
+      section: 3.2.1 MgAl2O4
+      audit: prose repeats Table 4 values 254 ± 47 and 416 ± 15 µm.
+    - page: 10
+      section: 3.2.2 ZnAl2O4
+      audit: prose repeats Table 4 values 847 ± 264 and 1223 ± 60 µm; reports corrosion sublayers 16 ± 6, 332 ± 24, 355 ± 16, and 137 ± 62 µm.
+    - page: 13
+      section: 4 Discussion
+      audit: gives ZnAl2O4 corrosion depth as 846.8 ± 263.9 µm; retained alongside rounded Table 4 value.
+schema_gap_checks:
+  penetration_depth:
+    rejected_candidates:
+      - OBSERVATION_TYPES in tools/validate_literature_extracts.py:79-100 has no penetration_depth_measurement type.
+      - TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and QUANTITY_ALIASES in simulator/battery/migrate.py:453-546 have no corrosion_depth or infiltration_depth token.
+      - Quantity in simulator/battery/enums.py:62-111 contains wall_deposit_mass (mass), but no depth quantity.
+    disposition: preserve printed measured depths in context; do not misuse wall_deposit_mass.
+  eds_atomic_percent:
+    rejected_candidates:
+      - OBSERVATION_TYPES in tools/validate_literature_extracts.py:79-100 permits composition_series, but not a dedicated standardless_EDS_composition type.
+      - EQUILIBRIUM_PHASE_COMPOSITION exists in simulator/battery/enums.py:108; PHASE_BASIS_TOKENS at :663 permits wt_percent, mole_fraction, and ppm_mass, not at_percent.
+      - PhaseRole at simulator/battery/enums.py:301-312 is melt, slag, glass, metal, matte; it has no reacted solid-feature role for these EDS regions.
+    precedent_check: Park 2021 and Barcza 1979 use equilibrium_phase_composition for mol% or wt% equilibrium liquid rows, not standardless EDS at% of corroded solid features.
+    disposition: preserve the measured EDS table cells in context as printed at%; do not convert or claim an equilibrium composition.
+  corrosion_phases:
+    rejected_candidates:
+      - OBSERVATION_TYPES in tools/validate_literature_extracts.py:79-100 has no corrosion_phase_identification type.
+      - TYPE_QUANTITY in simulator/battery/migrate.py:435-444 supplies transition_temperature for transition_point, not a categorical reaction-product quantity.
+      - PHASE_MAP in simulator/battery/migrate.py:380-405 maps sample phase tokens; it is not a product-assemblage quantity.
+    disposition: preserve XRD product identifications as context.
+no_mass_change: The paper reports no specimen mass change; no numerical row or observation is fabricated.
+figure_only_candidates:
+  - Figure 1C heating schedule; no digitized temperatures or dwell coordinates extracted.
+  - Figure 3 XRD pattern peak positions; phase names are taken from the authors' text, not digitized.
+  - Figures 7-12 microscopy; only printed dimensions and table cells are transcribed.

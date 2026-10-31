@@ -444,6 +444,35 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
+def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.pop("regime")
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "fallback", extract), write=False)
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method == State.of(MethodToken.KNUDSEN_EFFUSION)
+
+    explicit_regime = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = explicit_regime["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    result = migrate(
+        _write_min_tree(tmp_path / "explicit-regime", explicit_regime), write=False
+    )
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method.is_unknown
+
+
 def _migrate_real_extract(
     tmp_path: Path,
     name: str,
@@ -1198,6 +1227,125 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             "calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios"
         )
 
+    # Five rows pinned to the 300 dpi render of journal pages 23, 24, 25, 26
+    # and 27. The numbers are the printed cells.
+    rendered = (
+        {
+            "parent": "holzheid_1997_table2_page23_feo",
+            "run": "AD 10",
+            "slug": "ad-10",
+            "T_K": "1677",
+            "log_fO2": "-10.31",
+            "gamma": "1.62",
+            "melt_Fe": ("XFeO_mol_pct", "5.56"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page24_feo",
+            "run": "AD 45",
+            "slug": "ad-45",
+            "T_K": "1872",
+            "log_fO2": "-9.73",
+            "gamma": "2.02",
+            "melt_Fe": ("XFeO_mol_pct", "3.34"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page25_feo",
+            "run": "BK 50 a",
+            "slug": "bk-50-a",
+            "T_K": "1578",
+            "log_fO2": "-12.54",
+            "gamma": "1.39",
+            "melt_Fe": ("XFeO_mol_pct", "0.91"),
+        },
+        {
+            "parent": "holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1",
+            "run": "V 69",
+            "slug": "v-69",
+            "T_K": "1673",
+            "log_fO2": "-9.63",
+            "gamma": "1.72",
+            "melt_Fe": ("FeO_wt_pct", "26.0"),
+            "metal_Fe": ("alloy_Fe_wt_pct", "41.9"),
+        },
+        {
+            "parent": "holzheid_1997_table3_pages27_bk_feo",
+            "run": "V 67",
+            "slug": "v-67",
+            "T_K": "1667",
+            "log_fO2": "-9.79",
+            "gamma": "3.99",
+            "melt_Fe": ("FeO_wt_pct", "0.975"),
+            "metal_Fe": ("metal_Fe_wt_pct", "6.84"),
+        },
+    )
+    source_by_id = {row["observation_id"]: row for row in activity_sources}
+    for pin in rendered:
+        source_row = next(
+            item
+            for item in source_by_id[pin["parent"]]["values"]["series"]
+            if item["run"] == pin["run"]
+            and Decimal(str(item["T_K"])) == Decimal(pin["T_K"])
+            and Decimal(str(item["gamma"])) == Decimal(pin["gamma"])
+        )
+        assert Decimal(str(source_row["log_fO2"])) == Decimal(pin["log_fO2"])
+        melt_key, melt_value = pin["melt_Fe"]
+        assert Decimal(str(source_row[melt_key])) == Decimal(melt_value)
+        if "metal_Fe" in pin:
+            metal_key, metal_value = pin["metal_Fe"]
+            assert Decimal(str(source_row[metal_key])) == Decimal(metal_value)
+        migrated_row = next(
+            observation
+            for observation in all_rows
+            if f"::{pin['parent']}::" in observation.observation_id
+            and f"row={pin['slug']}:" in observation.observation_id
+            and observation.value.point == Decimal(pin["gamma"])
+        )
+        assert migrated_row.identity.temperature_K is not None
+        assert migrated_row.identity.temperature_K.is_value
+        assert migrated_row.identity.temperature_K.value == Decimal(pin["T_K"])
+        assert migrated_row.point_conditions["fO2_log"].state.is_value
+        assert migrated_row.point_conditions["fO2_log"].state.value == Decimal(
+            pin["log_fO2"]
+        )
+
+    # Journal page 26 Table 3(b) MgO s.d. (%) column, 300 dpi render.
+    # Five cells were stored as 5; the page prints 1. The last two rows
+    # print 5 and 7 and were already stored correctly.
+    corrected_mgo_sd = (
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6", "5"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7", "7"),
+    )
+    for parent_id, printed_sd in corrected_mgo_sd:
+        item = source_by_id[parent_id]["values"]["series"][0]
+        assert Decimal(str(item["MgO_sd_pct"])) == Decimal(printed_sd)
+
+    # Temperature and the printed absolute log fO2 reach every FeO activity row.
+    for observation in all_rows:
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        logged = observation.point_conditions["fO2_log"]
+        assert logged.state.is_value
+        assert logged.state.value < 0
+
+    stoichiometry = source_doc["source_tables"]["activity_calculation"][
+        "wustite_stoichiometry"
+    ]
+    assert stoichiometry["state"] == {"tag": "unknown", "reason": "not_published"}
+    assert "Fe0.947O" in stoichiometry["note"]
+    assert "1.94 at 1400" in stoichiometry["note"]
+    for parent_id in (
+        "holzheid_1997_table2_page23_feo",
+        "holzheid_1997_table2_page24_feo",
+        "holzheid_1997_table2_page25_feo",
+    ):
+        metal = source_by_id[parent_id]["values"]["metal_Fe_wt_pct"]
+        assert metal["state"] == {"tag": "unknown", "reason": "not_published"}
+
     # Mutating a persisted run composition must fail the three-run expected-value pin.
     mutated_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
     mutated_doc["species"]["FeO"]["observations"][0]["values"]["series"][0][
@@ -1462,6 +1610,16 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
     assert table1[0]["minus_delta_G_exp_kcal_mol"] == 8.3
     assert table1[0]["minus_delta_G_kohler"] == 8.4
     assert table1[0]["minus_delta_G_wilson"] == 7.4
+    cms = next(point for point in table1 if point["system"] == "SiO2:CaO:MgO")
+    # Printed p. 186. Third field is 25, not 0.25. Do not repair it into x.
+    assert cms["x_as_printed"] == "0.50:0.25:25"
+    assert cms["x"] is None
+    assert cms["T_K"] == 1833.0
+    assert "0.50:0.25:0.25" not in cms["note"]
+    mg = contexts["stolyarova_1992_mg_bearing_melt_activity_context"]["values"]
+    assert mg["numeric_activity_published"] is False
+    assert "0.50:0.25:25" in mg["numeric_activity_note"]
+    assert "0.50:0.25:0.25" not in mg["numeric_activity_note"]
     assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
     assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
     assert result.validation is not None
@@ -11173,8 +11331,9 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
         ).encode()
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
-    # point ids move. The reference states in this payload are unchanged.
-    assert digest == "979291d9c0a3171046d7bc98ee762e85687eb2b937c1d1fa4405b9493f15bf97"
+    # point ids move. The Table 2-3 run conditions move the same :h= suffix.
+    # The reference states in this payload are unchanged.
+    assert digest == "294d6b5b3fba35da66634a64205243f9a774bf7db707dab8ef9d7b37bbfa3754"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -11290,8 +11449,24 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         and obs.identity.composition is not None
         and obs.identity.composition.is_value
     ]
-    assert len(composition_rows) == 300
-    for obs in composition_rows:
+    table_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table2_" in obs.observation_id
+        or "stolyarova_1996_table3_" in obs.observation_id
+    ]
+    figure_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert len(table_composition_rows) == 300
+    assert len(figure_composition_rows) == 277
+    assert len(composition_rows) == (
+        len(table_composition_rows) + len(figure_composition_rows)
+    )
+    for obs in table_composition_rows:
         assert obs.identity.temperature_K.is_value
         assert obs.identity.temperature_K.value == Decimal("1933")
         condition = obs.point_conditions["composition"]
@@ -11364,21 +11539,35 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         for obs in candidates
         if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
     ]
-    candidate_rails = Counter(
-        str(
-            rail_for_quantity(
-                obs.identity.quantity.value if obs.identity.quantity.is_value else None,
-                species_formula=obs.identity.species.formula,
+    def _rail_counter(observations):
+        return Counter(
+            str(
+                rail_for_quantity(
+                    obs.identity.quantity.value if obs.identity.quantity.is_value else None,
+                    species_formula=obs.identity.species.formula,
+                )
             )
+            for obs in observations
         )
+
+    table_candidates = [
+        obs
         for obs in candidates
-    )
-    assert candidate_rails == {
+        if "stolyarova_1996_fig2_" not in obs.observation_id
+    ]
+    figure_candidates = [
+        obs
+        for obs in candidates
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert _rail_counter(table_candidates) == {
         "None": 6,
         "SiO_evolution": 45,
         "melt_activity": 137,
         "vapour": 118,
     }
+    assert _rail_counter(figure_candidates) == {"melt_activity": 277}
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
@@ -16921,17 +17110,38 @@ def test_markova_residue_default_admission_survives_printed_composition_maps(
         if observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     ]
-    def by_id(observations):
-        return {
-            observation.observation_id: (
+    def by_series_temperature(observations):
+        # The content hash in the observation id changes when a temperature
+        # step gains point conditions. Pair the printed loss on series and
+        # temperature; that is the value the store still holds.
+        keyed = {}
+        for observation in observations:
+            series = (
+                "VI"
+                if "residual_melt_VI_lherzolite" in observation.observation_id
+                else "V"
+            )
+            temperature = observation.identity.temperature_K
+            temperature_key = (
+                temperature.value
+                if temperature is not None and temperature.is_value
+                else None
+            )
+            keyed[(series, temperature_key)] = (
                 observation.value.point,
                 observation.admission.status,
                 observation.admission.reason,
             )
-            for observation in observations
-        }
+        return keyed
+
+    stored_by_step = by_series_temperature(stored_mass_loss)
+    migrated_by_step = by_series_temperature(migrated_mass_loss)
     assert len(stored_mass_loss) == 24
-    assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
+    assert len(migrated_mass_loss) == 24
+    # A repeated series and temperature would drop a row from the map.
+    assert len(stored_by_step) == 24
+    assert len(migrated_by_step) == 24
+    assert migrated_by_step == stored_by_step
 
 def test_residue_series_oxide_columns_are_migrated_or_documented() -> None:
     residue_fields = set(

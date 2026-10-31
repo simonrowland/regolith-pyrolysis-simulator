@@ -1,0 +1,166 @@
+source_id: van-limpt-2006-sodium-evaporation
+catalog_regeneration: Deferred to batch assembly per controller steer; do not regenerate INDEX or SOURCE_STATUS on this branch.
+input_order:
+  primary: pdftotext-layout for the born-digital text layer
+  pdf_role: page renders verify table row/column assignment and reported-rate prose; MinerU is an independent table comparison only
+tables:
+- printed_table: I
+  page: 4
+  caption: Calculated diffusion coefficients of NaOH
+  disposition: retained_context
+  reason: Green already records the calculated diffusion coefficients as source context; they are not scored as evaporation-rate, vapor-pressure, or melt-activity measurements.
+- printed_table: II
+  page: 7
+  caption: Mass balances for 6 transpiration experiments with sodium-disilicate melts
+  extract_observation: van_limpt_2006_p007_t02_sodium_disilicate_mass_balance
+  disposition: unavailable_quantity_unknown
+  schema_gap: No exact quantity token represents absolute Na2O loss in mg or its extractive/gravimetric ratio.
+  evidence_class: measured_tabulated
+  extractive_column_lineage: ICP-ES sodium measurement in the transpiration experiments; the separate gravimetric column is direct weighing.
+  printed_row_count: 6
+  draft_table_key: p007-t02
+  manual_draft_correction: MinerU initially marked the first numeric row as a header; render confirms it is data row 1. The scratch draft was corrected to six body rows before comparison.
+  row_assignment_check: PDF page 7 render confirms the four headers and every row-column assignment; MinerU/pdftotext numeric characters agree for all 24 cells.
+  cell_audit:
+  - {row: 1, pdf_table_row: 2, temperature_C: '1416', extractive_weight_loss_mg: '112', gravimetric_weight_loss_mg: '125', ratio: '0.90', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 2, pdf_table_row: 3, temperature_C: '1437', extractive_weight_loss_mg: '146', gravimetric_weight_loss_mg: '153', ratio: '0.96', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 3, pdf_table_row: 4, temperature_C: '1439', extractive_weight_loss_mg: '166', gravimetric_weight_loss_mg: '170', ratio: '0.98', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 4, pdf_table_row: 5, temperature_C: '1354', extractive_weight_loss_mg: '69', gravimetric_weight_loss_mg: '79', ratio: '0.87', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 5, pdf_table_row: 6, temperature_C: '1454', extractive_weight_loss_mg: '188', gravimetric_weight_loss_mg: '188', ratio: '1.00', source_reads: 'MinerU + pdftotext', render: confirmed}
+  - {row: 6, pdf_table_row: 7, temperature_C: '1356', extractive_weight_loss_mg: '85', gravimetric_weight_loss_mg: '71', ratio: '1.21', source_reads: 'MinerU + pdftotext', render: confirmed}
+prose_measurements:
+- page: 6
+  locator: Results V(1), carrier-gas comparison
+  source_reads: MinerU and pdftotext agree on the digits and exponents; PDF page 6 render confirms the printed sentence.
+  values_as_printed:
+    at_1400_C: '6.7 × 10^-5 to 7.4 × 10^-5 mol·(m2·s)^-1'
+    at_1450_to_1460_C: '~1.2 × 10^-4 mol·(m2·s)^-1'
+  interpretation: The paper does not assign the 1400 C range endpoints to the two carrier gas experiments; the higher-temperature rates are stated to be nearly identical.
+  conditions_as_printed:
+    H2O_partial_pressure_bar: '0.25 ± 0.01'
+    H2O_uncertainty_notice: confidence level not stated
+    N2_H2O_O2_partial_pressure_bar: '<0.01'
+    air_H2O_O2_partial_pressure_bar: '~0.16'
+    normalized_gas_flow_m3n_s: '1.6E-4'
+    flow_normalization_reference_as_printed: 'T = 293.15 K and P = 101325 Pa; these are flow normalization conditions, not the experiment pressure.'
+    total_experiment_pressure: not_printed
+    caveat: The total experiment pressure is not reported.
+  evidence_class: measured_reduced
+  reduction: ICP-ES sodium concentrations, carrier-gas volume flow, and experiment duration in the transpiration measurements; endpoint assignment is not stated.
+  disposition: unavailable_quantity_unknown
+relative_activity_statement:
+  page: 7
+  locator: Results V(3), measured chemical activities of Na2O
+  source_reads: MinerU and pdftotext agree on the relative range; page 7 render confirms the prose statement.
+  value_as_printed: about 10–15% lower
+  reference: original glass sample Na2O surface activity
+  scope_as_printed: both sodium-disilicate and soda-lime-silicate melts
+  conditions_not_assigned: The neighboring about-6-h and 1400–1500 °C conditions describe the soda-lime surface-concentration decrease, not this summarized relative activity comparison; atmosphere and individual temperatures are not tied to the comparison.
+  evidence_class: measured_reduced
+  reason: The authors summarize Na2O surface activities reduced from ICP-ES measurements in the transpiration experiments; the numeric activity points are figure-only and not digitized here.
+  disposition: unavailable_quantity_unknown
+figure_read_candidates:
+- {figure: '3', page: 6, candidate: measured NaOH saturation pressure versus square-root water pressure; no points digitized}
+- {figure: '4', page: 6, candidate: measured Na(g) saturation pressure versus temperature; no points digitized}
+- {figure: '5', page: 8, candidate: cumulative Na2O release versus time for eight runs A-H; green retains the A-H temperature and water-pressure labels, and curve points remain undigitized}
+- {figure: '6', page: 8, candidate: measured and modeled Na2O activity in sodium disilicate; no points digitized}
+- {figure: '7', page: 8, candidate: measured and modeled Na2O activity in soda-lime-silicate; no points digitized}
+- {figure: '8', page: 8, candidate: measured/model activity comparison; no points digitized}
+printed_activity_values: No absolute activity values in prose or tables; relative statement above is retained, and all numeric activity markers are figure-only.
+compare_scope: The comparator checks the six extractive-loss row values (the canonical value field). All other numeric cells in Table II are included in cell_audit and independently agree between MinerU and pdftotext; page-render layout verification covers their cell assignments.
+isolated_migration:
+  green_observation_count: 0
+  merged_observation_count: 9
+  observation_count_delta: 9
+  hard_issues: 0
+  rows:
+  - extract_observation_id: van_limpt_2006_measured_total_na_evaporation_rate_at_1400C
+    temperature_K: '1673.15'
+    condition_keys: [composition, gas_mix, carrier_gas_flow_m3n_s, H2O_partial_pressure_bar, oxygen_partial_pressure_bar_by_gas]
+    quantity_known: false
+    value_kind: unavailable
+    evidence_class: measured_reduced
+  - extract_observation_id: van_limpt_2006_measured_total_na_evaporation_rate_at_1450_1460C
+    temperature_K: 'unknown range [1723.15, 1733.15]'
+    condition_keys: [composition, gas_mix, carrier_gas_flow_m3n_s, H2O_partial_pressure_bar, oxygen_partial_pressure_bar_by_gas]
+    quantity_known: false
+    value_kind: unavailable
+    evidence_class: measured_reduced
+  - extract_observation_id: van_limpt_2006_p007_na2o_activity_relative_to_original_glass
+    temperature_K: not_assigned_by_source
+    condition_keys: []
+    quantity_known: false
+    value_kind: unavailable
+    evidence_class: measured_reduced
+  - extract_observation_id: van_limpt_2006_p007_t02_sodium_disilicate_mass_balance
+    rows: 6
+    point_temperatures_K_in_table_order: [1689.15, 1710.15, 1712.15, 1627.15, 1727.15, 1629.15]
+    condition_keys: [composition]
+    identity_composition: absent
+    quantity_known: false
+    value_kind: unavailable
+    evidence_class: measured_tabulated
+store_delta:
+  committed_observations_v2: none
+  expected_on_later_regeneration: 9 unavailable quantity-unknown observations
+reconciliation_table:
+- disagreement: Green's combined activity summary points to PDF page 8; the wave activity observation and review point to PDF page 7.
+  resolution: Keep the green observation id and locate its relative-activity and cumulative-release prose at PDF page 7, published page 3452. Move the page 8 model-fit values into a separate context row.
+  basis: PDF page 7 render places both prose summaries on page 7; PDF page 8 contains Figure 8 and its model comparison.
+- disagreement: The wave figure-read audit lists Figure 8 on page 9 while green lists PDF page 8.
+  resolution: Use PDF page 8, published page 3453.
+  basis: PDF page 8 render contains Figure 8.
+- review_finding: P2; Green labels the sodium rate context measured_direct, while the wave review classifies the author-reduced rates as measured_reduced.
+  disposition: Use measured_reduced because the authors calculate the rates from ICP-ES concentrations, carrier-gas flow, and experiment duration.
+  basis: PDF page 6 Results V(1) and the wave review's evidence-class finding.
+- review_finding: P2; Green labels Table II measured_direct, and both wave reviews classify the extractive column measured_reduced.
+  disposition: Use measured_tabulated for the author-reported Table II observation under the explicit Kim precedent. Keep the distinction that the extractive column is reduced from ICP-ES and the gravimetric column is directly weighed.
+  basis: PDF page 7 Table II and the brief's measured_tabulated rule.
+- review_finding: P2; Green classifies the combined activity and release summary as model_derived, while the wave review classifies the relative activity statement measured_reduced.
+  disposition: Class the relative-activity and cumulative-release summaries measured_reduced. Keep the separate measured/model fit summary model_derived.
+  basis: PDF page 7 prose reports measured summaries; PDF page 8 reports the modeled-versus-measured fit.
+- review_finding: P1; the early wave version bound evaporation_rate to molar areal flux, mass_loss_fraction to absolute mg, and activity to relative-to-glass percent.
+  disposition: The reviewed wave tip removed these bindings. Keep quantity absent on the nine observations, retain descriptive quantity_label and schema_gap fields, and do not add a schema token.
+  basis: Canonical quantity units do not fit the printed units or relative reference; isolated migration leaves every quantity unknown.
+- disagreement: Green used non-token quantity labels on several context rows, while the wave's early draft attempted false quantity bindings on observations.
+  resolution: Convert descriptive Green context labels to quantity_label/schema_gap, and retain exact tokens only where they match the context observable, such as p_partial on pressure figures and activity on activity figures.
+  basis: Context rows remain descriptive; the nine added observation rows migrate with quantity unknown and no rail.
+- disagreement: Dividing the last Table II extractive mass by its gravimetric mass gives about 1.20 while the paper prints 1.21.
+  resolution: Preserve the printed ratio 1.21 without recalculating it.
+  basis: PDF page 7 render and both extracted row records print 1.21.
+- review_finding: P2; the wave mapping audit says Figure 5's condition grid was not transcribed, although Green embeds conditions for all eight series.
+  disposition: Preserve the Green Figure 5 A-H series labels and conditions without duplicating them.
+  basis: PDF page 8 render confirms the A-H temperature and water-vapor-pressure grid.
+- review_finding: P2; the first wave draft citation span is 3449–3457, unlike the Green citation and final wave commit.
+  disposition: Keep 3446–3455.
+  basis: The PDF first-page header prints 3446–3455.
+- disagreement: Green omitted the wave's reported gas-flow normalization reference, which could be mistaken for an experiment pressure.
+  resolution: Add 293.15 K and 101325 Pa to the existing rate-summary context as flow normalization metadata; keep experiment total pressure unreported.
+  basis: PDF page 6 Results V(1) states the normalized flow reference; it does not state the experiment total pressure.
+- review_finding: P1; the formula coefficients for Na2O·2SiO2 were converted into 1/3 and 2/3 mole fractions.
+  disposition: Delete all composition_mol fraction maps. Store Na2O 1 and SiO2 2 as mol_inventory with basis printed_formula_stoichiometry on each rate and Table II point condition; leave identity composition absent because the v1 composition_mol reader cannot preserve inventory basis.
+  basis: PDF formula and the batch4 printed-formula ruling; the green Shornikov test pins the same point-condition representation.
+- review_finding: P1; the first wave version dropped the two sodium-rate points from migration.
+  disposition: Retain two separate rate_series observations with unavailable values and unknown quantities. T_C binds 1400 °C; T_C_range and T_range_K preserve 1450–1460 °C without a midpoint.
+  basis: PDF page 6 render and isolated migration.
+- review_finding: P1; about 6 h and 1400–1500 °C were attached to the 10–15% activity comparison.
+  disposition: Keep those conditions off the relative-activity observation. Do not add the neighboring surface-concentration measurement as a new observation in this reconciliation.
+  basis: PDF page 7 render separates the soda-lime concentration sentence from the both-glass activity summary.
+- review_finding: P2; the wave used transpiration_evaporation rather than the closed method token.
+  disposition: Use transpiration on both rate observations, the activity observation, and the Table II observation.
+  basis: The migrator closes on transpiration.
+- review_finding: P2; MinerU was described as the primary read for a born-digital PDF.
+  disposition: Record pdftotext-layout as primary and page renders as the verification source; retain MinerU only as the independent Table II comparison.
+  basis: The controller ruling for this born-digital source and the page renders.
+- review_finding: P2; catalog regeneration was requested while the controller deferred it.
+  disposition: Leave INDEX.yaml, INDEX.md, and SOURCE_STATUS.yaml untouched as directed; no store or catalog output is committed.
+  basis: Controller deferral recorded at the top of this mapping audit.
+- review_finding: P3; p_H2O and normalized flow were not pinned in the wave tests.
+  disposition: Pin both strings in the merged test and verify the flow migrates to Decimal 0.00016.
+  basis: PDF page 6 render.
+- review_finding: P2; the wave review disclosed figure-only and prose measurements outside the extracted rows, including soda-lime bulk/surface fractions and the page-9 error budget.
+  disposition: Preserve Green's existing 74:16:10 glass composition, 0.5-3.5% cumulative-release summary, and Figure 5 A-H context. Do not add the unextracted 0.308 bulk fraction, 0.293±0.005 surface fraction after 78 h at 1402 °C, 0.328 initial surface fraction, 0.330±0.005 or 0.157±0.003 modeled surfaces, new figure digitizations, or page-9 error-budget values in this reconciliation.
+  basis: Those values are disclosed in the review records but are absent from both extracts; the merged scope is their verified union, and numeric activity curves remain deferred.
+- review_finding: P3; the re-review notes that the omitted prose and figure values are not itemized in the wave audit.
+  disposition: List the omitted candidate values and deferral above; keep Figs. 3, 4, 6, 7, and 8 as undigitized figure context.
+  basis: PDF pages 6-9 and review ror-navanlimpt06-na-evap-r2.md.

@@ -126,7 +126,7 @@ fidelity_samples:
 - species: P
   observable: activity_coefficient
   observation_id: yamada_1983_epsilon_P_Al_body_4p0_printed
-  field: epsilon_P_Al
+  field: epsilon
   value: 4.0
   locator:
     published_page: 53
@@ -322,76 +322,157 @@ species:
         epsilon_P_Mo: -0.4
         rows:
         - solute: Al
-          epsilon_P_i: 4.6
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: 4.6
           epsilon_P_i_as_printed: 4.6±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.037
+          point_conditions:
+            solute:
+              state: {tag: value, value: Al}
+              locator: {table: '2', published_page: 54, row: Al}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Al, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Belton and Fruehan, Met. Trans., 1 (1970), 781 (ref 5)
         - solute: Si
-          epsilon_P_i: 11.9
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: 11.9
           epsilon_P_i_as_printed: 11.9±0.6
           epsilon_uncertainty: 0.6
           e_P_i: 0.099
+          point_conditions:
+            solute:
+              state: {tag: value, value: Si}
+              locator: {table: '2', published_page: 54, row: Si}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Si, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Chipman, Fulton, Gokcen and Caskey, Acta Met., 2 (1954), 439 (ref 3)
         - solute: Ti
-          epsilon_P_i: -8.0
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: -8.0
           epsilon_P_i_as_printed: -8±2
           epsilon_uncertainty: 2.0
           e_P_i: -0.04
+          point_conditions:
+            solute:
+              state: {tag: value, value: Ti}
+              locator: {table: '2', published_page: 54, row: Ti}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Ti, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Furukawa and Kato, Tetsu-to-Hagane, 61 (1975), 3050 (ref 6)
         - solute: V
-          epsilon_P_i: -4.9
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: -4.9
           epsilon_P_i_as_printed: -4.9±0.7
           epsilon_uncertainty: 0.7
           e_P_i: -0.024
+          point_conditions:
+            solute:
+              state: {tag: value, value: V}
+              locator: {table: '2', published_page: 54, row: V}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: V, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Furukawa and Kato, Trans. ISIJ, 16 (1976), 382 (ref 7)
         - solute: Cr
-          epsilon_P_i: -3.8
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: -3.8
           epsilon_P_i_as_printed: -3.8±0.7
           epsilon_uncertainty: 0.7
           e_P_i: -0.018
+          point_conditions:
+            solute:
+              state: {tag: value, value: Cr}
+              locator: {table: '2', published_page: 54, row: Cr}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Cr, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Raoultian a_Fe = N_Fe (Belton and Fruehan ref 5; Gilby and St. Pierre, Trans. Met.
             Soc. AIME, 245 (1969), 1749, ref 8)
         - solute: Co
-          epsilon_P_i: 0.9
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: 0.9
           epsilon_P_i_as_printed: 0.9±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.004
+          point_conditions:
+            solute:
+              state: {tag: value, value: Co}
+              locator: {table: '2', published_page: 54, row: Co}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Co, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Hultgren et al., Selected Values of the Thermodynamic Properties of Binary Alloys,
             ASM (1973), 656 and 874 (ref 9)
         - solute: Ni
-          epsilon_P_i: 0.7
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: 0.7
           epsilon_P_i_as_printed: 0.7±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.003
+          point_conditions:
+            solute:
+              state: {tag: value, value: Ni}
+              locator: {table: '2', published_page: 54, row: Ni}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Ni, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Hultgren et al. (ref 9)
         - solute: Nb
-          epsilon_P_i: -5.4
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: -5.4
           epsilon_P_i_as_printed: -5.4±1.2
           epsilon_uncertainty: 1.2
           e_P_i: -0.012
+          point_conditions:
+            solute:
+              state: {tag: value, value: Nb}
+              locator: {table: '2', published_page: 54, row: Nb}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Nb, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: a_Fe assumed to obey Raoult's law; no Fe-Nb activity investigation cited
         - solute: Mo
-          epsilon_P_i: -0.4
+          T_C: '1600'
+          T_K: '1873.0'
+          epsilon: -0.4
           epsilon_P_i_as_printed: -0.4±0.7
           epsilon_uncertainty: 0.7
           e_P_i: 0.001
+          point_conditions:
+            solute:
+              state: {tag: value, value: Mo}
+              locator: {table: '2', published_page: 54, row: Mo}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Mo, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: measured
           references_as_printed: Present work
           a_Fe_source: Ichise, Maruo, Sasho, Ueshima and Mori, Tetsu-to-Hagane, 66 (1980), 1075 (ref 10)
@@ -430,12 +511,19 @@ species:
         note: Body text value that disagrees with synopsis/Table 2/Fig. 2/conclusions
       standard_state: Henrian gamma_P; epsilon_P^Al at 1600 C, 1 wt% P
       units: dimensionless epsilon as published
+      point_conditions:
+        solute:
+          state: {tag: value, value: Al}
+          locator: {published_page: 53, section: 2. The Fe-P-Al Systems}
+        temperature_K:
+          state: {tag: value, value: '1873.0'}
+          locator: {published_page: 53, section: 2. The Fe-P-Al Systems, note: The extract records 1873.0 K from the authors' 1600 plus 273 convention}
       values:
         quantity: wagner_interaction_parameter
         method_class: measured
-        epsilon_P_Al: 4.0
+        epsilon: 4.0
         epsilon_P_Al_as_printed: 4.0±0.7
-        T_C_as_printed: 1600
+        T_C: '1600'
         T_K: 1873.0
         a_Fe_source: Belton and Fruehan, Met. Trans., 1 (1970), 781 (ref 5)
         note: Printed in the Fe-P-Al paragraph. Competing printed value 4.6±0.7 is in yamada_1983_epsilon_P_i_this_work_1600C.
@@ -451,6 +539,28 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+      derivation:
+        relation: The authors recomputed epsilon_P^Si using Fruehan's Fe-Si iron activity value in equations (7)-(8); the paper reports 12.6 +/- 0.6.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 53
+            pdf_page_index: 3
+            equation: '7'
+            section: 1. The Fe-P-Si System
+            note: The numerical Fe activity from Fruehan is not printed in this paper.
+        method:
+          state: {tag: value, value: Interaction parameter from the activity-coefficient relation using Fruehan's Fe-Si activity value}
+          locator:
+            page: 4
+            published_page: 53
+            pdf_page_index: 3
+            equation: '8'
+            section: 1. The Fe-P-Si System
+        references:
+        - R. J. Fruehan, Metallurgical Transactions 1 (1970), 865, ref. 4
       experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
@@ -460,14 +570,21 @@ species:
         note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
       standard_state: Henrian gamma_P; epsilon_P^Si at 1600 C using Fruehan a_Fe
       units: dimensionless epsilon as published
+      point_conditions:
+        solute:
+          state: {tag: value, value: Si}
+          locator: {published_page: 53, section: 1. The Fe-P-Si System}
+        temperature_K:
+          state: {tag: value, value: '1873.0'}
+          locator: {published_page: 53, section: 1. The Fe-P-Si System, note: The extract records 1873.0 K from the authors' 1600 plus 273 convention}
       values:
         quantity: wagner_interaction_parameter
         method_class: model_derived
         model_or_data_source: this-work I(P+)/I(Fe+) with a_Fe from Fruehan, Met. Trans., 1 (1970), 865
           (ref 4), instead of Chipman et al. (ref 3)
-        epsilon_P_Si: 12.6
+        epsilon: 12.6
         epsilon_P_Si_as_printed: 12.6±0.6
-        T_C_as_printed: 1600
+        T_C: '1600'
         T_K: 1873.0
         authors_comment: difference vs 11.9±0.6 is rather small because a_Fe deviates little from Raoult's
           law at high Fe concentration
@@ -497,57 +614,104 @@ species:
         T_C_header_as_printed: 1600
         rows:
         - solute: Si
-          epsilon_P_i: 21.0
+          T_K: '1873.0'
+          epsilon: 21.0
           epsilon_P_i_as_printed: '21'
           e_P_i: 0.18
           quoted_from: V. Cirilli (Table 2 spelling); References print V. Girilli, Chem. e L'Ind., 50
             (1968), 33 (ref 12)
-          T_C_as_printed: 1600
+          T_C: '1600'
           T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          point_conditions:
+            solute:
+              state: {tag: value, value: Si}
+              locator: {table: '2', published_page: 54, row: Si-Cirilli}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Si-Cirilli, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: quoted_measurement
         - solute: Si
-          epsilon_P_i: 14.2
+          epsilon: 14.2
           epsilon_P_i_as_printed: 14.2 (1 515 °C)
           e_P_i: 0.118
           quoted_from: H. Schenck, E. Steinmetz and R. Gohlke, Arch. Eisenhuttenw., 39 (1968), 109 (ref
             13)
-          T_C_as_printed: 1515
+          T_C: '1515'
           T_note: temperature printed in the epsilon cell, not 1600 C
+          point_conditions:
+            solute:
+              state: {tag: value, value: Si}
+              locator: {table: '2', published_page: 54, row: Si-Schenck-1515C}
+            temperature_K:
+              state: {tag: value, value: '1788.15'}
+              locator: {table: '2', published_page: 54, row: Si-Schenck-1515C, note: Source prints 1515 C; Kelvin conversion}
           method_class: quoted_measurement
         - solute: Si
-          epsilon_P_i: 11.0
+          T_K: '1873.0'
+          epsilon: 11.0
           epsilon_P_i_as_printed: '11'
           e_P_i: 0.091
           quoted_from: J. Chipman, JISI, 180 (1955), 97 (ref 11)
-          T_C_as_printed: 1600
+          T_C: '1600'
           T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          point_conditions:
+            solute:
+              state: {tag: value, value: Si}
+              locator: {table: '2', published_page: 54, row: Si-Chipman}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Si-Chipman, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: quoted_measurement
         - solute: Cr
-          epsilon_P_i: 18.8
+          T_K: '1873.0'
+          epsilon: 18.8
           epsilon_P_i_as_printed: '18.8'
           e_P_i: 0.083
           quoted_from: H. Schenck, E. Steinmetz and R. Gohlke, Arch. Eisenhuttenw., 39 (1968), 109 (ref
             13); Table 2 cites Schenck et al.13) on the Cr block
-          T_C_as_printed: 1600
+          T_C: '1600'
           T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          point_conditions:
+            solute:
+              state: {tag: value, value: Cr}
+              locator: {table: '2', published_page: 54, row: Cr-Schenck}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Cr-Schenck, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: quoted_measurement
         - solute: Cr
-          epsilon_P_i: -6.3
+          T_K: '1873.0'
+          epsilon: -6.3
           epsilon_P_i_as_printed: '-6.3'
           e_P_i: -0.03
           quoted_from: M. G. Frohberg, J. F. Elliott and H. G. Hadrys, Arch. Eisenhuttenw., 39 (1968),
             587; Met. Trans., 1 (1970), 1867 (ref 15)
-          T_C_as_printed: 1600
+          T_C: '1600'
           T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          point_conditions:
+            solute:
+              state: {tag: value, value: Cr}
+              locator: {table: '2', published_page: 54, row: Cr-Frohberg}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Cr-Frohberg, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: quoted_measurement
         - solute: Ni
-          epsilon_P_i: 0.0
+          T_K: '1873.0'
+          epsilon: 0.0
           epsilon_P_i_as_printed: '0.0'
           e_P_i: 0.0002
           quoted_from: H. Schenck, E. Steinmetz and H. Gitizad, Arch. Eisenhuttenw., 40 (1969), 597 (ref
             14)
-          T_C_as_printed: 1600
+          T_C: '1600'
           T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          point_conditions:
+            solute:
+              state: {tag: value, value: Ni}
+              locator: {table: '2', published_page: 54, row: Ni-Schenck}
+            temperature_K:
+              state: {tag: value, value: '1873.0'}
+              locator: {table: '2', published_page: 54, row: Ni-Schenck, note: Table 2 header prints 1600 C; source T_K follows authors' 273 degree offset}
           method_class: quoted_measurement
       uncertainty:
         note: quoted Table 2 rows print no ± except this-work rows; none invented

@@ -201,6 +201,7 @@ species:
         published_page: 3711
         pdf_page_index: 1
         table: Ia
+        note: "Table Ia, PDF page 2 (published page 3711); each per-cell sigma width is expressed in atm. unit='atm'."
       T_range_K:
       - 1993.0
       - 1993.0
@@ -391,7 +392,7 @@ species:
             published_page: 3711
             note: The paper describes effusion under vacuum but prints no numeric in-cell total pressure.
       uncertainty:
-        note: The printed ± terms are retained in each point; no additional uncertainty was assigned.
+        note: "Each Table Ia point prints a per-cell \u00b1 width in values.points.P_Ca_times_10^7_atm_as_printed; that exact text is retained verbatim. The sigma field is the corresponding width in atm using the printed \u00d710^7 atm scale. PDF page 2 (published page 3711); confidence level not stated."
       reaction:
         terms:
         - species:
@@ -435,6 +436,7 @@ species:
         published_page: 3711
         pdf_page_index: 1
         table: Ia
+        note: "Table Ia, PDF page 2 (published page 3711); each per-cell sigma width is expressed in atm. unit='atm'."
       T_range_K:
       - 1993.0
       - 1993.0
@@ -624,7 +626,7 @@ species:
             published_page: 3711
             note: The paper describes effusion under vacuum but prints no numeric in-cell total pressure.
       uncertainty:
-        note: The printed ± terms are retained in each point; no additional uncertainty was assigned.
+        note: "Each Table Ia point prints a per-cell \u00b1 width in values.points.P_Ca_times_10^7_atm_as_printed; that exact text is retained verbatim. The sigma field is the corresponding width in atm using the printed \u00d710^7 atm scale. PDF page 2 (published page 3711); confidence level not stated."
       reaction:
         terms:
         - species:
@@ -670,6 +672,7 @@ species:
         published_page: 3711
         pdf_page_index: 1
         table: Ia
+        note: "Table Ia, PDF page 2 (published page 3711); each per-cell sigma width is expressed in atm. unit='atm'."
       T_range_K:
       - 1993.0
       - 1993.0
@@ -866,7 +869,7 @@ species:
             published_page: 3711
             note: The paper describes effusion under vacuum but prints no numeric in-cell total pressure.
       uncertainty:
-        note: The printed ± terms are retained in each point; no additional uncertainty was assigned.
+        note: "Each Table Ia point prints a per-cell \u00b1 width in values.points.P_CaO_times_10^8_atm_as_printed; that exact text is retained verbatim. The sigma field is the corresponding width in atm using the printed \u00d710^8 atm scale. PDF page 2 (published page 3711); confidence level not stated."
       reaction:
         terms:
         - species:
@@ -906,6 +909,7 @@ species:
         published_page: 3711
         pdf_page_index: 1
         table: Ia
+        note: "Table Ia, PDF page 2 (published page 3711); each per-cell sigma width is expressed in atm. unit='atm'."
       T_range_K:
       - 1993.0
       - 1993.0
@@ -1101,7 +1105,7 @@ species:
             published_page: 3711
             note: The paper describes effusion under vacuum but prints no numeric in-cell total pressure.
       uncertainty:
-        note: The printed ± terms are retained in each point; no additional uncertainty was assigned.
+        note: "Each Table Ia point prints a per-cell \u00b1 width in values.points.P_CaO_times_10^8_atm_as_printed; that exact text is retained verbatim. The sigma field is the corresponding width in atm using the printed \u00d710^8 atm scale. PDF page 2 (published page 3711); confidence level not stated."
       reaction:
         terms:
         - species:
@@ -1923,7 +1927,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711, Eq. [2a]: "a_CaO = P_CaO/P°_CaO" (P° is the individual-oxide vapor pressure); whether the pure-oxide reference is solid or liquid is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2093,7 +2098,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Gibbs-Duhem comparison is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2266,7 +2272,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Belton-Fruehan comparison is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2455,7 +2462,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711, Eq. [2b]: "a_SiO2 = P_SiO2/P°_SiO2" (P° is the individual-oxide reference pressure); whether the pure-oxide reference is solid or liquid is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2626,7 +2634,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Gibbs-Duhem comparison is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2800,7 +2809,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Belton-Fruehan comparison is not stated.'
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
@@ -2969,7 +2979,8 @@ species:
       T_range_K:
       - 1933.0
       - 1933.0
-      phase: CaO-SiO2 liquid oxide melt
+      phase: l
+      phase_as_printed: CaO-SiO2 liquid oxide melt
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: kcal/mole as plotted

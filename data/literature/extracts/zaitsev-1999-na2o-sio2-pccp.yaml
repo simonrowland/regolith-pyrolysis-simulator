@@ -36,6 +36,18 @@ species:
         standard_state: pure liquid Na2O
         composition_basis: printed_mole_fraction
         composition_derivation: 'binary Na2O-SiO2 as declared on p.1901; x_Na2O = 1 - x_SiO2'
+        uncertainty:
+          value: 3
+          units: '%'
+          confidence_level: not_stated
+          scope: all points in the Table 1 experimental activity series
+          verbatim: The differences between the two-type values do not exceed the experimental error (1–3%).
+          note: The 3% upper endpoint is used as a conservative width for the printed table-wide range.
+          locator:
+            page: 5
+            published_page: 1903
+            pdf_page_index: 4
+            table: '1'
         values:
           quantity: activity
           method_class: measured_direct
@@ -498,6 +510,18 @@ species:
         standard_state: pure liquid SiO2
         composition_basis: printed_mole_fraction
         composition_derivation: 'binary Na2O-SiO2 as declared on p.1901; x_Na2O = 1 - x_SiO2'
+        uncertainty:
+          value: 3
+          units: '%'
+          confidence_level: not_stated
+          scope: all points in the Table 1 experimental activity series
+          verbatim: The differences between the two-type values do not exceed the experimental error (1–3%).
+          note: The 3% upper endpoint is used as a conservative width for the printed table-wide range.
+          locator:
+            page: 5
+            published_page: 1903
+            pdf_page_index: 4
+            table: '1'
         derived_from: [zaitsev_1999_table1_na2o_activity]
         derivation:
           relation: >-

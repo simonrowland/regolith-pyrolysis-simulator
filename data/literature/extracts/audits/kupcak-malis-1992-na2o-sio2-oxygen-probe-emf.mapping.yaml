@@ -1,0 +1,55 @@
+source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
+mapping_version: mineru_table_draft.v1
+table_mappings:
+  - printed_table: 'I'
+    page: 3
+    scope: context
+    columns:
+      x(SiO2): printed binary mole fraction; Na2O complement is 1-x
+      T/K: as printed
+      EMF/mV: as printed, measured concentration-cell EMF
+    species: Na2O
+    phase: l
+    units: T in K; EMF in mV
+    method_class: measured_direct
+    conditions:
+      temperature: printed per EMF measurement
+      composition: printed x(SiO2) per composition group
+      reference: 0.40 Na2O–0.60 SiO2 melt, printed in caption
+    disposition: >-
+      Store all 40 printed T/EMF pairs as context. Equation (3) reduces EMF to a(Na2O)/a0(Na2O), but a0 is not printed
+      numerically in this source. No numeric ratio observation is emitted.
+  - printed_table: 'II'
+    page: 4
+    scope: typed_refusal_observations
+    columns:
+      x(SiO2): printed binary mole fraction; Na2O complement is 1-x
+      ΔG(Na2O): partial molar Gibbs energy relative to reference melt; no exact Quantity token; leave quantity unbound
+      ΔS(Na2O): partial molar entropy relative to reference melt; no exact Quantity token; leave quantity unbound
+      ΔH(Na2O): partial molar enthalpy relative to reference melt; Quantity.PARTIAL_MOLAR_ENTHALPY
+    species: Na2O
+    phase: l
+    units:
+      ΔG: kJ mol^-1
+      ΔS: J K^-1 mol^-1
+      ΔH: kJ mol^-1
+    method_class: measured_reduced
+    conditions:
+      temperature: 1473 K for all rows, as printed
+      composition: each row's binary Na2O-SiO2 mole fractions, with x(Na2O)=1-x(SiO2)
+      pressure: not printed
+      oxygen_fugacity: not printed for these rows
+    uncertainty: The ± widths are 95% confidence intervals per the Table II footnote.
+    row_count: 7
+    value_count: 21
+  - printed_table: 'III'
+    page: 5
+    disposition: excluded from this melt-activity extraction; it reports cell-II EMF, calculated pO2 and t_ion.
+    printed_row_count: 5
+figure_candidates:
+  - figure: '4'
+    page: 5
+    axes: x(Na2O) 0.1–0.6; left a(SiO2) 0–1; right log a(Na2O) −4 to −10
+    line_series: 4
+    point_symbols: 0
+    values_digitised: false

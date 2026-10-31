@@ -1,0 +1,48 @@
+source_id: sugawara-2024-na-silicate-molybdate-miscibility
+input_order:
+  - MinerU content-list table blocks and markdown
+  - pdftotext-layout.txt
+  - rendered pages for full table row/column verification and flagged table cells
+tables:
+  - page: 2
+    table: '1'
+    printed_title: Experimental composition and run products
+    content_list_table: p002-t01
+    printed_rows: 11
+    disposition: context
+    context_kind: composition
+    columns_as_printed: [Sample, 'SiO2 mol%', 'Na2O mol%', 'MoO3 mol%', '1200 C run products', '1000 C run products', '1200 C glass appearance', '1000 C glass appearance']
+    render_verified: 'All 11 rows and all 33 composition values, plus the row and column assignments, checked against the page render.'
+  - page: 4
+    table: '2'
+    printed_title: Phase proportion and chemical composition of phase-separated silicate liquid and molybdate liquid
+    content_list_table: p004-t02
+    printed_rows: 8
+    disposition: observations_and_context
+    context_kind: composition
+    columns_as_printed: [Sample, 'Temperature/°C', 'SL mass%', 'ML mass%', 'Qtz mass%', 'Na2O loss mass%', 'SiO2 mol% SL then ML', 'Na2O mol% SL then ML', 'MoO3 mol% SL then ML']
+    observations_method_class: measured_direct
+    context_method_class: measured_reduced
+    observations: 'Emit all 48 mol% composition cells as equilibrium_phase_composition with mole_fraction basis; SL maps to glass and ML to melt.'
+    context_columns: 'Sample, temperature, SL mass%, ML mass%, Qtz mass%, and Na2O loss mass% remain in context.'
+    render_verified: 'All 8 rows, temperatures, phase proportions, all 48 composition values, and their SL/ML order checked against the page render.'
+  - page: 6
+    table: '4'
+    printed_title: Interaction parameters Lij of liquid in SiO2-Na2O-MoO3 system
+    content_list_table: p006-t04
+    printed_rows: 6
+    disposition: context
+    context_kind: thermodynamic_example
+    method_class: model_derived
+    columns_as_printed: ['i-j', 'k=0', 'k=1', 'k=2']
+    schema_gap: 'The fitted CALPHAD Redlich-Kister parameters do not fit the existing Wagner interaction_parameter profile; the phase-diagram fit inputs include undigitized Fig. 4 data.'
+    render_verified: 'All 6 parameter rows and 18 coefficient cells checked against the page render; MinerU/QA flagged the comma-grouped values and a k=2 numeric mismatch, resolved against the render.'
+excluded_reference_table:
+  page: 6
+  table: '3'
+  printed_title: Thermodynamic data used for CALPHAD analysis
+  reason: 'Referenced thermodynamic database inputs, outside the requested measured phase-equilibrium data and fitted interaction-parameter outputs.'
+figure_read_candidate:
+  page: 5
+  figure: '4'
+  note: 'Isothermal experimental phase fields and tie lines are plotted but not tabulated; figures are not digitized in this extraction wave.'

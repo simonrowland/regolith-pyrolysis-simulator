@@ -8,6 +8,7 @@ import re
 import pytest
 import yaml
 
+from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -18,7 +19,7 @@ EXTRACT = ROOT / "data/literature/extracts/witthohn-2000-coal-slag-alkali-vapori
 TABLE1_RENDER = """
 Sample | A | B | C | D | E | F | G
 Temperature 1) [°C] | 450 | 450 | 450 | 550 | 575 | ≈1500 | ≈1400
-Ash content 2) | 9.6 | 12.6 | 9.9 | 6.2 | 8.4 | – | –
+Ash content 2) | ad 9.6 | ad 12.6 | ad 9.9 | ad 6.2 | ad 8.4 | – | –
 SiO2 2) | 42.4 | 46.7 | 36.4 | 12.7 | 38.3 | 42.0 | 40.9
 Al2O3 | 2.8 | 3.1 | 4.2 | 2.1 | 18.3 | 24.3 | 24.3
 Fe2O3 | 8.9 | 7.0 | 10.2 | 11.1 | 11.4 | 14.9 | 11.2
@@ -147,10 +148,101 @@ def test_deferred_figures_keep_identity_series_and_no_numeric_points() -> None:
 
 def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
     extract = document()
-    assert all(not container.get("observations") for container in extract["species"].values())
+    assert sum(
+        len(container.get("observations", [])) for container in extract["species"].values()
+    ) == 7
+    assert table1_context(extract)["values"]["method_class"] == "measured_tabulated"
+    assert extract["species"]["Na2O"]["context"][1]["values"][
+        "section_heading_locator"
+    ] == {"page": 4, "section": "Experimental"}
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
-    assert not migrator.result.observations
+
+    rows = {
+        row.observation_id.split("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+    }
+    assert len(rows) == 7
+    assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
+    assert all(row.admission.status is AdmissionStatus.REJECTED for row in rows.values())
+
+    pressure_ids = {
+        "witthohn_2000_na_g_fig2_figure_only",
+        "witthohn_2000_na_g_fig3_figure_only",
+        "witthohn_2000_k_g_fig2_figure_only",
+        "witthohn_2000_k_g_fig3_figure_only",
+    }
+    activity_ids = {
+        "witthohn_2000_na2o_fig4_figure_only",
+        "witthohn_2000_na2o_fig5_figure_only",
+        "witthohn_2000_k2o_fig6_model_figure_only",
+    }
+    assert {key for key, row in rows.items() if row.identity.quantity.value.value == "p_partial"} == pressure_ids
+    assert {key for key, row in rows.items() if row.identity.quantity.value.value == "activity"} == activity_ids
+    assert all(
+        rows[key].evidence.class_.value.value == "measured_reduced"
+        for key in pressure_ids
+    )
+    assert all(
+        rows[key].evidence.class_.value.value == "quoted_attributed"
+        for key in activity_ids
+    )
+    assert all(rows[key].identity.species.phase.value.value == "l" for key in activity_ids)
+
+    expected_locators = {
+        "witthohn_2000_na_g_fig2_figure_only": (16, "2"),
+        "witthohn_2000_k_g_fig2_figure_only": (16, "2"),
+        "witthohn_2000_na_g_fig3_figure_only": (17, "3"),
+        "witthohn_2000_k_g_fig3_figure_only": (17, "3"),
+        "witthohn_2000_na2o_fig4_figure_only": (17, "4"),
+        "witthohn_2000_na2o_fig5_figure_only": (18, "5"),
+        "witthohn_2000_k2o_fig6_model_figure_only": (18, "6"),
+    }
+    for observation_id, (page, figure) in expected_locators.items():
+        row = rows[observation_id]
+        assert row.locator.page == page
+        assert row.locator.figure == figure
+        temperature = row.point_conditions["temperature_K"]
+        composition = row.point_conditions["composition"]
+        assert temperature.locator.page == page
+        assert temperature.locator.figure == figure
+        assert composition.state.is_unknown
+        assert composition.locator.page == page
+        assert composition.locator.figure == figure
+        if observation_id == "witthohn_2000_na2o_fig5_figure_only":
+            assert temperature.state.is_value
+            assert str(temperature.state.value) == "1343"
+        else:
+            assert temperature.state.is_unknown
+
+    contexts = {
+        row["observation_id"]: row
+        for context_rows in migrator.result.context_by_work.values()
+        for row in context_rows
+    }
+    assert len(contexts) == 19  # 12 green context rows plus seven sample rows
+    samples = {
+        observation_id: row
+        for observation_id, row in contexts.items()
+        if observation_id.startswith("witthohn_2000_table1_sample_")
+    }
+    assert len(samples) == 7
+    assert all(
+        row["values"]["method_class"] == "measured_tabulated"
+        for row in samples.values()
+    )
+    assert samples["witthohn_2000_table1_sample_A_composition"]["values"][
+        "SiO2_mass_fraction_percent"
+    ] == "42.4"
+    assert samples["witthohn_2000_table1_sample_C_composition"]["values"][
+        "K2O_mass_fraction_percent"
+    ] == "0.5"
+    assert samples["witthohn_2000_table1_sample_G_composition"]["values"][
+        "CaO_mass_fraction_percent"
+    ] == "9.7"
+    assert samples["witthohn_2000_table1_sample_D_composition"]["values"][
+        "CO2_mass_fraction_percent"
+    ] == "not analyzed"

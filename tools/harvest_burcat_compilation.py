@@ -15,12 +15,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
-import shutil
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +26,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.compilation_harvest_io import (  # noqa: E402
+    copy_if_needed,
+    resolve_existing,
+    sha256_bytes,
+    write_json,
+)
 from simulator.reference_data.burcat import (  # noqa: E402
     COMPILATION_ROLE,
     COMPILATION_SOURCE,
@@ -72,33 +74,6 @@ def cli() -> argparse.Namespace:
         default=ROOT / "data" / "literature" / "compilations" / "burcat",
     )
     return parser.parse_args()
-
-
-def sha256_bytes(payload: bytes) -> str:
-    return hashlib.sha256(payload).hexdigest()
-
-
-def resolve_existing(candidates: list[Path], label: str) -> Path:
-    for path in candidates:
-        if path.is_file():
-            return path
-    raise FileNotFoundError(
-        f"{label} not found; looked at: " + ", ".join(str(path) for path in candidates)
-    )
-
-
-def copy_if_needed(src: Path, dest: Path) -> None:
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    if src.resolve() != dest.resolve():
-        shutil.copyfile(src, dest)
-
-
-def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, indent=2, sort_keys=False, ensure_ascii=True) + "\n",
-        encoding="utf-8",
-    )
 
 
 def build_manifest(

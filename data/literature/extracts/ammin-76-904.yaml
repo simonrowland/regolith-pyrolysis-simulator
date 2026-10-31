@@ -207,10 +207,14 @@ species:
         values:
           method_class: quoted_attributed
           quantity: heat_of_fusion
-          enthalpy_of_fusion_kJ_per_mol: 138.1
-          fusion_temperature_K: 1665
+          delta_H_fusion_kJ_mol: 138.1
+          T_K: 1665
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1665'}
+              locator: {published_page: 909, pdf_page: 6}
           attribution: Stebbins et al. (1983)
-        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al.
       - observation_id: ammin_76_904_quoted_richet_bottinga_diopside_fusion
         type: heat_capacity_and_heat_content_series
         locator:
@@ -224,10 +228,14 @@ species:
         values:
           method_class: quoted_attributed
           quantity: heat_of_fusion
-          enthalpy_of_fusion_kJ_per_mol: 137.7
-          fusion_temperature_K: 1665
+          delta_H_fusion_kJ_mol: 137.7
+          T_K: 1665
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1665'}
+              locator: {published_page: 909, pdf_page: 6}
           attribution: Richet and Bottinga (1984)
-        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al.
       - observation_id: ammin_76_904_quoted_ferrier_diopside_fusion
         type: heat_capacity_and_heat_content_series
         locator:
@@ -241,10 +249,14 @@ species:
         values:
           method_class: quoted_attributed
           quantity: heat_of_fusion
-          enthalpy_of_fusion_kJ_per_mol: 128
-          fusion_temperature_K: 1665
+          delta_H_fusion_kJ_mol: 128
+          T_K: 1665
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1665'}
+              locator: {published_page: 909, pdf_page: 6}
           attribution: Ferrier (1968)
-        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+        note: Printed p. 909/PDF p. 6; cited diopside fusion enthalpy, not measured by Lange et al.
       - observation_id: ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
         type: heat_capacity_and_heat_content_series
         locator:
@@ -337,10 +349,14 @@ species:
         values:
           method_class: quoted_attributed
           quantity: heat_of_fusion
-          enthalpy_of_fusion_kJ_per_mol: 57.3
-          fusion_temperature_K: 1821
+          delta_H_fusion_kJ_mol: 57.3
+          T_K: 1821
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1821'}
+              locator: {published_page: 911, pdf_page: 8}
           attribution: Adamkovicova et al. (1980)
-        note: Printed p. 911/PDF p. 8; this value is for wollastonite (CaSiO3), not diopside. No closed heat-of-fusion quantity exists, so migration preserves the quote as unavailable.
+        note: Printed p. 911/PDF p. 8; this value is for wollastonite (CaSiO3), not diopside.
 metadata:
   scope_verdict: in_scope_direct_step_scan_calorimetry_on_silicate_diopside
   source_type: primary_experimental_paper
