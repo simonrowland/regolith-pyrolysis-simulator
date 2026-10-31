@@ -1,0 +1,196 @@
+source_id: kunisada-1986-na-silicate-dephosphorization
+source_read_order:
+- MinerU HTML table blocks and markdown
+- pdftotext-layout table QA comparison
+- PDF page renders for every numeric table cell because pdftotext does not preserve the table-cell text reliably
+tables:
+- table_key: p002-t01
+  printed_locator:
+    page: 2
+    published_page: 122
+    table: 1(I)
+  printed_row_count: 27
+  numeric_cell_count: 243
+  columns:
+  - printed_column: 2
+    field: T_C
+    phase: l
+    unit: °C
+    condition: true
+  - printed_column: 3
+    species: P
+    quantity: printed_initial_P_in_liquid_iron
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 4
+    species: P
+    quantity: printed_final_P_in_liquid_iron
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 5
+    species: O
+    quantity: printed_final_O_in_liquid_iron
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 6
+    species: Na2O
+    quantity: printed_Na2O_in_reactive_slag_assay
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 7
+    species: SiO2
+    quantity: printed_SiO2_in_reactive_slag_assay
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 8
+    species: Fe
+    quantity: printed_total_Fe_in_reactive_slag_assay
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 9
+    species: MgO
+    quantity: printed_MgO_in_reactive_slag_assay
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 10
+    species: P2O5
+    quantity: printed_P2O5_in_reactive_slag_assay
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  cell_audit: All 27 data rows and all 243 numeric cells, including temperature, were checked against the rendered
+    page 2. T. Fe means total Fe reported elementally. Table 1(I) does not claim endpoint equilibrium.
+- table_key: p002-t02
+  printed_locator:
+    page: 2
+    published_page: 122
+    table: 1(II)
+  printed_row_count: 5
+  numeric_cell_count: 45
+  columns:
+  - printed_column: 2
+    field: T_C
+    phase: l
+    unit: °C
+    condition: true
+  - printed_column: 3
+    species: P
+    quantity: printed_initial_P_in_liquid_iron
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 4
+    species: P
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  - printed_column: 5
+    species: O
+    quantity: printed_final_O_in_liquid_iron
+    type: concentration_series
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: typed_refusal
+  - printed_column: 6
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  - printed_column: 7
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  - printed_column: 8
+    species: Fe
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  - printed_column: 9
+    species: MgO
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  - printed_column: 10
+    species: P2O5
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  cell_audit: All five data rows and all 45 numeric cells, including temperature, were checked against the rendered
+    page 2. The prose states the Na2CO3 series attained slag-metal phosphorus equilibrium at the end of each 15
+    min run; initial P and final O remain typed-refused.
+- table_key: p006-t03
+  printed_locator:
+    page: 6
+    published_page: 126
+    table: '2'
+  printed_row_count: 5
+  numeric_cell_count: 10
+  columns:
+  - printed_column: 2
+    field: FeO_calculated
+    species: FeO
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: quoted_attributed
+    admission_status: admitted
+  - printed_column: 3
+    field: total_FeO_experiment
+    species: FeO
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: '%'
+    method_class: measured_direct
+    admission_status: admitted
+  cell_audit: All ten FeO cells in five rows checked against the rendered page 6. Calculated values are quoted_attributed
+    because the paper's assumed reaction extents and all numerical inputs are not stored; experimental values are
+    the authors' reported experiment result.
+numeric_cell_audit: kunisada-1986-na-silicate-dephosphorization.cell-audit.csv contains 298 render-confirmed numeric
+  cells, including all 32 table temperature cells.
+compare_index: The tool draft omitted printed Table 1 sublabels; the notes copy of index.yaml assigns draft order
+  p002-t01 to printed Table 1(I) and p002-t02 to printed Table 1(II), confirmed by their captions and page 2 render.
