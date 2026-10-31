@@ -26,7 +26,12 @@ Residuals are not generated (chunk 2). Pins are not touched.
 
 Absence is never a measured zero: a numbered literature row with missing
 admission is admitted by default with a visible notice under owner ruling
-d-056; no-number rows remain pending. Missing class/pressure/phase/method
+d-056; no-number rows remain pending. An evidence label filed in
+admission_status is admitted with an admission_from_legacy_token notice:
+figure_only fills a missing evidence class only, and quoted_attributed /
+model_output_not_measurement set their evidence class. Explicit rejection
+tokens stay rejected. Parked, preserved_unscored, and the Cardiff/Matchett
+and Markova holds stay pending. Missing class/pressure/phase/method
 remain unknown, never certified / 101325 Pa / liquid / knudsen_effusion.
 Unknown rail spellings raise. Unmapped phase strings are ``State.unknown``
 on ``Species.phase`` and queued; they are never stored as gas.
@@ -2144,6 +2149,37 @@ def _admission_default_notice(
     )
 
 
+def _admission_legacy_notice(
+    admission: Admission,
+    quantity: Quantity | State[Quantity],
+    observation_id: str,
+) -> Notice | None:
+    """Notice naming the legacy admission_status token that admitted the row."""
+
+    if (
+        admission.status is not AdmissionStatus.ADMITTED
+        or not admission.reason.startswith(_LEGACY_ADMISSION_NOTICE_PREFIX)
+    ):
+        return None
+    resolved: Quantity | None
+    if isinstance(quantity, State):
+        resolved = (
+            quantity.value
+            if quantity.is_value and isinstance(quantity.value, Quantity)
+            else None
+        )
+    elif isinstance(quantity, Quantity):
+        resolved = quantity
+    else:
+        resolved = None
+    return Notice(
+        kind=NoticeKind.ADMISSION_FROM_LEGACY_TOKEN,
+        affected_quantities=() if resolved is None else (resolved,),
+        reason=admission.reason,
+        origin=observation_id,
+    )
+
+
 def _admission_from_plain(payload: object, *, value: Value) -> Admission:
     assert isinstance(payload, Mapping)
     decided = None
@@ -2803,6 +2839,11 @@ def observation_from_plain(payload: object) -> Observation:
     )
     if admission_notice is not None and admission_notice not in notices:
         notices += (admission_notice,)
+    legacy_notice = _admission_legacy_notice(
+        admission, identity.quantity, observation_id
+    )
+    if legacy_notice is not None and legacy_notice not in notices:
+        notices += (legacy_notice,)
     point_conditions = None
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
@@ -7700,6 +7741,51 @@ def evidence_for(
     )
 
 
+_LEGACY_ADMISSION_NOTICE_PREFIX = "admission_from_legacy_token:"
+
+# One table beside admission_for. status, evidence class, and whether an
+# existing evidence class is replaced. figure_only fills only a missing class
+# so a real method_class (and figure locator / digitisation, which are not on
+# Evidence) stay put. quoted_attributed and model_output_not_measurement set
+# their class. Rejection tokens keep the source-admission reason. Pending rows
+# keep the non-closed fallthrough reason. typed_refusal and pending_validation
+# are not in this table; their reasons stay the ones above.
+_LEGACY_ADMISSION_RULES: dict[
+    str, tuple[AdmissionStatus, EvidenceClass | None, bool]
+] = {
+    "figure_only": (AdmissionStatus.ADMITTED, EvidenceClass.FIGURE_ONLY, False),
+    "quoted_attributed": (
+        AdmissionStatus.ADMITTED,
+        EvidenceClass.QUOTED_ATTRIBUTED,
+        True,
+    ),
+    "model_output_not_measurement": (
+        AdmissionStatus.ADMITTED,
+        EvidenceClass.MODEL_DERIVED,
+        True,
+    ),
+    "rejected_no_figure_reading": (AdmissionStatus.REJECTED, None, False),
+    "rejected_no_complete_figure_digitization": (
+        AdmissionStatus.REJECTED,
+        None,
+        False,
+    ),
+    "rejected_model_output_not_measurement": (
+        AdmissionStatus.REJECTED,
+        None,
+        False,
+    ),
+    "authors_rejected": (AdmissionStatus.REJECTED, None, False),
+    "authors_rejected_in_favour_of_ion_intensity_ratio_method": (
+        AdmissionStatus.REJECTED,
+        None,
+        False,
+    ),
+    "parked": (AdmissionStatus.PENDING, None, False),
+    "preserved_unscored": (AdmissionStatus.PENDING, None, False),
+}
+
+
 def admission_for(
     raw_status: object,
     *,
@@ -7742,7 +7828,17 @@ def admission_for(
             reason=f"source admission_status={text}",
             decided_by=decided,
         )
-    if text.startswith("rejected") or text in {"authors_rejected"}:
+    rule = _LEGACY_ADMISSION_RULES.get(text)
+    if rule is not None and rule[0] is AdmissionStatus.ADMITTED:
+        return Admission(
+            status=AdmissionStatus.ADMITTED,
+            reason=f"{_LEGACY_ADMISSION_NOTICE_PREFIX}{text}",
+        )
+    if (
+        text.startswith("rejected")
+        or text in {"authors_rejected"}
+        or (rule is not None and rule[0] is AdmissionStatus.REJECTED)
+    ):
         decided = None
         if isinstance(extraction, Mapping) and locator is not None:
             decided = AdmissionDecision(
@@ -7768,10 +7864,42 @@ def admission_for(
             reason=refusal_reason or "source status=typed_refusal",
             decided_by=decided,
         )
+    if rule is not None and rule[0] is not AdmissionStatus.PENDING:
+        raise RuntimeError(f"unhandled legacy admission token {text}")
     return Admission(
         status=AdmissionStatus.PENDING,
         reason=f"source admission_status={text} is not a closed v2.1 token",
     )
+
+
+def legacy_admission_evidence(evidence: Evidence, admission: Admission) -> Evidence:
+    """Apply the evidence class named by an admitted legacy token."""
+
+    if (
+        admission.status is not AdmissionStatus.ADMITTED
+        or not admission.reason.startswith(_LEGACY_ADMISSION_NOTICE_PREFIX)
+    ):
+        return evidence
+    token = admission.reason.removeprefix(_LEGACY_ADMISSION_NOTICE_PREFIX)
+    rule = _LEGACY_ADMISSION_RULES.get(token)
+    if rule is None:
+        return evidence
+    _status, mapped, overwrite = rule
+    if mapped is None:
+        return evidence
+    if evidence.class_.is_value and (
+        not overwrite or evidence.class_.value is mapped
+    ):
+        return evidence
+    if mapped is EvidenceClass.MODEL_DERIVED and not evidence.model:
+        # model_derived requires a model string. The legacy token is that
+        # label when the row did not already name one.
+        return replace(
+            evidence,
+            class_=State.of(mapped),
+            model=evidence.original_method_class or token,
+        )
+    return replace(evidence, class_=State.of(mapped))
 
 
 def _locator_is_page_grounded(locator: Locator | None) -> bool:
@@ -17853,6 +17981,7 @@ class Migrator:
                 read_from,
                 source_derivation,
             )
+        evidence = legacy_admission_evidence(evidence, admission)
         if source_composition_located is not None:
             # A source-declared point-condition composition is authoritative.
             # In particular, a typed refusal here cannot be replaced by a
@@ -23098,9 +23227,20 @@ class Migrator:
                 observation_id,
             )
             if admission_notice is not None and admission_notice not in observation.notices:
-                self.result.observations[observation_id] = replace(
+                observation = replace(
                     observation,
                     notices=(*observation.notices, admission_notice),
+                )
+                self.result.observations[observation_id] = observation
+            legacy_notice = _admission_legacy_notice(
+                observation.admission,
+                observation.identity.quantity,
+                observation_id,
+            )
+            if legacy_notice is not None and legacy_notice not in observation.notices:
+                self.result.observations[observation_id] = replace(
+                    observation,
+                    notices=(*observation.notices, legacy_notice),
                 )
         for work in self.result.works.values():
             if work.doi:

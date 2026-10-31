@@ -270,6 +270,9 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    # admission_status carried an evidence label. The reason names the legacy token.
+    # Not a flagged stratum and not a reviewer decision.
+    ADMISSION_FROM_LEGACY_TOKEN = "admission_from_legacy_token"
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     APPROXIMATE_VALUE = "approximate_value"

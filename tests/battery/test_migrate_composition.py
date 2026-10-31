@@ -936,7 +936,8 @@ def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
         "kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted"
     ]
     assert o2_figure.value.kind is ValueKind.UNAVAILABLE
-    assert o2_figure.admission.status is AdmissionStatus.PENDING
+    assert o2_figure.admission.status is AdmissionStatus.ADMITTED
+    assert o2_figure.admission.reason == "admission_from_legacy_token:figure_only"
     assert o2_figure.evidence.class_.is_value
     assert o2_figure.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     assert o2_figure.identity.species.phase.is_value
