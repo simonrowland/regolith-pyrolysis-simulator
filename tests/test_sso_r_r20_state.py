@@ -3207,11 +3207,13 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
     vacuum_pool = sim._native_fe_partition_diagnostic(100.0)
     assert vacuum_small["alpha_s_evaluation"]["alpha_s"] == pytest.approx(0.9)
     assert vacuum_small["alpha_s_evaluation"]["alpha_authority_status"] == (
-        "out_of_domain"
+        "extrapolated"
     )
-    assert "Fe is liquid" in vacuum_small["alpha_s_evaluation"][
-        "alpha_authority_notice"
-    ]
+    alpha_notice = vacuum_small["alpha_s_evaluation"]["alpha_authority_notice"]
+    assert "Fe is liquid above the band" in alpha_notice
+    assert "The certified solid-Fe band is 1358-1520 K" in alpha_notice
+    assert "Safarian & Engh 2013, Fig. 5 p. 749" in alpha_notice
+    assert "qualitative support only" in alpha_notice
     assert vacuum_small["alpha_s_evaluation"]["system_class"] == (
         "pure_element_condensed"
     )
