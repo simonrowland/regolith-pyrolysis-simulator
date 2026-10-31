@@ -449,6 +449,17 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
         )
 
     reference = identity_with_p2o5(reference, not sample_has_p2o5)
+    integrator_initial_inventories: list[dict[str, float]] = []
+    original_integrator = residue.integrate_residue_inventory
+
+    def forward_integrator(initial_inventory_mol, *args, **kwargs):
+        if not integrator_initial_inventories:
+            integrator_initial_inventories.append(dict(initial_inventory_mol))
+        return original_integrator(initial_inventory_mol, *args, **kwargs)
+
+    monkeypatch.setattr(
+        residue, "integrate_residue_inventory", forward_integrator
+    )
     prediction = score._sossi_residue_prediction(
         context, reference, Engine.OPENIMCC_SP, {}
     )
@@ -462,8 +473,14 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
     assert consumed is not None and consumed.is_value, failure
     assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
     consumed_components = dict(consumed.value.components)
-    assert consumed_components["MnO"] > 0.0, failure
-    assert consumed_components["TiO2"] > 0.0, failure
+    assert integrator_initial_inventories, failure
+    integrator_initial_inventory = integrator_initial_inventories[0]
+    assert {"MnO", "TiO2"} <= set(integrator_initial_inventory), failure
+    assert set(consumed_components) == set(integrator_initial_inventory), failure
+    for oxide, initial_moles in integrator_initial_inventory.items():
+        assert float(consumed_components[oxide]) == pytest.approx(
+            initial_moles, rel=1e-12, abs=1e-30
+        ), (oxide, failure)
     consumed_has_p2o5 = consumed_components.get("P2O5", 0.0) > 0.0
     assert consumed_has_p2o5 is sample_has_p2o5, failure
     assert any(
