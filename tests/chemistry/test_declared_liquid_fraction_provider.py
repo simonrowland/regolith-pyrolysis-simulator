@@ -845,6 +845,14 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
             assert notice['warnings']
             if failure in {'missing_bracket', 'non_monotone'}:
                 assert notice['reason'] == 'liquid_fraction_provider_failed'
+        if failure == 'warm_timeout':
+            assert notice['availability_notice'] == {
+                'type': 'typed_notice',
+                'kind': 'freeze_gate_magemin_source_fallback',
+                'reason': 'engine_worker_timeout',
+                'attempted_source': 'magemin',
+                'source_used': 'kress91_liquid_calibration_floor',
+            }
         assert sim._freeze_gate_last_good_curve is None
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
@@ -866,6 +874,9 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         recovered = sim._melt_redox_liquidus_gate_curve()
         assert recovered['liquidus_T_C'] == 1500.0
         assert 'gate_provider_refusal' not in recovered
+        assert 'availability_notice' not in recovered.get(
+            'gate_provider_refusal', {},
+        )
         assert sim._freeze_gate_last_good_curve['computed_hour'] == 9
         return
 
@@ -917,6 +928,14 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         assert notice['outcome'] == 'numerical_failure'
         if failure in {'missing_bracket', 'non_monotone'}:
             assert notice['reason'] == 'liquid_fraction_provider_failed'
+    if failure == 'warm_timeout':
+        assert notice['availability_notice'] == {
+            'type': 'typed_notice',
+            'kind': 'freeze_gate_magemin_source_fallback',
+            'reason': 'engine_worker_timeout',
+            'attempted_source': 'magemin',
+            'source_used': 'gate_liquid_fraction:fallback:magemin-shadow',
+        }
     assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
     assert set(shared) == shared_keys
     assert store.capture_sequence == []
@@ -943,6 +962,9 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     recovered = sim._melt_redox_liquidus_gate_curve()
     assert recovered['liquidus_T_C'] == 1500.0
     assert 'gate_provider_refusal' not in recovered
+    assert 'availability_notice' not in recovered.get(
+        'gate_provider_refusal', {},
+    )
     sim.melt.hour = 11
     sim.melt.p_total_mbar += 100.0
     phase['good'] = False
