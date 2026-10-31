@@ -544,9 +544,7 @@ class EnginePrediction:
     def __post_init__(self) -> None:
         if self.engine is not Engine.OPENIMCC_SP:
             return
-        p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(
-            self.identity
-        )
+        p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(self)
         authority = self.authority or (
             Authority.REFUSED if self.value is None else Authority.BRIDGE
         )
@@ -588,15 +586,26 @@ class EnginePrediction:
         )
 
 
-def _openimcc_sp_uses_p2o5_screening_proxy(identity: Identity | None) -> bool:
-    if identity is None:
-        return False
-    composition = identity.composition
-    if composition is None or not composition.is_value:
+def _openimcc_sp_uses_p2o5_screening_proxy(
+    prediction: EnginePrediction,
+) -> bool:
+    requested_composition = prediction.requested_composition
+    if requested_composition is not None:
+        composition_state = (
+            requested_composition if requested_composition.is_value else None
+        )
+    else:
+        identity = prediction.identity
+        composition_state = identity.composition if identity is not None else None
+    if (
+        composition_state is None
+        or not composition_state.is_value
+        or composition_state.value is None
+    ):
         return False
     return any(
         name == "P2O5" and amount > 0
-        for name, amount in composition.value.components
+        for name, amount in composition_state.value.components
     )
 
 
