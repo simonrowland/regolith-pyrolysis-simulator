@@ -611,6 +611,73 @@ def test_openimcc_sp_prediction_handles_missing_identity_composition(
     )
 
 
+@pytest.mark.parametrize(
+    "identity_composition",
+    (None, State.unknown("composition not recorded")),
+    ids=("absent", "unknown"),
+)
+def test_openimcc_sp_p2o5_proxy_uses_requested_composition(
+    identity_composition,
+) -> None:
+    identity = replace(F.activity_identity(), composition=identity_composition)
+    requested_composition = State.of(
+        Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.9")), ("P2O5", Decimal("0.1"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        authority=Authority.BRIDGE,
+        identity=identity,
+        requested_composition=requested_composition,
+    )
+
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
+def test_openimcc_sp_requested_composition_wins_over_identity_p2o5() -> None:
+    identity = F.activity_identity(
+        composition=Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.9")), ("P2O5", Decimal("0.1"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+    requested_composition = State.of(
+        Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("1")), ("P2O5", Decimal("0"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    )
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        authority=Authority.BRIDGE,
+        identity=identity,
+        requested_composition=requested_composition,
+    )
+
+    assert prediction.authority is Authority.BRIDGE
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
 def test_openimcc_sp_residue_domain_status_becomes_a_scored_notice() -> None:
     from simulator.battery.score import _residue_domain_notices
 
