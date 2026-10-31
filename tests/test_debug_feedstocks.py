@@ -370,8 +370,8 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     # so a small extra share of this Na flux condenses before the overhead
     # account. The production value falls from 2.0217140897425274 to
     # 1.9976229793240146 kg: delta = old - new = 0.0240911104185128 kg and
-    # delta/old = 1.19 (dimensionless). In the non-condensing hot-wall limit,
-    # this overhead tends back to the full 2.0217140897425274 kg flux.
+    # delta/old = 0.0119 (1.19%, dimensionless). In the non-condensing
+    # hot-wall limit, this overhead tends back to the full 2.0217140897425274 kg flux.
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
     ] == pytest.approx(1.9976229793240146)
