@@ -358,12 +358,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
     # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
     # Two in-process evaluations and the cross-process test pin determinism.
-    # 2026-10-31 b-929: gate replay keys now embed the owner freeze-gate cache
-    # key so inert membership, water, and formula identity cannot alias curves.
-    # The follow-up also keys the post-inert submitted composition and passes
-    # PT-0-quantized pressure to the owner. This prior Studio-2 literal awaits
-    # the follow-up run.
-    assert key_hash == "9392021e2f9eb29198293ce38e74f7c4f15d2c5df8c18851a55bdeed3642b43d"
+    # 2026-10-31 b-929: Studio-2 canonical bytes after gate replay identity
+    # began embedding the owner freeze-gate key. The key now binds the submitted
+    # post-inert composition and inert membership, plus water/formula identity.
+    assert key_hash == "4f2faa2ce387a1195d8d65561be1c9dd5dece161798b5a20df7db648349177eb"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -820,10 +818,11 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
-    # This SILICATE_EQUILIBRIUM key now includes the same owner input identity
-    # as gate replay; leave the old Studio-canonical pin for the review rerun.
+    # Studio-2 canonical bytes at f82e95910 after equilibrium replay keys began
+    # carrying the submitted post-inert composition and inert membership, with
+    # the same owner provider-input identity used by gate replay.
     assert _key_hash(base) == (
-        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+        "b5b37b2bd98b012a2e85887dbf16cb3f82444ea5adc561c976e9d80e59b61521"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
@@ -1003,20 +1002,20 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        (None, "7a07fc993ebdcccd17292967a6df9167ebd3b9ce1d2cceebc047bf4384dd1ef3"),
+        ("", "767e427c7663a01d8f5321355f9cbf1cf1e1be3b4caab598c106d1ead85767f2"),
+        (DEFAULT_ALPHAMELTS_MODEL, "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
+        ("pMELTS", "3bf3132d3a294220002d743a264e206882f30eadc707ce237f2c03bc47ff549f"),
+        ("MELTSv1.1.0", "bf940f7d7647b0fd3624de9157070ad835756a5eca1efcf4a31f494bce780ec8"),
+        ("MELTSv1.2.0", "c32a5f65e1ff0b5341296e616da37e37ee4cc38a2087f555fdc6cc2503b592ec"),
     ],
 )
-def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
     model: str | None,
     expected_hash: str,
 ) -> None:
-    # Hashes captured by the review probe at base
-    # 05b6309d30cfed84d5e2ecd0467106d5702ce628.
+    # Studio-2 canonical hashes at f82e95910. These keys now include the
+    # submitted post-inert composition and inert membership.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
@@ -1026,15 +1025,15 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        (None, "7a07fc993ebdcccd17292967a6df9167ebd3b9ce1d2cceebc047bf4384dd1ef3"),
+        ("", "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
+        (DEFAULT_ALPHAMELTS_MODEL, "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
+        ("pMELTS", "3bf3132d3a294220002d743a264e206882f30eadc707ce237f2c03bc47ff549f"),
+        ("MELTSv1.1.0", "bf940f7d7647b0fd3624de9157070ad835756a5eca1efcf4a31f494bce780ec8"),
+        ("MELTSv1.2.0", "c32a5f65e1ff0b5341296e616da37e37ee4cc38a2087f555fdc6cc2503b592ec"),
     ],
 )
-def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+def test_cached_real_python_api_replay_key_hashes_include_provider_input_identity(
     tmp_path: Path,
     model: str | None,
     expected_hash: str,
@@ -1061,7 +1060,8 @@ def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
     key = store._equilibrium_key(sim)
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
 
-    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 reviewer probe.
+    # Studio-2 canonical hashes at f82e95910 after submitted composition and
+    # inert membership became part of equilibrium replay identity.
     assert actual_hash == expected_hash
     if model is None:
         live_key, _authority = _alphamelts_pt0_identity(
@@ -1180,10 +1180,8 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
 
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
-    # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
-    # b-929 first added the owner freeze-gate key. The follow-up uses the
-    # provider-submitted inert-filtered composition and PT-0-quantized pressure;
-    # the existing literals below await Studio-2's canonical repin.
+    # Studio-2 canonical bytes at f82e95910 after gate keys began embedding the
+    # owner freeze-gate provider-input identity and submitted composition.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1200,9 +1198,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 2220
+    assert len(magemin_bytes) == 1320
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "8b1411ae7a83404ae1012d3093f86d642285a4c7f008e9a53724ecff22ada7ac"
+        "ce998a40295ba91cf382a415a4701fe80926c8aa4974f166ef4730d42324b16f"
     )
 
     generic_store = PT0DeterminismStore("capture")

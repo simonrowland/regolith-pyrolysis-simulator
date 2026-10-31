@@ -59,7 +59,7 @@ from tests.binding_admission_fixtures import (
 )
 
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
-    "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+    "ccfcea5d46d4478093df67dd50293db53bb2d6faff8eb87984bd2a9e68437d94"
 )
 _DEFAULT_MELTS_PROVIDER_KEY_HASH = (
     "0435dada46c55b064f6593edae3fbbac9c556e00ea56807944400dccbc3bc30a"
@@ -635,8 +635,10 @@ def test_cached_real_identity_matches_live_alphamelts_identity(
         "mode": "subprocess",
         "magemin_database": None,
     }
+    # Studio-2 canonical equilibrium key now includes submitted composition
+    # and inert membership in addition to the provider identity.
     assert _key_hash(blank_key) == (
-        "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+        "ccfcea5d46d4478093df67dd50293db53bb2d6faff8eb87984bd2a9e68437d94"
     )
 
 
@@ -1037,7 +1039,9 @@ def test_cached_real_provider_fallback_resolves_absent_or_blank_model(
 def test_current_cached_real_replay_key_bytes_and_live_result_shape(
     tmp_path: Path,
 ) -> None:
-    # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    # Studio-2 canonical replay-key bytes at f82e95910 after gate keys began
+    # embedding the owner freeze-gate input identity and equilibrium keys began
+    # binding submitted composition and inert membership. Live payload is unchanged.
     cases = (
         (
             "alphamelts-subprocess",
@@ -1049,8 +1053,8 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 model="MELTSv1.0.2",
                 mode="subprocess",
             ),
-            792,
-            "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e",
+            1364,
+            "ccfcea5d46d4478093df67dd50293db53bb2d6faff8eb87984bd2a9e68437d94",
         ),
         (
             "alphamelts-python-api-normalized",
@@ -1062,8 +1066,8 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 model="",
                 mode="python_api",
             ),
-            792,
-            "6768a423ef0a7b5dc476f44ec34cd100a2dc685a29271ef1434731e6ee68b3ff",
+            1364,
+            "74852aeacd50ff64467fd5ae34f5c9266c8dcd663d5e3a3eec370cd2907c4012",
         ),
         (
             "thermoengine",
@@ -1076,8 +1080,8 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
                 mode="thermoengine",
                 family=RealBackendFamily.THERMOENGINE,
             ),
-            761,
-            "910db5e7dcb63560d952207f990bb0ae61800a17dc83dc3414440df08240886b",
+            1333,
+            "71b20ce406953d8501b3f30d9b7ef615a115f31e0eb373de80ce9291690d0e1e",
         ),
     )
 
@@ -1118,9 +1122,9 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
         "mode": "AlphaMELTSProvider",
         "magemin_database": None,
     }
-    assert len(direct_bytes) == 810
+    assert len(direct_bytes) == 1382
     assert hashlib.sha256(direct_bytes).hexdigest() == (
-        "c1b77e3754d6d4bc7ebfc2d941dba750dbf08c2acbe18ebfbfcbbf8436361cfe"
+        "c1df11cd2c6ad7f7cf99f6f317d49763c959c45d59071fbbbe4d07154259d61a"
     )
 
     live_sim = _build_direct_real_sim(_FakeLiveRealBackend())
