@@ -43,8 +43,11 @@ from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
-from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.feedstock_composition import (
+    FEOT_FROM_FE2O3,
+    iron_oxide_feot_oxygen_wt_pct,
+)
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -2427,20 +2430,15 @@ def test_magemin_pressure_conversion_helpers_are_exact():
 
 
 def test_magemin_feot_conversion_uses_iupac_2feo_mass():
-    # Current standard atomic weights: Fe 55.845, O 15.999 g/mol.
-    feo_molar_mass = (
-        MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
-        + MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
-    )
-    fe2o3_molar_mass = (
-        2 * MAGEMinBackend._FE_MOLAR_MASS_G_PER_MOL
-        + 3 * MAGEMinBackend._O_MOLAR_MASS_G_PER_MOL
-    )
-    feot_numerator = 2 * feo_molar_mass
+    feo_molar_mass = resolve_species_formula(
+        "FeO"
+    ).molar_mass_g_per_mol()
+    fe2o3_molar_mass = resolve_species_formula(
+        "Fe2O3"
+    ).molar_mass_g_per_mol()
 
-    assert feot_numerator == pytest.approx(143.688)
     assert FEOT_FROM_FE2O3 == pytest.approx(
-        feot_numerator / fe2o3_molar_mass
+        2.0 * feo_molar_mass / fe2o3_molar_mass
     )
 
 
@@ -2487,9 +2485,9 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert mp.vector[mp.order.index("MnO")] == pytest.approx(0.4)
     assert "Cr2O3" not in mp.composition_wt_pct
     assert mp.dropped_components == ("Cr2O3",)
-    assert mp.merged_components == ("FeO->FeOt+O",)
+    assert mp.merged_components == ("FeO->FeOt",)
     assert any("Cr2O3" in warning for warning in mp.warnings)
-    assert any("FeO->FeOt+O" in warning for warning in mp.warnings)
+    assert any("FeO->FeOt" in warning for warning in mp.warnings)
 
     igad = backend._build_db_bulk_projection(composition, database="igad")
     assert "H2O" not in igad.order
@@ -2544,7 +2542,7 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         {'SiO2': 60.0, 'MgO': 40.0},
     )
 
-    args, buffer_name, buffer_n, _warnings = (
+    args, buffer_name, buffer_n, _warnings, buffer_o_reservoir = (
         backend._build_magemin_subprocess_args(
             bulk_projection=projection,
             temperature_C=1234.5,
@@ -2560,11 +2558,12 @@ def test_magemin_subprocess_argument_vector_matches_golden():
         '--Temp=1234.500000',
         '--Pres=10.000000',
         '--sys_in=wt',
-        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000',
+        '--Bulk=60.000000,0.000000,0.000000,40.000000,0.000000,0.000000,0.000000,0.000000,10.000000,0.000000,0.000000',
         '--buffer=nno',
         '--buffer_n=0.000000',
     ]
     assert (buffer_name, buffer_n) == ('nno', 0.0)
+    assert buffer_o_reservoir == 10.0
 
 
 def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
@@ -2575,9 +2574,11 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
 
     expected_feot = 10.0 + FEOT_FROM_FE2O3
     assert vector[feot_index] == pytest.approx(expected_feot)
-    assert vector[oxygen_index] == pytest.approx(
-        MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
-    )
+    _feot, excess_o = iron_oxide_feot_oxygen_wt_pct({
+        "FeO": 10.0,
+        "Fe2O3": 1.0,
+    })
+    assert vector[oxygen_index] == excess_o
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(11.0)
 
 
@@ -2599,8 +2600,9 @@ def test_magemin_bulk_projection_preserves_ledger_iron_and_oxygen(
     projection = backend._build_db_bulk_projection(composition_wt_pct)
 
     # Each wt% entry is grams per 100 g of the declared composition. Resolve
-    # atoms independently on both sides so the assertion checks the actual
-    # FeOt/O vector that MAGEMin receives against the source oxide inventory.
+    # atoms independently on both sides to compare the feedstock projection
+    # with its source inventory. The solver-only buffer O is added separately
+    # when CLI arguments are built and is not part of the feedstock ledger.
     assert _atom_moles_on_wt_basis(
         projection.composition_wt_pct, "Fe"
     ) == _atom_moles_on_wt_basis(composition_wt_pct, "Fe")
@@ -2614,12 +2616,12 @@ def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    assert vector[oxygen_index] == pytest.approx(
-        1.0 * MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR
-    )
+    assert vector[oxygen_index] == iron_oxide_feot_oxygen_wt_pct(
+        {"FeO": 10.0, "Fe2O3": 1.0}
+    )[1]
 
 
-def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
+def test_magemin_ig_bulk_vector_keeps_feo_total_iron_oxygen_exact():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector(
         {
@@ -2633,11 +2635,8 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    feo_excess_o = 16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-    assert vector[oxygen_index] == pytest.approx(feo_excess_o)
-    assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
-    assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
-    assert vector[oxygen_index] > 0.0
+    assert vector[feot_index] == 16.5
+    assert vector[oxygen_index] == 0.0
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):

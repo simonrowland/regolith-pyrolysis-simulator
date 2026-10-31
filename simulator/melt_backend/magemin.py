@@ -152,7 +152,16 @@ from simulator.melt_backend.pure_phase import (
 )
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.feedstock_composition import (
+    iron_oxide_feot_oxygen_wt_pct,
+    iron_oxide_values,
+)
+
+
+# MAGEMin's QFM tutorial uses O=10 wt% to make the requested buffer active.
+# This is solver-only oxygen added to the CLI vector, never feedstock O.
+# Source: MAGEMinApp QFM tutorial, buffer offset section, v1.8.5.
+_MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT = 10.0
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -2369,29 +2378,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         'H2O',
         'S',
     )))
-    # Current standard atomic weights used for FeOt total-iron conversion.
-    # The shared accounting table is rounded for legacy kg<->mol tests.
-    _FE_MOLAR_MASS_G_PER_MOL = 55.845
-    _O_MOLAR_MASS_G_PER_MOL = 15.999
-    _FEO_MOLAR_MASS_G_PER_MOL = (
-        _FE_MOLAR_MASS_G_PER_MOL + _O_MOLAR_MASS_G_PER_MOL
-    )
-    _FE2O3_MOLAR_MASS_G_PER_MOL = (
-        2 * _FE_MOLAR_MASS_G_PER_MOL + 3 * _O_MOLAR_MASS_G_PER_MOL
-    )
-    _EXCESS_O_FROM_FE2O3_FACTOR = (
-        _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
-    )
-    # Lunar/Apollo bulk chemistry reports total iron as ``FeO`` / ``FeO_T`` —
-    # a spectroscopy bookkeeping convention, not literal stoichiometric FeO.
-    # MAGEMin still needs a nonzero ``O`` bulk component for the qfm buffer.
-    # When no explicit ``Fe2O3`` is present, provision redox O from the total
-    # iron inventory using the same half-O-per-Fe stoichiometry as explicit
-    # Fe2O3 excess oxygen (mass-conserving with the Fe2O3 path above).
-    _EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR = (
-        _O_MOLAR_MASS_G_PER_MOL / (2.0 * _FEO_MOLAR_MASS_G_PER_MOL)
-    )
-
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
     # works in absolute log10(fO2); MAGEMin's single-point CLI takes a
     # named buffer, so absent an explicit buffer config the adapter uses
@@ -2422,7 +2408,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         fO2_log: float,
     ) -> str:
         """Return a bounded record of the exact timed-out MAGEMin request."""
-        args, buffer_name, buffer_n, _buffer_warnings = (
+        args, buffer_name, buffer_n, _buffer_warnings, _buffer_o_reservoir = (
             self._build_magemin_subprocess_args(
                 bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
@@ -2982,7 +2968,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
-    ) -> Tuple[List[str], str, float, Tuple[str, ...]]:
+    ) -> Tuple[List[str], str, float, Tuple[str, ...], float]:
         """Build the canonical MAGEMin argv and resolved buffer values."""
         if self._binary_path is None:
             raise RuntimeError('MAGEMin subprocess bridge has no binary path')
@@ -2991,6 +2977,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             temperature_C=temperature_C,
             fO2_log=fO2_log,
         )
+        buffer_o_reservoir = (
+            _MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT
+            if buffer_name in self._BUFFER_CHOICES
+            and 'O' in bulk_projection.order
+            else 0.0
+        )
+        bulk_vector = list(bulk_projection.vector)
+        if buffer_o_reservoir > 0.0:
+            bulk_vector[bulk_projection.order.index('O')] += (
+                buffer_o_reservoir
+            )
         args = [
             str(binary_path),
             '--Verb=0',
@@ -2999,12 +2996,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             f'--Pres={pressure_kbar:.6f}',
             '--sys_in=wt',
             '--Bulk=' + ','.join(
-                f'{value:.6f}' for value in bulk_projection.vector
+                f'{value:.6f}' for value in bulk_vector
             ),
             f'--buffer={buffer_name}',
             f'--buffer_n={buffer_n:.6f}',
         ]
-        return args, buffer_name, buffer_n, tuple(buffer_warnings)
+        return (
+            args,
+            buffer_name,
+            buffer_n,
+            tuple(buffer_warnings),
+            buffer_o_reservoir,
+        )
 
     def _call_magemin_subprocess(
         self,
@@ -3038,7 +3041,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
         """
-        args, buffer_name, buffer_n, buffer_warnings = (
+        args, buffer_name, buffer_n, buffer_warnings, _buffer_o_reservoir = (
             self._build_magemin_subprocess_args(
                 bulk_projection=bulk_projection,
                 temperature_C=temperature_C,
@@ -3257,24 +3260,25 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 + ', '.join(sorted(unknown))
             )
 
-        feot = source.pop('FeOt', 0.0) + total_fe(composition_wt_pct)
-        excess_o = source.pop('O', 0.0)
+        # MAGEMin reads FeOt on the FeO-equivalent basis, so nFe=FeOt/MFeO.
+        # The removed local factor was f=MO/(2*MFeO)=15.999/(2*71.844)
+        # =0.111345..., making pure FeO arrive as nFe_old=(1-f)*nFe: an
+        # 11.1345% loss. Units cancel because both molar masses are g/mol.
+        # The owner returns FeOt=FeO+2*MFeO*Fe2O3/MFe2O3 and excess
+        # O=MO*Fe2O3/MFe2O3; hence FeOt/MFeO=FeO/MFeO+2Fe2O3/MFe2O3,
+        # while FeOt/MFeO+O/MO=FeO/MFeO+3Fe2O3/MFe2O3. Each term is mol
+        # atoms per declared 100 g, conserving ledger Fe and O; for pure FeO,
+        # Fe2O3=0 and the owner's excess-O term is exactly zero.
+        feot, excess_o = iron_oxide_feot_oxygen_wt_pct(
+            composition_wt_pct
+        )
+        feot += source.pop('FeOt', 0.0)
+        excess_o += source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:
-            merged.append('FeO->FeOt+O')
+            merged.append('FeO->FeOt')
         if fe2o3 > 0.0:
             merged.append('Fe2O3->FeOt+O')
-
-        # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
-        # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
-        excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
-        if fe2o3 <= 0.0 and feo > 0.0:
-            # FeO key is total-iron inventory (FeO_T), not literal FeO only.
-            # Peel buffer O from the FeOt slot so FeOt + O == feo (same
-            # mass bookkeeping as the explicit Fe2O3 fold above).
-            feo_excess_o = feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-            excess_o += feo_excess_o
-            feot -= feo_excess_o
 
         if feot > 0.0:
             source['FeOt'] = source.get('FeOt', 0.0) + feot

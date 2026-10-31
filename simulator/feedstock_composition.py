@@ -177,6 +177,41 @@ def feot_equivalent_moles(feedstock_or_composition: Mapping[str, Any]) -> float:
     return feo_moles + 2.0 * fe2o3_moles
 
 
+def iron_oxide_feot_oxygen_wt_pct(
+    feedstock_or_composition: Mapping[str, Any],
+) -> tuple[float, float]:
+    """Decompose iron oxides into FeOt mass and excess atomic-O mass.
+
+    On a declared gram basis, let a = FeO mass and b = Fe2O3 mass, with
+    M1 = M(FeO), M2 = M(Fe2O3), and MO = M(O), all in g/mol. Then the
+    input contains nFe = a/M1 + 2b/M2 and nO = a/M1 + 3b/M2 mol atoms.
+    FeOt = total_fe(input) = a + 2M1*b/M2 carries nFe mol Fe and nFe mol O.
+    The remaining O mass is b*(1 - 2M1/M2) = MO*b/M2, since M2 = 2M1 + MO.
+    Dividing that mass by MO gives b/M2 mol O, so both atom totals close.
+    Units are grams on the input basis (wt% is grams per 100 declared grams).
+    Pure FeO needs no excess O; pure Fe2O3 becomes 2 FeO + O per formula unit.
+    No oxygen reservoir or unknown ferric inventory is inferred.
+    """
+    feo, fe2o3 = iron_oxide_values(feedstock_or_composition)
+    iron_moles = {
+        oxide: mass / resolve_species_formula(oxide).molar_mass_g_per_mol()
+        for oxide, mass in (("FeO", feo), ("Fe2O3", fe2o3))
+    }
+    feot_moles = feot_equivalent_moles(iron_moles)
+    oxygen_moles = math.fsum(
+        iron_moles[oxide]
+        * resolve_species_formula(oxide).elements.get("O", 0.0)
+        for oxide in iron_moles
+    )
+    feot_mass = (
+        feot_moles * resolve_species_formula("FeO").molar_mass_g_per_mol()
+    )
+    excess_oxygen_mass = (
+        oxygen_moles - feot_moles
+    ) * resolve_species_formula("O").molar_mass_g_per_mol()
+    return feot_mass, excess_oxygen_mass
+
+
 def fe2o3_equivalent_wt_pct(
     feedstock_or_composition: Mapping[str, Any],
     feo_to_fe2o3_factor: float = DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,
