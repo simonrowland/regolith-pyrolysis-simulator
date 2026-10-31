@@ -7944,10 +7944,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             alpha_data.get('liquid_transition_K') or math.inf
         )
         if T_K >= liquid_transition_K:
-            authority_status = 'out_of_domain'
+            authority_status = 'extrapolated'
+            temperature_range_K = alpha_data['temperature_range_K']
             authority_notice = (
-                f'{authority_notice} Evaluated at {T_K:.2f} K, where Fe is liquid; '
-                'no liquid-Fe evaporation coefficient is certified.'
+                f'{authority_notice} The certified solid-Fe band is '
+                f'{float(temperature_range_K[0]):g}-'
+                f'{float(temperature_range_K[1]):g} K; evaluated at '
+                f'{T_K:.2f} K, where Fe is liquid above the band. No '
+                'liquid-Fe evaporation coefficient is certified.'
             )
         alpha_evaluation.update({
             'alpha_authority_status': authority_status,

@@ -35,7 +35,7 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
         # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
         # the lunar cleaned-melt basis; migration routing assertions below stay.
         "native_fe_mol": 1607.3611432553353,
-        "native_vapor_Fe_kg": 0.1682078458614615,
+        "native_vapor_Fe_kg": 7.569353063765769,
     },
     "mars_basalt": {
         # Recomputed after 9de6ffb8: counterfactual tracing attributes the
@@ -330,10 +330,19 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         expected_native_fe_mol,
         abs=2e-2,
     )
+    assert partition["native_fe_vapor_mol"] < partition["native_fe_pool_mol"]
+    assert partition["native_fe_vapor_mol"] == pytest.approx(
+        partition["native_fe_vapor_capacity_mol_hr"],
+        abs=1e-9,
+    )
     assert tap_fe_credit_mol + partition["native_fe_vapor_mol"] == pytest.approx(
         partition["native_fe_pool_mol"],
         abs=1e-9,
     )
+    assert partition["alpha_Fe"] == pytest.approx(0.9, abs=1e-12)
+    assert partition["alpha_authority_status"] == "extrapolated"
+    assert "1358-1520 K" in partition["alpha_authority_notice"]
+    assert "liquid above the band" in partition["alpha_authority_notice"]
     # 2026-07-02 re-speciation #82: vapor Fe retains its oxide O in fO2 buffer.
     assert overhead_o2_credit_mol + retained_o2_mol == pytest.approx(
         0.5 * partition["native_fe_pool_mol"], abs=1e-9
