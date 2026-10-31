@@ -12,6 +12,7 @@ real MAGEMin binary runs end to end when one is built locally.
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import subprocess
@@ -43,6 +44,7 @@ import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.feedstock_composition import FEOT_FROM_FE2O3
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -59,6 +61,45 @@ from simulator.melt_backend.magemin import (
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+_LUNAR_MARE_LOW_TI_MAGEMIN_BULK = {
+    "SiO2": 44.5,
+    "TiO2": 1.5,
+    "Al2O3": 13.5,
+    "FeO": 16.5,
+    "MgO": 9.0,
+    "CaO": 11.0,
+    "Na2O": 0.4,
+    "K2O": 0.10,
+    "Cr2O3": 0.35,
+}
+_MARS_BASALT_MAGEMIN_BULK = {
+    "SiO2": 45.5,
+    "TiO2": 1.0,
+    "Al2O3": 10.5,
+    "FeO": 18.0,
+    "MgO": 8.5,
+    "CaO": 7.0,
+    "Na2O": 3.0,
+    "K2O": 0.50,
+}
+
+
+def _atom_moles_on_wt_basis(composition_wt_pct, element):
+    """Count formula-resolved atoms on the shared 100 g composition basis."""
+    atom_moles = []
+    for component, raw_amount in composition_wt_pct.items():
+        amount = float(raw_amount)
+        if amount <= 0.0:
+            continue
+        formula = resolve_species_formula(
+            "FeO" if component == "FeOt" else component
+        )
+        atom_moles.append(
+            amount * formula.elements.get(element, 0.0)
+            / formula.molar_mass_g_per_mol()
+        )
+    return math.fsum(atom_moles)
 
 
 def _bootstrap_sleeping_magemin_worker():
@@ -2540,6 +2581,34 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(11.0)
 
 
+@pytest.mark.parametrize(
+    "composition_wt_pct",
+    [
+        pytest.param({"FeO": 10.0}, id="pure-feo"),
+        pytest.param({"FeO": 10.0, "Fe2O3": 1.0}, id="mixed-feo-fe2o3"),
+        pytest.param(
+            _LUNAR_MARE_LOW_TI_MAGEMIN_BULK,
+            id="lunar-mare-low-ti",
+        ),
+    ],
+)
+def test_magemin_bulk_projection_preserves_ledger_iron_and_oxygen(
+    composition_wt_pct,
+):
+    backend = MAGEMinBackend()
+    projection = backend._build_db_bulk_projection(composition_wt_pct)
+
+    # Each wt% entry is grams per 100 g of the declared composition. Resolve
+    # atoms independently on both sides so the assertion checks the actual
+    # FeOt/O vector that MAGEMin receives against the source oxide inventory.
+    assert _atom_moles_on_wt_basis(
+        projection.composition_wt_pct, "Fe"
+    ) == _atom_moles_on_wt_basis(composition_wt_pct, "Fe")
+    assert _atom_moles_on_wt_basis(
+        projection.composition_wt_pct, "O"
+    ) == _atom_moles_on_wt_basis(composition_wt_pct, "O")
+
+
 def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector({"FeO": 10.0, "Fe2O3": 1.0})
@@ -3473,12 +3542,13 @@ def test_magemin_live_subliquidus_run_reports_crystalline_phases(request):
     _LIVE_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
-def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane(request):
-    """Apollo low-Ti mare basalt sample 12009 begins crystallizing near 1230 C.
+def test_magemin_live_shipped_gate_liquidus_and_phase_outputs_are_pinned(request):
+    """Pin current liquidus and phase outputs for shipped mare and Mars bulks.
 
     Reference: Walker et al. 1971, Experimental petrology of Apollo 12 basalts,
-    part 1, sample 12009. This feedstock is only an Apollo 12/15 low-Ti soil
-    analog, so the test checks a sane bracket rather than a forced retune.
+    part 1, sample 12009. The shipped lunar feedstock is an Apollo 12/15
+    low-Ti soil analog, so these pins measure the current model output; they
+    are not calibration targets.
     """
     backend = MAGEMinBackend()
     request.addfinalizer(backend.close)
@@ -3488,20 +3558,8 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane(request):
     if not available:
         pytest.skip("MAGEMin binary present but backend failed to initialize")
 
-    lunar_mare_low_ti_wt_pct = {
-        "SiO2": 44.5,
-        "TiO2": 1.5,
-        "Al2O3": 13.5,
-        "FeO": 16.5,
-        "MgO": 9.0,
-        "CaO": 11.0,
-        "Na2O": 0.4,
-        "K2O": 0.10,
-        "Cr2O3": 0.35,
-    }
-
     result = backend.find_liquidus_solidus(
-        composition_kg=lunar_mare_low_ti_wt_pct,
+        composition_kg=_LUNAR_MARE_LOW_TI_MAGEMIN_BULK,
         fO2_log=-9.0,
         pressure_bar=1.0,
         min_T_C=800.0,
@@ -3511,19 +3569,51 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane(request):
     )
 
     assert result.status == "ok", result.warnings
+    assert (result.solidus_T_C, result.liquidus_T_C) == (918.75, 1370.3125)
     assert 900.0 <= result.solidus_T_C <= 1100.0
     assert 1200.0 <= result.liquidus_T_C <= 1450.0
     assert result.liquidus_T_C >= result.solidus_T_C
 
     phase_result = backend.equilibrate(
         1300.0,
-        composition_kg=lunar_mare_low_ti_wt_pct,
+        composition_kg=_LUNAR_MARE_LOW_TI_MAGEMIN_BULK,
         fO2_log=-9.0,
         pressure_bar=1.0,
     )
 
     assert phase_result.status == "ok", phase_result.warnings
-    assert phase_result.phases_present
+    assert phase_result.liquid_fraction == 0.9963169287905369
+    assert phase_result.phases_present == ["liq", "spl"]
+    assert phase_result.phase_masses_kg == {"liq": 0.97114, "spl": 0.00359}
+
+    mars_result = backend.find_liquidus_solidus(
+        composition_kg=_MARS_BASALT_MAGEMIN_BULK,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+    assert mars_result.status == "ok", mars_result.warnings
+    assert (mars_result.solidus_T_C, mars_result.liquidus_T_C) == (
+        859.375,
+        1303.125,
+    )
+
+    mars_phase_result = backend.equilibrate(
+        1300.0,
+        composition_kg=_MARS_BASALT_MAGEMIN_BULK,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert mars_phase_result.status == "ok", mars_phase_result.warnings
+    assert mars_phase_result.liquid_fraction == 0.9971600263417847
+    assert mars_phase_result.phases_present == ["liq", "ol"]
+    assert mars_phase_result.phase_masses_kg == {
+        "liq": 0.96908,
+        "ol": 0.00276,
+    }
 
 
 # Pure-endmember melting references retained for any future calibrated engine
