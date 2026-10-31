@@ -17,6 +17,7 @@ from simulator.battery.enums import (
     Engine,
     ExecutionState,
     Quantity,
+    RefusalReason,
 )
 from simulator.battery.identity import quantity_token
 from simulator.battery.records import Composition, Located, State
@@ -294,9 +295,11 @@ def _source_data():
 
 @pytest.mark.parametrize("sample_has_p2o5", (False, True))
 def test_openimcc_sp_hashimoto_screening_uses_consumed_printed_inventory(
-    sample_has_p2o5,
+    sample_has_p2o5, monkeypatch,
 ):
+    """Hashimoto refuses P2O5 because the runtime gas catalog has no P row."""
     pytest.importorskip("openimcc", reason="openimcc is not importable")
+    import simulator.battery.residue as residue
     from simulator.battery.score import (
         _HASHIMOTO_SOURCE_ID,
         _hashimoto_residue_prediction,
@@ -305,11 +308,14 @@ def test_openimcc_sp_hashimoto_screening_uses_consumed_printed_inventory(
 
     engine = Engine.OPENIMCC_SP
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
-    reference = next(
-        row
-        for row in context.observations.values()
-        if row.source_id == "kems-015-hashimoto-1983"
-        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    reference = min(
+        (
+            row
+            for row in context.observations.values()
+            if row.source_id == "kems-015-hashimoto-1983"
+            and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ),
+        key=lambda row: row.experiment_id,
     )
     hashimoto_experiment_ids = {
         row.experiment_id
@@ -364,25 +370,58 @@ def test_openimcc_sp_hashimoto_screening_uses_consumed_printed_inventory(
         ),
     )
 
+    original_predict_cohort = residue._predict_hashimoto_residue_cohort
+
+    def predict_reference_run_only(experiments, runtime_catalog, **kwargs):
+        reference_experiment = next(
+            experiment
+            for experiment in experiments
+            if experiment["experiment_id"] == reference.experiment_id
+        )
+        return original_predict_cohort(
+            [reference_experiment],
+            runtime_catalog,
+            _allow_partial_cohort_for_test=True,
+            **kwargs,
+        )
+
+    monkeypatch.setattr(
+        residue, "_predict_hashimoto_residue_cohort", predict_reference_run_only
+    )
+
     prediction = _hashimoto_residue_prediction(context, reference, engine, {})
 
-    assert prediction.execution.state is ExecutionState.PRODUCED
+    failure = (
+        f"refusal_reason={prediction.refusal_reason}; "
+        f"refusal_detail={prediction.refusal_detail}"
+    )
+    if sample_has_p2o5:
+        assert prediction.execution.state is ExecutionState.NOT_PROBED, failure
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED, failure
+        assert (
+            prediction.refusal_detail.get("reason")
+            == "hashimoto_runtime_catalog_channel_missing"
+        ), failure
+        assert "no catalog row for P/P2O5" in str(
+            prediction.refusal_detail.get("detail")
+        ), failure
+        return
+
+    assert prediction.execution.state is ExecutionState.PRODUCED, failure
     consumed = prediction.requested_composition
-    assert consumed is not None and consumed.is_value
-    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+    assert consumed is not None and consumed.is_value, failure
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
     consumed_has_p2o5 = any(
         name == "P2O5" and amount > 0
         for name, amount in consumed.value.components
     )
-    assert consumed_has_p2o5 is sample_has_p2o5
+    assert consumed_has_p2o5 is sample_has_p2o5, failure
     p2o5_notices = tuple(
         notice
         for notice in prediction.notices
         if notice.reason.startswith("P2O5 parent reference state:")
     )
-    assert bool(p2o5_notices) is sample_has_p2o5
-    if sample_has_p2o5:
-        assert prediction.authority is Authority.EXTRAPOLATED
+    assert not p2o5_notices, failure
 
 
 def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:

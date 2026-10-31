@@ -28,7 +28,15 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition, Execution, Species, State
+from simulator.battery.records import (
+    Composition,
+    Execution,
+    Located,
+    Species,
+    State,
+    ThermalSchedule,
+    Value,
+)
 from simulator.battery.score import (
     ENGINE_COEFFICIENT_SOURCES,
     ENGINE_CHANNELS,
@@ -85,11 +93,6 @@ _OPENIMCC_GREEN_PREDICTION_SHA256 = {
     "residue": "794d18de88174b14f28d12617d163c9e863e6261abd3fe44e6a13e8a17994925",
     "mass_loss": "c3acd11cfc46b5067fba2de6c401c7cf7a661ccc36f77f923d1dca190358676a",
 }
-_OPENIMCC_SP_PRODUCER_EXEMPTIONS = {
-    "redox": "the produced prediction identity is replaced with the consumed material composition",
-}
-
-
 def _composition_with_p2o5(
     template: Composition, *, present: bool
 ) -> Composition:
@@ -313,6 +316,7 @@ def test_openimcc_sp_activity_screening_uses_observation_composition(
 def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     sample_has_p2o5: bool,
 ) -> None:
+    """A P2O5 mass-loss charge is refused when its gas channel is absent."""
     pytest.importorskip("openimcc", reason="openimcc is not importable")
 
     context = load_score_context(
@@ -330,6 +334,16 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     assert stated is not None and stated.state.is_value
     initial = _composition_with_p2o5(
         stated.state.value, present=sample_has_p2o5
+    )
+    schedule = experiment.thermal_schedule or ThermalSchedule()
+    experiment = replace(
+        experiment,
+        thermal_schedule=replace(
+            schedule,
+            total_duration_s=Located(
+                State.of(Value.point_of("5400")), stated.locator
+            ),
+        ),
     )
     experiment = replace(
         experiment,
@@ -352,19 +366,29 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
         _sp_engine(), reference, experiment=experiment, isolated=False
     )
 
-    assert prediction.execution.state is ExecutionState.PRODUCED
+    failure = (
+        f"refusal_reason={prediction.refusal_reason}; "
+        f"refusal_detail={prediction.refusal_detail}"
+    )
+    if sample_has_p2o5:
+        assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE, failure
+        assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE, failure
+        assert prediction.refusal_detail.get("reason") == "residue_gas_channel_missing", failure
+        return
+
+    assert prediction.execution.state is ExecutionState.PRODUCED, failure
     consumed = prediction.requested_composition
-    assert consumed is not None and consumed.is_value
-    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+    assert consumed is not None and consumed.is_value, failure
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
     consumed_has_p2o5 = any(
         name == "P2O5" and amount > 0
         for name, amount in consumed.value.components
     )
-    assert consumed_has_p2o5 is sample_has_p2o5
+    assert consumed_has_p2o5 is sample_has_p2o5, failure
     assert any(
         notice.reason.startswith("P2O5 parent reference state:")
         for notice in prediction.notices
-    ) is sample_has_p2o5
+    ) is sample_has_p2o5, failure
 
 
 @pytest.mark.parametrize(
@@ -447,88 +471,7 @@ def test_openimcc_sp_pure_reservoir_records_consumed_pot(
     ) is has_p2o5
 
 
-@pytest.mark.parametrize("source", ("identity", "printed-point"))
-@pytest.mark.parametrize("consumed_has_p2o5", (False, True))
-def test_openimcc_sp_vapour_producer_walk_tracks_consumed_composition(
-    monkeypatch: pytest.MonkeyPatch,
-    source: str,
-    consumed_has_p2o5: bool,
-) -> None:
-    import simulator.battery.score as score
-    from simulator.diagnostic_helpers import binary_pot_battery
-
-    engine = _sp_engine()
-    base = Composition(
-        "ordered_complete_mole_inventory",
-        (("FeO", Decimal("0.5")), ("MgO", Decimal("0.5"))),
-        AmountBasis.MOLE_FRACTION,
-    )
-    consumed = _composition_with_p2o5(base, present=consumed_has_p2o5)
-    identity = replace(
-        F.pref_identity(T_K=Decimal("1800"), fO2_Pa=Decimal("1e-6")),
-        quantity=Quantity.P_PARTIAL,
-        species=Species("P", Phase.G),
-        composition=(
-            State.of(consumed)
-            if source == "identity"
-            else State.unknown("composition is printed at the observation point")
-        ),
-        total_pressure_Pa=State.of(Decimal("100000")),
-    )
-    experiment = F.tabulation_experiment(
-        "t1577-openimcc-sp-vapour-producer",
-        T_K=Decimal("1800"),
-        total_P=Decimal("100000"),
-    )
-    reference = F.observation(
-        "t1577-openimcc-sp-vapour-producer",
-        experiment.experiment_id,
-        identity,
-        Decimal("1"),
-        source_id="t1577-sp-vapour-producer",
-    )
-    if source == "printed-point":
-        reference = replace(
-            reference,
-            point_conditions={"composition": F.located(consumed)},
-        )
-    monkeypatch.setattr(
-        score,
-        "_open_cached_battery_handle",
-        lambda *_args: SimpleNamespace(
-            name=engine.value, available=True, identity={}
-        ),
-    )
-    monkeypatch.setattr(
-        binary_pot_battery,
-        "equilibrate_cell",
-        lambda *_args, **_kwargs: SimpleNamespace(
-            status="ok",
-            gas_partial_pressures_Pa={"P": 1.0},
-            melt_activities={},
-            melt_activity_coefficients={},
-        ),
-    )
-    monkeypatch.setattr(score, "cell_notices", lambda *_args: ())
-    monkeypatch.setattr(
-        score,
-        "_flags_from_scored_cell",
-        lambda _cell, authority, certified_band: (authority, certified_band),
-    )
-
-    prediction = predict_with_engine(
-        engine, reference, experiment=experiment, isolated=False
-    )
-
-    assert prediction.execution.state is ExecutionState.PRODUCED
-    assert prediction.requested_composition == State.of(consumed)
-    assert any(
-        notice.reason.startswith("P2O5 parent reference state:")
-        for notice in prediction.notices
-    ) is consumed_has_p2o5
-
-
-def test_openimcc_sp_redox_producer_uses_named_identity_exemption(
+def test_openimcc_sp_redox_identity_records_consumed_composition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
@@ -582,8 +525,9 @@ def test_openimcc_sp_redox_producer_uses_named_identity_exemption(
     assert prediction.requested_composition is None
     assert prediction.identity is not None
     assert prediction.identity.composition == State.of(composition)
-    assert _OPENIMCC_SP_PRODUCER_EXEMPTIONS["redox"].startswith(
-        "the produced prediction identity"
+    assert not any(
+        notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
     )
 
 
@@ -1043,6 +987,54 @@ def test_openimcc_sp_requested_composition_wins_over_identity_p2o5() -> None:
     assert prediction.authority is Authority.BRIDGE
     assert not any(
         notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
+def test_openimcc_sp_produced_prediction_flags_unrecorded_screening_input() -> None:
+    identity = replace(F.activity_identity(), composition=None)
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        identity=identity,
+    )
+
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("recorded_on_identity", (False, True))
+def test_openimcc_sp_produced_prediction_with_recorded_input_needs_no_gap_notice(
+    recorded_on_identity: bool,
+) -> None:
+    composition = Composition(
+        "ordered_complete_mole_inventory",
+        (("SiO2", Decimal("1")),),
+        AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.activity_identity(),
+        composition=State.of(composition) if recorded_on_identity else None,
+    )
+    requested = None if recorded_on_identity else State.of(composition)
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        identity=identity,
+        requested_composition=requested,
+    )
+
+    assert not any(
+        notice.reason == "P2O5 screening input not recorded"
         for notice in prediction.notices
     )
 

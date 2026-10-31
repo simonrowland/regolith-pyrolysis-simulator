@@ -13,7 +13,7 @@ from simulator.battery.enums import (
     ExperimentKind, MethodToken, Phase, Quantity,
     RegimeClass, UncertaintyKind,
 )
-from simulator.battery.identity import Identity
+from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import (
     Admission, Apparatus, ApparatusGeometry, Composition, Evidence, Experiment, FlowRegime, Located, Locator, Observation,
     PressureEnvironment, Sample, Species, State, ThermalSchedule, Uncertainty, Value,
@@ -223,7 +223,7 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
 ):
     from simulator.battery.score import _knudsen_residue_prediction
 
-    reference, experiment, _rows = extent_point
+    reference, experiment, rows = extent_point
 
     def composition(with_p2o5):
         components = (
@@ -254,7 +254,7 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
     )
     context = SimpleNamespace(
         experiments={experiment.experiment_id: experiment},
-        observations={},
+        observations={row.observation_id: row for row in rows},
         benches={},
     )
 
@@ -262,23 +262,27 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
         context, reference, Engine.OPENIMCC_SP
     )
 
-    assert prediction.execution.state is ExecutionState.PRODUCED
+    failure = (
+        f"refusal_reason={prediction.refusal_reason}; "
+        f"refusal_detail={prediction.refusal_detail}"
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED, failure
     consumed = prediction.requested_composition
-    assert consumed is not None and consumed.is_value
-    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+    assert consumed is not None and consumed.is_value, failure
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
     consumed_has_p2o5 = any(
         name == "P2O5" and amount > 0
         for name, amount in consumed.value.components
     )
-    assert consumed_has_p2o5 is sample_has_p2o5
+    assert consumed_has_p2o5 is sample_has_p2o5, failure
     p2o5_notices = tuple(
         notice
         for notice in prediction.notices
         if notice.reason.startswith("P2O5 parent reference state:")
     )
-    assert bool(p2o5_notices) is sample_has_p2o5
+    assert bool(p2o5_notices) is sample_has_p2o5, failure
     if sample_has_p2o5:
-        assert prediction.authority is Authority.EXTRAPOLATED
+        assert prediction.authority is Authority.EXTRAPOLATED, failure
 
 
 def test_openimcc_sp_unknown_consumed_residue_inventory_does_not_fall_back(
@@ -418,21 +422,33 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
         context, negative_reference, Engine.OPENIMCC_SP, cache
     )
 
-    assert positive.execution.state is ExecutionState.PRODUCED
-    assert negative.execution.state is ExecutionState.PRODUCED
+    positive_failure = (
+        f"refusal_reason={positive.refusal_reason}; "
+        f"refusal_detail={positive.refusal_detail}"
+    )
+    negative_failure = (
+        f"refusal_reason={negative.refusal_reason}; "
+        f"refusal_detail={negative.refusal_detail}"
+    )
+    assert positive.execution.state is ExecutionState.PRODUCED, positive_failure
+    assert negative.execution.state is ExecutionState.PRODUCED, negative_failure
     for prediction, sample_has_p2o5 in ((positive, True), (negative, False)):
+        failure = (
+            f"refusal_reason={prediction.refusal_reason}; "
+            f"refusal_detail={prediction.refusal_detail}"
+        )
         consumed = prediction.requested_composition
-        assert consumed is not None and consumed.is_value
-        assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+        assert consumed is not None and consumed.is_value, failure
+        assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
         consumed_has_p2o5 = any(
             name == "P2O5" and amount > 0
             for name, amount in consumed.value.components
         )
-        assert consumed_has_p2o5 is sample_has_p2o5
+        assert consumed_has_p2o5 is sample_has_p2o5, failure
         assert any(
             notice.reason.startswith("P2O5 parent reference state:")
             for notice in prediction.notices
-        ) is sample_has_p2o5
+        ) is sample_has_p2o5, failure
 
 
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
