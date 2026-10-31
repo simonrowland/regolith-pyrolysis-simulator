@@ -61,6 +61,12 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
+    # The production band pin records the controller's intended area-weighted
+    # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
+    # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
+    # through. Round-3 midpoint totals were Stage 3/4/terminal 6.937950284 /
+    # 6.226604401 / 308.156143023 kg; round-4 band totals are 3.484007094 /
+    # 6.322898104 / 311.513785826 kg. No Stage-3 SiO refusals occurred.
     # Reuse the fixture's execution, with a fresh run AFTER the observer starts.
     # A cached package fixture would run before a function-scoped observer.
     _, _, sim = full_builtin_provider_run.__wrapped__(

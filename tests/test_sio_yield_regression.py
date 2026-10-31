@@ -679,10 +679,11 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # The piecewise shared-inventory solve retains each strip until its own
-    # saturation threshold, leaving this production route's measured remainder.
+    # Production at ae5998456 explicitly reports P_sat=0 for that reactive
+    # product backstop, yielding the measured 0.6848392024862018 kg remainder.
+    # The earlier 0.6877125897008886 pin predates this diagnostic path.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6877125897008886
+        0.6848392024862018
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
