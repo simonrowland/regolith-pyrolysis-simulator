@@ -4304,17 +4304,22 @@ class CondensationModel:
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
                 diagnostic_out=diagnostic,
             )
-            flux = _series_resistance_deposition_flux_mol_m2_s(
-                species, p_in, sample_T_K, sample_alpha_s,
-                pipe_diameter_m=gas_side_length_m,
-                stir_factor=self.stir_factor,
-                radial_stir_factor=self.radial_stir_factor,
-                regime_factor=self.regime_factor,
-                T_gas_K=T_gas_K,
-                overhead_pressure_pa=overhead_pressure_pa,
-                carrier_gas=self.carrier_gas,
-                **pressure_options,
-            )
+            try:
+                flux = _series_resistance_deposition_flux_mol_m2_s(
+                    species, p_in, sample_T_K, sample_alpha_s,
+                    pipe_diameter_m=gas_side_length_m,
+                    stir_factor=self.stir_factor,
+                    radial_stir_factor=self.radial_stir_factor,
+                    regime_factor=self.regime_factor,
+                    T_gas_K=T_gas_K,
+                    overhead_pressure_pa=overhead_pressure_pa,
+                    carrier_gas=self.carrier_gas,
+                    **pressure_options,
+                )
+            except WallSaturationPressureRefusal:
+                if not diagnostic.get('wall_saturation_pressure_refused'):
+                    raise
+                flux = None
             if diagnostic.get('wall_saturation_pressure_refused'):
                 raise WallSaturationPressureRefusal(
                     species, sample_T_K,
@@ -6802,19 +6807,40 @@ def _series_resistance_deposition_flux_mol_m2_s(
         # Category 3 (see above): perfectly non-sticking surface; the
         # zero is real, not a refusal.
         return 0.0
-    driving_pressure_pa = _wall_deposition_driving_pressure_pa(
-        species,
-        P_local_pa,
-        T_surface_K,
-        vapor_pressure_data=vapor_pressure_data,
-        reactive_product_backstop=reactive_product_backstop,
-        stable_condensation_product_backstop=(
-            stable_condensation_product_backstop
-        ),
-        antoine_extrapolations=antoine_extrapolations,
-        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-        diagnostic_out=diagnostic_out,
-    )
+    try:
+        driving_pressure_pa = _wall_deposition_driving_pressure_pa(
+            species,
+            P_local_pa,
+            T_surface_K,
+            vapor_pressure_data=vapor_pressure_data,
+            reactive_product_backstop=reactive_product_backstop,
+            stable_condensation_product_backstop=(
+                stable_condensation_product_backstop
+            ),
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=diagnostic_out,
+        )
+    except WallSaturationPressureRefusal as exc:
+        if diagnostic_out is not None:
+            diagnostic_out['wall_saturation_pressure_pa'] = None
+            diagnostic_out['wall_saturation_pressure_refused'] = True
+            diagnostic_out['wall_saturation_pressure_refusal_reason'] = (
+                exc.reason
+            )
+        raise
+    if (
+        diagnostic_out is not None
+        and diagnostic_out.get('wall_saturation_pressure_refused')
+    ):
+        raise WallSaturationPressureRefusal(
+            species,
+            T_surface_K,
+            str(diagnostic_out.get(
+                'wall_saturation_pressure_refusal_reason',
+                'saturation_pressure_unavailable',
+            )),
+        )
     if driving_pressure_pa <= 0.0:
         return 0.0
 
