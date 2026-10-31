@@ -316,7 +316,19 @@ def test_pure_element_alpha_is_not_comparable_to_silicate_melt_rail() -> None:
     assert not any(r.status in {"match", "mismatch"} for r in evaluation.records)
 
 
-def test_silicate_melt_alpha_remains_comparable() -> None:
+def test_silicate_melt_alpha_remains_comparable(monkeypatch) -> None:
+    captured_runtime: list[dict] = []
+    compare = extract_reproduction.compare_values
+
+    def _capture_compare_values(**kwargs):
+        captured_runtime.append(dict(kwargs["runtime"]))
+        return compare(**kwargs)
+
+    monkeypatch.setattr(
+        extract_reproduction,
+        "compare_values",
+        _capture_compare_values,
+    )
     obs = _alpha_fixture(
         species_id="Fe",
         observation_id="fixture_melt_fe_alpha",
@@ -345,6 +357,10 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     evaluation = evaluate_observation(obs, vapor_pressure_data={"metals": {}})
     assert evaluation.skip_reason is None
     assert any(record.status in SCORING_STATUSES for record in evaluation.records)
+    assert any(
+        runtime.get("alpha_context", {}).get("alpha_authority_status") == "bridge"
+        for runtime in captured_runtime
+    )
 
 
 def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:

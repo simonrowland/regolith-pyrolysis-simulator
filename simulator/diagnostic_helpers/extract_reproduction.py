@@ -38,7 +38,7 @@ from engines.antoine import (
 )
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import (
-    ALPHA_AUTHORITY_STATUSES,
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     ALPHA_AUTHORITY_STATUS_FIELD,
     _evaluate_extracted_arrhenius_alpha,
 )
@@ -3438,7 +3438,7 @@ def _evaluate_alpha(
     # (T, α) measurements split — aggregate/midpoint-synthesized points keep
     # the whole-row verdict).
     any_pin_bearing = False
-    nonmeasurement_alpha_skip_reason: str | None = None
+    analytical_ceiling_skip_reason: str | None = None
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
@@ -3506,11 +3506,18 @@ def _evaluate_alpha(
         alpha_authority_status = (runtime.get("alpha_context") or {}).get(
             ALPHA_AUTHORITY_STATUS_FIELD
         )
-        if alpha_authority_status in ALPHA_AUTHORITY_STATUSES:
-            nonmeasurement_alpha_skip_reason = (
-                f"{_TYPED_SKIP_PREFIX}{alpha_authority_status}_not_measurement"
+        # A bridge is a flagged model prediction and remains scoreable against
+        # independently sourced measurements. Only the analytical ceiling is
+        # a non-measurement input; same-source observations are handled by the
+        # provenance self-agreement rule at their owning comparison path.
+        analytical_ceiling = (
+            alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+        )
+        if analytical_ceiling:
+            analytical_ceiling_skip_reason = (
+                f"{_TYPED_SKIP_PREFIX}{ANALYTICAL_UPPER_BOUND_ALPHA_STATUS}_not_measurement"
             )
-            runtime["skip_reason"] = nonmeasurement_alpha_skip_reason
+            runtime["skip_reason"] = analytical_ceiling_skip_reason
         # Pin-bearing only when class AND form match. Form-corrected and all
         # other non-matches keep values for audit but out-of-domain status
         # excludes them from residual pins.
@@ -3534,10 +3541,10 @@ def _evaluate_alpha(
             runtime=runtime,
             unsupported_speciation=actual is None and pin_ok,
             out_of_domain=out_of_domain,
-            assumed_input=alpha_authority_status in ALPHA_AUTHORITY_STATUSES,
+            assumed_input=analytical_ceiling,
         )
         evaluation.records.append(record)
-        if pin_ok and alpha_authority_status not in ALPHA_AUTHORITY_STATUSES:
+        if pin_ok and not analytical_ceiling:
             any_pin_bearing = True
         if pin_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
@@ -3549,8 +3556,8 @@ def _evaluate_alpha(
     if not any_pin_bearing and axes_typed_skip is not None:
         evaluation.skip_reason = axes_typed_skip
         evaluation.skip_reasons.append(axes_typed_skip)
-    elif nonmeasurement_alpha_skip_reason and not any_pin_bearing:
-        evaluation.skip_reason = nonmeasurement_alpha_skip_reason
+    elif analytical_ceiling_skip_reason and not any_pin_bearing:
+        evaluation.skip_reason = analytical_ceiling_skip_reason
         evaluation.skip_reasons.append(evaluation.skip_reason)
     elif not any_numeric:
         evaluation.skip_reason = (
