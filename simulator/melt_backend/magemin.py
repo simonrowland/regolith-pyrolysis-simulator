@@ -111,7 +111,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
-from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
@@ -124,6 +123,7 @@ from simulator.melt_backend.base import (
     RealBackendAuthority,
     RealBackendFamily,
     liquid_fraction_from_phase_masses,
+    positive_melt_mass_by_species,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
@@ -3387,21 +3387,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         species_formula_registry: Optional[Mapping[str, Any]],
     ) -> float:
         """Return the cleaned melt's physical input mass in kilograms."""
-        if composition_mol is not None:
-            return math.fsum(
-                float(mol)
-                * resolve_species_formula(
-                    species, species_formula_registry
-                ).molar_mass_kg_per_mol()
-                for species, mol in composition_mol.items()
-                if float(mol) > 0.0
+        if composition_kg is not None or composition_mol is not None:
+            mass_by_species = positive_melt_mass_by_species(
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                species_formula_registry=species_formula_registry,
             )
-        if composition_kg is not None:
-            return math.fsum(
-                float(mass_kg)
-                for mass_kg in composition_kg.values()
-                if float(mass_kg) > 0.0
-            )
+            return math.fsum(mass_by_species.values())
         # A projected oxide wt% vector has no absolute scale. Direct
         # composition-only probes use a 1 kg reference sample; equilibrate()
         # passes the actual input mass whenever one was supplied.
