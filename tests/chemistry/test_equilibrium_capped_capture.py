@@ -149,6 +149,45 @@ def test_missing_inlet_pressure_is_unavailable():
         efficiency(model, None)
 
 
+def test_sio_above_reactive_product_cutoff_is_physical_pass_through():
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (1100.0, 1200.0)
+    outcomes = []
+
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=100.0, efficiency_outcomes=outcomes,
+    )
+
+    assert eta == 0.0
+    assert outcomes[-1]["status"] == "pass_through"
+    assert outcomes[-1]["reason"] == "above_reactive_product_condensation_temperature"
+
+
+def test_sio_missing_saturation_without_reactive_backstop_refuses(monkeypatch):
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (1000.0, 1000.0)
+    monkeypatch.setattr(
+        condensation, "_reactive_product_backstop_authorized", lambda _species: False,
+    )
+    monkeypatch.setattr(
+        condensation, "_try_antoine_psat_pa", lambda *_args, **_kwargs: (None, False),
+    )
+
+    with pytest.raises(
+        condensation.WallSaturationPressureRefusal,
+        match="saturation_pressure_unavailable",
+    ):
+        model._condensation_efficiency(
+            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=4.0,
+            available_kg=1.0, alpha_s_value=0.5,
+            inlet_partial_pressure_pa=100.0,
+        )
+
+
 @pytest.mark.parametrize("band", [(math.nan, 600.0), (500.0, math.inf), (600.0, 500.0)])
 def test_invalid_stage_temperature_band_remains_a_typed_refusal(band):
     model = _configured_model()

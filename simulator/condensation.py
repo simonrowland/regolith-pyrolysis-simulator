@@ -6476,12 +6476,6 @@ def _wall_deposition_driving_pressure_pa(
             refusal_reason = "source_certified_range_refused"
         else:
             refusal_reason = "saturation_pressure_unavailable"
-        if (
-            refusal_reason == "saturation_pressure_unavailable"
-            and species == "SiO"
-            and not reactive_product_backstop
-        ):
-            return 0.0
         if diagnostic_out is not None:
             diagnostic_out["wall_saturation_pressure_pa"] = None
             diagnostic_out["wall_saturation_pressure_refused"] = True
