@@ -592,8 +592,12 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         return sum(float(values.get(species, 0.0)) for species in ("Na", "K"))
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
-    # t-1217: Stage 4 is above the alkali dew points, so Na and K stay uncaptured and escape as terminal loss.
-    assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
+    # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
+    # 40 C K trap. The production runner captures 0.0004975624607245658 kg of
+    # alkalis by this row; the preceding row remains before that capture.
+    assert alkali_total(rows[8], "product_ledger_kg_at_hour") == pytest.approx(
+        0.0004975624607245658, rel=1e-12, abs=1e-15
+    )
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == 0.0
     for key in (
         "condensation_train_kg_cumulative",

@@ -366,9 +366,15 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
+    # d-137's 250 C Na/Mg collector is colder than the former 350 C interface,
+    # so a small extra share of this Na flux condenses before the overhead
+    # account. The production value falls from 2.0217140897425274 to
+    # 1.9976229793240146 kg: delta = old - new = 0.0240911104185128 kg and
+    # delta/old = 1.19 (dimensionless). In the non-condensing hot-wall limit,
+    # this overhead tends back to the full 2.0217140897425274 kg flux.
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
-    ] == pytest.approx(2.0217140897425274)
+    ] == pytest.approx(1.9976229793240146)
     # The equilibrium cap reduces Na capture without changing its Faraday source.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"

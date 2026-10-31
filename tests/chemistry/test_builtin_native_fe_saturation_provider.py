@@ -17,6 +17,7 @@ from simulator.chemistry.kernel.validation import (
     validate_atom_balance,
     validate_proposal_accounts,
 )
+from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _atom_check, _build_sim
 
 
@@ -259,6 +260,12 @@ def _native_fe_saturating_sim(
         additives_kg=additives,
     )
     sim.melt.temperature_C = 1600.0
+    # At this manually imposed 1600 C melt state, use the matching 6 h C2A
+    # schedule point. The 0 h 1540 C hot face is below this extreme test
+    # state's Fe dew point; the production 6 h 1650 C point passes Fe to the
+    # dedicated Stage-1 collector.
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 6.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0

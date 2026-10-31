@@ -328,7 +328,8 @@ def test_fe_condensation_sidecar_loader_validates_nested_arrhenius_spec(
 def _analytical_value_ref_entry(source_class: str) -> dict[str, object]:
     return {
         "value_ref": (
-            "data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value"
+            "data/literature/vacuum_pyrolysis_sticking.yaml::"
+            "species.Fe.condensation.value"
         ),
         "citation_status": "CITED",
         "status": "sourced",
@@ -651,13 +652,14 @@ def test_null_wall_liner_alpha_falls_back_to_grounded_sidecar() -> None:
 def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     route, authority = _route_wall_deposit_authority(
         "Fe",
+        wall_temperature_C=1250.0,
         materials=_materials_with_stage_alpha(
             1,
             "Fe",
             {
                 "value_ref": (
                     "data/literature/vacuum_pyrolysis_sticking.yaml::"
-                    "species.Fe.value"
+                    "species.Fe.condensation.value"
                 ),
             },
         ),
@@ -665,13 +667,16 @@ def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
 
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
-    # The source is cited, but transfer to this collector is an inference
-    # even at the stage's in-band temperature; that stronger limitation wins.
+    # wall_temperature_C sets the interstage wall, not the condenser's stage
+    # setpoints. Stage 1 stays at the shipped 1150 C (1423.15 K), just below
+    # the Tachibana band; its production-resolved Arrhenius value is flagged
+    # out of domain, and transfer to this collector remains an inference.
     assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
     assert "capture_budget" not in provenance
-    assert provenance["stage_1"]["alpha_s_domain_status"] == "in_domain"
+    assert provenance["stage_1"]["alpha_s_form"] == "arrhenius"
+    assert provenance["stage_1"]["alpha_s_domain_status"] == "out_of_domain"
     assert provenance["stage_1"]["output_status"] == "status_bearing"
 
 
@@ -697,8 +702,8 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert extrapolated
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
-    assert authority["uncertified_alpha_species"] == ["Fe"]
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["uncertified_alpha_species"] == []
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -890,7 +895,7 @@ def test_fe_collector_inference_is_non_authoritative_inside_and_above_band(
         entry={
             "value_ref": (
                 "data/literature/vacuum_pyrolysis_sticking.yaml::"
-                "species.Fe.value"
+                "species.Fe.condensation.value"
             )
         },
         source="test::Fe",
@@ -914,7 +919,7 @@ def test_fe_collector_inference_is_non_authoritative_inside_and_above_band(
         assert record["alpha_s_domain_status"] == "in_domain"
         assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     else:
-        assert record["alpha_s_domain_status"] == "extrapolated"
+        assert record["alpha_s_domain_status"] == "out_of_domain"
         assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
 
 
@@ -953,7 +958,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
 
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
-    assert cumulative["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -1260,7 +1265,7 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
+    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 

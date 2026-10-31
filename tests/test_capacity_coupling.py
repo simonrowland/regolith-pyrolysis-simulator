@@ -27,6 +27,10 @@ from simulator.capacity_coupling import (
     partition_melt_oxygen,
     solve_capacity_shadow,
 )
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
@@ -1078,21 +1082,22 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # d-252's C0 setup and d-237 phosphorus retention, remeasured on the
-    # merged t-1217 capture law (2026-10-29, OpenIMCC 66ec4a3). Supersaturated
-    # SiO, Fe and Ca still condense. AlO, the oxide carriers, CrO, TiO and
-    # TiO2_gas evaporate and do not condense on this first step, so the old
-    # 35-transition regularizer roster is not the law's ledger.
+    # The Stage-4 split adds independent Na/Mg collector and K-trap capture
+    # transitions to this first C0 step; they follow their corresponding
+    # evaporation transitions in the ledger.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
     ) == (
         "evaporate_SiO",
         "condense_SiO",
         "evaporate_Mg",
+        "condense_Mg",
         "evaporate_Fe",
         "condense_Fe",
         "evaporate_Na",
+        "condense_Na",
         "evaporate_K",
+        "condense_K",
         "evaporate_AlO",
         "evaporate_Ca",
         "condense_Ca",
@@ -1331,24 +1336,28 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         "condense_Ca",
     ):
         assert required in reason_set, required
-    assert {
-        "condense_SiO",
-        "condense_Al2O",
-        "condense_AlO",
-        "condense_CaO_gas",
-        "condense_CrO",
-        "condense_MgO_gas",
-        "condense_SiO2_gas",
-        "condense_TiO",
-        "condense_TiO2_gas",
-    } <= reason_set
-    assert tuple(reasons[-5:]) == (
-        "condense_TiO",
-        "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
-        "fe_redox_respeciation",
-        "overhead_bleed",
-    )
+
+    # The old single-Stage-4 condensate roster does not describe the split:
+    # read the production route's stage inventories for the designated alkalis
+    # and preserve unassigned oxide vapors in the terminal offgas projection.
+    stages = {stage.stage_key: stage for stage in sim.train.stages}
+    na_collector = stages[NA_COLLECTOR_STAGE_KEY].collected_kg
+    k_trap = stages[K_TRAP_STAGE_KEY].collected_kg
+    assert na_collector["Na"] > 0.0
+    assert na_collector["Mg"] > 0.0
+    assert k_trap["K"] > 0.0
+    offgas = sim.atom_ledger.project_account_kg("terminal.offgas")
+    for species in (
+        "Al2O",
+        "AlO",
+        "CaO_gas",
+        "CrO",
+        "MgO_gas",
+        "SiO2_gas",
+        "TiO",
+        "TiO2_gas",
+    ):
+        assert offgas.get(species, 0.0) > 0.0, species
 
 
 def test_unscaled_c0_commits_reversible_si_condensation():
