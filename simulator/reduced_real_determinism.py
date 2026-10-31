@@ -3028,13 +3028,6 @@ def canonical_replay_key(
         provider_role=provider_role,
     )
     namespace_id = dependency_vector["namespace_id"]
-    total_amount_kg = sum(
-        float(value)
-        for value in sim.atom_ledger.project_account_kg(
-            _CLEANED_MELT_ACCOUNT
-        ).values()
-        if float(value) > 0.0
-    )
     include_amount = _namespace_output_is_extensive(namespace_id)
     transport_getter = getattr(sim, "_vapor_pressure_dispatch_pO2_bar", None)
     transport_pO2 = (
@@ -3059,22 +3052,36 @@ def canonical_replay_key(
     )
     if redox_identity is not None:
         redox_key["redox_state_identity"] = redox_identity
-    cleaned_mol = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
     provider_melt_inputs = sim._silicate_provider_melt_inputs(
         intent,
-        cleaned_mol,
     )
-    submitted_mol = (
-        provider_melt_inputs[0]
-        if provider_melt_inputs is not None
-        else cleaned_mol
-    )
-    freeze_gate_cache_key = None
     if provider_melt_inputs is not None:
+        submitted_mol = provider_melt_inputs.composition_mol
+    else:
+        store = getattr(sim, "_pt0_determinism_store", None)
+        canonicalizer = getattr(
+            store,
+            "canonical_composition_mol_by_account",
+            None,
+        )
+        if store is not None and getattr(store, "quantize_live_controls", False):
+            if not callable(canonicalizer):
+                raise RuntimeError(
+                    "PT-0 live-control quantization requires composition "
+                    "canonicalization support"
+                )
+            submitted_mol = canonicalizer(sim).get(_CLEANED_MELT_ACCOUNT, {})
+        else:
+            submitted_mol = sim.atom_ledger.project_account_mol(
+                _CLEANED_MELT_ACCOUNT
+            )
+    freeze_gate_cache_key = None
+    if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
         freeze_gate_cache_key = sim._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            fO2_log=quantized_fO2_log,
             redox_state=redox_state,
+            provider_melt_inputs=provider_melt_inputs,
         )
     key = {
         "namespace_id": namespace_id,
@@ -3096,9 +3103,26 @@ def canonical_replay_key(
         "redox": redox_key,
         **dependency_vector,
     }
+    if provider_melt_inputs is not None and (
+        intent is not ChemistryIntent.GATE_LIQUID_FRACTION
+    ):
+        key["submitted_formula_identity"] = (
+            provider_melt_inputs.formula_identity
+        )
     if freeze_gate_cache_key is not None:
         key["freeze_gate_cache_key"] = freeze_gate_cache_key
     if include_amount:
+        total_amount_kg = (
+            provider_melt_inputs.amount_kg
+            if provider_melt_inputs is not None
+            else sum(
+                float(value)
+                for value in sim.atom_ledger.project_account_kg(
+                    _CLEANED_MELT_ACCOUNT
+                ).values()
+                if float(value) > 0.0
+            )
+        )
         key["total_submitted_amount_kg"] = _sigfig(
             total_amount_kg,
             quantization.composition_sig_figs,

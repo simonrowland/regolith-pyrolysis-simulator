@@ -855,6 +855,73 @@ def test_equilibrium_key_tracks_inert_and_refuses_cross_replay() -> None:
         replay.replay_equilibrium(silica_sim)
 
 
+def test_equilibrium_key_ignores_absent_species_formula_changes() -> None:
+    from simulator.accounting.formulas import SpeciesFormula
+
+    store = PT0DeterminismStore("capture")
+    sim, _result = _pt0_equilibrium_capture_context(store)
+    cleaned_mol = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert float(cleaned_mol.get("CoO", 0.0)) <= 0.0
+    baseline_key = store._equilibrium_key(sim)
+    formula_species = {
+        species for species, _elements in baseline_key["submitted_formula_identity"]
+    }
+    assert "SiO2" in formula_species
+    assert "CoO" not in formula_species
+
+    sim.species_formula_registry = dict(sim.species_formula_registry)
+    sim.species_formula_registry["CoO"] = SpeciesFormula.from_atoms(
+        "CoO",
+        {"Co": 1, "O": 2},
+    )
+
+    assert store._equilibrium_key(sim) == baseline_key
+
+    sim.species_formula_registry["SiO2"] = SpeciesFormula.from_atoms(
+        "SiO2",
+        {"Si": 1, "O": 1},
+    )
+    assert store._equilibrium_key(sim) != baseline_key
+
+
+def test_equilibrium_key_uses_submitted_amount_when_inert_amount_changes() -> None:
+    store = PT0DeterminismStore("capture")
+    first, _first_result = _pt0_equilibrium_capture_context(store)
+    second, _second_result = _pt0_equilibrium_capture_context(store)
+    cleaned_account = "process.cleaned_melt"
+
+    first.inventory.inert_melt_components_kg.clear()
+    second.inventory.inert_melt_components_kg.clear()
+    first_na2o_kg = first.atom_ledger.project_account_kg(
+        cleaned_account
+    )["Na2O"]
+    first.inventory.inert_melt_components_kg["Na2O"] = first_na2o_kg
+    second.atom_ledger.load_external_mol(
+        cleaned_account,
+        {"Na2O": 10.0},
+        source="b-929 inert amount identity",
+        material_origin="feedstock",
+    )
+    second_na2o_kg = second.atom_ledger.project_account_kg(
+        cleaned_account
+    )["Na2O"]
+    second.inventory.inert_melt_components_kg["Na2O"] = second_na2o_kg
+
+    first_mol = first.atom_ledger.project_account_mol(cleaned_account)
+    second_mol = second.atom_ledger.project_account_mol(cleaned_account)
+    first_payload = first._silicate_provider_melt_inputs(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        first_mol,
+    )
+    second_payload = second._silicate_provider_melt_inputs(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        second_mol,
+    )
+    assert first_payload == second_payload
+    assert first_na2o_kg != second_na2o_kg
+    assert store._equilibrium_key(first) == store._equilibrium_key(second)
+
+
 def test_gate_replay_key_uses_pt0_quantized_pressure_for_provider_identity() -> None:
     def key_at(pressure_bar: float) -> dict[str, Any]:
         store = PT0DeterminismStore("capture")
@@ -877,6 +944,28 @@ def test_gate_replay_key_uses_pt0_quantized_pressure_for_provider_identity() -> 
         lower["controls"]["pressure_bar"]
         == upper["controls"]["pressure_bar"]
     )
+    assert lower["freeze_gate_cache_key"] == upper["freeze_gate_cache_key"]
+    assert lower == upper
+
+
+def test_gate_replay_key_uses_pt0_quantized_fO2_for_provider_identity() -> None:
+    def key_at(fO2_log: float) -> dict[str, Any]:
+        store = PT0DeterminismStore("capture")
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=fO2_log,
+            fe_redox_policy="intrinsic",
+            control_quantization=store._control_quantization,
+        )
+
+    lower = key_at(-9.500001)
+    upper = key_at(-9.499999)
+
+    assert lower["controls"]["log_fO2"] == upper["controls"]["log_fO2"]
     assert lower["freeze_gate_cache_key"] == upper["freeze_gate_cache_key"]
     assert lower == upper
 
@@ -1157,9 +1246,12 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
 def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    sim = _build_pt0_sim(None)
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
     sim.inventory.inert_melt_components_kg.clear()
     sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    expected_payload = sim._silicate_provider_melt_inputs(
+        ChemistryIntent.SILICATE_EQUILIBRIUM
+    )
     observed: dict[str, Any] = {}
 
     class CapturingKernel:
@@ -1175,6 +1267,8 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
     )
 
     submitted_mol = observed["account_mol_overrides"]["process.cleaned_melt"]
+    assert expected_payload is not None
+    assert submitted_mol == expected_payload.composition_mol
     assert "Na2O" not in submitted_mol
     assert "SiO2" in submitted_mol
 
@@ -1348,7 +1442,6 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
         material_origin="feedstock",
     )
     wet_key = gate_key(water_sim)
-    assert legacy_identity(wet_key) == legacy_identity(dry_key)
     assert wet_key != dry_key
     assert wet_key["freeze_gate_cache_key"] != dry_key["freeze_gate_cache_key"]
 
@@ -1364,9 +1457,6 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
         SpeciesFormula.from_atoms("SiO2", {"Si": 1, "O": 1})
     )
     changed_formula_key = gate_key(formula_sim)
-    assert legacy_identity(changed_formula_key) == legacy_identity(
-        baseline_formula_key
-    )
     assert changed_formula_key != baseline_formula_key
     assert (
         changed_formula_key["freeze_gate_cache_key"]

@@ -2701,14 +2701,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'canonicalization support'
                 )
             account_mol_overrides = canonicalizer(self)
-        provider_source_mol = (
-            None
-            if account_mol_overrides is None
-            else account_mol_overrides.get('process.cleaned_melt', {})
-        )
         provider_melt_inputs = self._silicate_provider_melt_inputs(
             intent,
-            provider_source_mol,
         )
         if provider_melt_inputs is not None:
             if account_mol_overrides is None:
@@ -2718,14 +2712,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     account: dict(species_mol)
                     for account, species_mol in account_mol_overrides.items()
                 }
-                account_mol_overrides['process.cleaned_melt'] = (
-                    provider_melt_inputs[0]
-                )
             # MC-1 keeps cited refractory traces in the mol-native melt ledger,
             # but they are outside silicate-engine chemistry. Preserve their
             # inventory while excluding only that explicit inert partition from
             # AlphaMELTS/MAGEMin diagnostic account views.
-            account_mol_overrides['process.cleaned_melt'] = provider_melt_inputs[0]
+            account_mol_overrides['process.cleaned_melt'] = (
+                provider_melt_inputs.composition_mol
+            )
         if (
             intent is ChemistryIntent.METALLOTHERMIC_STEP
             and temperature_C_override is None
