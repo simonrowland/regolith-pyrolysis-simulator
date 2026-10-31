@@ -30,26 +30,10 @@ from simulator.backends import (
     emit_web_engine_selection_log,
     resolve_backend,
 )
-from simulator.account_ids import (
-    C7_AL_CREDIT_ACCOUNT,
-    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
-    EXTRACTED_METAL_PRODUCT_ACCOUNTS,
-    METAL_PHASE_ACCOUNTS,
-    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
-    OXYGEN_CAPTURED_ACCOUNTS,
-    OXYGEN_STORED_ACCOUNTS,
-    OXYGEN_VENTED_ACCOUNTS,
-    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-)
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.queries import (
     AccountingQueries,
-    CONDENSATION_TRAIN_ACCOUNT,
-    PRODUCT_LEDGER_ACCOUNTS,
-    TERMINAL_ESCAPE_ACCOUNT,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
-    TERMINAL_RUMP_SILICATE_RESIDUAL,
-    TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
 from simulator.accounting.run_artifact import build_run_artifact
 from simulator.backend_names import (
@@ -62,7 +46,6 @@ from simulator.condensation import (
     minimum_pressure_mbar_for_knudsen,
     stage_purity_report,
 )
-from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.cost_parameters import (
     default_cost_parameters_block,
     normalize_cost_parameters,
@@ -98,9 +81,13 @@ from simulator.session import (
 )
 from simulator.state import MOLAR_MASS
 from simulator.three_product_report import (
-    METAL_PRODUCT_SPECIES,
     _terminal_rump_classes_from_species,
+    build_product_story,
     classify_products,
+    product_story_account_kg as _product_story_account_kg,
+    product_story_bucket as _product_story_bucket,
+    product_story_extracted_kg as _extracted_product_kg,
+    product_story_extracted_projection as _product_story_extracted_projection,
 )
 from simulator.trace import PhysicsTrace
 from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
@@ -2473,106 +2460,6 @@ def _product_story_soundness(product_story: object) -> str:
     return 'ok'
 
 
-def _product_story_account_kg(sim):
-    accounts = (*PRODUCT_LEDGER_ACCOUNTS, TERMINAL_ESCAPE_ACCOUNT)
-    return {
-        account: dict(sim.atom_ledger.project_account_kg(account) or {})
-        for account in accounts
-        if account != C7_AL_CREDIT_ACCOUNT
-    }
-
-
-def _product_story_extracted_projection(sim, *, account_kg):
-    metal_ingots = {}
-    glass = {}
-    captured_volatiles = {}
-    off_spec_condensate = {}
-
-    for account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
-        for species, mass in account_kg.get(account, {}).items():
-            if species not in (
-                _PRODUCT_STORY_GLASS_SPECIES
-                | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-            ):
-                _merge_product_story_mass(metal_ingots, species, mass)
-
-    condensation_stage_species = {}
-    for key, mass in (
-        getattr(sim, '_stage_collection_kg_by_source', {}) or {}
-    ).items():
-        if not isinstance(key, tuple) or len(key) != 3:
-            continue
-        source_account, stage_number, species = key
-        if source_account != CONDENSATION_TRAIN_ACCOUNT:
-            continue
-        condensation_stage_species.setdefault(str(species), []).append(
-            (int(stage_number), float(mass))
-        )
-
-    for species, ledger_mass in account_kg.get(
-        CONDENSATION_TRAIN_ACCOUNT, {}
-    ).items():
-        routed = condensation_stage_species.get(str(species), [])
-        routed_total = sum(max(0.0, mass) for _stage, mass in routed)
-        scale = min(1.0, float(ledger_mass) / routed_total) if routed_total else 0.0
-        accounted = 0.0
-        for stage_number, projected_mass in routed:
-            mass = max(0.0, projected_mass) * scale
-            accounted += mass
-            accepted = species in accepted_species_for_stage_number(stage_number)
-            if (
-                accepted
-                and stage_number == 3
-                and species in _PRODUCT_STORY_GLASS_SPECIES
-            ):
-                target = glass
-            elif (
-                accepted
-                and stage_number == 4
-                and species in _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-            ):
-                target = captured_volatiles
-            elif (
-                (accepted or (stage_number == 4 and species == 'Ca'))
-                and species in METAL_PRODUCT_SPECIES
-            ):
-                target = metal_ingots
-            else:
-                target = off_spec_condensate
-            _merge_product_story_mass(target, species, mass)
-        _merge_product_story_mass(
-            off_spec_condensate,
-            species,
-            max(0.0, float(ledger_mass) - accounted),
-        )
-
-    oxygen = {}
-    oxygen_partition = {}
-    for account in (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_CAPTURED_ACCOUNTS):
-        account_total = 0.0
-        for species, mass in sim.atom_ledger.project_account_kg(account).items():
-            _merge_product_story_mass(oxygen, species, mass)
-            account_total += float(mass)
-        if account_total > 0.0:
-            oxygen_partition[account] = account_total
-
-    return {
-        'metal_ingots': metal_ingots,
-        'glass': glass,
-        'captured_volatiles': captured_volatiles,
-        'oxygen': oxygen,
-        'oxygen_partition': oxygen_partition,
-        'off_spec_condensate': off_spec_condensate,
-    }
-
-
-def _extracted_product_kg(extracted_projection):
-    return sum(
-        sum(float(mass) for mass in extracted_projection[key].values())
-        for key in ('metal_ingots', 'glass', 'oxygen', 'captured_volatiles')
-    )
-
-
 def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
     terminal_rump_by_species = sim._terminal_rump_by_species()
@@ -2598,26 +2485,50 @@ def _completion_payload(sim):
             terminal_rump_by_species
         )
     product_story_account_kg = _product_story_account_kg(sim)
-    extracted_product_projection = _product_story_extracted_projection(
-        sim,
-        account_kg=product_story_account_kg,
-    )
-    extracted_product_kg = _extracted_product_kg(
-        extracted_product_projection
-    )
     classification: Mapping[str, Any] = {}
+    classification_available = True
+    extracted_product_kg = None
     try:
         classification = classify_products(sim)
-        product_story = _product_story_payload(
-            sim,
-            terminal_rump_by_species=terminal_rump_by_species,
-            classification=classification,
-            account_kg=product_story_account_kg,
-            extracted_projection=extracted_product_projection,
-        )
-        product_story_status = _product_story_soundness(product_story)
     except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
         _safe_log(f'Product story unavailable; raw completion retained: {exc}')
+        classification_available = False
+        try:
+            extracted_product_projection = _product_story_extracted_projection(
+                sim,
+                account_kg=product_story_account_kg,
+            )
+            extracted_product_kg = _extracted_product_kg(
+                extracted_product_projection
+            )
+        except Exception as projection_exc:  # noqa: BLE001 -- optional view
+            _safe_log(
+                'Product extraction projection unavailable: '
+                f'{projection_exc}'
+            )
+    if classification_available:
+        try:
+            extracted_product_projection = _product_story_extracted_projection(
+                sim,
+                account_kg=product_story_account_kg,
+                classification=classification,
+            )
+            extracted_product_kg = _extracted_product_kg(
+                extracted_product_projection
+            )
+            product_story = _product_story_payload(
+                sim,
+                terminal_rump_by_species=terminal_rump_by_species,
+                classification=classification,
+                account_kg=product_story_account_kg,
+                extracted_projection=extracted_product_projection,
+            )
+            product_story_status = _product_story_soundness(product_story)
+        except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
+            _safe_log(f'Product story unavailable; raw completion retained: {exc}')
+            product_story = None
+            product_story_status = 'unavailable'
+    else:
         product_story = None
         product_story_status = 'unavailable'
     ceramic_panel = ceramic_rump_payload(refractory_rump_composition_wt_pct)
@@ -2699,40 +2610,6 @@ def _completion_payload(sim):
     return payload
 
 
-_PRODUCT_STORY_GLASS_SPECIES = frozenset({'SiO', 'SiO2'})
-_PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES = frozenset({'Na', 'K', 'Mg'})
-_PRODUCT_STORY_CLASSIFIED_SPECIES = (
-    frozenset(METAL_PRODUCT_SPECIES)
-    | _PRODUCT_STORY_GLASS_SPECIES
-    | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-)
-_PRODUCT_STORY_OXYGEN_ESCAPE_ACCOUNTS = (
-    *OXYGEN_VENTED_ACCOUNTS,
-    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
-)
-
-
-def _merge_product_story_mass(target, species, mass):
-    value = float(mass)
-    if value > 0.0:
-        target[str(species)] = target.get(str(species), 0.0) + value
-
-
-def _product_story_bucket(species_kg, **details):
-    rounded_species = {}
-    for species, mass in sorted(species_kg.items()):
-        if float(mass) <= 0.0:
-            continue
-        displayed_mass = round(mass, 2)
-        if displayed_mass != 0.0:
-            rounded_species[species] = displayed_mass
-    return {
-        'species_kg': rounded_species,
-        **{key: round(float(value), 2) for key, value in details.items()},
-        'class_total_kg': round(sum(species_kg.values()), 2),
-    }
-
-
 def _product_story_payload(
     sim,
     *,
@@ -2741,191 +2618,15 @@ def _product_story_payload(
     account_kg=None,
     extracted_projection=None,
 ):
-    # Keep web's stage-provenance mapping; the shared classifier owns refusal
-    # status and excluded quantities for these existing product totals.
     if classification is None:
         classification = classify_products(sim)
-    if account_kg is None:
-        account_kg = _product_story_account_kg(sim)
-    if extracted_projection is None:
-        extracted_projection = _product_story_extracted_projection(
-            sim,
-            account_kg=account_kg,
-        )
-    metal_ingots = dict(extracted_projection['metal_ingots'])
-    glass = dict(extracted_projection['glass'])
-    captured_volatiles = dict(extracted_projection['captured_volatiles'])
-    escaped_to_vacuum = {}
-    unrecovered_process_inventory = {}
-    unclassified = {}
-    off_spec_condensate = dict(extracted_projection['off_spec_condensate'])
-    wall_deposits = {}
-    process_residue = {}
-
-    for account, species_kg in account_kg.items():
-        for species, mass in species_kg.items():
-            if account == TERMINAL_ESCAPE_ACCOUNT:
-                target = escaped_to_vacuum
-            elif account in METAL_PHASE_ACCOUNTS:
-                target = unrecovered_process_inventory
-            elif account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
-                continue
-            elif account == CONDENSATION_TRAIN_ACCOUNT:
-                continue
-            elif account.startswith('process.'):
-                target = unrecovered_process_inventory
-            elif species in _PRODUCT_STORY_CLASSIFIED_SPECIES:
-                target = unrecovered_process_inventory
-            else:
-                target = unclassified
-            _merge_product_story_mass(target, species, mass)
-
-    for account in _PRODUCT_STORY_OXYGEN_ESCAPE_ACCOUNTS:
-        for species, mass in sim.atom_ledger.project_account_kg(account).items():
-            _merge_product_story_mass(escaped_to_vacuum, species, mass)
-
-    for species, mass in sim.atom_ledger.project_account_kg(
-        CONDENSATION_RETAINED_HOLDUP_ACCOUNT
-    ).items():
-        _merge_product_story_mass(unrecovered_process_inventory, species, mass)
-
-    for species, mass in sim.atom_ledger.project_account_kg(
-        SPENT_REDUCTANT_RESIDUE_ACCOUNT
-    ).items():
-        _merge_product_story_mass(process_residue, species, mass)
-
-    for account in sim.atom_ledger.mol_by_account():
-        if not (
-            str(account) == 'process.wall_deposit'
-            or str(account).startswith('process.wall_deposit_segment_')
-        ):
-            continue
-        for species, mass in sim.atom_ledger.project_account_kg(account).items():
-            _merge_product_story_mass(wall_deposits, species, mass)
-
-    refractory_ceramic = {}
-    terminal_residue = {}
-    for species, mass in terminal_rump_by_species.items():
-        target = (
-            refractory_ceramic
-            if species in TERMINAL_RUMP_REFRACTORY_OXIDES
-            else terminal_residue
-        )
-        _merge_product_story_mass(target, species, mass)
-
-    oxygen = _product_story_bucket(extracted_projection['oxygen'])
-    oxygen['partition_kg'] = {
-        key: round(float(value), 2)
-        for key, value in extracted_projection['oxygen_partition'].items()
-    }
-
-    residue_bucket = _product_story_bucket(
-        terminal_residue,
-        silicate_residual_kg=sum(
-            mass for species, mass in terminal_residue.items()
-            if species in TERMINAL_RUMP_SILICATE_RESIDUAL
-        ),
-        unextracted_metals_kg=sum(
-            mass for species, mass in terminal_residue.items()
-            if species in TERMINAL_RUMP_UNEXTRACTED_METALS
-        ),
-        other_kg=sum(
-            mass for species, mass in terminal_residue.items()
-            if species not in (
-                TERMINAL_RUMP_SILICATE_RESIDUAL
-                | TERMINAL_RUMP_UNEXTRACTED_METALS
-            )
-        ),
+    return build_product_story(
+        sim,
+        terminal_rump_by_species=terminal_rump_by_species,
+        classification=classification,
+        account_kg=account_kg,
+        extracted_projection=extracted_projection,
     )
-
-    refractory_ceramic_bucket = _product_story_bucket(refractory_ceramic)
-    metal_ingots_bucket = _product_story_bucket(metal_ingots)
-    try:
-        refractory_ceramic_bucket['ree_enrichment_extent'] = (
-            AccountingQueries(sim).terminal_ree_enrichment_extent()
-        )
-    except Exception as exc:  # noqa: BLE001 -- raw product masses remain usable
-        _safe_log(f'REE enrichment projection unavailable: {exc}')
-        refractory_ceramic_bucket['ree_enrichment_extent'] = {}
-
-    story = {
-        'input': {
-            'feedstock': sim.record.feedstock_key,
-            'feedstock_label': sim.record.feedstock_label,
-            'batch_mass_kg': round(float(sim.record.batch_mass_kg), 2),
-        },
-        'metal_ingots': metal_ingots_bucket,
-        'glass': _product_story_bucket(glass),
-        'oxygen': oxygen,
-        'captured_volatiles': _product_story_bucket(captured_volatiles),
-        'refractory_ceramic': refractory_ceramic_bucket,
-        'terminal_residue': residue_bucket,
-        'escaped_to_vacuum': _product_story_bucket(escaped_to_vacuum),
-        'unrecovered_process_inventory': _product_story_bucket(
-            unrecovered_process_inventory
-        ),
-        'wall_deposits': _product_story_bucket(wall_deposits),
-        'process_residue': _product_story_bucket(process_residue),
-        'off_spec_condensate': _product_story_bucket(off_spec_condensate),
-        'unclassified': _product_story_bucket(unclassified),
-    }
-    for name, source_name in (
-        ('metal_ingots', 'ingots_metals'),
-        ('glass', 'glass'),
-        ('oxygen', 'oxygen'),
-        ('captured_volatiles', 'captured_volatiles'),
-        ('refractory_ceramic', 'refractory_ceramic_rump'),
-    ):
-        source = classification.get(source_name)
-        if not isinstance(source, Mapping):
-            continue
-        estimated_contributions = source.get('estimated_contributions')
-        if estimated_contributions:
-            story[name]['estimated_contributions'] = list(
-                estimated_contributions
-            )
-        availability_flag = source.get('availability_flag')
-        flag = source.get('flag')
-        if not isinstance(availability_flag, Mapping) and not isinstance(flag, Mapping):
-            continue
-        if isinstance(flag, Mapping):
-            story[name]['flag'] = dict(flag)
-        if isinstance(availability_flag, Mapping):
-            story[name]['availability_flag'] = dict(availability_flag)
-        story[name]['status'] = source.get('status') or (
-            availability_flag or flag
-        ).get('status')
-        story[name]['excluded'] = list(source.get('excluded', ()))
-        if story[name]['status'] == 'unavailable':
-            story[name]['class_total_kg'] = None
-    if story['oxygen'].get('class_total_kg') is None:
-        story['oxygen']['partition_kg'] = dict.fromkeys(
-            story['oxygen']['partition_kg']
-        )
-    rump = classification.get('refractory_ceramic_rump')
-    if isinstance(rump, Mapping):
-        estimated_contributions = rump.get('estimated_contributions')
-        if estimated_contributions:
-            story['terminal_residue']['estimated_contributions'] = list(
-                estimated_contributions
-            )
-        rump_flag = rump.get('availability_flag') or rump.get('flag')
-        if (
-            isinstance(rump_flag, Mapping)
-            and rump_flag.get('status') in {'partial', 'unavailable'}
-        ):
-            story['terminal_residue']['availability_flag'] = dict(rump_flag)
-            story['terminal_residue']['status'] = rump_flag.get('status')
-            story['terminal_residue']['excluded'] = list(rump.get('excluded', ()))
-            for field, source_field in (
-                ('silicate_residual_kg', 'rump_silicate_residual_kg'),
-                ('unextracted_metals_kg', 'rump_unextracted_metals_kg'),
-            ):
-                if source_field in rump and rump[source_field] is None:
-                    if rump_flag.get('status') == 'unavailable':
-                        story['terminal_residue'][field] = None
-                        story['terminal_residue']['class_total_kg'] = None
-    return story
 
 
 def _knudsen_regime_diagnostic_from_sim(sim):

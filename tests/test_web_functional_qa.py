@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 import app as app_module
+import simulator.three_product_report as three_product_report
 import web.events as web_events
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -130,20 +131,26 @@ def web_driver(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize(
-    ("feedstock", "hours", "additives_kg", "web_ingots", "oxygen_kg", "rump_kg"),
+    (
+        "feedstock", "hours", "additives_kg", "web_ingots",
+        "web_unclassified", "oxygen_kg", "rump_kg",
+    ),
     [
         (
             "lunar_mare_low_ti", 24, {},
-            {"Co": 0.04, "Ni": 0.21}, 0.0, 363.32,
+            {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
+            0.0, 363.32,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
-            {}, 3.0629468311083095, 266.49,
+            {}, {"CaCO3": 0.01, "Cl": 8.36},
+            3.0629468311083095, 266.49,
         ),
     ],
 )
 def test_current_web_and_runner_product_story_pins_shipped_scenarios(
-    feedstock, hours, additives_kg, web_ingots, oxygen_kg, rump_kg
+    feedstock, hours, additives_kg, web_ingots, web_unclassified,
+    oxygen_kg, rump_kg,
 ):
     from simulator.run_executor import RunExecutor
     from simulator.runner import PyrolysisRun
@@ -167,6 +174,7 @@ def test_current_web_and_runner_product_story_pins_shipped_scenarios(
         classification=runner,
     )
     assert web_story["metal_ingots"]["species_kg"] == web_ingots
+    assert web_story["unclassified"]["species_kg"] == web_unclassified
     assert runner["ingots_metals"]["species_kg"] == {}
     assert web_story["glass"]["species_kg"] == {}
     assert runner["glass"]["species_kg"] == {}
@@ -827,10 +835,14 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
+    def fail_product_classification(_sim):
+        raise ValueError("rump mismatch")
+
     monkeypatch.setattr(
-        web_events,
-        "classify_products",
-        lambda _sim: (_ for _ in ()).throw(ValueError("rump mismatch")),
+        web_events, "classify_products", fail_product_classification
+    )
+    monkeypatch.setattr(
+        three_product_report, "classify_products", fail_product_classification
     )
     monkeypatch.setattr(
         sim,
@@ -1211,7 +1223,16 @@ def test_product_story_requires_designated_stage_provenance(monkeypatch):
             ("process.condensation_train", 4, "Ca"): 6.0,
         },
     )
-    monkeypatch.setattr(web_events, "classify_products", lambda _sim: {})
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "ingots_metals": {"species_kg": {"Ca": 6.0, "Fe": 3.0}},
+            "glass": {"species_kg": {}},
+            "captured_volatiles": {"kg_by_species": {}},
+            "oxygen": {"O2_kg": 0.0, "partition_kg": {}},
+        },
+    )
 
     story = web_events._product_story_payload(
         sim,
