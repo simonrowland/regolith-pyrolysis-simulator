@@ -584,7 +584,14 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
         for record in runtime_by_run[next(iter(runtime_by_run))].provenance["alpha_by_channel"]
         if record["channel"] == "Fe"
     )
-    assert math.isclose(fe_runtime_alpha, 0.02, rel_tol=1.0e-12)
+    from simulator.chemistry.langmuir_knudsen import grounded_alpha
+
+    runtime_provenance = runtime_by_run[next(iter(runtime_by_run))].provenance
+    resolved_alpha, alpha_evaluation = grounded_alpha(
+        "Fe", float(runtime_provenance["temperature_K"])
+    )
+    assert math.isclose(fe_runtime_alpha, resolved_alpha, rel_tol=1.0e-12)
+    assert alpha_evaluation["alpha_authority_status"] == "bridge"
 
 
 def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(

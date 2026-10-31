@@ -346,13 +346,14 @@ points:
   source_id: kems-015-hashimoto-1983
   observation_type: rate_series
   species: Fe
-  residual_dex: 0.06963592814139442
+  residual_dex: 0.033423755486949702
   band_dex: 0.01
-  residual: -4.0
+  residual: -2
   band_residual: 0.01
   status: ordering-fail
-  note: 'Ordering FINDING: Hashimoto Fe>(Mg|Si)>Ca>Al; engine held 23/27 pairwise constraints (residual
-    -4 pairs). Not tuned.'
+  note: 'd-316 Fe melt bridge changes Fe vapor ranking: 25/27 pair constraints held, so the
+    exact pair residual is 25 - 27 = -2 (previously 23 - 27 = -4). Same-source
+    Hashimoto fit context is recorded as a model-output pin, not independent validation.'
 # 2026-08-27 d-006 binary-melt composition gate: ms2000-044 (Tsaplin/Zaitsev)
 # binary Na2O-SiO2 / K2O-SiO2 rows state one mole fraction; the second
 # component is 1-x by closure. The gate now completes such binary
