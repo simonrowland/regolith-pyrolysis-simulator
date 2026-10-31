@@ -2781,6 +2781,20 @@ class EvaporationMixin:
             redox_state_identity=redox_identity_key,
         )
 
+    def _silicate_provider_composition_mol(
+        self,
+        composition_mol: Mapping[str, float],
+    ) -> dict[str, float]:
+        """Exclude explicitly inert components from the submitted melt view."""
+        inert_species = set(
+            (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
+        )
+        return {
+            species: float(mol)
+            for species, mol in composition_mol.items()
+            if species not in inert_species and float(mol) > 0.0
+        }
+
     def _freeze_gate_curve_from_gate_dispatch(
         self,
         reasons: list[str],

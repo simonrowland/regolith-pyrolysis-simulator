@@ -2707,9 +2707,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
             ChemistryIntent.GATE_LIQUID_FRACTION,
         }:
-            inert_species = set(
-                (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
-            )
             if account_mol_overrides is None:
                 cleaned_melt_mol = self.atom_ledger.project_account_mol(
                     'process.cleaned_melt'
@@ -2726,13 +2723,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # but they are outside silicate-engine chemistry. Preserve their
             # inventory while excluding only that explicit inert partition from
             # AlphaMELTS/MAGEMin diagnostic account views.
-            account_mol_overrides['process.cleaned_melt'] = {
-                species: float(mol)
-                for species, mol in account_mol_overrides.get(
-                    'process.cleaned_melt', {}
-                ).items()
-                if species not in inert_species and float(mol) > 0.0
-            }
+            account_mol_overrides['process.cleaned_melt'] = (
+                self._silicate_provider_composition_mol(
+                    account_mol_overrides.get('process.cleaned_melt', {})
+                )
+            )
         if (
             intent is ChemistryIntent.METALLOTHERMIC_STEP
             and temperature_C_override is None
