@@ -313,11 +313,8 @@ def test_openimcc_sp_activity_screening_uses_observation_composition(
         assert prediction.authority is Authority.EXTRAPOLATED
 
 
-@pytest.mark.parametrize("sample_has_p2o5", (False, True))
-def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
-    sample_has_p2o5: bool,
-) -> None:
-    """R-11's source-backed inputs exercise both synthetic P2O5 variants."""
+def test_openimcc_sp_mass_loss_richter_r11_refuses_unsourced_alpha() -> None:
+    """R-11 stays pinned to alpha_not_sourced; no store row produces today."""
     pytest.importorskip("openimcc", reason="openimcc is not importable")
 
     context = load_score_context(
@@ -333,12 +330,11 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     experiment = context.experiments[reference.experiment_id]
     stated = experiment.sample.initial_composition
     assert stated is not None and stated.state.is_value
-    initial = _composition_with_p2o5(
-        stated.state.value, present=sample_has_p2o5
-    )
     # These exact mass and area values are transcribed in Richter Table 1 for
-    # R-11; the schedule, area endpoints, and alpha fits come from the same row
-    # and extract. Only the P2O5 variants below are synthetic.
+    # R-11; schedule, area endpoints, and alpha fits come from the row/extract.
+    # The full-store run found all 486 plain-OpenIMCC mass-loss rows refuse, so
+    # a produced path is covered at the score boundary below, not by inventing
+    # a literature result.
     apparatus = experiment.apparatus or Apparatus()
     geometry = apparatus.geometry or ApparatusGeometry()
     experiment = replace(
@@ -348,7 +344,6 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
             mass_kg=Located(
                 State.of(Value.point_of("0.0001904")), reference.locator
             ),
-            initial_composition=replace(stated, state=State.of(initial)),
         ),
         apparatus=replace(
             apparatus,
@@ -362,15 +357,6 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     )
     assert experiment.thermal_schedule is not None
     assert experiment.thermal_schedule.total_duration_s is not None
-    reference = replace(
-        reference,
-        identity=replace(
-            reference.identity,
-            composition=State.of(
-                _composition_with_p2o5(initial, present=not sample_has_p2o5)
-            ),
-        ),
-    )
 
     prediction = predict_with_engine(
         _sp_engine(), reference, experiment=experiment, isolated=False
@@ -380,25 +366,106 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
         f"refusal_reason={prediction.refusal_reason}; "
         f"refusal_detail={prediction.refusal_detail}"
     )
-    if sample_has_p2o5:
-        assert prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE, failure
-        assert prediction.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE, failure
-        assert prediction.refusal_detail.get("reason") == "residue_gas_channel_missing", failure
-        return
+    assert prediction.execution.state is ExecutionState.NOT_PROBED, failure
+    assert prediction.value is None, failure
+    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS, failure
+    assert prediction.refusal_detail.get("reason") == "alpha_not_sourced", failure
 
+
+@pytest.mark.parametrize(
+    "inventory_has_p2o5",
+    (False, True),
+    ids=("inventory-p2-free", "inventory-p2-bearing"),
+)
+def test_openimcc_sp_mass_loss_screening_uses_stubbed_consumed_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+    inventory_has_p2o5: bool,
+) -> None:
+    """The scorer notices its consumed inventory; only the residue call is stubbed.
+
+    The full-store census found all 486 plain-OpenIMCC mass-loss rows refuse
+    before production, so this synthetic boundary result covers downstream
+    screening without inventing a literature result.
+    """
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    import simulator.battery.residue as residue
+
+    from simulator.battery.residue import ResidueMassLossPrediction
+
+    context = load_score_context(sources=("kems-010-richter-2007",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-010-richter-2007"
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.experiment_id.endswith("::cai-r-11")
+    )
+    experiment = context.experiments[reference.experiment_id]
+    stated = experiment.sample.initial_composition
+    assert stated is not None and stated.state.is_value
+    reference = replace(
+        reference,
+        source_id="synthetic-openimcc-sp-mass-loss",
+        identity=replace(
+            reference.identity,
+            composition=State.of(
+                _composition_with_p2o5(
+                    stated.state.value, present=not sample_has_p2o5
+                )
+            ),
+        ),
+    )
+    inventory = (
+        {"MgO": 0.9, "P2O5": 0.1}
+        if inventory_has_p2o5
+        else {"MgO": 1.0}
+    )
+
+    monkeypatch.setattr(
+        residue,
+        "predict_mass_loss_fraction",
+        lambda *_args, **_kwargs: ResidueMassLossPrediction(
+            mass_loss_fraction=0.1,
+            engine_flags=(),
+            engine_metadata={},
+            initial_inventory_mol=inventory,
+        ),
+    )
+    prediction = predict_with_engine(
+        _sp_engine(), reference, experiment=experiment, isolated=False
+    )
+
+    failure = (
+        f"refusal_reason={prediction.refusal_reason}; "
+        f"refusal_detail={prediction.refusal_detail}"
+    )
     assert prediction.execution.state is ExecutionState.PRODUCED, failure
-    consumed = prediction.requested_composition
-    assert consumed is not None and consumed.is_value, failure
-    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
+    assert prediction.requested_composition is not None, failure
+    assert prediction.requested_composition.is_value, failure
+    assert (
+        prediction.requested_composition.value.amount_basis
+        is AmountBasis.MOL_INVENTORY
+    ), failure
+    assert dict(prediction.requested_composition.value.components) == {
+        name: Decimal(str(amount)) for name, amount in inventory.items()
+    }, failure
     consumed_has_p2o5 = any(
         name == "P2O5" and amount > 0
-        for name, amount in consumed.value.components
+        for name, amount in prediction.requested_composition.value.components
     )
-    assert consumed_has_p2o5 is sample_has_p2o5, failure
-    assert any(
+    assert consumed_has_p2o5 is inventory_has_p2o5, failure
+    parent_notice = any(
         notice.reason.startswith("P2O5 parent reference state:")
         for notice in prediction.notices
-    ) is sample_has_p2o5, failure
+    )
+    assert parent_notice is inventory_has_p2o5, failure
+    assert prediction.authority is (
+        Authority.EXTRAPOLATED if inventory_has_p2o5 else Authority.BRIDGE
+    ), failure
+    assert not any(
+        notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
+    ), failure
 
 
 @pytest.mark.parametrize(

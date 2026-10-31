@@ -3,12 +3,14 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
 import simulator.battery.migrate as migrate_module
 import simulator.battery.score as score_module
 from simulator.battery.enums import (
+    AmountBasis,
     Engine,
     MethodToken,
     MetricOperation,
@@ -29,6 +31,7 @@ from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Apparatus,
     ApparatusGeometry,
+    Composition,
     Located,
     Locator,
     State,
@@ -44,6 +47,112 @@ from simulator.battery.score import (
 )
 
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
+
+
+def test_mass_loss_prediction_returns_integrator_input_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The output inventory records the exact initial map passed to integration."""
+    openimcc = pytest.importorskip("openimcc", reason="openimcc is not importable")
+
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    locator = Locator(paragraph="synthetic mass-loss inventory handoff")
+    initial_composition = Composition(
+        basis="synthetic_mass_loss_inventory",
+        components=(("MgO", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    sample = SimpleNamespace(
+        initial_composition=Located(State.of(initial_composition), locator),
+        mass_kg=Located(State.of(Value.point_of("1")), locator),
+    )
+    experiment = SimpleNamespace(
+        experiment_id="synthetic-mass-loss-inventory",
+        sample=sample,
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        pressure_environment=SimpleNamespace(
+            total_pressure_Pa=Located(State.of(Value.point_of("0")), locator)
+        ),
+        apparatus=SimpleNamespace(
+            geometry=SimpleNamespace(
+                exposed_area_m2=Located(State.of(Value.point_of("0.0001")), locator)
+            )
+        ),
+        thermal_schedule=SimpleNamespace(
+            total_duration_s=Located(State.of(Value.point_of("60")), locator)
+        ),
+    )
+    observation = SimpleNamespace(
+        value=Value.point_of("0"), uncertainty=None, locator=locator
+    )
+
+    def synthetic_gas_channels(*_args):
+        return [
+            ("Mg", ("MgO",)),
+            ("O2", ("",)),
+        ], ()
+
+    monkeypatch.setattr(openimcc, "load_gas_datapack", lambda: object())
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_openimcc_gas_channels_and_omission_notices",
+        synthetic_gas_channels,
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_sourced_alphas",
+        lambda *_args: {
+            "Mg": {
+                "alpha": 0.5,
+                "source_observation_id": "synthetic-alpha-fit",
+                "T_range_K": [1800.0, 1800.0],
+                "extrapolated": False,
+            }
+        },
+    )
+    monkeypatch.setattr(
+        residue, "_mass_loss_area_inputs", lambda *_args: (1e-4, 1e-4, 0.01)
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_thermal_segments",
+        lambda *_args: (1800.0, 3600.0, ((1800.0, 60.0),)),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_make_residue_pressure_model",
+        lambda *_args, **_kwargs: (lambda *_pressure_args: {"Mg": 0.0, "O2": 0.0}),
+    )
+    integrator_inputs: list[dict[str, float]] = []
+
+    def integrate(initial_inventory_mol, *_args, **_kwargs):
+        integrator_inputs.append(dict(initial_inventory_mol))
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct={},
+            pO2_steps=(),
+            exhaustion_notices=(),
+            refusal=None,
+            atom_closure={},
+            inventory_mol=dict(initial_inventory_mol),
+            evaporated_mol={},
+            pO2_balance_floor={},
+        )
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
+
+    prediction = residue.predict_mass_loss_fraction(
+        "openimcc-sp",
+        experiment,
+        temperature_K=1800.0,
+        source_document={},
+        observation=observation,
+    )
+
+    assert len(integrator_inputs) == 2
+    assert prediction.initial_inventory_mol == integrator_inputs[0]
+    assert integrator_inputs[0] == integrator_inputs[1]
 
 
 @pytest.fixture
