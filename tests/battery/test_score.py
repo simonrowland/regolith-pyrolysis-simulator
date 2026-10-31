@@ -5412,6 +5412,249 @@ def test_binary_complement_notice_requires_composition_consumption(
     )
 
 
+def _oxide_from_element_inference(oxide_sum: str) -> Derivation:
+    return Derivation(
+        relation="oxide_from_element_mass_percent",
+        inputs=(
+            "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); "
+            "locator page 2 published_page 178 table 2 row ACS2",
+            f"printed_oxide_sum_wt_percent: {oxide_sum}",
+        ),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+
+
+def _oxide_point_observation(experiment, observation_id, identity, value, oxide_sum):
+    composition = Composition(
+        basis="derived_from_table2_element_mass_percent",
+        components=(
+            ("CaO", Decimal("0.30465979")),
+            ("SiO2", Decimal("0.30850866")),
+            ("Al2O3", Decimal("0.38683155")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    reference = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        value,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="cho-suito-1994-cas-slag-activities",
+    )
+    return replace(
+        reference,
+        point_conditions={
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="2", note="Table 2 element mass percent ACS2"),
+                inference=_oxide_from_element_inference(oxide_sum),
+            )
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    ("relation", "scores"),
+    (
+        ("oxide_from_element_mass_percent", True),
+        ("extract_inference", False),
+        ("invented_oxide_balance", False),
+    ),
+)
+def test_only_allowlisted_exact_derivations_supply_point_composition(
+    relation: str, scores: bool
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
+        _printed_point_composition,
+        flagged_strata,
+    )
+
+    oxide_sum = "100.204223"
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="derived_from_table2_element_mass_percent",
+        components=(
+            ("CaO", Decimal("0.30465979")),
+            ("SiO2", Decimal("0.30850866")),
+            ("Al2O3", Decimal("0.38683155")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    inference = Derivation(
+        relation=relation,
+        inputs=(
+            "Table 2 printed slag elemental mass percent (Ca), (Si), (Al)",
+            f"printed_oxide_sum_wt_percent: {oxide_sum}",
+        ),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    identity = replace(
+        _partial_identity(),
+        composition=State.unknown("composition is recorded on the source point"),
+    )
+    reference = replace(
+        F.observation(
+            f"oxide-derivation-{relation}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="oxide-derivation-source",
+        ),
+        point_conditions={
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="2", note="Table 2 row ACS2"),
+                inference=inference,
+            )
+        },
+    )
+    point_composition, notice = _printed_point_composition(reference)
+    if not scores:
+        assert point_composition is None
+        assert notice is None
+        return
+
+    assert point_composition is not None
+    assert point_composition.value == composition
+    assert notice is not None
+    assert notice.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+    assert oxide_sum in notice.reason
+    assert "99.25" not in notice.reason
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        requested_composition=point_composition,
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=prediction,
+    )
+    oxide_notices = tuple(
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert len(oxide_notices) == 1
+    assert oxide_sum in oxide_notices[0].reason
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
+    )
+
+
+def test_oxide_sum_notice_reads_the_derivation_record() -> None:
+    from simulator.battery.score import _printed_point_composition
+
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _partial_identity(),
+        composition=State.unknown("composition is recorded on the source point"),
+    )
+    reference = _oxide_point_observation(
+        experiment,
+        "oxide-sum-from-record",
+        identity,
+        Decimal("1"),
+        "99.254073",
+    )
+    _point, notice = _printed_point_composition(reference)
+    assert notice is not None
+    assert "printed_oxide_sum_wt_percent=99.254073" in notice.reason
+
+    blank = replace(
+        reference,
+        point_conditions={
+            "composition": Located(
+                reference.point_conditions["composition"].state,
+                locator=reference.point_conditions["composition"].locator,
+                inference=Derivation(
+                    relation="oxide_from_element_mass_percent",
+                    inputs=("Table 2 locator only",),
+                    parameters=(),
+                    output_unit="mole_fraction",
+                ),
+            )
+        },
+    )
+    _blank_point, blank_notice = _printed_point_composition(blank)
+    assert blank_notice is not None
+    assert blank_notice.reason.endswith("printed_oxide_sum_wt_percent=")
+    assert "99." not in blank_notice.reason
+    assert "100." not in blank_notice.reason
+
+
+def test_oxide_notice_requires_composition_consumption() -> None:
+    oxide_sum = "100.204223"
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _partial_identity(),
+        quantity=Quantity.ION_INTENSITY,
+        composition=State.unknown("composition is recorded on the source point"),
+    )
+    reference = _oxide_point_observation(
+        experiment,
+        "oxide-derivation-not-consumed",
+        identity,
+        Decimal("1"),
+        oxide_sum,
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "not_a_vapour_quantity"
+    assert all(
+        notice.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+        for notice in residual.notices
+    )
+
+
+def test_binary_complement_on_identity_does_not_grow_a_second_notice() -> None:
+    from simulator.battery.score import _printed_point_composition
+
+    experiment = F.tabulation_experiment()
+    composition = Composition(
+        basis="binary_complement",
+        components=(("SrO", Decimal("0.33")), ("Al2O3", Decimal("0.67"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(_partial_identity(), composition=State.of(composition))
+    reference = replace(
+        F.observation(
+            "binary-complement-already-on-identity",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="binary-complement-source",
+        ),
+        point_conditions={
+            "composition": Located(
+                State.of(composition),
+                locator=F.loc(table="S7"),
+                inference=Derivation(
+                    relation="binary_complement",
+                    inputs=("caption: 33 mol% SrO",),
+                    parameters=(),
+                    output_unit="mole_fraction",
+                ),
+            )
+        },
+    )
+    point_composition, notice = _printed_point_composition(reference)
+    assert point_composition is None
+    assert notice is None
+
+
 def test_hastie_initial_charge_notice_reaches_residual() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -6383,6 +6626,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
@@ -6411,6 +6655,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
             NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
             "composition_binary_complement:probe",
+        ),
+        (
+            FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
+            NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT,
+            "composition_oxide_from_element_mass_percent: printed_oxide_sum_wt_percent=100.204223",
         ),
         (
             FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -6461,6 +6710,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
@@ -6484,6 +6734,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (
             NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
             "composition_binary_complement:probe",
+        ),
+        (
+            NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT,
+            "composition_oxide_from_element_mass_percent: printed_oxide_sum_wt_percent=99.254073",
         ),
         (NoticeKind.SOURCE_DISAGREEMENT, "source_internally_inconsistent:probe"),
         (NoticeKind.IMCC_COMPLEX_SATURATION, "imcc_complex_saturation:probe"),
@@ -6518,6 +6772,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
