@@ -5885,6 +5885,53 @@ def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
             )
             assert pinned.observation.identity.species.formula == "O2"
 
+            al_o = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_alo_psat_table4" in item.observation_id.split("::")
+            ]
+            assert len(al_o) == 6
+            assert all(item.experiment_id == experiment.experiment_id for item in al_o)
+            al_o_conditions = [
+                (
+                    item,
+                    resolve_source_oxygen(
+                        item,
+                        result.observations.values(),
+                        _bench_for_score(experiment, result.benches),
+                    ),
+                )
+                for item in al_o
+            ]
+            assert all(
+                isinstance(condition, SourceOxygenCondition)
+                for _item, condition in al_o_conditions
+            )
+            al_o_2320 = next(
+                condition
+                for item, condition in al_o_conditions
+                if item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2320")
+            )
+            assert al_o_2320.observation.identity.species.formula == "O2"
+            assert al_o_2320.observation.value.point == Decimal("0.008780430613159444")
+            used_atomic_oxygen = next(
+                item
+                for item in atomic_oxygen
+                if item.observation_id in al_o_2320.used_observations
+                and item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2320")
+            )
+            assert ":row=12065" in used_atomic_oxygen.observation_id
+
+            aluminum_figure = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_al_monatomic_figure7" in item.observation_id.split("::")
+            ]
+            assert aluminum_figure
+            assert all(item.experiment_id == experiment.experiment_id for item in aluminum_figure)
+
 def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
     source_ids = (
         "sesko-2022-tum-thesis",
