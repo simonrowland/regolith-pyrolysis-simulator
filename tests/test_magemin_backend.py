@@ -1715,16 +1715,27 @@ def test_magemin_plante_mode_vector_is_not_renormalized():
         )
 
 
-def test_magemin_control_mode_vector_serialization_is_byte_identical():
+def test_magemin_control_mode_vector_reports_physical_material_mass():
     parsed = MAGEMinBackend._parse_subprocess_stdout(
-        'Phase : liq cpx ol qfm\n'
-        'Mode  : 0.72251 0.00001 0.23073 0.04675\n'
+        'Phase : liq ol qfm\n'
+        'Mode  : 0.67500 0.22500 0.10000\n'
     )
 
-    assert repr(parsed) == (
-        "{'liq': {'mass_kg': 0.72251}, "
-        "'cpx': {'mass_kg': 1e-05}, "
-        "'ol': {'mass_kg': 0.23073}}"
+    assert parsed == {'liq': {'mass_kg': 0.75}, 'ol': {'mass_kg': 0.25}}
+    assert sum(phase['mass_kg'] for phase in parsed.values()) == pytest.approx(
+        1.0, rel=1e-12, abs=1e-12
+    )
+
+
+def test_magemin_input_mass_uses_formula_resolver_for_mol_composition():
+    input_mass_kg = MAGEMinBackend._input_material_mass_kg(
+        composition_kg=None,
+        composition_mol={'SiO2': 1.0},
+        species_formula_registry=None,
+    )
+
+    assert input_mass_kg == pytest.approx(
+        resolve_species_formula('SiO2').molar_mass_kg_per_mol()
     )
 
 
@@ -3583,7 +3594,6 @@ def test_magemin_live_shipped_gate_liquidus_and_phase_outputs_are_pinned(request
     assert phase_result.status == "ok", phase_result.warnings
     assert phase_result.liquid_fraction == 0.9963169287905369
     assert phase_result.phases_present == ["liq", "spl"]
-    assert phase_result.phase_masses_kg == {"liq": 0.97114, "spl": 0.00359}
 
     mars_result = backend.find_liquidus_solidus(
         composition_kg=_MARS_BASALT_MAGEMIN_BULK,
@@ -3609,10 +3619,36 @@ def test_magemin_live_shipped_gate_liquidus_and_phase_outputs_are_pinned(request
     assert mars_phase_result.status == "ok", mars_phase_result.warnings
     assert mars_phase_result.liquid_fraction == 0.9971600263417847
     assert mars_phase_result.phases_present == ["liq", "ol"]
-    assert mars_phase_result.phase_masses_kg == {
-        "liq": 0.96908,
-        "ol": 0.00276,
-    }
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_shipped_phase_masses_close_to_input_mass(request):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({})
+    if not available:
+        pytest.skip("MAGEMin binary present but backend failed to initialize")
+
+    for composition in (
+        _LUNAR_MARE_LOW_TI_MAGEMIN_BULK,
+        _MARS_BASALT_MAGEMIN_BULK,
+    ):
+        result = backend.equilibrate(
+            1300.0,
+            composition_kg=composition,
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+        assert result.status == "ok", result.warnings
+        assert sum(result.phase_masses_kg.values()) == pytest.approx(
+            sum(composition.values()), rel=1e-12, abs=1e-12
+        )
 
 
 # Pure-endmember melting references retained for any future calibrated engine

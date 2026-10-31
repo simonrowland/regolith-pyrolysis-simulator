@@ -111,6 +111,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.base import (
@@ -275,6 +276,7 @@ class _MAGEMinBulkProjection:
     merged_components: Tuple[str, ...] = ()
     source_sum_wt_pct: float = 0.0
     projected_sum_wt_pct: float = 0.0
+    input_material_mass_kg: float = 1.0
 
 
 def _bootstrap_magemin_subprocess_worker(
@@ -1606,7 +1608,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         try:
-            bulk_projection = self._build_db_bulk_projection(comp_wt)
+            bulk_projection = self._build_db_bulk_projection(
+                comp_wt,
+                input_material_mass_kg=self._input_material_mass_kg(
+                    composition_kg=composition_kg,
+                    composition_mol=composition_mol,
+                    species_formula_registry=species_formula_registry,
+                ),
+            )
         except MeltCompositionError as exc:
             message = f'MAGEMin bulk projection failed: {exc}'
             self._last_error = message
@@ -3183,6 +3192,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             _raise_magemin_output_invalid(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
+        input_material_mass_kg = bulk_projection.input_material_mass_kg
+        # The parser expresses normalized material modes on a 1 kg sample;
+        # this is the final unit conversion from that reference to the actual
+        # feedstock mass carried by the bulk projection.
+        for phase in phases.values():
+            phase['mass_kg'] *= input_material_mass_kg
+        phase_mass_total_kg = math.fsum(
+            phase['mass_kg'] for phase in phases.values()
+        )
+        if not math.isclose(
+            phase_mass_total_kg,
+            input_material_mass_kg,
+            rel_tol=1.0e-12,
+            abs_tol=1.0e-12,
+        ):
+            _raise_magemin_output_invalid(
+                'MAGEMin material phase masses do not close to input mass: '
+                f'{phase_mass_total_kg:.12g} kg != '
+                f'{input_material_mass_kg:.12g} kg'
+            )
         result = {
             'phases': phases,
             'buffer_warnings': buffer_warnings,
@@ -3222,6 +3251,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         composition_wt_pct: Mapping[str, float],
         *,
         database: Optional[str] = None,
+        input_material_mass_kg: float = 1.0,
     ) -> _MAGEMinBulkProjection:
         """
         Project simulator oxide wt% into the installed MAGEMin DB bulk order.
@@ -3337,7 +3367,36 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             merged_components=tuple(merged),
             source_sum_wt_pct=source_sum_wt_pct,
             projected_sum_wt_pct=sum(float(value) for value in projected.values()),
+            input_material_mass_kg=float(input_material_mass_kg),
         )
+
+    @staticmethod
+    def _input_material_mass_kg(
+        *,
+        composition_kg: Optional[Mapping[str, float]],
+        composition_mol: Optional[Mapping[str, float]],
+        species_formula_registry: Optional[Mapping[str, Any]],
+    ) -> float:
+        """Return the cleaned melt's physical input mass in kilograms."""
+        if composition_mol is not None:
+            return math.fsum(
+                float(mol)
+                * resolve_species_formula(
+                    species, species_formula_registry
+                ).molar_mass_kg_per_mol()
+                for species, mol in composition_mol.items()
+                if float(mol) > 0.0
+            )
+        if composition_kg is not None:
+            return math.fsum(
+                float(mass_kg)
+                for mass_kg in composition_kg.values()
+                if float(mass_kg) > 0.0
+            )
+        # A projected oxide wt% vector has no absolute scale. Direct
+        # composition-only probes use a 1 kg reference sample; equilibrate()
+        # passes the actual input mass whenever one was supplied.
+        return 1.0
 
     @staticmethod
     def _qfm_logfo2_oneill(temperature_C: float) -> float:
@@ -3422,7 +3481,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _parse_subprocess_stdout(
-        stdout: str, *, metadata: Optional[Dict[str, Any]] = None,
+        stdout: str,
+        *,
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Dict[str, float]]:
         """
         Parse the compact MAGEMin ``--Verb=0`` ``Phase :`` / ``Mode :``
@@ -3433,12 +3494,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
              Phase :       ol      liq      spl      qfm
              Mode  :  0.02491  0.96156  0.00213  0.01140
 
-        Mode values are mass fractions of the system.  The buffer
-        pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
-        a control row, not a material phase.  Returns
-        ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis (the
-        adapter only needs relative masses for ``liquid_fraction`` and
-        modal parity).
+        Mode values are fractions of the whole solver system. The buffer
+        pseudo-phase and solver-only oxygen reservoir are not feedstock
+        material. If the retained material modes sum to S, a mode m_i
+        represents m_i/S of a 1 kg reference sample. The subprocess caller
+        then scales that material-normalized mode to the actual input mass.
         """
         phase_line: Optional[str] = None
         mode_line: Optional[str] = None
@@ -3491,6 +3551,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'got {mode_total:.9g}'
             )
 
+        material_mode_total = math.fsum(
+            fraction
+            for name, fraction in parsed_modes
+            if name.lower() not in MAGEMinBackend._BUFFER_CHOICES
+        )
+        if material_mode_total <= 0.0:
+            return {}
         phases: Dict[str, Dict[str, float]] = {}
         for name, fraction in parsed_modes:
             if name.lower() in MAGEMinBackend._BUFFER_CHOICES:
@@ -3498,8 +3565,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if fraction <= 0.0:
                 continue
             # MAGEMin can emit multiple phase instances with one name; retain
-            # their combined system mass fraction instead of the last row.
-            phases.setdefault(name, {'mass_kg': 0.0})['mass_kg'] += fraction
+            # their combined normalized material mass instead of the last
+            # row. Premise: m_i is each phase's fraction of the entire solver
+            # system, while S is the sum of material modes after excluding
+            # the buffer/reservoir control phase. Thus m_i/S is the phase
+            # fraction of the material feedstock. It is dimensionless, so
+            # multiplying by the feedstock kg gives phase kg; the sum is
+            # (S/S)*feedstock_mass = feedstock_mass. In the limiting case
+            # S=1 (no pseudo-phase mass), this reduces to m_i*feedstock_mass.
+            # The parser uses a 1 kg reference sample; the caller applies the
+            # actual feedstock mass after parsing.
+            phase_mass_kg = fraction / material_mode_total
+            phases.setdefault(name, {'mass_kg': 0.0})['mass_kg'] += (
+                phase_mass_kg
+            )
         return phases
 
     @staticmethod
