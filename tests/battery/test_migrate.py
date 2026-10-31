@@ -15168,6 +15168,77 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert ms2.admission.status is AdmissionStatus.ADMITTED
 
 
+def _nested_temperature_estimate() -> dict:
+    return {
+        "state": {"tag": "value", "value": "926.85"},
+        "locator": {"page": 2, "table": "I"},
+        "inference": {
+            "relation": "source_temperature_estimate",
+            "inputs": ["source graph"],
+            "parameters": [],
+            "output_unit": "degC",
+        },
+    }
+
+
+def _assert_temperature_source_and_conversion(observation) -> None:
+    temperature = observation.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1200")
+    assert temperature.inference is not None
+    assert temperature.inference.relation == "source_temperature_estimate"
+    assert temperature.inference.inputs == ("source graph",)
+    original = dict(temperature.inference.parameters)["original"]
+    assert original.inference is not None
+    assert original.inference.relation == "celsius_to_kelvin"
+
+
+def test_nested_temperature_inference_survives_on_parent_observation(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"] = {
+        "quantity": "p_sat",
+        "pressure_atm": 1,
+        "point_conditions": {"T_C": _nested_temperature_estimate()},
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    _assert_temperature_source_and_conversion(observation)
+
+
+def test_nested_temperature_inference_survives_on_exploded_observation(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "id": "SiO2",
+                    "mass_loss_wt_pct": 1.1,
+                    "point_conditions": {"T_C": _nested_temperature_estimate()},
+                }
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["regime"] = "solar_vacuum_pyrolysis"
+    row["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    (observation,) = [
+        item for item in result.observations.values() if "::T=" in item.observation_id
+    ]
+
+    _assert_temperature_source_and_conversion(observation)
+
+
 def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
     tmp_path: Path,
 ) -> None:
