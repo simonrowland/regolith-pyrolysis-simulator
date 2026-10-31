@@ -285,6 +285,72 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
         assert prediction.authority is Authority.EXTRAPOLATED
 
 
+def test_openimcc_sp_sossi_records_sample_initial_composition(
+    extent_point,
+):
+    from simulator.battery.score import (
+        _SOSSI_SOURCE_ID,
+        _sossi_residue_prediction,
+    )
+
+    _reference, experiment, _rows = extent_point
+    experiment_id = _SOSSI_SOURCE_ID + "::run-1"
+    initial = Composition(
+        "ordered_complete_mole_inventory",
+        (("MnO", Decimal("0.5")), ("P2O5", Decimal("0.5"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    experiment = replace(
+        experiment,
+        experiment_id=experiment_id,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(State.of(initial), _reference.locator),
+        ),
+    )
+    reference = replace(
+        _reference,
+        source_id=_SOSSI_SOURCE_ID,
+        experiment_id=experiment_id,
+        identity=replace(
+            _reference.identity,
+            species=Species("Mn", Phase.L),
+            composition=State.of(
+                Composition(
+                    "ordered_complete_mole_inventory",
+                    (("MnO", Decimal("1")),),
+                    AmountBasis.MOLE_FRACTION,
+                )
+            ),
+        ),
+    )
+    context = SimpleNamespace(
+        experiments={experiment_id: experiment}, observations={}
+    )
+    cache = {
+        (_SOSSI_SOURCE_ID, Engine.OPENIMCC_SP): {
+            "run-1": SimpleNamespace(
+                provenance={},
+                channel_missing_elements=(),
+                primary_element_ppm={"Mn": 12.0},
+                sensitivity_band_ppm={"Mn": (10.0, 14.0)},
+            )
+        }
+    }
+
+    prediction = _sossi_residue_prediction(
+        context, reference, Engine.OPENIMCC_SP, cache
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.requested_composition == State.of(initial)
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
     from simulator.battery import source_oxygen
     reference, experiment, rows = extent_point
