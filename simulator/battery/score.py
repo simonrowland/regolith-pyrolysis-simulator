@@ -609,6 +609,17 @@ def _openimcc_sp_uses_p2o5_screening_proxy(
     )
 
 
+def _openimcc_sp_sample_initial_composition(
+    engine: Engine, experiment: Experiment | None
+) -> State[Composition] | None:
+    """Return the starting inventory consumed by an SP sample-residue route."""
+
+    if engine is not Engine.OPENIMCC_SP or experiment is None:
+        return None
+    initial = experiment.sample.initial_composition
+    return None if initial is None else initial.state
+
+
 def _openimcc_sp_pack_source() -> str:
     from simulator.melt_backend.openimcc_bridge import (
         OPENIMCC_SP_EXTENSION_PACK_NAME,
@@ -8533,6 +8544,9 @@ def _predict_mass_loss_with_residue(
         coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
+        requested_composition=_openimcc_sp_sample_initial_composition(
+            engine, experiment
+        ),
         version=(
             "method_class=calculated_residue_integrator; "
             "sourced_alpha; bounded_unsourced_channels_and_preheat; self_similar_printed_area"
@@ -9073,7 +9087,13 @@ def predict_with_engine(
             tuple((str(name), Decimal(str(amount))) for name, amount in moles.items()),
             AmountBasis.MOLE_FRACTION,
         )
-        requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
+        requested = State.of(built)
+        if (
+            engine is not Engine.OPENIMCC_SP
+            and identity.composition is not None
+            and identity.composition.is_value
+        ):
+            requested = identity.composition
         composition_value = built
         if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
             unsupported_components = sorted(
@@ -9241,6 +9261,14 @@ def predict_with_engine(
             )
         formula_pot, phase_name = stated
         wt = {formula_pot: 100.0}
+        if engine is Engine.OPENIMCC_SP:
+            requested = State.of(
+                Composition(
+                    "pure_substance_reservoir_mass_percent",
+                    ((formula_pot, Decimal("100")),),
+                    AmountBasis.MASS_PERCENT,
+                )
+            )
         input_notices.append(
             _omission_notice(
                 quantity,
@@ -10616,6 +10644,9 @@ def _hashimoto_residue_prediction(
             # The source-resolved Phase.L identity denotes the modeled run-end
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
+            requested_composition=_openimcc_sp_sample_initial_composition(
+                engine, context.experiments.get(reference.experiment_id)
+            ),
             version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=primary_provenance,
         )
@@ -10705,6 +10736,9 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             ),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             notices=(*result["notices"], *domain_notices), identity=reference.identity,
+            requested_composition=_openimcc_sp_sample_initial_composition(
+                engine, experiment
+            ),
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
@@ -10937,6 +10971,9 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             notices=tuple(notices),
             identity=reference.identity,
+            requested_composition=_openimcc_sp_sample_initial_composition(
+                engine, context.experiments.get(reference.experiment_id)
+            ),
             version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
         )
