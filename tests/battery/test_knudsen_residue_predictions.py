@@ -345,11 +345,19 @@ def test_openimcc_sp_unknown_consumed_residue_inventory_does_not_fall_back(
     )
 
 
+@pytest.mark.parametrize("sample_has_p2o5", (False, True))
 def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
-    monkeypatch,
+    sample_has_p2o5, monkeypatch,
 ):
+    """Screen the scorer with one real run because it normally integrates all 43.
+
+    The wrapper narrows only the Sossi prediction boundary. The selected run still
+    uses its recorded host and measured Mn/Ti additions through the real inventory
+    builder, OpenIMCC prediction, and integrator.
+    """
     pytest.importorskip("openimcc", reason="openimcc is not importable")
     import simulator.battery.score as score
+    import simulator.battery.residue as residue
 
     source_id = "kems-012-sossi-2019"
     context = score.load_score_context(sources=(source_id,))
@@ -372,27 +380,24 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
         for item in source.get("experiments", ())
         if isinstance(item, dict)
     }
-    positive_run_id = "sossi-2019-run-2m-15-07-16c"
-    assert positive_run_id in source_experiments
-    positive_reference = next(
+    selected_run_id = "sossi-2019-run-2m-15-07-16c"
+    assert selected_run_id in source_experiments
+    reference = next(
         row
         for row in rows
-        if row.experiment_id.rsplit("::", 1)[-1] == positive_run_id
+        if row.experiment_id.rsplit("::", 1)[-1] == selected_run_id
     )
-    negative_reference = next(
-        row
-        for row in rows
-        if row.experiment_id.rsplit("::", 1)[-1] != positive_run_id
-    )
-    positive_experiment = source_experiments[positive_run_id]
-    printed = positive_experiment["sample"]["printed_composition"]["state"]["value"]
-    parent = next(name for name in printed if name != "P2O5")
-    prior_p2o5 = float(printed.pop("P2O5", 0.0))
-    injected_p2o5_wt_pct = 0.1
-    printed[parent] = (
-        float(printed[parent]) - injected_p2o5_wt_pct + prior_p2o5
-    )
-    printed["P2O5"] = injected_p2o5_wt_pct
+    selected_experiment = source_experiments[selected_run_id]
+    printed = selected_experiment["sample"]["printed_composition"]["state"]["value"]
+    if sample_has_p2o5:
+        parent = next(name for name in printed if name != "P2O5")
+        prior_p2o5 = float(printed.pop("P2O5", 0.0))
+        # Keep the injected amount below the 1 wt% projection threshold.
+        injected_p2o5_wt_pct = 0.1
+        printed[parent] = (
+            float(printed[parent]) - injected_p2o5_wt_pct + prior_p2o5
+        )
+        printed["P2O5"] = injected_p2o5_wt_pct
 
     def load_modified_source(path):
         if str(path) == str(source_path):
@@ -400,6 +405,28 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
         return original_load_yaml(path)
 
     monkeypatch.setattr(score, "load_yaml", load_modified_source)
+
+    original_predict_cohort = residue._predict_sossi_residue_cohort
+
+    def predict_reference_run_only(experiments, runtime_catalog, **kwargs):
+        reference_experiment = next(
+            experiment
+            for experiment in experiments
+            if experiment["experiment_id"] == selected_run_id
+        )
+        run_kwargs = dict(kwargs)
+        for key in (
+            "starting_trace_ppm_by_experiment",
+            "buffered_fO2_log_by_experiment",
+        ):
+            run_kwargs[key] = {selected_run_id: kwargs[key][selected_run_id]}
+        return original_predict_cohort(
+            [reference_experiment], runtime_catalog, **run_kwargs
+        )
+
+    monkeypatch.setattr(
+        residue, "_predict_sossi_residue_cohort", predict_reference_run_only
+    )
 
     def identity_with_p2o5(reference, present):
         components = (
@@ -421,43 +448,28 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
             ),
         )
 
-    positive_reference = identity_with_p2o5(positive_reference, False)
-    negative_reference = identity_with_p2o5(negative_reference, True)
-    cache = {}
-    positive = score._sossi_residue_prediction(
-        context, positive_reference, Engine.OPENIMCC_SP, cache
-    )
-    negative = score._sossi_residue_prediction(
-        context, negative_reference, Engine.OPENIMCC_SP, cache
+    reference = identity_with_p2o5(reference, not sample_has_p2o5)
+    prediction = score._sossi_residue_prediction(
+        context, reference, Engine.OPENIMCC_SP, {}
     )
 
-    positive_failure = (
-        f"refusal_reason={positive.refusal_reason}; "
-        f"refusal_detail={positive.refusal_detail}"
+    failure = (
+        f"refusal_reason={prediction.refusal_reason}; "
+        f"refusal_detail={prediction.refusal_detail}"
     )
-    negative_failure = (
-        f"refusal_reason={negative.refusal_reason}; "
-        f"refusal_detail={negative.refusal_detail}"
-    )
-    assert positive.execution.state is ExecutionState.PRODUCED, positive_failure
-    assert negative.execution.state is ExecutionState.PRODUCED, negative_failure
-    for prediction, sample_has_p2o5 in ((positive, True), (negative, False)):
-        failure = (
-            f"refusal_reason={prediction.refusal_reason}; "
-            f"refusal_detail={prediction.refusal_detail}"
-        )
-        consumed = prediction.requested_composition
-        assert consumed is not None and consumed.is_value, failure
-        assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
-        consumed_has_p2o5 = any(
-            name == "P2O5" and amount > 0
-            for name, amount in consumed.value.components
-        )
-        assert consumed_has_p2o5 is sample_has_p2o5, failure
-        assert any(
-            notice.reason.startswith("P2O5 parent reference state:")
-            for notice in prediction.notices
-        ) is sample_has_p2o5, failure
+    assert prediction.execution.state is ExecutionState.PRODUCED, failure
+    consumed = prediction.requested_composition
+    assert consumed is not None and consumed.is_value, failure
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY, failure
+    consumed_components = dict(consumed.value.components)
+    assert consumed_components["MnO"] > 0.0, failure
+    assert consumed_components["TiO2"] > 0.0, failure
+    consumed_has_p2o5 = consumed_components.get("P2O5", 0.0) > 0.0
+    assert consumed_has_p2o5 is sample_has_p2o5, failure
+    assert any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    ) is sample_has_p2o5, failure
 
 
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
