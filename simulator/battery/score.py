@@ -504,6 +504,7 @@ FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION = "binary-complement-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
@@ -1872,6 +1873,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value in kinds:
+        strata.append(FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
         for kind, reason in notices
@@ -5590,22 +5593,48 @@ def _bench_for_score(
     return benches.get(experiment.bench_id)
 
 
-def _printed_point_composition(observation: Observation) -> State[Composition] | None:
+def _printed_point_composition(
+    observation: Observation,
+) -> tuple[State[Composition] | None, Notice | None]:
     """Printed point composition when the identity axis does not carry one.
 
     Series migration stores the row composition on point_conditions and
-    leaves identity.composition unknown. That stated composition is the
-    melt. A derived point composition is not used.
+    leaves identity.composition unknown. A binary complement is used with a
+    visible residual notice; other inferred point compositions are refused.
     """
 
+    identity = observation.identity
+    if (
+        isinstance(identity, Identity)
+        and identity.composition is not None
+        and identity.composition.is_value
+    ):
+        return None, None
     point = (observation.point_conditions or {}).get("composition")
-    if not isinstance(point, Located) or point.inference is not None:
-        return None
+    if not isinstance(point, Located):
+        return None, None
+    if (
+        point.inference is not None
+        and point.inference.relation != "binary_complement"
+    ):
+        return None, None
     if not point.state.is_value or point.state.value is None:
-        return None
+        return None, None
     if not isinstance(point.state.value, Composition):
-        return None
-    return point.state
+        return None, None
+    notice = None
+    quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+    if point.inference is not None and quantity is not None:
+        notice = Notice(
+            kind=NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            affected_quantities=(quantity,),
+            reason=(
+                "composition_binary_complement: SrO-Al2O3 binary; "
+                "complement of the caption mole percent"
+            ),
+            origin=observation.observation_id,
+        )
+    return point.state, notice
 
 
 def _solved_effusion_oxygen_payload(
@@ -5906,7 +5935,7 @@ def _comparison_identity(
                 identity.species, polymorph=State.of(solid_polymorph)
             )
     if identity.composition is None or not identity.composition.is_value:
-        point = _printed_point_composition(reference)
+        point, _notice = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
     if source_pressure is not None:
@@ -6031,7 +6060,7 @@ def _fe_redox_material(
 
     composition_state = identity.composition
     if composition_state is None or not composition_state.is_value:
-        composition_state = _printed_point_composition(observation)
+        composition_state, _notice = _printed_point_composition(observation)
     if (
         composition_state is None
         or not composition_state.is_value
@@ -7387,7 +7416,7 @@ def _battery_hero_oxygen_condition(
 
     requested = identity.composition
     if requested is None or not requested.is_value:
-        requested = _printed_point_composition(observation)
+        requested, _notice = _printed_point_composition(observation)
     composition_value = (
         requested.value
         if requested is not None and requested.is_value
@@ -9412,7 +9441,7 @@ def _predict_with_engine(
         assert identity.composition.value is not None
         composition_value = identity.composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM and (
-        point_composition := _printed_point_composition(observation)
+        point_composition := _printed_point_composition(observation)[0]
     ) is not None:
         requested = point_composition
         assert point_composition.value is not None
@@ -11332,6 +11361,9 @@ def compile_residual(
     )
     if non_measured_comparison:
         evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
+    _point_composition, point_composition_notice = _printed_point_composition(
+        source_reference
+    )
     # Value owns approximation; this notice carries it through the stratum/report flow.
     approximate_value_notices = (
         (
@@ -11822,6 +11854,12 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    if (
+        point_composition_notice is not None
+        and _point_composition is not None
+        and prediction.requested_composition == _point_composition
+    ):
+        notices = union_notices(notices, (point_composition_notice,))
     result_mode = fo2_mode or _fo2_mode_from_notices(notices)
     if quantity is not None and _pressure_independent_comparison(
         reference, prediction
@@ -12065,6 +12103,15 @@ def compile_residual(
         compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
+        if (
+            point_composition_notice is not None
+            and _point_composition is not None
+            and (
+                compared_reference.composition == _point_composition
+                or compared_candidate.composition == _point_composition
+            )
+        ):
+            notices = union_notices(notices, (point_composition_notice,))
     source_phase_missing = (
         quantity is Quantity.ACTIVITY
         and isinstance(source_identity, Identity)
@@ -16927,7 +16974,7 @@ class _ConditionHull:
             self.p = self._widen(self.p, as_decimal(pressure.value))
         state = identity.composition
         if state is None or not state.is_value or state.value is None:
-            state = _printed_point_composition(observation)
+            state, _notice = _printed_point_composition(observation)
         if state is None or not isinstance(state.value, Composition):
             return
         self.n_composition += 1
