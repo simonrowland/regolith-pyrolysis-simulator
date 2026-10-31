@@ -55,6 +55,10 @@ RENDER_PINS = {
     ),
 }
 
+IDENTITY_FORMULA_OVERRIDES = {
+    "kunisada_1986_table2_flux_i_experimental_total_FeO_content": "FeOT",
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -125,12 +129,12 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert set(migrated) == expected_ids
     assert len(migrated) == 278
     assert len(migrator.result.validation.hard_issues) == 0
-    assert len(migrator.result.validation.issues) == 116
+    assert len(migrator.result.validation.issues) == 440
     assert {issue.reason.value for issue in migrator.result.validation.issues} == {
         "identity_incomplete"
     }
     assert not migrator.result.registry_issues
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 234
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 72
 
     expected_quantity_unknown = {
         f"{SOURCE_ID}::{observation_id}"
@@ -143,7 +147,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         if row.identity.quantity.is_unknown
     }
     assert actual_quantity_unknown == expected_quantity_unknown
-    assert len(actual_quantity_unknown) == 234
+    assert len(actual_quantity_unknown) == 72
     assert all(
         row.identity.species is not None
         and row.identity.species.phase.is_value
@@ -181,9 +185,77 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         if row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ]
-    assert len(phase_rows) == 40
+    assert len(phase_rows) == 202
     assert all(row.identity.composition.is_value for row in phase_rows)
     assert all(row.point_conditions["composition"].state.is_value for row in phase_rows)
+
+    contexts = [
+        context
+        for context_rows in migrator.result.context_by_work.values()
+        for context in context_rows
+    ]
+    assert len(contexts) == 15
+    assert {
+        context["context_id"]
+        for context in contexts
+    } == {
+        f"{SOURCE_ID}::context::{context['observation_id']}"
+        for group in document["species"].values()
+        for context in group.get("context", [])
+    }
+    context_rows = {
+        context["observation_id"]: context
+        for group in document["species"].values()
+        for context in group.get("context", [])
+    }
+    assert len(context_rows) == 15
+    methods = context_rows["kunisada_1986_experimental_methods"]["values"]
+    assert methods["crucible_as_printed"] == (
+        "recrystallized magnesia (MgO), 40 mm I.D., 60 mm H"
+    )
+    assert methods["furnace_and_tube_as_printed"] == (
+        "Tammann furnace with an alumina reaction tube"
+    )
+    assert methods["atmosphere_as_printed"] == (
+        "argon dehydrated by P2O5 and deoxidized through Mg chips heated at 500 °C"
+    )
+    assert "Pt-6%Rh/Pt-30%Rh" in methods["temperature_measurement_as_printed"]
+    assert methods["phosphorus_analysis_as_printed"] == "Mo-blue colorimetry"
+    assert methods["oxygen_analysis_as_printed"] == (
+        "inert gas fusion-thermal conductivity method"
+    )
+    assert methods["carbon_analysis_as_printed"] == "infrared absorption spectrometry"
+    assert methods["slag_analysis_as_printed"] == (
+        "fluorescent X-ray and JIS-standard analyses"
+    )
+    assert context_rows["kunisada_1986_equation_6"]["values"][
+        "equation_as_printed"
+    ] == "2P + 5(FeO) = (P2O5) + 5Fe"
+    assert context_rows["kunisada_1986_equation_7"]["values"][
+        "equation_as_printed"
+    ] == "L_P = (%P2O5)/([%P]^2 · (%FeO)^5)"
+    assert context_rows["kunisada_1986_equation_8"]["values"][
+        "equation_as_printed"
+    ] == (
+        "log kP = log{(%P2O5)/([%P]^2 · (%FeO)^5)} = "
+        "8.67 log(%Na2O) - 14.55 (1600 °C)"
+    )
+    figure_contexts = [
+        context
+        for context in context_rows.values()
+        if context["type"] == "figure_caption"
+    ]
+    assert len(figure_contexts) == 11
+    assert {context["locator"]["figure"] for context in figure_contexts} == {
+        str(number) for number in range(1, 12)
+    }
+    assert all(
+        context["values"].get("caption_as_printed") for context in figure_contexts
+    )
+    assert all(
+        context["values"]["digitization"] == "not digitized; caption inventory only"
+        for context in figure_contexts
+    )
 
     for observation_id, (
         formula,
@@ -199,7 +271,9 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == migrated_value
         assert row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        assert row.identity.species.formula == formula
+        assert row.identity.species.formula == IDENTITY_FORMULA_OVERRIDES.get(
+            observation_id, formula
+        )
         assert row.identity.species.phase.value is Phase.L
         assert row.identity.phase_role.value is phase_role
         assert row.identity.temperature_K.is_value
@@ -218,3 +292,74 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         assert condition_locator.note is not None
         assert row.point_conditions["temperature_K"].state.is_value
         assert row.point_conditions["temperature_K"].state.value == Decimal("1873.15")
+
+    t1i_rows = {
+        observation_id: source_row
+        for observation_id, (_formula, source_row) in source_rows.items()
+        if source_row["locator"].get("table") == "1(I)"
+    }
+    assert len(t1i_rows) == 216
+    assert sum(
+        row["values"].get("admission_status") == "admitted"
+        for row in t1i_rows.values()
+    ) == 162
+    experiments = {
+        experiment["experiment_id"]: experiment
+        for experiment in document["experiments"]
+    }
+    for observation_id, source_row in t1i_rows.items():
+        source_experiment = experiments[source_row["experiment"]]
+        migrated_row = migrated[f"{SOURCE_ID}::{observation_id}"]
+        temperature = migrated_row.point_conditions["temperature_K"].state
+        assert temperature.is_value
+        assert temperature.value == Decimal(source_row["values"]["T_C"]) + Decimal(
+            "273.15"
+        )
+        if source_row["values"].get("admission_status") == "admitted":
+            sample_composition = source_experiment["sample"]["printed_composition"]
+            expected_composition = sample_composition["state"]["value"]
+            point_composition = migrated_row.point_conditions["composition"]
+            assert point_composition.state.is_value
+            assert point_composition.locator is not None
+            assert point_composition.locator.table == "1(I)"
+            assert point_composition.locator.note == sample_composition[
+                "locator"
+            ]["note"]
+            assert source_row["locator"]["row_label"] in (
+                point_composition.locator.note
+            )
+            assert migrated_row.identity.composition.is_value
+            actual_composition = dict(
+                migrated_row.identity.composition.value.components
+            )
+            assert set(actual_composition) == set(expected_composition)
+            assert all(
+                actual_composition[component] == Decimal(amount)
+                for component, amount in expected_composition.items()
+            )
+
+    table1_total_iron_rows = [
+        (species, row)
+        for species, row in _rows(document).values()
+        if row["locator"].get("table") in {"1(I)", "1(II)"}
+        and row["locator"].get("column") == "T. Fe"
+    ]
+    assert len(table1_total_iron_rows) == 32
+    for species, row in table1_total_iron_rows:
+        assert species == "Fe"
+        assert row["values"].get("formula", "Fe") == "Fe"
+        migrated_row = migrated[f"{SOURCE_ID}::{row['observation_id']}"]
+        assert migrated_row.identity.species.formula == "Fe"
+        assert "T.Fe" in dict(migrated_row.identity.composition.value.components)
+
+    table2_total_iron_rows = [
+        row
+        for _, row in _rows(document).values()
+        if row["locator"].get("table") == "2"
+        and row["locator"].get("column") == "(%T.FeO)exp."
+    ]
+    assert len(table2_total_iron_rows) == 5
+    for row in table2_total_iron_rows:
+        assert row["values"]["formula"] == "FeOT"
+        migrated_row = migrated[f"{SOURCE_ID}::{row['observation_id']}"]
+        assert migrated_row.identity.species.formula == "FeOT"
