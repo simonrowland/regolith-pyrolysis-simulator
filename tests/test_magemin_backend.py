@@ -42,7 +42,12 @@ from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
+from simulator.melt_backend.base import (
+    LiquidFractionInvalidError,
+    MeltCompositionError,
+    positive_melt_mass_by_species,
+    project_melt_to_oxide_projection,
+)
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
@@ -1739,6 +1744,33 @@ def test_magemin_input_mass_uses_formula_resolver_for_mol_composition():
     )
 
 
+@pytest.mark.parametrize(
+    ('composition_kg', 'composition_mol'),
+    (
+        ({'SiO2': 1.0, 'MgO': -2.0}, None),
+        (
+            {'SiO2': 99.0},
+            {'SiO2': 1.0, 'MgO': 2.0, 'CaO': 0.0, 'Al2O3': -1.0},
+        ),
+    ),
+    ids=('positive-kg-only', 'mol-precedes-kg'),
+)
+def test_magemin_input_mass_matches_shared_positive_species_masses(
+    composition_kg, composition_mol,
+):
+    expected_mass_by_species = positive_melt_mass_by_species(
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        species_formula_registry=None,
+    )
+
+    assert MAGEMinBackend._input_material_mass_kg(
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        species_formula_registry=None,
+    ) == math.fsum(expected_mass_by_species.values())
+
+
 def test_magemin_explicit_julia_runtime_failure_retries_subprocess(monkeypatch):
     def single_point_minimization(*args):
         raise RuntimeError("julia minimizer crashed")
@@ -2081,10 +2113,8 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
     # Remaining aggregate budget of 1.5s must clamp the 60s default.
     with pytest.raises(RuntimeError, match="timed out after 1.5"):
         backend._call_magemin_subprocess(
-            bulk_projection=types.SimpleNamespace(
-                vector=[1.0] * 11,
-                composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
-                warnings=(),
+            bulk_projection=backend._build_db_bulk_projection(
+                {"SiO2": 50.0, "MgO": 50.0}
             ),
             temperature_C=1200.0,
             pressure_kbar=0.001,
@@ -3417,26 +3447,30 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     )
     assert result.status == "ok", result.warnings
 
-    projection = backend._build_db_bulk_projection(composition)
+    normalized_projection = project_melt_to_oxide_projection(
+        composition_kg=composition,
+        composition_mol=None,
+        oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+    )
+    projection = backend._build_db_bulk_projection(
+        normalized_projection.oxide_wt_pct,
+        input_material_mass_kg=math.fsum(composition.values()),
+    )
     pressure_kbar = backend._GPa_to_kbar(
         backend._pressure_bar_to_GPa(pressure_bar)
     )
-    buffer_name, buffer_n, _warnings = backend._resolve_buffer(
-        temperature_C=temperature_C,
-        fO2_log=fO2_log,
+    direct_args, _buffer_name, _buffer_n, _warnings, _reservoir = (
+        backend._build_magemin_subprocess_args(
+            bulk_projection=projection,
+            temperature_C=temperature_C,
+            pressure_kbar=pressure_kbar,
+            fO2_log=fO2_log,
+        )
     )
     direct_args = [
-        str(_LIVE_MAGEMIN_BINARY.resolve()),
-        "--Verb=1",
-        "--db=ig",
-        f"--Temp={temperature_C:.6f}",
-        f"--Pres={pressure_kbar:.6f}",
-        "--sys_in=wt",
-        "--Bulk=" + ",".join(f"{value:.6f}" for value in projection.vector),
-        f"--buffer={buffer_name}",
-        f"--buffer_n={buffer_n:.6f}",
-        "--out_matlab=1",
+        "--Verb=1" if arg == "--Verb=0" else arg for arg in direct_args
     ]
+    direct_args.append("--out_matlab=1")
     with tempfile.TemporaryDirectory() as tmpdir:
         completed = subprocess.run(
             direct_args,
