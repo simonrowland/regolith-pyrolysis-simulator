@@ -396,9 +396,28 @@ BASELINE_STAGE4_SIO2_KG = {
 # and b42d14ed carried per-carrier authority into the wall-routing model.
 # 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
 # 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
+# 2026-10-31 d-137 CLI regen: Stage-1 Fe capture now uses the cited
+# Tachibana condensation fit (alpha=0.8336803024 at 1423.15 K, flagged below
+# its 1443 K band) and the owner-sized area ratio 20.86698 instead of the old
+# 0.02 scalar and area ratio 4. The hotter C2A duct wall carries Fe to that
+# collector; the route removes Fe before recomputing the Stage-3 gas mixture,
+# so the feedstock-specific SiO partial pressure changes even though SiO
+# evolution is nearly unchanged. Lunar CLI SiO evolved mass is
+# 1.04099076417e-05 kg; Stage-3 SiO2 capture is 2.73729872021e-06 ->
+# 6.95443158853e-06 kg (the stale test pin was 2.73730270602e-06 kg). Convert
+# product to SiO-equivalent mass as
+# m_SiO2 * (M_SiO/M_SiO2): one Si atom per molecule, so the kg/kg molar-mass
+# ratio is dimensionless. Relative to evolved SiO, captured Si rises 19% ->
+# 49%, below the 100% available-inventory limit. The live Stage-1 collector
+# capture is positive; the Stage-4 split is separately checked on both stage
+# objects in the production path. Mars moves in the opposite direction
+# (2.75786146523e-06 -> 1.88317547314e-06 kg): its production-run Stage-3 SiO
+# inlet pressures are lower and vary with its other molar flows, so the same
+# pressure-driven route has no feedstock-independent capture direction.
+# Values below are from simulator.runner.sio_yield's fixture-writing CLI.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73730270602e-06,
-    "mars_basalt": 2.75788843064e-06,
+    "lunar_mare_low_ti": 6.95443158853e-06,
+    "mars_basalt": 1.88317547314e-06,
 }
 
 
@@ -582,7 +601,12 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        "mars_basalt": 2.271604686598938e-7,
+        # d-137's upstream Fe capture changes the Stage-3/terminal Si partition,
+        # which is the production resolver's closure input. The recomputed
+        # residual is 2.271604686598938e-7 -> 2.2716049134323923e-7 percent;
+        # retain the production value while the independent atom-ledger
+        # balance remains within 5e-12 percent.
+        "mars_basalt": 2.2716049134323923e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
