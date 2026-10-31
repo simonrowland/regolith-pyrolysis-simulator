@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     Engine,
     ExecutionState,
     NoticeKind,
+    Phase,
     RefusalReason,
 )
 from simulator.battery.score import (
@@ -257,24 +258,26 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
         assert scored.value.as_map() == expected
         assert observation.identity.composition.is_value
         assert observation.identity.composition.value.as_map() == expected
+        reference_state = observation.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        endmember = reference_state.value.endmember
+        assert endmember.phase.value is Phase.CR
+        assert endmember.polymorph is not None and endmember.polymorph.is_unknown
         residual, _candidate = compile_residual(
             observation,
             Engine.INTERNAL_ANALYTICAL,
             context=context,
             comparison_ids={observation.observation_id},
         )
-        # Isolated migration leaves reference_state unknown, so the activity
-        # contract consumes the composition and then refuses. The notice is
-        # attached because that composition was requested.
+        # Crystal with an unstated polymorph refuses before prediction, so
+        # the oxide notice is not attached.
         assert residual.execution.state is ExecutionState.NOT_PROBED
         assert residual.refusal is not None
         assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-        assert residual.refusal.detail["reason"] == "missing_evidence"
-        assert residual.refusal.detail["consumer"] == "melt_activity"
-        oxide_notices = tuple(
-            item
-            for item in residual.notices
-            if item.kind is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+        assert residual.refusal.detail["reason"] == (
+            "fusion_source_reference_phase_unprinted"
         )
-        assert len(oxide_notices) == 1
-        assert f"printed_oxide_sum_wt_percent={oxide_sum}" in oxide_notices[0].reason
+        assert all(
+            item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+            for item in residual.notices
+        )
