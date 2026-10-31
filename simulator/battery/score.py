@@ -545,6 +545,18 @@ class EnginePrediction:
         if self.engine is not Engine.OPENIMCC_SP:
             return
         p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(self)
+        identity_composition = (
+            self.identity.composition
+            if isinstance(self.identity, Identity)
+            else None
+        )
+        p2o5_screening_input_not_recorded = (
+            self.requested_composition is None
+            and (
+                identity_composition is None
+                or not identity_composition.is_value
+            )
+        )
         authority = self.authority or (
             Authority.REFUSED if self.value is None else Authority.BRIDGE
         )
@@ -577,6 +589,19 @@ class EnginePrediction:
                     ),
                     origin=f"engine:{Engine.OPENIMCC_SP.value}",
                     authority=Authority.EXTRAPOLATED,
+                )
+            )
+        if (
+            evaluation_produced
+            and self.value is not None
+            and p2o5_screening_input_not_recorded
+        ):
+            identity_notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=() if quantity is None else (quantity,),
+                    reason="P2O5 screening input not recorded",
+                    origin=f"engine:{Engine.OPENIMCC_SP.value}",
                 )
             )
         object.__setattr__(
