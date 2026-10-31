@@ -5,7 +5,7 @@ geometry, melt inventory, activity model, or per-species gas back-pressure
 needed to claim an absolute kg/s reproduction. This harness therefore reports
 what is artifact-backed:
 
-* direct dex error for measured evaporation coefficients;
+* direct dex error for evaporation coefficients labeled by evidence tier;
 * scale-free dex error for measured depletion/mass-loss ordering, using the
   runtime Hertz-Knudsen/alpha flux model as the model ordering signal.
 
@@ -71,6 +71,7 @@ class SpeciesReproductionError:
     observed_floor_applied: bool = False
     notes: str = ""
     source_relation: str = "UNKNOWN"
+    evidence_tier: str = "measured"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -90,6 +91,7 @@ class SpeciesReproductionError:
             "observed_floor_applied": self.observed_floor_applied,
             "notes": self.notes,
             "source_relation": self.source_relation,
+            "evidence_tier": self.evidence_tier,
         }
 
 
@@ -104,6 +106,7 @@ class DatasetReproductionReport:
     species: tuple[SpeciesReproductionError, ...]
     skipped_reasons: tuple[str, ...] = ()
     median_abs_dex_error_excluding_same_input: float | None = None
+    median_abs_dex_error_measured_only: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -113,6 +116,9 @@ class DatasetReproductionReport:
             "median_abs_dex_error": self.median_abs_dex_error,
             "median_abs_dex_error_excluding_same_input": (
                 self.median_abs_dex_error_excluding_same_input
+            ),
+            "median_abs_dex_error_measured_only": (
+                self.median_abs_dex_error_measured_only
             ),
             "max_abs_dex_error": self.max_abs_dex_error,
             "endpoint_rank_disagreement_fraction": (
@@ -139,6 +145,7 @@ class _ObservedProxy:
     T_K: float
     observed_rate: float
     model_flux: _ModelFlux
+    evidence_tier: str
     notes: str = ""
 
 
@@ -224,6 +231,11 @@ def validate_dataset(
         for item in species_errors
         if item.source_relation != "SAME_INPUT"
     ]
+    measured_abs_errors = [
+        abs(item.dex_error_model_minus_observed)
+        for item in species_errors
+        if item.evidence_tier == "measured"
+    ]
     return DatasetReproductionReport(
         dataset_id=dataset_id,
         status="validated",
@@ -240,6 +252,9 @@ def validate_dataset(
             if non_same_input_abs_errors
             else None
         ),
+        median_abs_dex_error_measured_only=(
+            median(measured_abs_errors) if measured_abs_errors else None
+        ),
     )
 
 
@@ -251,22 +266,25 @@ def render_markdown_report(
     lines = [
         "# Time-Series KEMS/Evaporation Validation Report",
         "",
-        "No coefficients were tuned. Direct flux rows compare measured molecular fluxes to the runtime HKL/alpha flux after unit conversion. Scale-free rows compare endpoint rank agreement only; they are not sequential kinetic-ordering validation. Alpha rows compare measured evaporation coefficients directly.",
+        "No coefficients were tuned. Direct flux rows compare measured molecular fluxes to the runtime HKL/alpha flux after unit conversion. Scale-free rows compare endpoint rank agreement only; they are not sequential kinetic-ordering validation. Alpha rows compare evaporation coefficients labeled by evidence tier.",
         "",
         "Rows with zero, negative, or enrichment-only observed depletion are marked below-detection / not-comparable and excluded from dex-error statistics. Si-bearing oxide/residue rows use the runtime SiO volatile proxy instead of inactive elemental Si. K uses the builtin vapor-pressure provider with melt activity and pO2 context, not raw pseudo-Antoine.",
         "",
         "## Dataset Summary",
         "",
-        "| Dataset | status | rows evaluated | median abs dex (all) | median abs dex (excluding SAME_INPUT) | max abs dex | endpoint rank disagreement | skipped / gap |",
+        "| Dataset | status | rows evaluated | median abs dex (all) | median abs dex (measured only) | median abs dex (excluding SAME_INPUT) | max abs dex | endpoint rank disagreement | skipped / gap |",
         "|---|---|---:|---:|---:|---:|---:|---|",
     ]
     for report in reports:
         lines.append(
-            "| {dataset} | {status} | {rows} | {median} | {median_without_same_input} | {maxerr} | {inv} | {gap} |".format(
+            "| {dataset} | {status} | {rows} | {median} | {median_measured} | {median_without_same_input} | {maxerr} | {inv} | {gap} |".format(
                 dataset=report.dataset_id,
                 status=report.status,
                 rows=report.rows_evaluated,
                 median=_fmt_optional(report.median_abs_dex_error),
+                median_measured=_fmt_optional(
+                    report.median_abs_dex_error_measured_only
+                ),
                 median_without_same_input=_fmt_optional(
                     report.median_abs_dex_error_excluding_same_input
                 ),
@@ -281,18 +299,19 @@ def render_markdown_report(
             "",
             "## Per-Species Reproduction Error",
             "",
-            "| Dataset | species | model species | signal | T K | observed proxy/rate | model flux kg/m2/s | modeled value | observed value | dex error | factor | source relation | notes |",
-            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|",
+            "| Dataset | species | model species | signal | evidence tier | T K | observed proxy/rate | model flux kg/m2/s | modeled value | observed value | dex error | factor | source relation | notes |",
+            "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|",
         ]
     )
     for report in reports:
         for item in report.species:
             lines.append(
-                "| {dataset} | {species} | {model_species} | {signal} | {T} | {observed_rate} | {flux} | {modeled} | {observed} | {dex} | {factor} | {source_relation} | {notes} |".format(
+                "| {dataset} | {species} | {model_species} | {signal} | {evidence_tier} | {T} | {observed_rate} | {flux} | {modeled} | {observed} | {dex} | {factor} | {source_relation} | {notes} |".format(
                     dataset=item.dataset_id,
                     species=item.species,
                     model_species=item.model_species,
                     signal=item.signal_type,
+                    evidence_tier=item.evidence_tier,
                     T=_fmt_float(item.T_K),
                     observed_rate=_fmt_optional(item.observed_rate_proxy),
                     flux=_fmt_optional(item.model_flux_kg_s_m2),
@@ -323,8 +342,8 @@ def _validate_alpha_rows(
 ) -> tuple[list[SpeciesReproductionError], list[str]]:
     errors: list[SpeciesReproductionError] = []
     skipped: list[str] = []
-    grouped: dict[tuple[str, str, float], list[float]] = defaultdict(list)
-    original_species: dict[tuple[str, str, float], str] = {}
+    grouped: dict[tuple[str, str, float, str], list[float]] = defaultdict(list)
+    original_species: dict[tuple[str, str, float, str], str] = {}
     score_contexts: dict[tuple[str, ...], Any] = {}
     for row in rows:
         species = str(row.get("species") or "")
@@ -333,11 +352,11 @@ def _validate_alpha_rows(
         observed = _float_or_none(row.get("value"))
         if T_K is None or observed is None or observed <= 0.0:
             continue
-        key = (species, model_species, T_K)
+        key = (species, model_species, T_K, _evidence_tier(row))
         grouped[key].append(observed)
         original_species[key] = species
 
-    for (species, model_species, T_K), values in grouped.items():
+    for (species, model_species, T_K, evidence_tier), values in grouped.items():
         if model_species in UNMODELED_SPECIES:
             skipped.append(f"{dataset_id}:{species} has no model species")
             continue
@@ -394,7 +413,7 @@ def _validate_alpha_rows(
         errors.append(
             SpeciesReproductionError(
                 dataset_id=dataset_id,
-                species=original_species[(species, model_species, T_K)],
+                species=original_species[(species, model_species, T_K, evidence_tier)],
                 model_species=model_species,
                 signal_type="evaporation_coefficient",
                 T_K=T_K,
@@ -408,6 +427,7 @@ def _validate_alpha_rows(
                 alpha=modeled_alpha,
                 notes="direct alpha comparison",
                 source_relation=source_relation,
+                evidence_tier=evidence_tier,
             )
         )
     return errors, skipped
@@ -463,6 +483,7 @@ def _validate_direct_flux_rows(
                 p_eq_pa=model_flux.p_eq_pa,
                 alpha=model_flux.alpha,
                 notes=notes,
+                evidence_tier=_evidence_tier(row),
             )
         )
     return errors, skipped
@@ -472,7 +493,7 @@ def _validate_scale_free_series(
     dataset_id: str,
     rows: Sequence[Mapping[str, str]],
 ) -> tuple[list[SpeciesReproductionError], list[str]]:
-    grouped: dict[tuple[str, str, str, float], list[Mapping[str, str]]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, float, str], list[Mapping[str, str]]] = defaultdict(list)
     for row in rows:
         signal = str(row.get("signal_type") or "")
         if signal not in TIME_SERIES_SIGNALS:
@@ -484,11 +505,12 @@ def _validate_scale_free_series(
         model_species = str(row.get("model_species") or species)
         if time_s is None or T_K is None or value is None:
             continue
-        grouped[(species, model_species, signal, round(T_K, 6))].append(row)
+        evidence_tier = _evidence_tier(row)
+        grouped[(species, model_species, signal, round(T_K, 6), evidence_tier)].append(row)
 
     skipped: list[str] = []
     proxies: list[_ObservedProxy] = []
-    for (species, model_species, signal, T_K), group_rows in grouped.items():
+    for (species, model_species, signal, T_K, evidence_tier), group_rows in grouped.items():
         if len(group_rows) < 2:
             continue
         if model_species in UNMODELED_SPECIES:
@@ -528,6 +550,7 @@ def _validate_scale_free_series(
                 T_K=T_K,
                 observed_rate=observed_rate,
                 model_flux=model_flux,
+                evidence_tier=evidence_tier,
                 notes="scale-free endpoint depletion proxy",
             )
         )
@@ -563,6 +586,7 @@ def _validate_scale_free_series(
                     p_eq_pa=proxy.model_flux.p_eq_pa,
                     alpha=proxy.model_flux.alpha,
                     notes=proxy.notes,
+                    evidence_tier=proxy.evidence_tier,
                 )
             )
     return errors, skipped
@@ -725,6 +749,14 @@ def _positive(value: float, floor: float = 1.0e-300) -> float:
     if not math.isfinite(value):
         raise ValueError(f"non-finite validation value {value!r}")
     return max(abs(value), floor)
+
+
+def _evidence_tier(row: Mapping[str, str]) -> str:
+    return (
+        "literature-model"
+        if str(row.get("pressure_context") or "").strip().casefold() == "derived"
+        else "measured"
+    )
 
 
 def _unique(values: Iterable[str]) -> list[str]:

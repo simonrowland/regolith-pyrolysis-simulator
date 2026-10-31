@@ -60,10 +60,30 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
     assert reports["DS-006"].rows_evaluated == 4
     assert reports["DS-007"].rows_evaluated == 12
     assert reports["DS-007"].median_abs_dex_error == 0.06993954320061825
+    assert reports["DS-007"].median_abs_dex_error_measured_only is None
     assert (
         reports["DS-007"].median_abs_dex_error_excluding_same_input
         == 0.1406575917694785
     )
+    assert {item.evidence_tier for item in reports["DS-007"].species} == {
+        "literature-model"
+    }
+    ds007_payload = reports["DS-007"].as_dict()
+    assert ds007_payload["median_abs_dex_error"] == 0.06993954320061825
+    assert ds007_payload["median_abs_dex_error_excluding_same_input"] == (
+        0.1406575917694785
+    )
+    assert ds007_payload["median_abs_dex_error_measured_only"] is None
+    assert all(
+        item["evidence_tier"] == "literature-model"
+        for item in ds007_payload["species"]
+    )
+    assert reports["DS-001"].median_abs_dex_error_measured_only == (
+        reports["DS-001"].median_abs_dex_error
+    )
+    assert {item.evidence_tier for item in reports["DS-001"].species} == {
+        "measured"
+    }
     assert tuple(
         abs(item.dex_error_model_minus_observed)
         for item in reports["DS-007"].species
@@ -146,6 +166,7 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
         item.modeled_value > 0.0 and item.observed_value > 0.0
         for item in direct_flux
     )
+    assert {item.evidence_tier for item in direct_flux} == {"measured"}
     assert all(math.isfinite(item.error_factor) for item in direct_flux)
 
 
@@ -182,14 +203,22 @@ def test_markdown_report_contains_summary_and_json_pointer_for_long_skips(
     markdown = render_markdown_report(reports, catalog=validation_lake_catalog)
 
     assert "endpoint rank disagreement" in markdown
+    assert "median abs dex (measured only)" in markdown
+    assert "| evidence tier |" in markdown
     assert "ordering inversions" not in markdown
     assert (
-        "| DS-007 | validated | 12 | 0.070 | 0.141 | 0.322 | - | - |"
+        "| DS-007 | validated | 12 | 0.070 | - | 0.141 | 0.322 | - | - |"
     ) in markdown
-    assert "| DS-007 | Fe | Fe | evaporation_coefficient |" in markdown
+    assert (
+        "| DS-007 | Fe | Fe | evaporation_coefficient | literature-model |"
+        in markdown
+    )
     assert "| SAME_INPUT | direct alpha comparison |" in markdown
     # 2026-07-21 B1: DS-010 median/max reproduction error re-measured under
     # the corrected fits (1.392/1.920 -> 1.199/3.309); rank cell unchanged.
-    assert "| DS-010 | validated | 7 | 1.199 | 1.199 | 3.309 | 0.222 |" in markdown
+    assert (
+        "| DS-010 | validated | 7 | 1.199 | 1.199 | 1.199 | 3.309 | 0.222 |"
+        in markdown
+    )
     assert "more in JSON" in markdown
     assert "DS-010: fetch-dns-blocked" not in markdown
