@@ -65,6 +65,27 @@ def _kg_by_species_block(species_kg: Mapping[str, float]) -> str:
     return "\n".join(lines)
 
 
+def _source_accounts_block(source_accounts_by_species: Mapping[str, Any]) -> str:
+    lines = []
+    for species, entries in sorted(source_accounts_by_species.items()):
+        if not isinstance(entries, (list, tuple)):
+            continue
+        for entry in entries:
+            if not isinstance(entry, Mapping):
+                continue
+            try:
+                amount = float(entry.get('kg', 0.0))
+            except (TypeError, ValueError):
+                continue
+            account = str(entry.get('account') or 'unknown')
+            if amount > 0.0:
+                lines.append(
+                    f"  - **{species}** from `{account}`: "
+                    f"{_format_kg(amount)} kg"
+                )
+    return "\n".join(lines) if lines else "  (source accounts unavailable)"
+
+
 def format_three_product_markdown(
     classification: Mapping[str, Any],
     *,
@@ -204,6 +225,11 @@ def format_three_product_markdown(
             lines.append("")
             lines.append("Per-species:")
             lines.append(_kg_by_species_block(metals_kg))
+            source_accounts = bucket.get('source_accounts_by_species', {}) or {}
+            if isinstance(source_accounts, Mapping) and source_accounts:
+                lines.append("")
+                lines.append("Source accounts:")
+                lines.append(_source_accounts_block(source_accounts))
         elif bucket_key == 'pure_silica_glass':
             stage_3 = bucket.get('stage_3_kg_by_species', {}) or {}
             if class_total_kg is not None and class_total_kg <= 0.0:
@@ -295,6 +321,24 @@ def format_three_product_markdown(
             lines.append("")
             lines.append("Residual inventory per species (not all product):")
             lines.append(_kg_by_species_block(rump_species))
+        lines.append("")
+
+    # ----- Recovered boundary versus metal-phase inventory -----
+    unrecovered = classification.get('unrecovered_metal_phase', {}) or {}
+    unrecovered_species = unrecovered.get('species_kg', {}) or {}
+    if unrecovered_species:
+        lines.append("## Unrecovered metal phase (in-process inventory)")
+        lines.append(
+            f"**Total**: {_format_kg(unrecovered.get('class_total_kg', 0.0))} kg"
+        )
+        lines.append("")
+        lines.append("Per-element:")
+        lines.append(_kg_by_species_block(unrecovered_species))
+        source_accounts = unrecovered.get('source_accounts_by_species', {}) or {}
+        if isinstance(source_accounts, Mapping) and source_accounts:
+            lines.append("")
+            lines.append("Source accounts:")
+            lines.append(_source_accounts_block(source_accounts))
         lines.append("")
 
     # ----- Unclassified bin (only when non-empty) -----

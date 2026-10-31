@@ -482,6 +482,19 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert story["metal_ingots"]["species_kg"] == displayed_species_kg(
         runner_classification["ingots_metals"]["species_kg"]
     )
+    assert story["metal_ingots"]["source_accounts_by_species"] == (
+        runner_classification["ingots_metals"]["source_accounts_by_species"]
+    )
+    assert story["unrecovered_metal_phase"]["species_kg"] == (
+        displayed_species_kg(
+            runner_classification["unrecovered_metal_phase"]["species_kg"]
+        )
+    )
+    assert story["unrecovered_metal_phase"]["source_accounts_by_species"] == (
+        runner_classification["unrecovered_metal_phase"][
+            "source_accounts_by_species"
+        ]
+    )
     assert story["glass"]["species_kg"] == displayed_species_kg(
         runner_classification["glass"]["species_kg"]
     )
@@ -619,36 +632,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
     )
 
-    stage_collection = sim._stage_collection_kg_by_source
-    # _product_story_bucket omits positive species that display as 0.00 kg.
-    def _displayed_species_kg(species_kg):
-        displayed_species_kg = {}
-        for species, mass in species_kg.items():
-            if float(mass) <= 0.0:
-                continue
-            displayed_mass = round(mass, 2)
-            if displayed_mass != 0.0:
-                displayed_species_kg[species] = displayed_mass
-        return displayed_species_kg
-
-    def _stage_story_species_kg(stage_number, allowed_species):
-        species_kg = {}
-        for (account, stage, species), mass in stage_collection.items():
-            if (
-                account == CONDENSATION_TRAIN_ACCOUNT
-                and stage == stage_number
-                and species in allowed_species
-                and float(mass) > 0.0
-            ):
-                species_kg[species] = species_kg.get(species, 0.0) + mass
-        return _displayed_species_kg(species_kg)
-
-    assert story["glass"]["species_kg"] == _stage_story_species_kg(
-        3, {"SiO", "SiO2"}
-    )
-    assert story["captured_volatiles"]["species_kg"] == (
-        _stage_story_species_kg(4, {"Na", "K", "Mg"})
-    )
     escape_species_kg = {}
     escape_accounts = (
         TERMINAL_ESCAPE_ACCOUNT,
@@ -667,13 +650,13 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
                     escape_species_kg.get(species, 0.0) + mass
                 )
     assert story["escaped_to_vacuum"]["species_kg"] == (
-        _displayed_species_kg(escape_species_kg)
+            displayed_species_kg(escape_species_kg)
     )
     assert story["escaped_to_vacuum"]["class_total_kg"] == round(
         sum(escape_species_kg.values()), 2
     )
     rump = sim._terminal_rump_by_species()
-    assert story["refractory_ceramic"]["species_kg"] == _displayed_species_kg(
+    assert story["refractory_ceramic"]["species_kg"] == displayed_species_kg(
         {
             species: mass
             for species, mass in rump.items()
@@ -686,7 +669,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
     }
     assert set(story["terminal_residue"]["species_kg"]) == set(
-        _displayed_species_kg(terminal_residue_species_kg)
+        displayed_species_kg(terminal_residue_species_kg)
     )
 
     product_class_species = [
@@ -730,6 +713,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     story_total = _story_total(
         story,
         "metal_ingots",
+        "unrecovered_metal_phase",
         "glass",
         "oxygen",
         "captured_volatiles",
@@ -752,6 +736,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
+        "unrecovered_metal_phase",
         "unrecovered_process_inventory",
         "wall_deposits",
         "process_residue",
@@ -781,6 +766,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "Refractory ceramic out",
         "Terminal residue — incompletely extracted",
         "Escaped to vacuum",
+        "Unrecovered metal phase (in-process inventory)",
         "Unrecovered process inventory",
         "Furnace wall deposits",
         "Process residue",
@@ -795,6 +781,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
+        "unrecovered_metal_phase",
         "unrecovered_process_inventory",
         "wall_deposits",
         "process_residue",
@@ -1015,15 +1002,24 @@ def test_product_badge_counts_terminal_metal_tap_not_diagnostic_float_layer(
     assert payload["product_story"]["metal_ingots"]["class_total_kg"] == pytest.approx(
         drain_tap_kg
     )
-    assert payload["product_story"]["unrecovered_process_inventory"][
+    assert payload["product_story"]["unrecovered_metal_phase"][
         "class_total_kg"
     ] == pytest.approx(float_layer_kg)
     if float_layer_kg:
+        assert payload["product_story"]["unrecovered_metal_phase"][
+            "source_accounts_by_species"
+        ]["Al"] == [
+            {
+                "account": METAL_FLOAT_LAYER_ACCOUNT,
+                "kg": pytest.approx(float_layer_kg),
+            }
+        ]
         assert sim.atom_ledger.project_account_kg(METAL_FLOAT_LAYER_ACCOUNT) == {
             "Al": pytest.approx(float_layer_kg)
         }
-        assert "Unrecovered process inventory" in text
+        assert "Unrecovered metal phase (in-process inventory)" in text
         assert f"Al {_display_mass(float_layer_kg)} kg" in text
+        assert METAL_FLOAT_LAYER_ACCOUNT in text
 
 
 def test_empty_product_classes_render_from_completion_projection(web_driver):
@@ -1092,6 +1088,7 @@ def test_product_badge_uses_extracted_classes_not_residue(
                 "process_residue",
                 "off_spec_condensate",
                 "unclassified",
+                "unrecovered_metal_phase",
             )
         }
         for key, value in story_product.items():
@@ -1165,6 +1162,11 @@ def test_product_badge_does_not_count_unrecovered_flat_inventory_as_extraction(
             "species_kg": {"SiO": 50.0},
             "class_total_kg": 50.0,
         },
+        "unrecovered_metal_phase": {
+            "species_kg": {},
+            "source_accounts_by_species": {},
+            "class_total_kg": 0.0,
+        },
     }
     payload = {
         "mass_in_kg": 1000.0,
@@ -1221,7 +1223,9 @@ def test_completion_payload_marks_story_incomplete_without_builder_exception(
     assert payload["product_story_status"] == "incomplete"
 
 
-def test_product_story_requires_designated_stage_provenance(monkeypatch):
+def test_product_story_uses_runner_classification_and_keeps_off_spec_capture(
+    monkeypatch,
+):
     balances = {
         "process.condensation_train": {
             "SiO": 1.0,
@@ -1258,9 +1262,18 @@ def test_product_story_requires_designated_stage_provenance(monkeypatch):
         web_events,
         "classify_products",
         lambda _sim: {
-            "ingots_metals": {"species_kg": {"Ca": 6.0, "Fe": 3.0}},
+            "ingots_metals": {
+                "species_kg": {"Ca": 6.0, "Fe": 3.0},
+                "source_accounts_by_species": {
+                    "Ca": [{"account": CONDENSATION_TRAIN_ACCOUNT, "kg": 6.0}],
+                    "Fe": [{"account": CONDENSATION_TRAIN_ACCOUNT, "kg": 3.0}],
+                },
+            },
             "glass": {"species_kg": {}},
             "captured_volatiles": {"kg_by_species": {}},
+            "unrecovered_metal_phase": {
+                "species_kg": {}, "source_accounts_by_species": {}
+            },
             "oxygen": {"O2_kg": 0.0, "partition_kg": {}},
         },
     )

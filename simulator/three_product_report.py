@@ -35,10 +35,12 @@ E6a scope: the classifier function. E6b (deferred) is the runner CLI
 
 from __future__ import annotations
 
+import math
 from typing import Any, Mapping
 
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     EXTRACTED_METAL_PRODUCT_ACCOUNTS,
     METAL_PHASE_ACCOUNTS,
@@ -47,6 +49,7 @@ from simulator.account_ids import (
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    TERMINAL_DRAIN_TAP_ACCOUNT,
 )
 from simulator.accounting.completeness import (
     METAL_PRODUCT_SPECIES,
@@ -66,7 +69,10 @@ from simulator.accounting.queries import (
     TERMINAL_RUMP_SILICATE_RESIDUAL,
     TERMINAL_RUMP_UNEXTRACTED_METALS,
 )
-from simulator.condensation_routing import accepted_species_for_stage_number
+from simulator.condensation_routing import (
+    PRODUCT_DESTINATIONS,
+    accepted_species_for_stage_key,
+)
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
     VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
@@ -210,18 +216,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         getattr(getattr(sim, 'train', None), 'stages', []) or []
     )
     # ----- Class 1: metals + O2 -----
-    initial_inventory = getattr(getattr(sim, 'record', None), 'initial_inventory', None)
-    native_metals = getattr(initial_inventory, 'metal_alloy_kg', {}) or {}
-    cleanup_native_kg: dict[str, float] = {}
-    metals_kg: dict[str, float] = {}
-    for species in METAL_PRODUCT_SPECIES:
-        kg = float(products.get(species, 0.0))
-        native_kg = min(max(kg, 0.0), max(float(native_metals.get(species, 0.0)), 0.0))
-        if native_kg > 0.0:
-            cleanup_native_kg[species] = native_kg
-        kg -= native_kg
-        if kg > 0.0:
-            metals_kg[species] = kg
+    metal_accounting = _metal_product_accounting(sim, products=products)
+    cleanup_native_kg = metal_accounting['cleanup_native_kg']
+    metals_kg = metal_accounting['species_kg']
+    metal_sources_by_species = metal_accounting['source_accounts_by_species']
+    unrecovered_metal_phase = metal_accounting['unrecovered_metal_phase_kg']
+    unrecovered_metal_sources = metal_accounting[
+        'unrecovered_metal_phase_sources_by_species'
+    ]
     metals_total_kg = float(sum(metals_kg.values()))
     oxygen_partition = _oxygen_partition_kg(sim)
     o2_kg = float(oxygen_partition.get('total', products.get('O2', 0.0)))
@@ -338,10 +340,17 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     )
 
     # ----- Captured volatiles -----
+    # The condenser ledger can contain metal and silica species as well as
+    # ordinary volatiles. Their accepted product classes are handled above;
+    # any unaccepted condenser mass remains off-spec in the product story.
     captured_volatiles_kg_by_species = _ledger_species_kg(
         sim,
         CAPTURED_VOLATILE_ACCOUNTS,
-        exclude_species=set(O2_PRODUCT_SPECIES),
+        exclude_species=(
+            set(O2_PRODUCT_SPECIES)
+            | set(METAL_PRODUCT_SPECIES)
+            | set(PURE_SILICA_GLASS_SPECIES)
+        ),
     )
     captured_volatiles_total_kg = float(
         sum(captured_volatiles_kg_by_species.values())
@@ -488,6 +497,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     result = {
         'metals_plus_O2': {
             'metals_kg': metals_kg,
+            'source_accounts_by_species': metal_sources_by_species,
             'metals_total_kg': metals_total_kg,
             'O2_kg': o2_kg,
             'O2_partition_kg': oxygen_partition,
@@ -495,7 +505,13 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         },
         'ingots_metals': {
             'species_kg': metals_kg,
+            'source_accounts_by_species': metal_sources_by_species,
             'class_total_kg': metals_total_kg,
+        },
+        'unrecovered_metal_phase': {
+            'species_kg': unrecovered_metal_phase,
+            'source_accounts_by_species': unrecovered_metal_sources,
+            'class_total_kg': float(sum(unrecovered_metal_phase.values())),
         },
         'oxygen': {
             'O2_kg': o2_kg,
@@ -608,6 +624,167 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         ):
             result[name][key] = dict.fromkeys(oxygen_partition)
     return result
+
+
+def _metal_product_accounting(sim, *, products):
+    """Separate recovered metals from the ledger accounts that still hold them."""
+    record = getattr(sim, 'record', None)
+    initial_inventory = getattr(record, 'initial_inventory', None)
+    native_metals = getattr(initial_inventory, 'metal_alloy_kg', {}) or {}
+    ledger = getattr(sim, 'atom_ledger', None)
+    project_account_kg = getattr(ledger, 'project_account_kg', None)
+
+    # Lightweight classifier callers without an AtomLedger retain the former
+    # aggregate projection. Production simulations always use account-backed
+    # allocation below, where the product source remains explicit.
+    if not callable(project_account_kg):
+        cleanup_native_kg = {}
+        species_kg = {}
+        for species in METAL_PRODUCT_SPECIES:
+            amount = max(0.0, float(products.get(species, 0.0)))
+            native = min(amount, max(0.0, float(native_metals.get(species, 0.0))))
+            if native > 0.0:
+                cleanup_native_kg[species] = native
+            if amount > native:
+                species_kg[species] = amount - native
+        return {
+            'species_kg': species_kg,
+            'source_accounts_by_species': {},
+            'cleanup_native_kg': cleanup_native_kg,
+            'unrecovered_metal_phase_kg': {},
+            'unrecovered_metal_phase_sources_by_species': {},
+        }
+
+    source_accounts = (
+        *EXTRACTED_METAL_PRODUCT_ACCOUNTS,
+        *METAL_PHASE_ACCOUNTS,
+        CONDENSATION_TRAIN_ACCOUNT,
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    )
+    account_species_kg: dict[str, dict[str, float]] = {}
+    for account in source_accounts:
+        try:
+            raw = project_account_kg(account) or {}
+        except (AccountingError, AttributeError, TypeError, ValueError):
+            raw = {}
+        if not isinstance(raw, Mapping):
+            continue
+        values = {}
+        for species, value in raw.items():
+            try:
+                amount = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(amount) and amount > 0.0:
+                values[str(species)] = amount
+        account_species_kg[account] = values
+
+    stage_by_source: dict[str, dict[str, float]] = {}
+    stage_collections = getattr(sim, '_stage_collection_kg_by_source', {}) or {}
+    stages = list(getattr(getattr(sim, 'train', None), 'stages', ()) or ())
+    allowed_stage_sources = set(METAL_PHASE_ACCOUNTS) | {
+        CONDENSATION_TRAIN_ACCOUNT,
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    }
+    for key, raw_mass in stage_collections.items():
+        if not isinstance(key, tuple) or len(key) != 3:
+            continue
+        source_account, raw_stage_index, species = key
+        source_account = str(source_account)
+        species = str(species)
+        if source_account not in allowed_stage_sources or species not in METAL_PRODUCT_SPECIES:
+            continue
+        try:
+            stage = stages[int(raw_stage_index)]
+            amount = float(raw_mass)
+        except (IndexError, TypeError, ValueError):
+            continue
+        stage_key = str(getattr(stage, 'stage_key', '') or '')
+        if not math.isfinite(amount) or amount <= 0.0 or not stage_key:
+            continue
+        if not _product_stage_accepts_species(species, stage_key):
+            continue
+        backing = account_species_kg.get(source_account, {}).get(species, 0.0)
+        allocated = stage_by_source.setdefault(source_account, {})
+        allocated_key = species
+        available = max(0.0, backing - allocated.get(allocated_key, 0.0))
+        accepted_kg = min(amount, available)
+        if accepted_kg <= 0.0:
+            continue
+        allocated[allocated_key] = allocated.get(allocated_key, 0.0) + accepted_kg
+
+    product_sources: dict[str, dict[str, float]] = {}
+    cleanup_native_kg: dict[str, float] = {}
+    tapped = account_species_kg.get(TERMINAL_DRAIN_TAP_ACCOUNT, {})
+    for species in METAL_PRODUCT_SPECIES:
+        tapped_kg = tapped.get(species, 0.0)
+        native_kg = min(
+            tapped_kg,
+            max(0.0, float(native_metals.get(species, 0.0))),
+        )
+        if native_kg > 0.0:
+            cleanup_native_kg[species] = native_kg
+        recovered_kg = tapped_kg - native_kg
+        if recovered_kg > 0.0:
+            product_sources.setdefault(species, {})[
+                TERMINAL_DRAIN_TAP_ACCOUNT
+            ] = recovered_kg
+
+    for account, species_values in stage_by_source.items():
+        for species, amount in species_values.items():
+            product_sources.setdefault(species, {})[account] = (
+                product_sources.setdefault(species, {}).get(account, 0.0)
+                + amount
+            )
+
+    unrecovered_sources: dict[str, dict[str, float]] = {}
+    for account in METAL_PHASE_ACCOUNTS:
+        balance = account_species_kg.get(account, {})
+        accepted = stage_by_source.get(account, {})
+        for species in METAL_PRODUCT_SPECIES:
+            amount = max(0.0, balance.get(species, 0.0) - accepted.get(species, 0.0))
+            if amount > 0.0:
+                unrecovered_sources.setdefault(species, {})[account] = amount
+
+    def totals_and_sources(source_map):
+        totals = {
+            species: float(sum(accounts.values()))
+            for species, accounts in sorted(source_map.items())
+            if sum(accounts.values()) > 0.0
+        }
+        by_species = {
+            species: [
+                {'account': account, 'kg': float(amount)}
+                for account, amount in sorted(accounts.items())
+                if amount > 0.0
+            ]
+            for species, accounts in sorted(source_map.items())
+            if any(amount > 0.0 for amount in accounts.values())
+        }
+        return totals, by_species
+
+    species_kg, source_accounts_by_species = totals_and_sources(product_sources)
+    unrecovered_kg, unrecovered_source_accounts_by_species = totals_and_sources(
+        unrecovered_sources
+    )
+    return {
+        'species_kg': species_kg,
+        'source_accounts_by_species': source_accounts_by_species,
+        'cleanup_native_kg': cleanup_native_kg,
+        'unrecovered_metal_phase_kg': unrecovered_kg,
+        'unrecovered_metal_phase_sources_by_species': (
+            unrecovered_source_accounts_by_species
+        ),
+    }
+
+
+def _product_stage_accepts_species(species: str, stage_key: str) -> bool:
+    if species in accepted_species_for_stage_key(stage_key):
+        return True
+    return any(
+        destinations.get(species) == stage_key
+        for destinations in PRODUCT_DESTINATIONS.values()
+    )
 
 
 def _terminal_ree_enrichment_extent(sim: Any) -> dict[str, Any]:
@@ -796,74 +973,127 @@ def product_story_extracted_projection(
         except Exception:  # noqa: BLE001 -- ledger extraction remains useful
             classification = {}
 
-    runner_ingots = classification.get('ingots_metals', {})
-    runner_ingots = runner_ingots.get('species_kg', {})
-    metal_remaining = None
     if classification_available:
-        metal_remaining = {
-            str(species): max(0.0, float(mass))
-            for species, mass in runner_ingots.items()
-        }
-    for species, mass in (
-        classification.get('captured_volatiles', {}).get('kg_by_species', {})
-        or {}
-    ).items():
-        if metal_remaining is None:
-            continue
-        metal_remaining[str(species)] = max(
-            0.0,
-            metal_remaining.get(str(species), 0.0) - max(0.0, float(mass)),
+        # The shared classifier owns recovered-product destinations and their
+        # mass. The web story only partitions the remaining condenser account.
+        metal_ingots = dict(
+            classification.get('ingots_metals', {}).get('species_kg', {}) or {}
         )
-    native_metals = getattr(
-        getattr(getattr(sim, 'record', None), 'initial_inventory', None),
-        'metal_alloy_kg',
-        {},
-    ) or {}
-    metal_ingots = {}
-    for account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
-        for species, mass in account_kg.get(account, {}).items():
-            if species not in (
-                _PRODUCT_STORY_GLASS_SPECIES
-                | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-            ):
-                recovered = max(
-                    0.0,
-                    float(mass) - max(float(native_metals.get(species, 0.0)), 0.0),
-                )
-                classified = (
-                    recovered
-                    if metal_remaining is None
-                    else min(recovered, metal_remaining.get(str(species), 0.0))
-                )
-                _merge_product_story_mass(metal_ingots, species, classified)
-                if metal_remaining is not None:
-                    metal_remaining[str(species)] = max(
-                        0.0,
-                        metal_remaining.get(str(species), 0.0) - classified,
+        glass = dict(classification.get('glass', {}).get('species_kg', {}) or {})
+        captured_volatiles = dict(
+            classification.get('captured_volatiles', {}).get(
+                'kg_by_species', {}
+            ) or {}
+        )
+        recognized_condensate: dict[str, float] = {}
+        metal_sources = classification.get('ingots_metals', {}).get(
+            'source_accounts_by_species', {}
+        ) or {}
+        for species, sources in metal_sources.items():
+            if not isinstance(sources, (list, tuple)):
+                continue
+            for source in sources:
+                if (
+                    isinstance(source, Mapping)
+                    and source.get('account') == CONDENSATION_TRAIN_ACCOUNT
+                ):
+                    _merge_product_story_mass(
+                        recognized_condensate, species, source.get('kg', 0.0)
                     )
+        # These two classifier buckets are derived from the condenser ledger
+        # account; their species masses are already capped by that account.
+        for category in (glass, captured_volatiles):
+            for species, mass in category.items():
+                _merge_product_story_mass(recognized_condensate, species, mass)
+        off_spec_condensate = {}
+        for species, ledger_mass in account_kg.get(
+            CONDENSATION_TRAIN_ACCOUNT, {}
+        ).items():
+            accepted = recognized_condensate.get(str(species), 0.0)
+            remainder = max(0.0, float(ledger_mass) - accepted)
+            _merge_product_story_mass(off_spec_condensate, species, remainder)
+    else:
+        # Keep raw completion usable if the shared classifier refuses an
+        # incomplete ledger. This fallback is never used for a sound story.
+        metal_ingots = {}
+        native_metals = getattr(
+            getattr(getattr(sim, 'record', None), 'initial_inventory', None),
+            'metal_alloy_kg',
+            {},
+        ) or {}
+        for account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
+            for species, mass in account_kg.get(account, {}).items():
+                if species not in (
+                    _PRODUCT_STORY_GLASS_SPECIES
+                    | _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
+                ):
+                    recovered = max(
+                        0.0,
+                        float(mass)
+                        - max(float(native_metals.get(species, 0.0)), 0.0),
+                    )
+                    _merge_product_story_mass(metal_ingots, species, recovered)
+        glass = {}
+        captured_volatiles = {}
+        off_spec_condensate = {}
+        condensation_stage_species = {}
+        for key, mass in (
+            getattr(sim, '_stage_collection_kg_by_source', {}) or {}
+        ).items():
+            if not isinstance(key, tuple) or len(key) != 3:
+                continue
+            source_account, raw_stage_index, species = key
+            if source_account != CONDENSATION_TRAIN_ACCOUNT:
+                continue
+            try:
+                stage_idx = int(raw_stage_index)
+                stage = sim.train.stages[stage_idx]
+            except (AttributeError, IndexError, TypeError, ValueError):
+                continue
+            stage_key = str(getattr(stage, 'stage_key', '') or '')
+            if stage_key:
+                condensation_stage_species.setdefault(str(species), []).append(
+                    (stage_idx, stage_key, float(mass))
+                )
+        for species, ledger_mass in account_kg.get(
+            CONDENSATION_TRAIN_ACCOUNT, {}
+        ).items():
+            routed = condensation_stage_species.get(str(species), [])
+            routed_total = sum(max(0.0, mass) for _idx, _key, mass in routed)
+            scale = min(1.0, float(ledger_mass) / routed_total) if routed_total else 0.0
+            accounted = 0.0
+            for stage_idx, stage_key, projected_mass in routed:
+                mass = max(0.0, projected_mass) * scale
+                accounted += mass
+                stage_number = int(
+                    getattr(sim.train.stages[stage_idx], 'stage_number', stage_idx)
+                )
+                accepted = _product_stage_accepts_species(str(species), stage_key)
+                if (
+                    accepted
+                    and stage_number == 3
+                    and species in _PRODUCT_STORY_GLASS_SPECIES
+                ):
+                    _merge_product_story_mass(glass, species, mass)
+                elif (
+                    accepted
+                    and stage_number == 4
+                    and species in _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
+                ):
+                    _merge_product_story_mass(captured_volatiles, species, mass)
+                elif (
+                    (accepted or (stage_number == 4 and species == 'Ca'))
+                    and species in METAL_PRODUCT_SPECIES
+                ):
+                    _merge_product_story_mass(metal_ingots, species, mass)
+                else:
+                    _merge_product_story_mass(off_spec_condensate, species, mass)
+            _merge_product_story_mass(
+                off_spec_condensate,
+                species,
+                max(0.0, float(ledger_mass) - accounted),
+            )
 
-    glass_result = classification.get('glass', {})
-    glass = dict(glass_result.get('species_kg', {}) or {})
-    glass_remaining = (
-        {
-            str(species): max(0.0, float(mass))
-            for species, mass in glass.items()
-        }
-        if classification_available
-        else None
-    )
-    volatile_result = classification.get('captured_volatiles', {})
-    captured_volatiles = dict(
-        volatile_result.get('kg_by_species', {}) or {}
-    )
-    volatile_remaining = (
-        {
-            str(species): max(0.0, float(mass))
-            for species, mass in captured_volatiles.items()
-        }
-        if classification_available
-        else None
-    )
     oxygen = {}
     oxygen_partition = {}
     for account in (*OXYGEN_STORED_ACCOUNTS, *OXYGEN_CAPTURED_ACCOUNTS):
@@ -873,97 +1103,6 @@ def product_story_extracted_projection(
             account_total += float(mass)
         if account_total > 0.0:
             oxygen_partition[account] = account_total
-
-    condensation_stage_species = {}
-    for key, mass in (
-        getattr(sim, '_stage_collection_kg_by_source', {}) or {}
-    ).items():
-        if not isinstance(key, tuple) or len(key) != 3:
-            continue
-        source_account, stage_number, species = key
-        if source_account != CONDENSATION_TRAIN_ACCOUNT:
-            continue
-        condensation_stage_species.setdefault(str(species), []).append(
-            (int(stage_number), float(mass))
-        )
-
-    off_spec_condensate = {}
-    for species, ledger_mass in account_kg.get(
-        CONDENSATION_TRAIN_ACCOUNT, {}
-    ).items():
-        routed = condensation_stage_species.get(str(species), [])
-        routed_total = sum(max(0.0, mass) for _stage, mass in routed)
-        scale = min(1.0, float(ledger_mass) / routed_total) if routed_total else 0.0
-        accounted = 0.0
-        for stage_number, projected_mass in routed:
-            mass = max(0.0, projected_mass) * scale
-            accounted += mass
-            accepted = species in accepted_species_for_stage_number(stage_number)
-            route = None
-            if (
-                accepted
-                and stage_number == 3
-                and species in _PRODUCT_STORY_GLASS_SPECIES
-                and (
-                    not classification_available
-                    or species in glass
-                )
-            ):
-                route = 'glass'
-            elif (
-                accepted
-                and stage_number == 4
-                and species in _PRODUCT_STORY_CAPTURED_VOLATILE_SPECIES
-                and (
-                    not classification_available
-                    or species in captured_volatiles
-                )
-            ):
-                route = 'captured_volatiles'
-            elif (
-                (accepted or (stage_number == 4 and species == 'Ca'))
-                and species in METAL_PRODUCT_SPECIES
-                and (
-                    metal_remaining is None
-                    or metal_remaining.get(str(species), 0.0) > 0.0
-                )
-            ):
-                route = 'metal_ingots'
-
-            if route is not None:
-                # The classifier's species total is the kg ceiling for each
-                # product route; condenser provenance allocates that total,
-                # and any excess remains visible as off-spec capture.
-                remaining = {
-                    'metal_ingots': metal_remaining,
-                    'glass': glass_remaining,
-                    'captured_volatiles': volatile_remaining,
-                }[route]
-                recovered = (
-                    mass
-                    if remaining is None
-                    else min(mass, remaining.get(str(species), 0.0))
-                )
-                if route == 'metal_ingots':
-                    _merge_product_story_mass(metal_ingots, species, recovered)
-                elif route == 'glass':
-                    _merge_product_story_mass(glass, species, recovered)
-                elif route == 'captured_volatiles':
-                    _merge_product_story_mass(
-                        captured_volatiles, species, recovered
-                    )
-                if remaining is not None:
-                    remaining[str(species)] -= recovered
-                _merge_product_story_mass(
-                    off_spec_condensate, species, mass - recovered
-                )
-            else:
-                _merge_product_story_mass(off_spec_condensate, species, mass)
-        _merge_product_story_mass(
-            off_spec_condensate,
-            species,
-            max(0.0, float(ledger_mass) - accounted),
-        )
 
     return {
         'metal_ingots': metal_ingots,
@@ -1030,7 +1169,7 @@ def build_product_story(
             if account == TERMINAL_ESCAPE_ACCOUNT:
                 target = escaped_to_vacuum
             elif account in METAL_PHASE_ACCOUNTS:
-                target = unrecovered_process_inventory
+                continue
             elif account in EXTRACTED_METAL_PRODUCT_ACCOUNTS:
                 continue
             elif account == CONDENSATION_TRAIN_ACCOUNT:
@@ -1116,6 +1255,25 @@ def build_product_story(
 
     refractory_ceramic_bucket = product_story_bucket(refractory_ceramic)
     metal_ingots_bucket = product_story_bucket(metal_ingots)
+    metal_sources = classification.get('ingots_metals', {})
+    if isinstance(metal_sources, Mapping):
+        metal_ingots_bucket['source_accounts_by_species'] = dict(
+            metal_sources.get('source_accounts_by_species', {}) or {}
+        )
+    unrecovered_metal_sources = classification.get(
+        'unrecovered_metal_phase', {}
+    )
+    if isinstance(unrecovered_metal_sources, Mapping):
+        unrecovered_metal_phase_bucket = product_story_bucket(
+            unrecovered_metal_sources.get('species_kg', {}) or {}
+        )
+        unrecovered_metal_phase_bucket['source_accounts_by_species'] = dict(
+            unrecovered_metal_sources.get(
+                'source_accounts_by_species', {}
+            ) or {}
+        )
+    else:
+        unrecovered_metal_phase_bucket = product_story_bucket({})
     try:
         refractory_ceramic_bucket['ree_enrichment_extent'] = (
             AccountingQueries(sim).terminal_ree_enrichment_extent()
@@ -1136,6 +1294,7 @@ def build_product_story(
         'refractory_ceramic': refractory_ceramic_bucket,
         'terminal_residue': residue_bucket,
         'escaped_to_vacuum': product_story_bucket(escaped_to_vacuum),
+        'unrecovered_metal_phase': unrecovered_metal_phase_bucket,
         'unrecovered_process_inventory': product_story_bucket(
             unrecovered_process_inventory
         ),

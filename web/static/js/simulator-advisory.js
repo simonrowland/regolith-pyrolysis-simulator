@@ -407,7 +407,10 @@ function advisoryEstimatedTransportText(value) {
 }
 
 function advisoryIsProductMetadata(key) {
-    return ['status', 'flag', 'availability_flag', 'excluded', 'reason']
+    return [
+        'status', 'flag', 'availability_flag', 'excluded', 'reason',
+        'source_accounts_by_species',
+    ]
         .includes(key);
 }
 
@@ -581,6 +584,7 @@ function renderProductLedgerPanel(payload) {
         if (appendAdvisorySection(content, 'Refractory ceramic out', story.refractory_ceramic, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Terminal residue — incompletely extracted', story.terminal_residue, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Escaped to vacuum', story.escaped_to_vacuum, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Unrecovered metal phase (in-process inventory)', story.unrecovered_metal_phase, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Unrecovered process inventory', story.unrecovered_process_inventory, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Furnace wall deposits', story.wall_deposits, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Process residue', story.process_residue, 'kg', true)) sections += 1;

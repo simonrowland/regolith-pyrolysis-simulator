@@ -71,6 +71,7 @@ def test_classifier_returns_documented_5_bucket_shape():
     }
     additive_buckets = {
         'ingots_metals',
+        'unrecovered_metal_phase',
         'oxygen',
         'glass',
         'captured_volatiles',
@@ -83,7 +84,8 @@ def test_classifier_returns_documented_5_bucket_shape():
     for bucket in (
         'metals_plus_O2', 'pure_silica_glass',
         'industrial_mixed_glass', 'refractory_ceramic_rump',
-        'ingots_metals', 'oxygen', 'glass', 'captured_volatiles',
+        'ingots_metals', 'unrecovered_metal_phase', 'oxygen', 'glass',
+        'captured_volatiles',
     ):
         assert 'class_total_kg' in result[bucket]
         assert isinstance(result[bucket]['class_total_kg'], float)
@@ -148,6 +150,86 @@ def test_native_cleanup_is_inventory_but_extracted_same_species_remains_product(
     assert result['unclassified']['kg_by_species'] == native_metals
     assert result['unclassified']['total_kg'] == 5.0
     assert result['ingots_metals']['class_total_kg'] + result['unclassified']['total_kg'] == 8.5
+
+
+def test_stage_accepted_metals_are_products_and_phase_remainder_is_inventory():
+    from simulator.accounting.queries import CONDENSATION_TRAIN_ACCOUNT
+
+    from simulator.three_product_report import _metal_product_accounting
+
+    class Ledger:
+        accounts = {
+            'terminal.drain_tap_material': {'Fe': 2.0},
+            CONDENSATION_TRAIN_ACCOUNT: {'Fe': 1.5, 'Na': 0.6, 'K': 0.2},
+            'process.metal_phase': {'Si': 5.0, 'Fe': 3.0},
+            'process.metal_phase_float_layer': {'Al': 0.75},
+        }
+
+        def project_account_kg(self, account):
+            return dict(self.accounts.get(account, {}))
+
+    stage_keys = [
+        'stage_0_hot_duct',
+        'stage_1_fe_condenser',
+        'stage_2_cr_oxide_harvest',
+        'stage_3_sio_zone',
+        'stage_4_alkali_mg_cyclone',
+        'stage_5_vortex_dust_filter',
+        'stage_6_turbine_compressor',
+        'stage_7_accumulator',
+        'stage_4b_k_trap',
+    ]
+    sim = SimpleNamespace(
+        atom_ledger=Ledger(),
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(metal_alloy_kg={}),
+        ),
+        train=SimpleNamespace(
+            stages=[
+                SimpleNamespace(stage_key=key, stage_number=(4 if i == 8 else i))
+                for i, key in enumerate(stage_keys)
+            ],
+        ),
+        _stage_collection_kg_by_source={
+            (CONDENSATION_TRAIN_ACCOUNT, 1, 'Fe'): 1.5,
+            (CONDENSATION_TRAIN_ACCOUNT, 4, 'Na'): 0.6,
+            (CONDENSATION_TRAIN_ACCOUNT, 8, 'K'): 0.2,
+            ('process.metal_phase', 3, 'Si'): 1.0,
+        },
+    )
+
+    result = _metal_product_accounting(sim, products={})
+
+    assert result['species_kg'] == {
+        'Fe': 3.5,
+        'K': 0.2,
+        'Na': 0.6,
+        'Si': 1.0,
+    }
+    assert result['source_accounts_by_species']['Fe'] == [
+        {'account': 'process.condensation_train', 'kg': 1.5},
+        {'account': 'terminal.drain_tap_material', 'kg': 2.0},
+    ]
+    assert result['unrecovered_metal_phase_kg'] == {
+        'Al': 0.75,
+        'Fe': 3.0,
+        'Si': 4.0,
+    }
+    assert result['unrecovered_metal_phase_sources_by_species']['Al'] == [
+        {'account': 'process.metal_phase_float_layer', 'kg': 0.75},
+    ]
+    classification = classify_products(sim)
+    assert classification['unrecovered_metal_phase'] == {
+        'species_kg': {'Al': 0.75, 'Fe': 3.0, 'Si': 4.0},
+        'source_accounts_by_species': {
+            'Al': [
+                {'account': 'process.metal_phase_float_layer', 'kg': 0.75},
+            ],
+            'Fe': [{'account': 'process.metal_phase', 'kg': 3.0}],
+            'Si': [{'account': 'process.metal_phase', 'kg': 4.0}],
+        },
+        'class_total_kg': 7.75,
+    }
 
 
 def test_c0_native_cleanup_does_not_produce_ingots_before_any_step():
@@ -374,7 +456,7 @@ def test_captured_volatiles_include_condensation_train_account():
         atom_ledger=SimpleNamespace(
             project_account_kg=lambda acct: {
                 'terminal.offgas': {'H2O': 1.0, 'O2': 2.0},
-                'process.condensation_train': {'Na': 3.0, 'K': 4.0},
+                'process.condensation_train': {'H2O': 3.0, 'CO': 4.0},
             }.get(acct, {})
         ),
     )
@@ -382,8 +464,8 @@ def test_captured_volatiles_include_condensation_train_account():
     result = classify_products(sim)
 
     assert result['captured_volatiles']['kg_by_species'] == {
-        'K': 4.0,
-        'Na': 3.0,
+        'CO': 4.0,
+        'H2O': 3.0,
     }
     assert result['captured_volatiles']['class_total_kg'] == pytest.approx(7.0)
 

@@ -94,6 +94,9 @@ def test_metals_class_renders_per_species_breakdown():
     classification = _empty_classification()
     classification['metals_plus_O2'] = {
         'metals_kg': {'Fe': 5.0, 'Na': 1.0, 'K': 0.5},
+        'source_accounts_by_species': {
+            'Fe': [{'account': 'process.condensation_train', 'kg': 5.0}],
+        },
         'metals_total_kg': 6.5,
         'O2_kg': 2.0,
         'class_total_kg': 8.5,
@@ -111,6 +114,24 @@ def test_metals_class_renders_per_species_breakdown():
     assert "Metals subtotal" in report
     assert "Source-side O₂ potential subtotal" in report
     assert "includes estimated transport for SiO" in report
+    assert "**Fe** from `process.condensation_train`: 5.000 kg" in report
+
+
+def test_unrecovered_metal_phase_renders_as_inventory_with_source_account():
+    classification = _empty_classification()
+    classification['unrecovered_metal_phase'] = {
+        'species_kg': {'Fe': 19.02},
+        'source_accounts_by_species': {
+            'Fe': [{'account': 'process.metal_phase', 'kg': 19.02}],
+        },
+        'class_total_kg': 19.02,
+    }
+
+    report = format_three_product_markdown(classification)
+
+    assert "## Unrecovered metal phase (in-process inventory)" in report
+    assert "**Fe**: 19.020 kg" in report
+    assert "**Fe** from `process.metal_phase`: 19.020 kg" in report
 
 
 def test_partial_product_class_renders_excluded_refusal():

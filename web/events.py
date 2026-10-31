@@ -2411,6 +2411,7 @@ _PRODUCT_STORY_REQUIRED_BUCKETS = (
     'refractory_ceramic',
     'terminal_residue',
     'escaped_to_vacuum',
+    'unrecovered_metal_phase',
     'unrecovered_process_inventory',
     'wall_deposits',
     'process_residue',
