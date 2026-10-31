@@ -1768,7 +1768,16 @@ def snapshot_atom_ledger(ledger: Any) -> Any:
     return snapshot
 
 
+_LEDGER_IMMUTABLE_STATE_TYPES = frozenset({
+    type(None), bool, int, float, complex, str, bytes,
+})
+
+
 def _clone_owned_ledger_state(value: Any, memo: dict[int, Any]) -> Any:
+    # The snapshot owns mutable containers; immutable scalar leaves are shared
+    # unchanged, so they do not need a memo lookup or entry.
+    if type(value) in _LEDGER_IMMUTABLE_STATE_TYPES:
+        return value
     identity = id(value)
     if identity in memo:
         return memo[identity]

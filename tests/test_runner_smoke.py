@@ -29,11 +29,13 @@ import math
 import subprocess
 import sys
 from pathlib import Path
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 from unittest.mock import patch
 
 import pytest
 
+import simulator.diagnostics as diagnostics_module
+import simulator.runner as runner_module
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.ledger_api import LedgerAPI
@@ -42,6 +44,7 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
+from simulator.diagnostics import _plain_value
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -124,6 +127,92 @@ def test_json_safe_nonfinite_numbers_export_null():
     ) == {"nan": None, "inf": [None, None]}
 
 
+def test_json_safe_mapping_proxy_keeps_serialized_order_and_shape():
+    safe = _json_safe(
+        MappingProxyType({"first": "ok", "second": (1, float("inf"))})
+    )
+
+    assert safe == {"first": "ok", "second": [1, None]}
+    assert json.dumps(safe, separators=(",", ":")) == (
+        '{"first":"ok","second":[1,null]}'
+    )
+
+
+def test_plain_diagnostic_values_keep_serialized_payload_bytes():
+    payload = {
+        "message": "ok",
+        "enabled": True,
+        "missing": None,
+        "count": 12,
+        "nested": ({"items": {"b", "a"}},),
+        "nonfinite": float("inf"),
+    }
+
+    plain = _plain_value(payload)
+
+    assert plain == {
+        "message": "ok",
+        "enabled": True,
+        "missing": None,
+        "count": 12,
+        "nested": [{"items": ["a", "b"]}],
+        "nonfinite": "inf",
+    }
+    assert json.dumps(plain, separators=(",", ":")) == (
+        '{"message":"ok","enabled":true,"missing":null,"count":12,'
+        '"nested":[{"items":["a","b"]}],"nonfinite":"inf"}'
+    )
+
+
+def test_plain_value_scalar_fast_path_skips_only_small_scalar_probes(monkeypatch):
+    original_dumps = diagnostics_module.json.dumps
+    probed = []
+
+    def count_json_probe(value, *args, **kwargs):
+        probed.append(value)
+        return original_dumps(value, *args, **kwargs)
+
+    monkeypatch.setattr(diagnostics_module.json, "dumps", count_json_probe)
+
+    assert _plain_value(42) == 42
+    assert probed == []
+
+    large_integer = 1 << 2048
+    assert _plain_value(large_integer) == large_integer
+    assert probed == [large_integer]
+
+
+def test_per_hour_and_p_o2_projections_keep_bytes_and_ownership():
+    from simulator.runner import (
+        _execution_pO2_enforcement_by_hour,
+        _execution_per_hour_summary,
+    )
+
+    execution = SimpleNamespace(per_hour=[{
+        "hour": 1,
+        "pO2_enforcement": MappingProxyType({
+            "status": "ok",
+            "details": ({"limit": None},),
+        }),
+        "extra": (1, 2),
+    }])
+    per_hour = _execution_per_hour_summary(execution)
+    p_o2_by_hour = _execution_pO2_enforcement_by_hour(
+        execution,
+        per_hour_summary=per_hour,
+    )
+
+    assert json.dumps(per_hour, separators=(",", ":")) == (
+        '[{"hour":1,"pO2_enforcement":{"status":"ok",'
+        '"details":[{"limit":null}]},"extra":[1,2]}]'
+    )
+    assert json.dumps(p_o2_by_hour, separators=(",", ":")) == (
+        '[{"status":"ok","details":[{"limit":null}]}]'
+    )
+    per_hour[0]["pO2_enforcement"]["details"][0]["limit"] = 3
+    assert p_o2_by_hour[0]["details"][0]["limit"] is None
+
+
 def test_completed_run_wires_product_classification_and_markdown() -> None:
     """Wiring-only: runner attaches the shared classifier and formatter output."""
 
@@ -150,6 +239,125 @@ def test_completed_run_wires_product_classification_and_markdown() -> None:
     assert "Silica glass" in report["markdown"]
     assert "Industrial mixed glass" in report["markdown"]
     assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_success_payload_builds_per_hour_projection_once(monkeypatch):
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            liquid_fraction_provider="probe",
+            snapshots=[],
+            cost_rollup={},
+        ),
+        melt=SimpleNamespace(hour=1),
+        _c3_alkali_credit_drawn_kg_by_species={},
+        _c3_alkali_credit_outstanding_kg_by_species=lambda: {},
+        species_formula_registry={},
+        train=SimpleNamespace(),
+    )
+    row = {
+        "hour": 1,
+        "mass_balance_pct": 0.0,
+        "pO2_enforcement": {"status": "ok"},
+    }
+    execution = SimpleNamespace(
+        simulator=sim,
+        session=SimpleNamespace(
+            _config=SimpleNamespace(additives_kg={}, setpoints={}),
+        ),
+        snapshots=(),
+        trace=SimpleNamespace(),
+        per_hour=(row,),
+        shadow_trace=(),
+        reduced_real_cache={},
+        campaigns_elapsed=1.0,
+        campaigns_elapsed_start=0.0,
+        backend_status="ok",
+        backend_authoritative=False,
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic={},
+        envelope_detail_unavailable=None,
+    )
+    per_hour_conversion_calls = []
+    json_safe = runner_module._json_safe
+
+    def count_per_hour_conversion(value):
+        if (
+            type(value) is list
+            and len(value) == len(execution.per_hour)
+            and all(
+                converted is original
+                for converted, original in zip(value, execution.per_hour)
+            )
+        ):
+            per_hour_conversion_calls.append(value)
+        return json_safe(value)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_json_safe",
+        count_per_hour_conversion,
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload["per_hour_summary"] == [row]
+    assert payload["pO2_enforcement_by_hour"] == [{"status": "ok"}]
+    # A reverted success builder converts the original rows again for summary.
+    assert len(per_hour_conversion_calls) == 1
+
+
+def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
+    per_hour_projection_calls = []
+    project_per_hour = runner_module._execution_per_hour_summary
+
+    def count_per_hour_projection(execution):
+        per_hour_projection_calls.append(execution)
+        return project_per_hour(execution)
+
+    monkeypatch.setattr(
+        runner_module,
+        "_execution_per_hour_summary",
+        count_per_hour_projection,
+    )
+    execution = SimpleNamespace(
+        status="failed",
+        reason="probe",
+        error_message="probe failure",
+        simulator=None,
+        per_hour=({"pO2_enforcement": {"status": "ok"}},),
+        shadow_trace=(),
+        refusal_diagnostic={},
+    )
+
+    failure = _runner_failure_result(
+        error=RunnerError("probe failure"),
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        mass_kg=1.0,
+        additives_kg={},
+        track="pyrolysis",
+        backend_name="internal-analytical",
+        engines={},
+        metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "per-hour-cache-pin",
+        },
+        execution=execution,
+    )
+
+    assert failure["per_hour_summary"] == [
+        {"pO2_enforcement": {"status": "ok"}}
+    ]
+    assert failure["pO2_enforcement_by_hour"] == [{"status": "ok"}]
+    assert per_hour_projection_calls == [execution]
 
 
 def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
