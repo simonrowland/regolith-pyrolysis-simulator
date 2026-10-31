@@ -18,9 +18,7 @@ notes:
     page: 9
     published_page: 2
     table: '1'
-- text: Table 2 contains 71 measured drop-calorimetry rows. The series statement that capsules were sealed
-    under 1 atmosphere of helium is retained as setup context and is not treated as measurement total
-    pressure. The source prints no fO2.
+- text: Table 2 contains 71 measured drop-calorimetry rows.
   locator:
     pdf_page_index: 9
     page: 10
@@ -43,32 +41,39 @@ notes:
     page: 12
     published_page: 5
     section: Measurements and results
-- text: Phase labels α and β are stored only at the Table 3 points where those labels are printed (830
-    K for Na2CaSiO4 and 750 K for Na2Ca2Si3O9). Other calorimetric rows retain the source-supported crystalline
-    phase only.
+- text: Table 3 prints separate α and β values at the 830 K Na2CaSiO4 and 750 K Na2Ca2Si3O9 polymorphic
+    boundaries. No polymorph is assigned to Table 2 measurements or to compounds with no printed polymorph
+    label.
   locator:
     pdf_page_index: 12
     page: 13
     published_page: 6
     table: '3'
+- text: The four fitted equations for Na2CaSiO4 and Na2Ca2Si3O9 are explicitly labeled α or β; the matching
+    fit observations retain those labels.
+  locator:
+    pdf_page_index: 11
+    page: 12
+    published_page: 5
+    section: Measurements and results
 - text: X-ray diffraction identified Na2CaSiO4 and Na2Ca2Si2O7 as matching ASTM patterns except for two
     low-intensity unidentified lines in the latter; Na2Ca2Si3O9 matched Kroger and Blomer; Na4CaSi3O9
     matched its reference pattern except for four low-intensity unidentified lines. Sodium oxide analysis
     was obtained by difference from 100 percent, without printed numeric Na2O values.
   locator:
-    pdf_page_index: 7
-    page: 8
-    published_page: 1
+    pdf_page_index: 8
+    page: 9
+    published_page: 2
     section: Materials
 - text: The calorimeter capsules were platinum-rhodium and the paper says they were sealed under 1 atmosphere
     of helium. This setup statement is not treated as total measurement pressure. No fO2 is printed. The
     reported standard errors are 0.1 percent for Na2CaSiO4, Na2Ca2Si3O9, and Na4CaSi3O9, and 0.2 percent
     for Na2Ca2Si2O7; the confidence level is not stated.
   locator:
-    pdf_page_index: 9
-    page: 10
-    published_page: 3
-    table: '2'
+    pdf_page_index: 8
+    page: 9
+    published_page: 2
+    section: Measurements and results
 - text: Measurements on Na2Ca2Si2O7 and Na4CaSi3O9 were limited by incongruent melting. The paper gives
     no numerical fusion temperature or enthalpy for either. It states that Na4CaSi3O9 fusion information
     could not be determined because its 298 K reference state had changed. Figure 1 plots (H_T-H_298.15)/(T-298.15);
@@ -234,6 +239,8 @@ species:
         - T_K: 1309.0
           enthalpy_increment: 54360
     - observation_id: pank68_naca1_alpha_fit_equation
+      condensed_form:
+        polymorph: alpha
       type: gibbs_table
       locator:
         pdf_page_index: 11
@@ -263,6 +270,8 @@ species:
         fit_range_as_printed: 298°–830° K
         average_deviation_percent: '0.2'
     - observation_id: pank68_naca1_alpha_table3_smooth_heat_content
+      condensed_form:
+        polymorph: alpha
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -452,6 +461,8 @@ species:
         entropy_increment: '45.55'
         fit_equation_observation_id: pank68_naca1_alpha_fit_equation
     - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T830_α
+      condensed_form:
+        polymorph: alpha
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -483,6 +494,8 @@ species:
         fit_equation_observation_id: pank68_naca1_alpha_fit_equation
         polymorph_as_printed: α
     - observation_id: pank68_naca1_beta_fit_equation
+      condensed_form:
+        polymorph: beta
       type: gibbs_table
       locator:
         pdf_page_index: 11
@@ -512,6 +525,8 @@ species:
         fit_range_as_printed: 830°–1,300° K
         average_deviation_percent: '0.1'
     - observation_id: pank68_naca1_beta_table3_smooth_heat_content
+      condensed_form:
+        polymorph: beta
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -551,6 +566,8 @@ species:
         - T_K: 1300
           enthalpy_increment: 53880
     - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T830_β
+      condensed_form:
+        polymorph: beta
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -783,10 +800,9 @@ species:
     - observation_id: pank68_naca1_irreversible_structure_change_above_1309
       type: phase_transition
       locator:
-        pdf_page_index: 9
-        page: 10
-        published_page: 3
-        table: '2'
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
         section: Measurements and results
       phase: cr
       units: K
@@ -1454,6 +1470,8 @@ species:
         - T_K: 1504.4
           enthalpy_increment: 114080
     - observation_id: pank68_naca3_alpha_fit_equation
+      condensed_form:
+        polymorph: alpha
       type: gibbs_table
       locator:
         pdf_page_index: 11
@@ -1483,6 +1501,8 @@ species:
         fit_range_as_printed: 298°–750° K
         average_deviation_percent: '0.1'
     - observation_id: pank68_naca3_alpha_table3_smooth_heat_content
+      condensed_form:
+        polymorph: alpha
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -1640,6 +1660,8 @@ species:
         entropy_increment: '69.62'
         fit_equation_observation_id: pank68_naca3_alpha_fit_equation
     - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T750_α
+      condensed_form:
+        polymorph: alpha
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -1671,6 +1693,8 @@ species:
         fit_equation_observation_id: pank68_naca3_alpha_fit_equation
         polymorph_as_printed: α
     - observation_id: pank68_naca3_beta_fit_equation
+      condensed_form:
+        polymorph: beta
       type: gibbs_table
       locator:
         pdf_page_index: 11
@@ -1700,6 +1724,8 @@ species:
         fit_range_as_printed: 750°–1,500° K
         average_deviation_percent: '0.1'
     - observation_id: pank68_naca3_beta_table3_smooth_heat_content
+      condensed_form:
+        polymorph: beta
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -1745,6 +1771,8 @@ species:
         - T_K: 1500
           enthalpy_increment: 113490
     - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T750_β
+      condensed_form:
+        polymorph: beta
       type: heat_capacity_and_heat_content_series
       locator:
         pdf_page_index: 12
@@ -2087,10 +2115,9 @@ species:
     - observation_id: pank68_naca3_fusion_slightly_above_last_measurement
       type: phase_transition
       locator:
-        pdf_page_index: 9
-        page: 10
-        published_page: 3
-        table: '2'
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
         section: Measurements and results
       phase: cr
       units: K

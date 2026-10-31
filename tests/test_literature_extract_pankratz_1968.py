@@ -110,6 +110,7 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     ]
     assert sum(len(row["values"]["series"]) for row in table2) == 71
     assert sum(len(row["values"]["series"]) for row in table2) * 2 == 142
+    assert all(row["locator"]["page"] == 10 for row in table2)
 
     table3_heat = [
         row
@@ -135,6 +136,20 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     assert len(equations) == 6
     assert all(row["locator"]["page"] == 12 and row["locator"]["published_page"] == 5 for row in equations)
     assert all("table" not in row["locator"] for row in equations)
+    polymorph_source_labels = {
+        "pank68_naca1_alpha_fit_equation": "alpha",
+        "pank68_naca1_alpha_table3_smooth_heat_content": "alpha",
+        "pank68_naca1_alpha_table3_relative_entropy_increment_T830_α": "alpha",
+        "pank68_naca1_beta_fit_equation": "beta",
+        "pank68_naca1_beta_table3_smooth_heat_content": "beta",
+        "pank68_naca1_beta_table3_relative_entropy_increment_T830_β": "beta",
+        "pank68_naca3_alpha_fit_equation": "alpha",
+        "pank68_naca3_alpha_table3_smooth_heat_content": "alpha",
+        "pank68_naca3_alpha_table3_relative_entropy_increment_T750_α": "alpha",
+        "pank68_naca3_beta_fit_equation": "beta",
+        "pank68_naca3_beta_table3_smooth_heat_content": "beta",
+        "pank68_naca3_beta_table3_relative_entropy_increment_T750_β": "beta",
+    }
     assert all(row["values"]["reference_temperature_K"] == 298.15 for row in table3_heat)
     for equation in equations:
         parents = equation["derived_from"]
@@ -227,6 +242,48 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
         assert not row.identity.fO2_Pa.is_value
         assert set(row.point_conditions) == {"temperature_K"}
 
+    polymorph_pins = [
+        (
+            "Na2CaSiO4",
+            "830",
+            {"alpha": Decimal("108.24008"), "beta": Decimal("108.90952")},
+        ),
+        (
+            "Na2Ca2Si3O9",
+            "750",
+            {"alpha": Decimal("161.12584"), "beta": Decimal("167.61104")},
+        ),
+    ]
+    for formula, temperature, expected in polymorph_pins:
+        rows = [
+            row
+            for row in migrated.values()
+            if row.identity.quantity.is_value
+            and row.identity.quantity.value is Quantity.H_MINUS_H298
+            and row.identity.species.formula == formula
+            and row.identity.temperature_K.is_value
+            and row.identity.temperature_K.value == Decimal(temperature)
+            and row.locator is not None
+            and row.locator.table == "3"
+        ]
+        assert len(rows) == 2
+        actual = {}
+        for row in rows:
+            assert row.identity.species.polymorph.is_value
+            polymorph = row.identity.species.polymorph.value.value
+            actual[polymorph] = row.value.point
+        assert actual == expected
+    assert {
+        observation_id: source_rows[observation_id]["condensed_form"]["polymorph"]
+        for observation_id in polymorph_source_labels
+    } == polymorph_source_labels
+    assert _point_at(
+        migrated, formula="Na2CaSiO4", table="2", temperature="403.4"
+    ).identity.species.polymorph.is_unknown
+    assert _point_at(
+        migrated, formula="Na2Ca2Si2O7", table="3", temperature="1000"
+    ).identity.species.polymorph.is_unknown
+
     # Every measured or smooth heat-content point carries its printed T condition and locator.
     heat_rows = [
         row
@@ -239,6 +296,15 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     assert len(heat_rows) == 118
     assert all(row.identity.temperature_K.is_value for row in heat_rows)
     assert all(row.point_conditions["temperature_K"].state.is_value for row in heat_rows)
+    assert all(
+        row.point_conditions["temperature_K"].state.value
+        == row.identity.temperature_K.value
+        and row.point_conditions["temperature_K"].locator.page == row.locator.page
+        and row.point_conditions["temperature_K"].locator.published_page
+        == row.locator.published_page
+        and row.point_conditions["temperature_K"].locator.table == row.locator.table
+        for row in heat_rows
+    )
     assert all(not row.identity.total_pressure_Pa.is_value for row in heat_rows)
     assert all(not row.identity.fO2_Pa.is_value for row in heat_rows)
     for row in table2:
@@ -255,6 +321,15 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     assert all(row.identity.species.phase.value == "cr" for row in entropy_migrated)
     assert all(row.identity.temperature_K.is_value for row in entropy_migrated)
     assert all(row.point_conditions["temperature_K"].state.is_value for row in entropy_migrated)
+    assert all(
+        row.point_conditions["temperature_K"].state.value
+        == row.identity.temperature_K.value
+        and row.point_conditions["temperature_K"].locator.page == row.locator.page
+        and row.point_conditions["temperature_K"].locator.published_page
+        == row.locator.published_page
+        and row.point_conditions["temperature_K"].locator.table == row.locator.table
+        for row in entropy_migrated
+    )
     assert all(set(row.point_conditions) == {"temperature_K"} for row in entropy_migrated)
     assert all(
         "total_pressure_Pa" not in row["values"] and "fO2_Pa" not in row["values"]
@@ -265,7 +340,29 @@ def test_pankratz_1968_tables_migrate_with_full_row_pins() -> None:
     helium_note = next(
         note for note in document["notes"] if "1 atmosphere of helium" in note["text"]
     )
-    assert helium_note["locator"]["page"] == 10
+    assert helium_note["locator"] == {
+        "pdf_page_index": 8,
+        "page": 9,
+        "published_page": 2,
+        "section": "Measurements and results",
+    }
+    xrd_note = next(
+        note for note in document["notes"] if "X-ray diffraction" in note["text"]
+    )
+    assert xrd_note["locator"]["pdf_page_index"] == 8
+    assert xrd_note["locator"]["page"] == 9
+    assert xrd_note["locator"]["published_page"] == 2
+    assert xrd_note["locator"]["section"] == "Materials"
+    for observation_id in (
+        "pank68_naca1_irreversible_structure_change_above_1309",
+        "pank68_naca3_fusion_slightly_above_last_measurement",
+    ):
+        locator = source_rows[observation_id]["locator"]
+        assert locator["pdf_page_index"] == 8
+        assert locator["page"] == 9
+        assert locator["published_page"] == 2
+        assert locator["section"] == "Measurements and results"
+        assert "table" not in locator
     prep_context = {
         formula: block["context"][0]
         for formula, block in document["species"].items()
