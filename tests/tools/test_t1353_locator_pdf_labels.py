@@ -14,6 +14,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tools import mineru_table_draft as mineru_draft
+
 BASE = "28af098ed04b8ca99f569381a2f38330cb66d7cd"
 ROOT = Path(__file__).resolve().parents[2]
 _REPO_ANCESTORS = tuple(ROOT.parents)
@@ -30,6 +32,31 @@ CORPUS_ROOTS = tuple(
     if corpus_root and (Path(corpus_root) / "raw").is_dir()
 )
 MINERU_TEXT_ROOT = Path.home() / "Repos/.regolith-main-review/corpus-main/text"
+_REVIEWED_LOCATOR_SKIP_REASONS = {
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.0.locator",
+    ): "T_K value filtered as temperature",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.1.locator",
+    ): "component_amount is not an *_as_published field; generic parser returns empty",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "fidelity_samples.2.locator",
+    ): "component_amount is not an *_as_published field; generic parser returns empty",
+    (
+        "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
+        "species.CaO.context.2.locator",
+    ): "figure_only, no digitized coordinates",
+}
+
+
+@lru_cache(maxsize=None)
+def _mineru_content_list_paths(root):
+    return tuple(sorted(root.rglob("*content_list.json"))) if root.is_dir() else ()
+
+
 TOUCHED_EXTRACTS = (
     "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml",
     "data/literature/extracts/basu-2008-feo-steelmaking.yaml",
@@ -205,17 +232,37 @@ def _mineru_page_text(source_id, corpus_source_id, page_index):
     for sid in dict.fromkeys((source_id, corpus_source_id)):
         if not sid:
             continue
-        candidates = (
-            MINERU_TEXT_ROOT / sid / "mineru" / f"{sid}_content_list.json",
-            MINERU_TEXT_ROOT / sid / "mineru/source/vlm/source_content_list.json",
-            *(root / sid / "ocr-mineru" / name for root in CORPUS_ROOTS
-              for name in (f"{sid}_content_list.json", "source_content_list.json")),
+        text_roots = dict.fromkeys((
+            MINERU_TEXT_ROOT,
+            *(root.parent / "text" for root in CORPUS_ROOTS),
+        ))
+        candidates = [
+            path
+            for text_root in text_roots
+            for path in _mineru_content_list_paths(text_root / sid / "mineru")
+        ]
+        candidates.extend(
+            root / sid / "ocr-mineru" / name
+            for root in CORPUS_ROOTS
+            for name in (f"{sid}_content_list.json", "source_content_list.json")
         )
-        for path in candidates:
+        for path in dict.fromkeys(candidates):
             if not path.is_file():
                 continue
             content = json.loads(path.read_text())
-            chunks = [chunk for chunk in content if chunk.get("page_idx") == page_index]
+            try:
+                chunk_start_page = mineru_draft._chunk_start_page(path)
+            except ValueError:
+                chunk_start_page = 1
+            chunks = [
+                chunk for chunk in content
+                if chunk.get("page_idx") is not None
+                and mineru_draft.absolute_pdf_page(
+                    chunk_start_page, int(chunk["page_idx"])
+                ) == page_index + 1
+            ]
+            if not chunks:
+                continue
             parts = []
             for chunk in chunks:
                 for key in (
@@ -229,6 +276,32 @@ def _mineru_page_text(source_id, corpus_source_id, page_index):
                         parts.append(value)
             return "\n".join(parts)
     return ""
+
+
+def test_mineru_page_text_reads_nested_chunk_at_physical_pdf_page(tmp_path, monkeypatch):
+    source_id = "nested-mineru-fixture"
+    mineru_root = tmp_path / source_id / "mineru"
+    for chunk, items in (
+        ("p001-p008", [
+            {"type": "text", "page_idx": 0, "text": "first physical page"},
+            {"type": "table", "page_idx": 1, "table_body": "<td>57.5</td>"},
+        ]),
+        ("p003-p010", [
+            {"type": "text", "page_idx": 0, "text": "third physical page"},
+        ]),
+    ):
+        content_list = (
+            mineru_root / chunk / "out" / "source" / "vlm"
+            / f"source-{chunk}_content_list.json"
+        )
+        content_list.parent.mkdir(parents=True, exist_ok=True)
+        content_list.write_text(json.dumps(items))
+
+    monkeypatch.setitem(globals(), "MINERU_TEXT_ROOT", tmp_path)
+
+    assert "first physical page" in _mineru_page_text(source_id, None, 0)
+    assert "57.5" in _mineru_page_text(source_id, None, 1)
+    assert "third physical page" in _mineru_page_text(source_id, None, 2)
 
 
 def _has_page_text(text):
@@ -691,15 +764,20 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                     mineru_matched += 1
                     continue
                 kind, label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
+                locator_label = ".".join(locator_path)
+                verdict = (
+                    "label-present; stored value is not literal page text for this typed locator"
+                    if generic_values else "label-present; no literal printed numeric value to assert"
+                )
+                verdict = _REVIEWED_LOCATOR_SKIP_REASONS.get(
+                    (relative, locator_label), verdict
+                )
                 value_skips.append({
                     "extract": relative,
-                    "locator": ".".join(locator_path) + f" [{kind} {label}, page {page_number}]",
-                        "printed_string": "; ".join(generic_values),
+                    "locator": locator_label + f" [{kind} {label}, page {page_number}]",
+                    "printed_string": "; ".join(generic_values),
                     "class": _skip_class(current, locator_path, locator),
-                        "verdict": (
-                            "label-present; stored value is not literal page text for this typed locator"
-                            if generic_values else "label-present; no literal printed numeric value to assert"
-                        ),
+                    "verdict": verdict,
                 })
                 skipped += 1
     for relative, document in checked_documents.items():

@@ -13,12 +13,32 @@ source:
   corpus_asset: raw/shornikov-2025-ca-al-inclusion-kems/shornikov-2025-ca-al-inclusion-kems.pdf
 extraction:
   method: >-
-    No MinerU table. The chapter's numeric results are figures. A 600 dpi
-    distance-transform read of Fig. 1 did not give one centroid per marker
-    within a stated uncertainty, so no figure value was stored.
-  date: '2026-10-20'
-  worker: t1372-w1
+    No MinerU table and no MinerU chart block. Fig. 1 (published p. 120) was
+    rendered at 600 dpi. Both axes were calibrated from the labelled ticks,
+    and the log axis was calibrated in log space. Every filled-circle marker
+    was read twice, as the centre of mass of its series-colour mask and as
+    the distance-transform peak. Partial pressures are stored at two
+    significant figures. Pixel coordinates, both reads, and the tick fits are
+    in the companion figure-audit CSV. Figs. 2-5 were not read.
+  date: '2026-10-28'
+  worker: refr-figs
 review_status: draft
+fidelity_samples:
+- path: species.Ca.observations[shornikov_2025_fig1_typeA_Ca_digitized].values.points[0].pressure_atm
+  value: "4.5e-8"
+  locator:
+    figure: '1'
+    published_page: 120
+    pdf_page_index: 3
+    note: >-
+      A-Ca-01, filled circle, partial pressure of Ca on Fig. 1 panel A
+      (published p. 120). Crop pixel centres (790.90, 1419.47) and
+      (791.00, 1419.00); crop origin (400, 3650) on the 600 dpi render.
+      Panel A ticks: 1800 K at 377 px, 2000 K at 807 px, 2200 K at 1236.5 px,
+      2400 K at 1666 px, and 2600 K at 2095.5 px. Ordinate ticks: lg p of -5
+      at 487 px, -6 at 884 px, and -7 at 1281.5 px. The fit is
+      T_K = 0.46554932300556573*x_px + 1624.3948170359188 and
+      lg p = -0.002517306149736147*y_px - 3.7742818126082898.
 experiments:
   - experiment_id: shornikov-2025-efremovka-cai-kems
     kind: kems
@@ -27,15 +47,127 @@ experiments:
       published_page: 119
       pdf_page_index: 2
       section: Experimental
-    method: >-
+    method: knudsen_effusion
+    method_as_printed: >-
       Knudsen effusion mass spectrometry of natural Efremovka (CV3) CAI melts,
-      types A and B, 1300–2600 K. Samples of 10–15 mg in rhenium foil in a
+      types A and B, 1300-2600 K. Samples of 10-15 mg in rhenium foil in a
       tungsten effusion cell, electron bombardment heating, ionizing energy 28 eV,
       about 3 K/min. The Murchison (CM2) curves are the comparison of Yakovlev
       et al. (1987), not a new measurement in this chapter.
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_printed}
+        locator:
+          figure: '1'
+          published_page: 120
+          pdf_page_index: 3
+          note: "Fig. 1 prints partial pressures as lg p_i, atm. It does not print a total pressure."
+      sweep_gas:
+        state: {tag: unknown, reason: not_printed}
+        locator:
+          page: 3
+          published_page: 119
+          pdf_page_index: 2
+          section: Experimental
+          note: "The effusion cell is tungsten with a rhenium foil liner. No sweep gas is stated."
+      regime:
+        regime_class: {tag: unknown, reason: not_printed}
+        locator:
+          page: 3
+          published_page: 119
+          pdf_page_index: 2
+          section: Experimental
+          note: "The chapter describes Knudsen effusion and does not print a Knudsen number."
+
 species:
   Ca:
-    observations: []
+    observations:
+    - observation_id: shornikov_2025_fig1_typeA_Ca_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'A'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Ca over the Efremovka CAI residual melt, type A. Series 1, filled circle."
+      T_range_K:
+      - 1992.6
+      - 2540.4
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type A during evaporation."
+      standard_state: "partial pressure of Ca over the type A residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: A-Ca-01, marker_symbol: 'filled circle', T_C: '1719.45', pressure_atm: '4.5e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-01; log10(p_atm)=-7.34752; second centre read pixel centres=(790.90,1419.47)/(791.00,1419.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-02, marker_symbol: 'filled circle', T_C: '1772.35', pressure_atm: '2.3e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-02; log10(p_atm)=-6.63709; second centre read pixel centres=(905.09,1137.25)/(904.00,1138.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-03, marker_symbol: 'filled circle', T_C: '1823.15', pressure_atm: '4.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-03; log10(p_atm)=-6.32751; second centre read pixel centres=(1013.42,1014.27)/(1014.00,1014.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-04, marker_symbol: 'filled circle', T_C: '1917.25', pressure_atm: '2.8e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-04; log10(p_atm)=-5.55361; second centre read pixel centres=(1215.53,706.84)/(1216.00,706.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-05, marker_symbol: 'filled circle', T_C: '1917.35', pressure_atm: '2.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-05; log10(p_atm)=-5.70435; second centre read pixel centres=(1216.07,766.72)/(1216.00,767.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-06, marker_symbol: 'filled circle', T_C: '1974.15', pressure_atm: '5.9e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-06; log10(p_atm)=-5.23112; second centre read pixel centres=(1338.17,578.73)/(1338.00,579.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-07, marker_symbol: 'filled circle', T_C: '2016.55', pressure_atm: '1.1e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-07; log10(p_atm)=-4.95319; second centre read pixel centres=(1428.11,468.32)/(1430.00,468.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-08, marker_symbol: 'filled circle', T_C: '2072.15', pressure_atm: '1.5e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-08; log10(p_atm)=-4.83789; second centre read pixel centres=(1548.18,422.52)/(1549.00,422.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-09, marker_symbol: 'filled circle', T_C: '2137.15', pressure_atm: '1.5e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-09; log10(p_atm)=-4.83490; second centre read pixel centres=(1688.46,421.33)/(1688.00,421.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-10, marker_symbol: 'filled circle', T_C: '2178.65', pressure_atm: '1.2e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-10; log10(p_atm)=-4.91115; second centre read pixel centres=(1777.65,451.62)/(1777.00,452.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-11, marker_symbol: 'filled circle', T_C: '2267.05', pressure_atm: '5.7e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-11; log10(p_atm)=-5.23991; second centre read pixel centres=(1967.46,582.22)/(1967.00,583.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Ca-12, marker_symbol: 'filled circle', T_C: '2267.25', pressure_atm: '7.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Ca-12; log10(p_atm)=-5.12056; second centre read pixel centres=(1967.36,534.81)/(1968.00,534.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+    - observation_id: shornikov_2025_fig1_typeB_Ca_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'B'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Ca over the Efremovka CAI residual melt, type B. Series 1, filled circle."
+      T_range_K:
+      - 2039.7
+      - 2575.1
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type B during evaporation."
+      standard_state: "partial pressure of Ca over the type B residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: B-Ca-01, marker_symbol: 'filled circle', T_C: '1766.55', pressure_atm: '1.0e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-01; log10(p_atm)=-6.99362; second centre read pixel centres=(2805.77,1273.57)/(2806.00,1273.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-02, marker_symbol: 'filled circle', T_C: '1823.65', pressure_atm: '3.1e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-02; log10(p_atm)=-6.50304; second centre read pixel centres=(2928.32,1079.91)/(2929.00,1079.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-03, marker_symbol: 'filled circle', T_C: '1868.65', pressure_atm: '5.4e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-03; log10(p_atm)=-6.26545; second centre read pixel centres=(3024.59,986.12)/(3026.00,987.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-04, marker_symbol: 'filled circle', T_C: '1913.65', pressure_atm: '1.4e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-04; log10(p_atm)=-5.84514; second centre read pixel centres=(3122.16,820.20)/(3122.00,819.00); read uncertainty ±0.00152 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-05, marker_symbol: 'filled circle', T_C: '1913.65', pressure_atm: '1.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-05; log10(p_atm)=-5.95110; second centre read pixel centres=(3122.33,862.03)/(3122.00,863.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-06, marker_symbol: 'filled circle', T_C: '1969.35', pressure_atm: '3.4e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-06; log10(p_atm)=-5.46782; second centre read pixel centres=(3241.73,671.25)/(3242.00,672.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-07, marker_symbol: 'filled circle', T_C: '2017.85', pressure_atm: '8.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-07; log10(p_atm)=-5.09222; second centre read pixel centres=(3346.17,522.98)/(3346.00,523.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-08, marker_symbol: 'filled circle', T_C: '2079.85', pressure_atm: '7.2e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-08; log10(p_atm)=-5.14278; second centre read pixel centres=(3479.73,542.94)/(3479.00,542.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-09, marker_symbol: 'filled circle', T_C: '2131.75', pressure_atm: '4.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-09; log10(p_atm)=-5.36588; second centre read pixel centres=(3591.21,631.01)/(3591.00,631.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-10, marker_symbol: 'filled circle', T_C: '2180.75', pressure_atm: '2.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-10; log10(p_atm)=-5.64620; second centre read pixel centres=(3696.80,741.67)/(3696.00,741.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-11, marker_symbol: 'filled circle', T_C: '2258.65', pressure_atm: '9.0e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-11; log10(p_atm)=-6.04696; second centre read pixel centres=(3863.78,899.87)/(3864.00,900.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Ca-12, marker_symbol: 'filled circle', T_C: '2301.95', pressure_atm: '3.9e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Ca-12; log10(p_atm)=-6.41387; second centre read pixel centres=(3956.99,1044.71)/(3957.00,1045.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
     context:
       - observation_id: shornikov_2025_fig1_partial_pressures_not_digitised
         type: figure_not_digitised
@@ -52,15 +184,14 @@ species:
         values:
           quantity_as_printed: lg p_i, atm
           method_class: figure_only
-          status: context_only
-          unavailable_reason: marker_centroids_not_separated
-          value_as_printed: not sampled
+          status: digitized_in_observations
+          value_as_printed: stored on the Ca, Mg, Al, and SiO figure observations
+          audit_csv: shornikov-2025-ca-al-inclusion-kems-figure-audit.csv
           read_attempt: >-
-            On the 600 dpi page the distance transform of each series color
-            kept disks of radius about 20–29 px and still returned two peaks on
-            some disks (about 0.15 in lg p apart) and missed part of the blue
-            Al series (4 peaks in panel A against a longer rising curve). That
-            is not one reading per marker. No partial pressure was stored.
+            The 2026-10-20 distance transform split some disks. This pass keeps
+            one centre per filled circle: the distance-transform peak, checked
+            against the colour-mask centre of mass. Both reads are in the
+            companion CSV. Partial pressures are the species observations.
       - observation_id: shornikov_2025_detected_ions
         type: vapour_species_list
         locator:
@@ -77,6 +208,269 @@ species:
           predominant_as_printed: Ca, Mg, Al, and SiO
           oxygen_calculation_as_printed: >-
             The partial pressure of atomic oxygen was calculated from WO2 + O = WO3.
+  Mg:
+    observations:
+    - observation_id: shornikov_2025_fig1_typeA_Mg_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'A'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Mg over the Efremovka CAI residual melt, type A. Series 2, filled circle."
+      T_range_K:
+      - 1801.0
+      - 2096.7
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type A during evaporation."
+      standard_state: "partial pressure of Mg over the type A residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: A-Mg-01, marker_symbol: 'filled circle', T_C: '1527.85', pressure_atm: '2.9e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-01; log10(p_atm)=-6.53851; second centre read pixel centres=(379.65,1098.09)/(379.00,1097.00); read uncertainty ±0.00137 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-02, marker_symbol: 'filled circle', T_C: '1545.95', pressure_atm: '2.3e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-02; log10(p_atm)=-6.63679; second centre read pixel centres=(417.59,1137.13)/(419.00,1139.00); read uncertainty ±0.00235 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-03, marker_symbol: 'filled circle', T_C: '1574.95', pressure_atm: '2.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-03; log10(p_atm)=-6.57272; second centre read pixel centres=(479.95,1111.68)/(481.00,1113.00); read uncertainty ±0.00166 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-04, marker_symbol: 'filled circle', T_C: '1584.15', pressure_atm: '5.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-04; log10(p_atm)=-6.24862; second centre read pixel centres=(499.64,982.93)/(501.00,982.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-05, marker_symbol: 'filled circle', T_C: '1629.65', pressure_atm: '9.6e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-05; log10(p_atm)=-6.01640; second centre read pixel centres=(599.14,890.68)/(597.00,891.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-06, marker_symbol: 'filled circle', T_C: '1674.35', pressure_atm: '1.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-06; log10(p_atm)=-5.95009; second centre read pixel centres=(694.03,864.34)/(694.00,864.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-07, marker_symbol: 'filled circle', T_C: '1719.35', pressure_atm: '1.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-07; log10(p_atm)=-5.78415; second centre read pixel centres=(790.51,798.42)/(791.00,798.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-08, marker_symbol: 'filled circle', T_C: '1719.25', pressure_atm: '1.2e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-08; log10(p_atm)=-5.93680; second centre read pixel centres=(789.81,859.06)/(791.00,860.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-09, marker_symbol: 'filled circle', T_C: '1772.55', pressure_atm: '1.4e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-09; log10(p_atm)=-5.86422; second centre read pixel centres=(904.98,830.23)/(905.00,830.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Mg-10, marker_symbol: 'filled circle', T_C: '1823.55', pressure_atm: '2.8e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Mg-10; log10(p_atm)=-5.54898; second centre read pixel centres=(1014.96,705.00)/(1014.00,704.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+    - observation_id: shornikov_2025_fig1_typeB_Mg_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'B'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Mg over the Efremovka CAI residual melt, type B. Series 2, filled circle."
+      T_range_K:
+      - 1811.9
+      - 2142.1
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type B during evaporation."
+      standard_state: "partial pressure of Mg over the type B residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: B-Mg-01, marker_symbol: 'filled circle', T_C: '1538.75', pressure_atm: '2.1e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-01; log10(p_atm)=-7.67125; second centre read pixel centres=(2316.08,1541.07)/(2316.00,1542.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-02, marker_symbol: 'filled circle', T_C: '1593.75', pressure_atm: '8.9e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-02; log10(p_atm)=-7.05099; second centre read pixel centres=(2434.52,1296.22)/(2434.00,1296.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-03, marker_symbol: 'filled circle', T_C: '1627.55', pressure_atm: '6.8e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-03; log10(p_atm)=-7.16970; second centre read pixel centres=(2507.16,1343.08)/(2507.00,1343.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-04, marker_symbol: 'filled circle', T_C: '1668.95', pressure_atm: '1.4e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-04; log10(p_atm)=-6.85761; second centre read pixel centres=(2595.94,1219.88)/(2596.00,1220.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-05, marker_symbol: 'filled circle', T_C: '1668.85', pressure_atm: '6.9e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-05; log10(p_atm)=-7.15919; second centre read pixel centres=(2595.65,1338.93)/(2596.00,1339.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-06, marker_symbol: 'filled circle', T_C: '1724.75', pressure_atm: '1.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-06; log10(p_atm)=-6.77683; second centre read pixel centres=(2716.14,1187.99)/(2716.00,1188.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-07, marker_symbol: 'filled circle', T_C: '1725.15', pressure_atm: '2.9e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-07; log10(p_atm)=-6.54235; second centre read pixel centres=(2716.78,1095.43)/(2717.00,1095.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-08, marker_symbol: 'filled circle', T_C: '1766.95', pressure_atm: '4.2e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-08; log10(p_atm)=-6.38099; second centre read pixel centres=(2806.30,1031.73)/(2807.00,1032.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-09, marker_symbol: 'filled circle', T_C: '1823.65', pressure_atm: '8.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-09; log10(p_atm)=-6.06031; second centre read pixel centres=(2928.20,905.14)/(2929.00,907.00); read uncertainty ±0.00236 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Mg-10, marker_symbol: 'filled circle', T_C: '1868.95', pressure_atm: '1.5e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Mg-10; log10(p_atm)=-5.83303; second centre read pixel centres=(3025.98,815.42)/(3026.00,814.00); read uncertainty ±0.00180 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+  Al:
+    observations:
+    - observation_id: shornikov_2025_fig1_typeA_Al_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'A'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Al over the Efremovka CAI residual melt, type A. Series 3, filled circle."
+      T_range_K:
+      - 2190.6
+      - 2540.5
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type A during evaporation."
+      standard_state: "partial pressure of Al over the type A residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: A-Al-01, marker_symbol: 'filled circle', T_C: '1917.45', pressure_atm: '1.0e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-01; log10(p_atm)=-6.98030; second centre read pixel centres=(1216.21,1273.59)/(1216.00,1274.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-02, marker_symbol: 'filled circle', T_C: '1974.65', pressure_atm: '1.6e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-02; log10(p_atm)=-6.79510; second centre read pixel centres=(1339.35,1200.02)/(1339.00,1199.00); read uncertainty ±0.00128 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-03, marker_symbol: 'filled circle', T_C: '2011.45', pressure_atm: '1.6e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-03; log10(p_atm)=-6.78609; second centre read pixel centres=(1418.10,1196.44)/(1418.00,1197.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-04, marker_symbol: 'filled circle', T_C: '2072.65', pressure_atm: '4.5e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-04; log10(p_atm)=-6.34868; second centre read pixel centres=(1549.33,1022.68)/(1550.00,1023.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-05, marker_symbol: 'filled circle', T_C: '2137.55', pressure_atm: '2.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-05; log10(p_atm)=-5.58521; second centre read pixel centres=(1689.05,719.39)/(1689.00,719.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-06, marker_symbol: 'filled circle', T_C: '2182.35', pressure_atm: '8.8e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-06; log10(p_atm)=-5.05886; second centre read pixel centres=(1785.26,510.30)/(1785.00,509.00); read uncertainty ±0.00164 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-07, marker_symbol: 'filled circle', T_C: '2204.85', pressure_atm: '1.3e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-07; log10(p_atm)=-4.87296; second centre read pixel centres=(1834.08,436.45)/(1833.00,436.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-Al-08, marker_symbol: 'filled circle', T_C: '2267.35', pressure_atm: '3.6e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-Al-08; log10(p_atm)=-4.44779; second centre read pixel centres=(1967.69,267.55)/(1968.00,268.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+    - observation_id: shornikov_2025_fig1_typeB_Al_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'B'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of Al over the Efremovka CAI residual melt, type B. Series 3, filled circle."
+      T_range_K:
+      - 2142.1
+      - 2575.2
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type B during evaporation."
+      standard_state: "partial pressure of Al over the type B residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: B-Al-01, marker_symbol: 'filled circle', T_C: '1868.95', pressure_atm: '3.4e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-01; log10(p_atm)=-7.47348; second centre read pixel centres=(3025.99,1463.00)/(3026.00,1463.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-02, marker_symbol: 'filled circle', T_C: '1913.55', pressure_atm: '3.4e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-02; log10(p_atm)=-7.46393; second centre read pixel centres=(3121.94,1459.23)/(3122.00,1459.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-03, marker_symbol: 'filled circle', T_C: '1970.15', pressure_atm: '7.1e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-03; log10(p_atm)=-7.15250; second centre read pixel centres=(3244.34,1336.29)/(3243.00,1335.00); read uncertainty ±0.00163 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-04, marker_symbol: 'filled circle', T_C: '2017.45', pressure_atm: '7.3e-8', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-04; log10(p_atm)=-7.13672; second centre read pixel centres=(3344.70,1330.06)/(3346.00,1331.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-05, marker_symbol: 'filled circle', T_C: '2079.75', pressure_atm: '1.9e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-05; log10(p_atm)=-6.72672; second centre read pixel centres=(3478.44,1168.21)/(3480.00,1169.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-06, marker_symbol: 'filled circle', T_C: '2131.95', pressure_atm: '7.7e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-06; log10(p_atm)=-6.11356; second centre read pixel centres=(3591.90,926.16)/(3591.00,925.00); read uncertainty ±0.00147 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-07, marker_symbol: 'filled circle', T_C: '2131.45', pressure_atm: '4.2e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-07; log10(p_atm)=-6.37174; second centre read pixel centres=(3589.92,1028.08)/(3591.00,1029.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-08, marker_symbol: 'filled circle', T_C: '2180.65', pressure_atm: '1.2e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-08; log10(p_atm)=-5.91100; second centre read pixel centres=(3696.34,846.20)/(3696.00,846.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-09, marker_symbol: 'filled circle', T_C: '2258.15', pressure_atm: '2.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-09; log10(p_atm)=-5.63136; second centre read pixel centres=(3862.68,735.81)/(3863.00,736.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-Al-10, marker_symbol: 'filled circle', T_C: '2302.05', pressure_atm: '2.8e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-Al-10; log10(p_atm)=-5.55754; second centre read pixel centres=(3957.25,706.67)/(3957.00,708.00); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+  SiO:
+    observations:
+    - observation_id: shornikov_2025_fig1_typeA_SiO_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'A'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of SiO over the Efremovka CAI residual melt, type A. Series 4, filled circle."
+      T_range_K:
+      - 1912.8
+      - 2540.1
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type A during evaporation."
+      standard_state: "partial pressure of SiO over the type A residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: A-SiO-01, marker_symbol: 'filled circle', T_C: '1639.65', pressure_atm: '2.2e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-01; log10(p_atm)=-5.66246; second centre read pixel centres=(620.04,750.08)/(619.00,749.00); read uncertainty ±0.00136 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-02, marker_symbol: 'filled circle', T_C: '1674.35', pressure_atm: '3.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-02; log10(p_atm)=-5.52668; second centre read pixel centres=(694.06,696.14)/(694.00,696.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-03, marker_symbol: 'filled circle', T_C: '1719.25', pressure_atm: '4.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-03; log10(p_atm)=-5.33549; second centre read pixel centres=(789.95,620.19)/(791.00,622.00); read uncertainty ±0.00228 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-04, marker_symbol: 'filled circle', T_C: '1772.35', pressure_atm: '7.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-04; log10(p_atm)=-5.15165; second centre read pixel centres=(904.23,547.16)/(905.00,548.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-05, marker_symbol: 'filled circle', T_C: '1822.95', pressure_atm: '1.4e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-05; log10(p_atm)=-4.84006; second centre read pixel centres=(1013.55,423.38)/(1013.00,424.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-06, marker_symbol: 'filled circle', T_C: '1867.05', pressure_atm: '2.0e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-06; log10(p_atm)=-4.68955; second centre read pixel centres=(1107.90,363.59)/(1108.00,363.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-07, marker_symbol: 'filled circle', T_C: '1916.95', pressure_atm: '1.3e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-07; log10(p_atm)=-4.90161; second centre read pixel centres=(1215.27,447.83)/(1215.00,448.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-08, marker_symbol: 'filled circle', T_C: '2012.15', pressure_atm: '4.4e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-08; log10(p_atm)=-5.35490; second centre read pixel centres=(1420.17,627.90)/(1419.00,629.00); read uncertainty ±0.00138 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-09, marker_symbol: 'filled circle', T_C: '2072.45', pressure_atm: '2.7e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-09; log10(p_atm)=-5.56847; second centre read pixel centres=(1549.34,712.74)/(1549.00,714.00); read uncertainty ±0.00159 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-10, marker_symbol: 'filled circle', T_C: '2072.55', pressure_atm: '3.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-10; log10(p_atm)=-5.44809; second centre read pixel centres=(1548.94,664.92)/(1550.00,664.00); read uncertainty ±0.00126 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-11, marker_symbol: 'filled circle', T_C: '2137.85', pressure_atm: '4.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-11; log10(p_atm)=-5.34105; second centre read pixel centres=(1690.38,622.40)/(1689.00,621.00); read uncertainty ±0.00176 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-12, marker_symbol: 'filled circle', T_C: '2180.05', pressure_atm: '3.6e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-12; log10(p_atm)=-5.44328; second centre read pixel centres=(1780.66,663.01)/(1780.00,662.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-13, marker_symbol: 'filled circle', T_C: '2202.75', pressure_atm: '3.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-13; log10(p_atm)=-5.51593; second centre read pixel centres=(1829.02,691.87)/(1829.00,693.00); read uncertainty ±0.00142 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: A-SiO-14, marker_symbol: 'filled circle', T_C: '2266.95', pressure_atm: '3.9e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'A', note: 'A-SiO-14; log10(p_atm)=-5.41519; second centre read pixel centres=(1966.76,651.85)/(1967.00,650.00); read uncertainty ±0.00233 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
+    - observation_id: shornikov_2025_fig1_typeB_SiO_digitized
+      type: partial_pressure
+      locator:
+        figure: '1'
+        panel: 'B'
+        published_page: 120
+        pdf_page_index: 3
+        note: "Partial pressure of SiO over the Efremovka CAI residual melt, type B. Series 4, filled circle."
+      T_range_K:
+      - 1812.3
+      - 2531.9
+      phase: gas
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: "Fig. 1 caption: partial pressures of vapor species over CAIs residual melts of type B during evaporation."
+      standard_state: "partial pressure of SiO over the type B residual melt; axis lg p_i, atm"
+      regime: kems_effusion
+      units: atm
+      experiment: shornikov-2025-efremovka-cai-kems
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_p_atm vs T_K
+        points:
+        - {point_id: B-SiO-01, marker_symbol: 'filled circle', T_C: '1539.15', pressure_atm: '6.9e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-01; log10(p_atm)=-6.15738; second centre read pixel centres=(2316.77,943.46)/(2317.00,944.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-02, marker_symbol: 'filled circle', T_C: '1594.05', pressure_atm: '9.6e-7', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-02; log10(p_atm)=-6.01815; second centre read pixel centres=(2434.97,888.50)/(2435.00,888.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-03, marker_symbol: 'filled circle', T_C: '1627.65', pressure_atm: '2.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-03; log10(p_atm)=-5.70938; second centre read pixel centres=(2507.61,766.61)/(2507.00,766.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-04, marker_symbol: 'filled circle', T_C: '1668.55', pressure_atm: '1.5e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-04; log10(p_atm)=-5.82254; second centre read pixel centres=(2595.12,811.28)/(2595.00,811.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-05, marker_symbol: 'filled circle', T_C: '1724.65', pressure_atm: '3.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-05; log10(p_atm)=-5.50594; second centre read pixel centres=(2715.43,686.30)/(2716.00,687.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-06, marker_symbol: 'filled circle', T_C: '1766.75', pressure_atm: '5.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-06; log10(p_atm)=-5.27321; second centre read pixel centres=(2805.69,594.43)/(2807.00,595.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-07, marker_symbol: 'filled circle', T_C: '1823.25', pressure_atm: '1.3e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-07; log10(p_atm)=-4.89635; second centre read pixel centres=(2927.70,445.66)/(2928.00,445.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-08, marker_symbol: 'filled circle', T_C: '1823.85', pressure_atm: '9.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-08; log10(p_atm)=-5.03861; second centre read pixel centres=(2929.21,501.82)/(2929.00,502.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-09, marker_symbol: 'filled circle', T_C: '1868.55', pressure_atm: '1.5e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-09; log10(p_atm)=-4.81987; second centre read pixel centres=(3025.21,415.47)/(3025.00,415.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-10, marker_symbol: 'filled circle', T_C: '1869.05', pressure_atm: '8.9e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-10; log10(p_atm)=-5.04763; second centre read pixel centres=(3026.41,505.38)/(3026.00,506.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-11, marker_symbol: 'filled circle', T_C: '1913.65', pressure_atm: '1.1e-5', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-11; log10(p_atm)=-4.94263; second centre read pixel centres=(3122.07,463.93)/(3122.00,464.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-12, marker_symbol: 'filled circle', T_C: '1913.65', pressure_atm: '4.7e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-12; log10(p_atm)=-5.32476; second centre read pixel centres=(3122.07,614.78)/(3122.00,615.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-13, marker_symbol: 'filled circle', T_C: '1969.85', pressure_atm: '2.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-13; log10(p_atm)=-5.62931; second centre read pixel centres=(3243.02,735.00)/(3243.00,737.00); read uncertainty ±0.00253 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-14, marker_symbol: 'filled circle', T_C: '2017.75', pressure_atm: '3.0e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-14; log10(p_atm)=-5.52919; second centre read pixel centres=(3345.91,695.48)/(3346.00,696.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-15, marker_symbol: 'filled circle', T_C: '2080.15', pressure_atm: '1.8e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-15; log10(p_atm)=-5.73484; second centre read pixel centres=(3480.23,776.66)/(3480.00,778.00); read uncertainty ±0.00170 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-16, marker_symbol: 'filled circle', T_C: '2080.05', pressure_atm: '1.2e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-16; log10(p_atm)=-5.91688; second centre read pixel centres=(3479.86,848.52)/(3480.00,848.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-17, marker_symbol: 'filled circle', T_C: '2131.75', pressure_atm: '3.1e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-17; log10(p_atm)=-5.51012; second centre read pixel centres=(3591.09,687.95)/(3591.00,689.00); read uncertainty ±0.00133 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-18, marker_symbol: 'filled circle', T_C: '2213.95', pressure_atm: '1.3e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-18; log10(p_atm)=-5.89236; second centre read pixel centres=(3767.74,838.84)/(3768.00,838.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+        - {point_id: B-SiO-19, marker_symbol: 'filled circle', T_C: '2258.75', pressure_atm: '1.5e-6', point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, panel: 'B', note: 'B-SiO-19; log10(p_atm)=-5.81813; second centre read pixel centres=(3864.01,809.54)/(3864.00,810.00); read uncertainty ±0.00127 dex; see companion figure audit CSV'}}, fO2_log: {state: {tag: unknown, reason: oxygen_pressure_not_printed_on_figure}, locator: {figure: '1', published_page: 120, pdf_page_index: 3, note: 'Fig. 1 does not print an oxygen pressure'}}}}
+      uncertainty:
+        note: "No numeric uncertainty is printed. Marker pressures are stored at two significant figures. Paired pixel reads and the axis fits are in the companion figure audit CSV."
+
   CaO:
     observations: []
     context:

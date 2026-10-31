@@ -3009,7 +3009,34 @@ species:
       - 1074.0
       - 1074.0
       phase: NaCl_on_K1_slag
-      standard_state: JANAF 1971 P° as printed on Fig. 15
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: NaCl
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: liquid reference has no crystalline polymorph
+              charge:
+                tag: value
+                value: 0
+            component_basis: NaCl
+        inferred: false
+        note: >-
+          The source labels NaCl(l) and KCl(l) in the exchange reaction. Figure 15
+          reports thermodynamic activities; its caption identifies JANAF (1971)
+          as the source of the reference-state partial pressures.
+        locator:
+          page: 41
+          published_page: 35
+          pdf_page_index: 40
+          section: '10.8'
+          note: 'Reaction uses liquid salts; Fig. 15 reference pressures are from JANAF (1971).'
       regime: transpiration_mass_spectrometry
       units: dimensionless activity; atm for P°
       values:

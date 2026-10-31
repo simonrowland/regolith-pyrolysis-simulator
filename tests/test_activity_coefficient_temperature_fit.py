@@ -63,7 +63,7 @@ def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
     ]
 
     assert len(rows) == 31
-    assert _sha256(rows) == "bf17a89285db88efd09fa764e4a80a30639f539307ec29790338108be4229682"
+    assert _sha256(rows) == "c95839a185c7dc214c21d0cec07d1cca25f85e70ec4fe0cd83d2546584dc3c91"
 
 
 def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:

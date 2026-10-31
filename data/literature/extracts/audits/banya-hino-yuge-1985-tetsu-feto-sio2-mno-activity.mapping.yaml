@@ -1,0 +1,50 @@
+source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+source:
+  citation: Ban-ya, S., Hino, M. and Yuge, N. (1985), ‘Activity of the Constituents in FetO-SiO2-MnO Slags in Equilibrium
+    with Solid Iron’, Tetsu-to-Hagane 71(7), 853–860.
+  doi: 10.2355/tetsutohagane1955.71.7_853
+extraction:
+  machine_inputs:
+  - MinerU Table 1 HTML
+  - pdftotext-layout
+  render_check: PDF page 2 at 300 dpi; all 30 rows and all stored numeric cells checked because MinerU table QA agreement
+    was 0.000.
+  printed_row_count: 30
+tables:
+- page: 2
+  table: '1'
+  published_page: 854
+  observation_type: activity_coefficient
+  quantity: activity
+  evidence_class: measured_tabulated
+  species: Fe_tO
+  component_as_printed: FetO
+  standard_state: FetO(l) as printed (Fe_tO component; FeO + Fe2O3 oxide basis)
+  phase: l
+  rows: 30
+  columns:
+    '1': run_number_as_printed
+    '2': PH2O_over_PH2_as_printed
+    '3': FeO_wt_percent_as_printed
+    '4': Fe2O3_wt_percent_as_printed
+    '5': SiO2_wt_percent_as_printed
+    '6': MnO_wt_percent_as_printed
+    '7': Fe3_over_Fe2
+    '8': a_FetO_as_printed
+  extracted_observables:
+  - observation_type: concentration_series
+    quantity: fe3_fe2_ratio
+    species: Fe
+    evidence_class: measured_tabulated
+    value_column: '7'
+    value_field: Fe3_over_Fe2
+    phase: l
+    rows: 30
+  unprinted_components:
+    CaO: typed unknown, not present in the Table 1 analysis
+    MgO: typed unknown, not present in the Table 1 analysis
+  conditions:
+    temperature: 1450 C (caption)
+    gas_mix: H2O/H2 ratio per row
+    iron_saturation: solid iron, caption
+    total_pressure: not printed

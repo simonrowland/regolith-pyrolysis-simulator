@@ -1,0 +1,841 @@
+schema_version: literature_extract.v1
+source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+source:
+  citation: >-
+    Kröger, C. & Kreitlow, G. (1956), Die Lösungs- und Bildungswärmen der
+    Natronkalksilikate, Glastechnische Berichte, 29(10), 393–400.
+  repository_deposit_doi: 10.34657/16662
+  year: 1956
+extraction:
+  method: >-
+    Transcribed from MinerU and Tesseract machine reads; Table 7 used the
+    additional hybrid-high and pipeline-ocr reads. Scanned table layouts were
+    checked against PDF page renders. German headers are translated in the
+    companion audit.
+  date: '2026-10-28'
+  worker: w1028naE2-kroger56-cal
+review_status: draft
+fidelity_samples:
+  - path: species.Na2Si2O5.observations[kroger_kreitlow_1956_nadisilicate_crystal_solution_table3].values.mean_solution_heat_kcal_mol
+    value: -97.31
+    locator: {page: 3, published_page: 395, pdf_page_index: 2, table: '3', row: '1'}
+  - path: species.Na2O-CaO-SiO2.observations[kroger_kreitlow_1956_table7_glass_formation_heat_1_1_6].values.direct_heat_kcal_100kg
+    value: 11780
+    locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6', column: '4, kcal/100 kg glass'}
+  - path: species.Na2O-CaO-SiO2.observations[kroger_kreitlow_1956_table8_direct_glass_formation_runs].values.mean_heat_cal_g_glass
+    value: 117.8
+    locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '8', row: 'mean'}
+species:
+  Na2CO3:
+    observations:
+      - observation_id: kroger_kreitlow_1956_soda_solution_table1
+        type: gibbs_table
+        locator: {page: 3, published_page: 395, pdf_page_index: 2, table: '1'}
+        phase: cr
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in
+            simulator/battery/enums.py has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          standard_state: dissolved in the printed 20.6% HF-HCl mixture at 22°C
+          solution_heat_trials_as_printed:
+            - {mass_mg: 359.7, intervals: 7, delta_t_scale_divisions: 38.46, water_value_cal_per_division: 1.172, solution_heat_cal_g: -125.3, solution_heat_kcal_mol: -13.28}
+            - {mass_mg: 375.1, intervals: 6, delta_t_scale_divisions: 40.02, water_value_cal_per_division: 1.170, solution_heat_cal_g: -124.8, solution_heat_kcal_mol: -13.23}
+            - {mass_mg: 379.9, intervals: 7, delta_t_scale_divisions: 40.36, water_value_cal_per_division: 1.174, solution_heat_cal_g: -124.8, solution_heat_kcal_mol: -13.23}
+          mean_solution_heat_kcal_mol: -13.25
+          mean_solution_heat_cal_g: -125.0
+          mean_uncertainty_cal_g: 0.1
+          correction_as_printed: -148
+          corrected_solution_heat_kcal_mol: -13.4
+          note: 'The authors print the mean uncertainty as ±0.01 kcal/mol; the corrected value is printed without uncertainty.'
+      - observation_id: kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, paragraph: 'section 4.2'}
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: reaction_enthalpy
+          method_class: quoted_attributed
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no reaction_enthalpy token; Quantity in simulator/battery/enums.py
+            has no reaction enthalpy token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the cited soda dissociation heat
+          reaction: Na2CO3(cr) = Na2O(cr) + CO2(g)
+          reaction_enthalpy_kcal_mol: -76.9
+          attribution: DE FORCRAND [22], as cited by Kröger and Kreitlow
+  CaO:
+    observations:
+      - observation_id: kroger_kreitlow_1956_cao_solution_table2
+        type: gibbs_table
+        locator: {page: 3, published_page: 395, pdf_page_index: 2, table: '2'}
+        phase: cr
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          standard_state: dissolved in the printed 20.6% HF-HCl mixture at 22°C
+          solution_heat_trials_as_printed:
+            - {mass_mg: 72.4, intervals: 15, delta_t_scale_divisions: 57.19, water_value_cal_per_division: 1.145, solution_heat_cal_g: -904.4, solution_heat_kcal_mol: -50.72}
+            - {mass_mg: 74.1, intervals: 9, delta_t_scale_divisions: 59.50, water_value_cal_per_division: 1.123, solution_heat_cal_g: -903.8, solution_heat_kcal_mol: -50.68}
+            - {mass_mg: 70.25, intervals: 6, delta_t_scale_divisions: 56.05, water_value_cal_per_division: 1.127, solution_heat_cal_g: -899.3, solution_heat_kcal_mol: -50.44}
+          mean_solution_heat_kcal_mol: -50.61
+          mean_solution_heat_cal_g: -902.5
+          mean_uncertainty_cal_g: 2.4
+          mean_uncertainty_kcal_mol: 0.07
+  Na2Si2O5:
+    observations:
+      - observation_id: kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+        type: gibbs_table
+        locator: {page: 3, published_page: 395, pdf_page_index: 2, table: '3'}
+        phase: cr
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          standard_state: dissolved in the printed 20.6% HF-HCl mixture at 22°C
+          solution_heat_trials_as_printed:
+            - {mass_mg: 80.05, intervals: 12, delta_t_scale_divisions: 36.68, water_value_cal_per_division: 1.168, solution_heat_cal_g: -535.2, solution_heat_kcal_mol: -97.41}
+            - {mass_mg: 70.65, intervals: 11, delta_t_scale_divisions: 32.56, water_value_cal_per_division: 1.160, solution_heat_cal_g: -534.7, solution_heat_kcal_mol: -97.32}
+            - {mass_mg: 79.62, intervals: 11, delta_t_scale_divisions: 36.56, water_value_cal_per_division: 1.164, solution_heat_cal_g: -534.6, solution_heat_kcal_mol: -97.30}
+            - {mass_mg: 79.60, intervals: 11, delta_t_scale_divisions: 36.36, water_value_cal_per_division: 1.169, solution_heat_cal_g: -534.1, solution_heat_kcal_mol: -97.21}
+          mean_solution_heat_kcal_mol: -97.31
+          mean_solution_heat_cal_g: -534.6
+          mean_uncertainty_cal_g: 0.1
+          mean_uncertainty_kcal_mol: 0.01
+      - observation_id: kroger_kreitlow_1956_nadisilicate_glass_solution_table4
+        type: gibbs_table
+        locator: {page: 3, published_page: 395, pdf_page_index: 2, table: '4'}
+        phase: glass
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 3, quote: 'quenching the platinum crucible in water produced a clear glass'}
+          standard_state: dissolved in the printed 20.6% HF-HCl mixture at 22°C
+          solution_heat_trials_as_printed:
+            - {mass_mg: 75.72, intervals: 17, delta_t_scale_divisions: 37.90, water_value_cal_per_division: 1.168, solution_heat_cal_g: -584.7, solution_heat_kcal_mol: -106.4}
+            - {mass_mg: 71.23, intervals: 20, delta_t_scale_divisions: 35.29, water_value_cal_per_division: 1.178, solution_heat_cal_g: -583.7, solution_heat_kcal_mol: -106.3}
+            - {mass_mg: 77.36, intervals: 20, delta_t_scale_divisions: 38.21, water_value_cal_per_division: 1.181, solution_heat_cal_g: -583.4, solution_heat_kcal_mol: -106.2}
+            - {mass_mg: 72.90, intervals: 16, delta_t_scale_divisions: 35.72, water_value_cal_per_division: 1.185, solution_heat_cal_g: -580.9, solution_heat_kcal_mol: -105.7}
+            - {mass_mg: 77.50, intervals: 18, delta_t_scale_divisions: 38.01, water_value_cal_per_division: 1.189, solution_heat_cal_g: -583.0, solution_heat_kcal_mol: -106.1}
+          mean_solution_heat_kcal_mol: -106.1
+          mean_solution_heat_cal_g: -583.1
+          mean_uncertainty_cal_g: 0.4
+          mean_uncertainty_kcal_mol: 0.1
+      - observation_id: kroger_kreitlow_1956_nadisilicate_devitrification_heat_solution_difference
+        type: gibbs_table
+        locator: {page: 4, published_page: 396, pdf_page_index: 3, section: '3.2'}
+        phase: glass
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_nadisilicate_crystal_solution_table3, kroger_kreitlow_1956_nadisilicate_glass_solution_table4]
+        derivation:
+          relation: Difference of the measured glass and crystal solution heats, reported as the disilicate devitrification heat.
+          inputs: [kroger_kreitlow_1956_nadisilicate_glass_solution_table4, kroger_kreitlow_1956_nadisilicate_crystal_solution_table3]
+        values:
+          quantity: devitrification_heat
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no devitrification_heat token;
+            heat_of_fusion is a distinct quantity, and TYPE_QUANTITY in
+            simulator/battery/migrate.py:435-444 does not define this quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for devitrification heat
+          quench_statement: {status: asserted_preserved, page: 3, quote: 'quenching the platinum crucible in water produced a clear glass'}
+          devitrification_heat_from_solution_difference_kcal_mol: -8.79
+      - observation_id: kroger_kreitlow_1956_nadisilicate_devitrification_heat_direct_kroger_janetzko
+        type: gibbs_table
+        locator: {page: 4, published_page: 396, pdf_page_index: 3, section: '3.2'}
+        phase: glass
+        units: kcal/mol
+        values:
+          quantity: devitrification_heat
+          method_class: quoted_attributed
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no devitrification_heat token;
+            heat_of_fusion is a distinct quantity, and TYPE_QUANTITY in
+            simulator/battery/migrate.py:435-444 does not define this quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for devitrification heat
+          quench_statement: {status: asserted_preserved, page: 3, quote: 'quenching the platinum crucible in water produced a clear glass'}
+          direct_devitrification_heat_kcal_mol: 8.81
+          attribution: Kröger and Janetzko [2], direct measurement
+      - observation_id: kroger_kreitlow_1956_nadisilicate_formation_reaction_heat_from_solution_heats
+        type: gibbs_table
+        locator: {page: 4, published_page: 396, pdf_page_index: 3, section: '3.3'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_nadisilicate_crystal_solution_table3]
+        derivation:
+          relation: Printed reaction enthalpy from soda and quartz solution heats and crystalline disilicate solution heat.
+          inputs: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_nadisilicate_crystal_solution_table3]
+        values:
+          quantity: formation_reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed soda-quartz formation reaction enthalpy
+          reaction_as_printed: '[Na2CO3] + 2[SiO2]q = [Na2Si2O5] + (CO2)'
+          formation_reaction_enthalpy_kcal_mol: 15.69
+      - observation_id: kroger_kreitlow_1956_nadisilicate_formation_reaction_heat_direct_kroger_janetzko
+        type: gibbs_table
+        locator: {page: 4, published_page: 396, pdf_page_index: 3, section: '3.3'}
+        phase: cr
+        units: kcal/mol
+        values:
+          quantity: formation_reaction_enthalpy
+          method_class: quoted_attributed
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed soda-quartz formation reaction enthalpy
+          reaction_as_printed: '[Na2CO3] + 2[SiO2]q = [Na2Si2O5] + (CO2)'
+          direct_formation_reaction_enthalpy_kcal_mol: 16.5
+          attribution: Kröger and Janetzko [2], direct measurement
+  SiO2:
+    observations:
+      - observation_id: kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+        type: gibbs_table
+        locator: {page: 3, published_page: 395, pdf_page_index: 2, section: '2'}
+        phase: cr
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: quoted_attributed
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          solution_heat_kcal_mol: -34.11
+          attribution: Roth and Troitzsch [16], measured at 77°C and corrected by the authors to 22°C
+  Na2O·2CaO·3SiO2:
+    observations:
+      - observation_id: kroger_kreitlow_1956_oxide_formation_naca2si3o8
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, equation: '4'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed oxide-formation equation (4), calculated from solution heats and the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          heat_of_formation_from_oxides_kcal_mol: -110.75
+          formation_basis: oxides
+          equation_as_printed: '[Na2O] + 2[CaO] + 3[SiO2]q = [Na2O·2CaO·3SiO2]'
+          soda_dissociation_heat_kcal_mol: -76.9
+      - observation_id: kroger_kreitlow_1956_element_formation_naca2si3o8
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, paragraph: 'section 4.2'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_oxide_formation_naca2si3o8]
+        derivation:
+          relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+          inputs: [kroger_kreitlow_1956_oxide_formation_naca2si3o8]
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          delta_f_H: -1141.95
+          formation_basis: elements in their standard states
+          component_formation_enthalpies_kcal_mol: {Na2O: -102.9, CaO: -151.7, SiO2: -208.3}
+  2Na2O·CaO·3SiO2:
+    observations:
+      - observation_id: kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, equation: '5'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed oxide-formation equation (5), calculated from solution heats and the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          heat_of_formation_from_oxides_kcal_mol: -134.44
+          formation_basis: oxides
+          equation_as_printed: '2[Na2O] + [CaO] + 3[SiO2]q = [2Na2O·CaO·3SiO2]'
+          soda_dissociation_heat_kcal_mol: -76.9
+      - observation_id: kroger_kreitlow_1956_element_formation_na2ca3si3o8
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, paragraph: 'section 4.2'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_oxide_formation_na2ca3si3o8]
+        derivation:
+          relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+          inputs: [kroger_kreitlow_1956_oxide_formation_na2ca3si3o8]
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          delta_f_H: -1116.84
+          formation_basis: elements in their standard states
+          component_formation_enthalpies_kcal_mol: {Na2O: -102.9, CaO: -151.7, SiO2: -208.3}
+  Na2O·3CaO·6SiO2:
+    observations:
+      - observation_id: kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, equation: '6'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed oxide-formation equation (6), calculated from solution heats and the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          heat_of_formation_from_oxides_kcal_mol: -137.39
+          formation_basis: oxides
+          equation_as_printed: '[Na2O] + 3[CaO] + 6[SiO2]q = [Na2O·3CaO·6SiO2]'
+          soda_dissociation_heat_kcal_mol: -76.9
+      - observation_id: kroger_kreitlow_1956_element_formation_na2ca6si6o13
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, paragraph: 'section 4.2'}
+        phase: cr
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_oxide_formation_na2ca6si6o13]
+        derivation:
+          relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+          inputs: [kroger_kreitlow_1956_oxide_formation_na2ca6si6o13]
+        values:
+          quantity: delta_fH
+          method_class: measured_reduced
+          delta_f_H: -1945.19
+          formation_basis: elements in their standard states
+          component_formation_enthalpies_kcal_mol: {Na2O: -102.9, CaO: -151.7, SiO2: -208.3}
+  Na2O-CaO-SiO2:
+    observations:
+      - observation_id: kroger_kreitlow_1956_table5_crystalline_solution_and_devitrification_heats
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, table: '5'}
+        phase: cr
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 4, quote: 'after melting and subsequent quenching a clear glass was obtained'}
+          caption_as_printed: mean solution and devitrification heats for ternary soda-lime silicates; each solution value averages five determinations
+          rows_as_printed:
+            - {composition_formula: Na2O·2CaO·3SiO2, form: crystalline, solution_heat_cal_g: -516.9, uncertainty_cal_g: 0.1, solution_heat_kcal_mol: -183.1, uncertainty_kcal_mol: 0.1, devitrification_heat_cal_g: -61.5, devitrification_heat_kcal_mol: -21.8}
+            - {composition_formula: 2Na2O·CaO·3SiO2, form: crystalline, solution_heat_cal_g: -552.8, uncertainty_cal_g: 0.5, solution_heat_kcal_mol: -199.1, uncertainty_kcal_mol: 0.1, devitrification_heat_cal_g: -42.8, devitrification_heat_kcal_mol: -15.5}
+            - {composition_formula: Na2O·3CaO·6SiO2, form: crystalline, solution_heat_cal_g: -523.9, uncertainty_cal_g: 0.4, solution_heat_kcal_mol: -309.4, uncertainty_kcal_mol: 0.2, devitrification_heat_cal_g: -58.1, devitrification_heat_kcal_mol: -34.3}
+      - observation_id: kroger_kreitlow_1956_table5_glass_solution_heats
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, table: '5'}
+        phase: glass
+        T_C: 22
+        units: kcal/mol
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py
+            has heat_of_fusion but no heat_of_solution.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 4, quote: 'after melting and subsequent quenching a clear glass was obtained'}
+          rows_as_printed:
+            - {composition_formula: Na2O·2CaO·3SiO2, solution_heat_cal_g: -578.4, uncertainty_cal_g: 0.2, solution_heat_kcal_mol: -204.9, uncertainty_kcal_mol: 0.1}
+            - {composition_formula: 2Na2O·CaO·3SiO2, solution_heat_cal_g: -595.6, uncertainty_cal_g: 0.5, solution_heat_kcal_mol: -214.6, uncertainty_kcal_mol: 0.1}
+            - {composition_formula: Na2O·3CaO·6SiO2, solution_heat_cal_g: -582.0, uncertainty_cal_g: 0.3, solution_heat_kcal_mol: -343.7, uncertainty_kcal_mol: 0.1}
+      - observation_id: kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+        type: gibbs_table
+        locator: {page: 6, published_page: 398, pdf_page_index: 5, section: '5', row: '1:1:6'}
+        phase: glass
+        T_C: 22
+        units: cal/g
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6'}
+          heat_cal_g: -588.9
+          uncertainty_cal_g: 0.2
+          heat_kcal_mol: -281.8
+      - observation_id: kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+        type: gibbs_table
+        locator: {page: 6, published_page: 398, pdf_page_index: 5, section: '5', row: '1:1:4.8'}
+        phase: glass
+        T_C: 22
+        units: cal/g
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          composition_mol_ratio_as_printed: '1:1:4.8'
+          composition_wt_pct: {Na2O: 15.26, CaO: 13.79, SiO2: 70.95}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8'}
+          heat_cal_g: -587.2
+          uncertainty_cal_g: 0.7
+          heat_kcal_mol: -238.6
+      - observation_id: kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+        type: gibbs_table
+        locator: {page: 6, published_page: 398, pdf_page_index: 5, section: '5', row: '1:0.71:4.85'}
+        phase: glass
+        T_C: 22
+        units: cal/g
+        values:
+          quantity: heat_of_solution
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no heat_of_solution token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for heat of solution
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          composition_mol_ratio_as_printed: '1:0.71:4.85'
+          composition_wt_pct: {Na2O: 15.77, CaO: 10.12, SiO2: 74.11}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85'}
+          heat_cal_g: -592.4
+          uncertainty_cal_g: 1.9
+          heat_kcal_mol: -232.8
+      - observation_id: kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_1_6
+        type: gibbs_table
+        locator:
+          page: 6
+          published_page: 398
+          pdf_page_index: 5
+          paragraph: glass formation from crystalline oxides
+          row: '1:1:6'
+        phase: glass
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          formation_basis: crystalline oxides
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6'}
+          heat_of_formation_from_oxides_kcal_mol: -63.77
+      - observation_id: kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_1_4_8
+        type: gibbs_table
+        locator:
+          page: 6
+          published_page: 398
+          pdf_page_index: 5
+          paragraph: glass formation from crystalline oxides
+          row: '1:1:4.8'
+        phase: glass
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          formation_basis: crystalline oxides
+          composition_mol_ratio_as_printed: '1:1:4.8'
+          composition_wt_pct: {Na2O: 15.26, CaO: 13.79, SiO2: 70.95}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8'}
+          heat_of_formation_from_oxides_kcal_mol: -66.03
+      - observation_id: kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_0_71_4_85
+        type: gibbs_table
+        locator:
+          page: 6
+          published_page: 398
+          pdf_page_index: 5
+          paragraph: glass formation from crystalline oxides
+          row: '1:0.71:4.85'
+        phase: glass
+        units: kcal/mol
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: heat_of_formation_from_oxides
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity.DELTA_FH in simulator/battery/enums.py:84 is delta_fH and
+            FORMATION_QUANTITIES at simulator/battery/enums.py:620-621 includes it
+            as a formation quantity; no exact token represents formation from oxides.
+            TYPE_QUANTITY at simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES at simulator/battery/migrate.py:453-512 define no such token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for formation heat from oxides
+          quench_statement: {status: asserted_preserved, page: 6, quote: 'the melt was then quenched; a clear glass was obtained'}
+          formation_basis: crystalline oxides
+          composition_mol_ratio_as_printed: '1:0.71:4.85'
+          composition_wt_pct: {Na2O: 15.77, CaO: 10.12, SiO2: 74.11}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85'}
+          heat_of_formation_from_oxides_kcal_mol: -58.86
+      - observation_id: kroger_kreitlow_1956_table7_glass_formation_heat_1_1_6
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6', subrow: direct calorimetry}
+        phase: glass
+        T_range_C: [1300, 1350]
+        units: kcal/mol glass; kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py have no
+            reaction_enthalpy token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          direct_heat_kcal_mol_glass: 55.5
+          direct_heat_kcal_100kg: 11780
+          direct_uncertainty_kcal_100kg: 250
+      - observation_id: kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_6
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6', subrow: solution-derived}
+        phase: glass
+        units: kcal/mol glass; kcal/100 kg glass
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6'}
+          solution_heat_kcal_mol_glass: 55.7
+          solution_heat_kcal_100kg: 11640
+      - observation_id: kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_6
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6', subrow: 'prior calculation'}
+        phase: glass
+        units: kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: quoted_attributed
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:6'}
+          prior_calculation_kcal_100kg: 14859
+          attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+      - observation_id: kroger_kreitlow_1956_table7_glass_formation_heat_1_1_4_8
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8', subrow: direct calorimetry}
+        phase: glass
+        T_range_C: [1300, 1350]
+        units: kcal/mol glass; kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py have no
+            reaction_enthalpy token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:4.8'
+          composition_wt_pct: {Na2O: 15.26, CaO: 13.79, SiO2: 70.95}
+          direct_heat_kcal_mol_glass: 54.04
+          direct_uncertainty_kcal_mol_glass: 0.1
+          direct_heat_kcal_100kg: 13300
+          direct_uncertainty_kcal_100kg: 250
+      - observation_id: kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_4_8
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8', subrow: solution-derived}
+        phase: glass
+        units: kcal/mol glass; kcal/100 kg glass
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:4.8'
+          composition_wt_pct: {Na2O: 15.26, CaO: 13.79, SiO2: 70.95}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8'}
+          solution_heat_kcal_mol_glass: 55.43
+          solution_heat_kcal_100kg: 13150
+      - observation_id: kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_4_8
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8', subrow: 'prior calculation'}
+        phase: glass
+        units: kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: quoted_attributed
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:1:4.8'
+          composition_wt_pct: {Na2O: 15.26, CaO: 13.79, SiO2: 70.95}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:1:4.8'}
+          prior_calculation_kcal_100kg: 16502
+          attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+      - observation_id: kroger_kreitlow_1956_table7_glass_formation_heat_1_0_71_4_85
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85', subrow: direct calorimetry}
+        phase: glass
+        T_range_C: [1300, 1350]
+        units: kcal/mol glass; kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py have no
+            reaction_enthalpy token; Quantity in simulator/battery/enums.py has no such quantity.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:0.71:4.85'
+          composition_wt_pct: {Na2O: 15.77, CaO: 10.12, SiO2: 74.11}
+          direct_heat_kcal_mol_glass: 48.2
+          direct_heat_kcal_100kg: 12260
+          direct_uncertainty_kcal_100kg: 190
+      - observation_id: kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_0_71_4_85
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85', subrow: solution-derived}
+        phase: glass
+        units: kcal/mol glass; kcal/100 kg glass
+        derived_from: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        derivation:
+          relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda dissociation heat.
+          inputs: [kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85, kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch, kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand]
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:0.71:4.85'
+          composition_wt_pct: {Na2O: 15.77, CaO: 10.12, SiO2: 74.11}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85'}
+          solution_heat_kcal_mol_glass: 48.26
+          solution_heat_kcal_100kg: 12280
+      - observation_id: kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_0_71_4_85
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85', subrow: 'prior calculation'}
+        phase: glass
+        units: kcal/100 kg glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: quoted_attributed
+          schema_gap: >-
+            Quantity in simulator/battery/enums.py:84-112 has no reaction_enthalpy token;
+            TYPE_QUANTITY in simulator/battery/migrate.py:435-444 and
+            QUANTITY_ALIASES in simulator/battery/migrate.py:453-512 define no exact token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          composition_mol_ratio_as_printed: '1:0.71:4.85'
+          composition_wt_pct: {Na2O: 15.77, CaO: 10.12, SiO2: 74.11}
+          composition_locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '7', row: '1:0.71:4.85'}
+          prior_calculation_kcal_100kg: 14841
+          attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+      - observation_id: kroger_kreitlow_1956_table8_direct_glass_formation_runs
+        type: gibbs_table
+        locator: {page: 7, published_page: 399, pdf_page_index: 6, table: '8'}
+        phase: glass
+        T_range_C: [1300, 1350]
+        units: cal/g glass
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_direct
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no reaction_enthalpy token; Quantity in simulator/battery/enums.py
+            has no reaction enthalpy token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+          standard_state: soda-limestone-quartz batch 1:1:6 reacted to glass
+          composition_mol_ratio_as_printed: '1:1:6'
+          composition_wt_pct: {Na2O: 12.97, CaO: 11.73, SiO2: 75.30}
+          quench_statement: {status: asserted_preserved, page: 7, quote: 'the melts solidify to a homogeneous, clear glass'}
+          experimental_conditions_as_printed: 'heated to about 1300–1350°C for 6 minutes; complete reaction was confirmed by reweighing'
+          water_value_cal: 2974
+          runs_as_printed:
+            - {run: 1, charge_g: 1.1821, formed_CO2_mg: 184.9, conversion_pct: {value: 100.5, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 0.9972, delta_t_C: 2.5931, water_value_delta_t_cal: 7711.8, heating_energy_cal: 7825.7, heat_cal_batch: 113.9, heat_cal_g_glass: 114.1}
+            - {run: 2, charge_g: 1.0926, formed_CO2_mg: 170.0, conversion_pct: {value: 100.2, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 0.9226, delta_t_C: 2.5617, water_value_delta_t_cal: 7618.6, heating_energy_cal: 7728.9, heat_cal_batch: 110.3, heat_cal_g_glass: 119.2}
+            - {run: 3, charge_g: 1.2016, formed_CO2_mg: 185.9, conversion_pct: {value: 99.5, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 1.0157, delta_t_C: 2.6078, water_value_delta_t_cal: 7755.6, heating_energy_cal: 7874.7, heat_cal_batch: 119.1, heat_cal_g_glass: 117.2}
+            - {run: 4, charge_g: 1.1517, formed_CO2_mg: 178.7, conversion_pct: {value: 99.7, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 0.9730, delta_t_C: 2.5891, water_value_delta_t_cal: 7699.8, heating_energy_cal: 7813.6, heat_cal_batch: 113.8, heat_cal_g_glass: 116.9}
+            - {run: 5, charge_g: 1.1878, formed_CO2_mg: 184.1, conversion_pct: {value: 99.6, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 1.0037, delta_t_C: 2.6011, water_value_delta_t_cal: 7735.6, heating_energy_cal: 7852.9, heat_cal_batch: 117.3, heat_cal_g_glass: 117.0}
+            - {run: 6, charge_g: 1.2119, formed_CO2_mg: 183.2, conversion_pct: {value: 100.0, unit: '%', printed_wording: 'Umsatz in %'}, glass_g: 1.0227, delta_t_C: 2.6152, water_value_delta_t_cal: 7777.5, heating_energy_cal: 7902.7, heat_cal_batch: 125.2, heat_cal_g_glass: 122.3}
+          mean_heat_cal_g_glass: 117.8
+          uncertainty_cal_g_glass: 2.5
+      - observation_id: kroger_kreitlow_1956_batch_formation_reaction_heats_equations1_3
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, equations: '1–3'}
+        phase: glass
+        units: kcal/mol formula
+        derived_from: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch]
+        derivation:
+          relation: >-
+            Author calculations from the stored measured solution heats, the
+            quoted quartz solution heat and printed input compound heats.
+          inputs: [kroger_kreitlow_1956_soda_solution_table1, kroger_kreitlow_1956_cao_solution_table2, kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch]
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no reaction_enthalpy token; Quantity in simulator/battery/enums.py
+            has no reaction enthalpy token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed batch formation reaction heats
+          values_as_printed:
+            - {formula: Na2O·2CaO·3SiO2, reaction_enthalpy_kcal_mol: -33.85, equation: '1'}
+            - {formula: 2Na2O·CaO·3SiO2, reaction_enthalpy_kcal_mol: 19.36, equation: '2'}
+            - {formula: Na2O·3CaO·6SiO2, reaction_enthalpy_kcal_mol: -60.49, equation: '3'}
+          inputs_as_printed:
+            soda_solution_heat_kcal_mol: -13.4
+            CaO_solution_heat_kcal_mol: -50.61
+            quartz_solution_heat_kcal_mol: -34.11
+      - observation_id: kroger_kreitlow_1956_ternary_reaction_heats_from_binary_silicates_equations7_9
+        type: gibbs_table
+        locator: {page: 5, published_page: 397, pdf_page_index: 4, equations: '7–9'}
+        phase: cr
+        units: kcal/mol formula
+        derived_from: [kroger_kreitlow_1956_oxide_formation_naca2si3o8, kroger_kreitlow_1956_oxide_formation_na2ca3si3o8, kroger_kreitlow_1956_oxide_formation_na2ca6si6o13]
+        derivation:
+          relation: printed enthalpy of formation from binary silicates, calculated using the oxide-formation heats cited by the authors
+          inputs: [kroger_kreitlow_1956_oxide_formation_naca2si3o8, kroger_kreitlow_1956_oxide_formation_na2ca3si3o8, kroger_kreitlow_1956_oxide_formation_na2ca6si6o13]
+        values:
+          quantity: reaction_enthalpy
+          method_class: measured_reduced
+          schema_gap: >-
+            QUANTITY_ALIASES and TYPE_QUANTITY in simulator/battery/migrate.py
+            have no reaction_enthalpy token; Quantity in simulator/battery/enums.py
+            has no reaction enthalpy token.
+          status: typed_refusal
+          reason: no exact migrated quantity token exists for the printed formation reactions
+          values_as_printed:
+            - {formula: Na2O·2CaO·3SiO2, reaction_enthalpy_kcal_mol: -12.3, equation: '7'}
+            - {formula: 2Na2O·CaO·3SiO2, reaction_enthalpy_kcal_mol: -3.2, equation: '8'}
+            - {formula: Na2O·3CaO·6SiO2, reaction_enthalpy_kcal_mol: -13.3, alternate_value_kcal_mol: -11.6, equation: '9'}
