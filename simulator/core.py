@@ -7951,7 +7951,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'{float(temperature_range_K[0]):g}-'
                 f'{float(temperature_range_K[1]):g} K; evaluated at '
                 f'{T_K:.2f} K, where Fe is liquid above the band. No '
-                'liquid-Fe evaporation coefficient is certified.'
+                'liquid-Fe evaporation coefficient is certified. Safarian '
+                '& Engh 2013, Fig. 5 p. 749, report liquid-Fe free '
+                'evaporation at 1687-1837 °C below 0.13 Pa agreeing closely '
+                'with Hertz-Knudsen eta=1; this is qualitative support only, '
+                'with no printed liquid-Fe alpha value.'
             )
         alpha_evaluation.update({
             'alpha_authority_status': authority_status,

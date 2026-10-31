@@ -343,6 +343,8 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
     assert partition["alpha_authority_status"] == "extrapolated"
     assert "1358-1520 K" in partition["alpha_authority_notice"]
     assert "liquid above the band" in partition["alpha_authority_notice"]
+    assert "Safarian & Engh 2013" in partition["alpha_authority_notice"]
+    assert "qualitative support only" in partition["alpha_authority_notice"]
     # 2026-07-02 re-speciation #82: vapor Fe retains its oxide O in fO2 buffer.
     assert overhead_o2_credit_mol + retained_o2_mol == pytest.approx(
         0.5 * partition["native_fe_pool_mol"], abs=1e-9
