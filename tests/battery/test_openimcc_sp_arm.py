@@ -29,12 +29,13 @@ from simulator.battery.oxygen_balance import (
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
 from simulator.battery.records import (
+    Apparatus,
+    ApparatusGeometry,
     Composition,
     Execution,
     Located,
     Species,
     State,
-    ThermalSchedule,
     Value,
 )
 from simulator.battery.score import (
@@ -316,18 +317,18 @@ def test_openimcc_sp_activity_screening_uses_observation_composition(
 def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     sample_has_p2o5: bool,
 ) -> None:
-    """A P2O5 mass-loss charge is refused when its gas channel is absent."""
+    """R-11's source-backed inputs exercise both synthetic P2O5 variants."""
     pytest.importorskip("openimcc", reason="openimcc is not importable")
 
     context = load_score_context(
-        sources=("mendybaev-2017-fun-cai-lab-evaporation",)
+        sources=("kems-010-richter-2007",)
     )
     reference = next(
         row
         for row in context.observations.values()
-        if row.source_id == "mendybaev-2017-fun-cai-lab-evaporation"
+        if row.source_id == "kems-010-richter-2007"
         and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
-        and row.experiment_id.endswith("::func-5")
+        and row.experiment_id.endswith("::cai-r-11")
     )
     experiment = context.experiments[reference.experiment_id]
     stated = experiment.sample.initial_composition
@@ -335,23 +336,32 @@ def test_openimcc_sp_mass_loss_screening_uses_consumed_inventory(
     initial = _composition_with_p2o5(
         stated.state.value, present=sample_has_p2o5
     )
-    schedule = experiment.thermal_schedule or ThermalSchedule()
-    experiment = replace(
-        experiment,
-        thermal_schedule=replace(
-            schedule,
-            total_duration_s=Located(
-                State.of(Value.point_of("5400")), stated.locator
-            ),
-        ),
-    )
+    # These exact mass and area values are transcribed in Richter Table 1 for
+    # R-11; the schedule, area endpoints, and alpha fits come from the same row
+    # and extract. Only the P2O5 variants below are synthetic.
+    apparatus = experiment.apparatus or Apparatus()
+    geometry = apparatus.geometry or ApparatusGeometry()
     experiment = replace(
         experiment,
         sample=replace(
             experiment.sample,
+            mass_kg=Located(
+                State.of(Value.point_of("0.0001904")), reference.locator
+            ),
             initial_composition=replace(stated, state=State.of(initial)),
         ),
+        apparatus=replace(
+            apparatus,
+            geometry=replace(
+                geometry,
+                exposed_area_m2=Located(
+                    State.of(Value.point_of("0.0000913")), reference.locator
+                ),
+            ),
+        ),
     )
+    assert experiment.thermal_schedule is not None
+    assert experiment.thermal_schedule.total_duration_s is not None
     reference = replace(
         reference,
         identity=replace(
@@ -1005,6 +1015,37 @@ def test_openimcc_sp_produced_prediction_flags_unrecorded_screening_input() -> N
     assert any(
         notice.kind is NoticeKind.INPUT_OMITTED
         and notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
+    )
+
+
+def test_openimcc_sp_unknown_requested_input_does_not_fall_back_to_identity() -> None:
+    identity = F.activity_identity(
+        composition=Composition(
+            "ordered_complete_mole_inventory",
+            (("SiO2", Decimal("0.9")), ("P2O5", Decimal("0.1"))),
+            AmountBasis.MOLE_FRACTION,
+        )
+    )
+
+    prediction = EnginePrediction(
+        engine=_sp_engine(),
+        channel=ENGINE_CHANNELS[_sp_engine()],
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal("1"),
+        authority=Authority.BRIDGE,
+        identity=identity,
+        requested_composition=State.unknown("consumed composition unavailable"),
+    )
+
+    assert prediction.authority is Authority.BRIDGE
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
         for notice in prediction.notices
     )
 

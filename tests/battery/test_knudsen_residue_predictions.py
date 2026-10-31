@@ -10,7 +10,7 @@ import pytest
 
 from simulator.battery.enums import (
     AdmissionStatus, AmountBasis, Authority, Engine, EvidenceClass, ExecutionState,
-    ExperimentKind, MethodToken, Phase, Quantity,
+    ExperimentKind, MethodToken, NoticeKind, Phase, Quantity,
     RegimeClass, UncertaintyKind,
 )
 from simulator.battery.identity import Identity, quantity_token
@@ -334,6 +334,11 @@ def test_openimcc_sp_unknown_consumed_residue_inventory_does_not_fall_back(
     assert prediction.execution.state is ExecutionState.PRODUCED
     assert prediction.requested_composition is not None
     assert prediction.requested_composition.is_unknown
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason == "P2O5 screening input not recorded"
+        for notice in prediction.notices
+    )
     assert not any(
         notice.reason.startswith("P2O5 parent reference state:")
         for notice in prediction.notices
@@ -367,7 +372,8 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
         for item in source.get("experiments", ())
         if isinstance(item, dict)
     }
-    positive_run_id = next(iter(sorted(source_experiments)))
+    positive_run_id = "sossi-2019-run-2m-15-07-16c"
+    assert positive_run_id in source_experiments
     positive_reference = next(
         row
         for row in rows
@@ -382,8 +388,11 @@ def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
     printed = positive_experiment["sample"]["printed_composition"]["state"]["value"]
     parent = next(name for name in printed if name != "P2O5")
     prior_p2o5 = float(printed.pop("P2O5", 0.0))
-    printed[parent] = float(printed[parent]) - 1.0 + prior_p2o5
-    printed["P2O5"] = 1.0
+    injected_p2o5_wt_pct = 0.1
+    printed[parent] = (
+        float(printed[parent]) - injected_p2o5_wt_pct + prior_p2o5
+    )
+    printed["P2O5"] = injected_p2o5_wt_pct
 
     def load_modified_source(path):
         if str(path) == str(source_path):
