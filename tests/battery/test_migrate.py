@@ -2119,6 +2119,47 @@ def test_production_migration_accepts_model_derived_raw_input_method(
     assert reloaded.derivation == observation.derivation
 
 
+def test_shornikov_2015_extract_migrates_model_derived_provenance(
+    tmp_path: Path,
+) -> None:
+    source_id = "shornikov-2015-cai-vaporization-coefficients"
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", write=False
+    )
+    model_rows = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    assert set(model_rows) == {
+        "shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04",
+        "shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04",
+        "shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04",
+        "shornikov_2015_feo_cr_prose",
+    }
+
+    for observation in model_rows.values():
+        assert observation.derivation is not None
+        raw_inputs = observation.derivation.raw_inputs
+        assert raw_inputs is not None
+        assert raw_inputs.state.is_value
+        assert raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        assert raw_inputs.locator is not None
+        method = observation.derivation.method
+        assert method is not None and method.state.is_value
+        assert method.locator is not None
+        assert observation.derivation.references
+
+    assert result.validation is not None
+    assert not any(
+        issue.path.startswith(f"observation[{source_id}::")
+        and issue.path.endswith(".derivation.raw_inputs")
+        for issue in result.validation.hard_issues
+    )
+
+
 @pytest.mark.parametrize(
     "method", [0, {"nonsense": True}], ids=["numeric", "object"]
 )
