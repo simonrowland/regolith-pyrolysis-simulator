@@ -170,9 +170,9 @@ def test_stage_accepted_metals_are_products_and_phase_remainder_is_inventory():
 
     stage_keys = [
         'stage_0_hot_duct',
-        'stage_1_fe_condenser',
+        '',
         'stage_2_cr_oxide_harvest',
-        'stage_3_sio_zone',
+        '',
         'stage_4_alkali_mg_cyclone',
         'stage_5_vortex_dust_filter',
         'stage_6_turbine_compressor',

@@ -698,9 +698,17 @@ def _metal_product_accounting(sim, *, products):
         try:
             stage = stages[int(raw_stage_index)]
             amount = float(raw_mass)
+            stage_number = int(getattr(stage, 'stage_number', raw_stage_index))
+            stage_identity = (
+                stage_number,
+                int(getattr(stage, 'sub_order', 0)),
+            )
+            stage_key = str(
+                getattr(stage, 'stage_key', '')
+                or STAGE_KEY_BY_IDENTITY.get(stage_identity, '')
+            )
         except (IndexError, TypeError, ValueError):
             continue
-        stage_key = str(getattr(stage, 'stage_key', '') or '')
         if not math.isfinite(amount) or amount <= 0.0 or not stage_key:
             continue
         if not _product_stage_accepts_species(species, stage_key):
