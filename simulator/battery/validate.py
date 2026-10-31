@@ -1319,10 +1319,16 @@ def _validate_observation(
     if ev.is_value and ev.value in _DERIVATION_EVIDENCE_CLASSES:
         # A caption-only figure admission with no numeric value is never scored,
         # so there is no derived numeric value whose ancestry needs tracing.
+        # The stored store still carries the pre-admtok fallthrough sentence.
+        # A fresh migration admits the same caption-only figure rows and names
+        # the legacy token. Both are unscored when the value is not numeric.
         figure_only_without_value = (
-            observation.admission.reason
-            == "source admission_status=figure_only is not a closed v2.1 token"
-            and not _value_has_numeric_value(observation.value)
+            not _value_has_numeric_value(observation.value)
+            and observation.admission.reason
+            in {
+                "source admission_status=figure_only is not a closed v2.1 token",
+                "admission_from_legacy_token:figure_only",
+            }
         )
         declares_unprinted_raw_inputs = (
             derivation is not None and derivation.declares_unprinted_raw_inputs
@@ -1519,12 +1525,21 @@ def _validate_observation(
         and notice.reason.startswith("admission_defaulted:")
         for notice in observation.notices
     )
+    # Same shape as d-056: the legacy-token notice is the decision record.
+    # These rows were not a reviewer admission, so decided_by stays empty.
+    legacy_token_admission = any(
+        notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+        and notice.origin == observation.observation_id
+        and notice.reason == observation.admission.reason
+        and notice.reason.startswith("admission_from_legacy_token:")
+        for notice in observation.notices
+    )
     if (
         observation.admission.status is not AdmissionStatus.PENDING
         and observation.admission.decided_by is None
         and not (
             observation.admission.status is AdmissionStatus.ADMITTED
-            and admission_defaulted
+            and (admission_defaulted or legacy_token_admission)
         )
     ):
         issues.append(
