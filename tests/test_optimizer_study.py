@@ -3721,14 +3721,14 @@ def test_parallel_composition_target_stub_study_completes(
 
         wall_authority = summary["wall_deposit_sticking_authority"]
         fe_records = wall_authority["alpha_s_provenance_by_species"]["Fe"].values()
+        # The shipped Stage-1 wall is 1150 C = 1423.15 K, just below the
+        # Tachibana fit's 1443 K lower bound, so this path predicts and flags
+        # the Arrhenius flank instead of using the retired 0.02 scalar.
         assert any(
-            record.get("alpha_s", 0.0) == pytest.approx(0.02)
-            and record.get("alpha_s_extrapolation_notice", {}).get(
-                "authority_level"
-            ) == "extrapolated"
-            and record["alpha_s_extrapolation_notice"].get(
-                "temperature_used_K"
-            ) == pytest.approx(1523.15)
+            record.get("alpha_s_form") == "arrhenius"
+            and record.get("citation_status") == "CITED"
+            and record.get("alpha_s_domain_status") == "out_of_domain"
+            and record.get("alpha_s_temperature_K") == pytest.approx(1423.15)
             for record in fe_records
         )
 
