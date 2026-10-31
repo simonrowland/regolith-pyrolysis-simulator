@@ -819,10 +819,10 @@ const common = {
     'data-temperature-k-offset': config.temperature_k_offset,
     'data-pressure-pa-per-mbar': config.pressure_pa_per_mbar,
     'data-default-pressure-band-role': 'default',
-    'data-default-pressure-band-min-mbar': config.default_pressure_band.min,
-    'data-default-pressure-band-max-mbar': config.default_pressure_band.max,
-    'data-default-pressure-band-label': config.default_pressure_band.label,
-    'data-default-pressure-band-warning-message': config.default_pressure_band.warning_message,
+    'data-default-pressure-band-min-mbar': config.default_pressure_band_mbar.min,
+    'data-default-pressure-band-max-mbar': config.default_pressure_band_mbar.max,
+    'data-default-pressure-band-label': config.default_pressure_band_mbar.label,
+    'data-default-pressure-band-warning-message': config.default_pressure_band_mbar.warning_message,
 };
 function render(extra) {
     const indicator = {

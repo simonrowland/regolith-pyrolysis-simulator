@@ -27,8 +27,6 @@ PER_HOUR_KEYS = {
     "T_C",
     "P_total_bar",
     "pO2_bar",
-    "carrier_identity",
-    "p_carrier_bar",
     "mass_balance_pct",
     "O2_yield_kg_cumulative",
     "O2_source_side_potential_kg_cumulative",
@@ -445,6 +443,7 @@ def test_cli_start_carrier_paths_reach_hourly_kr_state(carrier_argument):
     frames = _frames(result.stdout)
     assert result.returncode == 0, result.stderr
     assert frames[0]["frame_type"] == "start"
+    assert frames[0]["carrier_gas_overrides"] == {"C2A": "Kr"}
     assert frames[1]["frame_type"] == "step"
     assert frames[1]["step"]["carrier_identity"] == "Kr"
     assert frames[1]["step"]["p_carrier_bar"] > 0.0
