@@ -170,10 +170,11 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/foulant_thermo.yaml:230</code> - CaCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.1&quot;</li>
 <li><code>data/foulant_thermo.yaml:250</code> - MgCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.2&quot;</li>
 <li><code>data/foulant_thermo.yaml:270</code> - Na2CO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)&quot;</li>
+<li><code>data/setpoints.yaml:1836</code> - overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.schedule: # pure-Fe curve is derived from REF-012 Tb and dH_vap and is used below</li>
 <li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:1518</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
-<li><code>simulator/core.py:12002</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:12007</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -184,8 +185,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:130</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:180</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/setpoints.yaml:409</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>data/vapor_pressures.yaml:5065</code> - families.foulant_vapor_nacl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
 <li><code>data/vapor_pressures.yaml:5164</code> - families.foulant_vapor_kcl_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal</li>
@@ -206,9 +207,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:190</code> - observation_id.experiment_id: experiment_id: 10.1016/j.gca.2005.08.014::REF-014</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:274</code> - observation_id.source_id: source_id: REF-014</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:279</code> - observation_id.read_from: read_from: unknown:REF-014</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.CrO2.source: source: &quot;REF-014 notes no isolated CrO2 Hertz-Knudsen alpha adopted; retain high-capture default as a fouling-conservative placeholder.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:165</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:125</code> - species.CrO2.source: source: &quot;REF-014 notes no isolated CrO2 Hertz-Knudsen alpha adopted; retain high-capture default as a fouling-conservative placeholder.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:180</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:190</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/literature/vapour_rail_langmuir_anchors.yaml:59</code> - records.record_id.extraction_note: data/vapor_pressures.yaml REF-014 still carries a known-wrong</li>
 <li><code>data/literature/works/10.1016_j.gca.2005.08.014.yaml:8</code> - work.source_ids: - REF-014</li>
 <li><code>data/literature/works/10.1016_j.gca.2005.08.014.yaml:39</code> - work.source_files.asset_id: - asset_id: unknown:REF-014</li>
@@ -226,7 +227,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:110</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:135</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
 <li><code>data/vapor_pressures.yaml:1450</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
 </ul>
 </section>
@@ -247,8 +248,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:98</code> - observation_id.experiment_id: experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::REF-016</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:184</code> - observation_id.source_id: source_id: REF-016</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:188</code> - observation_id.read_from: read_from: unknown:REF-016</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:61</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:79</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:63</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:104</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 <li><code>data/literature/works/ALIASES.yaml:385</code> - aliases.REF-016: REF-016: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab</li>
 <li><code>data/literature/works/a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab.yaml:9</code> - work.source_ids: - REF-016</li>
 <li><code>data/literature/works/a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab.yaml:40</code> - work.source_files.asset_id: - asset_id: unknown:REF-016</li>
@@ -280,8 +281,8 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:79</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:110</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:104</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:135</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
 <li><code>data/vapor_pressures.yaml:1450</code> - families.metals_mg_family.vaporisation_coefficients.evaporation_alpha.source: source: REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table</li>
 <li><code>data/vapor_pressures.yaml:1961</code> - families.metals_al_family.vaporisation_coefficients.evaporation_alpha.source: source: &#x27;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table</li>
 <li><code>data/vapor_pressures.yaml:4799</code> - families.oxide_vapors_sio_family.vaporisation_coefficients.evaporation_alpha.value.prior_scalar.source: source: REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa</li>
@@ -295,7 +296,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:130</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:155</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
 <li><code>data/setpoints.yaml:409</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>simulator/mre_ladder.py:32</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
@@ -427,10 +428,10 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:2579</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>data/vapor_pressures.yaml:2690</code> - families.metals_mn_family.physical_properties.species.Mn.pure_component_antoine.name.source: source: REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation;</li>
 <li><code>engines/builtin/stage0_pretreatment.py:1637</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
-<li><code>simulator/core.py:919</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner/__init__.py:3200</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner/__init__.py:3339</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner/__init__.py:3364</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>simulator/core.py:921</code> - def _liquidus_status_from_freeze_gate_exception(: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
+<li><code>simulator/runner/__init__.py:3205</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner/__init__.py:3344</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner/__init__.py:3369</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -485,8 +486,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
-<li><code>simulator/core.py:11440</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
-<li><code>simulator/core.py:11442</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
+<li><code>simulator/core.py:11445</code> - def _oxidized_stage0_products(: The earlier text here cited Sephton (REF-024) as authority for applying</li>
+<li><code>simulator/core.py:11447</code> - def _oxidized_stage0_products(: backwards. REF-024 is the 2004 GCA hydropyrolysis study</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -943,7 +944,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:6</code> - observation_id.experiment_id: experiment_id: 10.1063/1.3253096::REF-040</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:90</code> - observation_id.source_id: source_id: REF-040</li>
 <li><code>data/literature/observations-v2/langmuir_knudsen_flux_validation.yaml:94</code> - observation_id.read_from: read_from: unknown:REF-040</li>
-<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:84</code> - species.SiO.cold_wall_condensation.source: source: &quot;REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -&gt; unity; evaporation alpha_e != condensation alpha_c off-equilibrium.&quot;</li>
+<li><code>data/literature/vacuum_pyrolysis_sticking.yaml:109</code> - species.SiO.cold_wall_condensation.source: source: &quot;REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -&gt; unity; evaporation alpha_e != condensation alpha_c off-equilibrium.&quot;</li>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:8</code> - work.source_ids: - REF-040</li>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:39</code> - work.source_files.asset_id: - asset_id: unknown:REF-040</li>
 <li><code>data/literature/works/10.1063_1.3253096.yaml:47</code> - experiment_id: - experiment_id: 10.1063/1.3253096::REF-040</li>
@@ -1176,9 +1177,9 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>Fractional crystallization of this magma ocean would have produced large enrichments of incompatibles in a residual liquid.</p><footer>NASA NTRS abstract; REEs are incompatible and concentrate in the residual fraction.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/accounting/queries.py:120</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
-<li><code>simulator/accounting/queries.py:598</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
-<li><code>simulator/extraction.py:3430</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
+<li><code>simulator/accounting/queries.py:119</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:615</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
+<li><code>simulator/extraction.py:3435</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
 </ul>
 </section>
 <section class="entry" id="REF-057">
@@ -1189,8 +1190,8 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>lithophile elements (RLE) including Al, Ti, Ca, Zr, Hf, Sc, Y and the REE</p><footer>accepted manuscript p. 21 (PDF page 20); Ca and REEs belong to the refractory lithophile component retained in the residue.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/accounting/queries.py:120</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
-<li><code>simulator/accounting/queries.py:599</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
+<li><code>simulator/accounting/queries.py:119</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:616</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
 </ul>
 </section>
 <section class="entry" id="REF-058">
@@ -1202,7 +1203,7 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1502</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1526</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:125</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:80</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:320</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>
