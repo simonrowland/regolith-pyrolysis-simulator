@@ -2032,6 +2032,30 @@ class EvaporationMixin:
         if repair_notices is not None and notice not in repair_notices:
             repair_notices.append(notice)
 
+    def _record_freeze_gate_magemin_timeout_fallback_notice(
+        self,
+        curve: dict[str, Any],
+        *,
+        timeout_reason: str | None,
+    ) -> dict[str, Any]:
+        if (
+            self._liquid_fraction_provider != 'magemin'
+            or timeout_reason != 'engine_worker_timeout'
+        ):
+            return curve
+
+        notice = {
+            'type': 'typed_notice',
+            'kind': 'freeze_gate_magemin_source_fallback',
+            'reason': timeout_reason,
+            'attempted_source': 'magemin',
+            'source_used': str(curve.get('source') or ''),
+        }
+        refusal = dict(curve.get('gate_provider_refusal') or {})
+        refusal['availability_notice'] = notice
+        curve['gate_provider_refusal'] = refusal
+        return curve
+
     def _stash_invalid_projected_liquidus_notice(
         self,
         notice: Mapping[str, Any],
@@ -2862,7 +2886,10 @@ class EvaporationMixin:
                     timeout_reason=timeout_reason,
                 )
                 if held is not None:
-                    return held
+                    return self._record_freeze_gate_magemin_timeout_fallback_notice(
+                        held,
+                        timeout_reason=timeout_reason,
+                    )
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
                     curve['gate_provider_refusal'] = {
@@ -2882,7 +2909,10 @@ class EvaporationMixin:
                             'not a fresh solve or a melting measurement'
                         ),
                     }
-                    return curve
+                    return self._record_freeze_gate_magemin_timeout_fallback_notice(
+                        curve,
+                        timeout_reason=timeout_reason,
+                    )
             if diagnostic.get('exception_class'):
                 mark_uncacheable_replay_disposition(
                     self,
