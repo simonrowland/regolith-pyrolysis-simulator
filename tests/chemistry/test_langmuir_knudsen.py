@@ -280,7 +280,7 @@ def test_validate_against_baseline_reports_ratios_without_tuning():
     rows = validate_against_baseline()
     assert len(rows) == 3
     by_species = {row.species: row for row in rows}
-    for species in ("Cr", "K", "Fe"):
+    for species in ("Cr", "K"):
         row = by_species[species]
         assert row.measured_ratio_low <= row.modeled_langmuir_to_effusion_ratio
         assert row.modeled_langmuir_to_effusion_ratio <= row.measured_ratio_high
@@ -289,9 +289,20 @@ def test_validate_against_baseline_reports_ratios_without_tuning():
 
     assert by_species["Cr"].relative_error_percent == pytest.approx(0.0)
     assert by_species["K"].relative_error_percent == pytest.approx(0.0)
-    assert by_species["Fe"].relative_error_percent == pytest.approx(
-        29.0322580645
-    )
+
+    # d-316's Fe melt coefficient is an extrapolated bridge, while REF-016 is
+    # a direct Fe+ range from Fo93Fa7 olivine at a lower temperature. Preserve
+    # that observed range and report the live bridge as an out-of-range
+    # prediction; the runtime coefficient is not a measurement of REF-016.
+    from simulator.chemistry.langmuir_knudsen import grounded_alpha
+
+    fe = by_species["Fe"]
+    fe_alpha, alpha_evaluation = grounded_alpha("Fe", fe.T_K)
+    assert fe.modeled_langmuir_to_effusion_ratio == pytest.approx(fe_alpha)
+    assert alpha_evaluation["alpha_authority_status"] == "bridge"
+    assert alpha_evaluation["alpha_s_extrapolated"] is True
+    assert fe.modeled_langmuir_to_effusion_ratio > fe.measured_ratio_high
+    assert abs(fe.relative_error_percent) > fe.allowed_error_percent
 
 
 def test_validation_observations_live_in_literature_sidecar():
