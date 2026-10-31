@@ -10,9 +10,13 @@ import pytest
 from engines.builtin.vapor_pressure import (
     VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG,
     VaporPressureRangeError,
+    vapor_pressure_source_equation_range_K,
+    vapor_pressure_valid_range_K,
+    wall_condensation_antoine_coefficients,
 )
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
+from simulator.config import resolve_collector_bands_C
 from simulator.overhead import OverheadGasModel
 from simulator.runner import (
     SIO_ALPHA_PROVENANCE,
@@ -82,6 +86,7 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
         overhead_model=SimpleNamespace(
             pipe_diameter_m=0.12,
             stage_area_m2_by_stage=lambda: {1: 2.0},
+            stage_hydraulic_diameter_m={1: 0.02},
             stage_area_geometry_provenance_notice=lambda: {"status": "test"},
         ),
         condensation_model=condensation_model,
@@ -743,9 +748,26 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     )
 
     extrapolation = route.antoine_extrapolations["Ca"]
-    # t-1217: Antoine extrapolation now uses the actual 525 C stage surface.
-    assert extrapolation["temperature_K"] == pytest.approx(798.15)
-    assert tuple(extrapolation["valid_range_K"]) == (1254.0, 1712.0)
+    # d-137 splits the former Stage 4 into a 250 C Na collector and a 40 C K
+    # trap. Resolve the Na collector band through the production config owner;
+    # Ca's recorded extrapolation follows that current surface.
+    na_collector_low_C = resolve_collector_bands_C()[4][0]
+    na_collector_temperature_K = (
+        na_collector_low_C + condensation_module.CELSIUS_TO_KELVIN_OFFSET
+    )
+    assert extrapolation["temperature_K"] == pytest.approx(
+        na_collector_temperature_K
+    )
+    coefficients, coefficient_block = wall_condensation_antoine_coefficients(
+        ca_data, temperature_K=na_collector_temperature_K
+    )
+    expected_range = vapor_pressure_source_equation_range_K(
+        ca_data, coefficient_block, na_collector_temperature_K
+    ) or vapor_pressure_valid_range_K(
+        ca_data, coefficient_block, na_collector_temperature_K
+    )
+    assert coefficients
+    assert tuple(extrapolation["valid_range_K"]) == tuple(expected_range)
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in route.antoine_extrapolation_warnings
