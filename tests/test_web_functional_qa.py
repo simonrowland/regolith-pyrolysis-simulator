@@ -580,9 +580,19 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
-    # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
-    # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    _PINNED_CR_OFFGAS_EQ_KG = 0.1824367962875407
+    # c679673f5 integrates Stage 2 capture over its temperature band (33 equal
+    # center samples). This captures Cr-bearing vapour the midpoint calculation
+    # sent to terminal.offgas: Cr-equivalent offgas falls from 0.182436796288
+    # to 0.180051898903 kg, while accepted Stage 2 Cr rises from 0.000066897364
+    # to 0.002451792057 kg. The remaining 2.69e-9 kg Cr moves into the rump:
+    # 3.932472e-9 kg extra Cr2O3 times its formula-derived Cr mass fraction.
+    # Thus 2.384897384 g lost from offgas = 2.384894693 g gained in Stage 2
+    # plus 0.000002691 g gained in the rump; the full ledger still totals
+    # 2.459768802 kg Cr against the 2.46 kg feed. CrO offgas remains 0.
+    # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
+    # into Stage 2 capture; the later segment-update refactor leaves the pin
+    # unchanged.
+    _PINNED_CR_OFFGAS_EQ_KG = 0.18005189890349527
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
