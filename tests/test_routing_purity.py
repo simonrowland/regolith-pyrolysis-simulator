@@ -130,7 +130,12 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
 
 
 def test_default_k_route_allocation_numeric_pin():
-    """Deterministic cb13f9f92 output pin, not a physics calibration target."""
+    """Pin the production band-integrated route, not a calibration target.
+
+    The c679673f5/85fedcb8e capture changes integrate each collector's
+    temperature band and saturation thresholds; the old midpoint pin had
+    more K reaching stage 6 and less captured at stage 5.
+    """
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
         'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
@@ -147,15 +152,15 @@ def test_default_k_route_allocation_numeric_pin():
         MeltState(temperature_C=1650.0),
     )
     assert route.condensed_by_stage_species == {
-        4: {'K': 0.999966157780451},
-        5: {'K': 2.7683081079644686e-05},
-        6: {'K': 6.1577634990554845e-06},
+        4: {'K': 0.9999661577804508},
+        5: {'K': 3.344749012837271e-05},
+        6: {'K': 3.947289899573387e-07},
     }
-    assert route.remaining_by_species == {'K': 1.374970351584895e-09}
+    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        5: {'K': 2.7683081079644686e-05},
-        6: {'K': 6.1577634990554845e-06},
+        5: {'K': 3.344749012837271e-05},
+        6: {'K': 3.947289899573387e-07},
     }
 
 
@@ -212,8 +217,10 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     ``_record_antoine_extrapolation`` record (reason
     ``wall_saturation_pressure_out_of_validated_range``). At these two
     walls ``require_antoine_source_certified_temperature`` does not raise,
-    so the ``#wall:`` key is not the record this route writes. This
-    combined route recorded the collector walls as ``Na#4`` and ``K#4``.
+    so the ``#wall:`` key is not the record this route writes. Band
+    sampling adds unique extrapolation records before the same 523.15 K
+    and 313.15 K wall records, whose serial keys are now ``Na#67`` and
+    ``K#67``.
     """
 
     model = CondensationModel(CondensationTrain.create_default())
@@ -235,8 +242,8 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     assert 'K' not in route.impurity_by_stage_species.get(4, {})
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
-    assert na_key == 'Na#4'
-    assert k_key == 'K#4'
+    assert na_key == 'Na#67'
+    assert k_key == 'K#67'
     assert 'Na#wall:523.15' not in route.antoine_extrapolations
     assert 'K#wall:313.15' not in route.antoine_extrapolations
     assert tuple(na_record['valid_range_K']) == (924.0, 1118.0)

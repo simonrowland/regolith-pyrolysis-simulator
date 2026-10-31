@@ -72,8 +72,9 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
 
-    # Pin the complete serialized runner result and the authoritative ledger
-    # projections before changing the per-hour refusal snapshot ownership.
+    # Product-accounting now serializes source-account metal attribution and
+    # the separate unrecovered-phase report. Re-derived this runner payload
+    # from the production path; the authoritative ledger projection is stable.
     ledger = snapshot_atom_ledger(execution.simulator.atom_ledger)
     ledger_state = {
         "gross_account_flows": ledger.gross_account_flows(),
@@ -103,7 +104,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     assert execution.status == "ok"
     assert len(execution.snapshots) == 2
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "48f5ef924f554599242f2cbabd8c12b594cf69b0033a7d2cb4412624e76471b9"
+        "a2dad0d9cfe5e49393505a143855f5de6fb2e00b7c1da7337c7f4a2119515176"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
