@@ -381,6 +381,7 @@ class ResidueMassLossPrediction:
     mass_loss_fraction: float
     engine_flags: tuple[str, ...]
     engine_metadata: Mapping[str, str]
+    initial_inventory_mol: Mapping[str, float]
 
 
 @dataclass(frozen=True)
@@ -422,6 +423,7 @@ class _HashimotoResiduePrediction:
     geometry_oxide_wt_pct: Mapping[str, Mapping[str, float]]
     sensitivity_band_wt_pct: Mapping[str, tuple[float, float]]
     provenance: Mapping[str, object]
+    initial_inventory_mol: Mapping[str, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -432,6 +434,7 @@ class _SossiResiduePrediction:
     sensitivity_band_ppm: Mapping[str, tuple[float, float]]
     channel_missing_elements: tuple[str, ...]
     provenance: Mapping[str, object]
+    initial_inventory_mol: Mapping[str, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -2083,7 +2086,7 @@ def predict_knudsen_residue_composition(
         except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
             diagnostic = {"refusal": getattr(exc, "reason", str(exc))}
         _append_omission_notices(notices, pressure_callbacks)
-        return {
+        result = {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
@@ -2092,6 +2095,9 @@ def predict_knudsen_residue_composition(
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
         }
+        if engine == Engine.OPENIMCC_SP.value:
+            result["initial_inventory_mol"] = dict(initial)
+        return result
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         _append_omission_notices(notices, pressure_callbacks)
         exc.provenance = provenance
@@ -2448,6 +2454,7 @@ def predict_mass_loss_fraction(
         return ResidueMassLossPrediction(
             mass_loss_fraction=point_loss_kg / sample_mass_kg,
             engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
+            initial_inventory_mol=dict(initial_inventory_mol),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attach_omissions(exc)
@@ -3315,6 +3322,7 @@ def _predict_hashimoto_residue_cohort(
                     geometry_oxide_wt_pct=geometry_predictions,
                     sensitivity_band_wt_pct=band,
                     provenance=provenance,
+                    initial_inventory_mol=dict(run_initial_mol),
                 )
             )
 
@@ -3885,6 +3893,7 @@ def _predict_sossi_residue_cohort(
                 geometry_element_ppm=geometry_predictions,
                 sensitivity_band_ppm=bands,
                 channel_missing_elements=tuple(missing_elements),
+                initial_inventory_mol=dict(inventory),
                 provenance={
                     "source_id": _SOSSI_SOURCE_ID,
                     "experiment_id": experiment_id,

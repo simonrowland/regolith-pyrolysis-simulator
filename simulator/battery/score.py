@@ -609,15 +609,23 @@ def _openimcc_sp_uses_p2o5_screening_proxy(
     )
 
 
-def _openimcc_sp_sample_initial_composition(
-    engine: Engine, experiment: Experiment | None
+def _openimcc_sp_residue_inventory_composition(
+    engine: Engine, inventory_mol: Mapping[str, float] | None
 ) -> State[Composition] | None:
-    """Return the starting inventory consumed by an SP sample-residue route."""
-
-    if engine is not Engine.OPENIMCC_SP or experiment is None:
+    if engine is not Engine.OPENIMCC_SP:
         return None
-    initial = experiment.sample.initial_composition
-    return None if initial is None else initial.state
+    if not isinstance(inventory_mol, Mapping) or not inventory_mol:
+        return State.unknown("residue evaluator starting inventory unavailable")
+    return State.of(
+        Composition(
+            "residue_evaluator_initial_mol_inventory",
+            tuple(
+                (str(oxide), as_decimal(str(amount)))
+                for oxide, amount in sorted(inventory_mol.items())
+            ),
+            AmountBasis.MOL_INVENTORY,
+        )
+    )
 
 
 def _openimcc_sp_pack_source() -> str:
@@ -8544,8 +8552,8 @@ def _predict_mass_loss_with_residue(
         coefficient_sources=(*sources, *json.loads(result.engine_metadata.get("alpha_sources", "[]"))),
         lineage_complete=False,
         identity=identity,
-        requested_composition=_openimcc_sp_sample_initial_composition(
-            engine, experiment
+        requested_composition=_openimcc_sp_residue_inventory_composition(
+            engine, result.initial_inventory_mol
         ),
         version=(
             "method_class=calculated_residue_integrator; "
@@ -9020,7 +9028,6 @@ def predict_with_engine(
     if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
         # Activity rows use the melt-activity contract. A gap is a typed
         # refusal. No engine fO2 default is an input on this path.
-        from simulator.battery.enums import AmountBasis
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
@@ -10644,8 +10651,8 @@ def _hashimoto_residue_prediction(
             # The source-resolved Phase.L identity denotes the modeled run-end
             # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
-            requested_composition=_openimcc_sp_sample_initial_composition(
-                engine, context.experiments.get(reference.experiment_id)
+            requested_composition=_openimcc_sp_residue_inventory_composition(
+                engine, getattr(primary, "initial_inventory_mol", None)
             ),
             version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=primary_provenance,
@@ -10722,7 +10729,10 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             )
             if cache is not None:
                 cache[cache_key] = result
-        provenance = {k: v for k, v in result.items() if k != "notices"}
+        provenance = {
+            k: v for k, v in result.items()
+            if k not in {"notices", "initial_inventory_mol"}
+        }
         value = result["composition_wt_pct"].get(reference.identity.species.formula)
         if value is None:
             raise ResidueInventoryRefusal("channel_missing", reference.identity.species.formula)
@@ -10736,8 +10746,8 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             ),
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             notices=(*result["notices"], *domain_notices), identity=reference.identity,
-            requested_composition=_openimcc_sp_sample_initial_composition(
-                engine, experiment
+            requested_composition=_openimcc_sp_residue_inventory_composition(
+                engine, result.get("initial_inventory_mol")
             ),
             refusal_detail=provenance,
         )
@@ -10971,8 +10981,8 @@ def _sossi_residue_prediction(
             lineage_complete=False,
             notices=tuple(notices),
             identity=reference.identity,
-            requested_composition=_openimcc_sp_sample_initial_composition(
-                engine, context.experiments.get(reference.experiment_id)
+            requested_composition=_openimcc_sp_residue_inventory_composition(
+                engine, getattr(prediction, "initial_inventory_mol", None)
             ),
             version=str(provenance.get("code_revision") or "unknown"),
             refusal_detail=provenance,
