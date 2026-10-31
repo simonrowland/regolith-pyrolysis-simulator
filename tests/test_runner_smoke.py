@@ -102,8 +102,10 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # studio-2 and studio-3 (gate config).
         # d-316 / b-1081 pinned alpha=1.0; t-1582 now changes this scenario to
         # the bridge value. The controller owns regenerating these hash pins.
-        "flux_maps_sha256": "07216beaa43016b071a5b8fc18af255899dea7db8fe981248c95ed4c107f4cb5",
-        "ledger_sha256": "a9f494b3d6155edd63b94be8abf36598f125d0f3d9c624e36bad696e18e0deac",
+        # d-316 / t-1582: Fe melt evaporation alpha 0.24 bridge (supersedes alpha = 1)
+        # on green c4a5fb34e; regenerated on studio-3, two passes identical.
+        "flux_maps_sha256": "3c316a684a5d407d5ca5f33271335dace4e3f931fafe17af4a31b5f91993ceaa",
+        "ledger_sha256": "494037a46de7e88112e1d5ab433c9a76b0336965a2aae26961181d29e265360d",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
