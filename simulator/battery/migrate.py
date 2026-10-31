@@ -5153,7 +5153,9 @@ def _converted_temperature(
     )
 
 
-def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -> object:
+def _temperature_field_value(
+    payload: Mapping[str, Any], field_name: str | None
+) -> object:
     if not field_name:
         return None
     raw: object = payload
@@ -5161,6 +5163,11 @@ def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -
         if not isinstance(raw, Mapping):
             return None
         raw = raw.get(part)
+    return raw
+
+
+def _temperature_field_raw(payload: Mapping[str, Any], field_name: str | None) -> object:
+    raw = _temperature_field_value(payload, field_name)
     if isinstance(raw, Mapping) and isinstance(raw.get("state"), Mapping):
         located = _point_condition_from_plain(raw, key=field_name.rsplit(".", 1)[-1])
         if located.state.is_value:
@@ -5176,9 +5183,7 @@ def _temperature_field_inference(
 ) -> Derivation | None:
     """Inference declared on the selected temperature field. Absent means none."""
 
-    if not field_name:
-        return None
-    raw = payload.get(field_name)
+    raw = _temperature_field_value(payload, field_name)
     if not isinstance(raw, Mapping):
         return None
     inference = raw.get("inference")
@@ -5192,11 +5197,7 @@ def _temperature_field_locator(
 ) -> Locator | None:
     if not field_name:
         return fallback
-    raw: object = payload
-    for part in field_name.split("."):
-        if not isinstance(raw, Mapping):
-            return fallback
-        raw = raw.get(part)
+    raw = _temperature_field_value(payload, field_name)
     if isinstance(raw, Mapping):
         return locator_from_mapping(raw.get("locator")) or fallback
     return fallback

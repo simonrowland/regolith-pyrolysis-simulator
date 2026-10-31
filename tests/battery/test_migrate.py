@@ -8687,7 +8687,16 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
     # The independent census checks all six source cells; mismatches stay 0.
     # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
-    assert census.get("H_minus_H298") == 136
+    # Schumm (1981) adds 123 temperature rows each for cp, H-H298, delta_fH,
+    # and delta_fG, plus eight printed entropy points; mismatches stay 0.
+    assert census.get("H_minus_H298") == 259
+    assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
+        "cp": 123,
+        "H_minus_H298": 123,
+        "delta_fH": 123,
+        "delta_fG": 123,
+        "S": 8,
+    }
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
@@ -8718,7 +8727,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8200, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8700, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -15371,6 +15380,77 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert ms2.identity.species.formula == "unknown"
     assert float(ms2.identity.temperature_K.value) == 1836.15
     assert ms2.admission.status is AdmissionStatus.ADMITTED
+
+
+def _nested_temperature_estimate() -> dict:
+    return {
+        "state": {"tag": "value", "value": "926.85"},
+        "locator": {"page": 2, "table": "I"},
+        "inference": {
+            "relation": "source_temperature_estimate",
+            "inputs": ["source graph"],
+            "parameters": [],
+            "output_unit": "degC",
+        },
+    }
+
+
+def _assert_temperature_source_and_conversion(observation) -> None:
+    temperature = observation.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1200")
+    assert temperature.inference is not None
+    assert temperature.inference.relation == "source_temperature_estimate"
+    assert temperature.inference.inputs == ("source graph",)
+    original = dict(temperature.inference.parameters)["original"]
+    assert original.inference is not None
+    assert original.inference.relation == "celsius_to_kelvin"
+
+
+def test_nested_temperature_inference_survives_on_parent_observation(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"] = {
+        "quantity": "p_sat",
+        "pressure_atm": 1,
+        "point_conditions": {"T_C": _nested_temperature_estimate()},
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    _assert_temperature_source_and_conversion(observation)
+
+
+def test_nested_temperature_inference_survives_on_exploded_observation(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "id": "SiO2",
+                    "mass_loss_wt_pct": 1.1,
+                    "point_conditions": {"T_C": _nested_temperature_estimate()},
+                }
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["regime"] = "solar_vacuum_pyrolysis"
+    row["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    (observation,) = [
+        item for item in result.observations.values() if "::T=" in item.observation_id
+    ]
+
+    _assert_temperature_source_and_conversion(observation)
 
 
 def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
