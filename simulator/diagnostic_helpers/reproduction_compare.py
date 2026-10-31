@@ -148,6 +148,7 @@ class ComparisonRecord:
     recipe_digest: str
     observation_digest: str
     runtime_digest: str
+    prediction_alpha_authority: str | None = None
 
     def __post_init__(self) -> None:
         if self.status not in COMPARISON_STATUSES:
@@ -185,6 +186,7 @@ class ComparisonRecord:
             "recipe_digest": self.recipe_digest,
             "observation_digest": self.observation_digest,
             "runtime_digest": self.runtime_digest,
+            "prediction_alpha_authority": self.prediction_alpha_authority,
         }
 
 
@@ -240,6 +242,7 @@ def compare_values(
     assumed_input: bool = False,
     out_of_domain: bool = False,
     status_override: str | None = None,
+    prediction_alpha_authority: str | None = None,
 ) -> ComparisonRecord:
     """Compare one independent observation to one runtime value."""
 
@@ -298,6 +301,11 @@ def compare_values(
         recipe_digest=content_digest(recipe),
         observation_digest=content_digest(observation),
         runtime_digest=content_digest(runtime),
+        prediction_alpha_authority=(
+            str(prediction_alpha_authority)
+            if prediction_alpha_authority is not None
+            else None
+        ),
     )
 
 
@@ -330,8 +338,8 @@ def records_to_markdown(records: Sequence[ComparisonRecord]) -> str:
 
     lines = [
         "| case | observable | species | temperature/time/window | expected | "
-        "actual | residual | units | status | evidence | source |",
-        "|---|---|---|---|---:|---:|---:|---|---|---|---|",
+        "actual | residual | units | status | alpha authority | evidence | source |",
+        "|---|---|---|---|---:|---:|---:|---|---|---|---|---|",
     ]
     for record in records:
         locator = _markdown_value(record.source_locator).replace("|", "\\|")
@@ -342,6 +350,7 @@ def records_to_markdown(records: Sequence[ComparisonRecord]) -> str:
             f"{_markdown_value(record.expected_value)} | "
             f"{_markdown_value(record.actual_value)} | "
             f"{_markdown_value(record.residual)} | {record.units} | "
-            f"{record.status} | {record.evidence_scope} | {locator} |"
+            f"{record.status} | {record.prediction_alpha_authority or '-'} | "
+            f"{record.evidence_scope} | {locator} |"
         )
     return "\n".join(lines)

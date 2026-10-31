@@ -380,6 +380,8 @@ def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
 @pytest.mark.parametrize("markers", [
     {"evidence_kind": "model"},
     {"measurement_status": "model_output_not_measurement"},
+    {"alpha_authority_status": "analytical_upper_bound"},
+    {"alpha_authority_status": "bridge"},
     {"status": "typed_refusal"},
     {"admission_status": "rejected_model_output_not_measurement"},
     {"class": "model"},
@@ -407,6 +409,10 @@ def test_refused_markers_never_score(monkeypatch, markers, nested) -> None:
     obs, = load_adopted_observations()
     ev = evaluate_observation(obs)
     assert ev.skip_reason.startswith("typed-refusal:")
+    if "alpha_authority_status" in markers:
+        assert ev.skip_reason == (
+            f"typed-refusal:{markers['alpha_authority_status']}_not_measurement"
+        )
     assert ev.records
     assert not any(r.status in SCORING_STATUSES for r in ev.records)
     assert all((obs.values if nested else obs.admission_metadata)[key] == value
@@ -490,13 +496,13 @@ def test_marked_ceiling_receipt_survives_alpha_report_runtime(
         == "analytical_upper_bound"
         for runtime in captured_runtime
     )
-    assert {record.status for record in evaluation.records} == {"assumed-input"}
-    assert evaluation.skip_reason == (
-        "typed-refusal:analytical_upper_bound_not_measurement"
+    assert len(evaluation.records) == 1
+    assert all(record.status in SCORING_STATUSES for record in evaluation.records)
+    assert all(
+        record.prediction_alpha_authority == "analytical_upper_bound"
+        for record in evaluation.records
     )
-    assert not any(
-        record.status in {"match", "mismatch"} for record in evaluation.records
-    )
+    assert evaluation.skip_reason is None
 
 
 def test_crystalline_form_is_not_pin_bearing_even_when_class_comparable() -> None:

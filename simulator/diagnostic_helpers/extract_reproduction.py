@@ -40,6 +40,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import (
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
     ALPHA_AUTHORITY_STATUS_FIELD,
+    BRIDGE_ALPHA_STATUS,
     _evaluate_extracted_arrhenius_alpha,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -491,6 +492,10 @@ _EVIDENCE_VOCABULARY = {
     })},
     "measurement_status": dict(_MARKER_REFUSALS),
     "alpha_role": dict(_MARKER_REFUSALS),
+    "alpha_authority_status": {
+        ANALYTICAL_UPPER_BOUND_ALPHA_STATUS: "analytical_upper_bound_not_measurement",
+        BRIDGE_ALPHA_STATUS: "bridge_not_measurement",
+    },
     "review_status": {
         "draft": None,  # ames-walsh-white-1967: source review pending.
         "reviewed": None,  # ivtan-mno-coo-thermo: source reviewed.
@@ -2152,6 +2157,7 @@ def _compare_point(
     out_of_domain: bool = False,
     assumed_input: bool = False,
     status_override: str | None = None,
+    prediction_alpha_authority: str | None = None,
 ) -> ComparisonRecord:
     # compare_values requires uncertainty whenever expected is numeric.
     unc = uncertainty
@@ -2187,6 +2193,7 @@ def _compare_point(
         assumed_input=assumed_input,
         out_of_domain=out_of_domain,
         status_override=status_override,
+        prediction_alpha_authority=prediction_alpha_authority,
     )
 
 
@@ -3438,7 +3445,6 @@ def _evaluate_alpha(
     # (T, α) measurements split — aggregate/midpoint-synthesized points keep
     # the whole-row verdict).
     any_pin_bearing = False
-    analytical_ceiling_skip_reason: str | None = None
     for pt in points:
         T_K = float(pt["T_K"])
         expected = float(pt["alpha"])
@@ -3506,18 +3512,6 @@ def _evaluate_alpha(
         alpha_authority_status = (runtime.get("alpha_context") or {}).get(
             ALPHA_AUTHORITY_STATUS_FIELD
         )
-        # A bridge is a flagged model prediction and remains scoreable against
-        # independently sourced measurements. Only the analytical ceiling is
-        # a non-measurement input; same-source observations are handled by the
-        # provenance self-agreement rule at their owning comparison path.
-        analytical_ceiling = (
-            alpha_authority_status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-        )
-        if analytical_ceiling:
-            analytical_ceiling_skip_reason = (
-                f"{_TYPED_SKIP_PREFIX}{ANALYTICAL_UPPER_BOUND_ALPHA_STATUS}_not_measurement"
-            )
-            runtime["skip_reason"] = analytical_ceiling_skip_reason
         # Pin-bearing only when class AND form match. Form-corrected and all
         # other non-matches keep values for audit but out-of-domain status
         # excludes them from residual pins.
@@ -3541,10 +3535,14 @@ def _evaluate_alpha(
             runtime=runtime,
             unsupported_speciation=actual is None and pin_ok,
             out_of_domain=out_of_domain,
-            assumed_input=analytical_ceiling,
+            prediction_alpha_authority=(
+                str(alpha_authority_status)
+                if alpha_authority_status is not None
+                else None
+            ),
         )
         evaluation.records.append(record)
-        if pin_ok and not analytical_ceiling:
+        if pin_ok:
             any_pin_bearing = True
         if pin_ok and record.status == "mismatch":
             extr_tag = " extrapolated: true" if extrapolated else ""
@@ -3556,9 +3554,6 @@ def _evaluate_alpha(
     if not any_pin_bearing and axes_typed_skip is not None:
         evaluation.skip_reason = axes_typed_skip
         evaluation.skip_reasons.append(axes_typed_skip)
-    elif analytical_ceiling_skip_reason and not any_pin_bearing:
-        evaluation.skip_reason = analytical_ceiling_skip_reason
-        evaluation.skip_reasons.append(evaluation.skip_reason)
     elif not any_numeric:
         evaluation.skip_reason = (
             f"{_TYPED_SKIP_PREFIX}{last_refusal or 'alpha_unsupported'}"

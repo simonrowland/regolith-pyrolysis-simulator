@@ -88,7 +88,7 @@ def _comparison(**overrides):
 
 
 def test_comparison_record_exact_chain_schema_and_reports() -> None:
-    record = _comparison()
+    record = _comparison(prediction_alpha_authority="analytical_upper_bound")
     expected_keys = {
         "case_id",
         "source_id",
@@ -106,13 +106,17 @@ def test_comparison_record_exact_chain_schema_and_reports() -> None:
         "recipe_digest",
         "observation_digest",
         "runtime_digest",
+        "prediction_alpha_authority",
     }
     assert set(record.as_dict()) == expected_keys
     assert record.status == "match"
     assert record.residual == pytest.approx(0.5)
+    assert record.as_dict()["prediction_alpha_authority"] == "analytical_upper_bound"
     assert set(json.loads(records_to_json([record]))[0]) == expected_keys
     markdown = records_to_markdown([record])
     assert "| case | observable | species | temperature/time/window |" in markdown
+    assert "| status | alpha authority | evidence | source |" in markdown
+    assert "| analytical_upper_bound |" in markdown
     assert "| match |" in markdown
 
 
