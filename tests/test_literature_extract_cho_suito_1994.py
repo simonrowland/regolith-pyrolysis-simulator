@@ -103,9 +103,9 @@ def test_table5_cells_and_column_alignment_are_pinned_to_page_180() -> None:
         assert row["values"]["temperature_K"] == 1873
         assert row["phase"] == "l"
         assert row["standard_state"] in {
-            "relative to the solid standard state; SiO2(s)",
-            "relative to the solid standard state; Al2O3(s)",
-            "relative to the solid standard state; CaO(s)",
+            "pure solid SiO2(s)",
+            "pure solid Al2O3(s)",
+            "pure solid CaO(s)",
         }
 
     for observation_id in UNKNOWN_COMPOSITION_IDS:
