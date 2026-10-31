@@ -1035,9 +1035,20 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # d-316 uses the Fe melt bridge α=0.24 in this live step; a positive Fe
+    # flux and bridge authority show the changed coefficient reaches the run.
+    # The all-carrier rate moves +2.05% (100 * (0.06555089 / 0.06423670 - 1));
+    # total flux is kg/hr and stays far below the 12x alpha ratio because Fe
+    # is only one species in the redox-coupled total. If Fe flux is zero, this
+    # pin should return to the pre-bridge value.
+    assert snapshot.evap_flux.alpha_authority_status_by_species["Fe"] == "bridge"
+    assert snapshot.evap_flux.species_kg_hr["Fe"] > 0.0
+    assert sim._last_evaporation_flux_diagnostic[
+        "alpha_used_by_species"
+    ]["Fe"] == pytest.approx(0.24)
+    # Re-pinned from capacity_pin_values(snapshot) on the local production path.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.06555088956128961, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1065,15 +1076,15 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # The first C0 step is 1400 C under the 1 mbar Ar cover and 200 C/h
+        # ramp. d-316's bridged Fe flux changes this all-carrier snapshot;
+        # the capacity result remains well below the transport ceiling.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.06555088956128961,
+            2.491553126459357,
+            998.7058913678549,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

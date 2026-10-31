@@ -550,7 +550,23 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
 
 
 @pytest.mark.parametrize("feedstock", ["lunar_mare_low_ti", "mars_basalt"])
-def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
+def test_sio_yield_restored_capture_keeps_provenance_and_closure(
+    feedstock,
+    monkeypatch,
+):
+    from simulator.core import PyrolysisSimulator
+
+    captured_alpha_diagnostics = []
+    step = PyrolysisSimulator.step
+
+    def capture_alpha_diagnostics(sim):
+        snapshot = step(sim)
+        captured_alpha_diagnostics.append(
+            dict(sim._last_evaporation_flux_diagnostic)
+        )
+        return snapshot
+
+    monkeypatch.setattr(PyrolysisSimulator, "step", capture_alpha_diagnostics)
     report, diagnostics = build_sio_yield_report(
         feedstock_id=feedstock,
         hours=24,
@@ -575,19 +591,31 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # b-850 round 2: corrected alkali dimer pressures slightly change melt
-    # activities, SiO flux, and restored terminal capture. This is a residual
-    # after subtracting nearly equal Si inventories, so the small route shift
-    # moves the reported percent by a larger relative factor.
+    # d-316 raises the Fe melt alpha from the former 0.02 fit to its 0.24
+    # bridge, confirmed by the live diagnostic below. Fe loss changes the
+    # oxygen/redox trajectory feeding SiO evolution. This residual is
+    # abs(evaporated - terminal) / evaporated * 100, so cancellation between
+    # nearly equal inventories makes the feedstocks move in different
+    # directions: lunar +36.8% and Mars -58.3% relative to the stale pins.
+    # The residual is percent; it is not the independently closed atom ledger.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333700073318e-7,
+        "lunar_mare_low_ti": 8.431066471078024e-7,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        "mars_basalt": 2.271604686598938e-7,
+        "mars_basalt": 9.464991426183768e-8,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
+    )
+    fe_bridge_diagnostics = [
+        item for item in captured_alpha_diagnostics
+        if item.get("alpha_authority_status_by_species", {}).get("Fe") == "bridge"
+    ]
+    assert fe_bridge_diagnostics
+    assert any(
+        item.get("alpha_used_by_species", {}).get("Fe") == pytest.approx(0.24)
+        for item in fe_bridge_diagnostics
     )
     assert report["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"] > 0.0
     authority = report["fouling_rate"]["sticking_alpha_authority"]

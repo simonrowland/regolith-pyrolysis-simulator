@@ -32,6 +32,11 @@ GOLDEN_TRACE = (
 # byte-identical. VOLATILE_KEYS strip timestamps/run ids; two-pass
 # self-equality still proves determinism of the live path. Do NOT
 # soft-xfail again; rebaseline from the executable only (Hard Invariant 7).
+# d-316 live run trace: the Fe melt bridge is active in this C0 session and
+# moves the coupled C_evac_kg_hr field from 4.794582587158566 to
+# 4.794586469865267 kg/hr (+3.8827e-6 kg/hr, 8.10e-7 relative). The tiny
+# shift is consistent with a small Fe-mediated state change in the full
+# campaign rate; it is far below the dominant carbon evacuation rate.
 
 VOLATILE_KEYS = {
     "duration_s",

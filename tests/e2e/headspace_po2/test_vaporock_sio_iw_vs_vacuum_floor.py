@@ -104,7 +104,13 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# d-316: the Fe melt bridge moves from the old 0.02 fit to alpha=0.24 (12x).
+# At the six-hour C2A anchor, Fe loss shifts the managed oxygen ledger and
+# hence the finite-pO2/IW SiO ratio; the executed decade drift is 0.21192742
+# rather than 0.20906020 (+0.00286722 decade, 1.37%). The response is coupled
+# through redox and co-evaporation, so it does not scale 12x; with zero Fe
+# flux this bridge-driven separation change should disappear.
+EXPECTED_SIO_DECADE_DRIFT = 0.21192741990115788
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
@@ -114,6 +120,12 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
         campaign=SIO_ANCHOR_CAMPAIGN,
         start_temperature_C=SIO_ANCHOR_START_TEMPERATURE_C,
     )
+    assert sim._last_evaporation_flux_diagnostic[
+        "alpha_used_by_species"
+    ]["Fe"] == pytest.approx(0.24)
+    assert sim._last_evaporation_flux_diagnostic[
+        "alpha_authority_status_by_species"
+    ]["Fe"] == "bridge"
     anchor = hour_trace[SIO_ANCHOR_HOUR]
     p_sio_finite = anchor["p_SiO_Pa"]
     temperature_C = anchor["temperature_C"]
