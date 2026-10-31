@@ -528,6 +528,7 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     expected = json.loads((FIXTURE_DIR / golden_name).read_text())
 
     _assert_golden_close(actual, expected)
+    assert actual["sio_to_silica_fume_kg"] == expected["sio_to_silica_fume_kg"]
     # Strict-equality on a baseline float caught FP-jitter (~1e-12 absolute,
     # ~1e-9 relative) introduced by F4 rump-payload assembly + S1b shuttle
     # gate after the post-2026-05-20 refit established the baseline. The

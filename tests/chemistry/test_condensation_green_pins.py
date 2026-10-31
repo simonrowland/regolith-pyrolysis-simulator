@@ -13,7 +13,7 @@ from simulator.runner import PyrolysisRun
 from tests.chemistry.conftest import full_builtin_provider_run
 
 
-SPECIES = ("Fe", "Na", "K", "Mg", "SiO")
+SPECIES = ("Fe", "Na", "K", "Mg", "SiO", "Cr")
 PINS = Path(__file__).parents[1] / "fixtures" / "condensation_green.json"
 
 
@@ -52,7 +52,14 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
     expected = json.loads(PINS.read_text())[name]
     for species in SPECIES:
-        assert actual[species] == pytest.approx(expected[species], rel=1e-10, abs=1e-14)
+        if species not in expected:
+            continue
+        if name == "full_lunar" and species in {"Fe", "Cr", "SiO"}:
+            assert actual[species] == expected[species]
+        else:
+            assert actual[species] == pytest.approx(
+                expected[species], rel=1e-10, abs=1e-14
+            )
     if runner_output is not None:
         assert actual["runner_sha256"] == expected["runner_sha256"]
 
