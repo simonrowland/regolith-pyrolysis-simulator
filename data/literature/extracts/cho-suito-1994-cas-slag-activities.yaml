@@ -278,8 +278,12 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2"
+                - "printed_oxide_sum_wt_percent: 100.204223"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -359,8 +363,12 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4"
+                - "printed_oxide_sum_wt_percent: 99.976350"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -440,8 +448,12 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5"
+                - "printed_oxide_sum_wt_percent: 100.225360"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -521,8 +533,12 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8"
+                - "printed_oxide_sum_wt_percent: 99.254073"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -785,8 +801,12 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2"
+                - "printed_oxide_sum_wt_percent: 100.204223"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -866,8 +886,12 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2"
+                - "printed_oxide_sum_wt_percent: 100.204223"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -947,8 +971,12 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4"
+                - "printed_oxide_sum_wt_percent: 99.976350"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1028,8 +1056,12 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4"
+                - "printed_oxide_sum_wt_percent: 99.976350"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1109,8 +1141,12 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5"
+                - "printed_oxide_sum_wt_percent: 100.225360"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1190,8 +1226,12 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5"
+                - "printed_oxide_sum_wt_percent: 100.225360"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1271,8 +1311,12 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8"
+                - "printed_oxide_sum_wt_percent: 99.254073"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1351,8 +1395,12 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8"
+                - "printed_oxide_sum_wt_percent: 99.254073"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1762,8 +1810,12 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2"
+                - "printed_oxide_sum_wt_percent: 100.204223"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1842,8 +1894,12 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2"
+                - "printed_oxide_sum_wt_percent: 100.204223"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -1922,8 +1978,12 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4"
+                - "printed_oxide_sum_wt_percent: 99.976350"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -2002,8 +2062,12 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4"
+                - "printed_oxide_sum_wt_percent: 99.976350"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -2082,8 +2146,12 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5"
+                - "printed_oxide_sum_wt_percent: 100.225360"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -2162,8 +2230,12 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5"
+                - "printed_oxide_sum_wt_percent: 100.225360"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -2242,8 +2314,12 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8"
+                - "printed_oxide_sum_wt_percent: 99.254073"
+              output_unit: mole_fraction
             state:
               tag: value
               value:
@@ -2321,8 +2397,12 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
-            inferred: true
-            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
+            inference:
+              relation: oxide_from_element_mass_percent
+              inputs:
+                - "Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8"
+                - "printed_oxide_sum_wt_percent: 99.254073"
+              output_unit: mole_fraction
             state:
               tag: value
               value:

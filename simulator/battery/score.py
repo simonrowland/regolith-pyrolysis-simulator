@@ -127,6 +127,7 @@ from simulator.battery.records import (
     CandidateRequest,
     Composition,
     DecisionBand,
+    Derivation,
     EngineTrace,
     Evidence,
     Execution,
@@ -505,6 +506,9 @@ FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION = "binary-complement-composition"
+FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
+    "oxide-from-element-mass-percent-composition"
+)
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
@@ -1875,6 +1879,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value in kinds:
         strata.append(FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION)
+    if NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT.value in kinds:
+        strata.append(FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION)
     if any(
         _is_source_internally_inconsistent(kind, reason)
         for kind, reason in notices
@@ -5593,30 +5599,69 @@ def _bench_for_score(
     return benches.get(experiment.bench_id)
 
 
+# Exact typed composition derivations the scorer may use. Any other
+# inference relation is refused. Each kind carries its own notice.
+_EXACT_COMPOSITION_DERIVATIONS: dict[str, NoticeKind] = {
+    "binary_complement": NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+    "oxide_from_element_mass_percent": (
+        NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+    ),
+}
+_OXIDE_SUM_INPUT_PREFIX = "printed_oxide_sum_wt_percent:"
+
+
+def _printed_oxide_sum_wt_percent(inference: Derivation) -> str:
+    """Oxide sum text stored on the derivation. Empty when the input is absent."""
+
+    for item in inference.inputs:
+        text = str(item).strip()
+        if text.startswith(_OXIDE_SUM_INPUT_PREFIX):
+            return text[len(_OXIDE_SUM_INPUT_PREFIX) :].strip()
+    return ""
+
+
+def _exact_derivation_notice_reason(inference: Derivation) -> str:
+    kind = _EXACT_COMPOSITION_DERIVATIONS[inference.relation]
+    if kind is NoticeKind.COMPOSITION_BINARY_COMPLEMENT:
+        return (
+            "composition_binary_complement: SrO-Al2O3 binary; "
+            "complement of the caption mole percent"
+        )
+    oxide_sum = _printed_oxide_sum_wt_percent(inference)
+    return (
+        "composition_oxide_from_element_mass_percent: "
+        f"printed_oxide_sum_wt_percent={oxide_sum}"
+    )
+
+
 def _printed_point_composition(
     observation: Observation,
 ) -> tuple[State[Composition] | None, Notice | None]:
     """Printed point composition when the identity axis does not carry one.
 
     Series migration stores the row composition on point_conditions and
-    leaves identity.composition unknown. A binary complement is used with a
-    visible residual notice; other inferred point compositions are refused.
+    leaves identity.composition unknown. An allowlisted exact derivation is
+    used with its own residual notice; other inferred point compositions
+    are refused. ``oxide_from_element_mass_percent`` is also returned when
+    identity already holds that map, so the notice can attach where the
+    composition is consumed. ``binary_complement`` stays identity-first:
+    activity rows that already copied the complement onto identity do not
+    grow a second notice path.
     """
 
     identity = observation.identity
-    if (
+    identity_has_composition = (
         isinstance(identity, Identity)
         and identity.composition is not None
         and identity.composition.is_value
-    ):
-        return None, None
+    )
     point = (observation.point_conditions or {}).get("composition")
     if not isinstance(point, Located):
         return None, None
-    if (
-        point.inference is not None
-        and point.inference.relation != "binary_complement"
-    ):
+    relation = None if point.inference is None else point.inference.relation
+    if relation is not None and relation not in _EXACT_COMPOSITION_DERIVATIONS:
+        return None, None
+    if identity_has_composition and relation != "oxide_from_element_mass_percent":
         return None, None
     if not point.state.is_value or point.state.value is None:
         return None, None
@@ -5626,12 +5671,9 @@ def _printed_point_composition(
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if point.inference is not None and quantity is not None:
         notice = Notice(
-            kind=NoticeKind.COMPOSITION_BINARY_COMPLEMENT,
+            kind=_EXACT_COMPOSITION_DERIVATIONS[point.inference.relation],
             affected_quantities=(quantity,),
-            reason=(
-                "composition_binary_complement: SrO-Al2O3 binary; "
-                "complement of the caption mole percent"
-            ),
+            reason=_exact_derivation_notice_reason(point.inference),
             origin=observation.observation_id,
         )
     return point.state, notice
