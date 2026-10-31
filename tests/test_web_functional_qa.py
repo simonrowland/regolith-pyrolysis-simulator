@@ -464,11 +464,42 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert completion["mass_balance_error_breached"] is False
 
     story = completion["product_story"]
-    runner_story = web_events._product_story_payload(
+    from simulator.runner import _product_classification_report
+
+    runner_classification = _product_classification_report(
         runner_sim,
-        terminal_rump_by_species=runner_sim._terminal_rump_by_species(),
+        feedstock_id=runner_sim.record.feedstock_key,
+        campaign=runner_sim.melt.campaign.name,
+    )["classification"]
+
+    def displayed_species_kg(species_kg):
+        return {
+            species: round(float(mass), 2)
+            for species, mass in species_kg.items()
+            if round(float(mass), 2) > 0.0
+        }
+
+    assert story["metal_ingots"]["species_kg"] == displayed_species_kg(
+        runner_classification["ingots_metals"]["species_kg"]
     )
-    assert story == runner_story
+    assert story["glass"]["species_kg"] == displayed_species_kg(
+        runner_classification["glass"]["species_kg"]
+    )
+    assert story["captured_volatiles"]["species_kg"] == displayed_species_kg(
+        runner_classification["captured_volatiles"]["kg_by_species"]
+    )
+    oxygen_partition = runner_classification["oxygen"]["partition_kg"]
+    assert story["oxygen"]["class_total_kg"] == round(
+        oxygen_partition["stored"] + oxygen_partition["captured"], 2
+    )
+    rump_by_species = runner_classification["refractory_ceramic_rump"][
+        "rump_kg_by_species"
+    ]
+    story_rump_by_species = {
+        **story["refractory_ceramic"]["species_kg"],
+        **story["terminal_residue"]["species_kg"],
+    }
+    assert story_rump_by_species == displayed_species_kg(rump_by_species)
     assert story["input"] == {
         "feedstock": "lunar_mare_low_ti",
         "feedstock_label": sim.record.feedstock_label,
