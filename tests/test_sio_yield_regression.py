@@ -615,11 +615,10 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        # d-137's upstream Fe capture and d-137fix4's integrated Stage-3 band
-        # change the terminal Si partition. This is the measured
-        # production-resolver residual; atom-ledger balance remains within
-        # 5e-12 percent.
-        "mars_basalt": 2.2716048000156648e-7,
+        # The piecewise segment solve changes the cancellation residual by
+        # 1.134167275e-14 percentage points from the single-exponential pin;
+        # canonical atom-ledger balance remains within 5e-12 percent.
+        "mars_basalt": 2.2716049134323923e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -680,10 +679,10 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor.
-    # Integrated band flux with the t-1217 shared-inventory balance leaves the
-    # production route's measured remainder.
+    # The piecewise shared-inventory solve retains each strip until its own
+    # saturation threshold, leaving this production route's measured remainder.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6847703181648169
+        0.6877125897008886
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 

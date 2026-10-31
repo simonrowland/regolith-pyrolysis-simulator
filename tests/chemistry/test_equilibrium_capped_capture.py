@@ -228,6 +228,68 @@ def test_band_capture_integrates_33_centers_with_inclusive_reactive_cutoff(monke
     assert eta == pytest.approx(expected, rel=1e-8)
 
 
+def test_mixed_saturation_band_matches_numerical_ode_below_mean_threshold(monkeypatch):
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (0.0, 2.0)
+    monkeypatch.setattr(condensation, "HKL_BAND_SAMPLES", 2)
+    strip_conductance = 1.0e-4
+
+    def two_strip_flux(_species, pressure, temperature_K, _alpha, **kwargs):
+        psat = 0.0 if temperature_K < 274.15 else 90.0
+        kwargs["diagnostic_out"].update(
+            wall_saturation_pressure_pa=psat,
+            wall_saturation_pressure_refused=False,
+        )
+        return strip_conductance * max(0.0, pressure - psat)
+
+    monkeypatch.setattr(
+        condensation,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        two_strip_flux,
+    )
+    pressure_in_pa = 100.0
+    residence_s = 4.0
+    available_kg = 1.0
+    eta = model._condensation_efficiency(
+        stage=stage,
+        species="Fe",
+        T_cond_C=1050.0,
+        residence_s=residence_s,
+        available_kg=available_kg,
+        alpha_s_value=0.5,
+        inlet_partial_pressure_pa=pressure_in_pa,
+    )
+
+    molar_mass_kg_mol = condensation.MOLAR_MASS["Fe"] / 1000.0
+    inventory_mol = available_kg / molar_mass_kg_mol / 3600.0 * residence_s
+    area = model._stage_area_m2_for_stage(stage)
+    pressure_scale_pa_per_mol = pressure_in_pa / inventory_mol
+    strips = ((0.0, strip_conductance), (90.0, strip_conductance))
+
+    def pressure_derivative(pressure_pa):
+        return -pressure_scale_pa_per_mol * sum(
+            conductance
+            * area
+            / len(strips)
+            * max(pressure_pa - psat, 0.0)
+            for psat, conductance in strips
+        )
+
+    pressure_pa = pressure_in_pa
+    step_s = residence_s / 10_000
+    for _ in range(10_000):
+        k1 = pressure_derivative(pressure_pa)
+        k2 = pressure_derivative(pressure_pa + step_s * k1 / 2)
+        k3 = pressure_derivative(pressure_pa + step_s * k2 / 2)
+        k4 = pressure_derivative(pressure_pa + step_s * k3)
+        pressure_pa += step_s * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    numerical_eta = (pressure_in_pa - pressure_pa) / pressure_in_pa
+
+    assert pressure_pa < 45.0
+    assert eta == pytest.approx(numerical_eta, rel=1e-8)
+
+
 def test_isothermal_band_matches_midpoint_excess_inventory_capture(monkeypatch):
     model = _configured_model()
     stage = model.train.stages[3]

@@ -39,12 +39,12 @@ A separate volatiles train handles C0/C0b products and is sealed
 by a gate valve after devolatilisation.
 
 Key physics:
-    At the stage midpoint and measured inlet partial pressure,          [COND-1]
-        f_eq = max(0, 1 - P_sat / p_in)
-        k_s = J_series * A_stage / N_stage
-        η_stage = f_eq * (1 - exp(-k_s * t_res / f_eq))
+    Each band strip has its own conductance and saturation pressure. The
+    shared inventory follows dp/dt = -(RT/V)*sum_i(k_i*A_i*max(p-P_sat,i,0));
+    _condensation_efficiency integrates the piecewise-exponential segments.
     N_stage is the residence-sized inventory from molar throughput, not
-    an hourly mass. The derivation is in _condensation_efficiency.
+    an hourly mass. Equal strip saturation pressures reduce to the former
+    single-exponential capture balance exactly.
     Walls and stages remove vapor in physical order; every capture stays
     at its location and the remainder goes to terminal offgas.
 
@@ -4259,10 +4259,9 @@ class CondensationModel:
         T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
         band_flux_sum = 0.0
-        band_conductance_sum = 0.0
-        midpoint_driving_pressure: float | None = None
         active_temperature_samples = 0
         positive_driving_samples = 0
+        strip_conductance_and_saturation: list[tuple[float, float]] = []
         for sample in range(sample_count):
             sample_T_C = (
                 lo_C if width_C == 0.0
@@ -4287,8 +4286,6 @@ class CondensationModel:
                     species, sample_T_K, alpha_context,
                 )
             if sample_alpha_s == 0.0:
-                if sample_T_C == (lo_C + hi_C) / 2.0:
-                    midpoint_driving_pressure = 0.0
                 continue
 
             diagnostic: dict[str, Any] = {}
@@ -4339,15 +4336,14 @@ class CondensationModel:
                     species, sample_T_K, 'saturation_pressure_unavailable',
                 )
             sample_driving_pressure = max(0.0, p_in - float(saturation_pressure))
-            if (
-                sample_T_C == (lo_C + hi_C) / 2.0
-                or (width_C == 0.0 and sample == 0)
-            ):
-                midpoint_driving_pressure = sample_driving_pressure
             band_flux_sum += flux
             if sample_driving_pressure > 0.0:
                 positive_driving_samples += 1
-                band_conductance_sum += flux / sample_driving_pressure
+                conductance = flux / sample_driving_pressure
+                if conductance > 0.0:
+                    strip_conductance_and_saturation.append(
+                        (conductance, float(saturation_pressure))
+                    )
 
         if active_temperature_samples == 0 and reactive_backstop_authorized:
             return _mint_zero(
@@ -4355,51 +4351,92 @@ class CondensationModel:
                 stage_temperature_band_C=[lo_C, hi_C],
             )
         band_flux = band_flux_sum / sample_count
-        band_conductance = band_conductance_sum / sample_count
-        if band_flux <= 0.0 or band_conductance <= 0.0:
+        if band_flux <= 0.0 or not strip_conductance_and_saturation:
             return _mint_zero(
                 'nonpositive_reference_flux'
                 if positive_driving_samples else 'no_supersaturation',
                 reference_flux=band_flux,
             )
-        # For a declared isothermal collector, the sole sample is the midpoint;
-        # retain its exact driving pressure rather than round-tripping through
-        # flux/conductance. The band case uses the conductance-weighted drive.
-        driving_pressure = (
-            midpoint_driving_pressure
-            if width_C == 0.0 and midpoint_driving_pressure is not None
-            else band_flux / band_conductance
-        )
-        if (
-            driving_pressure is None
-            or not math.isfinite(driving_pressure)
-            or driving_pressure <= 0.0
-        ):
-            raise WallSaturationPressureRefusal(
-                species, midpoint_T_K, 'saturation_pressure_unavailable',
-            )
         molar_mass = (
             _molecular_mass_kg_per_molecule(species, vapor_pressure_data=self.vapor_pressure_data)
             * AVOGADRO_MOL
         )
-        # Premise: each band strip has J_i=K_i*(p-P_sat,i), with the same gas
-        # inventory feeding all strips. The existing equal-width center rule
-        # evaluates Jbar=(1/DeltaT)*integral(J dT) ~= sum(J_i)/N and
-        # Kbar=(1/DeltaT)*integral(K dT) ~= sum(J_i/(p-P_sat,i))/N; samples
-        # above the reactive cutoff contribute zero to both integrals. Then
-        # d_eff=Jbar/Kbar and f_eq=d_eff/p represent the integrated surface
-        # response. Apply the t-1217 excess-inventory balance once, after this
-        # integration: d(N-N_eq)/dt=-(Kbar*A*R*T/V)*(N-N_eq), hence
-        # eta=f_eq*(1-exp(-Jbar*A*tau/(N_stage*f_eq))). Applying the balance
-        # per strip would spend the same stage inventory N times. Units:
-        # Jbar*A/N_stage is 1/s and the exponent is dimensionless. At zero
-        # sticking eta is zero; long exposure tends to f_eq. An isothermal
-        # band uses its one midpoint sample and exactly reproduces that
-        # midpoint balance; no supersaturation gives zero.
+        # Premise: each band strip has J_i=k_i*max(p-P_sat,i,0), and all
+        # strips share N_stage=flow*residence/3600 mol in a fixed volume V.
+        # Since p=N*R*T/V, q=R*T/V=p_in/N_stage and
+        # dp/dt=-q*sum_i(k_i*A_i*max(p-P_sat,i,0)). In one active set let
+        # C_i=k_i*A_stage/sample_count, C=sum_i(C_i), and
+        # p_eq=sum_i(C_i*P_sat,i)/C. The segment solution is
+        # p(t)=p_eq+(p_start-p_eq)*exp(-q*C*t). A strip stops when p reaches
+        # its own P_sat; the time to that threshold is
+        # ln((p_start-p_eq)/(P_sat-p_eq))/(q*C). Advance through thresholds
+        # in descending order. If the next threshold takes longer than the
+        # remaining residence, use the partial-segment solution; otherwise
+        # remove the saturated strips and continue for the remaining time.
+        # Units: k_i*A_i is mol/(s Pa), q is Pa/mol, so q*C is 1/s.
+        # When all P_sat,i=P_sat, p=P_sat+(p_in-P_sat)*exp(-q*C*t), hence
+        # eta=(p_in-P_sat)/p_in*(1-exp(-q*C*t)). Since q=p_in/N_stage and
+        # Jbar*A_stage=C*(p_in-P_sat), this reproduces the former
+        # single-exponential result exactly. For P_sat={0,90} Pa with equal conductance and
+        # p_in=100 Pa, the first-set equilibrium is 45 Pa, but the 90 Pa
+        # strip stops there while the cold strip remains active and captures
+        # below 45 Pa.
         inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
-        k_s = band_flux * area / inventory_mol
-        f_eq = driving_pressure / p_in
-        eta = f_eq * -math.expm1(-k_s * residence_s / f_eq)
+        pressure_scale_pa_per_mol = p_in / inventory_mol
+        pressure_pa = p_in
+        remaining_s = residence_s
+        saturation_levels = sorted({
+            saturation
+            for conductance, saturation in strip_conductance_and_saturation
+            if conductance > 0.0
+        })
+        for threshold_pa in reversed(saturation_levels[1:]):
+            active = [
+                (conductance * area / sample_count, saturation)
+                for conductance, saturation in strip_conductance_and_saturation
+                if saturation < pressure_pa
+            ]
+            total_conductance = sum(value for value, _ in active)
+            if total_conductance <= 0.0:
+                break
+            equilibrium_pressure_pa = sum(
+                value * saturation for value, saturation in active
+            ) / total_conductance
+            time_to_threshold_s = math.log(
+                (pressure_pa - equilibrium_pressure_pa)
+                / (threshold_pa - equilibrium_pressure_pa)
+            ) / (pressure_scale_pa_per_mol * total_conductance)
+            if time_to_threshold_s > remaining_s:
+                pressure_pa = equilibrium_pressure_pa + (
+                    pressure_pa - equilibrium_pressure_pa
+                ) * math.exp(
+                    -pressure_scale_pa_per_mol
+                    * total_conductance
+                    * remaining_s
+                )
+                remaining_s = 0.0
+                break
+            pressure_pa = threshold_pa
+            remaining_s -= time_to_threshold_s
+        if remaining_s > 0.0:
+            active = [
+                (conductance * area / sample_count, saturation)
+                for conductance, saturation in strip_conductance_and_saturation
+                if saturation < pressure_pa
+            ]
+            total_conductance = sum(value for value, _ in active)
+            if total_conductance > 0.0:
+                equilibrium_pressure_pa = sum(
+                    value * saturation for value, saturation in active
+                ) / total_conductance
+                pressure_pa = equilibrium_pressure_pa + (
+                    pressure_pa - equilibrium_pressure_pa
+                ) * math.exp(
+                    -pressure_scale_pa_per_mol
+                    * total_conductance
+                    * remaining_s
+                )
+        eta = (p_in - pressure_pa) / p_in
         notice = notices.get(f'{species}#wall:{midpoint_T_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
             efficiency_outcomes.append({
