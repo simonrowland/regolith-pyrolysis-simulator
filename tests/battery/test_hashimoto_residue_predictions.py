@@ -293,9 +293,10 @@ def _source_data():
 
 
 @pytest.mark.parametrize("sample_has_p2o5", (False, True))
-def test_openimcc_sp_hashimoto_screening_uses_sample_initial_composition(
+def test_openimcc_sp_hashimoto_screening_uses_consumed_printed_inventory(
     sample_has_p2o5,
 ):
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
     from simulator.battery.score import (
         _HASHIMOTO_SOURCE_ID,
         _hashimoto_residue_prediction,
@@ -310,67 +311,70 @@ def test_openimcc_sp_hashimoto_screening_uses_sample_initial_composition(
         if row.source_id == "kems-015-hashimoto-1983"
         and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
     )
-    formula = reference.identity.species.formula
-
-    def composition(with_p2o5):
-        components = (
-            ("FeO", Decimal("0.45" if with_p2o5 else "0.5")),
-            ("MgO", Decimal("0.45" if with_p2o5 else "0.5")),
+    hashimoto_experiment_ids = {
+        row.experiment_id
+        for row in context.observations.values()
+        if row.source_id == _HASHIMOTO_SOURCE_ID
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    }
+    experiments = {}
+    for experiment_id, experiment in context.experiments.items():
+        if experiment_id not in hashimoto_experiment_ids:
+            experiments[experiment_id] = experiment
+            continue
+        printed = experiment.sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        values = dict(printed.state.value)
+        p2o5 = values.pop("P2O5", 0.0)
+        if sample_has_p2o5:
+            parent = "FeO" if "FeO" in values else next(iter(values))
+            values[parent] = float(values[parent]) - 1.0 + p2o5
+            values["P2O5"] = 1.0
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                printed_composition=replace(
+                    printed, state=State.of(values)
+                ),
+            ),
         )
-        if with_p2o5:
-            components += (("P2O5", Decimal("0.1")),)
-        return Composition(
-            "ordered_complete_mole_inventory", components,
-            AmountBasis.MOLE_FRACTION,
-        )
-
-    initial = composition(sample_has_p2o5)
-    experiment = context.experiments[reference.experiment_id]
-    experiment = replace(
-        experiment,
-        sample=replace(
-            experiment.sample,
-            initial_composition=Located(State.of(initial), reference.locator),
-        ),
-    )
-    context = replace(
-        context,
-        experiments={**context.experiments, experiment.experiment_id: experiment},
+        experiments[experiment_id] = experiment
+    context = replace(context, experiments=experiments)
+    identity_has_p2o5 = not sample_has_p2o5
+    identity_components = (
+        ("FeO", Decimal("0.45")),
+        ("MgO", Decimal("0.45")),
+        ("P2O5", Decimal("0.1")),
+    ) if identity_has_p2o5 else (
+        ("FeO", Decimal("0.5")),
+        ("MgO", Decimal("0.5")),
     )
     reference = replace(
         reference,
         identity=replace(
             reference.identity,
-            composition=State.of(composition(not sample_has_p2o5)),
+            composition=State.of(
+                Composition(
+                    "ordered_complete_mole_inventory",
+                    identity_components,
+                    AmountBasis.MOLE_FRACTION,
+                )
+            ),
         ),
     )
-    primary = SimpleNamespace(
-        alpha_arm="alpha_common_unity_sensitivity",
-        primary_geometry_policy_id="fixture-geometry",
-        primary_oxide_wt_pct={formula: 25.0},
-        geometry_oxide_wt_pct={},
-        sensitivity_band_wt_pct={formula: (20.0, 30.0)},
-        provenance={},
-    )
-    production = SimpleNamespace(
-        alpha_arm="alpha_runtime_catalog",
-        primary_geometry_policy_id="fixture-geometry",
-        primary_oxide_wt_pct={formula: 25.0},
-        geometry_oxide_wt_pct={},
-        sensitivity_band_wt_pct={formula: (20.0, 30.0)},
-        provenance={},
-    )
-    cache = {
-        (_HASHIMOTO_SOURCE_ID, engine): {
-            reference.experiment_id + "::alpha_common_unity_sensitivity": primary,
-            reference.experiment_id + "::alpha_runtime_catalog": production,
-        }
-    }
 
-    prediction = _hashimoto_residue_prediction(context, reference, engine, cache)
+    prediction = _hashimoto_residue_prediction(context, reference, engine, {})
 
     assert prediction.execution.state is ExecutionState.PRODUCED
-    assert prediction.requested_composition == State.of(initial)
+    consumed = prediction.requested_composition
+    assert consumed is not None and consumed.is_value
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+    consumed_has_p2o5 = any(
+        name == "P2O5" and amount > 0
+        for name, amount in consumed.value.components
+    )
+    assert consumed_has_p2o5 is sample_has_p2o5
     p2o5_notices = tuple(
         notice
         for notice in prediction.notices

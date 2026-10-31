@@ -221,7 +221,6 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
 def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
     extent_point, monkeypatch, sample_has_p2o5
 ):
-    import simulator.battery.residue as residue
     from simulator.battery.score import _knudsen_residue_prediction
 
     reference, experiment, _rows = extent_point
@@ -253,16 +252,6 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
             composition=State.of(composition(not sample_has_p2o5)),
         ),
     )
-    monkeypatch.setattr(
-        residue,
-        "predict_knudsen_residue_composition",
-        lambda *_args, **_kwargs: {
-            "composition_wt_pct": {"FeO": 25.0},
-            "notices": (),
-            "engine_flags": (),
-            "engine_metadata": {},
-        },
-    )
     context = SimpleNamespace(
         experiments={experiment.experiment_id: experiment},
         observations={},
@@ -274,7 +263,14 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
     )
 
     assert prediction.execution.state is ExecutionState.PRODUCED
-    assert prediction.requested_composition == State.of(initial)
+    consumed = prediction.requested_composition
+    assert consumed is not None and consumed.is_value
+    assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+    consumed_has_p2o5 = any(
+        name == "P2O5" and amount > 0
+        for name, amount in consumed.value.components
+    )
+    assert consumed_has_p2o5 is sample_has_p2o5
     p2o5_notices = tuple(
         notice
         for notice in prediction.notices
@@ -285,70 +281,103 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
         assert prediction.authority is Authority.EXTRAPOLATED
 
 
-def test_openimcc_sp_sossi_records_sample_initial_composition(
-    extent_point,
+def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
+    monkeypatch,
 ):
-    from simulator.battery.score import (
-        _SOSSI_SOURCE_ID,
-        _sossi_residue_prediction,
-    )
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    import simulator.battery.score as score
 
-    _reference, experiment, _rows = extent_point
-    experiment_id = _SOSSI_SOURCE_ID + "::run-1"
-    initial = Composition(
-        "ordered_complete_mole_inventory",
-        (("MnO", Decimal("0.5")), ("P2O5", Decimal("0.5"))),
-        AmountBasis.MOLE_FRACTION,
-    )
-    experiment = replace(
-        experiment,
-        experiment_id=experiment_id,
-        sample=replace(
-            experiment.sample,
-            initial_composition=Located(State.of(initial), _reference.locator),
+    source_id = "kems-012-sossi-2019"
+    context = score.load_score_context(sources=(source_id,))
+    rows = sorted(
+        (
+            row
+            for row in context.observations.values()
+            if row.source_id == source_id
+            and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and row.identity.species.formula in {"Mn", "Ti"}
         ),
+        key=lambda row: row.experiment_id,
     )
-    reference = replace(
-        _reference,
-        source_id=_SOSSI_SOURCE_ID,
-        experiment_id=experiment_id,
-        identity=replace(
-            _reference.identity,
-            species=Species("Mn", Phase.L),
-            composition=State.of(
-                Composition(
-                    "ordered_complete_mole_inventory",
-                    (("MnO", Decimal("1")),),
-                    AmountBasis.MOLE_FRACTION,
-                )
-            ),
-        ),
-    )
-    context = SimpleNamespace(
-        experiments={experiment_id: experiment}, observations={}
-    )
-    cache = {
-        (_SOSSI_SOURCE_ID, Engine.OPENIMCC_SP): {
-            "run-1": SimpleNamespace(
-                provenance={},
-                channel_missing_elements=(),
-                primary_element_ppm={"Mn": 12.0},
-                sensitivity_band_ppm={"Mn": (10.0, 14.0)},
-            )
-        }
+    assert rows
+    source_path = score.REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml"
+    original_load_yaml = score.load_yaml
+    source = original_load_yaml(source_path)
+    source_experiments = {
+        str(item.get("experiment_id")): item
+        for item in source.get("experiments", ())
+        if isinstance(item, dict)
     }
+    positive_run_id = next(iter(sorted(source_experiments)))
+    positive_reference = next(
+        row
+        for row in rows
+        if row.experiment_id.rsplit("::", 1)[-1] == positive_run_id
+    )
+    negative_reference = next(
+        row
+        for row in rows
+        if row.experiment_id.rsplit("::", 1)[-1] != positive_run_id
+    )
+    positive_experiment = source_experiments[positive_run_id]
+    printed = positive_experiment["sample"]["printed_composition"]["state"]["value"]
+    parent = next(name for name in printed if name != "P2O5")
+    prior_p2o5 = float(printed.pop("P2O5", 0.0))
+    printed[parent] = float(printed[parent]) - 1.0 + prior_p2o5
+    printed["P2O5"] = 1.0
 
-    prediction = _sossi_residue_prediction(
-        context, reference, Engine.OPENIMCC_SP, cache
+    def load_modified_source(path):
+        if str(path) == str(source_path):
+            return source
+        return original_load_yaml(path)
+
+    monkeypatch.setattr(score, "load_yaml", load_modified_source)
+
+    def identity_with_p2o5(reference, present):
+        components = (
+            (("MnO", Decimal("0.9")), ("P2O5", Decimal("0.1")))
+            if present
+            else (("MnO", Decimal("1")),)
+        )
+        return replace(
+            reference,
+            identity=replace(
+                reference.identity,
+                composition=State.of(
+                    Composition(
+                        "ordered_complete_mole_inventory",
+                        components,
+                        AmountBasis.MOLE_FRACTION,
+                    )
+                ),
+            ),
+        )
+
+    positive_reference = identity_with_p2o5(positive_reference, False)
+    negative_reference = identity_with_p2o5(negative_reference, True)
+    cache = {}
+    positive = score._sossi_residue_prediction(
+        context, positive_reference, Engine.OPENIMCC_SP, cache
+    )
+    negative = score._sossi_residue_prediction(
+        context, negative_reference, Engine.OPENIMCC_SP, cache
     )
 
-    assert prediction.execution.state is ExecutionState.PRODUCED
-    assert prediction.requested_composition == State.of(initial)
-    assert prediction.authority is Authority.EXTRAPOLATED
-    assert any(
-        notice.reason.startswith("P2O5 parent reference state:")
-        for notice in prediction.notices
-    )
+    assert positive.execution.state is ExecutionState.PRODUCED
+    assert negative.execution.state is ExecutionState.PRODUCED
+    for prediction, sample_has_p2o5 in ((positive, True), (negative, False)):
+        consumed = prediction.requested_composition
+        assert consumed is not None and consumed.is_value
+        assert consumed.value.amount_basis is AmountBasis.MOL_INVENTORY
+        consumed_has_p2o5 = any(
+            name == "P2O5" and amount > 0
+            for name, amount in consumed.value.components
+        )
+        assert consumed_has_p2o5 is sample_has_p2o5
+        assert any(
+            notice.reason.startswith("P2O5 parent reference state:")
+            for notice in prediction.notices
+        ) is sample_has_p2o5
 
 
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
