@@ -544,18 +544,12 @@ class EnginePrediction:
     def __post_init__(self) -> None:
         if self.engine is not Engine.OPENIMCC_SP:
             return
-        p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(self)
-        identity_composition = (
-            self.identity.composition
-            if isinstance(self.identity, Identity)
-            else None
+        screening_composition = _openimcc_sp_screening_composition(self)
+        p2o5_screening_proxy = _openimcc_sp_uses_p2o5_screening_proxy(
+            screening_composition
         )
         p2o5_screening_input_not_recorded = (
-            self.requested_composition is None
-            and (
-                identity_composition is None
-                or not identity_composition.is_value
-            )
+            screening_composition is None or not screening_composition.is_value
         )
         authority = self.authority or (
             Authority.REFUSED if self.value is None else Authority.BRIDGE
@@ -611,17 +605,19 @@ class EnginePrediction:
         )
 
 
-def _openimcc_sp_uses_p2o5_screening_proxy(
+def _openimcc_sp_screening_composition(
     prediction: EnginePrediction,
-) -> bool:
+) -> State[Composition] | None:
     requested_composition = prediction.requested_composition
     if requested_composition is not None:
-        composition_state = (
-            requested_composition if requested_composition.is_value else None
-        )
-    else:
-        identity = prediction.identity
-        composition_state = identity.composition if identity is not None else None
+        return requested_composition
+    identity = prediction.identity
+    return identity.composition if isinstance(identity, Identity) else None
+
+
+def _openimcc_sp_uses_p2o5_screening_proxy(
+    composition_state: State[Composition] | None,
+) -> bool:
     if (
         composition_state is None
         or not composition_state.is_value
