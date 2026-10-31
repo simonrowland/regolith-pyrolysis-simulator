@@ -1,0 +1,177 @@
+source_id: pankratz-1968-ri7201-sodium-calcium-silicates
+paper:
+  citation: Pankratz, L. B. (1968), High-Temperature Heat Contents and Entropies of Four Crystalline Sodium-Calcium
+    Silicates, U.S. Bureau of Mines Report of Investigations 7201.
+  pdf_sha256: f1b774aaf5c74047b05ce9bd386308c7e9b923991bbab30333825208a7d9f8f9
+input_order:
+- MinerU content-list tables and markdown
+- pdftotext-layout.txt
+- render only for conflicts or full-cell audit
+tables:
+- printed_table: '1'
+  locator:
+    pdf_page_index: 8
+    page: 9
+    published_page: 2
+    table: '1'
+  caption: Chemical analyses, weight-percent
+  printed_rows: 2
+  cell_count: 16
+  species_columns:
+  - Na2CaSiO4
+  - Na2Ca2Si2O7
+  - Na2Ca2Si3O9
+  - Na4CaSi3O9
+  mapping: CaO and SiO2 each have an observed analysis and a theoretical value in parentheses. Store as
+    typed-refused sample chemical analysis because no exact schema quantity names this non-equilibrium
+    sample assay.
+  quantity: sample_chemical_analysis_wt_percent / theoretical_sample_composition_wt_percent
+  units: wt%
+  confirmation: a for all 16 numeric cells; row and compound-column placement checked on page render.
+- printed_table: '2'
+  locator:
+    pdf_page_index: 9
+    page: 10
+    published_page: 3
+    table: '2'
+  caption: Heat content above 298.15 K (measured values)
+  printed_rows: 71
+  cell_count: 142
+  species:
+  - Na2CaSiO4
+  - Na2Ca2Si2O7
+  - Na2Ca2Si3O9
+  - Na4CaSi3O9
+  quantity: H_minus_H298
+  phase: cr
+  units: cal/mole
+  conditions:
+    temperature: T_K in every series row
+    total_pressure: not bound; capsule helium statement is setup only
+    fO2: not printed
+  confirmation: b for all 142 cells; render of full page reconciles QA mismatches and checks column assignment.
+  footnotes:
+    1/: pretransition
+    2/: premelting
+  measured_rows_outside_all_fit_ranges:
+  - Na2CaSiO4 at 1309.0 K
+  - Na2Ca2Si2O7 at 1300.3 K
+  - Na2Ca2Si3O9 at 1504.4 K
+- printed_table: '3'
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+  caption: Heat content and entropy increments above 298.15 K (smooth values)
+  printed_rows: 47
+  cell_count: 141
+  species:
+  - Na2CaSiO4
+  - Na2Ca2Si2O7
+  - Na2Ca2Si3O9
+  - Na4CaSi3O9
+  heat_content:
+    quantity: H_minus_H298
+    method_class: model_derived
+    units: cal/mole
+    lineage: six equation-fit segments, each linked only to the measured Table 2 points inside that equation's
+      printed range.
+  entropy:
+    quantity: relative_entropy_increment_S_T_minus_S_298_15
+    status: typed refusal; no exact relative-entropy token; absolute Quantity.S is not substituted
+    units: cal/deg-mole
+  confirmation: b for all 141 cells; upright render of full page confirms row/column assignment and the
+    two OCR-misread extrapolated values.
+  footnote: 1/ value obtained by extrapolation.
+- printed_table: not tabled; fitted equations
+  locator:
+    pdf_page_index: 11
+    page: 12
+    published_page: 5
+    section: Measurements and results
+  printed_rows: 6
+  cell_count: 6
+  quantity: H_minus_H298
+  type: gibbs_table
+  fit_form: equation string plus numeric range and average deviation
+  lineage: each fit uses the corresponding stored Table 2 measured subset.
+  confirmation: b; rendered equation page, including signs, powers, ranges, deviations and transition
+    enthalpy notes.
+schema_gaps:
+- quantity: sample_chemical_analysis_wt_percent
+  rows: Table 1 actual and theoretical values
+  reason: No exact Quantity token exists for non-equilibrium sample oxide analysis. Quantity.RESIDUE_COMPONENT_COMPOSITION
+    is residue composition; Quantity.EQUILIBRIUM_PHASE_COMPOSITION is equilibrium phase composition.
+  code:
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  - simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+  - simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+  - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+- quantity: relative_entropy_increment_S_T_minus_S_298_15
+  rows: Table 3 S_T-S_298.15
+  reason: Quantity.S is absolute entropy; there is no exact relative entropy increment token.
+  code:
+  - simulator/battery/enums.py::Quantity.S
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+- quantity: solid_solid_transition_enthalpy
+  rows: ΔH at 830 K and 750 K
+  reason: Quantity.ENTHALPY_OF_FUSION represents fusion enthalpy; no solid-solid transition enthalpy token
+    exists.
+  code:
+  - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+  - simulator/battery/enums.py::Quantity
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+- quantity: qualitative or interval-only transition/fusion bounds
+  rows: 733–753 K quoted range, irreversible change above 1309 K, fusion slightly above 1504 K
+  reason: These are intervals or bounds, not exact scalar transition_temperature values; kept typed-refused.
+  code:
+  - simulator/battery/enums.py::Quantity.TRANSITION_TEMPERATURE
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+figure_read_candidates:
+- figure: '1'
+  locator:
+    pdf_page_index: 10
+    page: 11
+    published_page: 4
+    figure: '1'
+  quantity: (H_T-H_298.15)/(T-298.15)
+  reason: Figure-only plotted values are not digitized.
+render_checks:
+- locator:
+    pdf_page_index: 8
+    page: 9
+    published_page: 2
+    table: '1'
+  reason: Rendered once to verify compound columns and actual/theoretical parenthetical placement.
+- locator:
+    pdf_page_index: 9
+    page: 10
+    published_page: 3
+    table: '2'
+  reason: Full-page render; MinerU/pdftotext QA mismatches and numeric column assignment checked cell
+    by cell.
+- locator:
+    pdf_page_index: 11
+    page: 12
+    published_page: 5
+    section: Measurements and results
+  reason: Rendered equation page to verify coefficients, signs, exponents, fit ranges, deviations, and
+    transition heats.
+- locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+  reason: Rendered and rotated upright; entire table checked, including OCR errors at the extrapolated
+    1300/1400 K values.
+- locator:
+    pdf_page_index: 13
+    page: 14
+    published_page: 7
+    section: Discussion
+  reason: Rendered to confirm the Frischat and Oel 733–753 K attribution and the no-fusion-information
+    statement for Na4CaSi3O9.

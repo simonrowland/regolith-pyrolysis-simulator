@@ -1,0 +1,2695 @@
+schema_version: literature_extract.v1
+source_id: pankratz-1968-ri7201-sodium-calcium-silicates
+source:
+  citation: Pankratz, L. B. (1968), High-Temperature Heat Contents and Entropies of Four Crystalline Sodium-Calcium
+    Silicates, U.S. Bureau of Mines Report of Investigations 7201.
+  year: 1968
+extraction:
+  method: Transcribed from MinerU and pdftotext machine text; every numeric cell reconciled by the two-read
+    agreement rule or page render and recorded in the cell audit.
+  date: '2026-10-31'
+  worker: w1031na-pank68
+review_status: draft
+notes:
+- text: Table 1 prints CaO and SiO2 analyses with theoretical values in parentheses for four crystalline
+    compounds. Na2O was obtained by difference, but no numeric Na2O values are printed; none are inferred.
+  locator:
+    pdf_page_index: 8
+    page: 9
+    published_page: 2
+    table: '1'
+- text: Table 2 contains 71 measured drop-calorimetry rows. The series statement that capsules were sealed
+    under 1 atmosphere of helium is retained as setup context and is not treated as measurement total
+    pressure. The source prints no fO2.
+  locator:
+    pdf_page_index: 9
+    page: 10
+    published_page: 3
+    table: '2'
+- text: Table 3 contains 47 smoothed heat-content rows and 47 relative entropy-increment rows. H_T-H_298.15
+    values are model_derived from the fits; S_T-S_298.15 is retained as a distinct typed refusal because
+    no exact relative-entropy quantity token exists. No absolute S is printed.
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+- text: The six heat-content equations are printed on published page 5. Their ranges and average deviations
+    are retained as printed, and each fit is linked only to the Table 2 points in its printed fit interval.
+    The 1309.0 K, 1300.3 K, and 1504.4 K measured endpoints beyond those ranges remain measured and are
+    not fit parents.
+  locator:
+    pdf_page_index: 11
+    page: 12
+    published_page: 5
+    section: Measurements and results
+- text: Phase labels α and β are stored only at the Table 3 points where those labels are printed (830
+    K for Na2CaSiO4 and 750 K for Na2Ca2Si3O9). Other calorimetric rows retain the source-supported crystalline
+    phase only.
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+- text: X-ray diffraction identified Na2CaSiO4 and Na2Ca2Si2O7 as matching ASTM patterns except for two
+    low-intensity unidentified lines in the latter; Na2Ca2Si3O9 matched Kroger and Blomer; Na4CaSi3O9
+    matched its reference pattern except for four low-intensity unidentified lines. Sodium oxide analysis
+    was obtained by difference from 100 percent, without printed numeric Na2O values.
+  locator:
+    pdf_page_index: 7
+    page: 8
+    published_page: 1
+    section: Materials
+- text: The calorimeter capsules were platinum-rhodium and the paper says they were sealed under 1 atmosphere
+    of helium. This setup statement is not treated as total measurement pressure. No fO2 is printed. The
+    reported standard errors are 0.1 percent for Na2CaSiO4, Na2Ca2Si3O9, and Na4CaSi3O9, and 0.2 percent
+    for Na2Ca2Si2O7; the confidence level is not stated.
+  locator:
+    pdf_page_index: 9
+    page: 10
+    published_page: 3
+    table: '2'
+- text: Measurements on Na2Ca2Si2O7 and Na4CaSi3O9 were limited by incongruent melting. The paper gives
+    no numerical fusion temperature or enthalpy for either. It states that Na4CaSi3O9 fusion information
+    could not be determined because its 298 K reference state had changed. Figure 1 plots (H_T-H_298.15)/(T-298.15);
+    its figure-only values are not transcribed.
+  locator:
+    pdf_page_index: 13
+    page: 14
+    published_page: 7
+    section: Discussion
+species:
+  Na2CaSiO4:
+    observations:
+    - observation_id: pank68_naca1_table1_measured_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2CaSiO4
+        column: measured analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: sample_chemical_analysis_wt_percent
+        method_class: measured_direct
+        method: Authors' chemical analysis; analytical method is not stated.
+        oxide_wt_percent:
+          CaO: '31.48'
+          SiO2: '33.80'
+    - observation_id: pank68_naca1_table1_theoretical_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2CaSiO4
+        column: theoretical analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: theoretical_sample_composition_wt_percent
+        method_class: quoted_attributed
+        method: Theoretical percentages printed in parentheses in Table 1.
+        oxide_wt_percent:
+          CaO: '31.48'
+          SiO2: '33.73'
+        attribution: Pankratz (1968), Table 1 theoretical percentages in parentheses
+    - observation_id: pank68_naca1_alpha_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2CaSiO4
+        note: fit-input subset 298–830 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 395.1
+          enthalpy_increment: 3790
+        - T_K: 403.4
+          enthalpy_increment: 4150
+        - T_K: 407.7
+          enthalpy_increment: 4330
+        - T_K: 500.6
+          enthalpy_increment: 8370
+        - T_K: 505.7
+          enthalpy_increment: 8590
+        - T_K: 595.5
+          enthalpy_increment: 12900
+        - T_K: 606.7
+          enthalpy_increment: 13430
+        - T_K: 702.3
+          enthalpy_increment: 18460
+        - T_K: 702.3
+          enthalpy_increment: 18480
+        - T_K: 726.3
+          enthalpy_increment: 19780
+        - T_K: 760.4
+          enthalpy_increment: 21760
+        - T_K: 795.9
+          enthalpy_increment: 23880
+        - T_K: 805.3
+          enthalpy_increment: 24400
+        - T_K: 810.4
+          enthalpy_increment: 24660
+        - T_K: 817.7
+          enthalpy_increment: 25150
+        - T_K: 822.5
+          enthalpy_increment: 25480
+          footnote_marker_as_printed: 1/
+          footnote_text_as_printed: Pretransition.
+    - observation_id: pank68_naca1_beta_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2CaSiO4
+        note: fit-input subset 830–1300 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 830.8
+          enthalpy_increment: 26040
+        - T_K: 850.6
+          enthalpy_increment: 27210
+        - T_K: 855.4
+          enthalpy_increment: 27510
+        - T_K: 880.3
+          enthalpy_increment: 28940
+        - T_K: 904.8
+          enthalpy_increment: 30410
+        - T_K: 1003.0
+          enthalpy_increment: 36220
+        - T_K: 1099.4
+          enthalpy_increment: 42040
+        - T_K: 1203.6
+          enthalpy_increment: 48160
+        - T_K: 1203.7
+          enthalpy_increment: 48170
+    - observation_id: pank68_naca1_table2_measured_outside_fit_range
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2CaSiO4
+        note: measured point outside every printed fit range
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured value not included in a printed equation
+          fit range.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 1309.0
+          enthalpy_increment: 54360
+    - observation_id: pank68_naca1_alpha_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2CaSiO4 alpha fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca1_alpha_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca1_alpha_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: '(α): H_T-H_298.15 = 20.99 T + 23.85 × 10^-3 T^2 − 1.86 × 10^5 T^-1 − 7,754'
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 298
+        - 830
+        fit_range_as_printed: 298°–830° K
+        average_deviation_percent: '0.2'
+    - observation_id: pank68_naca1_alpha_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca1_alpha_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca1_alpha_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+        series:
+        - T_K: 400
+          enthalpy_increment: 4010
+        - T_K: 500
+          enthalpy_increment: 8330
+        - T_K: 600
+          enthalpy_increment: 13100
+        - T_K: 700
+          enthalpy_increment: 18340
+        - T_K: 800
+          enthalpy_increment: 24070
+        - T_K: 830
+          enthalpy_increment: 25870
+          polymorph_as_printed: α
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 400
+        entropy_increment: '11.54'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T500
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=500 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 500
+        entropy_increment: '21.16'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T600
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=600 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 600
+        entropy_increment: '29.84'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T700
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=700 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 700
+        entropy_increment: '37.91'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T800
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=800 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 800
+        entropy_increment: '45.55'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+    - observation_id: pank68_naca1_alpha_table3_relative_entropy_increment_T830_α
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=830 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 830
+        entropy_increment: '47.76'
+        fit_equation_observation_id: pank68_naca1_alpha_fit_equation
+        polymorph_as_printed: α
+    - observation_id: pank68_naca1_beta_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2CaSiO4 beta fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca1_beta_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca1_beta_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: '(β): H_T-H_298.15 = 56.51 T + 1.29 × 10^-3 T^2 − 21,758'
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 830
+        - 1300
+        fit_range_as_printed: 830°–1,300° K
+        average_deviation_percent: '0.1'
+    - observation_id: pank68_naca1_beta_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca1_beta_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca1_beta_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+        series:
+        - T_K: 830
+          enthalpy_increment: 26030
+          polymorph_as_printed: β
+        - T_K: 900
+          enthalpy_increment: 30130
+        - T_K: 1000
+          enthalpy_increment: 36040
+        - T_K: 1100
+          enthalpy_increment: 41980
+        - T_K: 1200
+          enthalpy_increment: 47930
+        - T_K: 1300
+          enthalpy_increment: 53880
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T830_β
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=830 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 830
+        entropy_increment: '47.96'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+        polymorph_as_printed: β
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T900
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=900 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 900
+        entropy_increment: '52.70'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T1000
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=1000 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1000
+        entropy_increment: '58.92'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T1100
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=1100 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1100
+        entropy_increment: '64.59'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T1200
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=1200 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1200
+        entropy_increment: '69.76'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+    - observation_id: pank68_naca1_beta_table3_relative_entropy_increment_T1300
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2CaSiO4
+        column: S_T-S_298.15 increments
+        note: T=1300 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca1_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca1_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1300
+        entropy_increment: '74.53'
+        fit_equation_observation_id: pank68_naca1_beta_fit_equation
+    - observation_id: pank68_naca1_polymorphic_transition_temperature
+      type: transition_point
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2CaSiO4 transition
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: reversible_first_order_polymorphic_transition
+        T_m_K: 830
+        temperature_as_printed: 830° K
+    - observation_id: pank68_naca1_solid_solid_transition_enthalpy
+      type: phase_transition
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2CaSiO4 transition enthalpy
+      phase: cr
+      units: cal/mole
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '830'
+          locator:
+            pdf_page_index: 11
+            page: 12
+            published_page: 5
+            section: Measurements and results
+            row: Na2CaSiO4 transition enthalpy
+      admission_status: typed_refusal
+      reason: No exact schema quantity for solid-solid polymorphic transition enthalpy; do not map it
+        to heat of fusion.
+      values:
+        quantity: solid_solid_transition_enthalpy
+        T_K: 830
+        method_class: measured_direct
+        value_as_printed_cal_per_mole: 160
+        transition_temperature_K_as_printed: 830
+        transition_temperature_label: 830° K
+    - observation_id: pank68_naca1_irreversible_structure_change_above_1309
+      type: phase_transition
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        section: Measurements and results
+      phase: cr
+      units: K
+      admission_status: typed_refusal
+      reason: Only a lower bound is reported; 1309 K is the last measurement limit, not an exact transition
+        temperature.
+      values:
+        quantity: irreversible_crystal_structure_change_temperature_lower_bound
+        method_class: measured_direct
+        lower_bound_K: 1309
+        statement_as_printed: An irreversible crystal structure change had taken place above 1,309° K.
+    context:
+    - observation_id: pank68_naca1_sample_preparation
+      type: sample_preparation
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 1
+        section: Materials
+      units: hours and °C
+      values:
+        compound_as_printed: Na2CaSiO4
+        starting_materials:
+        - reagent-grade Na2CO3
+        - CaCO3
+        - silicic acid
+        synthesis: dry synthesis; stoichiometric mixture heat-treated in a platinum dish
+        total_heating_time_hours: 770
+        maximum_heating_temperature_C: 980
+        phase_identity_as_printed: crystalline sodium-calcium silicate
+  Na2Ca2Si2O7:
+    observations:
+    - observation_id: pank68_naca2_table1_measured_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2Ca2Si2O7
+        column: measured analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: sample_chemical_analysis_wt_percent
+        method_class: measured_direct
+        method: Authors' chemical analysis; analytical method is not stated.
+        oxide_wt_percent:
+          CaO: '38.17'
+          SiO2: '40.78'
+    - observation_id: pank68_naca2_table1_theoretical_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2Ca2Si2O7
+        column: theoretical analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: theoretical_sample_composition_wt_percent
+        method_class: quoted_attributed
+        method: Theoretical percentages printed in parentheses in Table 1.
+        oxide_wt_percent:
+          CaO: '38.11'
+          SiO2: '40.83'
+        attribution: Pankratz (1968), Table 1 theoretical percentages in parentheses
+    - observation_id: pank68_naca2_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2Ca2Si2O7
+        note: fit-input subset 298–1300 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 402.0
+          enthalpy_increment: 6410
+        - T_K: 505.8
+          enthalpy_increment: 13450
+        - T_K: 601.2
+          enthalpy_increment: 20450
+        - T_K: 702.3
+          enthalpy_increment: 28150
+        - T_K: 800.2
+          enthalpy_increment: 35800
+        - T_K: 904.9
+          enthalpy_increment: 43960
+        - T_K: 1001.3
+          enthalpy_increment: 51880
+        - T_K: 1001.3
+          enthalpy_increment: 51900
+        - T_K: 1104.0
+          enthalpy_increment: 60180
+        - T_K: 1203.6
+          enthalpy_increment: 68500
+    - observation_id: pank68_naca2_table2_measured_outside_fit_range
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2Ca2Si2O7
+        note: measured point outside every printed fit range
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured value not included in a printed equation
+          fit range.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 1300.3
+          enthalpy_increment: 76770
+    - observation_id: pank68_naca2_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2Ca2Si2O7 crystalline fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca2_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca2_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: H_T-H_298.15 = 71.53 T + 5.73 × 10^-3 T^2 + 15.96 × 10^5 T^-1 − 27,189
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 298
+        - 1300
+        fit_range_as_printed: 298°–1,300° K
+        average_deviation_percent: '0.3'
+    - observation_id: pank68_naca2_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca2_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca2_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca2_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca2_fit_equation
+        series:
+        - T_K: 400
+          enthalpy_increment: 6260
+        - T_K: 500
+          enthalpy_increment: 13070
+        - T_K: 600
+          enthalpy_increment: 20370
+        - T_K: 700
+          enthalpy_increment: 27970
+        - T_K: 800
+          enthalpy_increment: 35740
+        - T_K: 900
+          enthalpy_increment: 43660
+        - T_K: 1000
+          enthalpy_increment: 51720
+        - T_K: 1100
+          enthalpy_increment: 59920
+        - T_K: 1200
+          enthalpy_increment: 68250
+        - T_K: 1300
+          enthalpy_increment: 76710
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 400
+        entropy_increment: '18.00'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T500
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=500 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 500
+        entropy_increment: '33.18'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T600
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=600 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 600
+        entropy_increment: '46.48'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T700
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=700 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 700
+        entropy_increment: '58.19'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T800
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=800 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 800
+        entropy_increment: '68.56'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T900
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=900 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 900
+        entropy_increment: '77.88'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T1000
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=1000 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1000
+        entropy_increment: '86.38'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T1100
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=1100 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1100
+        entropy_increment: '94.19'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T1200
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=1200 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1200
+        entropy_increment: '101.44'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    - observation_id: pank68_naca2_table3_relative_entropy_increment_T1300
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si2O7
+        column: S_T-S_298.15 increments
+        note: T=1300 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca2_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca2_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1300
+        entropy_increment: '108.21'
+        fit_equation_observation_id: pank68_naca2_fit_equation
+    context:
+    - observation_id: pank68_naca2_sample_preparation
+      type: sample_preparation
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 1
+        section: Materials
+      units: hours and °C
+      values:
+        compound_as_printed: Na2Ca2Si2O7
+        starting_materials:
+        - reagent-grade Na2CO3
+        - CaCO3
+        - silicic acid
+        synthesis: dry synthesis; stoichiometric mixture heat-treated in a platinum dish
+        total_heating_time_hours: 500
+        maximum_heating_temperature_C: 1050
+        phase_identity_as_printed: crystalline sodium-calcium silicate
+  Na2Ca2Si3O9:
+    observations:
+    - observation_id: pank68_naca3_table1_measured_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2Ca2Si3O9
+        column: measured analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: sample_chemical_analysis_wt_percent
+        method_class: measured_direct
+        method: Authors' chemical analysis; analytical method is not stated.
+        oxide_wt_percent:
+          CaO: '31.66'
+          SiO2: '50.88'
+    - observation_id: pank68_naca3_table1_theoretical_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na2Ca2Si3O9
+        column: theoretical analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: theoretical_sample_composition_wt_percent
+        method_class: quoted_attributed
+        method: Theoretical percentages printed in parentheses in Table 1.
+        oxide_wt_percent:
+          CaO: '31.65'
+          SiO2: '50.86'
+        attribution: Pankratz (1968), Table 1 theoretical percentages in parentheses
+    - observation_id: pank68_naca3_alpha_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2Ca2Si3O9
+        note: fit-input subset 298–750 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 405.0
+          enthalpy_increment: 7830
+        - T_K: 408.3
+          enthalpy_increment: 8100
+        - T_K: 505.8
+          enthalpy_increment: 15960
+        - T_K: 595.7
+          enthalpy_increment: 23720
+        - T_K: 649.6
+          enthalpy_increment: 28720
+        - T_K: 704.4
+          enthalpy_increment: 34020
+        - T_K: 730.4
+          enthalpy_increment: 36540
+        - T_K: 743.9
+          enthalpy_increment: 38400
+          footnote_marker_as_printed: 1/
+          footnote_text_as_printed: Pretransition.
+    - observation_id: pank68_naca3_beta_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2Ca2Si3O9
+        note: fit-input subset 750–1500 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 754.3
+          enthalpy_increment: 40400
+        - T_K: 779.9
+          enthalpy_increment: 42860
+        - T_K: 805.3
+          enthalpy_increment: 45190
+        - T_K: 904.8
+          enthalpy_increment: 54470
+        - T_K: 1001.3
+          enthalpy_increment: 63750
+        - T_K: 1104.1
+          enthalpy_increment: 73540
+        - T_K: 1203.6
+          enthalpy_increment: 83440
+        - T_K: 1300.3
+          enthalpy_increment: 92980
+        - T_K: 1403.0
+          enthalpy_increment: 103510
+    - observation_id: pank68_naca3_table2_measured_outside_fit_range
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na2Ca2Si3O9
+        note: measured point outside every printed fit range
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured value not included in a printed equation
+          fit range.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 1504.4
+          enthalpy_increment: 114080
+    - observation_id: pank68_naca3_alpha_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2Ca2Si3O9 alpha fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca3_alpha_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca3_alpha_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: '(α): H_T-H_298.15 = 50.27 T + 33.68 × 10^-3 T^2 + 0.76 × 10^5 T^-1 − 18,232'
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 298
+        - 750
+        fit_range_as_printed: 298°–750° K
+        average_deviation_percent: '0.1'
+    - observation_id: pank68_naca3_alpha_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca3_alpha_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca3_alpha_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+        series:
+        - T_K: 400
+          enthalpy_increment: 7460
+        - T_K: 500
+          enthalpy_increment: 15470
+        - T_K: 600
+          enthalpy_increment: 24170
+        - T_K: 700
+          enthalpy_increment: 33560
+        - T_K: 750
+          enthalpy_increment: 38510
+          polymorph_as_printed: α
+    - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 400
+        entropy_increment: '21.47'
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+    - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T500
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=500 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 500
+        entropy_increment: '39.32'
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+    - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T600
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=600 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 600
+        entropy_increment: '55.16'
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+    - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T700
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=700 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 700
+        entropy_increment: '69.62'
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+    - observation_id: pank68_naca3_alpha_table3_relative_entropy_increment_T750_α
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=750 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_alpha_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_alpha_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 750
+        entropy_increment: '76.45'
+        fit_equation_observation_id: pank68_naca3_alpha_fit_equation
+        polymorph_as_printed: α
+    - observation_id: pank68_naca3_beta_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2Ca2Si3O9 beta fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca3_beta_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca3_beta_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: '(β): H_T-H_298.15 = 80.77 T + 7.62 × 10^-3 T^2 − 24,804'
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 750
+        - 1500
+        fit_range_as_printed: 750°–1,500° K
+        average_deviation_percent: '0.1'
+    - observation_id: pank68_naca3_beta_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca3_beta_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca3_beta_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+        series:
+        - T_K: 750
+          enthalpy_increment: 40060
+          polymorph_as_printed: β
+        - T_K: 800
+          enthalpy_increment: 44680
+        - T_K: 900
+          enthalpy_increment: 54060
+        - T_K: 1000
+          enthalpy_increment: 63590
+        - T_K: 1100
+          enthalpy_increment: 73270
+        - T_K: 1200
+          enthalpy_increment: 83100
+        - T_K: 1300
+          enthalpy_increment: 93080
+        - T_K: 1400
+          enthalpy_increment: 103210
+        - T_K: 1500
+          enthalpy_increment: 113490
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T750_β
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=750 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 750
+        entropy_increment: '78.52'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+        polymorph_as_printed: β
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T800
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=800 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 800
+        entropy_increment: '84.48'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T900
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=900 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 900
+        entropy_increment: '95.53'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1000
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1000 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1000
+        entropy_increment: '105.57'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1100
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1100 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1100
+        entropy_increment: '114.79'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1200
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1200 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1200
+        entropy_increment: '123.35'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1300
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1300 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1300
+        entropy_increment: '131.33'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1400
+        entropy_increment: '138.84'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_beta_table3_relative_entropy_increment_T1500
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na2Ca2Si3O9
+        column: S_T-S_298.15 increments
+        note: T=1500 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca3_beta_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca3_beta_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1500
+        entropy_increment: '145.93'
+        fit_equation_observation_id: pank68_naca3_beta_fit_equation
+    - observation_id: pank68_naca3_polymorphic_transition_temperature
+      type: transition_point
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2Ca2Si3O9 transition
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: measured_direct
+        property_kind: reversible_first_order_polymorphic_transition
+        T_m_K: 750
+        temperature_as_printed: 750° K
+    - observation_id: pank68_naca3_solid_solid_transition_enthalpy
+      type: phase_transition
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na2Ca2Si3O9 transition enthalpy
+      phase: cr
+      units: cal/mole
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '750'
+          locator:
+            pdf_page_index: 11
+            page: 12
+            published_page: 5
+            section: Measurements and results
+            row: Na2Ca2Si3O9 transition enthalpy
+      admission_status: typed_refusal
+      reason: No exact schema quantity for solid-solid polymorphic transition enthalpy; do not map it
+        to heat of fusion.
+      values:
+        quantity: solid_solid_transition_enthalpy
+        T_K: 750
+        method_class: measured_direct
+        value_as_printed_cal_per_mole: 1550
+        transition_temperature_K_as_printed: 750
+        transition_temperature_label: 750° K
+    - observation_id: pank68_naca3_frischat_oel_transition_range
+      type: phase_transition
+      locator:
+        pdf_page_index: 13
+        page: 14
+        published_page: 7
+        section: Discussion
+        attribution: Frischat and Oel (3)
+      phase: cr
+      units: K
+      admission_status: typed_refusal
+      reason: The quoted transition is an interval, not an exact scalar transition temperature.
+      values:
+        quantity: polymorphic_transition_temperature_range
+        method_class: quoted_attributed
+        attribution: Frischat and Oel (3)
+        range_K:
+        - 733
+        - 753
+        description: Reversible polymorphic inversion occurring between 733° and 753° K.
+    - observation_id: pank68_naca3_fusion_slightly_above_last_measurement
+      type: phase_transition
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        section: Measurements and results
+      phase: cr
+      units: K
+      admission_status: typed_refusal
+      reason: The sample melted slightly above the final measurement; no exact fusion temperature is printed.
+      values:
+        quantity: fusion_temperature_slightly_above_last_measurement
+        method_class: measured_direct
+        last_measurement_as_printed_K: 1504
+        relation_as_printed: The sample melted and formed a glass at a temperature slightly above that
+          of the last reported measurement (1,504° K).
+    context:
+    - observation_id: pank68_naca3_sample_preparation
+      type: sample_preparation
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 1
+        section: Materials
+      units: hours and °C
+      values:
+        compound_as_printed: Na2Ca2Si3O9
+        starting_materials:
+        - reagent-grade Na2CO3
+        - CaCO3
+        - silicic acid
+        synthesis: dry synthesis; stoichiometric mixture heat-treated in a platinum dish
+        total_heating_time_hours: 240
+        maximum_heating_temperature_C: 1150
+        phase_identity_as_printed: crystalline sodium-calcium silicate
+  Na4CaSi3O9:
+    observations:
+    - observation_id: pank68_naca4_table1_measured_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na4CaSi3O9
+        column: measured analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: sample_chemical_analysis_wt_percent
+        method_class: measured_direct
+        method: Authors' chemical analysis; analytical method is not stated.
+        oxide_wt_percent:
+          CaO: '15.57'
+          SiO2: '50.02'
+    - observation_id: pank68_naca4_table1_theoretical_chemical_analysis
+      type: composition_series
+      locator:
+        pdf_page_index: 8
+        page: 9
+        published_page: 2
+        table: '1'
+        row: Na4CaSi3O9
+        column: theoretical analysis
+      phase: cr
+      units: wt%
+      admission_status: typed_refusal
+      reason: No exact quantity token for non-equilibrium sample oxide chemical analysis; see extraction
+        audit.
+      values:
+        quantity: theoretical_sample_composition_wt_percent
+        method_class: quoted_attributed
+        method: Theoretical percentages printed in parentheses in Table 1.
+        oxide_wt_percent:
+          CaO: '15.56'
+          SiO2: '50.03'
+        attribution: Pankratz (1968), Table 1 theoretical percentages in parentheses
+    - observation_id: pank68_naca4_table2_measured
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 9
+        page: 10
+        published_page: 3
+        table: '2'
+        row: Na4CaSi3O9
+        note: fit-input subset 298–1400 K
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      values:
+        quantity: H_minus_H298
+        method_class: measured_direct
+        method: Copper-block drop calorimetry; Table 2 measured values.
+        reference_temperature_K: 298.15
+        series:
+        - T_K: 368.7
+          enthalpy_increment: 5630
+        - T_K: 396.7
+          enthalpy_increment: 7970
+        - T_K: 504.7
+          enthalpy_increment: 17590
+        - T_K: 608.4
+          enthalpy_increment: 27430
+        - T_K: 712.0
+          enthalpy_increment: 37710
+        - T_K: 800.5
+          enthalpy_increment: 46640
+        - T_K: 898.1
+          enthalpy_increment: 56690
+        - T_K: 901.6
+          enthalpy_increment: 57030
+        - T_K: 1008.3
+          enthalpy_increment: 68140
+        - T_K: 1018.6
+          enthalpy_increment: 69260
+        - T_K: 1019.1
+          enthalpy_increment: 69160
+        - T_K: 1101.7
+          enthalpy_increment: 78230
+        - T_K: 1197.1
+          enthalpy_increment: 88560
+        - T_K: 1205.3
+          enthalpy_increment: 89340
+        - T_K: 1303.5
+          enthalpy_increment: 100620
+          footnote_marker_as_printed: 2/
+          footnote_text_as_printed: Premelting.
+        - T_K: 1353.8
+          enthalpy_increment: 107040
+          footnote_marker_as_printed: 2/
+          footnote_text_as_printed: Premelting.
+    - observation_id: pank68_naca4_fit_equation
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        page: 12
+        published_page: 5
+        section: Measurements and results
+        row: Na4CaSi3O9 crystalline fit
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca4_table2_measured
+      derivation:
+        relation: Printed heat-content fit to the Table 2 drop-calorimetry values.
+        inputs:
+        - pank68_naca4_table2_measured
+        output_unit: cal/mole
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        fit_form: equation
+        equation_as_printed: H_T-H_298.15 = 93.83 T + 7.08 × 10^-3 T^2 + 21.12 × 10^5 T^-1 − 35,688
+        reference_temperature_K: 298.15
+        fit_range_K:
+        - 298
+        - 1400
+        fit_range_as_printed: 298°–1,400° K
+        average_deviation_percent: '0.1'
+    - observation_id: pank68_naca4_table3_smooth_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: H_T-H_298.15 smooth values
+      phase: cr
+      units: cal/mole
+      per: mol_species
+      derived_from:
+      - pank68_naca4_table2_measured
+      derivation:
+        relation: Smooth Table 3 heat-content values represented by the printed fit.
+        inputs:
+        - pank68_naca4_table2_measured
+        output_unit: cal/mole
+        fit_equation_observation_id: pank68_naca4_fit_equation
+      values:
+        quantity: H_minus_H298
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        fit_equation_observation_id: pank68_naca4_fit_equation
+        series:
+        - T_K: 400
+          enthalpy_increment: 8250
+        - T_K: 500
+          enthalpy_increment: 17170
+        - T_K: 600
+          enthalpy_increment: 26630
+        - T_K: 700
+          enthalpy_increment: 36480
+        - T_K: 800
+          enthalpy_increment: 46580
+        - T_K: 900
+          enthalpy_increment: 56870
+        - T_K: 1000
+          enthalpy_increment: 67340
+        - T_K: 1100
+          enthalpy_increment: 78000
+        - T_K: 1200
+          enthalpy_increment: 88840
+        - T_K: 1300
+          enthalpy_increment: 99860
+          footnote_marker_as_printed: 1/
+          footnote_text_as_printed: Value obtained by extrapolation.
+        - T_K: 1400
+          enthalpy_increment: 111060
+          footnote_marker_as_printed: 1/
+          footnote_text_as_printed: Value obtained by extrapolation.
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 400
+        entropy_increment: '23.72'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T500
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=500 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 500
+        entropy_increment: '43.60'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T600
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=600 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 600
+        entropy_increment: '60.83'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T700
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=700 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 700
+        entropy_increment: '76.01'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T800
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=800 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 800
+        entropy_increment: '89.50'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T900
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=900 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 900
+        entropy_increment: '101.61'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T1000
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=1000 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1000
+        entropy_increment: '112.64'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T1100
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=1100 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1100
+        entropy_increment: '122.80'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T1200
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=1200 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1200
+        entropy_increment: '132.23'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T1300
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=1300 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1300
+        entropy_increment: '141.05'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+        footnote_marker_as_printed: 1/
+        footnote_text_as_printed: Value obtained by extrapolation.
+    - observation_id: pank68_naca4_table3_relative_entropy_increment_T1400
+      type: heat_capacity_and_heat_content_series
+      locator:
+        pdf_page_index: 12
+        page: 13
+        published_page: 6
+        table: '3'
+        row: Na4CaSi3O9
+        column: S_T-S_298.15 increments
+        note: T=1400 K
+      phase: cr
+      units: cal/deg-mole
+      per: mol_species
+      admission_status: typed_refusal
+      reason: No exact quantity token for the relative entropy increment S_T-S_298.15; Quantity.S is absolute
+        entropy only.
+      derived_from:
+      - pank68_naca4_fit_equation
+      derivation:
+        relation: Entropy increment calculated by Kelley's method (4) from the fitted heat-content curve.
+        inputs:
+        - pank68_naca4_fit_equation
+        output_unit: cal/deg-mole
+      values:
+        quantity: relative_entropy_increment_S_T_minus_S_298_15
+        method_class: model_derived
+        reference_temperature_K: 298.15
+        T_K: 1400
+        entropy_increment: '149.35'
+        fit_equation_observation_id: pank68_naca4_fit_equation
+        footnote_marker_as_printed: 1/
+        footnote_text_as_printed: Value obtained by extrapolation.
+    context:
+    - observation_id: pank68_naca4_sample_preparation
+      type: sample_preparation
+      locator:
+        pdf_page_index: 7
+        page: 8
+        published_page: 1
+        section: Materials
+      units: hours and °C
+      values:
+        compound_as_printed: Na4CaSi3O9
+        starting_materials:
+        - reagent-grade Na2CO3
+        - CaCO3
+        - silicic acid
+        synthesis: dry synthesis; stoichiometric mixture heat-treated in a platinum dish
+        total_heating_time_hours: 185
+        maximum_heating_temperature_C: 950
+        phase_identity_as_printed: crystalline sodium-calcium silicate
+fidelity_samples:
+- path: species.Na2CaSiO4.observations[pank68_naca1_alpha_table2_measured].values.series[0]
+  value:
+    T_K: 395.1
+    enthalpy_increment: 3790
+  locator:
+    pdf_page_index: 9
+    page: 10
+    published_page: 3
+    table: '2'
+    row: Na2CaSiO4
+- path: species.Na2CaSiO4.observations[pank68_naca1_alpha_table3_smooth_heat_content].values.series[0]
+  value:
+    T_K: 400
+    enthalpy_increment: 4010
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+    row: Na2CaSiO4
+- path: species.Na2Ca2Si3O9.observations[pank68_naca3_beta_table3_smooth_heat_content].values.series[8]
+  value:
+    T_K: 1500
+    enthalpy_increment: 113490
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+    row: Na2Ca2Si3O9
+- path: species.Na4CaSi3O9.observations[pank68_naca4_table3_relative_entropy_increment_T1400].values.entropy_increment
+  value: '149.35'
+  locator:
+    pdf_page_index: 12
+    page: 13
+    published_page: 6
+    table: '3'
+    row: Na4CaSi3O9
