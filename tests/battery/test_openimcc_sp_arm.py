@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     Engine,
     ExecutionState,
     NoticeKind,
+    Phase,
     Quantity,
     Rail,
     RefusalReason,
@@ -27,7 +28,7 @@ from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
 )
-from simulator.battery.records import Composition, Execution, State
+from simulator.battery.records import Composition, Execution, Species, State
 from simulator.battery.score import (
     ENGINE_COEFFICIENT_SOURCES,
     ENGINE_CHANNELS,
@@ -215,6 +216,217 @@ def test_openimcc_activity_prediction_matches_green_baseline() -> None:
     )
     _assert_openimcc_prediction_matches_green_baseline(
         "activity", activity_prediction
+    )
+
+
+@pytest.mark.parametrize(
+    "identity_p2o5,waypoint_p2o5",
+    ((False, True), (True, False)),
+    ids=("observation-p2o5-wins", "consumed-p2o5-free-wins"),
+)
+def test_openimcc_sp_activity_screening_uses_observation_composition(
+    identity_p2o5: bool,
+    waypoint_p2o5: bool,
+) -> None:
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+
+    def composition(*, with_p2o5: bool) -> Composition:
+        components = (
+            ("MgO", Decimal("0.45" if with_p2o5 else "0.5")),
+            ("SiO2", Decimal("0.45" if with_p2o5 else "0.5")),
+        )
+        if with_p2o5:
+            components += (("P2O5", Decimal("0.1")),)
+        return Composition(
+            basis="ordered_complete_mole_inventory",
+            components=components,
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+
+    experiment = F.tabulation_experiment(
+        "t1577-openimcc-sp-waypoint", T_K=Decimal("1800"),
+        total_P=Decimal("100000"),
+    )
+    identity_composition = composition(with_p2o5=identity_p2o5)
+    waypoint_composition = composition(with_p2o5=waypoint_p2o5)
+    reference = F.observation(
+        "t1577-openimcc-sp-waypoint",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            component_basis="SiO2",
+            T_K=Decimal("1800"),
+            composition=identity_composition,
+        ),
+        Decimal("0.5"),
+        source_id="t1577-sp-waypoint",
+    )
+    reference = replace(
+        reference,
+        point_conditions={"composition": F.located(waypoint_composition)},
+    )
+
+    prediction = predict_with_engine(
+        _sp_engine(), reference, experiment=experiment, isolated=False
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value is not None
+    assert prediction.requested_composition is not None
+    assert prediction.requested_composition.is_value
+    consumed_p2o5 = any(
+        name == "P2O5" and amount > 0
+        for name, amount in prediction.requested_composition.value.components
+    )
+    assert consumed_p2o5 is waypoint_p2o5
+    p2o5_notices = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("P2O5 parent reference state:")
+    )
+    assert bool(p2o5_notices) is waypoint_p2o5
+    if waypoint_p2o5:
+        assert prediction.authority is Authority.EXTRAPOLATED
+
+
+def test_openimcc_sp_mass_loss_records_sample_initial_composition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.residue as residue
+
+    initial = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("FeO", Decimal("0.45")),
+            ("MgO", Decimal("0.45")),
+            ("P2O5", Decimal("0.1")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity_composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("FeO", Decimal("0.5")), ("MgO", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.tabulation_experiment(
+        "t1577-openimcc-sp-mass-loss", T_K=Decimal("1800"),
+        total_P=Decimal("100000"),
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=F.located(initial),
+        ),
+    )
+    identity = replace(
+        F.activity_identity(
+            formula="FeO",
+            component_basis="FeO",
+            T_K=Decimal("1800"),
+            composition=identity_composition,
+        ),
+        quantity=Quantity.MASS_LOSS_FRACTION,
+    )
+    reference = F.observation(
+        "t1577-openimcc-sp-mass-loss",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        source_id="t1577-sp-mass-loss",
+    )
+    monkeypatch.setattr(
+        residue,
+        "predict_mass_loss_fraction",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            mass_loss_fraction=0.2,
+            engine_flags=(),
+            engine_metadata={"alpha_sources": "[]"},
+        ),
+    )
+
+    prediction = predict_with_engine(
+        _sp_engine(), reference, experiment=experiment, isolated=False
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.requested_composition == State.of(initial)
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
+def test_openimcc_sp_pure_reservoir_records_consumed_pot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.score as score
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    engine = _sp_engine()
+    identity = replace(
+        F.pref_identity(T_K=Decimal("1800"), fO2_Pa=Decimal("1e-6")),
+        quantity=Quantity.P_PARTIAL,
+        species=Species("P", Phase.G),
+        reservoir=State.of(Species("P2O5", Phase.L)),
+        composition=State.unknown("the stated reservoir is the pure pot"),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    experiment = F.tabulation_experiment(
+        "t1577-openimcc-sp-pure-reservoir",
+        T_K=Decimal("1800"),
+        total_P=Decimal("100000"),
+    )
+    reference = F.observation(
+        "t1577-openimcc-sp-pure-reservoir",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        source_id="t1577-sp-pure-reservoir",
+    )
+    consumed_pots = []
+    monkeypatch.setattr(
+        score,
+        "_open_cached_battery_handle",
+        lambda *_args: SimpleNamespace(
+            name=engine.value, available=True, identity={}
+        ),
+    )
+
+    def equilibrate(_handle, pot, **_kwargs):
+        consumed_pots.append(dict(pot.composition_wt_pct))
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={"P": 1.0},
+            melt_activities={},
+            melt_activity_coefficients={},
+        )
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", equilibrate)
+    monkeypatch.setattr(score, "cell_notices", lambda *_args: ())
+    monkeypatch.setattr(
+        score,
+        "_flags_from_scored_cell",
+        lambda _cell, authority, certified_band: (authority, certified_band),
+    )
+
+    prediction = predict_with_engine(
+        engine, reference, experiment=experiment, isolated=False
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert consumed_pots == [{"P2O5": 100.0}]
+    assert prediction.requested_composition is not None
+    assert prediction.requested_composition.is_value
+    assert prediction.requested_composition.value.amount_basis is AmountBasis.MASS_PERCENT
+    assert prediction.requested_composition.value.components == (
+        ("P2O5", Decimal("100")),
+    )
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
     )
 
 

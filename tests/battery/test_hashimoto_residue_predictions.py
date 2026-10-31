@@ -2,12 +2,24 @@ from __future__ import annotations
 
 import json
 import math
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
+from types import SimpleNamespace
 
 import pytest
 import yaml
+
+from simulator.battery.enums import (
+    AmountBasis,
+    Authority,
+    Engine,
+    ExecutionState,
+    Quantity,
+)
+from simulator.battery.identity import quantity_token
+from simulator.battery.records import Composition, Located, State
 
 from simulator.battery.residue import (
     _HASHIMOTO_GEOMETRIES,
@@ -278,6 +290,95 @@ def _source_data():
         measured_rows,
         geometry_record["values"]["starting_preform_mm"],
     )
+
+
+@pytest.mark.parametrize("sample_has_p2o5", (False, True))
+def test_openimcc_sp_hashimoto_screening_uses_sample_initial_composition(
+    sample_has_p2o5,
+):
+    from simulator.battery.score import (
+        _HASHIMOTO_SOURCE_ID,
+        _hashimoto_residue_prediction,
+        load_score_context,
+    )
+
+    engine = Engine.OPENIMCC_SP
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    formula = reference.identity.species.formula
+
+    def composition(with_p2o5):
+        components = (
+            ("FeO", Decimal("0.45" if with_p2o5 else "0.5")),
+            ("MgO", Decimal("0.45" if with_p2o5 else "0.5")),
+        )
+        if with_p2o5:
+            components += (("P2O5", Decimal("0.1")),)
+        return Composition(
+            "ordered_complete_mole_inventory", components,
+            AmountBasis.MOLE_FRACTION,
+        )
+
+    initial = composition(sample_has_p2o5)
+    experiment = context.experiments[reference.experiment_id]
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(State.of(initial), reference.locator),
+        ),
+    )
+    context = replace(
+        context,
+        experiments={**context.experiments, experiment.experiment_id: experiment},
+    )
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(composition(not sample_has_p2o5)),
+        ),
+    )
+    primary = SimpleNamespace(
+        alpha_arm="alpha_common_unity_sensitivity",
+        primary_geometry_policy_id="fixture-geometry",
+        primary_oxide_wt_pct={formula: 25.0},
+        geometry_oxide_wt_pct={},
+        sensitivity_band_wt_pct={formula: (20.0, 30.0)},
+        provenance={},
+    )
+    production = SimpleNamespace(
+        alpha_arm="alpha_runtime_catalog",
+        primary_geometry_policy_id="fixture-geometry",
+        primary_oxide_wt_pct={formula: 25.0},
+        geometry_oxide_wt_pct={},
+        sensitivity_band_wt_pct={formula: (20.0, 30.0)},
+        provenance={},
+    )
+    cache = {
+        (_HASHIMOTO_SOURCE_ID, engine): {
+            reference.experiment_id + "::alpha_common_unity_sensitivity": primary,
+            reference.experiment_id + "::alpha_runtime_catalog": production,
+        }
+    }
+
+    prediction = _hashimoto_residue_prediction(context, reference, engine, cache)
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.requested_composition == State.of(initial)
+    p2o5_notices = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("P2O5 parent reference state:")
+    )
+    assert bool(p2o5_notices) is sample_has_p2o5
+    if sample_has_p2o5:
+        assert prediction.authority is Authority.EXTRAPOLATED
 
 
 def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:

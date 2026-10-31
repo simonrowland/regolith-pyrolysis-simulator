@@ -9,7 +9,8 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.battery.enums import (
-    AdmissionStatus, AmountBasis, Engine, EvidenceClass, ExperimentKind, MethodToken, Phase, Quantity,
+    AdmissionStatus, AmountBasis, Authority, Engine, EvidenceClass, ExecutionState,
+    ExperimentKind, MethodToken, Phase, Quantity,
     RegimeClass, UncertaintyKind,
 )
 from simulator.battery.identity import Identity
@@ -214,6 +215,74 @@ def test_each_row_uses_own_extent_and_never_measured_composition(extent_point):
     assert any("SC-360" in r and "3 dex (W) / 2.5 dex (Mo)" in r and "pO2^-nu" in r for r in reasons)
     assert any("printed step temperatures held" in r for r in reasons)
     assert {r["source"] for r in result["oxygen_sources"]} == {"d142_closure"}
+
+
+@pytest.mark.parametrize("sample_has_p2o5", (False, True))
+def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
+    extent_point, monkeypatch, sample_has_p2o5
+):
+    import simulator.battery.residue as residue
+    from simulator.battery.score import _knudsen_residue_prediction
+
+    reference, experiment, _rows = extent_point
+
+    def composition(with_p2o5):
+        components = (
+            ("FeO", Decimal("0.45" if with_p2o5 else "0.5")),
+            ("MgO", Decimal("0.45" if with_p2o5 else "0.5")),
+        )
+        if with_p2o5:
+            components += (("P2O5", Decimal("0.1")),)
+        return Composition(
+            "ordered_complete_mole_inventory", components,
+            AmountBasis.MOLE_FRACTION,
+        )
+
+    initial = composition(sample_has_p2o5)
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(State.of(initial), reference.locator),
+        ),
+    )
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            composition=State.of(composition(not sample_has_p2o5)),
+        ),
+    )
+    monkeypatch.setattr(
+        residue,
+        "predict_knudsen_residue_composition",
+        lambda *_args, **_kwargs: {
+            "composition_wt_pct": {"FeO": 25.0},
+            "notices": (),
+            "engine_flags": (),
+            "engine_metadata": {},
+        },
+    )
+    context = SimpleNamespace(
+        experiments={experiment.experiment_id: experiment},
+        observations={},
+        benches={},
+    )
+
+    prediction = _knudsen_residue_prediction(
+        context, reference, Engine.OPENIMCC_SP
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.requested_composition == State.of(initial)
+    p2o5_notices = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("P2O5 parent reference state:")
+    )
+    assert bool(p2o5_notices) is sample_has_p2o5
+    if sample_has_p2o5:
+        assert prediction.authority is Authority.EXTRAPOLATED
 
 
 def test_printed_oxygen_precedes_selector(extent_point, monkeypatch):
