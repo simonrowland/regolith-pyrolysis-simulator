@@ -516,19 +516,46 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     ) > 1.0e-3
 
 
-def _residue_catalog_alpha(species: str) -> tuple[float, str]:
+def _residue_catalog_alpha(species: str) -> tuple[float, str, str | None]:
+    from simulator.alpha_kinetics import (
+        ALPHA_AUTHORITY_STATUS_FIELD,
+        parse_alpha_contract,
+    )
+    from simulator.condensation import alpha_s
+
     row = _runtime_catalog_rows()[species]
     alpha_row = row["evaporation_alpha"]
     assert isinstance(alpha_row, dict)
-    return float(alpha_row["value"]), str(alpha_row["source"])
+    alpha_spec = parse_alpha_contract(alpha_row)
+    alpha = float(
+        alpha_s(species, 2073.0, {"coefficient_spec": alpha_spec})
+    )
+    authority = (
+        alpha_spec.get(ALPHA_AUTHORITY_STATUS_FIELD)
+        if isinstance(alpha_spec, dict)
+        else None
+    )
+    source = str(alpha_row.get("source") or "runtime catalog")
+    return alpha, source, str(authority) if authority is not None else None
+
+
+def test_residue_catalog_alpha_keeps_bridge_authority_visible() -> None:
+    fe_alpha, _source, authority = _residue_catalog_alpha("Fe")
+    fe_channel = _residue_channels()[0]
+
+    assert authority == "bridge"
+    assert fe_alpha == pytest.approx(fe_channel.alpha)
+    assert "Bridge value" in fe_channel.alpha_source
 
 
 def _residue_channels(*, fe_alpha: float | None = None):
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.battery.residue import ResidueChannel
 
-    catalog_fe_alpha, fe_source = _residue_catalog_alpha("Fe")
-    catalog_mg_alpha, mg_source = _residue_catalog_alpha("Mg")
+    catalog_fe_alpha, fe_source, fe_authority = _residue_catalog_alpha("Fe")
+    catalog_mg_alpha, mg_source, _mg_authority = _residue_catalog_alpha("Mg")
+    if fe_authority is not None:
+        fe_source = f"{fe_source}; alpha_authority_status={fe_authority}"
     return (
         ResidueChannel(
             "Fe", "Fe", "FeO",
@@ -590,7 +617,7 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
         duration_s=duration_s,
         area_evolution_m2=(area_m2,),
     )
-    alpha, _source = _residue_catalog_alpha("Fe")
+    alpha, _source, _authority = _residue_catalog_alpha("Fe")
     fe_molar_mass = parse_formula("Fe").molar_mass_kg_per_mol()
     root_bar = result.pO2_bar_by_step[0]
     assert root_bar is not None
@@ -678,7 +705,7 @@ def test_buffered_residue_keeps_printed_fo2_and_accounts_reservoir_exchange() ->
     requested_logp = -3.25
     seen_logp: list[float] = []
     starting = {"FeO": 1.0e-3}
-    fe_alpha, alpha_source = _residue_catalog_alpha("Fe")
+    fe_alpha, alpha_source, _authority = _residue_catalog_alpha("Fe")
     result = integrate_residue_inventory(
         starting,
         (ResidueChannel("Fe", "Fe", "FeO", fe_alpha, alpha_source),),
