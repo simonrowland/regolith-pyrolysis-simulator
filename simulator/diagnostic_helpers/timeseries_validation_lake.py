@@ -70,6 +70,7 @@ class SpeciesReproductionError:
     alpha: float | None
     observed_floor_applied: bool = False
     notes: str = ""
+    source_relation: str = "UNASSESSED"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -88,6 +89,7 @@ class SpeciesReproductionError:
             "alpha": self.alpha,
             "observed_floor_applied": self.observed_floor_applied,
             "notes": self.notes,
+            "source_relation": self.source_relation,
         }
 
 
@@ -101,6 +103,7 @@ class DatasetReproductionReport:
     endpoint_rank_disagreement_fraction: float | None
     species: tuple[SpeciesReproductionError, ...]
     skipped_reasons: tuple[str, ...] = ()
+    median_abs_dex_error_excluding_same_input: float | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -108,6 +111,9 @@ class DatasetReproductionReport:
             "status": self.status,
             "rows_evaluated": self.rows_evaluated,
             "median_abs_dex_error": self.median_abs_dex_error,
+            "median_abs_dex_error_excluding_same_input": (
+                self.median_abs_dex_error_excluding_same_input
+            ),
             "max_abs_dex_error": self.max_abs_dex_error,
             "endpoint_rank_disagreement_fraction": (
                 self.endpoint_rank_disagreement_fraction
@@ -207,6 +213,11 @@ def validate_dataset(
         )
 
     abs_errors = [abs(item.dex_error_model_minus_observed) for item in species_errors]
+    non_same_input_abs_errors = [
+        abs(item.dex_error_model_minus_observed)
+        for item in species_errors
+        if item.source_relation != "SAME_INPUT"
+    ]
     return DatasetReproductionReport(
         dataset_id=dataset_id,
         status="validated",
@@ -218,6 +229,11 @@ def validate_dataset(
         ),
         species=tuple(species_errors),
         skipped_reasons=tuple(_unique(skipped_reasons)),
+        median_abs_dex_error_excluding_same_input=(
+            median(non_same_input_abs_errors)
+            if non_same_input_abs_errors
+            else None
+        ),
     )
 
 
@@ -235,16 +251,19 @@ def render_markdown_report(
         "",
         "## Dataset Summary",
         "",
-        "| Dataset | status | rows evaluated | median abs dex | max abs dex | endpoint rank disagreement | skipped / gap |",
-        "|---|---|---:|---:|---:|---:|---|",
+        "| Dataset | status | rows evaluated | median abs dex (all) | median abs dex (excluding SAME_INPUT) | max abs dex | endpoint rank disagreement | skipped / gap |",
+        "|---|---|---:|---:|---:|---:|---:|---|",
     ]
     for report in reports:
         lines.append(
-            "| {dataset} | {status} | {rows} | {median} | {maxerr} | {inv} | {gap} |".format(
+            "| {dataset} | {status} | {rows} | {median} | {median_without_same_input} | {maxerr} | {inv} | {gap} |".format(
                 dataset=report.dataset_id,
                 status=report.status,
                 rows=report.rows_evaluated,
                 median=_fmt_optional(report.median_abs_dex_error),
+                median_without_same_input=_fmt_optional(
+                    report.median_abs_dex_error_excluding_same_input
+                ),
                 maxerr=_fmt_optional(report.max_abs_dex_error),
                 inv=_fmt_optional(report.endpoint_rank_disagreement_fraction),
                 gap=_summarize_reasons(report.skipped_reasons),
@@ -256,14 +275,14 @@ def render_markdown_report(
             "",
             "## Per-Species Reproduction Error",
             "",
-            "| Dataset | species | model species | signal | T K | observed proxy/rate | model flux kg/m2/s | modeled value | observed value | dex error | factor | notes |",
-            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| Dataset | species | model species | signal | T K | observed proxy/rate | model flux kg/m2/s | modeled value | observed value | dex error | factor | source relation | notes |",
+            "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|",
         ]
     )
     for report in reports:
         for item in report.species:
             lines.append(
-                "| {dataset} | {species} | {model_species} | {signal} | {T} | {observed_rate} | {flux} | {modeled} | {observed} | {dex} | {factor} | {notes} |".format(
+                "| {dataset} | {species} | {model_species} | {signal} | {T} | {observed_rate} | {flux} | {modeled} | {observed} | {dex} | {factor} | {source_relation} | {notes} |".format(
                     dataset=item.dataset_id,
                     species=item.species,
                     model_species=item.model_species,
@@ -275,6 +294,7 @@ def render_markdown_report(
                     observed=_fmt_float(item.observed_value),
                     dex=_fmt_float(item.dex_error_model_minus_observed),
                     factor=_fmt_float(item.error_factor),
+                    source_relation=item.source_relation,
                     notes=item.notes.replace("|", "/") or "-",
                 )
             )
@@ -309,15 +329,6 @@ def _validate_alpha_rows(
         original_species[key] = species
 
     for (species, model_species, T_K), values in grouped.items():
-        # DS-007 Table 3 Fe alphas are the Fedkin fit used to construct the
-        # runtime Fe melt bridge. Counting those same points as validation
-        # would turn the bridge's source data into a self-agreement score.
-        if dataset_id == "DS-007" and species == "Fe":
-            skipped.append(
-                "DS-007:Fe Table 3 alpha is source data for the runtime bridge; "
-                "self-agreement excluded"
-            )
-            continue
         if model_species in UNMODELED_SPECIES:
             skipped.append(f"{dataset_id}:{species} has no model species")
             continue
@@ -345,6 +356,11 @@ def _validate_alpha_rows(
                 p_eq_pa=p_eq,
                 alpha=modeled_alpha,
                 notes="direct alpha comparison",
+                source_relation=(
+                    "SAME_INPUT"
+                    if dataset_id == "DS-007" and species == "Fe"
+                    else "UNASSESSED"
+                ),
             )
         )
     return errors, skipped

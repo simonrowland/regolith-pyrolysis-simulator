@@ -57,14 +57,22 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
     assert reports["DS-001"].rows_evaluated == 3
     assert reports["DS-003"].rows_evaluated == 12
     assert reports["DS-006"].rows_evaluated == 4
-    assert reports["DS-007"].rows_evaluated == 8
-    assert any(
-        "DS-007:Fe Table 3 alpha is source data for the runtime bridge" in reason
-        for reason in reports["DS-007"].skipped_reasons
-    )
+    assert reports["DS-007"].rows_evaluated == 12
     assert reports["DS-007"].median_abs_dex_error == pytest.approx(
+        0.06993954320061825
+    )
+    assert reports["DS-007"].median_abs_dex_error_excluding_same_input == pytest.approx(
         0.1406575917694785
     )
+    same_input_rows = [
+        item for item in reports["DS-007"].species
+        if item.source_relation == "SAME_INPUT"
+    ]
+    assert len(same_input_rows) == 4
+    assert {item.species for item in same_input_rows} == {"Fe"}
+    assert reports["DS-007"].as_dict()[
+        "median_abs_dex_error_excluding_same_input"
+    ] == pytest.approx(0.1406575917694785)
     assert reports["DS-010"].status == "validated"
     assert reports["DS-010"].rows_evaluated == 7
 
@@ -149,12 +157,12 @@ def test_markdown_report_contains_summary_and_json_pointer_for_long_skips(
     assert "endpoint rank disagreement" in markdown
     assert "ordering inversions" not in markdown
     assert (
-        "| DS-007 | validated | 8 | 0.141 | 0.322 | - | "
-        "DS-007:Fe Table 3 alpha is source data for the runtime bridge; "
-        "self-agreement excluded |"
+        "| DS-007 | validated | 12 | 0.070 | 0.141 | 0.322 | - | - |"
     ) in markdown
+    assert "| DS-007 | Fe | Fe | evaporation_coefficient |" in markdown
+    assert "| SAME_INPUT | direct alpha comparison |" in markdown
     # 2026-07-21 B1: DS-010 median/max reproduction error re-measured under
     # the corrected fits (1.392/1.920 -> 1.199/3.309); rank cell unchanged.
-    assert "| DS-010 | validated | 7 | 1.199 | 3.309 | 0.222 |" in markdown
+    assert "| DS-010 | validated | 7 | 1.199 | 1.199 | 3.309 | 0.222 |" in markdown
     assert "more in JSON" in markdown
     assert "DS-010: fetch-dns-blocked" not in markdown
