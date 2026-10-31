@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -51,7 +52,7 @@ EXPECTED_ALPHA = {
         "source": (
             "Bridge value for Fe(g) leaving ferrous silicate melt: alpha=0.24 ±0.03 from the "
             "overlapping model fits to Hashimoto 1983 vacuum-evaporation experiments, "
-            "Fedkin, Grossman & Ghiorso 2006 (0.23-0.25) and Alexander’s comparison "
+            "Fedkin, Grossman & Ghiorso 2006 (0.23-0.25) and Alexander's comparison "
             "(0.25-0.28). One dataset, two modellers; not measured and not certifying. "
             "Hertz-Knudsen alpha=1 remains the analytical upper bound. Pound 1972 Table 1 / "
             "McCabe et al. 1956 alpha=0.9 for solid electrolytic Fe is fenced as pure-element "
@@ -690,7 +691,7 @@ def test_fe_melt_alpha_notice_preserves_bridge_and_extrapolation_authority(
     assert any(warning_authority in warning for warning in result.warnings)
 
 
-def test_fe_bridge_alpha_is_not_scored_as_a_measurement() -> None:
+def test_bridge_alpha_prediction_is_scored_but_bridge_reference_is_refused() -> None:
     observation = AdoptedObservation(
         species_id="Fe",
         source_id="fixture-source",
@@ -722,12 +723,32 @@ def test_fe_bridge_alpha_is_not_scored_as_a_measurement() -> None:
         vapor_pressure_data=load_vapor_pressure_data(),
     )
 
-    assert evaluation.records
-    assert {record.status for record in evaluation.records} == {"assumed-input"}
-    assert evaluation.skip_reason == "typed-refusal:bridge_not_measurement"
+    scored_records = [
+        record for record in evaluation.records
+        if record.status in {"match", "mismatch"}
+    ]
+    assert scored_records
+    assert all(
+        record.prediction_alpha_authority == "bridge"
+        for record in scored_records
+    )
+
+    bridge_reference = replace(
+        observation,
+        observation_id="fixture_fe_bridge_alpha_as_reference",
+        values={**observation.values, "alpha_authority_status": "bridge"},
+    )
+    reference_evaluation = evaluate_observation(
+        bridge_reference,
+        vapor_pressure_data=load_vapor_pressure_data(),
+    )
+    assert reference_evaluation.skip_reason == (
+        "typed-refusal:bridge_not_measurement"
+    )
+    assert reference_evaluation.records
     assert not any(
         record.status in {"match", "mismatch"}
-        for record in evaluation.records
+        for record in reference_evaluation.records
     )
 
 
