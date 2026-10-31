@@ -9721,7 +9721,12 @@ _ANCILLARY_SERIES_KEYS = (
 
 _PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
 
-QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
+# Quantity keys are the closed observables. A plain string key is an
+# unsupported token whose printed column this migrator still records, so the
+# point is admitted as a typed-unavailable observation. H_rel is not an
+# H(T)-H(298) field, and the melt-cooling column under
+# sample_dependent_enthalpy_change_on_cooling is not the scored increment.
+QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha", "alpha_times_Gamma"),
@@ -9875,6 +9880,23 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.DISTRIBUTION_RATIO: ("distribution_ratio",),
     Quantity.SULFIDE_CAPACITY: ("log10_C_S",),
     Quantity.CHLORIDE_CAPACITY: ("log10_C_Cl",),
+    "relative_enthalpy": ("H_rel_kJ_mol-1",),
+    "sample_dependent_enthalpy_change_on_cooling": (
+        "minus_delta_H_cool_kJ_mol-1",
+    ),
+    # select_declared_source reads Quantity keys only and does not score a
+    # plain-string column. relative_enthalpy and the sample-dependent
+    # melt-cooling token do not resolve. ion_current_ratio resolves to
+    # ion_intensity_ratio, and Fe3plus_over_total_Fe resolves to
+    # valence_ratio; these columns stay unscored.
+    "predicted_partial_pressure": ("p_bar",),
+    "third_law_delta_H0_from_simultaneous_partial_pressures": (
+        "delta_H0_kcal_mol",
+    ),
+    "third_law_Kp_and_delta_H0": ("delta_H0_kcal_mol", "Kp"),
+    "post_run_xrd_phases": ("experimental",),
+    "ion_current_ratio": ("ln_ionic_intensity_ratio_as_published",),
+    "Fe3plus_over_total_Fe": ("value_as_published",),
 }
 
 
@@ -10050,28 +10072,120 @@ _NON_YIELD_RANGE_QUANTITIES = frozenset(
         Quantity.MASS_LOSS_RATE,
     }
 )
+# The token names two closed observables. Recording either field would pick
+# one number; activity_coefficient_uncertainty is the same cell's printed
+# band, not a third observable. Table 4 stays the unavailable parent.
+_UNPICKED_COMPOUND_FIELDS = {
+    "activity_and_activity_coefficient": frozenset(
+        {
+            "activity",
+            "activity_coefficient",
+            "activity_coefficient_uncertainty",
+        }
+    ),
+}
+
+
+def _is_decorated_quantity_field(quantity: Quantity, key: str) -> bool:
+    """True when ``key`` is a species- or component-labelled value of ``quantity``.
+
+    ``_selection_from_named_field`` records the same prefix: one such numeric
+    field is the measurement (``evolved_gas_yield_H2O`` for evolved gas yield).
+    """
+
+    return key.startswith(f"{quantity.value}_")
+
+
+def _closed_or_token_quantity(
+    quantity: Quantity | None,
+    declared_token: str | None,
+) -> Quantity | None:
+    if isinstance(quantity, Quantity):
+        return quantity
+    if not isinstance(declared_token, str) or not declared_token:
+        return None
+    try:
+        return Quantity(declared_token)
+    except ValueError:
+        return QUANTITY_ALIASES.get(declared_token)
+
+
+def _plain_token_fields(declared_token: str | None) -> tuple[str, ...]:
+    """Plain-string entries of ``QUANTITY_SOURCE_FIELDS`` for this token.
+
+    Quantity members compare equal to their value strings, so membership has
+    to be by exact ``str`` type. Those entries are not scored.
+    """
+
+    if not isinstance(declared_token, str) or not declared_token:
+        return ()
+    for key, fields in QUANTITY_SOURCE_FIELDS.items():
+        if type(key) is str and key == declared_token:
+            return fields
+    return ()
+
+
+def _recorded_source_fields(
+    quantity: Quantity | None,
+    declared_token: str | None,
+) -> tuple[str, ...]:
+    """Fields this migrator records for the declared quantity.
+
+    A resolved quantity, or an alias of one, uses that quantity's map entry.
+    ``fe3_fe2_ratio`` also uses the printed-ratio and ferric-fraction fields
+    ``_fe3_fe2_ratio_selection`` already reads. An unsupported token adds only
+    its plain-string entry on the same map. A token with no entry records
+    nothing: a leftover number is not a value.
+    """
+
+    fields: list[str] = []
+    closed = _closed_or_token_quantity(quantity, declared_token)
+    if closed is not None:
+        fields.extend(QUANTITY_SOURCE_FIELDS.get(closed, ()))
+        if closed is Quantity.FE3_FE2_RATIO:
+            fields.extend(FE3_FE2_RATIO_PRINTED_FIELDS)
+            fields.extend(FERRIC_FRACTION_FIELDS)
+            fields.append(KRESS_FE2O3_WT_PCT_FIELD)
+            fields.append(KRESS_FEO_WT_PCT_FIELD)
+    fields.extend(_plain_token_fields(declared_token))
+    return tuple(dict.fromkeys(fields))
+
+
+def _recorded_field_present(raw: Mapping[str, Any], name: str, *, text_ok: bool) -> bool:
+    if _numeric_field(raw, name) is not None:
+        return True
+    if not text_ok:
+        return False
+    raw_value = raw.get(name)
+    return isinstance(raw_value, str) and raw_value.strip() != ""
 
 
 def _non_yield_point_is_blank(
     raw: Mapping[str, Any],
     *,
     quantity: Quantity | None,
+    declared_token: str | None,
     selected_available: bool,
 ) -> bool:
-    """True when no recognised value field holds a number.
+    """True when the point has no printed measurement of its declared quantity.
 
-    One owner for the non-yield blank cell. ``value`` being empty is not
-    blank when a source-specific field holds the number: that row migrates,
-    and a number the migrator cannot ground becomes a typed-unavailable
-    observation. A payload with no number is blank. The caller queues it,
-    including a declared unavailable value. Condition axes, ``*_as_printed``
-    echoes, and mole-count keys are not value fields. A numeric ``range`` is
-    the measurement only for density and the two rate quantities.
+    A recorded field (``QUANTITY_SOURCE_FIELDS``, including a plain-string
+    token column) counts. So does any other numeric column of a declared
+    token: that row is admitted as typed-unavailable and is not scored.
+    Condition axes, ``*_as_printed`` echoes, mole-count keys, a replicate
+    ``measurement`` index, and ``activity`` / ``activity_coefficient``
+    (plus that cell's uncertainty) on
+    ``activity_and_activity_coefficient`` do not count. A point with no
+    declared quantity does not pick up a stray number. The caller queues a
+    blank cell when a source-unavailable reason is set or the raw value is
+    empty. A numeric ``range`` is the measurement only for density and the
+    two rate quantities.
     """
 
     if selected_available:
         return False
-    if quantity in _NON_YIELD_RANGE_QUANTITIES:
+    closed = _closed_or_token_quantity(quantity, declared_token)
+    if closed in _NON_YIELD_RANGE_QUANTITIES:
         raw_range = raw.get("range")
         if (
             isinstance(raw_range, (list, tuple))
@@ -10079,15 +10193,51 @@ def _non_yield_point_is_blank(
             and all(_as_dec_or_none(bound) is not None for bound in raw_range[:2])
         ):
             return False
+    recorded = _recorded_source_fields(quantity, declared_token)
+    text_fields = set(_plain_token_fields(declared_token))
+    residue_fields: frozenset[str] = frozenset()
+    if closed is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        valid_residue, _invalid_residue = _residue_component_field_sets(raw)
+        residue_fields = frozenset(valid_residue)
     for key in raw:
         name = str(key)
         if name in _NON_YIELD_CONDITION_FIELDS or name.endswith("_as_printed"):
             continue
         if name.startswith("N_") and raw.get("composition_basis") == "mole_fraction":
             continue
-        if _numeric_field(raw, name) is not None:
+        recorded_field = name in recorded or name in residue_fields
+        if not recorded_field and closed is not None:
+            recorded_field = _is_decorated_quantity_field(closed, name)
+        if recorded_field and _recorded_field_present(
+            raw, name, text_ok=name in text_fields
+        ):
+            return False
+        if _stray_printed_measurement(name, raw, declared_token):
             return False
     return True
+
+
+def _stray_printed_measurement(
+    name: str,
+    raw: Mapping[str, Any],
+    declared_token: str | None,
+) -> bool:
+    """True when ``name`` is a printed number of the declared token.
+
+    Not a condition axis, an ``*_as_printed`` echo, or a mole-fraction
+    ``N_*`` key: the caller already skipped those. A replicate index and
+    the unpicked activity pair are not measurements. No declared token
+    means the number is not a measurement of a quantity.
+    """
+
+    if not isinstance(declared_token, str) or not declared_token:
+        return False
+    if name in _PRINTED_LOG_FO2_KEYS or name == "measurement":
+        return False
+    refused = _UNPICKED_COMPOUND_FIELDS.get(declared_token)
+    if refused is not None and name in refused:
+        return False
+    return _numeric_field(raw, name) is not None
 
 
 def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
@@ -11467,12 +11617,11 @@ def _selection_from_named_field(
         return _point_selection(
             amount, key, trail, approximate_payload, condition_ranges
         )
-    decorated_prefix = f"{q_token.value}_"
     decorated = [
         (key, _numeric_field(payload, key))
         for key in payload
         if isinstance(key, str)
-        and key.startswith(decorated_prefix)
+        and _is_decorated_quantity_field(q_token, key)
         and _numeric_field(payload, key) is not None
     ]
     if len(decorated) == 1:
@@ -19633,13 +19782,19 @@ class Migrator:
                             )
                         )
                         # Queue a declared unavailable cell and a genuinely blank
-                        # cell. A number in any recognised value field is a
-                        # measurement, so the row migrates when `value` is empty.
+                        # cell. A number counts only when QUANTITY_SOURCE_FIELDS
+                        # records that field for the declared quantity.
+                        raw_quantity = values.get("quantity")
                         suppress_unvalued_nonyield_point = (
                             _non_yield_point_is_blank(
                                 raw,
                                 quantity=(
                                     q_token if isinstance(q_token, Quantity) else None
+                                ),
+                                declared_token=(
+                                    raw_quantity
+                                    if isinstance(raw_quantity, str)
+                                    else None
                                 ),
                                 selected_available=point_value.available,
                             )
