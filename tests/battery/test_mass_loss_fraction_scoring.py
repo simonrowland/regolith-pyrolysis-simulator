@@ -150,9 +150,13 @@ def test_mass_loss_prediction_returns_integrator_input_inventory(
         observation=observation,
     )
 
-    assert len(integrator_inputs) == 2
-    assert prediction.initial_inventory_mol == integrator_inputs[0]
-    assert integrator_inputs[0] == integrator_inputs[1]
+    assert len(integrator_inputs) == 3
+    preheat_input, documented_segment_input, joint_arm_input = integrator_inputs
+    # The scored point follows the documented segment. Its consumed starting
+    # charge is the map also supplied to preheat and joint sensitivity arms.
+    assert prediction.initial_inventory_mol == documented_segment_input
+    assert prediction.initial_inventory_mol == preheat_input
+    assert prediction.initial_inventory_mol == joint_arm_input
 
 
 @pytest.fixture

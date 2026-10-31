@@ -373,13 +373,25 @@ def test_openimcc_sp_mass_loss_richter_r11_refuses_unsourced_alpha() -> None:
 
 
 @pytest.mark.parametrize(
-    "inventory_has_p2o5",
-    (False, True),
-    ids=("inventory-p2-free", "inventory-p2-bearing"),
+    ("inventory", "expected_p2o5_notice", "expected_missing_input_notice"),
+    (
+        ({"MgO": 1.0}, False, False),
+        ({"MgO": 0.9, "P2O5": 0.1}, True, False),
+        (None, False, True),
+        ({}, False, True),
+    ),
+    ids=(
+        "inventory-p2-free",
+        "inventory-p2-bearing",
+        "inventory-unavailable",
+        "inventory-empty",
+    ),
 )
 def test_openimcc_sp_mass_loss_screening_uses_stubbed_consumed_inventory(
     monkeypatch: pytest.MonkeyPatch,
-    inventory_has_p2o5: bool,
+    inventory: Mapping[str, float] | None,
+    expected_p2o5_notice: bool,
+    expected_missing_input_notice: bool,
 ) -> None:
     """The scorer notices its consumed inventory; only the residue call is stubbed.
 
@@ -410,15 +422,10 @@ def test_openimcc_sp_mass_loss_screening_uses_stubbed_consumed_inventory(
             reference.identity,
             composition=State.of(
                 _composition_with_p2o5(
-                    stated.state.value, present=not sample_has_p2o5
+                    stated.state.value, present=not expected_p2o5_notice
                 )
             ),
         ),
-    )
-    inventory = (
-        {"MgO": 0.9, "P2O5": 0.1}
-        if inventory_has_p2o5
-        else {"MgO": 1.0}
     )
 
     monkeypatch.setattr(
@@ -441,31 +448,36 @@ def test_openimcc_sp_mass_loss_screening_uses_stubbed_consumed_inventory(
     )
     assert prediction.execution.state is ExecutionState.PRODUCED, failure
     assert prediction.requested_composition is not None, failure
-    assert prediction.requested_composition.is_value, failure
-    assert (
-        prediction.requested_composition.value.amount_basis
-        is AmountBasis.MOL_INVENTORY
-    ), failure
-    assert dict(prediction.requested_composition.value.components) == {
-        name: Decimal(str(amount)) for name, amount in inventory.items()
-    }, failure
-    consumed_has_p2o5 = any(
-        name == "P2O5" and amount > 0
-        for name, amount in prediction.requested_composition.value.components
-    )
-    assert consumed_has_p2o5 is inventory_has_p2o5, failure
+    if inventory:
+        assert prediction.requested_composition.is_value, failure
+        assert (
+            prediction.requested_composition.value.amount_basis
+            is AmountBasis.MOL_INVENTORY
+        ), failure
+        assert dict(prediction.requested_composition.value.components) == {
+            name: Decimal(str(amount)) for name, amount in inventory.items()
+        }, failure
+        consumed_has_p2o5 = any(
+            name == "P2O5" and amount > 0
+            for name, amount in prediction.requested_composition.value.components
+        )
+        assert consumed_has_p2o5 is expected_p2o5_notice, failure
+    else:
+        assert not prediction.requested_composition.is_value, failure
     parent_notice = any(
         notice.reason.startswith("P2O5 parent reference state:")
         for notice in prediction.notices
     )
-    assert parent_notice is inventory_has_p2o5, failure
-    assert prediction.authority is (
-        Authority.EXTRAPOLATED if inventory_has_p2o5 else Authority.BRIDGE
-    ), failure
-    assert not any(
+    assert parent_notice is expected_p2o5_notice, failure
+    missing_input_notice = any(
         notice.reason == "P2O5 screening input not recorded"
         for notice in prediction.notices
-    ), failure
+    )
+    assert missing_input_notice is expected_missing_input_notice, failure
+    if expected_p2o5_notice:
+        assert prediction.authority is Authority.EXTRAPOLATED, failure
+    elif not expected_missing_input_notice:
+        assert prediction.authority is Authority.BRIDGE, failure
 
 
 @pytest.mark.parametrize(
