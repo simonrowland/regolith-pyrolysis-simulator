@@ -2408,8 +2408,9 @@ def _backend_boundary_composition(
     *,
     namespace_id: str,
     sig_figs: int,
+    composition_mol: Mapping[str, float],
 ) -> list[tuple[str, float]]:
-    cleaned = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
+    cleaned = dict(composition_mol)
     backend = _resolved_backend_for_cache_identity(sim, intent, provider_role)
     species_registry = getattr(sim, "species_formula_registry", None)
     family = namespace_id.partition(":")[0]
@@ -3058,10 +3059,20 @@ def canonical_replay_key(
     )
     if redox_identity is not None:
         redox_key["redox_state_identity"] = redox_identity
+    cleaned_mol = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
+    provider_melt_inputs = sim._silicate_provider_melt_inputs(
+        intent,
+        cleaned_mol,
+    )
+    submitted_mol = (
+        provider_melt_inputs[0]
+        if provider_melt_inputs is not None
+        else cleaned_mol
+    )
     freeze_gate_cache_key = None
-    if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
+    if provider_melt_inputs is not None:
         freeze_gate_cache_key = sim._freeze_gate_cache_key(
-            pressure_bar=raw_pressure_bar,
+            pressure_bar=pressure_bar,
             fO2_log=fO2_log,
             redox_state=redox_state,
         )
@@ -3073,6 +3084,7 @@ def canonical_replay_key(
             provider_role,
             namespace_id=namespace_id,
             sig_figs=quantization.composition_sig_figs,
+            composition_mol=submitted_mol,
         ),
         "controls": {
             "T_K": T_K,

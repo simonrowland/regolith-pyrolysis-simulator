@@ -2669,12 +2669,18 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> FreezeGateCurveCacheKey:
         from simulator.reduced_real_determinism import _digest
+        from simulator.chemistry.kernel import ChemistryIntent
 
         cleaned_mol = self.atom_ledger.project_account_mol(
             _FREEZE_GATE_ACCOUNT
         )
+        provider_mol, inert_species = self._silicate_provider_melt_inputs(
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            cleaned_mol,
+        )
+        assert provider_mol is not None
         relevant_mol: dict[str, float] = {}
-        for species, mol in cleaned_mol.items():
+        for species, mol in provider_mol.items():
             species_key = str(species)
             if species_key not in _FREEZE_GATE_COMPOSITION_SPECIES:
                 continue
@@ -2699,7 +2705,7 @@ class EvaporationMixin:
                 if quantized_fraction <= 0.0:
                     continue
                 composition_key.append((species, round(quantized_fraction, 6)))
-        water_mol = max(float(cleaned_mol.get('H2O', 0.0)), 0.0)
+        water_mol = max(float(provider_mol.get('H2O', 0.0)), 0.0)
         tracked_total_mol = oxide_total_mol + water_mol
         water_fraction = (
             water_mol / tracked_total_mol
@@ -2710,15 +2716,6 @@ class EvaporationMixin:
             round(water_fraction / _FREEZE_GATE_WATER_FRACTION_QUANTUM)
             * _FREEZE_GATE_WATER_FRACTION_QUANTUM
         )
-        inert_components = (
-            getattr(self.inventory, 'inert_melt_components_kg', {}) or {}
-        )
-        inert_species = tuple(sorted(
-            str(species)
-            for species in inert_components
-            if species in cleaned_mol
-            and float(cleaned_mol[species]) > _FREEZE_GATE_EPSILON
-        ))
         pressure_bucket = (
             round(float(pressure_bar) / _FREEZE_GATE_PRESSURE_BAR_QUANTUM)
             * _FREEZE_GATE_PRESSURE_BAR_QUANTUM
@@ -2748,7 +2745,7 @@ class EvaporationMixin:
         provider_formula_species.add('H2O')
         provider_formula_species.update(
             str(species)
-            for species, mol in cleaned_mol.items()
+            for species, mol in provider_mol.items()
             if float(mol) > _FREEZE_GATE_EPSILON
         )
         provider_formula_identity = []
@@ -2769,7 +2766,9 @@ class EvaporationMixin:
                 (species_key, normalized_elements)
             )
         return FreezeGateCurveCacheKey(
-            schema='oxide_mol_fraction_p_fO2_v6',
+            # v7 moves explicitly inert species out of the submitted curve
+            # composition while keeping their membership as a separate input.
+            schema='oxide_mol_fraction_p_fO2_v7',
             pressure_bar=round(pressure_bucket, 6),
             fO2_log=round(fO2_bucket, 6),
             composition_mol_fractions=tuple(sorted(composition_key)),
@@ -2781,19 +2780,40 @@ class EvaporationMixin:
             redox_state_identity=redox_identity_key,
         )
 
-    def _silicate_provider_composition_mol(
+    def _silicate_provider_melt_inputs(
         self,
-        composition_mol: Mapping[str, float],
-    ) -> dict[str, float]:
-        """Exclude explicitly inert components from the submitted melt view."""
+        intent: Any,
+        composition_mol: Mapping[str, float] | None = None,
+    ) -> tuple[dict[str, float], tuple[str, ...]] | None:
+        """Return provider mol composition and active inert membership."""
+        from simulator.chemistry.kernel import ChemistryIntent
+
+        if intent not in {
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        }:
+            return None
+        if composition_mol is None:
+            composition_mol = self.atom_ledger.project_account_mol(
+                _FREEZE_GATE_ACCOUNT
+            )
         inert_species = set(
             (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
         )
-        return {
+        active_inert_species = tuple(sorted(
+            str(species)
+            for species in inert_species
+            if species in composition_mol
+            and float(composition_mol[species]) > 0.0
+        ))
+        submitted_mol = {
             species: float(mol)
             for species, mol in composition_mol.items()
             if species not in inert_species and float(mol) > 0.0
         }
+        return submitted_mol, active_inert_species
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,

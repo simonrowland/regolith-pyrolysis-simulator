@@ -360,7 +360,9 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # Two in-process evaluations and the cross-process test pin determinism.
     # 2026-10-31 b-929: gate replay keys now embed the owner freeze-gate cache
     # key so inert membership, water, and formula identity cannot alias curves.
-    # Paired base/candidate run on Studio-2 confirmed this canonical digest.
+    # The follow-up also keys the post-inert submitted composition and passes
+    # PT-0-quantized pressure to the owner. This prior Studio-2 literal awaits
+    # the follow-up run.
     assert key_hash == "9392021e2f9eb29198293ce38e74f7c4f15d2c5df8c18851a55bdeed3642b43d"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
@@ -818,6 +820,8 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
+    # This SILICATE_EQUILIBRIUM key now includes the same owner input identity
+    # as gate replay; leave the old Studio-canonical pin for the review rerun.
     assert _key_hash(base) == (
         "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
     )
@@ -825,6 +829,57 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
     assert "engine_version" not in next_engine["model"]
     assert _key_hash(base) != _key_hash(thermoengine)
     assert _key_hash(base) == _key_hash(next_engine)
+
+
+def test_equilibrium_key_tracks_inert_and_refuses_cross_replay() -> None:
+    capture = PT0DeterminismStore("capture")
+    sodium_sim, result = _pt0_equilibrium_capture_context(capture)
+    sodium_sim.inventory.inert_melt_components_kg.clear()
+    sodium_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    sodium_key = capture._equilibrium_key(sodium_sim)
+    capture._store(
+        "equilibrium_post_record",
+        sodium_key,
+        rrd.equilibrium_payload(sodium_sim, result),
+        repair_notices=(),
+    )
+
+    replay = capture._clone_for_context("replay", persistent_cache=False)
+    silica_sim, _ = _pt0_equilibrium_capture_context(replay)
+    silica_sim.inventory.inert_melt_components_kg.clear()
+    silica_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    silica_key = replay._equilibrium_key(silica_sim)
+
+    assert sodium_key != silica_key
+    replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    with pytest.raises(PT0CacheMiss):
+        replay.replay_equilibrium(silica_sim)
+
+
+def test_gate_replay_key_uses_pt0_quantized_pressure_for_provider_identity() -> None:
+    def key_at(pressure_bar: float) -> dict[str, Any]:
+        store = PT0DeterminismStore("capture")
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim.melt.p_total_mbar = pressure_bar * 1000.0
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=-9.0,
+            fe_redox_policy="intrinsic",
+            control_quantization=store._control_quantization,
+        )
+
+    lower = key_at(0.014999)
+    upper = key_at(0.015001)
+
+    assert (
+        lower["controls"]["pressure_bar"]
+        == upper["controls"]["pressure_bar"]
+    )
+    assert lower["freeze_gate_cache_key"] == upper["freeze_gate_cache_key"]
+    assert lower == upper
 
 
 def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
@@ -1126,9 +1181,9 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
-    # b-929 changes the gate key bytes by including the owner freeze-gate key;
-    # the equilibrium key below remains unchanged. Studio-2 confirmed the
-    # canonical post-change gate length and digest.
+    # b-929 first added the owner freeze-gate key. The follow-up uses the
+    # provider-submitted inert-filtered composition and PT-0-quantized pressure;
+    # the existing literals below await Studio-2's canonical repin.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1209,7 +1264,7 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
     assert inert_sim.atom_ledger.project_account_mol(
         "process.cleaned_melt"
     ) == cleaned_before
-    assert legacy_identity(sodium_inert_key) == legacy_identity(
+    assert legacy_identity(sodium_inert_key) != legacy_identity(
         silica_inert_key
     )
     assert sodium_inert_key != silica_inert_key
@@ -1217,10 +1272,13 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
         sodium_inert_key["freeze_gate_cache_key"]
         != silica_inert_key["freeze_gate_cache_key"]
     )
+    legacy_sim = build_sim()
+    legacy_sim.inventory.inert_melt_components_kg.clear()
+    legacy_key = legacy_identity(gate_key(legacy_sim))
     legacy_store = PT0DeterminismStore("capture")
     legacy_store._store(
         "freeze_gate_curve",
-        legacy_identity(sodium_inert_key),
+        legacy_key,
         {
             "curve": {
                 "source": "gate_liquid_fraction:legacy",
@@ -1239,9 +1297,7 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
     replay_sim = build_sim()
     replay_sim.inventory.inert_melt_components_kg.clear()
     replay_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
-    assert legacy_identity(gate_key(replay_sim)) == legacy_identity(
-        sodium_inert_key
-    )
+    assert legacy_identity(gate_key(replay_sim)) != legacy_key
     with pytest.raises(PT0CacheMiss):
         legacy_replay.replay_gate_curve(replay_sim, fO2_log=-9.0)
 
@@ -1265,7 +1321,7 @@ def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
     silica_replay_sim = build_sim()
     silica_replay_sim.inventory.inert_melt_components_kg.clear()
     silica_replay_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
-    assert legacy_identity(gate_key(silica_replay_sim)) == legacy_identity(
+    assert legacy_identity(gate_key(silica_replay_sim)) != legacy_identity(
         sodium_inert_key
     )
     with pytest.raises(PT0CacheMiss):
