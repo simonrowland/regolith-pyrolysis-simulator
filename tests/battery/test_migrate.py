@@ -2183,6 +2183,33 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
                 "per-run composition is not published"
                 in point_composition.state.reason
             )
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "kems-020-hastie-1981-nbsir.yaml",
+        "kang-2007-sio2-activity-cas-low-silica.yaml",
+    ],
+)
+def test_empirical_composition_locators_survive_migration(
+    tmp_path: Path, name: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, name)
+
+    missing_locator_issues = [
+        issue
+        for issue in result.validation.issues
+        if issue.detail == "empirical Located value requires a locator"
+        and (
+            issue.path.endswith(".initial_composition")
+            or ".initial_composition.inference.parameters[" in issue.path
+            or issue.path.endswith(".printed_composition")
+        )
+    ]
+    assert not missing_locator_issues, "\n".join(
+        f"{issue.path}: {issue.detail}" for issue in missing_locator_issues
+    )
             role_notices = [
                 notice
                 for notice in observation.notices
