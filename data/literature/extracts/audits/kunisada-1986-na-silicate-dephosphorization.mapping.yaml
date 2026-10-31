@@ -27,12 +27,12 @@ tables:
     admission_status: typed_refusal
   - printed_column: 4
     species: P
-    quantity: printed_final_P_in_liquid_iron
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   - printed_column: 5
     species: O
     quantity: printed_final_O_in_liquid_iron
@@ -43,46 +43,48 @@ tables:
     admission_status: typed_refusal
   - printed_column: 6
     species: Na2O
-    quantity: printed_Na2O_in_reactive_slag_assay
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   - printed_column: 7
     species: SiO2
-    quantity: printed_SiO2_in_reactive_slag_assay
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   - printed_column: 8
     species: Fe
-    quantity: printed_total_Fe_in_reactive_slag_assay
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   - printed_column: 9
     species: MgO
-    quantity: printed_MgO_in_reactive_slag_assay
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   - printed_column: 10
     species: P2O5
-    quantity: printed_P2O5_in_reactive_slag_assay
-    type: concentration_series
+    quantity: equilibrium_phase_composition
+    type: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
-    admission_status: typed_refusal
+    admission_status: admitted
   cell_audit: All 27 data rows and all 243 numeric cells, including temperature, were checked against the rendered
-    page 2. T. Fe means total Fe reported elementally. Table 1(I) does not claim endpoint equilibrium.
+    page 2. T. Fe means total Fe reported elementally. Final P and the five slag assay endpoints are admitted as
+    equilibrium_phase_composition; initial P and final O remain typed-refused. The paper states slag-metal phosphorus
+    equilibrium was attained at run end, and Figure 11 includes the low-Na2O Table 1(I) series.
 - table_key: p002-t02
   printed_locator:
     page: 2
@@ -181,15 +183,15 @@ tables:
     admission_status: admitted
   - printed_column: 3
     field: total_FeO_experiment
-    species: FeO
+    species: FeOT
     quantity: equilibrium_phase_composition
     phase: l
     unit: '%'
     method_class: measured_direct
     admission_status: admitted
-  cell_audit: All ten FeO cells in five rows checked against the rendered page 6. Calculated values are quoted_attributed
-    because the paper's assumed reaction extents and all numerical inputs are not stored; experimental values are
-    the authors' reported experiment result.
+  cell_audit: All ten cells in five rows checked against the rendered page 6. Calculated FeO values are quoted_attributed
+    because the paper's assumed reaction extents and all numerical inputs are not stored. The experimental total-iron-as-FeO
+    values are admitted as measured_direct with the delivered FeOT identity.
 numeric_cell_audit: kunisada-1986-na-silicate-dephosphorization.cell-audit.csv contains 298 render-confirmed numeric
   cells, including all 32 table temperature cells.
 compare_index: The tool draft omitted printed Table 1 sublabels; the notes copy of index.yaml assigns draft order

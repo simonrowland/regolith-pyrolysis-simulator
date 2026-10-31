@@ -231,14 +231,31 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert context_rows["kunisada_1986_equation_6"]["values"][
         "equation_as_printed"
     ] == "2P + 5(FeO) = (P2O5) + 5Fe"
+    for equation_id in (
+        "kunisada_1986_equation_6",
+        "kunisada_1986_equation_7",
+        "kunisada_1986_equation_8",
+    ):
+        assert context_rows[equation_id]["locator"]["page"] == 7
+        assert context_rows[equation_id]["locator"]["published_page"] == 127
+        assert context_rows[equation_id]["locator"]["pdf_page_index"] == 6
     assert context_rows["kunisada_1986_equation_7"]["values"][
         "equation_as_printed"
-    ] == "L_P = (%P2O5)/([%P]^2 · (%FeO)^5)"
+    ] == "k_P = (%P2O5)/([%P]^2 · (%FeO)^5)"
     assert context_rows["kunisada_1986_equation_8"]["values"][
         "equation_as_printed"
+    ] == "log k_P = 8.67 log(%Na2O) - 14.55 (1600 °C)"
+    assert context_rows["kunisada_1986_equation_8"]["values"][
+        "temperature_dependence_as_printed"
     ] == (
-        "log kP = log{(%P2O5)/([%P]^2 · (%FeO)^5)} = "
-        "8.67 log(%Na2O) - 14.55 (1600 °C)"
+        "The temperature dependence of log k_P was not clear at this time "
+        "as shown in the figure."
+    )
+    assert context_rows["kunisada_1986_equation_8"]["values"][
+        "total_iron_basis_as_printed"
+    ] == (
+        "where, (%Fe_tO) calculated from the total iron content in the slag "
+        "was used instead of (%FeO)."
     )
     figure_contexts = [
         context

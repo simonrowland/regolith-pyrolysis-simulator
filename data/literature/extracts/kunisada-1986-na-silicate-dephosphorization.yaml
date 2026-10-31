@@ -5541,9 +5541,9 @@ species:
       - observation_id: kunisada_1986_equation_6
         type: thermodynamic_equation
         locator:
-          page: 6
-          published_page: 126
-          pdf_page_index: 5
+          page: 7
+          published_page: 127
+          pdf_page_index: 6
           section: III. Results and Discussion — 3. Dephosphorization Equilibrium
         units: as printed
         values:
@@ -5554,15 +5554,15 @@ species:
       - observation_id: kunisada_1986_equation_7
         type: thermodynamic_equation
         locator:
-          page: 6
-          published_page: 126
-          pdf_page_index: 5
+          page: 7
+          published_page: 127
+          pdf_page_index: 6
           section: III. Results and Discussion — 3. Dephosphorization Equilibrium
         units: as printed
         values:
           method_class: quoted_attributed
           equation_number_as_printed: (7)
-          equation_as_printed: 'L_P = (%P2O5)/([%P]^2 · (%FeO)^5)'
+          equation_as_printed: 'k_P = (%P2O5)/([%P]^2 · (%FeO)^5)'
           use_as_printed: phosphorus dephosphorization equilibrium relation; context only
       - observation_id: kunisada_1986_equation_8
         type: thermodynamic_equation
@@ -5575,7 +5575,9 @@ species:
         values:
           method_class: quoted_attributed
           equation_number_as_printed: (8)
-          equation_as_printed: 'log kP = log{(%P2O5)/([%P]^2 · (%FeO)^5)} = 8.67 log(%Na2O) - 14.55 (1600 °C)'
+          equation_as_printed: 'log k_P = 8.67 log(%Na2O) - 14.55 (1600 °C)'
+          temperature_dependence_as_printed: The temperature dependence of log k_P was not clear at this time as shown in the figure.
+          total_iron_basis_as_printed: 'where, (%Fe_tO) calculated from the total iron content in the slag was used instead of (%FeO).'
           use_as_printed: phosphorus dephosphorization equilibrium relation; context only
       - observation_id: kunisada_1986_figure_01_caption
         type: figure_caption
