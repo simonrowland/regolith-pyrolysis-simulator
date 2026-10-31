@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, UncertaintyKind, ValueKind
+from simulator.battery.enums import Phase, PhaseRole, Quantity, UncertaintyKind, ValueKind, NoticeKind
 from simulator.battery.identity import celsius_to_kelvin
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
@@ -179,7 +179,18 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
             assert observation.uncertainty.verbatim["units"] == "mol.%"
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
-        assert not observation.notices
+        if row["table"] == "2":
+            # This paper's own runs: no notice of any kind.
+            assert not observation.notices
+        else:
+            # Values the paper quotes from its references may carry admission_status
+            # quoted_attributed; the legacy-token mapping admits those with one notice naming
+            # the old token. No other notice kind is allowed on any row.
+            assert all(
+                notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+                for notice in observation.notices
+            )
+            assert len(observation.notices) <= 1
 
     assert sum(row["table"] == "2" for row in fixture) == 147
     assert sum(row["table"] == "2" and Decimal(row["component_amount"]) > 0 for row in fixture) == 144

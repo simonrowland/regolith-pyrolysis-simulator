@@ -3420,8 +3420,8 @@ def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -
     [
         ("pending", AdmissionStatus.ADMITTED, True),
         ("pending_validation", AdmissionStatus.ADMITTED, True),
-        ("figure_only", AdmissionStatus.PENDING, False),
-        ("model_output_not_measurement", AdmissionStatus.PENDING, False),
+        ("figure_only", AdmissionStatus.ADMITTED, False),
+        ("model_output_not_measurement", AdmissionStatus.ADMITTED, False),
         (
             "rejected_model_output_not_measurement",
             AdmissionStatus.REJECTED,
@@ -3448,6 +3448,220 @@ def test_source_admission_default_scope(
     assert any(
         notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in obs.notices
     ) is defaulted
+
+
+def _legacy_token_observation(
+    tmp_path: Path,
+    token: str,
+    *,
+    method_class: str | None | object = "KEEP",
+    locator_figure: str | None = None,
+    provenance: dict | None = None,
+    drop_regime: bool = False,
+):
+    """One migrated fixture row whose admission_status is ``token``."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    values.pop("series", None)
+    values["admission_status"] = token
+    if method_class is None:
+        values.pop("method_class", None)
+    elif method_class != "KEEP":
+        values["method_class"] = method_class
+    if drop_regime:
+        row.pop("regime", None)
+    if locator_figure is not None:
+        row["locator"]["figure"] = locator_figure
+    if provenance is not None:
+        values["provenance"] = provenance
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    assert len(result.observations) == 1
+    return next(iter(result.observations.values()))
+
+
+def _legacy_notice(observation, token: str):
+    matches = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+        and notice.reason == f"admission_from_legacy_token:{token}"
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def test_legacy_admission_evidence_labels_are_admitted(tmp_path: Path) -> None:
+    """Class (a): evidence labels are admitted; an existing class is kept."""
+
+    missing = _legacy_token_observation(
+        tmp_path / "figure-missing",
+        "figure_only",
+        method_class=None,
+        drop_regime=True,
+        locator_figure="7 caption",
+        provenance={"digitized_from_figure": True, "reader": "kept"},
+    )
+    assert missing.admission.status is AdmissionStatus.ADMITTED
+    assert missing.admission.reason == "admission_from_legacy_token:figure_only"
+    assert missing.admission.decided_by is None
+    assert missing.evidence.class_.is_value
+    assert missing.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    assert missing.locator is not None and missing.locator.figure == "7 caption"
+    assert missing.provenance is not None
+    assert missing.provenance["digitized_from_figure"] is True
+    assert missing.provenance["reader"] == "kept"
+    notice = _legacy_notice(missing, "figure_only")
+    assert notice.affected_quantities
+    assert not any(
+        item.kind is NoticeKind.ADMISSION_DEFAULTED for item in missing.notices
+    )
+
+    kept = _legacy_token_observation(
+        tmp_path / "figure-kept",
+        "figure_only",
+        method_class="measured_direct",
+    )
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.reason == "admission_from_legacy_token:figure_only"
+    assert kept.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert kept.evidence.original_method_class == "measured_direct"
+    _legacy_notice(kept, "figure_only")
+
+    quoted = _legacy_token_observation(
+        tmp_path / "quoted",
+        "quoted_attributed",
+        method_class="measured_direct",
+    )
+    assert quoted.admission.status is AdmissionStatus.ADMITTED
+    assert quoted.admission.reason == "admission_from_legacy_token:quoted_attributed"
+    assert quoted.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert quoted.evidence.original_method_class == "measured_direct"
+    _legacy_notice(quoted, "quoted_attributed")
+
+    model = _legacy_token_observation(
+        tmp_path / "model",
+        "model_output_not_measurement",
+        method_class="quoted_attributed",
+    )
+    assert model.admission.status is AdmissionStatus.ADMITTED
+    assert (
+        model.admission.reason
+        == "admission_from_legacy_token:model_output_not_measurement"
+    )
+    assert model.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert model.evidence.original_method_class == "quoted_attributed"
+    assert model.evidence.model is None
+    _legacy_notice(model, "model_output_not_measurement")
+
+    model_missing = _legacy_token_observation(
+        tmp_path / "model-missing",
+        "model_output_not_measurement",
+        method_class=None,
+        drop_regime=True,
+    )
+    assert model_missing.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert model_missing.evidence.model == "model_output_not_measurement"
+    assert model_missing.admission.status is AdmissionStatus.ADMITTED
+
+
+def test_legacy_admission_rejection_tokens_are_rejected(tmp_path: Path) -> None:
+    """Class (b): explicit rejection tokens stay rejected and keep their reason."""
+
+    tokens = (
+        "rejected_no_figure_reading",
+        "rejected_no_complete_figure_digitization",
+        "rejected_model_output_not_measurement",
+        "authors_rejected",
+        "authors_rejected_in_favour_of_ion_intensity_ratio_method",
+    )
+    for token in tokens:
+        observation = _legacy_token_observation(tmp_path / token, token)
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.admission.reason == f"source admission_status={token}"
+        assert not any(
+            notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+            for notice in observation.notices
+        )
+
+
+def test_legacy_admission_holds_stay_pending(tmp_path: Path) -> None:
+    """Class (c): parked rows and the named holds stay pending with their reason."""
+
+    from simulator.battery.migrate import _yield_point_admission, admission_for
+    from simulator.battery.records import Evidence
+
+    for token in ("parked", "preserved_unscored"):
+        observation = _legacy_token_observation(tmp_path / token, token)
+        assert observation.admission.status is AdmissionStatus.PENDING
+        assert observation.admission.reason == (
+            f"source admission_status={token} is not a closed v2.1 token"
+        )
+        assert not any(
+            notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+            for notice in observation.notices
+        )
+
+    parent = admission_for(
+        "figure_only",
+        superseded_by=None,
+        extraction={"worker": "pytest", "date": "2026-10-30"},
+        locator=Locator(page=12, table="1"),
+    )
+    assert parent.status is AdmissionStatus.ADMITTED
+    assert parent.reason == "admission_from_legacy_token:figure_only"
+    evidence = Evidence(
+        class_=State.of(EvidenceClass.MEASURED_DIRECT),
+        original_method_class="measured_direct",
+    )
+    locator = Locator(page=12, table="1")
+    extraction = {"worker": "pytest", "date": "2026-10-30"}
+    initial = _yield_point_admission(
+        item={"T_C_is_initial_composition": True, "test": "1"},
+        parent_values={},
+        evidence=evidence,
+        locator=locator,
+        extraction=extraction,
+        t_is_point=True,
+        parent_admission=parent,
+    )
+    assert initial.status is AdmissionStatus.PENDING
+    assert (
+        initial.reason
+        == "initial composition is not a run-temperature mass-loss measurement"
+    )
+    for test_id in ("2b", "3"):
+        disagreed = _yield_point_admission(
+            item={"test": test_id},
+            parent_values={
+                "contradiction_vs_matchett_2006_table3": {"kept": "as_printed"}
+            },
+            evidence=evidence,
+            locator=locator,
+            extraction=extraction,
+            t_is_point=True,
+            parent_admission=parent,
+        )
+        assert disagreed.status is AdmissionStatus.PENDING
+        assert "16.00/37.00" in disagreed.reason
+        assert "0.16/0.37" in disagreed.reason
+
+
+def test_unlisted_admission_token_falls_through(tmp_path: Path) -> None:
+    """An unlisted non-closed token keeps the pre-existing pending fallthrough."""
+
+    token = "qualitative_not_numeric"
+    observation = _legacy_token_observation(tmp_path / token, token)
+    assert observation.admission.status is AdmissionStatus.PENDING
+    assert observation.admission.reason == (
+        f"source admission_status={token} is not a closed v2.1 token"
+    )
+    assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+        for notice in observation.notices
+    )
 
 
 def test_plain_pending_without_source_decision_defaults_and_adds_notice(
