@@ -1461,19 +1461,20 @@ vm.runInContext([
     'let loadedRecipeCostRecipeName = null;',
 ].join('\n'), context);
 vm.runInContext(`
-elements['carrier-gas'].value = 'Kr';
+document.getElementById('carrier-gas').value = 'N2';
 applyLoadedRecipeControls({
     lever_campaign: 'C4', pO2_mbar: 0.12, p_total_mbar: 0.12,
-    stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22
+    stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22,
+    runtime_campaign_overrides: {C2A: {carrier_gas: 'Kr'}}
 });
-const carrierAfterLoad = elements['carrier-gas'].value;
+const carrierAfterLoad = document.getElementById('carrier-gas').value;
 loadedRecipePatch = {campaigns: {C4: {temp_range_C: [1600, 1660]}}};
 loadedRecipeCostParameters = {schema_version: 'optimize-costs-v1', parameters: {}};
 loadedRecipeCostRecipeName = 'tab-local-prices';
 const payload = {};
 applyLoadedRecipeStartIdentity(payload);
 const changedPayload = {};
-elements['carrier-gas'].value = 'N2';
+document.getElementById('carrier-gas').value = 'N2';
 applyLoadedRecipeStartIdentity(changedPayload);
 console.log(JSON.stringify({
     carrierAfterLoad,

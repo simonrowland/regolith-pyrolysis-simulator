@@ -2646,6 +2646,7 @@ const context = {
     updateMreFields: () => {},
     updateKnudsenIndicator: () => {},
     updateLeverWarning: () => {},
+    console,
 };
 vm.createContext(context);
 vm.runInContext([
@@ -2663,15 +2664,15 @@ vm.runInContext([
 context.loadedControls = JSON.parse(process.argv[3]);
 vm.runInContext(`
 applyLoadedRecipeControls(loadedControls);
-const savedCarrierAfterLoad = elements['carrier-gas'].value;
+const savedCarrierAfterLoad = document.getElementById('carrier-gas').value;
 const launchPayload = {};
 applyLoadedRecipeStartIdentity(launchPayload);
-elements['carrier-gas'].value = 'Ar';
+document.getElementById('carrier-gas').value = 'Ar';
 applyLoadedRecipeControls({lever_campaign: 'C4'});
 console.log(JSON.stringify({
     savedCarrierAfterLoad,
     launchPayload,
-    candidateCarrierAfterLoad: elements['carrier-gas'].value,
+    candidateCarrierAfterLoad: document.getElementById('carrier-gas').value,
 }));
 `, context);
 """
