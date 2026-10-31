@@ -347,14 +347,12 @@ def test_shornikov_2013_migrates_printed_gibbs_energies() -> None:
 
 def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     result = _migrate("adamkovicova-1980-casio3-heat-of-fusion.yaml")
-    # 38 = the old 25 parents-and-scored-points, minus the 3 parents for the
-    # series below, plus their 16 printed children. 25 was wrong because it
-    # dropped those printed cells. 47 was wrong because it also exploded two
-    # shells that do not carry a recorded field: Table II heat_of_solution
-    # (the enthalpy is only in delta_Hsol_kJ_mol-1_as_printed; the other
-    # number is the measurement index) and Table III
-    # mean_negative_heat_of_solution (minus_delta_Hsol_kJ_mol-1 is not a
-    # field QUANTITY_SOURCE_FIELDS records for that token).
+    # 42 = 25 parents-and-scored-points, minus the 3 parents of the Hrel and
+    # melt-cooling series, plus their 16 printed children, plus the 5 Table
+    # III solution-mean children in place of that parent. 25 dropped the
+    # printed Hrel and melt-cooling cells. 47 also exploded Table II, whose
+    # enthalpy is only in delta_Hsol_kJ_mol-1_as_printed and whose other
+    # number is the measurement index, so Table II stays one parent.
     # Printed children, Silikáty XXIV (1980):
     # Table I p. 195 Hrel,CS,c kJ/mol: 1506 K 448.8, 1576 K 459.8,
     # 1630 K 466.3, 1678 K 474.2, 1730 K 483.1, 1780 K 492.5.
@@ -362,7 +360,9 @@ def test_adamkovicova_1980_ingested_count_and_pdf_cells() -> None:
     # 1859 K 561.2, 1915 K 567.8, 1961 K 577.9.
     # Table III p. 196 −ΔHcool,CS,m kJ/mol: 1829 K 217.1, 1848 K 219.9,
     # 1859 K 222.2, 1915 K 230.5, 1961 K 238.9.
-    assert len(result.observations) == 38
+    # Table III p. 196 −ΔHsol kJ/mol: 1829 K 340.5, 1848 K 339.5,
+    # 1859 K 339.0, 1915 K 337.3, 1961 K 339.0.
+    assert len(result.observations) == 42
     assert result.validation.hard_issues == ()
     assert _point(result, "adamkovicova_1980_heat_of_fusion_at_1817K") == Decimal(
         "57.3"

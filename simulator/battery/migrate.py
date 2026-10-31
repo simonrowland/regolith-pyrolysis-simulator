@@ -9881,9 +9881,11 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
     "sample_dependent_enthalpy_change_on_cooling": (
         "minus_delta_H_cool_kJ_mol-1",
     ),
-    # These tokens do not resolve to a scored quantity. The column is still
-    # the printed value, so the point is admitted as typed-unavailable.
-    # select_declared_source reads Quantity keys only and does not score them.
+    # select_declared_source reads Quantity keys only and does not score a
+    # plain-string column. relative_enthalpy and the sample-dependent
+    # melt-cooling token do not resolve. ion_current_ratio resolves to
+    # ion_intensity_ratio, and Fe3plus_over_total_Fe resolves to
+    # valence_ratio; these columns stay unscored.
     "predicted_partial_pressure": ("p_bar",),
     "third_law_delta_H0_from_simultaneous_partial_pressures": (
         "delta_H0_kcal_mol",
@@ -10067,6 +10069,18 @@ _NON_YIELD_RANGE_QUANTITIES = frozenset(
         Quantity.MASS_LOSS_RATE,
     }
 )
+# The token names two closed observables. Recording either field would pick
+# one number; activity_coefficient_uncertainty is the same cell's printed
+# band, not a third observable. Table 4 stays the unavailable parent.
+_UNPICKED_COMPOUND_FIELDS = {
+    "activity_and_activity_coefficient": frozenset(
+        {
+            "activity",
+            "activity_coefficient",
+            "activity_coefficient_uncertainty",
+        }
+    ),
+}
 
 
 def _is_decorated_quantity_field(quantity: Quantity, key: str) -> bool:
@@ -10150,16 +10164,19 @@ def _non_yield_point_is_blank(
     declared_token: str | None,
     selected_available: bool,
 ) -> bool:
-    """True when no field this migrator records for the declared quantity holds a number.
+    """True when the point has no printed measurement of its declared quantity.
 
-    One owner for the non-yield blank cell: ``QUANTITY_SOURCE_FIELDS``.
-    ``value`` being empty is not blank when a recorded field holds the number.
-    That row migrates, including a typed-unavailable observation whose token
-    has a string entry on the map. A number in any other key stays blank.
-    The caller queues a blank cell when a source-unavailable reason is set
-    or the raw value is empty. Condition axes, ``*_as_printed`` echoes, and
-    mole-count keys are not value fields. A numeric ``range`` is the
-    measurement only for density and the two rate quantities.
+    A recorded field (``QUANTITY_SOURCE_FIELDS``, including a plain-string
+    token column) counts. So does any other numeric column of a declared
+    token: that row is admitted as typed-unavailable and is not scored.
+    Condition axes, ``*_as_printed`` echoes, mole-count keys, a replicate
+    ``measurement`` index, and ``activity`` / ``activity_coefficient``
+    (plus that cell's uncertainty) on
+    ``activity_and_activity_coefficient`` do not count. A point with no
+    declared quantity does not pick up a stray number. The caller queues a
+    blank cell when a source-unavailable reason is set or the raw value is
+    empty. A numeric ``range`` is the measurement only for density and the
+    two rate quantities.
     """
 
     if selected_available:
@@ -10188,11 +10205,36 @@ def _non_yield_point_is_blank(
         recorded_field = name in recorded or name in residue_fields
         if not recorded_field and closed is not None:
             recorded_field = _is_decorated_quantity_field(closed, name)
-        if not recorded_field:
-            continue
-        if _recorded_field_present(raw, name, text_ok=name in text_fields):
+        if recorded_field and _recorded_field_present(
+            raw, name, text_ok=name in text_fields
+        ):
+            return False
+        if _stray_printed_measurement(name, raw, declared_token):
             return False
     return True
+
+
+def _stray_printed_measurement(
+    name: str,
+    raw: Mapping[str, Any],
+    declared_token: str | None,
+) -> bool:
+    """True when ``name`` is a printed number of the declared token.
+
+    Not a condition axis, an ``*_as_printed`` echo, or a mole-fraction
+    ``N_*`` key: the caller already skipped those. A replicate index and
+    the unpicked activity pair are not measurements. No declared token
+    means the number is not a measurement of a quantity.
+    """
+
+    if not isinstance(declared_token, str) or not declared_token:
+        return False
+    if name in _PRINTED_LOG_FO2_KEYS or name == "measurement":
+        return False
+    refused = _UNPICKED_COMPOUND_FIELDS.get(declared_token)
+    if refused is not None and name in refused:
+        return False
+    return _numeric_field(raw, name) is not None
 
 
 def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
