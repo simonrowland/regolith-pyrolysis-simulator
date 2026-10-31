@@ -319,6 +319,10 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
 @pytest.mark.nightly
 def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
+    from dataclasses import replace
+
+    from simulator.run_executor import RunExecutor
+
     sid, state, events, decisions, completion = _drive(
         web_driver,
         perturb_every_gate=True,
@@ -356,6 +360,28 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
     sim = state["session"].simulator
+    from simulator.accounting.queries import TERMINAL_RUMP_ACCOUNTS
+
+    # Replay the same inputs through a fresh AUTO_APPLY runner session. The
+    # web envelope above is built from its live session, so it cannot by itself
+    # establish web-versus-runner parity.
+    runner_execution = RunExecutor().execute(
+        replace(
+            state["session"]._config,
+            hours=int(sim.melt.hour),
+            result_document_factory=None,
+        )
+    )
+    assert runner_execution.status == "ok"
+    assert [
+        (row["decision_type"], row["choice"])
+        for row in runner_execution.operator_decisions
+    ] == decisions
+    runner_sim = runner_execution.simulator
+    for account in TERMINAL_RUMP_ACCOUNTS:
+        assert dict(runner_sim.atom_ledger.project_account_mol(account)) == dict(
+            sim.atom_ledger.project_account_mol(account)
+        )
     assert (
         sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
         is False
@@ -375,6 +401,11 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert completion["mass_balance_error_breached"] is False
 
     story = completion["product_story"]
+    runner_story = web_events._product_story_payload(
+        runner_sim,
+        terminal_rump_by_species=runner_sim._terminal_rump_by_species(),
+    )
+    assert story == runner_story
     assert story["input"] == {
         "feedstock": "lunar_mare_low_ti",
         "feedstock_label": sim.record.feedstock_label,
@@ -424,33 +455,49 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # metal-equivalent Cr in terminal offgas. The product story displays the
     # same inventory by species, rounded to two decimal places.
     rump = completion["terminal_rump_by_species"]
-    _CR_MASS_FRACTION_IN_CR2O3 = 2 * 51.9961 / 151.9904  # 2 Cr per Cr2O3
-    _CR_MW = 51.9961
-    _CRO_MW = 51.9961 + 15.9994  # CrO
+    from simulator.accounting.formulas import resolve_species_formula
+
+    cr_formula = resolve_species_formula("Cr", sim.species_formula_registry)
+
+    def _cr_mass_fraction(species):
+        formula = resolve_species_formula(species, sim.species_formula_registry)
+        # Premise: one formula unit contains formula.atom_moles(1)['Cr'] Cr atoms;
+        # multiplying by Cr kg/mol and dividing by species kg/mol gives a
+        # dimensionless mass fraction. A pure Cr formula is the limiting case 1.
+        return (
+            formula.atom_moles(1.0).get("Cr", 0.0)
+            * cr_formula.molar_mass_kg_per_mol()
+            / formula.molar_mass_kg_per_mol()
+        )
+
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
     # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
     # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
-    cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
+    _PINNED_CR_OFFGAS_EQ_KG = 0.1824367962875407
+    cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
     cro_offgas_kg = float(offgas_kg.get("CrO", 0.0) or 0.0)
-    # Offgas Cr metal-equivalent (kg Cr) across Cr-bearing offgas species.
-    _CRO2_MW = _CR_MW + 2.0 * 15.9994
-    _CRO3_MW = _CR_MW + 3.0 * 15.9994
-    cr_offgas_eq_kg = (
-        float(offgas_kg.get("Cr", 0.0) or 0.0)
-        + cro_offgas_kg * (_CR_MW / _CRO_MW)
-        + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
-        + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
+    # Convert only the Cr-bearing terminal streams to Cr-equivalent kg; formula
+    # resolution supplies the atom count and molar mass used by accounting.
+    cr_offgas_eq_kg = sum(
+        float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
+        for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
-    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
-    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280300206015765, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
+    # Stage 4 now captures Na/Mg at 250 C and K at 40 C. That changes per-hour
+    # alkali capture and the later pressure-limited reduction trajectory: the
+    # independent runner and web paths both move Cr2O3 from 3.3280300206015765
+    # to 3.3283236817361845 kg, while Cr-equivalent terminal offgas moves from
+    # 9.216286830238766e-06 to 0.1824367962875407 kg and extracted Cr falls
+    # from 0.18 to 0 kg. The Cr2O3 delta is 0.000293661134608 kg; dividing by
+    # the old residual gives 8.8239e-5 (dimensionless); kg cancel in that
+    # ratio. In the limiting case of
+    # unchanged alkali capture, the late reduction trajectory and delta return
+    # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3283236817361845, rel=1e-9)
+    assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
