@@ -603,7 +603,11 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # ratio. In the limiting case of
     # unchanged alkali capture, the late reduction trajectory and delta return
     # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3283236817361845, rel=1e-9)
+    # d-137 rounds 5-7 (per-strip piecewise capture solution) move this by
+    # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
+    # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
+    # solver's per-call differences at <=1.1e-7 kg.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
