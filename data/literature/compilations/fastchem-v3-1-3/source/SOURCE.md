@@ -11,7 +11,7 @@ All four public raw files returned HTTP 200 after URL-history checks and paced r
 - README.TXT: 714 bytes; SHA-256 45c88c13e1665d26d6a2fd507f5fd04805fad6a93bce542895d820a5c832b35a.
 - licence.md: 34,917 bytes; SHA-256 2e13f31cbd2ca0dbbd35df7d0fb8beb4dc20e2c03e0eedc6b114afe8e82a8cb2. Repository GPL version 3 text.
 
-The header dates are not release dates. FILES.json in /Users/simonrowland/Repos/paper-download-tools/runs/2026-10-30-wave233-fastchem/ preserves exact raw URLs, receipt body paths and intermediate rename custody. Transport receipts retain historical staging paths; canonical files now reside here. Native ADD/TAKE and post-intake hashes are in that run.
+The header dates are not release dates. FILES.json in paper-download-tools run 2026-10-30-wave233-fastchem preserves exact raw URLs, receipt body paths and intermediate rename custody. Transport receipts retain historical staging paths; canonical files now reside here. Native ADD/TAKE and post-intake hashes are in that run.
 
 ## Verification and conventions
 
