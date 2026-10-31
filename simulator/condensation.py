@@ -4383,6 +4383,31 @@ class CondensationModel:
         # below 45 Pa.
         inventory_mol = available_kg / molar_mass / 3600.0 * residence_s
         pressure_scale_pa_per_mol = p_in / inventory_mol
+
+        def _segment_solution(
+            pressure_pa: float,
+            duration_s: float,
+        ) -> tuple[float, float, float] | None:
+            active = [
+                (conductance * area / sample_count, saturation)
+                for conductance, saturation in strip_conductance_and_saturation
+                if saturation < pressure_pa
+            ]
+            total_conductance = sum(value for value, _ in active)
+            if total_conductance <= 0.0:
+                return None
+            equilibrium_pressure_pa = sum(
+                value * saturation for value, saturation in active
+            ) / total_conductance
+            next_pressure_pa = equilibrium_pressure_pa + (
+                pressure_pa - equilibrium_pressure_pa
+            ) * math.exp(
+                -pressure_scale_pa_per_mol
+                * total_conductance
+                * duration_s
+            )
+            return total_conductance, equilibrium_pressure_pa, next_pressure_pa
+
         pressure_pa = p_in
         remaining_s = residence_s
         saturation_levels = sorted({
@@ -4391,51 +4416,24 @@ class CondensationModel:
             if conductance > 0.0
         })
         for threshold_pa in reversed(saturation_levels[1:]):
-            active = [
-                (conductance * area / sample_count, saturation)
-                for conductance, saturation in strip_conductance_and_saturation
-                if saturation < pressure_pa
-            ]
-            total_conductance = sum(value for value, _ in active)
-            if total_conductance <= 0.0:
+            segment = _segment_solution(pressure_pa, remaining_s)
+            if segment is None:
                 break
-            equilibrium_pressure_pa = sum(
-                value * saturation for value, saturation in active
-            ) / total_conductance
+            total_conductance, equilibrium_pressure_pa, next_pressure_pa = segment
             time_to_threshold_s = math.log(
                 (pressure_pa - equilibrium_pressure_pa)
                 / (threshold_pa - equilibrium_pressure_pa)
             ) / (pressure_scale_pa_per_mol * total_conductance)
             if time_to_threshold_s > remaining_s:
-                pressure_pa = equilibrium_pressure_pa + (
-                    pressure_pa - equilibrium_pressure_pa
-                ) * math.exp(
-                    -pressure_scale_pa_per_mol
-                    * total_conductance
-                    * remaining_s
-                )
+                pressure_pa = next_pressure_pa
                 remaining_s = 0.0
                 break
             pressure_pa = threshold_pa
             remaining_s -= time_to_threshold_s
         if remaining_s > 0.0:
-            active = [
-                (conductance * area / sample_count, saturation)
-                for conductance, saturation in strip_conductance_and_saturation
-                if saturation < pressure_pa
-            ]
-            total_conductance = sum(value for value, _ in active)
-            if total_conductance > 0.0:
-                equilibrium_pressure_pa = sum(
-                    value * saturation for value, saturation in active
-                ) / total_conductance
-                pressure_pa = equilibrium_pressure_pa + (
-                    pressure_pa - equilibrium_pressure_pa
-                ) * math.exp(
-                    -pressure_scale_pa_per_mol
-                    * total_conductance
-                    * remaining_s
-                )
+            segment = _segment_solution(pressure_pa, remaining_s)
+            if segment is not None:
+                _, _, pressure_pa = segment
         eta = (p_in - pressure_pa) / p_in
         notice = notices.get(f'{species}#wall:{midpoint_T_K}')
         if isinstance(notice, Mapping) and efficiency_outcomes is not None:
