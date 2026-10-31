@@ -253,6 +253,50 @@ def test_unrecovered_only_metal_is_not_duplicated_by_aggregate_projection():
     assert result['unclassified']['kg_by_species'].get('Al', 0.0) == 0.0
 
 
+def test_mixed_source_aluminum_inventory_is_reconciled_by_account():
+    from simulator.account_ids import (
+        METAL_FLOAT_LAYER_ACCOUNT,
+        TERMINAL_DRAIN_TAP_ACCOUNT,
+    )
+    from simulator.accounting.queries import CONDENSATION_TRAIN_ACCOUNT
+
+    sim = SimSession().start(_config(campaign='C0')).simulator
+    for account, amount_mol in (
+        (TERMINAL_DRAIN_TAP_ACCOUNT, 1.0),
+        (CONDENSATION_TRAIN_ACCOUNT, 2.0),
+        (METAL_FLOAT_LAYER_ACCOUNT, 3.0),
+    ):
+        sim.atom_ledger.load_external_mol(
+            account, {'Al': amount_mol}, material_origin='feedstock',
+        )
+
+    source_kg = {
+        account: sim.atom_ledger.project_account_kg(account)['Al']
+        for account in (
+            TERMINAL_DRAIN_TAP_ACCOUNT,
+            CONDENSATION_TRAIN_ACCOUNT,
+            METAL_FLOAT_LAYER_ACCOUNT,
+        )
+    }
+    inventory_kg = sim.product_ledger()['Al']
+    result = classify_products(sim)
+
+    assert result['ingots_metals']['species_kg']['Al'] == source_kg[
+        TERMINAL_DRAIN_TAP_ACCOUNT
+    ]
+    assert result['unrecovered_metal_phase']['species_kg']['Al'] == source_kg[
+        METAL_FLOAT_LAYER_ACCOUNT
+    ]
+    assert result['unclassified']['kg_by_species']['Al'] == source_kg[
+        CONDENSATION_TRAIN_ACCOUNT
+    ]
+    assert sum((
+        result['ingots_metals']['species_kg']['Al'],
+        result['unrecovered_metal_phase']['species_kg']['Al'],
+        result['unclassified']['kg_by_species']['Al'],
+    )) == pytest.approx(inventory_kg, rel=0.0, abs=1e-15)
+
+
 def test_c0_native_cleanup_does_not_produce_ingots_before_any_step():
     sim = SimSession().start(_config(campaign='C0')).simulator
     result = classify_products(sim)

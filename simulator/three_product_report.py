@@ -464,40 +464,100 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         )
 
     # ----- Unclassified bin -----
-    classified_species: set[str] = (
-        set(metals_kg.keys())
-        | set(cleanup_native_kg.keys())
-        | {'O2'}
-        | set(stage_3_kg_by_species.keys())
-        | set(captured_volatiles_kg_by_species.keys())
-        | set(spent_reductant_kg_by_species.keys())
-        | set(rump_kg_by_species.keys())
-    )
-    unrecovered_metal_account_kg_by_species = {
-        species: float(sum(
-            float(source.get('kg', 0.0))
-            for source in sources
-            if isinstance(source, Mapping)
-        ))
-        for species, sources in unrecovered_metal_sources.items()
-    }
-    unclassified: dict[str, float] = dict(cleanup_native_kg)
-    for species, kg in products.items():
-        try:
-            value = float(kg)
-        except (TypeError, ValueError):
-            continue
-        # product_ledger() collapses several source accounts by species. Remove
-        # only metal-phase inventory already assigned to its own report class;
-        # a species-wide skip would also hide that element from other accounts.
-        value = max(
-            0.0,
-            value - unrecovered_metal_account_kg_by_species.get(species, 0.0),
+    source_account_kg = metal_accounting.get('source_account_kg', {})
+    if source_account_kg:
+        allocated_by_source: dict[str, dict[str, float]] = {}
+
+        def allocate_source_mass(account: str, species: str, raw_kg: float) -> float:
+            backing = float(
+                source_account_kg.get(account, {}).get(species, 0.0)
+            )
+            allocated = allocated_by_source.setdefault(account, {})
+            available = max(0.0, backing - allocated.get(species, 0.0))
+            accepted = min(max(0.0, float(raw_kg)), available)
+            allocated[species] = allocated.get(species, 0.0) + accepted
+            return accepted
+
+        for species, sources in metal_sources_by_species.items():
+            for source in sources:
+                if isinstance(source, Mapping):
+                    allocate_source_mass(
+                        str(source.get('account', '')),
+                        species,
+                        float(source.get('kg', 0.0)),
+                    )
+        for species, sources in unrecovered_metal_sources.items():
+            for source in sources:
+                if isinstance(source, Mapping):
+                    allocate_source_mass(
+                        str(source.get('account', '')),
+                        species,
+                        float(source.get('kg', 0.0)),
+                    )
+        for species, amount in stage_3_kg_by_species.items():
+            allocate_source_mass(CONDENSATION_TRAIN_ACCOUNT, species, amount)
+        for species, amount in captured_volatiles_kg_by_species.items():
+            remaining = amount
+            for account in CAPTURED_VOLATILE_ACCOUNTS:
+                remaining -= allocate_source_mass(account, species, remaining)
+        for species, amount in rump_kg_by_species.items():
+            allocate_source_mass(
+                C7_AL_CREDIT_ACCOUNT,
+                species,
+                min(
+                    float(amount),
+                    source_account_kg.get(C7_AL_CREDIT_ACCOUNT, {}).get(
+                        species, 0.0
+                    ),
+                ),
+            )
+
+        unclassified: dict[str, float] = {}
+        source_backed_kg_by_species: dict[str, float] = {}
+        for account, balances in source_account_kg.items():
+            allocated = allocated_by_source.get(account, {})
+            for species, balance in balances.items():
+                if species in O2_PRODUCT_SPECIES:
+                    continue
+                source_backed_kg_by_species[species] = (
+                    source_backed_kg_by_species.get(species, 0.0) + balance
+                )
+                residual = max(0.0, balance - allocated.get(species, 0.0))
+                if residual > 0.0:
+                    unclassified[species] = (
+                        unclassified.get(species, 0.0) + residual
+                    )
+        for species, raw_kg in products.items():
+            try:
+                value = float(raw_kg)
+            except (TypeError, ValueError):
+                continue
+            unbacked = max(
+                0.0,
+                value - source_backed_kg_by_species.get(species, 0.0),
+            )
+            if unbacked > 0.0:
+                unclassified[species] = (
+                    unclassified.get(species, 0.0) + unbacked
+                )
+    else:
+        classified_species: set[str] = (
+            set(metals_kg.keys())
+            | set(cleanup_native_kg.keys())
+            | {'O2'}
+            | set(stage_3_kg_by_species.keys())
+            | set(captured_volatiles_kg_by_species.keys())
+            | set(spent_reductant_kg_by_species.keys())
+            | set(rump_kg_by_species.keys())
         )
-        if species in classified_species:
-            continue
-        if value > 0.0:
-            unclassified[species] = value
+        unclassified = dict(cleanup_native_kg)
+        for species, kg in products.items():
+            try:
+                value = float(kg)
+            except (TypeError, ValueError):
+                continue
+            if species not in classified_species and value > 0.0:
+                unclassified[species] = value
     unclassified_total = float(sum(unclassified.values()))
 
     silica_bucket: dict[str, Any] = {
@@ -669,14 +729,10 @@ def _metal_product_accounting(sim, *, products):
             'cleanup_native_kg': cleanup_native_kg,
             'unrecovered_metal_phase_kg': {},
             'unrecovered_metal_phase_sources_by_species': {},
+            'source_account_kg': {},
         }
 
-    source_accounts = (
-        *EXTRACTED_METAL_PRODUCT_ACCOUNTS,
-        *METAL_PHASE_ACCOUNTS,
-        CONDENSATION_TRAIN_ACCOUNT,
-        CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
-    )
+    source_accounts = PRODUCT_LEDGER_ACCOUNTS
     account_species_kg: dict[str, dict[str, float]] = {}
     for account in source_accounts:
         try:
@@ -799,6 +855,7 @@ def _metal_product_accounting(sim, *, products):
         'unrecovered_metal_phase_sources_by_species': (
             unrecovered_source_accounts_by_species
         ),
+        'source_account_kg': account_species_kg,
     }
 
 
