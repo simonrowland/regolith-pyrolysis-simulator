@@ -4054,9 +4054,21 @@ def _recipe_controls_from_metadata(metadata: Mapping[str, Any]) -> dict[str, Any
                 f'invalid saved runtime_campaign_overrides: {exc}'
             ) from exc
         controls['runtime_campaign_overrides'] = copy.deepcopy(dict(overrides))
-        campaign, fields = next(iter(overrides.items()))
-        controls['lever_campaign'] = str(campaign)
-        if isinstance(fields, Mapping):
+        # Fixed C2A carrier overrides are orthogonal to the selected lever.
+        # Carrier-only entries must not become the lever when recipe YAML
+        # sorting places C2A before the campaign that owns numeric controls.
+        lever_override = next(
+            (
+                (campaign, fields)
+                for campaign, fields in overrides.items()
+                if isinstance(fields, Mapping)
+                and any(str(field) != 'carrier_gas' for field in fields)
+            ),
+            None,
+        )
+        if lever_override is not None:
+            campaign, fields = lever_override
+            controls['lever_campaign'] = str(campaign)
             field_map = {
                 'pO2_mbar': 'pO2_mbar',
                 'hold_temp_C': 'stage_temp_C',
