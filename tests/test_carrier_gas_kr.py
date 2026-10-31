@@ -77,6 +77,19 @@ def test_default_n2_carrier_unchanged_by_kr_plumbing():
     assert composition.get("Kr", 0.0) == pytest.approx(0.0)
 
 
+def test_runtime_carrier_override_is_currently_refused():
+    """Pin the pre-Tier-1 runtime refusal before opening carrier_gas."""
+    from simulator.campaigns import CampaignManager
+
+    with pytest.raises(
+        ValueError,
+        match=r"unknown runtime_campaign_overrides\['C2A'\]\.carrier_gas",
+    ):
+        CampaignManager.validate_runtime_campaign_overrides(
+            {"C2A": {"carrier_gas": "pKr"}}
+        )
+
+
 def test_runner_carrier_observables_label_kr():
     """The artifact-identity hole: _CARRIER_TOKENS lacked KR, so hourly
     observables relabelled a Kr run as N2 via the PN2_SWEEP fallback."""

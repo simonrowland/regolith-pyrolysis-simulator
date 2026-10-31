@@ -2003,6 +2003,27 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
     assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
+    if scenario["name"] == "mars_basalt_C2A_12h":
+        # Pre-t-423 default-N2 hourly envelope. This uses the existing runner
+        # scenario/generator path and excludes run metadata; the rows contain
+        # no run IDs or timestamps. Keep this byte pin separate from fixture
+        # semantics so a default-path drift cannot be accepted by reblessing.
+        canonical_hours = json.dumps(
+            actual["per_hour_summary"],
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+        expected_hours = json.dumps(
+            expected["per_hour_summary"],
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+        assert canonical_hours == expected_hours
+        assert hashlib.sha256(canonical_hours).hexdigest() == (
+            "744fee078070a611770a4e86d34c47235d11006b0e8fe072cf759eb827bf9ebd"
+        )
 
 
 def test_runner_golden_output_ignores_host_binding_receipts(
