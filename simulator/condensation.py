@@ -374,7 +374,7 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     # here would falsely report proxy authority for deposition transport.
 }
 
-DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+DEFAULT_CARRIER_GAS = 'N2'  # Default carrier; CO2 for Mars feedstocks
 STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     1: 'fe_stage1',
     2: 'cr_stage2',
@@ -382,8 +382,74 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = (
-    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'
+
+
+@dataclass(frozen=True)
+class CarrierGasCatalogEntry:
+    token: str
+    aliases: tuple[str, ...]
+    label: str
+    legacy: bool
+    physical_selection_reason: str
+    alias_patterns: tuple[str, ...] = ()
+
+
+CARRIER_GAS_CATALOG = (
+    CarrierGasCatalogEntry(
+        'He', ('He', 'pHe'), 'He', False,
+        'Configured inert carrier with sourced transport properties.',
+    ),
+    CarrierGasCatalogEntry(
+        'N2', ('N2', 'pN2', 'N2Sweep', 'pN2Sweep'), 'N₂ (default)', False,
+        'Default operator carrier; unset selection preserves current N₂ behavior.',
+    ),
+    CarrierGasCatalogEntry(
+        'Kr', ('Kr', 'pKr'), 'Kr', False,
+        'Recommended inert: condenses about 30 K above LOX and drops out first.',
+    ),
+    CarrierGasCatalogEntry(
+        'Ar', ('Ar', 'pAr'), 'Ar (legacy)', True,
+        'Boiling point about 87.3 K is about 3 K from LOX, complicating cryogenic separation.',
+    ),
+    CarrierGasCatalogEntry(
+        'O2', ('O2', 'pO2', 'O2Backpressure', 'controlledO2'), 'O₂', False,
+        'Configured oxygen carrier for controlled-oxygen conditions.',
+    ),
+    CarrierGasCatalogEntry(
+        'CO2', ('CO2', 'pCO2', 'CO2Backpressure'), 'CO₂', False,
+        'Configured carbon-dioxide carrier for Mars feedstocks.',
+        alias_patterns=('{percentage}%CO2',),
+    ),
+)
+
+
+def carrier_gas_catalog_payload() -> list[dict[str, Any]]:
+    return [
+        {
+            'token': entry.token,
+            'aliases': list(entry.aliases),
+            'alias_patterns': list(entry.alias_patterns),
+            'label': entry.label,
+            'legacy': entry.legacy,
+            'physical_selection_reason': entry.physical_selection_reason,
+            'collision_diameter_m': CARRIER_GAS_PROPERTIES[
+                entry.token
+            ].collision_diameter_m,
+        }
+        for entry in CARRIER_GAS_CATALOG
+    ]
+
+
+_CARRIER_GAS_KEY_BY_ALIAS = {
+    alias.upper().replace(' ', '').replace('_', '').replace('-', ''): entry.token
+    for entry in CARRIER_GAS_CATALOG
+    for alias in entry.aliases
+}
+
+SUPPORTED_CARRIER_GAS_LABELS = ', '.join(
+    f'{entry.aliases[0]}/{entry.aliases[1]}'
+    + (' (legacy)' if entry.legacy else '')
+    for entry in CARRIER_GAS_CATALOG
 )
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
@@ -1748,26 +1814,19 @@ def _canonical_carrier_gas_key(
             'condensation carrier_gas must be non-empty when provided'
         )
     upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
-    if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
-        return 'N2'
-    if upper in {'HE', 'PHE'}:
-        return 'He'
-    if upper in {'AR', 'PAR'}:
-        return 'Ar'
-    # Kr (t-395): recommended fallback buffer replacing Ar (legacy kept).
-    if upper in {'KR', 'PKR'}:
-        return 'Kr'
-    if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
-        return 'O2'
-    if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
-        return 'CO2'
-    if upper.endswith('%CO2'):
-        try:
-            co2_percent = float(upper[:-4])
-        except ValueError:
-            co2_percent = 0.0
-        if 0.0 < co2_percent <= 100.0:
-            return 'CO2'
+    if upper in _CARRIER_GAS_KEY_BY_ALIAS:
+        return _CARRIER_GAS_KEY_BY_ALIAS[upper]
+    for entry in CARRIER_GAS_CATALOG:
+        for pattern in entry.alias_patterns:
+            prefix, suffix = pattern.split('{percentage}', maxsplit=1)
+            if upper.startswith(prefix) and upper.endswith(suffix):
+                percentage_text = upper[len(prefix):len(upper) - len(suffix)]
+                try:
+                    percentage = float(percentage_text)
+                except ValueError:
+                    percentage = 0.0
+                if 0.0 < percentage <= 100.0:
+                    return entry.token
     raise _unsupported_carrier_gas_error(carrier_gas)
 
 
