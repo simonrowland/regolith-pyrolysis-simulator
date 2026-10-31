@@ -126,6 +126,100 @@ def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
 
 
 @pytest.mark.parametrize(
+    ("campaign", "override_name"),
+    [("C2A", "C2A"), ("C2A_STAGED", "C2A_staged")],
+)
+def test_session_runtime_carrier_override_reaches_hourly_state(
+    campaign,
+    override_name,
+):
+    from simulator.runner import _carrier_pressure_observables
+
+    session = SimSession().start(
+        _config(
+            campaign=campaign,
+            runtime_campaign_overrides={
+                override_name: {"carrier_gas": "pKr"},
+            },
+        )
+    )
+    sim = session.simulator
+    assert session._config.runtime_campaign_overrides[override_name][
+        "carrier_gas"
+    ] == "Kr"
+
+    snapshot = session.step()
+
+    assert sim.melt.background_gas_species == "Kr"
+    assert snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+    assert snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+    hourly = _carrier_pressure_observables(sim, snapshot)
+    assert hourly["carrier_identity"] == "Kr"
+    assert hourly["p_carrier_bar"] > 0.0
+
+
+def test_session_runtime_unknown_carrier_is_rejected_before_start():
+    session = SimSession()
+
+    with pytest.raises(ValueError, match="supported carrier gases:.*Kr/pKr"):
+        session.start(
+            _config(
+                campaign="C2A",
+                runtime_campaign_overrides={
+                    "C2A": {"carrier_gas": "pXenon"},
+                },
+            )
+        )
+
+    assert session.simulator is None
+
+
+def test_session_start_refuses_carrier_override_outside_c2a_campaigns():
+    session = SimSession()
+
+    with pytest.raises(
+        ValueError,
+        match=r"unknown runtime_campaign_overrides\['C4'\]\.carrier_gas",
+    ):
+        session.start(
+            _config(
+                campaign="C4",
+                runtime_campaign_overrides={
+                    "C4": {"carrier_gas": "Kr"},
+                },
+            )
+        )
+
+    assert session.simulator is None
+
+
+def test_session_adjust_carrier_is_canonical_and_unknown_is_non_mutating():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    session.adjust(
+        "campaign_override",
+        "pKr",
+        campaign="C2A",
+        field="carrier_gas",
+    )
+
+    assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+    assert sim.melt.background_gas_species == "Kr"
+    before_invalid = sim.campaign_mgr.overrides
+    with pytest.raises(ValueError, match="supported carrier gases:.*Kr/pKr"):
+        session.adjust(
+            "campaign_override",
+            "pXenon",
+            campaign="C2A",
+            field="carrier_gas",
+        )
+    assert sim.campaign_mgr.overrides is before_invalid
+    assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+    assert sim.melt.background_gas_species == "Kr"
+
+
+@pytest.mark.parametrize(
     "model",
     [None, "", "MELTSv1.0.2", "pMELTS", "MELTSv1.1.0", "MELTSv1.2.0"],
 )

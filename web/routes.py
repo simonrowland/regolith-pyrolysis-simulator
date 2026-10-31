@@ -37,7 +37,9 @@ from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
     DEFAULT_PIPE_DIAMETER_M,
+    DEFAULT_CARRIER_GAS,
     N2_COLLISION_DIAMETER_M,
+    carrier_gas_catalog_payload,
 )
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier,
@@ -2272,9 +2274,22 @@ def _knudsen_config_payload(
         pressure_band,
         'campaigns.C2A_continuous.p_total_mbar',
     )
+    carrier_options = carrier_gas_catalog_payload()
+    default_carrier = next(
+        item for item in carrier_options
+        if item['token'] == DEFAULT_CARRIER_GAS
+    )
     return {
         'boltzmann_constant_j_k': BOLTZMANN_CONSTANT_J_K,
         'characteristic_length_m': DEFAULT_PIPE_DIAMETER_M,
+        'carrier_gas': default_carrier['token'],
+        'carrier_collision_diameter_m': default_carrier[
+            'collision_diameter_m'
+        ],
+        'carrier_gas_options': carrier_options,
+        # Deprecated N2-valued fallback. Removal owner: this payload and its
+        # JS consumer, at the next explicit Knudsen-config schema epoch after
+        # all clients read the carrier-aware fields.
         'n2_collision_diameter_m': N2_COLLISION_DIAMETER_M,
         'continuum_buffer_kn': CONTINUUM_BUFFER_KN,
         'mean_free_path_formula_id': MEAN_FREE_PATH_FORMULA_ID,
@@ -2288,10 +2303,10 @@ def _knudsen_config_payload(
             'max': pressure_high,
             'label': 'viscous-flow band',
             'warning_message': (
-                'pN2 sweep outside '
+                'Buffer pressure outside '
                 f'{_format_compact_number(pressure_low)}-'
                 f'{_format_compact_number(pressure_high)} mbar '
-                'viscous-flow band'
+                'viscous-flow band; no carrier flow rate is modeled'
             ),
         },
     }
@@ -3161,7 +3176,7 @@ def _recipe_stage_sections(eval_spec: Mapping[str, Any]) -> list[dict[str, Any]]
                     _first_present(override, 'pO2_mbar', 'po2_mbar', 'pO2_Pa'),
                 ),
                 _labelled_value(
-                    'pN2 sweep',
+                    'Carrier / buffer pressure',
                     _first_present(
                         override,
                         'pN2_mbar',
@@ -3574,6 +3589,7 @@ def _recipe_runtime_overrides_from_controls(
     if not isinstance(raw, Mapping):
         raise BadRequest('controls.runtime_campaign_overrides must be an object')
     overrides: dict[str, dict[str, Any]] = {}
+    has_carrier_override = False
     for campaign, fields in raw.items():
         campaign_name = _recipe_text_value(campaign)
         if not campaign_name:
@@ -3589,6 +3605,10 @@ def _recipe_runtime_overrides_from_controls(
                 raise BadRequest(
                     f'controls.runtime_campaign_overrides.{campaign_name} field is required'
                 )
+            if field_name == 'carrier_gas':
+                clean_fields[field_name] = raw_value
+                has_carrier_override = True
+                continue
             value = _recipe_non_negative_number(
                 raw_value,
                 f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}',
@@ -3597,6 +3617,15 @@ def _recipe_runtime_overrides_from_controls(
                 clean_fields[field_name] = value
         if clean_fields:
             overrides[campaign_name] = clean_fields
+    if has_carrier_override:
+        try:
+            canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
+                overrides
+            )
+            CampaignManager.validate_runtime_campaign_overrides(canonical)
+            return canonical
+        except ValueError as exc:
+            raise BadRequest(str(exc)) from exc
     return overrides
 
 

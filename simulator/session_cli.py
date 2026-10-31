@@ -169,18 +169,24 @@ class SessionScriptRunner:
                 )
             campaign, field = args[1], args[2]
             value = " ".join(args[3:])
+            if field != "carrier_gas":
+                value = float(value)
             self.session.adjust(
                 "campaign_override",
-                float(value),
+                value,
                 campaign=campaign,
                 field=field,
             )
+            if field == "carrier_gas":
+                value = self.session.simulator.campaign_mgr.overrides[
+                    campaign
+                ][field]
             return {
                 "frame_type": "adjust",
                 "param": param,
                 "campaign": campaign,
                 "field": field,
-                "value": float(value),
+                "value": value,
             }
         if len(args) != 2:
             raise ValueError(f"adjust {param} requires exactly one value")
@@ -417,8 +423,8 @@ def _parse_setpoint_overrides(
     setpoints: list[str],
     legacy_raw_json: str | None,
     runtime_raw_json: str | None,
-) -> dict[str, dict[str, float]]:
-    overrides: dict[str, dict[str, float]] = {}
+) -> dict[str, dict[str, Any]]:
+    overrides: dict[str, dict[str, Any]] = {}
     legacy = _parse_override_json(
         legacy_raw_json,
         flag_name="--setpoints-overrides",
@@ -438,36 +444,45 @@ def _parse_setpoint_overrides(
     for item in setpoints:
         if "=" not in item or "." not in item.split("=", 1)[0]:
             raise ValueError(
-                f"expected CAMPAIGN.FIELD=FLOAT setpoint, got {item!r}"
+                f"expected CAMPAIGN.FIELD=VALUE setpoint, got {item!r}"
             )
         lhs, value = item.split("=", 1)
         campaign, field = lhs.split(".", 1)
         if not campaign or not field:
             raise ValueError(
-                f"expected CAMPAIGN.FIELD=FLOAT setpoint, got {item!r}"
+                f"expected CAMPAIGN.FIELD=VALUE setpoint, got {item!r}"
             )
-        overrides.setdefault(campaign, {})[field] = float(value)
-    return overrides
+        overrides.setdefault(campaign, {})[field] = (
+            value if field == "carrier_gas" else float(value)
+        )
+    from simulator.campaigns import CampaignManager
+
+    return CampaignManager._canonicalize_runtime_carrier_overrides(overrides)
 
 
 def _parse_override_json(
     raw_json: str | None,
     *,
     flag_name: str,
-) -> dict[str, dict[str, float]] | None:
+) -> dict[str, dict[str, Any]] | None:
     if not raw_json:
         return None
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise ValueError(f"{flag_name} must decode to an object")
-    overrides: dict[str, dict[str, float]] = {}
+    overrides: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise ValueError(f"{flag_name}[{campaign!r}] must be an object")
         target = overrides.setdefault(str(campaign), {})
         for field, value in fields.items():
-            target[str(field)] = float(value)
-    return overrides
+            field_name = str(field)
+            target[field_name] = (
+                value if field_name == "carrier_gas" else float(value)
+            )
+    from simulator.campaigns import CampaignManager
+
+    return CampaignManager._canonicalize_runtime_carrier_overrides(overrides)
 
 
 def _decision_payload(decision: DecisionPoint) -> dict[str, Any]:

@@ -27,6 +27,8 @@ PER_HOUR_KEYS = {
     "T_C",
     "P_total_bar",
     "pO2_bar",
+    "carrier_identity",
+    "p_carrier_bar",
     "mass_balance_pct",
     "O2_yield_kg_cumulative",
     "O2_source_side_potential_kg_cumulative",
@@ -422,6 +424,73 @@ def test_adjust_variadic_campaign_override_and_scalar_forms_parse():
     # 0.001) guards against regressing to the old melt.pO2_mbar-painted-onto-a-
     # vacuum-floor behavior that the Phase C fix deliberately removed.
     assert frames[3]["snapshot"]["pO2_bar"] == 0.0
+
+
+@pytest.mark.parametrize(
+    "carrier_argument",
+    [
+        '--runtime-campaign-overrides=\'{"C2A":{"carrier_gas":"pKr"}}\'',
+        "--setpoint=C2A.carrier_gas=pKr",
+    ],
+)
+def test_cli_start_carrier_paths_reach_hourly_kr_state(carrier_argument):
+    result = _run_session_inprocess(
+        f"""
+        start --feedstock=lunar_mare_low_ti --campaign=C2A --backend=stub {carrier_argument}
+        advance 1
+        quit
+        """
+    )
+
+    frames = _frames(result.stdout)
+    assert result.returncode == 0, result.stderr
+    assert frames[0]["frame_type"] == "start"
+    assert frames[1]["frame_type"] == "step"
+    assert frames[1]["step"]["carrier_identity"] == "Kr"
+    assert frames[1]["step"]["p_carrier_bar"] > 0.0
+
+
+def test_cli_adjust_carrier_path_reaches_hourly_kr_state():
+    result = _run_session_inprocess(
+        """
+        start --feedstock=lunar_mare_low_ti --campaign=C2A --backend=stub
+        adjust campaign_override C2A carrier_gas pKr
+        advance 1
+        quit
+        """
+    )
+
+    frames = _frames(result.stdout)
+    assert result.returncode == 0, result.stderr
+    assert frames[1]["value"] == "Kr"
+    assert frames[2]["frame_type"] == "step"
+    assert frames[2]["step"]["carrier_identity"] == "Kr"
+    assert frames[2]["step"]["p_carrier_bar"] > 0.0
+
+
+@pytest.mark.parametrize(
+    "carrier_argument",
+    [
+        '--runtime-campaign-overrides=\'{"C2A":{"carrier_gas":"pXenon"}}\'',
+        "--setpoint=C2A.carrier_gas=pXenon",
+    ],
+)
+def test_cli_start_unknown_carrier_fails_before_start(carrier_argument):
+    result = _run_session_inprocess(
+        f"""
+        start --feedstock=lunar_mare_low_ti --campaign=C2A --backend=stub {carrier_argument}
+        advance 1
+        quit
+        """,
+        strict=True,
+    )
+
+    assert result.returncode != 0
+    assert "supported carrier gases:" in result.stderr
+    assert not any(
+        frame.get("frame_type") == "start"
+        for frame in _frames(result.stdout)
+    )
 
 
 def test_run_subcommand_matches_runner_byte_for_byte(tmp_path: Path):

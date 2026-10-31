@@ -2027,12 +2027,12 @@ def _coerce_additives_kg(value) -> dict[str, float]:
     return additives_kg
 
 
-def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
+def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
     if value is None:
         return {}
     if not isinstance(value, Mapping):
         raise InputValidationError('runtime_campaign_overrides must be an object')
-    overrides: dict[str, dict[str, float]] = {}
+    overrides: dict[str, dict[str, object]] = {}
     for campaign, fields in value.items():
         campaign_name = str(campaign).strip()
         if not campaign_name:
@@ -2043,7 +2043,7 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
             raise InputValidationError(
                 f'runtime_campaign_overrides.{campaign_name} must be an object'
             )
-        clean_fields: dict[str, float] = {}
+        clean_fields: dict[str, object] = {}
         for field_name, field_value in fields.items():
             field_key = str(field_name).strip()
             if not field_key:
@@ -2051,6 +2051,9 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
                     f'runtime_campaign_overrides.{campaign_name} '
                     'field names must be non-empty'
                 )
+            if field_key == 'carrier_gas':
+                clean_fields[field_key] = field_value
+                continue
             clean_value = _coerce_bounded_float(
                 field_value,
                 field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',
@@ -2064,6 +2067,9 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
         if clean_fields:
             overrides[campaign_name] = clean_fields
     try:
+        overrides = CampaignManager._canonicalize_runtime_carrier_overrides(
+            overrides
+        )
         CampaignManager.validate_runtime_campaign_overrides(overrides)
     except ValueError as exc:
         raise InputValidationError(str(exc)) from exc
@@ -4701,6 +4707,15 @@ def register_events(socketio):
                     value = c4_max_temp
                 else:
                     sim = state['session'].simulator
+                    canonical_override = (
+                        CampaignManager._canonicalize_runtime_carrier_overrides(
+                            {campaign_name: {field_name: value}}
+                        )
+                    )
+                    CampaignManager.validate_runtime_campaign_overrides(
+                        canonical_override
+                    )
+                    value = canonical_override[campaign_name][field_name]
                     campaign_overrides_snapshot = copy.deepcopy(
                         sim.campaign_mgr.overrides
                     )
@@ -4711,10 +4726,11 @@ def register_events(socketio):
                             'p_total_mbar': melt.p_total_mbar,
                             'atmosphere': melt.atmosphere,
                             'stir_state': copy.deepcopy(melt.stir_state),
+                            'background_gas_species': melt.background_gas_species,
+                            'background_gas_mole_fraction': (
+                                melt.background_gas_mole_fraction
+                            ),
                         }
-                    CampaignManager.validate_runtime_campaign_overrides(
-                        {campaign_name: {field_name: value}}
-                    )
                     state['session'].adjust(
                         'campaign_override',
                         value,

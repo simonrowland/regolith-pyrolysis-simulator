@@ -256,6 +256,7 @@ _CARRIER_TOKENS: dict[str, str] = {
     "KR": "Kr",
     "HE": "He",
     "CO2": "CO2",
+    "O2": "O2",
 }
 
 

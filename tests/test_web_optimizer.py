@@ -6,6 +6,7 @@ import io
 import json
 import math
 import sqlite3
+import subprocess
 import threading
 import zipfile
 from collections.abc import Mapping
@@ -25,15 +26,20 @@ from simulator.backend_names import (
 )
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
+    CARRIER_GAS_CATALOG,
     CONTINUUM_BUFFER_KN,
     DEFAULT_PIPE_DIAMETER_M,
     N2_COLLISION_DIAMETER_M,
+    carrier_gas_catalog_payload,
+    knudsen_regime_diagnostic,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
 from simulator.transport_constants import (
+    CARRIER_GAS_PROPERTIES,
     MEAN_FREE_PATH_DENOMINATOR_FACTOR,
     MEAN_FREE_PATH_FORMULA_ID,
 )
+from simulator.transport_regime import single_species_mean_free_path_m
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.fidelity_vocabulary import UnknownFidelityVocabularyTokenError
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -644,7 +650,10 @@ def test_simulator_config_renders_mre_default_off_backend_badge_and_levers(
     assert 'id="lever-pn2-mbar"' in html
     assert 'id="knudsen-indicator"' in html
     assert "No live wall-temperature offset path exists yet" in html
-    assert "pN2 and wall-temperature controls are display-only" in html
+    assert "Buffer pressure and wall-temperature controls are display-only" in html
+    assert 'id="carrier-gas"' in html
+    assert 'value="N2"' in html
+    assert 'data-legacy="true"' in html
 
 
 def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
@@ -654,6 +663,11 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
     payload = response.get_json()
     assert payload["boltzmann_constant_j_k"] == BOLTZMANN_CONSTANT_J_K
     assert payload["characteristic_length_m"] == DEFAULT_PIPE_DIAMETER_M
+    assert payload["carrier_gas"] == "N2"
+    assert payload["carrier_collision_diameter_m"] == (
+        CARRIER_GAS_PROPERTIES["N2"].collision_diameter_m
+    )
+    assert payload["carrier_gas_options"] == carrier_gas_catalog_payload()
     assert payload["n2_collision_diameter_m"] == N2_COLLISION_DIAMETER_M
     assert payload["continuum_buffer_kn"] == CONTINUUM_BUFFER_KN
     assert payload["mean_free_path_formula_id"] == MEAN_FREE_PATH_FORMULA_ID
@@ -669,12 +683,19 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
         "min": 5.0,
         "max": 15.0,
         "label": "viscous-flow band",
-        "warning_message": "pN2 sweep outside 5-15 mbar viscous-flow band",
+        "warning_message": (
+            "Buffer pressure outside 5-15 mbar viscous-flow band; "
+            "no carrier flow rate is modeled"
+        ),
     }
 
     html = client.get("/").get_data(as_text=True)
     assert (
         f'data-characteristic-length-m="{DEFAULT_PIPE_DIAMETER_M}"'
+        in html
+    )
+    assert (
+        f'data-carrier-collision-diameter-m="{CARRIER_GAS_PROPERTIES["N2"].collision_diameter_m}"'
         in html
     )
     assert f'data-continuum-buffer-kn="{CONTINUUM_BUFFER_KN}"' in html
@@ -689,9 +710,165 @@ def test_knudsen_config_exposes_condensation_model_constants(client) -> None:
     assert 'data-default-pressure-band-min-mbar="5.0"' in html
     assert 'data-default-pressure-band-max-mbar="15.0"' in html
     assert (
-        'data-default-pressure-band-warning-message="pN2 sweep outside '
-        '5-15 mbar viscous-flow band"'
+        'data-default-pressure-band-warning-message="Buffer pressure outside '
+        '5-15 mbar viscous-flow band; no carrier flow rate is modeled"'
     ) in html
+
+
+def test_catalog_drives_carrier_picker_and_kr_knudsen_uses_kr_diameter(client):
+    from simulator.condensation import _canonical_carrier_gas_key
+
+    response = client.get("/api/knudsen-config")
+    options = response.get_json()["carrier_gas_options"]
+    html = client.get("/").get_data(as_text=True)
+    controls_path = (
+        Path(web_routes.__file__).parent
+        / "static"
+        / "js"
+        / "simulator-controls.js"
+    )
+    controls = controls_path.read_text()
+
+    assert [option["token"] for option in options] == [
+        entry.token for entry in CARRIER_GAS_CATALOG
+    ]
+    for entry in CARRIER_GAS_CATALOG:
+        assert all(
+            _canonical_carrier_gas_key(alias) == entry.token
+            for alias in entry.aliases
+        )
+        assert all(
+            _canonical_carrier_gas_key(pattern.replace("{percentage}", "96"))
+            == entry.token
+            for pattern in entry.alias_patterns
+        )
+    assert all(
+        f'value="{option["token"]}"' in html
+        and option["physical_selection_reason"] in html
+        for option in options
+    )
+    argon = next(option for option in options if option["token"] == "Ar")
+    krypton = next(option for option in options if option["token"] == "Kr")
+    assert argon["legacy"] is True
+    assert "87.3 K" in argon["physical_selection_reason"]
+    assert "3 K" in argon["physical_selection_reason"]
+    assert "30 K above LOX" in krypton["physical_selection_reason"]
+    assert "carrierCollisionDiameterM" in controls
+    assert "carrierGas ? null : legacyN2CollisionDiameterM" in controls
+    assert "option.dataset.collisionDiameterM" in controls
+
+    temperature_K = 1773.15
+    pressure_pa = 1000.0
+    n2_mfp = single_species_mean_free_path_m(
+        pressure_pa,
+        temperature_K,
+        CARRIER_GAS_PROPERTIES["N2"].collision_diameter_m,
+    )
+    kr_mfp = single_species_mean_free_path_m(
+        pressure_pa,
+        temperature_K,
+        CARRIER_GAS_PROPERTIES["Kr"].collision_diameter_m,
+    )
+    assert kr_mfp != pytest.approx(n2_mfp)
+    n2_kn = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=DEFAULT_PIPE_DIAMETER_M,
+        carrier_gas="N2",
+    )["knudsen_number"]
+    kr_kn = knudsen_regime_diagnostic(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1500.0,
+        pipe_diameter_m=DEFAULT_PIPE_DIAMETER_M,
+        carrier_gas="Kr",
+    )["knudsen_number"]
+    assert kr_kn != pytest.approx(n2_kn)
+    assert n2_kn == pytest.approx(n2_mfp / DEFAULT_PIPE_DIAMETER_M)
+    assert kr_kn == pytest.approx(kr_mfp / DEFAULT_PIPE_DIAMETER_M)
+    assert krypton["collision_diameter_m"] == (
+        CARRIER_GAS_PROPERTIES["Kr"].collision_diameter_m
+    )
+
+    javascript = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[2], 'utf8');
+const config = JSON.parse(process.argv[3]);
+function functionSource(name) {
+    const start = source.indexOf(`function ${name}(`);
+    const open = source.indexOf('{', start);
+    let depth = 0;
+    for (let i = open; i < source.length; i += 1) {
+        if (source[i] === '{') depth += 1;
+        if (source[i] === '}' && --depth === 0) return source.slice(start, i + 1);
+    }
+    throw new Error(`missing function ${name}`);
+}
+const functions = [
+    functionSource('numericDataAttribute'),
+    functionSource('knudsenDisplayConfig'),
+    functionSource('updateKnudsenIndicator'),
+].join('\n');
+const common = {
+    'data-boltzmann-constant-j-k': config.boltzmann_constant_j_k,
+    'data-characteristic-length-m': config.characteristic_length_m,
+    'data-n2-collision-diameter-m': config.n2_collision_diameter_m,
+    'data-continuum-buffer-kn': config.continuum_buffer_kn,
+    'data-mean-free-path-formula-id': config.mean_free_path_formula_id,
+    'data-mean-free-path-denominator-factor': config.mean_free_path_denominator_factor,
+    'data-temperature-k-offset': config.temperature_k_offset,
+    'data-pressure-pa-per-mbar': config.pressure_pa_per_mbar,
+    'data-default-pressure-band-role': 'default',
+    'data-default-pressure-band-min-mbar': config.default_pressure_band.min,
+    'data-default-pressure-band-max-mbar': config.default_pressure_band.max,
+    'data-default-pressure-band-label': config.default_pressure_band.label,
+    'data-default-pressure-band-warning-message': config.default_pressure_band.warning_message,
+};
+function render(extra) {
+    const indicator = {
+        getAttribute: name => ({...common, ...extra})[name] ?? null,
+        classList: {remove() {}},
+        textContent: '',
+    };
+    const pressure = {value: '10'};
+    const temperature = {value: '1500'};
+    const context = {
+        document: {
+            getElementById: id => id === 'knudsen-indicator'
+                ? indicator
+                : id === 'lever-pn2-mbar' ? pressure : temperature,
+        },
+    };
+    vm.runInNewContext(functions + '\nupdateKnudsenIndicator();', context);
+    return indicator.textContent;
+}
+console.log(JSON.stringify({
+    legacyN2: render({}),
+    carrierKr: render({
+        'data-carrier-gas': 'Kr',
+        'data-carrier-collision-diameter-m': config.kr_collision_diameter_m,
+    }),
+}));
+"""
+    config = {
+        **response.get_json(),
+        "kr_collision_diameter_m": CARRIER_GAS_PROPERTIES[
+            "Kr"
+        ].collision_diameter_m,
+    }
+    completed = subprocess.run(
+        ["node", "-", str(controls_path), json.dumps(config)],
+        input=javascript,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    display = json.loads(completed.stdout)
+    legacy_kn = float(display["legacyN2"].split()[1])
+    carrier_kr_kn = float(display["carrierKr"].split()[1])
+    assert legacy_kn == pytest.approx(n2_kn, rel=0.005)
+    assert carrier_kr_kn == pytest.approx(kr_kn, rel=0.005)
 
 
 def test_cli_web_evalspec_parity_for_mre_preset(client, tmp_path) -> None:
@@ -2373,7 +2550,8 @@ def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
                     "C4": {
                         "hold_temp_C": 1600.0,
                         "pO2_mbar": 0.12,
-                    }
+                    },
+                    "C2A": {"carrier_gas": "pKr"},
                 },
                 "c4_max_temp_C": 1660.0,
                 "c5_enabled": True,
@@ -2397,6 +2575,10 @@ def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
     saved = yaml.safe_load(recipe_path.read_text(encoding="utf-8"))
     assert saved["campaigns"]["C4"]["temp_range_C"] == [1600.0, 1660.0]
     assert saved["campaigns"]["C4"]["pO2_mbar_default"] == 0.12
+    assert saved["campaigns"].get("C2A", {}).get("carrier_gas") is None
+    assert saved["metadata"]["headline_recipe"]["pinned_knobs"][
+        "runtime_campaign_overrides"
+    ]["C2A"]["carrier_gas"] == "Kr"
     assert "C5" not in saved["campaigns"]
     assert "C3" not in saved["campaigns"]
     assert saved["metadata"]["headline_recipe"]["feedstock"] == "lunar_mare_low_ti"
@@ -2424,6 +2606,119 @@ def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
         "C": 5.0,
     }
     assert controls["furnace_material_id"] == "alumina-hot-face"
+    assert controls["runtime_campaign_overrides"]["C2A"][
+        "carrier_gas"
+    ] == "Kr"
+
+    controls_path = (
+        Path(web_routes.__file__).parent
+        / "static"
+        / "js"
+        / "simulator-controls.js"
+    )
+    harness = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[2], 'utf8');
+function functionSource(name) {
+    const start = source.indexOf(`function ${name}(`);
+    const open = source.indexOf('{', start);
+    let depth = 0;
+    for (let i = open; i < source.length; i += 1) {
+        if (source[i] === '{') depth += 1;
+        if (source[i] === '}' && --depth === 0) return source.slice(start, i + 1);
+    }
+    throw new Error(`missing function ${name}`);
+}
+const elements = Object.fromEntries([
+    'carrier-gas', 'lever-campaign', 'lever-po2-mbar', 'lever-pn2-mbar',
+    'lever-stage-temp', 'lever-stage-duration', 'lever-stage-ramp',
+    'c4-max-temp', 'feedstock-select', 'batch-mass', 'engine-select',
+    'furnace-material', 'add-na', 'add-k', 'add-mg', 'add-ca', 'add-c',
+].map(id => [id, {id, value: '', dataset: {}}]));
+elements['carrier-gas'].value = 'N2';
+const context = {
+    document: {
+        getElementById: id => elements[id] || null,
+        querySelectorAll: () => [],
+        querySelector: () => null,
+    },
+    updateMreFields: () => {},
+    updateKnudsenIndicator: () => {},
+    updateLeverWarning: () => {},
+};
+vm.createContext(context);
+vm.runInContext([
+    functionSource('selectedLeverCampaign'),
+    functionSource('selectedCarrierGas'),
+    functionSource('buildRuntimeCampaignOverrides'),
+    functionSource('setRadioValue'),
+    functionSource('applyLoadedRecipeControls'),
+    functionSource('applyLoadedRecipeStartIdentity'),
+    functionSource('updateCarrierGasDisplayConfig'),
+    'let loadedRecipePatch = null;',
+    'let loadedRecipeCostParameters = null;',
+    'let loadedRecipeCostRecipeName = null;',
+].join('\n'), context);
+context.loadedControls = JSON.parse(process.argv[3]);
+vm.runInContext(`
+applyLoadedRecipeControls(loadedControls);
+const savedCarrierAfterLoad = elements['carrier-gas'].value;
+const launchPayload = {};
+applyLoadedRecipeStartIdentity(launchPayload);
+elements['carrier-gas'].value = 'Ar';
+applyLoadedRecipeControls({lever_campaign: 'C4'});
+console.log(JSON.stringify({
+    savedCarrierAfterLoad,
+    launchPayload,
+    candidateCarrierAfterLoad: elements['carrier-gas'].value,
+}));
+`, context);
+"""
+    browser_round_trip = subprocess.run(
+        ["node", "-", str(controls_path), json.dumps(controls)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert browser_round_trip.returncode == 0, browser_round_trip.stderr
+    browser_result = json.loads(browser_round_trip.stdout)
+    assert browser_result["savedCarrierAfterLoad"] == "Kr"
+    assert browser_result["launchPayload"]["runtime_campaign_overrides"][
+        "C2A"
+    ]["carrier_gas"] == "Kr"
+    assert browser_result["launchPayload"]["runtime_campaign_overrides"][
+        "C2A_staged"
+    ]["carrier_gas"] == "Kr"
+    assert browser_result["candidateCarrierAfterLoad"] == "Ar"
+
+
+def test_recipe_save_unknown_carrier_is_a_typed_bad_request(
+    client,
+    tmp_path,
+    monkeypatch,
+):
+    import web.events as web_events
+
+    monkeypatch.setattr(web_events, "recipe_save_context", lambda _sid: {})
+    client.application.config["RECIPE_LIBRARY_DIR"] = tmp_path / "recipes"
+    response = client.post(
+        "/recipes/save",
+        json={
+            "title": "Unknown Carrier",
+            "sid": "carrier-save-sid",
+            "controls": {
+                "runtime_campaign_overrides": {
+                    "C2A": {"carrier_gas": "pXenon"},
+                },
+            },
+        },
+    )
+
+    assert response.status_code == 400
+    assert "supported carrier gases:" in response.get_json()["error"]
+    assert not (tmp_path / "recipes" / "unknown-carrier.yaml").exists()
 
 
 def test_loaded_recipe_start_payload_keeps_patch_and_runtime_overrides() -> None:
@@ -4031,7 +4326,7 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "Hold point" in html
     assert "Overhead pressure setpoint" in html
     assert "pO2" in html
-    assert "pN2 sweep" in html
+    assert "Carrier / buffer pressure" in html
     assert "MRE policy" in html
     assert "Wall-temp offset" in html
     assert "Alkali-shuttle dosing" in html

@@ -893,3 +893,44 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
 
     assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
+def test_c2a_schedule_gas_overrides_operator_carrier_for_the_scheduled_step():
+    from simulator.backends import SimulatorBuildConfig, build_simulator
+    from simulator.config import load_config_bundle
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.runner import _carrier_pressure_observables
+
+    bundle = load_config_bundle()
+    backend = InternalAnalyticalBackend()
+    assert backend.initialize({})
+    sim = build_simulator(
+        SimulatorBuildConfig(
+            backend=backend,
+            setpoints=bundle.setpoints,
+            feedstocks=bundle.feedstocks,
+            vapor_pressures=bundle.vapor_pressures,
+            materials=bundle.materials,
+        )
+    )
+    sim.load_batch("lunar_mare_low_ti", 1000.0)
+    sim.campaign_mgr.overrides["C2A"] = {
+        "carrier_gas": "pKr",
+        "lab_schedule": _n2_lab_schedule(),
+    }
+    sim.start_campaign(CampaignPhase.C2A)
+
+    sim.step()
+
+    snapshot = sim.record.snapshots[-1]
+    hourly = _carrier_pressure_observables(sim, snapshot)
+    assert sim.melt.background_gas_species == "N2"
+    assert snapshot.overhead.composition.get("N2", 0.0) > 0.0
+    assert snapshot.overhead.composition.get("Kr", 0.0) == pytest.approx(0.0)
+    assert hourly["carrier_identity"] == "N2"
+    assert hourly["p_carrier_bar"] > 0.0
+    assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "pKr"
+
+    del sim.campaign_mgr.overrides["C2A"]["lab_schedule"]
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+    assert sim.melt.background_gas_species == "Kr"

@@ -1690,6 +1690,96 @@ def test_draft_is_stateless_validate_and_echo(monkeypatch):
     assert web_events._simulations == before
 
 
+def test_typed_http_carrier_draft_and_submit_reach_c2a_without_patch_leak(
+    tmp_path,
+    monkeypatch,
+):
+    from simulator.runner import _carrier_pressure_observables
+    from simulator.state import CampaignPhase
+
+    def force_backend(_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    monkeypatch.setattr(web_events, "_get_backend", force_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        lambda *_args, **_kwargs: object(),
+    )
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app.test_client()
+    client.get("/")
+    candidate_patch = {
+        "campaigns": {"C4": {"temp_range_C": [1585.0, 1655.0]}}
+    }
+    body = _single_run_body({
+        "speed": 0,
+        "setpoints_patch": candidate_patch,
+        "runtime_campaign_overrides": {
+            "C2A": {"carrier_gas": "pKr"},
+        },
+    })
+
+    draft = client.post("/api/runs/draft", json=body)
+    assert draft.status_code == 200, draft.get_json()
+    assert draft.get_json()["validated_inputs"]["runtime_campaign_overrides"] == {
+        "C2A": {"carrier_gas": "Kr"}
+    }
+    assert draft.get_json()["validated_inputs"]["setpoints_patch"] == candidate_patch
+
+    submitted = client.post("/api/runs", json=body)
+    assert submitted.status_code == 201, submitted.get_json()
+    state = next(
+        item
+        for item in web_events._simulations.values()
+        if item.get("run_id") == submitted.get_json()["run_id"]
+    )
+    sim = state["session"].simulator
+    assert state["recipe_inputs"]["runtime_campaign_overrides"] == {
+        "C2A": {"carrier_gas": "Kr"}
+    }
+    assert state["setpoints_patch"] == candidate_patch
+    assert "carrier_gas" not in state["setpoints_patch"]["campaigns"].get(
+        "C2A", {}
+    )
+    assert "cover_gas" not in state["setpoints_patch"]["campaigns"].get(
+        "C2A", {}
+    )
+
+    sim.start_campaign(CampaignPhase.C2A)
+    result = state["session"].advance()
+    hourly = result.per_hour_summary
+    assert sim.melt.background_gas_species == "Kr"
+    assert result.snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+    assert result.snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+    assert hourly["carrier_identity"] == "Kr"
+    assert hourly["p_carrier_bar"] > 0.0
+    assert _carrier_pressure_observables(sim, result.snapshot)[
+        "carrier_identity"
+    ] == "Kr"
+
+
+@pytest.mark.parametrize("path", ["/api/runs/draft", "/api/runs"])
+def test_typed_http_unknown_carrier_refuses_before_simulation_mutation(path):
+    app = app_module.create_app()
+    before = dict(web_events._simulations)
+    body = _single_run_body({
+        "runtime_campaign_overrides": {
+            "C2A": {"carrier_gas": "pXenon"},
+        },
+    })
+
+    response = app.test_client().post(path, json=body)
+
+    assert response.status_code == 400
+    assert response.get_json()["error_type"] == "invalid_run_input"
+    assert "supported carrier gases:" in response.get_json()["message"]
+    assert web_events._simulations == before
+
+
 @pytest.mark.parametrize(
     ("body", "error_type"),
     [
@@ -1747,6 +1837,9 @@ def test_source_run_draft_is_pure_and_child_persists_lineage(
             "setpoints_patch": {
                 "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
             },
+            "runtime_campaign_overrides": {
+                "C2A": {"carrier_gas": "Kr"},
+            },
         },
         "name": "Source run",
         "seed": 11,
@@ -1780,6 +1873,9 @@ def test_source_run_draft_is_pure_and_child_persists_lineage(
     assert single_run["l2_overrides"]["setpoints_patch"] == {
         "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
     }
+    assert single_run["l2_overrides"]["runtime_campaign_overrides"] == {
+        "C2A": {"carrier_gas": "Kr"}
+    }
     assert single_run["name"] == "Source run"
     assert single_run["seed"] == 11
     assert single_run["fidelity"] == "internal-analytical"
@@ -1788,6 +1884,9 @@ def test_source_run_draft_is_pure_and_child_persists_lineage(
     command_payload, context = web_events._typed_single_run_payload(draft)
     assert command_payload["setpoints_patch"] == {
         "campaigns": {"C4": {"temp_range_C": [1600.0, 1650.0]}}
+    }
+    assert command_payload["runtime_campaign_overrides"] == {
+        "C2A": {"carrier_gas": "Kr"}
     }
     assert context["parent_run_id"] == "source-run"
 

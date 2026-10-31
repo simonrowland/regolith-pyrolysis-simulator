@@ -19,11 +19,14 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase
 
 
-def _build_c2a_sim(carrier_gas: str | None, *, finite_headspace: bool = True):
-    """Config-level carrier selection: the runtime-override surface
-    deliberately refuses carrier_gas (fail-closed; operator wiring is a
-    separate chunk), so a Kr recipe arrives the way a real one would —
-    in the setpoints config."""
+def _build_c2a_sim(
+    carrier_gas: str | None,
+    *,
+    finite_headspace: bool = True,
+    campaign: CampaignPhase = CampaignPhase.C2A,
+    runtime_carrier_gas: str | None = None,
+):
+    """Build a short C2A run with config-level or runtime carrier selection."""
     import copy
 
     bundle = load_config_bundle()
@@ -46,7 +49,14 @@ def _build_c2a_sim(carrier_gas: str | None, *, finite_headspace: bool = True):
         )
     )
     sim.load_batch("lunar_mare_low_ti", 1000.0)
-    sim.start_campaign(CampaignPhase.C2A)
+    if runtime_carrier_gas is not None:
+        override_key = (
+            "C2A_staged" if campaign == CampaignPhase.C2A_STAGED else "C2A"
+        )
+        sim.campaign_mgr.overrides[override_key] = {
+            "carrier_gas": runtime_carrier_gas,
+        }
+    sim.start_campaign(campaign)
     return sim
 
 
@@ -77,17 +87,56 @@ def test_default_n2_carrier_unchanged_by_kr_plumbing():
     assert composition.get("Kr", 0.0) == pytest.approx(0.0)
 
 
-def test_runtime_carrier_override_is_currently_refused():
-    """Pin the pre-Tier-1 runtime refusal before opening carrier_gas."""
+def test_runtime_carrier_override_is_canonicalized_for_both_c2a_variants():
     from simulator.campaigns import CampaignManager
 
-    with pytest.raises(
-        ValueError,
-        match=r"unknown runtime_campaign_overrides\['C2A'\]\.carrier_gas",
-    ):
-        CampaignManager.validate_runtime_campaign_overrides(
-            {"C2A": {"carrier_gas": "pKr"}}
+    for campaign in ("C2A", "C2A_staged"):
+        canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
+            {campaign: {"carrier_gas": "pKr"}}
         )
+        CampaignManager.validate_runtime_campaign_overrides(canonical)
+        assert canonical[campaign]["carrier_gas"] == "Kr"
+        assert "carrier_gas" in CampaignManager.known_override_fields(campaign)
+
+
+def test_runtime_unknown_carrier_still_fails_closed_without_input_mutation():
+    from simulator.campaigns import CampaignManager
+
+    overrides = {"C2A": {"carrier_gas": "pXenon"}}
+    before = {campaign: dict(fields) for campaign, fields in overrides.items()}
+    with pytest.raises(ValueError, match="supported carrier gases:.*Kr/pKr"):
+        CampaignManager.validate_runtime_campaign_overrides(overrides)
+    assert overrides == before
+
+
+@pytest.mark.parametrize(
+    ("campaign", "override_name"),
+    [
+        (CampaignPhase.C2A, "C2A"),
+        (CampaignPhase.C2A_STAGED, "C2A_staged"),
+    ],
+)
+def test_runtime_kr_override_reaches_melt_overhead_and_hourly_summary(
+    campaign,
+    override_name,
+):
+    from simulator.runner import _carrier_pressure_observables
+
+    sim = _build_c2a_sim(
+        None,
+        campaign=campaign,
+        runtime_carrier_gas="pKr",
+    )
+    sim.step()
+
+    assert sim.campaign_mgr.overrides[override_name]["carrier_gas"] == "pKr"
+    assert sim.melt.background_gas_species == "Kr"
+    composition = dict(sim.record.snapshots[-1].overhead.composition)
+    assert composition.get("Kr", 0.0) > 0.0, composition
+    assert composition.get("N2", 0.0) == pytest.approx(0.0), composition
+    hourly = _carrier_pressure_observables(sim, sim.record.snapshots[-1])
+    assert hourly["carrier_identity"] == "Kr"
+    assert hourly["p_carrier_bar"] > 0.0
 
 
 def test_runner_carrier_observables_label_kr():

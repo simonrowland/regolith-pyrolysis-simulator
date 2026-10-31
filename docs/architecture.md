@@ -49,7 +49,7 @@ The simulator's chemistry plane is centralized in the `ChemistryKernel` facade a
 
 ## Session Model
 
-Each browser connection gets an independent in-memory simulator. The backend runs a background loop that calls `sim.step()`, emits a `simulation_tick`, and pauses when operator decisions are required. This keeps the current application simple and suitable for local exploration, but it is not yet a multi-user production service.
+Each browser connection gets an independent in-memory simulator. Typed HTTP draft/submit commands and the transitional Socket.IO start path create the session; the backend then runs a background loop that calls `sim.step()`, emits a `simulation_tick`, and pauses when operator decisions are required. The selected C2A carrier is fixed in `runtime_campaign_overrides` for that run, with N₂ as the default; a declared lab schedule controls the gas during its scheduled step. This keeps the current application simple and suitable for local exploration, but it is not yet a multi-user production service.
 
 ## Batch Eval Plane
 

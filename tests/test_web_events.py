@@ -1424,7 +1424,9 @@ const elements = Object.fromEntries([
     'lever-stage-temp', 'lever-stage-duration', 'lever-stage-ramp',
     'c4-max-temp', 'feedstock-select', 'batch-mass', 'engine-select',
     'furnace-material', 'add-na', 'add-k', 'add-mg', 'add-ca', 'add-c',
+    'carrier-gas',
 ].map(id => [id, {id, value: '', dataset: {}}]));
+elements['carrier-gas'].value = 'N2';
 const leverFields = {
     'lever-po2-mbar': 'pO2_mbar',
     'lever-pn2-mbar': 'p_total_mbar',
@@ -1448,25 +1450,36 @@ const context = {
 vm.createContext(context);
 vm.runInContext([
     functionSource('selectedLeverCampaign'),
+    functionSource('selectedCarrierGas'),
     functionSource('buildRuntimeCampaignOverrides'),
     functionSource('setRadioValue'),
     functionSource('applyLoadedRecipeControls'),
     functionSource('applyLoadedRecipeStartIdentity'),
+    functionSource('updateCarrierGasDisplayConfig'),
     'let loadedRecipePatch = null;',
     'let loadedRecipeCostParameters = null;',
     'let loadedRecipeCostRecipeName = null;',
 ].join('\n'), context);
 vm.runInContext(`
+elements['carrier-gas'].value = 'Kr';
 applyLoadedRecipeControls({
     lever_campaign: 'C4', pO2_mbar: 0.12, p_total_mbar: 0.12,
     stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22
 });
+const carrierAfterLoad = elements['carrier-gas'].value;
 loadedRecipePatch = {campaigns: {C4: {temp_range_C: [1600, 1660]}}};
 loadedRecipeCostParameters = {schema_version: 'optimize-costs-v1', parameters: {}};
 loadedRecipeCostRecipeName = 'tab-local-prices';
 const payload = {};
 applyLoadedRecipeStartIdentity(payload);
-console.log(JSON.stringify(payload));
+const changedPayload = {};
+elements['carrier-gas'].value = 'N2';
+applyLoadedRecipeStartIdentity(changedPayload);
+console.log(JSON.stringify({
+    carrierAfterLoad,
+    payload,
+    changedPayload,
+}));
 `, context);
 """
     completed = subprocess.run(
@@ -1477,7 +1490,9 @@ console.log(JSON.stringify(payload));
         check=False,
     )
     assert completed.returncode == 0, completed.stderr
-    assert json.loads(completed.stdout) == {
+    result = json.loads(completed.stdout)
+    assert result["carrierAfterLoad"] == "Kr"
+    assert result["payload"] == {
         "setpoints_patch": {"campaigns": {"C4": {"temp_range_C": [1600, 1660]}}},
         "cost_parameters": {
             "schema_version": "optimize-costs-v1",
@@ -1491,9 +1506,29 @@ console.log(JSON.stringify(payload));
                 "hold_temp_C": 1600,
                 "max_hours": 7.5,
                 "ramp_rate": 22,
-            }
+            },
+            "C2A": {"carrier_gas": "Kr"},
+            "C2A_staged": {"carrier_gas": "Kr"},
         },
     }
+    assert result["changedPayload"]["setpoints_patch"] == result["payload"][
+        "setpoints_patch"
+    ]
+    assert result["changedPayload"]["cost_parameters"] == result["payload"][
+        "cost_parameters"
+    ]
+    assert result["changedPayload"]["cost_parameters_recipe_name"] == (
+        result["payload"]["cost_parameters_recipe_name"]
+    )
+    assert result["changedPayload"]["runtime_campaign_overrides"]["C2A"][
+        "carrier_gas"
+    ] == "N2"
+    assert result["changedPayload"]["runtime_campaign_overrides"][
+        "C2A_staged"
+    ]["carrier_gas"] == "N2"
+    assert result["changedPayload"]["runtime_campaign_overrides"]["C4"] == (
+        result["payload"]["runtime_campaign_overrides"]["C4"]
+    )
 
 
 def test_recipe_cost_intent_is_tab_local_replaceable_and_clearable() -> None:
@@ -3214,6 +3249,87 @@ def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatc
         assert statuses[-1]["status"] == "error"
         assert "pressure validation failed" in statuses[-1]["message"]
         assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_socket_campaign_carrier_adjust_operates_and_unknown_is_non_mutating(
+    monkeypatch,
+):
+    from simulator.runner import _carrier_pressure_observables
+    from simulator.state import CampaignPhase
+
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        sid = (set(_simulations) - before).pop()
+        state, _ = _current_simulation_state(sid)
+        sim = state["session"].simulator
+        sim.start_campaign(CampaignPhase.C2A)
+
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C2A",
+                "field": "carrier_gas",
+                "value": "pKr",
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "parameter_adjusted"
+        assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+        assert sim.melt.background_gas_species == "Kr"
+
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C2A",
+                "field": "carrier_gas",
+                "value": "pXenon",
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "error"
+        assert "supported carrier gases:" in statuses[-1]["message"]
+        assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+        assert sim.melt.background_gas_species == "Kr"
+
+        result = state["session"].advance()
+        hourly = result.per_hour_summary
+        assert result.snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+        assert result.snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+        assert hourly["carrier_identity"] == "Kr"
+        assert hourly["p_carrier_bar"] > 0.0
+        assert _carrier_pressure_observables(sim, result.snapshot)[
+            "carrier_identity"
+        ] == "Kr"
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -6268,6 +6384,8 @@ def _socket_single_run_payload(target_or_recipe, **overrides):
 def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
     monkeypatch,
 ):
+    from simulator.state import CampaignPhase
+
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     client = _identified_socket_client(app)
@@ -6282,6 +6400,9 @@ def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
                 speed=0,
                 track="pyrolysis",
                 additives={"C": 100.0},
+                runtime_campaign_overrides={
+                    "C2A": {"carrier_gas": "pKr"},
+                },
             ),
         )
         events = client.get_received()
@@ -6293,6 +6414,15 @@ def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
         sim = states[0]["session"].simulator
         assert sim.record.feedstock_key == "mars_basalt"
         assert sim.record.batch_mass_kg == pytest.approx(321.0)
+        assert states[0]["session"]._config.runtime_campaign_overrides[
+            "C2A"
+        ]["carrier_gas"] == "Kr"
+        sim.start_campaign(CampaignPhase.C2A)
+        result = states[0]["session"].advance()
+        assert result.snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+        assert result.snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+        assert result.per_hour_summary["carrier_identity"] == "Kr"
+        assert result.per_hour_summary["p_carrier_bar"] > 0.0
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -6338,6 +6468,35 @@ def test_socket_single_run_envelope_refuses_absent_or_ambiguous_feedstock(
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_socket_start_unknown_carrier_refuses_before_run_creation(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            _socket_single_run_payload(
+                "mars_basalt",
+                runtime_campaign_overrides={
+                    "C2A": {"carrier_gas": "pXenon"},
+                },
+            ),
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses[-1]["status"] == "error"
+        assert "supported carrier gases:" in statuses[-1]["message"]
+        assert set(_simulations) == before
+    finally:
+        client.disconnect()
 
 
 def test_refusal_message_explains_without_replacing_the_machine_reason():

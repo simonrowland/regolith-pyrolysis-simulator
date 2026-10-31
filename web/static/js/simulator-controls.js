@@ -162,6 +162,10 @@ function selectedLeverCampaign() {
     return document.getElementById('lever-campaign')?.value || 'C4';
 }
 
+function selectedCarrierGas() {
+    return document.getElementById('carrier-gas')?.value || '';
+}
+
 function buildRuntimeCampaignOverrides() {
     const campaign = selectedLeverCampaign();
     const fields = {};
@@ -171,7 +175,16 @@ function buildRuntimeCampaignOverrides() {
             fields[input.dataset.field] = value;
         }
     });
-    return Object.keys(fields).length ? {[campaign]: fields} : {};
+    const overrides = Object.keys(fields).length ? {[campaign]: fields} : {};
+    const carrierGas = selectedCarrierGas();
+    if (carrierGas) {
+        overrides.C2A = {...(overrides.C2A || {}), carrier_gas: carrierGas};
+        overrides.C2A_staged = {
+            ...(overrides.C2A_staged || {}),
+            carrier_gas: carrierGas,
+        };
+    }
+    return overrides;
 }
 
 function selectedRadioValue(name) {
@@ -543,6 +556,10 @@ function applyLoadedRecipeControls(controls) {
     if (controls.speed !== undefined && controls.speed !== null) {
         setRadioValue('speed', Math.round(Number(controls.speed) * 1000));
     }
+    const runtimeOverrides = controls.runtime_campaign_overrides || {};
+    const savedCarrierGas = runtimeOverrides.C2A?.carrier_gas
+        || runtimeOverrides.C2A_staged?.carrier_gas;
+    setValue('carrier-gas', savedCarrierGas);
     setValue('lever-campaign', controls.lever_campaign);
     setValue('lever-po2-mbar', controls.pO2_mbar);
     setValue('lever-pn2-mbar', controls.p_total_mbar);
@@ -577,6 +594,7 @@ function applyLoadedRecipeControls(controls) {
         }
         updateMreFields();
     }
+    updateCarrierGasDisplayConfig();
     updateKnudsenIndicator();
     updateLeverWarning();
 }
@@ -589,10 +607,21 @@ function numericDataAttribute(element, name) {
 function knudsenDisplayConfig(indicator) {
     const pressureBandMinMbar = numericDataAttribute(indicator, 'default-pressure-band-min-mbar');
     const pressureBandMaxMbar = numericDataAttribute(indicator, 'default-pressure-band-max-mbar');
+    const carrierGas = indicator?.getAttribute('data-carrier-gas') || '';
+    const configuredCarrierCollisionDiameterM = numericDataAttribute(
+        indicator,
+        'carrier-collision-diameter-m',
+    );
+    const legacyN2CollisionDiameterM = numericDataAttribute(
+        indicator,
+        'n2-collision-diameter-m',
+    );
     const config = {
         boltzmannConstantJK: numericDataAttribute(indicator, 'boltzmann-constant-j-k'),
         characteristicLengthM: numericDataAttribute(indicator, 'characteristic-length-m'),
-        n2CollisionDiameterM: numericDataAttribute(indicator, 'n2-collision-diameter-m'),
+        carrierGas,
+        carrierCollisionDiameterM: configuredCarrierCollisionDiameterM
+            ?? (carrierGas ? null : legacyN2CollisionDiameterM),
         continuumBufferKn: numericDataAttribute(indicator, 'continuum-buffer-kn'),
         meanFreePathFormulaId: indicator?.getAttribute('data-mean-free-path-formula-id') || '',
         meanFreePathDenominatorFactor: numericDataAttribute(
@@ -615,8 +644,8 @@ function knudsenDisplayConfig(indicator) {
         config.boltzmannConstantJK === null
         || config.characteristicLengthM === null
         || config.characteristicLengthM <= 0
-        || config.n2CollisionDiameterM === null
-        || config.n2CollisionDiameterM <= 0
+        || config.carrierCollisionDiameterM === null
+        || config.carrierCollisionDiameterM <= 0
         || config.continuumBufferKn === null
         || config.continuumBufferKn <= 0
         || !config.meanFreePathFormulaId
@@ -656,7 +685,7 @@ function updateKnudsenIndicator() {
         * (tempC + config.temperatureKOffset)
         / (
             config.meanFreePathDenominatorFactor
-            * config.n2CollisionDiameterM ** 2
+            * config.carrierCollisionDiameterM ** 2
             * pressurePa
         );
     const kn = meanFreePathM / config.characteristicLengthM;
@@ -690,6 +719,23 @@ function updateLeverWarning() {
     warning.textContent = messages.join('; ');
 }
 
+function updateCarrierGasDisplayConfig() {
+    const select = document.getElementById('carrier-gas');
+    const option = select?.selectedOptions?.[0];
+    const indicator = document.getElementById('knudsen-indicator');
+    const reason = document.getElementById('carrier-gas-reason');
+    if (indicator && option) {
+        indicator.dataset.carrierGas = select.value;
+        indicator.dataset.carrierCollisionDiameterM = (
+            option.dataset.collisionDiameterM || ''
+        );
+    }
+    if (reason && option) {
+        reason.textContent = `${option.dataset.reason || ''} `
+            + 'Static pressure is modeled; carrier flow rate is not.';
+    }
+}
+
 hydrateMrePresetCatalog();
 hydrateFurnaceMaterialCatalog();
 document.getElementById('mre-enabled')?.addEventListener('change', updateMreFields);
@@ -698,10 +744,15 @@ document.getElementById('lever-pn2-mbar')?.addEventListener('input', () => {
     updateKnudsenIndicator();
     updateLeverWarning();
 });
+document.getElementById('carrier-gas')?.addEventListener('change', () => {
+    updateCarrierGasDisplayConfig();
+    updateKnudsenIndicator();
+});
 document.getElementById('lever-stage-temp')?.addEventListener('input', () => {
     updateKnudsenIndicator();
     updateLeverWarning();
 });
+updateCarrierGasDisplayConfig();
 updateKnudsenIndicator();
 updateLeverWarning();
 

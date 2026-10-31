@@ -103,18 +103,36 @@
                 </select>
             </label>
             <label>
+                C2A carrier gas:
+                <select id="carrier-gas" aria-label="C2A carrier gas">
+                    {% for option in knudsen_config.carrier_gas_options %}
+                    <option value="{{ option.token }}"
+                            data-collision-diameter-m="{{ option.collision_diameter_m }}"
+                            data-reason="{{ option.physical_selection_reason }}"
+                            data-legacy="{{ option.legacy|lower }}"
+                            title="{{ option.physical_selection_reason }}"
+                            {% if option.token == knudsen_config.carrier_gas %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="config-hint" id="carrier-gas-reason" aria-live="polite">
+                Static pressure is modeled; carrier flow rate is not.
+            </div>
+            <label>
                 pO2 (mbar):
                 <input type="number" id="lever-po2-mbar" class="recipe-lever recipe-defining-control"
                        data-param="pO2_mbar" data-field="pO2_mbar" min="0" step="0.001" value="{{ c4_operator_presets.pO2_mbar }}">
             </label>
             <label>
-                Total overhead / pN2 sweep (mbar):
+                Total overhead / buffer-gas pressure (mbar):
                 <input type="number" id="lever-pn2-mbar" min="0" step="0.1" value="10">
             </label>
             <div id="knudsen-indicator"
                  class="config-hint"
                  data-boltzmann-constant-j-k="{{ knudsen_config.boltzmann_constant_j_k }}"
                  data-characteristic-length-m="{{ knudsen_config.characteristic_length_m }}"
+                 data-carrier-gas="{{ knudsen_config.carrier_gas }}"
+                 data-carrier-collision-diameter-m="{{ knudsen_config.carrier_collision_diameter_m }}"
                  data-n2-collision-diameter-m="{{ knudsen_config.n2_collision_diameter_m }}"
                  data-continuum-buffer-kn="{{ knudsen_config.continuum_buffer_kn }}"
                  data-mean-free-path-formula-id="{{ knudsen_config.mean_free_path_formula_id }}"
@@ -164,7 +182,7 @@
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">+100</button>
             </div>
             <div id="lever-warning" class="config-warning" hidden></div>
-            <div class="config-hint">pN2 and wall-temperature controls are display-only until runtime support lands.</div>
+            <div class="config-hint">Buffer pressure and wall-temperature controls are display-only until runtime support lands.</div>
         </fieldset>
 
         <!-- Additives -->
