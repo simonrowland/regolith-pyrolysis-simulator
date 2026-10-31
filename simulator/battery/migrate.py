@@ -4158,6 +4158,34 @@ def _source_printed_composition_values(
     return printed
 
 
+def _composition_source_locator(
+    payload: object, *, fallback: Locator | None = None
+) -> Locator | None:
+    """Select the locator attached to this map, role, or source row."""
+
+    if not isinstance(payload, Mapping):
+        return fallback
+    for key in _PRINTED_COMPOSITION_MAP_KEYS:
+        composition = payload.get(key)
+        if isinstance(composition, Mapping):
+            locator = _locator_from_plain(composition.get("locator"))
+            if locator is not None:
+                return locator
+    point_conditions = payload.get("point_conditions")
+    if isinstance(point_conditions, Mapping):
+        printed = point_conditions.get("printed_composition")
+        if isinstance(printed, Mapping):
+            locator = _locator_from_plain(printed.get("locator"))
+            if locator is not None:
+                return locator
+    role = payload.get("composition_role")
+    if isinstance(role, Mapping):
+        locator = _locator_from_plain(role.get("locator"))
+        if locator is not None:
+            return locator
+    return _locator_from_plain(payload.get("locator")) or fallback
+
+
 def _preserve_printed_composition_context(
     printed: Located[Mapping[str, Any]] | None,
     wt: Mapping[str, Any] | None,
@@ -4166,15 +4194,13 @@ def _preserve_printed_composition_context(
     source_values = _printed_map_payload(
         _source_printed_composition_values(wt, closure_context)
     )
+    source_locator = _composition_source_locator(closure_context)
     if printed is None or not printed.state.is_value:
         if printed is not None or not source_values:
             return printed
-        locator = (
-            _locator_from_plain(closure_context.get("locator"))
-            if isinstance(closure_context, Mapping)
-            else None
-        )
-        return located_value(source_values, locator)
+        return located_value(source_values, source_locator)
+    if printed.locator is None and source_locator is not None:
+        printed = replace(printed, locator=source_locator)
     values = dict(printed.state.value)
     for name, amount in source_values.items():
         values.setdefault(name, amount)
@@ -19031,7 +19057,11 @@ class Migrator:
                 }
             row_printed_values = row_sample.printed_composition.state.value
             row_printed_fingerprint = _printed_fingerprint(row_printed_values)
-            for source_values in (values, obs.get("equipment")):
+            row_printed_locator = row_sample.printed_composition.locator
+            for source_values, source_fallback in (
+                (values, locator),
+                (obs.get("equipment"), None),
+            ):
                 candidate_values = _source_printed_composition_values(
                     None, source_values
                 )
@@ -19041,14 +19071,23 @@ class Migrator:
                     == row_printed_fingerprint
                 ):
                     row_printed_values = candidate_values
+                    if row_printed_locator is None:
+                        row_printed_locator = _composition_source_locator(
+                            source_values, fallback=source_fallback
+                        )
                     break
             row_printed_composition = replace(
                 row_sample.printed_composition,
-                state=State.of(
-                    _runtime_printed_composition_values(
-                        row_printed_values
+                state=(
+                    State.of(
+                        _runtime_printed_composition_values(row_printed_values)
+                    )
+                    if row_printed_locator is not None
+                    else State.unknown(
+                        "printed composition has no source locator"
                     )
                 ),
+                locator=row_printed_locator,
             )
             point_conditions = {
                 **(point_conditions or {}),
