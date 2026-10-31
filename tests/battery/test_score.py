@@ -15953,6 +15953,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             use_repository_index_row=True,
         )
         for source_id in (
+            "kems-051-allibert-1981",
             "kems-053-stolyarova-1991",
             "stolyarova-1995-cao-alumina-kems",
             "stolyarova-1996-cao-alumina-silica-kems",
@@ -16339,17 +16340,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             )
             for row in allibert_cao_rows
         )
+        # a5c006e43 added printed row/column coordinates to each point; the
+        # migrator hashes the full point, so these seven admitted rows changed IDs.
         unprinted_cao_references = {
             "kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h="
             + suffix
             for suffix in (
-                "089e4f903141",
-                "0a68381c8d07",
-                "3816d169fbf5",
-                "803c6b10f6a7",
-                "98d5192921f6",
-                "b3b06405be2e",
-                "d5945aa87c1c",
+                "0a9ee70de0a3",
+                "0e32f4985ad8",
+                "537d124817e3",
+                "5c0602c60016",
+                "a124fa850837",
+                "b03402915fb9",
+                "c6f2b8a83874",
             )
         }
         affected_cao_rows = [
