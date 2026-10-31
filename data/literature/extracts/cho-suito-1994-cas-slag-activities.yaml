@@ -265,7 +265,7 @@ species:
         uncertainty: '±0.10 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Eq. 9: log aSiO2 = 4/3 log(C(N)/LN) + log(K6 · fN^(4/3) · aSi / K7^(4/3)); activity converted from the printed base-10 logarithm as 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         point_conditions:
           T_K:
@@ -278,6 +278,8 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -344,7 +346,7 @@ species:
         uncertainty: '±0.23 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Eq. 9; activity converted from printed base-10 logarithm as 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         point_conditions:
           T_K:
@@ -357,6 +359,8 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -423,7 +427,7 @@ species:
         uncertainty: '±0.15 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Eq. 9; activity converted from printed base-10 logarithm as 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         point_conditions:
           T_K:
@@ -436,6 +440,8 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -502,7 +508,7 @@ species:
         uncertainty: '±0.22 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Eq. 9; activity converted from printed base-10 logarithm as 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         point_conditions:
           T_K:
@@ -515,6 +521,8 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -764,7 +772,7 @@ species:
         uncertainty: '±0.16 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; activity converted from printed log10 activity; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         point_conditions:
           T_K:
@@ -777,6 +785,8 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -843,7 +853,7 @@ species:
         uncertainty: '±0.11 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 5; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 5 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         point_conditions:
           T_K:
@@ -856,6 +866,8 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -922,7 +934,7 @@ species:
         uncertainty: '±0.40 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; activity converted from printed log10 activity; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         point_conditions:
           T_K:
@@ -935,6 +947,8 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1001,7 +1015,7 @@ species:
         uncertainty: '±0.11 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 5; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 5 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         point_conditions:
           T_K:
@@ -1014,6 +1028,8 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1080,7 +1096,7 @@ species:
         uncertainty: '±0.41 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; activity converted from printed log10 activity; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         point_conditions:
           T_K:
@@ -1093,6 +1109,8 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1159,7 +1177,7 @@ species:
         uncertainty: '±0.12 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 5; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 5 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         point_conditions:
           T_K:
@@ -1172,6 +1190,8 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1238,7 +1258,7 @@ species:
         uncertainty: '±0.66 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; activity converted from printed log10 activity; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         point_conditions:
           T_K:
@@ -1251,6 +1271,8 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1316,7 +1338,7 @@ species:
         uncertainty: '±0.17 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 5; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 5 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         point_conditions:
           T_K:
@@ -1329,6 +1351,8 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1725,7 +1749,7 @@ species:
         uncertainty: '±0.13 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route using calcium contents and iron interaction parameters; convert printed log10 activity using 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         point_conditions:
           T_K:
@@ -1738,6 +1762,8 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1803,7 +1829,7 @@ species:
         uncertainty: '±0.14 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 6; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 6 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_acs2_1_metal, cho_suito_1994_t2_acs2_2_metal, cho_suito_1994_t2_acs2_3_metal]
         point_conditions:
           T_K:
@@ -1816,6 +1842,8 @@ species:
               row: ACS2
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1881,7 +1909,7 @@ species:
         uncertainty: '±0.13 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; convert printed log10 activity using 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         point_conditions:
           T_K:
@@ -1894,6 +1922,8 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -1959,7 +1989,7 @@ species:
         uncertainty: '±0.14 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 6; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 6 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_acs4_1_metal, cho_suito_1994_t2_acs4_2_metal, cho_suito_1994_t2_acs4_3_metal]
         point_conditions:
           T_K:
@@ -1972,6 +2002,8 @@ species:
               row: ACS4
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -2037,7 +2069,7 @@ species:
         uncertainty: '±0.33 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; convert printed log10 activity using 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         point_conditions:
           T_K:
@@ -2050,6 +2082,8 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -2115,7 +2149,7 @@ species:
         uncertainty: '±0.35 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 6; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 6 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_cas5_1_metal, cho_suito_1994_t2_cas5_2_metal, cho_suito_1994_t2_cas5_3_metal]
         point_conditions:
           T_K:
@@ -2128,6 +2162,8 @@ species:
               row: CAS5
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -2193,7 +2229,7 @@ species:
         uncertainty: '±0.83 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         derivation:
-          relation: 'Table 5 printed log10(a) from C(N) and L_N; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Nitride capacity/distribution route; convert printed log10 activity using 10^log(a); associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes. The listed parents are this paper’s Table 2 assays only; the reduction is a mixed present/previous assessment and other inputs are not enumerated in the paper (p. 180): “The values for aSiO2 relative to the solid standard state can be calculated from the following relation given by Eq. (9), using the values for nitride capacity obtained from a gas-slag equilibration technique, nitrogen distribution ratio, the Si and Al contents obtained from the supersaturation experiments⁴) as well as present (Table 2) and previous equilibrium experiments⁴) and the respective interaction parameters listed in Table 1.”'
           inputs: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         point_conditions:
           T_K:
@@ -2206,6 +2242,8 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
@@ -2270,7 +2308,7 @@ species:
         uncertainty: '±0.76 standard deviation of log10(a) as printed'
         derived_from: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         derivation:
-          relation: 'Activity is the author estimate from the from intercepts in Figs. 5 and 6; Fig. 6; activity converted from the printed base-10 logarithm as 10^log(a).'
+          relation: 'Activity is the author estimate from the Fig. 6 intercept; associated composition is the arithmetic mean of this system’s analysed Table 2 runs, detailed in values.notes.'
           inputs: [cho_suito_1994_t2_cas8_1_metal, cho_suito_1994_t2_cas8_2_metal]
         point_conditions:
           T_K:
@@ -2283,6 +2321,8 @@ species:
               row: CAS8
               note: 'Table 5 caption: slags at 1873 K.'
           composition:
+            inferred: true
+            inference: 'oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry'
             state:
               tag: value
               value:
