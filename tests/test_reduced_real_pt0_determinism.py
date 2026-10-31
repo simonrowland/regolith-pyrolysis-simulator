@@ -1099,6 +1099,31 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
     assert _key_hash(ig) != _key_hash(igad)
 
 
+def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _build_pt0_sim(None)
+    sim.inventory.inert_melt_components_kg.clear()
+    sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    observed: dict[str, Any] = {}
+
+    class CapturingKernel:
+        def dispatch(self, _intent, **kwargs):
+            observed.update(kwargs)
+            return None
+
+    monkeypatch.setattr(sim, "_require_chem_kernel", lambda: CapturingKernel())
+    sim._dispatch_only(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        control_inputs={},
+        fO2_log=-9.0,
+    )
+
+    submitted_mol = observed["account_mol_overrides"]["process.cleaned_melt"]
+    assert "Na2O" not in submitted_mol
+    assert "SiO2" in submitted_mol
+
+
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
     # b-929 changes the gate key bytes by including the owner freeze-gate key;
