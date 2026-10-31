@@ -2967,8 +2967,9 @@ def canonical_replay_key(
         )
     else:
         T_K = live_T_K
+    raw_pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
     pressure_bar = _quantize(
-        float(sim.melt.p_total_mbar) / 1000.0,
+        raw_pressure_bar,
         quantization.pressure_bar_quantum,
         quantization.pressure_bar_decimals,
     )
@@ -3057,6 +3058,13 @@ def canonical_replay_key(
     )
     if redox_identity is not None:
         redox_key["redox_state_identity"] = redox_identity
+    freeze_gate_cache_key = None
+    if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
+        freeze_gate_cache_key = sim._freeze_gate_cache_key(
+            pressure_bar=raw_pressure_bar,
+            fO2_log=fO2_log,
+            redox_state=redox_state,
+        )
     key = {
         "namespace_id": namespace_id,
         "composition_mol_fraction": _backend_boundary_composition(
@@ -3076,6 +3084,8 @@ def canonical_replay_key(
         "redox": redox_key,
         **dependency_vector,
     }
+    if freeze_gate_cache_key is not None:
+        key["freeze_gate_cache_key"] = freeze_gate_cache_key
     if include_amount:
         key["total_submitted_amount_kg"] = _sigfig(
             total_amount_kg,

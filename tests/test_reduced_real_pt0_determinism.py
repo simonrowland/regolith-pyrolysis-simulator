@@ -358,7 +358,9 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
     # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
     # Two in-process evaluations and the cross-process test pin determinism.
-    assert key_hash == "aa4dd3b20f35e622b503841d42cc094556dea5607ebbd4ec91f2257fda19358b"
+    # 2026-10-31 b-929: gate replay keys now embed the owner freeze-gate cache
+    # key so inert membership, water, and formula identity cannot alias curves.
+    assert key_hash == "f460549321df39ccd76ddad95505f4c8f65eba6fa0c0888893afdcb8feb26b50"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -1098,6 +1100,8 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    # b-929 changes the gate key bytes by including the owner freeze-gate key;
+    # the equilibrium key below remains unchanged.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1114,9 +1118,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 1648
+    assert len(magemin_bytes) == 2221
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "13ada0c3401a52f88761e3a2b0abcd64caefc16765e943e9812398bf3fcb7d90"
+        "cee6defee87036c727fe284541e982d5d6138ef5ee0ad657ed05f07da6d13c07"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1127,6 +1131,117 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     assert len(generic_bytes) == 1687
     assert hashlib.sha256(generic_bytes).hexdigest() == (
         "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+    )
+
+
+def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
+    from simulator.accounting.formulas import SpeciesFormula
+    from simulator.evaporation import _FREEZE_GATE_COMPOSITION_SPECIES
+
+    class AlphaMELTSKeyBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+        _model = "MELTSv1.0.2"
+        _mode = "subprocess"
+
+        def is_available(self):
+            return True
+
+    def build_sim():
+        sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        return sim
+
+    def gate_key(sim):
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=-9.0,
+            fe_redox_policy="intrinsic",
+        )
+
+    def legacy_identity(key):
+        return {
+            name: value
+            for name, value in key.items()
+            if name != "freeze_gate_cache_key"
+        }
+
+    inert_sim = build_sim()
+    cleaned_before = inert_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    )
+    inert_sim.inventory.inert_melt_components_kg.clear()
+    inert_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    sodium_inert_key = gate_key(inert_sim)
+    assert gate_key(inert_sim) == sodium_inert_key
+
+    inert_sim.inventory.inert_melt_components_kg.clear()
+    inert_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    silica_inert_key = gate_key(inert_sim)
+    assert inert_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    ) == cleaned_before
+    assert legacy_identity(sodium_inert_key) == legacy_identity(
+        silica_inert_key
+    )
+    assert sodium_inert_key != silica_inert_key
+    assert (
+        sodium_inert_key["freeze_gate_cache_key"]
+        != silica_inert_key["freeze_gate_cache_key"]
+    )
+    legacy_store = PT0DeterminismStore("capture")
+    legacy_store._store(
+        "freeze_gate_curve",
+        legacy_identity(sodium_inert_key),
+        {"curve": {"status": "in_range"}},
+        repair_notices=(),
+    )
+    with pytest.raises(PT0CacheMiss):
+        legacy_store._lookup("freeze_gate_curve", sodium_inert_key)
+
+    water_sim = build_sim()
+    water_sim._chem_registry = None
+    water_sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    water_sim.backend = AlphaMELTSKeyBackend()
+    dry_key = gate_key(water_sim)
+    cleaned_mol = water_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    )
+    oxide_total_mol = sum(
+        float(cleaned_mol.get(species, 0.0))
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES
+    )
+    water_sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"H2O": oxide_total_mol * 0.004 / 100.0},
+        source="b-929 replay key water identity",
+        material_origin="feedstock",
+    )
+    wet_key = gate_key(water_sim)
+    assert legacy_identity(wet_key) == legacy_identity(dry_key)
+    assert wet_key != dry_key
+    assert wet_key["freeze_gate_cache_key"] != dry_key["freeze_gate_cache_key"]
+
+    formula_sim = build_sim()
+    formula_sim._chem_registry = None
+    formula_sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    formula_sim.backend = None
+    baseline_formula_key = gate_key(formula_sim)
+    formula_sim.species_formula_registry = dict(
+        formula_sim.species_formula_registry
+    )
+    formula_sim.species_formula_registry["SiO2"] = (
+        SpeciesFormula.from_atoms("SiO2", {"Si": 1, "O": 1})
+    )
+    changed_formula_key = gate_key(formula_sim)
+    assert legacy_identity(changed_formula_key) == legacy_identity(
+        baseline_formula_key
+    )
+    assert changed_formula_key != baseline_formula_key
+    assert (
+        changed_formula_key["freeze_gate_cache_key"]
+        != baseline_formula_key["freeze_gate_cache_key"]
     )
 
 
