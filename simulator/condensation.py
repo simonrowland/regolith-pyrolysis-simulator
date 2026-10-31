@@ -6639,6 +6639,11 @@ def _wall_deposition_driving_pressure_pa(
         # species. Today SiO uses the disproportionation-product limit
         # P_sat ~= 0; this explicit hook can grow a real product P_sat later.
         effective_product_psat_pa = 0.0
+        if diagnostic_out is not None:
+            diagnostic_out["wall_saturation_pressure_pa"] = effective_product_psat_pa
+            diagnostic_out["wall_saturation_pressure_status"] = (
+                "reactive_product_backstop"
+            )
         return max(0.0, local_pressure_pa - effective_product_psat_pa)
     return max(0.0, local_pressure_pa - P_sat_pa)
 

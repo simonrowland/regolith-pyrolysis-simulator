@@ -166,6 +166,54 @@ def test_sio_above_reactive_product_cutoff_is_physical_pass_through():
     assert outcomes[-1]["reason"] == "above_reactive_product_condensation_temperature"
 
 
+def test_reactive_sio_backstop_keeps_raw_saturated_strip_active():
+    model = _configured_model()
+    stage = model.train.stages[3]
+    stage.temp_range_C = (1200.0, 1200.0)
+    model.vapor_pressure_data = {
+        "oxide_vapors": {
+            "SiO": {
+                "pure_component_antoine": {
+                    "A": 2.0,
+                    "B": 0.0,
+                    "C": 0.0,
+                    "valid_range_K": [1000.0, 1600.0],
+                },
+            },
+        },
+    }
+    wall_temperature_K = 1200.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    raw_psat, refused = condensation._try_antoine_psat_pa(
+        "SiO", wall_temperature_K,
+        vapor_pressure_data=model.vapor_pressure_data,
+    )
+    assert not refused
+    assert raw_psat is not None
+    inlet_pressure_pa = raw_psat / 2.0
+    assert raw_psat >= inlet_pressure_pa
+
+    diagnostic = {}
+    flux = condensation._series_resistance_deposition_flux_mol_m2_s(
+        "SiO", inlet_pressure_pa, wall_temperature_K, 0.5,
+        pipe_diameter_m=model.pipe_diameter_m,
+        T_gas_K=model.gas_temperature_C + condensation.CELSIUS_TO_KELVIN_OFFSET,
+        overhead_pressure_pa=model.overhead_pressure_mbar * 100.0,
+        carrier_gas=model.carrier_gas,
+        vapor_pressure_data=model.vapor_pressure_data,
+        reactive_product_backstop=True,
+        diagnostic_out=diagnostic,
+    )
+    assert flux > 0.0
+    assert diagnostic["wall_saturation_pressure_pa"] == 0.0
+
+    eta = model._condensation_efficiency(
+        stage=stage, species="SiO", T_cond_C=1200.0, residence_s=4.0,
+        available_kg=1.0, alpha_s_value=0.5,
+        inlet_partial_pressure_pa=inlet_pressure_pa,
+    )
+    assert eta > 0.0
+
+
 def test_sio_missing_saturation_without_reactive_backstop_refuses(monkeypatch):
     model = _configured_model()
     stage = model.train.stages[3]
