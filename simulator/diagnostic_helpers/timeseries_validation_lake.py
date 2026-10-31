@@ -309,6 +309,15 @@ def _validate_alpha_rows(
         original_species[key] = species
 
     for (species, model_species, T_K), values in grouped.items():
+        # DS-007 Table 3 Fe alphas are the Fedkin fit used to construct the
+        # runtime Fe melt bridge. Counting those same points as validation
+        # would turn the bridge's source data into a self-agreement score.
+        if dataset_id == "DS-007" and species == "Fe":
+            skipped.append(
+                "DS-007:Fe Table 3 alpha is source data for the runtime bridge; "
+                "self-agreement excluded"
+            )
+            continue
         if model_species in UNMODELED_SPECIES:
             skipped.append(f"{dataset_id}:{species} has no model species")
             continue
