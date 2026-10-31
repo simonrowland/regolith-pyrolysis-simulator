@@ -612,7 +612,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
 
     source_total = sum(
         sum(sim.atom_ledger.project_account_kg(account).values())
-        for account in PRODUCT_LEDGER_ACCOUNTS
+        for account in (*PRODUCT_LEDGER_ACCOUNTS, TERMINAL_ESCAPE_ACCOUNT)
         if account != C7_AL_CREDIT_ACCOUNT
     )
     source_total += sum(
