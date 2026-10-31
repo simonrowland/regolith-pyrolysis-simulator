@@ -361,7 +361,7 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-10-31 b-929: Studio-2 canonical bytes after gate replay identity
     # began embedding the owner freeze-gate key. The key now binds the submitted
     # post-inert composition and inert membership, plus water/formula identity.
-    assert key_hash == "4f2faa2ce387a1195d8d65561be1c9dd5dece161798b5a20df7db648349177eb"
+    assert key_hash == "4cee08747e68f2c46df68ef2fbbe4b5141cd1395c9345d8315daa83305d5a2df"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -818,11 +818,10 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
-    # Studio-2 canonical bytes at f82e95910 after equilibrium replay keys began
-    # carrying the submitted post-inert composition and inert membership, with
-    # the same owner provider-input identity used by gate replay.
+    # Studio-2 canonical bytes at 35c987e96 after the equilibrium key was
+    # narrowed to the submitted inert-filtered composition and its formulas.
     assert _key_hash(base) == (
-        "b5b37b2bd98b012a2e85887dbf16cb3f82444ea5adc561c976e9d80e59b61521"
+        "79d74e79f9f00d458f048acbcd1da25f19cad645d0d0efc8f060cba22dd9373d"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
@@ -1097,20 +1096,19 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "7a07fc993ebdcccd17292967a6df9167ebd3b9ce1d2cceebc047bf4384dd1ef3"),
-        ("", "767e427c7663a01d8f5321355f9cbf1cf1e1be3b4caab598c106d1ead85767f2"),
-        (DEFAULT_ALPHAMELTS_MODEL, "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
-        ("pMELTS", "3bf3132d3a294220002d743a264e206882f30eadc707ce237f2c03bc47ff549f"),
-        ("MELTSv1.1.0", "bf940f7d7647b0fd3624de9157070ad835756a5eca1efcf4a31f494bce780ec8"),
-        ("MELTSv1.2.0", "c32a5f65e1ff0b5341296e616da37e37ee4cc38a2087f555fdc6cc2503b592ec"),
+        (None, "aba38d237aa4c4e57ce0b1d4331e646e5f224e7baa349354b085aacff441637e"),
+        ("", "20a65e05d5acf3303c5ac794dc455d45359c34f61602ddd7e10ecb5b06b6ce76"),
+        (DEFAULT_ALPHAMELTS_MODEL, "250646f69b23a91fe5d1f0904fdeab2f206432e6f28f9472bff84ee032b54cb3"),
+        ("pMELTS", "7b50ed0b4168c94d12ca1ae38e7a64b2e049942f16757765ea359ad52106eef1"),
+        ("MELTSv1.1.0", "238d7c7582835a6d4983861344fbc8fa8cc05dbdb96c45eec242f58f5b83614d"),
+        ("MELTSv1.2.0", "70ed32461ba7e9755beb1e95a34b356837e7ae09f3090b1ca150a08f4e39b273"),
     ],
 )
 def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
     model: str | None,
     expected_hash: str,
 ) -> None:
-    # Studio-2 canonical hashes at f82e95910. These keys now include the
-    # submitted post-inert composition and inert membership.
+    # Studio-2 canonical hashes at 35c987e96 after keying on submitted inputs.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
@@ -1120,12 +1118,12 @@ def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "7a07fc993ebdcccd17292967a6df9167ebd3b9ce1d2cceebc047bf4384dd1ef3"),
-        ("", "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
-        (DEFAULT_ALPHAMELTS_MODEL, "e48bd2e4e70234ff82efd13588eac565ee75ed0db552a69057b222ca5f0a5405"),
-        ("pMELTS", "3bf3132d3a294220002d743a264e206882f30eadc707ce237f2c03bc47ff549f"),
-        ("MELTSv1.1.0", "bf940f7d7647b0fd3624de9157070ad835756a5eca1efcf4a31f494bce780ec8"),
-        ("MELTSv1.2.0", "c32a5f65e1ff0b5341296e616da37e37ee4cc38a2087f555fdc6cc2503b592ec"),
+        (None, "70082de80468f7c4239446ac453e340ccc53c58e7f06d30ed4340a97abf9dae1"),
+        ("", "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
+        (DEFAULT_ALPHAMELTS_MODEL, "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
+        ("pMELTS", "bba92d10ca74b54a58eb5457558079a5c5ce4e196bac55dbeab2937ecf2afd97"),
+        ("MELTSv1.1.0", "4a6ccd886a196e09ad376cb783b9c689d5210e5d5e797409355dccd13e8cdfb5"),
+        ("MELTSv1.2.0", "771a9c502a0e0b789ca0f2fc1ccb95015cfcf7015d972777a6469adf02a9611f"),
     ],
 )
 def test_cached_real_python_api_replay_key_hashes_include_provider_input_identity(
@@ -1155,18 +1153,25 @@ def test_cached_real_python_api_replay_key_hashes_include_provider_input_identit
     key = store._equilibrium_key(sim)
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
 
-    # Studio-2 canonical hashes at f82e95910 after submitted composition and
-    # inert membership became part of equilibrium replay identity.
+    # Studio-2 canonical hashes at 35c987e96 after identity was narrowed to
+    # submitted provider inputs. The cached-real fixture has no PT-0 store,
+    # while the live fixture uses fine PT-0 quantization; their submitted oxide
+    # values differ by a few last-place digits, so those replay identities must
+    # differ even though their backend model fields match.
     assert actual_hash == expected_hash
     if model is None:
         live_key, _authority = _alphamelts_pt0_identity(
             model,
             mode="python_api",
         )
-        assert key == live_key
+        assert key["model"] == live_key["model"]
+        assert key["composition_mol_fraction"] != (
+            live_key["composition_mol_fraction"]
+        )
         payload = {"authority": _alphamelts_record_authority()}
         store._store("equilibrium_post_record", live_key, payload)
-        assert store._lookup("equilibrium_post_record", key) == payload
+        with pytest.raises(PT0CacheMiss):
+            store._lookup("equilibrium_post_record", key)
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
@@ -1290,8 +1295,8 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
 
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
-    # Studio-2 canonical bytes at f82e95910 after gate keys began embedding the
-    # owner freeze-gate provider-input identity and submitted composition.
+    # Studio-2 canonical bytes at 35c987e96 after gate keys began embedding the
+    # owner freeze-gate provider-input identity.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1308,9 +1313,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 1320
+    assert len(magemin_bytes) == 1319
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "ce998a40295ba91cf382a415a4701fe80926c8aa4974f166ef4730d42324b16f"
+        "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
     )
 
     generic_store = PT0DeterminismStore("capture")

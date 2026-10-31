@@ -606,6 +606,49 @@ class PT0DeterminismStore:
             control_quantization=self._control_quantization,
         )
 
+    def _physics_ladder_key_for_lookup(
+        self,
+        sim: Any,
+        replay_key: Mapping[str, Any],
+        rung_tag: str,
+    ) -> dict[str, Any]:
+        sig_figs = _physics_ladder_sig_figs(rung_tag)
+        default_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            replay_key,
+            rung_tag,
+        )
+        if sim is None:
+            return default_key
+        provider_input_builder = getattr(
+            sim,
+            "_silicate_provider_melt_inputs",
+            None,
+        )
+        if not callable(provider_input_builder):
+            return default_key
+        intent = _equilibrium_payload_intent(sim)
+        provider_inputs = provider_input_builder(
+            intent,
+            composition_sig_figs=int(sig_figs),
+        )
+        if provider_inputs is None:
+            return default_key
+        rung_replay_key = copy.deepcopy(dict(replay_key))
+        rung_replay_key["composition_mol_fraction"] = (
+            _backend_boundary_composition(
+                sim,
+                intent,
+                None,
+                namespace_id=str(replay_key["namespace_id"]),
+                sig_figs=int(sig_figs),
+                composition_mol=provider_inputs.composition_mol,
+            )
+        )
+        return canonical_physics_ladder_bucket_key_from_replay_key(
+            rung_replay_key,
+            rung_tag,
+        )
+
     def _equilibrium_from_payload(
         self,
         sim: Any,
@@ -1160,7 +1203,8 @@ class PT0DeterminismStore:
                 )
                 if entry is None:
                     for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
-                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        rung_key = self._physics_ladder_key_for_lookup(
+                            sim,
                             candidate_key,
                             rung_tag,
                         )
@@ -1179,7 +1223,8 @@ class PT0DeterminismStore:
                             break
                 if entry is None:
                     for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
-                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        rung_key = self._physics_ladder_key_for_lookup(
+                            sim,
                             candidate_key,
                             rung_tag,
                         )

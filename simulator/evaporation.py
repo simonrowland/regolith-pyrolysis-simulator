@@ -2795,6 +2795,8 @@ class EvaporationMixin:
         self,
         intent: Any,
         composition_mol: Mapping[str, float] | None = None,
+        *,
+        composition_sig_figs: int | None = None,
     ) -> _SilicateProviderMeltInputs | None:
         """Build the filtered silicate payload shared by dispatch and replay."""
         from simulator.chemistry.kernel import ChemistryIntent
@@ -2829,10 +2831,22 @@ class EvaporationMixin:
             # PT-0 dispatch canonicalizes the full ledger before removing
             # explicit inerts. Keep replay identity on those exact submitted
             # values, including any rounding interaction with inert species.
-            composition_mol = canonicalizer(
-                self,
-                {_FREEZE_GATE_ACCOUNT: composition_mol},
-            ).get(_FREEZE_GATE_ACCOUNT, {})
+            if composition_sig_figs is None:
+                composition_mol = canonicalizer(
+                    self,
+                    {_FREEZE_GATE_ACCOUNT: composition_mol},
+                ).get(_FREEZE_GATE_ACCOUNT, {})
+            else:
+                # Ladder lookups reproduce the source rung's canonicalization
+                # using the same owner resolver as the PT-0 store.
+                from simulator.reduced_real_determinism import (
+                    canonicalized_composition_mol_by_account,
+                )
+
+                composition_mol = canonicalized_composition_mol_by_account(
+                    {_FREEZE_GATE_ACCOUNT: composition_mol},
+                    sig_figs=composition_sig_figs,
+                ).get(_FREEZE_GATE_ACCOUNT, {})
         inert_species = set(
             (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
         )
