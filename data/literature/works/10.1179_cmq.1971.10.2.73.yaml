@@ -76,6 +76,21 @@ experiments:
   locator:
     page: 74
     table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []
 - experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
   kind: literature
   method:
@@ -121,6 +136,21 @@ experiments:
   locator:
     page: 74
     table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []
 - experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
   kind: literature
   method:
@@ -166,3 +196,18 @@ experiments:
   locator:
     page: 74
     table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []

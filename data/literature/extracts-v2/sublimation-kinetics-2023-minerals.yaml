@@ -12,11 +12,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -686,11 +685,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1239,11 +1237,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1627,11 +1624,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1747,11 +1743,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1867,11 +1862,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1987,11 +1981,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2107,11 +2100,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2227,11 +2219,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2347,11 +2338,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2467,11 +2457,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2578,7 +2567,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -2610,11 +2599,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2721,7 +2709,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -2753,11 +2741,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2864,7 +2851,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -2896,11 +2883,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3007,7 +2993,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -3039,11 +3025,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3150,7 +3135,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -3182,11 +3167,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3293,7 +3277,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -3325,11 +3309,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3436,7 +3419,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -3468,11 +3451,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3586,11 +3568,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3704,11 +3685,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3822,11 +3802,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3940,11 +3919,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4058,11 +4036,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4176,11 +4153,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4294,11 +4270,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4404,7 +4379,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -4436,11 +4411,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4546,7 +4520,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -4578,11 +4552,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4688,7 +4661,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -4720,11 +4693,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4830,7 +4802,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -4862,11 +4834,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4972,7 +4943,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -5004,11 +4975,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5114,7 +5084,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -5146,11 +5116,10 @@ observations:
       formula: K
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5256,7 +5225,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -5288,11 +5257,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5406,11 +5374,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5524,11 +5491,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5642,11 +5608,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5760,11 +5725,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5878,11 +5842,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5996,11 +5959,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6114,11 +6076,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6225,7 +6186,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6257,11 +6218,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6368,7 +6328,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6400,11 +6360,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6511,7 +6470,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6543,11 +6502,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6654,7 +6612,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6686,11 +6644,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6797,7 +6754,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6829,11 +6786,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6940,7 +6896,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:
@@ -6972,11 +6928,10 @@ observations:
       formula: Na
       phase:
         tag: value
-        value: cr
+        value: g
       polymorph:
-        tag: unknown
-        reason: source does not state polymorph
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7083,7 +7038,7 @@ observations:
         output_unit: K
         references: []
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=p_sat (p_sat identity names the gas species)
     inputs:
     - pdf:sublimation-kinetics-2023-minerals
     parameters:

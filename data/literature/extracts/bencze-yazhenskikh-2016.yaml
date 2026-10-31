@@ -84,7 +84,7 @@ species:
         page: 1-6
         table: S-I
         note: 'Columns: ln(p(Na(g))/Pa)=A+B/T; vapor pressure p(Na(g))/Pa at 1273 K; activity a(Na2O) at 1273 K.'
-      phase: solidified_gasifier_slag_subsamples
+      phase: gas
       condensed_form:
         state: unresolved
         metastable: false
@@ -95,6 +95,7 @@ species:
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author-fitted KEMS vapor-pressure relation ln(p(Na(g))/Pa)=A+B/T; a(Na2O) obtained from the authors' KEMS calibration
@@ -169,11 +170,12 @@ species:
     - observation_id: bencze_2016_table_s2_na_selected_means
       type: psat_series
       locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
-      phase: solidified_gasifier_slag_selected_subsamples
+      phase: gas
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author mean of selected KEMS vapor-pressure fits
@@ -191,11 +193,12 @@ species:
     - observation_id: bencze_2016_table_s1_k_all_subsamples
       type: psat_series
       locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
-      phase: solidified_gasifier_slag_subsamples
+      phase: gas
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author-fitted KEMS vapor-pressure relation ln(p(K(g))/Pa)=A+B/T; a(K2O) obtained from the authors' KEMS calibration
@@ -208,11 +211,12 @@ species:
     - observation_id: bencze_2016_table_s2_k_selected_means
       type: psat_series
       locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
-      phase: solidified_gasifier_slag_selected_subsamples
+      phase: gas
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:
+        system_class: silicate_melt
         quantity: partial_pressure
         method_class: model_derived
         generator: author mean of selected KEMS vapor-pressure fits

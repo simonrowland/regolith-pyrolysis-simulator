@@ -52,7 +52,6 @@ from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
-    MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
     MAGEMinBackend,
 )
 
@@ -272,6 +271,7 @@ def _make_absent_magemin(monkeypatch):
 class _ImmediateFailurePool:
     def __init__(self, exception):
         self.exception = exception
+        self.close_calls = 0
 
     def submit(self, *_args, **_kwargs):
         future = Future()
@@ -280,6 +280,9 @@ class _ImmediateFailurePool:
 
     def _abort_request(self, _future, *, diagnostic_detail=None):
         return False
+
+    def close(self, *, cancel_pending=False):
+        self.close_calls += 1
 
 
 def _make_pooled_subprocess_backend(exception):
@@ -1080,6 +1083,7 @@ def test_magemin_worker_exit_returns_typed_not_converged():
             'MAGEMin subprocess pool slot 0 worker exited without a result',
         )
     )
+    pool = backend._subprocess_pool
 
     result = backend.equilibrate(
         1500.0,
@@ -1095,7 +1099,8 @@ def test_magemin_worker_exit_returns_typed_not_converged():
     assert 'worker exited without a result' in (
         result.diagnostics['backend_failure_message']
     )
-    assert backend.is_available() is True
+    assert backend.is_available() is False
+    assert pool.close_calls == 1
 
 
 def test_magemin_pool_unavailable_returns_typed_not_converged():
@@ -1117,6 +1122,7 @@ def test_magemin_pool_unavailable_returns_typed_not_converged():
     assert 'worker is unavailable' in (
         result.diagnostics['backend_failure_message']
     )
+    assert backend.is_available() is False
 
 
 def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
@@ -1138,6 +1144,7 @@ def test_magemin_pool_lifecycle_error_returns_typed_not_converged():
         'EngineWorkerPoolLifecycleError'
     )
     assert 'no live consumer' in result.diagnostics['backend_failure_message']
+    assert backend.is_available() is False
 
 
 def test_magemin_in_process_budget_exhaustion_returns_typed_status():
@@ -1205,14 +1212,12 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
 
 @pytest.mark.parametrize(
-    ('pooled', 'expected_budget_s'),
-    ((True, MAGEMIN_WARM_LIQUIDUS_BUDGET_S),
-     (False, liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S)),
+    'pooled',
+    (True, False),
 )
-def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
+def test_magemin_liquidus_uses_same_hang_guard_for_all_modes(
     monkeypatch,
     pooled,
-    expected_budget_s,
 ):
     import simulator.melt_backend.magemin as magemin_module
 
@@ -1237,11 +1242,15 @@ def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
     backend.find_liquidus_solidus(
         composition_mol={'SiO2': 1.0, 'MgO': 1.0},
     )
-    assert captured['budget_s'] == pytest.approx(expected_budget_s)
+    assert captured['budget_s'] == pytest.approx(
+        liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+    )
 
 
-def test_magemin_cold_liquidus_budget_retains_bounded_diagnostic_headroom():
-    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(300.0)
+def test_magemin_liquidus_budget_is_a_generous_hang_guard():
+    assert liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S == pytest.approx(
+        1800.0
+    )
 
 
 # The test pins its OWN coarse grid rather than relying on the backend's
@@ -2031,15 +2040,13 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
     assert 0.0 < seen_timeouts[0] <= 1.5
 
 
-def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
+def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
     monkeypatch,
 ):
-    """Subprocess-shaped residual timeout must keep structured budget diagnostics.
+    """A per-sample timeout stays independent of the finder hang guard.
 
-    The in-process minimize mock already covers the post-sample budget check.
-    The real default bridge is subprocess; residual-clamped timeouts used to
-    fall through as generic ``liquidus finder failed`` with empty diagnostics.
-    Mock the subprocess boundary (no real engine required).
+    Mock the subprocess boundary; the explicit call timeout remains in
+    seconds and is not clamped to the aggregate finder budget.
     """
     clock = {"t": 0.0}
     seen_timeouts: list[float] = []
@@ -2047,7 +2054,7 @@ def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
     def fake_run(*args, **kwargs):
         timeout = float(kwargs["timeout"])
         seen_timeouts.append(timeout)
-        # Burn residual wall the way a real residual-clamped hang would.
+        # The sample fails after its independently configured call timeout.
         clock["t"] += timeout
         raise subprocess.TimeoutExpired(cmd=args[0], timeout=timeout)
 
@@ -2079,21 +2086,10 @@ def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
     )
 
     assert result.status == "not_converged"
-    assert seen_timeouts == [pytest.approx(0.05)]
-    assert any(
-        "liquidus finder exceeded aggregate budget 0.05s after 0 calls"
-        in warning
-        for warning in result.warnings
-    )
-    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
-    assert result.diagnostics["call_count"] == 0
-    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
-    assert result.diagnostics["budget_s"] == pytest.approx(0.05)
-    assert result.diagnostics["elapsed_s"] == pytest.approx(0.05)
-    assert not any(
-        warning.startswith("liquidus finder failed:")
-        for warning in result.warnings
-    )
+    assert seen_timeouts == [pytest.approx(60.0)]
+    assert result.diagnostics["backend_failure_exception"] == "TimeoutExpired"
+    assert result.diagnostics["backend_failure_disposition"] == "environment"
+    assert result.diagnostics.get("reason") != "aggregate_budget_exceeded"
 
 
 def test_magemin_liquidus_finder_unavailable_without_backend():
