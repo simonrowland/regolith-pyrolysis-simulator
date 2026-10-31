@@ -8473,7 +8473,16 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
     # The independent census checks all six source cells; mismatches stay 0.
     # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
-    assert census.get("H_minus_H298") == 136
+    # Schumm (1981) adds 123 temperature rows each for cp, H-H298, delta_fH,
+    # and delta_fG, plus eight printed entropy points; mismatches stay 0.
+    assert census.get("H_minus_H298") == 259
+    assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
+        "cp": 123,
+        "H_minus_H298": 123,
+        "delta_fH": 123,
+        "delta_fG": 123,
+        "S": 8,
+    }
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
@@ -8504,7 +8513,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8200, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8700, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
