@@ -260,6 +260,7 @@ def test_mixed_saturation_band_matches_numerical_ode_below_mean_threshold(monkey
         alpha_s_value=0.5,
         inlet_partial_pressure_pa=pressure_in_pa,
     )
+    assert eta.hex() == "0x1.459050b43bb4fp-1"
 
     molar_mass_kg_mol = condensation.MOLAR_MASS["Fe"] / 1000.0
     inventory_mol = available_kg / molar_mass_kg_mol / 3600.0 * residence_s
