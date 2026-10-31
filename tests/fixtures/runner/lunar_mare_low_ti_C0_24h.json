@@ -14059,6 +14059,40 @@
     },
     "closure_status": "excluded_major_heat_carrier_report_incomplete",
     "condensation_crossings": {
+      "Al": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 4.2153976556483005e-07,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "diagnostic_only",
+          "temperature_K": 938.998020148046,
+          "valid_range_K": [
+            933.0,
+            2792.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override for completeness; no source-backed 1 mbar condensation-temperature row is declared. VR-11 audit: Al/Ti overrides are operator-routing only -- do not add further Al/Ti/trace T_cond overrides without independent engineering policy approval (DESIGN-REV5 section 7.2).",
+        "stage_window_K": null,
+        "temperature_K": 1453.15
+      },
+      "Ca": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 9.757236380021549e-07,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            1115.0,
+            1757.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override for possible carryover; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": null,
+        "temperature_K": 1053.15
+      },
       "Cr": {
         "antoine_dew_diagnostic": {
           "partial_pressure_Pa": 0.011397128102514024,
@@ -14078,38 +14112,131 @@
           1573.15
         ],
         "temperature_K": 1553.15
+      },
+      "Fe": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 14.878219731084974,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "diagnostic_only",
+          "temperature_K": 1869.8497367371515,
+          "valid_range_K": [
+            1400.0,
+            1900.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the Fe condenser band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          1423.15,
+          1423.15
+        ],
+        "temperature_K": 1523.15
+      },
+      "K": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 6.822413729543716,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            679.4,
+            1600.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          313.15,
+          313.15
+        ],
+        "temperature_K": 693.15
+      },
+      "Mg": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 0.021155858553557467,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            701.0,
+            1361.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          523.15,
+          523.15
+        ],
+        "temperature_K": 853.15
+      },
+      "Mn": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 0.009694091909105265,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            1519.0,
+            2334.526
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override for the Cr/Mn oxide harvester branch; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          1373.15,
+          1573.15
+        ],
+        "temperature_K": 1273.15
+      },
+      "Na": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 93.17772713927262,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            924.0,
+            1600.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          523.15,
+          523.15
+        ],
+        "temperature_K": 753.15
       }
     },
     "display_costs": {
-      "amortized_per_campaign_usd": 4338.281525936889,
+      "amortized_per_campaign_usd": 4338.386630843338,
       "captured_o2_display_value_usd": 5.8717491448426635,
       "compressor_installed_usd": 12290.836658882421,
       "cryo_installed_basis": "cold_load_W_not_net_shaft_work",
       "cryo_installed_usd": 65781.35167769429,
       "fixed_run_cost_usd": 1200.0,
-      "radiator_installed_usd": 8693.442182161078,
+      "radiator_installed_usd": 8695.54428029005,
       "source_tag": "owner-ratified-2026-07-13",
       "status": "display_only_not_optimizer_objective",
       "storage_keeping_psr_usd": 0.0,
       "storage_keeping_warm_overburden_usd": 0.029358745724213316,
-      "total_installed_usd": 86765.63051873779
+      "total_installed_usd": 86767.73261686676
     },
     "excluded_major_heat_carrier_species": [
-      "Al",
       "Al2O",
       "Al2O2",
       "AlO",
-      "Ca",
       "CaO_gas",
       "CrO",
-      "Fe",
-      "K",
       "K2",
       "K2O_gas",
-      "Mg",
       "MgO_gas",
-      "Mn",
-      "Na",
       "Na2",
       "Na2O_gas",
       "PO",
@@ -14122,15 +14249,6 @@
     ],
     "excluded_refractory_trace_species": [],
     "excluded_species": {
-      "Al": {
-        "chosen_temperature_K": 1453.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 1.0400159757868617e-05,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 3.1272229849300787e-09,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": null
-      },
       "Al2O": {
         "exclusion_class": "major_heat_carrier_report_incomplete",
         "heat_load_W": null,
@@ -14152,15 +14270,6 @@
         "peak_kg_hr": 3.3692515662837444e-08,
         "reason": "no vapor Cp model for 'AlO'"
       },
-      "Ca": {
-        "chosen_temperature_K": 1053.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 7.584558094745843e-06,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 5.6836562761421146e-09,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": null
-      },
       "CaO_gas": {
         "exclusion_class": "major_heat_carrier_report_incomplete",
         "heat_load_W": null,
@@ -14174,30 +14283,6 @@
         "heat_load_status": "unavailable",
         "peak_kg_hr": 0.0002790740017750783,
         "reason": "no vapor Cp model for 'CrO'"
-      },
-      "Fe": {
-        "chosen_temperature_K": 1523.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 430.5934837191825,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 0.22844878558897186,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": [
-          1423.15,
-          1423.15
-        ]
-      },
-      "K": {
-        "chosen_temperature_K": 693.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 0.7695668101064227,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 0.0009351142878666299,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": [
-          313.15,
-          313.15
-        ]
       },
       "K2": {
         "exclusion_class": "major_heat_carrier_report_incomplete",
@@ -14213,48 +14298,12 @@
         "peak_kg_hr": 1.0564289096841156e-12,
         "reason": "unknown species 'K2O_gas'"
       },
-      "Mg": {
-        "chosen_temperature_K": 853.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 0.10503653779682806,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 5.525267942989109e-05,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": [
-          523.15,
-          523.15
-        ]
-      },
       "MgO_gas": {
         "exclusion_class": "major_heat_carrier_report_incomplete",
         "heat_load_W": null,
         "heat_load_status": "unavailable_invalid_entry_rate",
         "peak_kg_hr": 8.717788562411711e-07,
         "reason": "unknown species 'MgO_gas'"
-      },
-      "Mn": {
-        "chosen_temperature_K": 1273.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 0.1920824887980161,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 0.00014643129928061113,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": [
-          1373.15,
-          1573.15
-        ]
-      },
-      "Na": {
-        "chosen_temperature_K": 753.15,
-        "exclusion_class": "major_heat_carrier_report_incomplete",
-        "heat_load_W": 54.42705723570462,
-        "heat_load_status": "conservative_full_path",
-        "peak_kg_hr": 0.033035358411193164,
-        "reason": "authoritative_condensation_temperature_outside_stage_window",
-        "stage_window_K": [
-          523.15,
-          523.15
-        ]
       },
       "Na2": {
         "exclusion_class": "major_heat_carrier_report_incomplete",
@@ -14894,18 +14943,38 @@
       },
       "hot_radiator": {
         "active_lift_W": 0.0,
-        "area_m2": 0.0001202323762028364,
-        "latent_area_m2": 1.0536756116074678e-06,
+        "area_m2": 0.0016886782085898744,
+        "latent_area_m2": 0.0014916523646854114,
         "latent_crossings": {
+          "Al": {
+            "area_m2": 4.255933326148652e-11,
+            "load_W": 9.146624974482658e-06,
+            "temperature_K": 1453.15
+          },
+          "Ca": {
+            "area_m2": 1.0205682483781723e-10,
+            "load_W": 6.0507676975413826e-06,
+            "temperature_K": 1053.15
+          },
           "Cr": {
             "area_m2": 1.0536756116074678e-06,
             "load_W": 0.29551960504595004,
             "temperature_K": 1553.15
+          },
+          "Fe": {
+            "area_m2": 0.0014893093195082318,
+            "load_W": 386.3500517317298,
+            "temperature_K": 1523.15
+          },
+          "Mn": {
+            "area_m2": 1.2892249494142462e-06,
+            "load_W": 0.16325512209603663,
+            "temperature_K": 1273.15
           }
         },
-        "latent_load_W": 0.29551960504595004,
-        "sensible_area_m2": 0.00011917870059122894,
-        "sensible_load_W": 20.43976759217435,
+        "latent_load_W": 386.80884165626446,
+        "sensible_area_m2": 0.00019702584390446305,
+        "sensible_load_W": 40.904896677220684,
         "sizing_basis": "per_species_maxima_conservative",
         "status": "sized"
       },
@@ -14916,12 +14985,28 @@
       },
       "mid_radiator": {
         "active_lift_W": 0.0,
-        "area_m2": 0.0,
-        "latent_area_m2": 0.0,
-        "latent_crossings": {},
-        "latent_load_W": 0.0,
-        "sensible_area_m2": 0.0,
-        "sensible_load_W": 0.0,
+        "area_m2": 0.002635750425559974,
+        "latent_area_m2": 0.0025570510525229503,
+        "latent_crossings": {
+          "K": {
+            "area_m2": 4.593191358674805e-05,
+            "load_W": 0.5108938292638456,
+            "temperature_K": 693.15
+          },
+          "Mg": {
+            "area_m2": 3.150983941878356e-06,
+            "load_W": 0.08044974010112374,
+            "temperature_K": 853.15
+          },
+          "Na": {
+            "area_m2": 0.002507968154994324,
+            "load_W": 38.88571014666038,
+            "temperature_K": 753.15
+          }
+        },
+        "latent_load_W": 39.477053716025345,
+        "sensible_area_m2": 7.869937303702374e-05,
+        "sensible_load_W": 2.092392976720353,
         "sizing_basis": "per_species_maxima_conservative",
         "status": "sized"
       },
@@ -190083,7 +190168,7 @@
                 "phase_masses_kg": {},
                 "liquid_fraction": null,
                 "mode": "subprocess",
-                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:c94d7bb9bef58fddc9fe738df36c7233e6c4075f4d026bbe21d3bfe9e61ff8be)",
+                "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
                 "backend_status": "out_of_domain",
                 "backend_warnings": [
                   "MAGEMin: database 'ig' merged FeO->FeOt+O, Fe2O3->FeOt+O",
