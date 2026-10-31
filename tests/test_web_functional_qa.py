@@ -129,6 +129,61 @@ def web_driver(monkeypatch, tmp_path):
             _clear_simulation_state(sid)
 
 
+@pytest.mark.parametrize(
+    ("feedstock", "hours", "additives_kg", "web_ingots", "oxygen_kg", "rump_kg"),
+    [
+        (
+            "lunar_mare_low_ti", 24, {},
+            {"Co": 0.04, "Ni": 0.21}, 0.0, 363.32,
+        ),
+        (
+            "mars_basalt", 12, {"C": 30.0},
+            {}, 3.0629468311083095, 266.49,
+        ),
+    ],
+)
+def test_current_web_and_runner_product_story_pins_shipped_scenarios(
+    feedstock, hours, additives_kg, web_ingots, oxygen_kg, rump_kg
+):
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import PyrolysisRun
+    from simulator.three_product_report import classify_products
+
+    execution = RunExecutor().execute(
+        PyrolysisRun(
+            feedstock_id=feedstock,
+            campaign="C2A",
+            hours=hours,
+            additives_kg=additives_kg,
+        )._session_config()
+    )
+    assert execution.status == "ok"
+    sim = execution.simulator
+    assert sim.melt.hour == hours
+
+    runner = classify_products(sim)
+    web_story = web_events._product_story_payload(
+        sim, terminal_rump_by_species=sim._terminal_rump_by_species(),
+        classification=runner,
+    )
+    assert web_story["metal_ingots"]["species_kg"] == web_ingots
+    assert runner["ingots_metals"]["species_kg"] == {}
+    assert web_story["glass"]["species_kg"] == {}
+    assert runner["glass"]["species_kg"] == {}
+    assert web_story["captured_volatiles"]["species_kg"] == {}
+    assert runner["captured_volatiles"]["kg_by_species"] == {}
+    assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
+        oxygen_kg, abs=0.01
+    )
+    assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
+    assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
+        rump_kg, abs=0.01
+    )
+    assert runner["refractory_ceramic_rump"]["class_total_kg"] == pytest.approx(
+        rump_kg, abs=0.01
+    )
+
+
 def _drive(
     driver,
     *,
