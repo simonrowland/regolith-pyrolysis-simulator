@@ -281,3 +281,23 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
             item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
             for item in residual.notices
         )
+        assert observation.identity.composition is point.state
+        vaporock, _vaporock_candidate = compile_residual(
+            observation,
+            Engine.VAPOROCK,
+            context=context,
+            comparison_ids={observation.observation_id},
+        )
+        # The contract echoes identity.composition and generated is None.
+        # That is not consumption of the derived point composition.
+        assert vaporock.execution.state is ExecutionState.NOT_PROBED
+        assert vaporock.refusal is not None
+        assert vaporock.refusal.reason is RefusalReason.UNSUPPORTED
+        assert vaporock.refusal.detail["reason"] == (
+            "engine_does_not_report_melt_activity"
+        )
+        assert vaporock.refusal.detail["gaps"] == []
+        assert all(
+            item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+            for item in vaporock.notices
+        )

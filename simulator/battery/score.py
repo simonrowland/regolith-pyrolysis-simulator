@@ -11896,10 +11896,32 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    identity_composition = (
+        reference.identity.composition
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    refusal_detail = prediction.refusal_detail
+    # VapoRock's melt-activity contract is generated-is-None. It stamps
+    # identity.composition and refuses before any composition is consumed.
+    # When that State is the printed point, the equality is an echo.
+    oxide_identity_echo = (
+        point_composition_notice is not None
+        and point_composition_notice.kind
+        is NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+        and identity_composition is not None
+        and identity_composition.is_value
+        and prediction.requested_composition == identity_composition
+        and prediction.value is None
+        and prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        and refusal_detail.get("reason") == "engine_does_not_report_melt_activity"
+        and refusal_detail.get("gaps") == []
+    )
     if (
         point_composition_notice is not None
         and _point_composition is not None
         and prediction.requested_composition == _point_composition
+        and not oxide_identity_echo
     ):
         notices = union_notices(notices, (point_composition_notice,))
     result_mode = fo2_mode or _fo2_mode_from_notices(notices)
