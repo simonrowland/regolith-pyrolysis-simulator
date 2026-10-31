@@ -1094,6 +1094,8 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
     # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
+    # d-316: Fe uses the 0.24 bridge in this run; only CrO2 and SiO move in
+    # the reported map because Fe itself is below its 1e-12 kg/hr cutoff.
     expected_rates = {
         "Al": 1.776974630811854e-10,
         "AlO": 2.622990526227972e-10,
@@ -1101,7 +1103,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "CaO_gas": 2.067737447801073e-11,
         "Cr": 4.355218555260953e-05,
         "CrO": 9.136286575214734e-06,
-        "CrO2": 3.1730720722299763e-06,
+        "CrO2": 3.1730720631228424e-06,
         "CrO3": 9.294384109563237e-10,
         "K": 1.8395070246088384e-04,
         "K2": 1.6813544178336032e-11,
@@ -1112,7 +1114,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "Na2": 3.013634463408095e-08,
         "Na2O_gas": 3.0031933641137976e-11,
         "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
+        "SiO": 7.78051483412021e-09,
         "SiO2_gas": 4.598894711291365e-06,
         "TiO": 2.8635316467141483e-09,
         "TiO2_gas": 4.788176871001818e-08,
@@ -1124,6 +1126,9 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         ).items()
         if float(rate) > 1.0e-12
     }
+    alpha_diagnostic = sim._last_evaporation_flux_diagnostic
+    assert alpha_diagnostic["alpha_used_by_species"]["Fe"] == pytest.approx(0.24)
+    assert alpha_diagnostic["alpha_authority_status_by_species"]["Fe"] == "bridge"
     assert actual_rates == pytest.approx(
         expected_rates,
         rel=1.0e-12,
