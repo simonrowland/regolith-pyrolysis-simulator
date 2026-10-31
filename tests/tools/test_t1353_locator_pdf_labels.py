@@ -49,10 +49,6 @@ _REVIEWED_LOCATOR_SKIP_REASONS = {
         "data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml",
         "species.CaO.context.2.locator",
     ): "figure_only, no digitized coordinates",
-    (
-        "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml",
-        "species.gehlenite.observations.7.locator",
-    ): "values not found in page text; pending verification (t-1581)",
 }
 
 
