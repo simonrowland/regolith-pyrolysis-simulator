@@ -58,11 +58,27 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
     assert reports["DS-003"].rows_evaluated == 12
     assert reports["DS-006"].rows_evaluated == 4
     assert reports["DS-007"].rows_evaluated == 12
-    assert reports["DS-007"].median_abs_dex_error == pytest.approx(
-        0.06993954320061825
+    assert reports["DS-007"].median_abs_dex_error == 0.06993954320061825
+    assert (
+        reports["DS-007"].median_abs_dex_error_excluding_same_input
+        == 0.1406575917694785
     )
-    assert reports["DS-007"].median_abs_dex_error_excluding_same_input == pytest.approx(
-        0.1406575917694785
+    assert tuple(
+        abs(item.dex_error_model_minus_observed)
+        for item in reports["DS-007"].species
+    ) == (
+        0.018483405694013133,
+        0.017728766960431602,
+        0.0,
+        0.018483405694013133,
+        0.0791812460476248,
+        0.021189299069938095,
+        0.146128035678238,
+        0.0606978403536117,
+        0.17431584757931465,
+        0.13518714786071903,
+        0.32150855070082623,
+        0.14944524188811364,
     )
     same_input_rows = [
         item for item in reports["DS-007"].species
