@@ -1028,7 +1028,6 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     )
 
     snapshot = sim.step()
-
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
     # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
     # capacity; the new Ar-film diffusion-limited value is 2.47%.
@@ -1082,9 +1081,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # The Stage-4 split adds independent Na/Mg collector and K-trap capture
-    # transitions to this first C0 step; they follow their corresponding
-    # evaporation transitions in the ledger.
+    # The split adds Na/Mg collector and K-trap captures after their matching
+    # evaporations. Generic C0 Ca has no designated collector in that split;
+    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
+    # offgas instead of the former mixed-stage condense_Ca transition.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
     ) == (
@@ -1100,7 +1100,6 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_K",
         "evaporate_AlO",
         "evaporate_Ca",
-        "condense_Ca",
         "evaporate_CaO_gas",
         "evaporate_Cr",
         "evaporate_CrO",
@@ -1116,6 +1115,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
+    assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
+        "Ca", 0.0
+    ) > 0.0
     # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
     assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
         transition.reason for transition in sim.atom_ledger.transitions
