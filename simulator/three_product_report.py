@@ -71,6 +71,7 @@ from simulator.accounting.queries import (
 )
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
+    STAGE_KEY_BY_IDENTITY,
     accepted_species_for_stage_key,
 )
 from simulator.vapour_rail.instrumentation import (
@@ -966,12 +967,6 @@ def product_story_extracted_projection(
     classification=None,
 ):
     classification_available = classification is not None
-    if classification is None:
-        try:
-            classification = classify_products(sim)
-            classification_available = True
-        except Exception:  # noqa: BLE001 -- ledger extraction remains useful
-            classification = {}
 
     if classification_available:
         # The shared classifier owns recovered-product destinations and their
@@ -1048,9 +1043,17 @@ def product_story_extracted_projection(
             try:
                 stage_idx = int(raw_stage_index)
                 stage = sim.train.stages[stage_idx]
+                stage_number = int(getattr(stage, 'stage_number', stage_idx))
+                stage_identity = (
+                    stage_number,
+                    int(getattr(stage, 'sub_order', 0)),
+                )
+                stage_key = str(
+                    getattr(stage, 'stage_key', '')
+                    or STAGE_KEY_BY_IDENTITY.get(stage_identity, '')
+                )
             except (AttributeError, IndexError, TypeError, ValueError):
                 continue
-            stage_key = str(getattr(stage, 'stage_key', '') or '')
             if stage_key:
                 condensation_stage_species.setdefault(str(species), []).append(
                     (stage_idx, stage_key, float(mass))
