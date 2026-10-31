@@ -165,6 +165,18 @@ def test_source_bytes_match_the_sidecar_and_manifest(manifest) -> None:
     assert _sha256(gas) == GAS_SHA == manifest["source"]["sha256"]
     assert _sha256(condensates) == COND_SHA == manifest["source"]["condensate_sha256"]
     assert _sha256(extended) == EXT_SHA == manifest["source"]["extended_sha256"]
+    # Custody hashes of the notes and sidecar must describe the committed bytes, and the
+    # sidecar's own files[] entries must match every file it lists (catches note edits
+    # that forget to re-hash).
+    assert _sha256(SOURCE / "SOURCE.md") == manifest["source"]["source_md_sha256"]
+    assert _sha256(SOURCE / "EXTENDED-SOURCE.md") == manifest["source"]["extended_source_md_sha256"]
+    assert _sha256(SOURCE / "sidecar.yaml") == manifest["source"]["sidecar_sha256"]
+    sidecar = yaml.safe_load((SOURCE / "sidecar.yaml").read_text(encoding="utf-8"))
+    for item in sidecar["files"]:
+        listed = SOURCE / item["name"]
+        if listed.exists():
+            assert _sha256(listed) == item["sha256"], item["name"]
+            assert listed.stat().st_size == item["bytes"], item["name"]
     assert _lines("fastchem-v3-1-3-gas-condensate-coefficients.dat")[0] == FORM_AS_PUBLISHED
     assert _lines("logK_condensates.dat")[0] == FORM_AS_PUBLISHED
     source_md = (SOURCE / "SOURCE.md").read_text(encoding="utf-8")
