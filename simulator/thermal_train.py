@@ -1502,26 +1502,17 @@ def report_from_recorded_series(
             excluded_molar_rates[species] = molar_rate
             excluded_has_latent[species] = True
             continue
-        if window is None or not window[0] <= crossing <= window[1]:
-            excluded[species] = {
-                "peak_kg_hr": peak_rate,
-                "reason": "authoritative_condensation_temperature_outside_stage_window",
-                "heat_load_W": None,
-                "heat_load_status": "conservative_full_path",
-                "exclusion_class": "major_heat_carrier_report_incomplete",
-                "chosen_temperature_K": crossing,
-                "stage_window_K": list(window) if window is not None else None,
-            }
-            excluded_molar_rates[species] = molar_rate
-            excluded_has_latent[species] = True
-            continue
+        # Gas dew crossings determine the radiator heat path. Collector wall
+        # bands are separate hardware temperatures: the colder Stage 4b trap
+        # must not make Na/Mg report as excluded when their gas crossings are
+        # authoritative.
         hot_molar_rates[species] = molar_rate
         crossings[species] = crossing
         crossing_authority[species] = {
             "temperature_K": crossing,
             "source": authority["source"],
             "authority": authority["authority"],
-            "stage_window_K": list(window),
+            "stage_window_K": list(window) if window is not None else None,
         }
 
     inlet_temperature = max(
