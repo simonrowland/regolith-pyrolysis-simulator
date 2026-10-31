@@ -281,6 +281,61 @@ def test_openimcc_sp_knudsen_screening_uses_sample_initial_composition(
         assert prediction.authority is Authority.EXTRAPOLATED
 
 
+def test_openimcc_sp_unknown_consumed_residue_inventory_does_not_fall_back(
+    extent_point, monkeypatch
+):
+    import simulator.battery.residue as residue
+    from simulator.battery.score import _knudsen_residue_prediction
+
+    reference, experiment, _rows = extent_point
+    p2o5_composition = Composition(
+        "ordered_complete_mole_inventory",
+        (("FeO", Decimal("0.45")), ("MgO", Decimal("0.45")),
+         ("P2O5", Decimal("0.1"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=Located(State.of(p2o5_composition), reference.locator),
+        ),
+    )
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity, composition=State.of(p2o5_composition)
+        ),
+    )
+    monkeypatch.setattr(
+        residue,
+        "predict_knudsen_residue_composition",
+        lambda *_args, **_kwargs: {
+            "composition_wt_pct": {"FeO": 25.0},
+            "notices": (),
+            "engine_flags": (),
+            "engine_metadata": {},
+        },
+    )
+    context = SimpleNamespace(
+        experiments={experiment.experiment_id: experiment},
+        observations={},
+        benches={},
+    )
+
+    prediction = _knudsen_residue_prediction(
+        context, reference, Engine.OPENIMCC_SP
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.requested_composition is not None
+    assert prediction.requested_composition.is_unknown
+    assert not any(
+        notice.reason.startswith("P2O5 parent reference state:")
+        for notice in prediction.notices
+    )
+
+
 def test_openimcc_sp_sossi_screening_uses_consumed_host_and_trace_inventory(
     monkeypatch,
 ):
