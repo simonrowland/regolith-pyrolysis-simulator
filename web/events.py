@@ -2474,9 +2474,10 @@ def _product_story_soundness(product_story: object) -> str:
 
 
 def _product_story_account_kg(sim):
+    accounts = (*PRODUCT_LEDGER_ACCOUNTS, TERMINAL_ESCAPE_ACCOUNT)
     return {
         account: dict(sim.atom_ledger.project_account_kg(account) or {})
-        for account in PRODUCT_LEDGER_ACCOUNTS
+        for account in accounts
         if account != C7_AL_CREDIT_ACCOUNT
     }
 
