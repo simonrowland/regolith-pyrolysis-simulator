@@ -375,10 +375,12 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
     ] == pytest.approx(1.9976229793240146)
-    # The equilibrium cap reduces Na capture without changing its Faraday source.
+    # The same 0.0240911104185125 kg moves into the condenser: capture rises
+    # from 0.31316216606196157 to 0.3372532764804741 kg, exactly balancing the
+    # overhead decrease to the displayed precision. Faraday input is unchanged.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(0.31316216606196157)
+    ] == pytest.approx(0.3372532764804741)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
