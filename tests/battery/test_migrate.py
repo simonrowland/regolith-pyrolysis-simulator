@@ -3294,7 +3294,7 @@ def _legacy_notice(observation, token: str):
 
 
 def test_legacy_admission_evidence_labels_are_admitted(tmp_path: Path) -> None:
-    """Class (a): evidence labels filed as admission_status are admitted."""
+    """Class (a): evidence labels are admitted; an existing class is kept."""
 
     missing = _legacy_token_observation(
         tmp_path / "figure-missing",
@@ -3337,7 +3337,7 @@ def test_legacy_admission_evidence_labels_are_admitted(tmp_path: Path) -> None:
     )
     assert quoted.admission.status is AdmissionStatus.ADMITTED
     assert quoted.admission.reason == "admission_from_legacy_token:quoted_attributed"
-    assert quoted.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert quoted.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
     assert quoted.evidence.original_method_class == "measured_direct"
     _legacy_notice(quoted, "quoted_attributed")
 
@@ -3351,11 +3351,9 @@ def test_legacy_admission_evidence_labels_are_admitted(tmp_path: Path) -> None:
         model.admission.reason
         == "admission_from_legacy_token:model_output_not_measurement"
     )
-    assert model.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert model.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     assert model.evidence.original_method_class == "quoted_attributed"
-    # model_derived requires a model string. The filed method is that label
-    # when the row did not name a model of its own.
-    assert model.evidence.model == "quoted_attributed"
+    assert model.evidence.model is None
     _legacy_notice(model, "model_output_not_measurement")
 
     model_missing = _legacy_token_observation(

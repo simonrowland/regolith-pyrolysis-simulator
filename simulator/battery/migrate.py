@@ -27,11 +27,11 @@ Residuals are not generated (chunk 2). Pins are not touched.
 Absence is never a measured zero: a numbered literature row with missing
 admission is admitted by default with a visible notice under owner ruling
 d-056; no-number rows remain pending. An evidence label filed in
-admission_status is admitted with an admission_from_legacy_token notice:
-figure_only fills a missing evidence class only, and quoted_attributed /
-model_output_not_measurement set their evidence class. Explicit rejection
-tokens stay rejected. Parked, preserved_unscored, and the Cardiff/Matchett
-and Markova holds stay pending. Missing class/pressure/phase/method
+admission_status is admitted with an admission_from_legacy_token notice.
+The token's evidence class is filled only when the record has none; an
+existing class is kept. Explicit rejection tokens stay rejected. Parked,
+preserved_unscored, and the Cardiff/Matchett and Markova holds stay
+pending. Missing class/pressure/phase/method
 remain unknown, never certified / 101325 Pa / liquid / knudsen_effusion.
 Unknown rail spellings raise. Unmapped phase strings are ``State.unknown``
 on ``Species.phase`` and queued; they are never stored as gas.
@@ -7743,46 +7743,29 @@ def evidence_for(
 
 _LEGACY_ADMISSION_NOTICE_PREFIX = "admission_from_legacy_token:"
 
-# One table beside admission_for. status, evidence class, and whether an
-# existing evidence class is replaced. figure_only fills only a missing class
-# so a real method_class (and figure locator / digitisation, which are not on
-# Evidence) stay put. quoted_attributed and model_output_not_measurement set
-# their class. Rejection tokens keep the source-admission reason. Pending rows
-# keep the non-closed fallthrough reason. typed_refusal and pending_validation
-# are not in this table; their reasons stay the ones above.
-_LEGACY_ADMISSION_RULES: dict[
-    str, tuple[AdmissionStatus, EvidenceClass | None, bool]
-] = {
-    "figure_only": (AdmissionStatus.ADMITTED, EvidenceClass.FIGURE_ONLY, False),
-    "quoted_attributed": (
-        AdmissionStatus.ADMITTED,
-        EvidenceClass.QUOTED_ATTRIBUTED,
-        True,
-    ),
+# One table beside admission_for. The evidence class is filled only when the
+# record has none, for every admitted token. An existing class is kept, as
+# are figure locator and digitisation fields (they are not on Evidence).
+# Rejection tokens keep the source-admission reason. Pending rows keep the
+# non-closed fallthrough reason. typed_refusal and pending_validation are
+# not in this table; their reasons stay the ones above.
+_LEGACY_ADMISSION_RULES: dict[str, tuple[AdmissionStatus, EvidenceClass | None]] = {
+    "figure_only": (AdmissionStatus.ADMITTED, EvidenceClass.FIGURE_ONLY),
+    "quoted_attributed": (AdmissionStatus.ADMITTED, EvidenceClass.QUOTED_ATTRIBUTED),
     "model_output_not_measurement": (
         AdmissionStatus.ADMITTED,
         EvidenceClass.MODEL_DERIVED,
-        True,
     ),
-    "rejected_no_figure_reading": (AdmissionStatus.REJECTED, None, False),
-    "rejected_no_complete_figure_digitization": (
-        AdmissionStatus.REJECTED,
-        None,
-        False,
-    ),
-    "rejected_model_output_not_measurement": (
-        AdmissionStatus.REJECTED,
-        None,
-        False,
-    ),
-    "authors_rejected": (AdmissionStatus.REJECTED, None, False),
+    "rejected_no_figure_reading": (AdmissionStatus.REJECTED, None),
+    "rejected_no_complete_figure_digitization": (AdmissionStatus.REJECTED, None),
+    "rejected_model_output_not_measurement": (AdmissionStatus.REJECTED, None),
+    "authors_rejected": (AdmissionStatus.REJECTED, None),
     "authors_rejected_in_favour_of_ion_intensity_ratio_method": (
         AdmissionStatus.REJECTED,
         None,
-        False,
     ),
-    "parked": (AdmissionStatus.PENDING, None, False),
-    "preserved_unscored": (AdmissionStatus.PENDING, None, False),
+    "parked": (AdmissionStatus.PENDING, None),
+    "preserved_unscored": (AdmissionStatus.PENDING, None),
 }
 
 
@@ -7873,7 +7856,7 @@ def admission_for(
 
 
 def legacy_admission_evidence(evidence: Evidence, admission: Admission) -> Evidence:
-    """Apply the evidence class named by an admitted legacy token."""
+    """Fill the legacy token's evidence class only when the row has none."""
 
     if (
         admission.status is not AdmissionStatus.ADMITTED
@@ -7884,12 +7867,8 @@ def legacy_admission_evidence(evidence: Evidence, admission: Admission) -> Evide
     rule = _LEGACY_ADMISSION_RULES.get(token)
     if rule is None:
         return evidence
-    _status, mapped, overwrite = rule
-    if mapped is None:
-        return evidence
-    if evidence.class_.is_value and (
-        not overwrite or evidence.class_.value is mapped
-    ):
+    _status, mapped = rule
+    if mapped is None or evidence.class_.is_value:
         return evidence
     if mapped is EvidenceClass.MODEL_DERIVED and not evidence.model:
         # model_derived requires a model string. The legacy token is that
