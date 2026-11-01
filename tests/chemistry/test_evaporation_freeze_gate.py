@@ -530,8 +530,10 @@ def test_freeze_gate_cache_key_distinguishes_provider_inputs(
     inert_sim.inventory.inert_melt_components_kg['Na2O'] = 1.0
     inert_key = _freeze_gate_key_for_current_state(inert_sim)
     assert inert_key != baseline_key
-    assert inert_key._replace(inert_species=baseline_key.inert_species) == (
-        baseline_key
+    assert 'Na2O' in inert_key.inert_species
+    assert (
+        inert_key.composition_mol_fractions
+        != baseline_key.composition_mol_fractions
     )
 
 

@@ -139955,6 +139955,508 @@ entries:
       pdf_page_index: 14
       table: '5'
       note: Experimental X = 0.37(1) total entropy; row=2; column=S_total_J_mol-1_K-1_as_printed
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped cp field selected; source fields: quantity, method_class, attribution, calculation_method_as_printed, equation_as_printed,
+    status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_fit
+    locator:
+      page: 13
+      section: 5.2 Results
+      equation: theoretical Cp regression
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped cp field selected; source fields: quantity, method_class, attribution, equation_as_printed, temperature_range_C_as_printed,
+    measurement_method_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_iyer_fit
+    locator:
+      page: 4
+      section: literature heat-capacity measurements
+      equation: Cp fit
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_sreedharan_fit
+    locator:
+      page: 4
+      section: literature heat-capacity measurements
+      equation: Cp fit
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped cp field selected; source fields: quantity, method_class, attribution, measurement_method_as_printed, sample_scope_as_printed,
+    temperature_range_C_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, mean_point_dispersion_as_printed,
+    status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_experimental_cp_fit
+    locator:
+      page: 14
+      section: 6.1 Heat capacity measurements
+      equation: experimental Cp fit
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, equation_as_printed, uncertainty_as_printed,
+    confidence_level, calculation_inputs_as_printed, unavailable_inputs, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_formation_gibbs_fit
+    locator:
+      page: 15
+      section: 6.1 Heat capacity measurements
+      equation: formation Gibbs-energy fit
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    equilibrium_as_printed, equation_as_printed, T_range_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=8
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=3
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: KEMS
+      note: row=9
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    equilibrium_as_printed, equation_as_printed, fit_note_as_printed, T_range_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=1; column=Δf,TG°(NaCrO2)
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed, status, schema_gap,
+    method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=10
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=4
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: EMF
+      note: row=5
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=7
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed, status,
+    schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=2
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level,
+    T_range_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=6
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=6
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    fit_label_as_printed, equilibrium_as_printed, equation_as_printed, intercept_as_printed, slope_as_printed, uncertainty_as_printed,
+    confidence_level, T_range_as_printed, status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=11
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=11
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed, method_as_printed,
+    fit_label_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed,
+    status, schema_gap, method_class_reason'
+  axes:
+  - value
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+    locator:
+      page: 6
+      table: '1'
+      equation: Average
+      note: row=2
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [510, 1000]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=11
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [573, 773]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=8
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=1; column=Δf,TG°(NaCrO2)
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [657, 825]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: EMF
+      note: row=5
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [660, 890]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=11
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [700, 1100]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+    locator:
+      page: 6
+      table: '1'
+      equation: Average
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=2
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [782, 1014]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=6
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [784, 1012]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=4
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [800, 980]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=3
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [809, 1040]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=6
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [820, 1006]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=7
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [825, 1025]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: KEMS
+      note: row=9
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source T_range_K [930, 1044]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=10
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source does not state a numeric total_pressure_Pa
+  axes:
+  - total_pressure_Pa
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+    locator:
+      page: 2
+      section: Abstract
+- work_id: 10.1016/j.jallcom.2021.160784
+  source: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_298
+    locator:
+      page: 15
+      paragraph: inputs to formation Gibbs-energy calculation
+      section: 6.1 Heat capacity measurements
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_29815
+    locator:
+      page: 13
+      paragraph: theoretical standard Cp and entropy values
+      section: 5.2 Results
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+    locator:
+      page: 2
+      section: Abstract
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_experimental_cp_fit
+    locator:
+      page: 14
+      section: 6.1 Heat capacity measurements
+      equation: experimental Cp fit
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_formation_gibbs_fit
+    locator:
+      page: 15
+      section: 6.1 Heat capacity measurements
+      equation: formation Gibbs-energy fit
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_gross_formation_enthalpy_298
+    locator:
+      page: 3
+      paragraph: Gross et al. value
+      section: literature enthalpy of formation
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_jain_dft_formation_enthalpy_298
+    locator:
+      page: 4
+      paragraph: Jain et al. DFT value
+      section: literature enthalpy of formation
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_iyer_fit
+    locator:
+      page: 4
+      section: literature heat-capacity measurements
+      equation: Cp fit
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_sreedharan_fit
+    locator:
+      page: 4
+      section: literature heat-capacity measurements
+      equation: Cp fit
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=8
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=11
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=11
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=10
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=1; column=Δf,TG°(NaCrO2)
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+    locator:
+      page: 6
+      table: '1'
+      equation: Average
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=2
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=3
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=4
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+    locator:
+      page: 6
+      table: '1'
+      equation: I
+      note: row=6
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+    locator:
+      page: 6
+      table: '1'
+      equation: II
+      note: row=6
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: EMF
+      note: row=5
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      equation: KEMS
+      note: row=9
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+    locator:
+      page: 6
+      table: '1'
+      note: row=7
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_29815
+    locator:
+      page: 13
+      paragraph: theoretical standard Cp and entropy values
+      section: 5.2 Results
+  - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_fit
+    locator:
+      page: 13
+      section: 5.2 Results
+      equation: theoretical Cp regression
 - work_id: 10.1016/j.jct.2018.08.026
   source: data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml
   why: regime 'Physical Properties Measurement System (PPMS) heat-capacity measurement' is not a closed method token (kems_effusion
@@ -220754,6 +221256,32 @@ entries:
       pdf_page_index: 5
       table: '1'
       note: row=9
+- work_id: 10.2320/matertrans1960.27.608
+  source: data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml
+  why: source does not state a numeric total_pressure_Pa
+  axes:
+  - total_pressure_Pa
+  observations:
+  - observation_id: takeda-1986-liquid-copper-soda-slag::takeda_1986_cu2o_melting_point
+    locator:
+      page: 2
+      published_page: 609
+      pdf_page_index: 1
+      section: Binary slag of Cu2O-Na2O or Cu2O-SiO2 system
+      note: The prose states the melting point of liquid Cu2O as 1503 K.
+- work_id: 10.2320/matertrans1960.27.608
+  source: data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: takeda-1986-liquid-copper-soda-slag::takeda_1986_cu2o_melting_point
+    locator:
+      page: 2
+      published_page: 609
+      pdf_page_index: 1
+      section: Binary slag of Cu2O-Na2O or Cu2O-SiO2 system
+      note: The prose states the melting point of liquid Cu2O as 1503 K.
 - work_id: 10.2320/matertrans1960.27.976
   source: data/literature/extracts/oishi-1986-cu2o-cao-activities.yaml
   why: phase_label is not a closed phase role (melt, slag, glass, metal, matte)
@@ -244373,6 +244901,409 @@ entries:
       pdf_page_index: 4
       equation: '7'
       note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: declared quantity is unknown; unsupported quantity 'log_sodium_vapor_pressure_difference_as_published'; refusing to
+    pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1250C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.44 at 1250°C
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1350C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.57 at 1350°C
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: declared quantity is unknown; unsupported quantity 'log_sulfur_activity_coefficient_as_published'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1250C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.74
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1350C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.75
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: declared quantity is unknown; unsupported quantity 'normalized_sodium_loss_rate_per_time_as_published'; refusing to
+    pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_100_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=100; column_header=ΔNa/(Na_init·t); printed_cell=1.59
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_101_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=101; column_header=ΔNa/(Na_init·t); printed_cell=6.01
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_105_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=105; column_header=ΔNa/(Na_init·t); printed_cell=1.63
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_106_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=106; column_header=ΔNa/(Na_init·t); printed_cell=2.73
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_107_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=107; column_header=ΔNa/(Na_init·t); printed_cell=5.11
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_108_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=108; column_header=ΔNa/(Na_init·t); printed_cell=11.7
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_151_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=151; column_header=ΔNa/(Na_init·t); printed_cell=.55
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_152_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=152; column_header=ΔNa/(Na_init·t); printed_cell=.18
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_153_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=153; column_header=ΔNa/(Na_init·t); printed_cell=.99
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_154_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=154; column_header=ΔNa/(Na_init·t); printed_cell=.58
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_15_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=15; column_header=ΔNa/(Na_init·t); printed_cell=2.73×10^-3
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_16_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=16; column_header=ΔNa/(Na_init·t); printed_cell=1.18
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_19_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=19; column_header=ΔNa/(Na_init·t); printed_cell=1.98
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_20_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=20; column_header=ΔNa/(Na_init·t); printed_cell=2.34
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_22_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=22; column_header=ΔNa/(Na_init·t); printed_cell=.54
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_24_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=24; column_header=ΔNa/(Na_init·t); printed_cell=.56
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_28_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=28; column_header=ΔNa/(Na_init·t); printed_cell=.17
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_29_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=29; column_header=ΔNa/(Na_init·t); printed_cell=.26
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_99_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=99; column_header=ΔNa/(Na_init·t); printed_cell=1.23
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_102_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=102; column_header=ΔNa/(Na_init·t); printed_cell=1.52×10^-3
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_155_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=155; column_header=ΔNa/(Na_init·t); printed_cell=4.28
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_156_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=156; column_header=ΔNa/(Na_init·t); printed_cell=2.46
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_157_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=157; column_header=ΔNa/(Na_init·t); printed_cell=2.38
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: qualifier coefficient does not name a reference_state
+  axes:
+  - reference_state
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample_1_3_l_FeO_gamma_feo
+    locator:
+      page: 8
+      table: '4'
+      note: row_label=1.3; column_header=gamma_FeO; printed_cell=4.3
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__3_l_FeO_gamma_feo
+    locator:
+      page: 8
+      table: '4'
+      note: row_label=.3; column_header=gamma_FeO; printed_cell=.5
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__6_l_FeO_gamma_feo
+    locator:
+      page: 8
+      table: '4'
+      note: row_label=.6; column_header=gamma_FeO; printed_cell=.7
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__9_l_FeO_gamma_feo
+    locator:
+      page: 8
+      table: '4'
+      note: row_label=.9; column_header=gamma_FeO; printed_cell=1.6
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1250C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.44 at 1250°C
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1350C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.57 at 1350°C
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1250C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.74
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1350C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.75
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio05_denier_log_Cs
+    locator:
+      page: 1
+      paragraph: sulfide capacity
+      note: Abstract prior-work comparison at printed Na2O/SiO2 ratio .5.; printed_cell=-4
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio05_nagashima_log_Cs
+    locator:
+      page: 1
+      paragraph: sulfide capacity
+      note: Abstract prior-work comparison at printed Na2O/SiO2 ratio .5.; printed_cell=-4
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio10_denier_log_Cs
+    locator:
+      page: 1
+      paragraph: sulfide capacity
+      note: Abstract prior-work comparison at printed Na2O/SiO2 ratio 1.0.; printed_cell=-2.0
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio10_nagashima_log_Cs
+    locator:
+      page: 1
+      paragraph: sulfide capacity
+      note: Abstract prior-work comparison at printed Na2O/SiO2 ratio 1.0.; printed_cell=-3.0
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_pure_cao_log_Cs
+    locator:
+      page: 7
+      paragraph: sulfide capacity
+      note: Pure-liquid CaO capacity, as printed.; printed_cell=.23
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_pure_na2o_log_Cs
+    locator:
+      page: 7
+      paragraph: sulfide capacity
+      note: Pure-liquid Na2O capacity, as printed.; printed_cell=3.44
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: unsupported quantity 'log_sodium_vapor_pressure_difference_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1250C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.44 at 1250°C
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1350C
+    locator:
+      page: 3
+      paragraph: sodium vapor pressure comparison
+      equation: '6'
+      note: printed_cell=Δ log P_Na = 1.57 at 1350°C
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: unsupported quantity 'log_sulfur_activity_coefficient_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1250C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.74
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1350C
+    locator:
+      page: 5
+      paragraph: sulfur activity coefficient
+      equation: '13'
+      note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.75
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: unsupported quantity 'normalized_sodium_loss_rate_per_time_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_100_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=100; column_header=ΔNa/(Na_init·t); printed_cell=1.59
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_101_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=101; column_header=ΔNa/(Na_init·t); printed_cell=6.01
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_105_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=105; column_header=ΔNa/(Na_init·t); printed_cell=1.63
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_106_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=106; column_header=ΔNa/(Na_init·t); printed_cell=2.73
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_107_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=107; column_header=ΔNa/(Na_init·t); printed_cell=5.11
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_108_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=108; column_header=ΔNa/(Na_init·t); printed_cell=11.7
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_151_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=151; column_header=ΔNa/(Na_init·t); printed_cell=.55
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_152_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=152; column_header=ΔNa/(Na_init·t); printed_cell=.18
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_153_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=153; column_header=ΔNa/(Na_init·t); printed_cell=.99
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_154_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=154; column_header=ΔNa/(Na_init·t); printed_cell=.58
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_15_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=15; column_header=ΔNa/(Na_init·t); printed_cell=2.73×10^-3
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_16_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=16; column_header=ΔNa/(Na_init·t); printed_cell=1.18
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_19_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=19; column_header=ΔNa/(Na_init·t); printed_cell=1.98
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_20_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=20; column_header=ΔNa/(Na_init·t); printed_cell=2.34
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_22_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=22; column_header=ΔNa/(Na_init·t); printed_cell=.54
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_24_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=24; column_header=ΔNa/(Na_init·t); printed_cell=.56
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_28_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=28; column_header=ΔNa/(Na_init·t); printed_cell=.17
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_29_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=29; column_header=ΔNa/(Na_init·t); printed_cell=.26
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t1_sample_99_normalized_sodium_loss_rate
+    locator:
+      page: 6
+      table: '1'
+      note: row_label=99; column_header=ΔNa/(Na_init·t); printed_cell=1.23
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_102_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=102; column_header=ΔNa/(Na_init·t); printed_cell=1.52×10^-3
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_155_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=155; column_header=ΔNa/(Na_init·t); printed_cell=4.28
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_156_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=156; column_header=ΔNa/(Na_init·t); printed_cell=2.46
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t3_sample_157_normalized_sodium_loss_rate
+    locator:
+      page: 7
+      table: '3'
+      note: row_label=157; column_header=ΔNa/(Na_init·t); printed_cell=2.38
 - work_id: 10.2355/isijinternational1966.22.552
   source: data/literature/extracts/kems-111-ichise-1982.yaml
   why: declared quantity is unknown; refusing to pick a number
@@ -246175,6 +247106,1632 @@ entries:
       published_page: 56
       pdf_page_index: 1
       table: '1'
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'calculated_carbon_amount_from_dephosphorization'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_amount_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'calculated_carbon_concentration_increment'; refusing to pick a
+    number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'dephosphorization_rate_per_interface_area'; refusing to pick a
+    number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'initial_non_equilibrium_carbon_concentration'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'measured_non_equilibrium_carbon_concentration'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'printed_final_O_in_liquid_iron'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=5; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%O]f; table_row_number=6; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%O]f; table_row_number=7; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=8; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=9; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=10; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%O]f; table_row_number=11; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%O]f; table_row_number=12; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%O]f; table_row_number=13; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=14; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=15; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=16; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=17; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=18; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=19; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=20; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=21; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=22; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=23; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=24; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%O]f; table_row_number=25; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%O]f; table_row_number=26; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=27; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=28; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=29; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%O]f; table_row_number=1; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%O]f; table_row_number=2; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%O]f; table_row_number=5; table_column_number=5
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'printed_initial_P_in_liquid_iron'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=5; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%P]i; table_row_number=6; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%P]i; table_row_number=7; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=8; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=9; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=10; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%P]i; table_row_number=11; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%P]i; table_row_number=12; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%P]i; table_row_number=13; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=14; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=15; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=16; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=17; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=18; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=19; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=20; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=21; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=22; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=23; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=24; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%P]i; table_row_number=25; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%P]i; table_row_number=26; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=27; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=28; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=29; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%P]i; table_row_number=1; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%P]i; table_row_number=2; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%P]i; table_row_number=5; table_column_number=3
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: declared quantity is unknown; unsupported quantity 'printed_non_equilibrium_slag_composition_endpoint'; refusing to
+    pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: regime 'reactive_dephosphorization' is not a closed method token (kems_effusion alone is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=5; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=5; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%P]i; table_row_number=6; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%O]f; table_row_number=6; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%P]i; table_row_number=7; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%O]f; table_row_number=7; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=8; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=8; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=9; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=9; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=10; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=10; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%P]i; table_row_number=11; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%O]f; table_row_number=11; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%P]i; table_row_number=12; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%O]f; table_row_number=12; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%P]i; table_row_number=13; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%O]f; table_row_number=13; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=14; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=14; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=15; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=15; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=16; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=16; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=17; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=17; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=18; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=18; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=19; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=19; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=20; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=20; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=21; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=21; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=22; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=22; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=23; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=23; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=24; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=24; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%P]i; table_row_number=25; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%O]f; table_row_number=25; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%P]i; table_row_number=26; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%O]f; table_row_number=26; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=27; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=27; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=28; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=28; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=29; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=29; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%O]f; table_row_number=1; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%P]i; table_row_number=1; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%O]f; table_row_number=2; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%P]i; table_row_number=2; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%O]f; table_row_number=5; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%P]i; table_row_number=5; table_column_number=3
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_amount_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_A
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      section: III.1 Effect of Fe2O3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_B
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      section: III.1 Effect of Fe2O3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_C
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      section: III.1 Effect of Fe2O3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_D
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      section: III.1 Effect of Fe2O3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'calculated_carbon_amount_from_dephosphorization'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_amount_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'calculated_carbon_concentration_increment'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'dephosphorization_rate_per_interface_area'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'initial_non_equilibrium_carbon_concentration'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
+    locator:
+      page: 5
+      published_page: 125
+      pdf_page_index: 4
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'measured_non_equilibrium_carbon_concentration'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
+    locator:
+      page: 6
+      published_page: 126
+      pdf_page_index: 5
+      section: III.2 Effect of Na2CO3 in Flux
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'printed_final_O_in_liquid_iron'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%O]f; table_row_number=5; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%O]f; table_row_number=6; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%O]f; table_row_number=7; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=8; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=9; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%O]f; table_row_number=10; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%O]f; table_row_number=11; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%O]f; table_row_number=12; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%O]f; table_row_number=13; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=14; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=15; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%O]f; table_row_number=16; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=17; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=18; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=19; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=20; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%O]f; table_row_number=21; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=22; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=23; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%O]f; table_row_number=24; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%O]f; table_row_number=25; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%O]f; table_row_number=26; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=27; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=28; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%O]f; table_row_number=29; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%O]f; table_row_number=1; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%O]f; table_row_number=2; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%O]f; table_row_number=3; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%O]f; table_row_number=4; table_column_number=5
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%O]f; table_row_number=5; table_column_number=5
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'printed_initial_P_in_liquid_iron'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-2; column=[%P]i; table_row_number=5; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-3; column=[%P]i; table_row_number=6; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=A-4; column=[%P]i; table_row_number=7; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=8; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=9; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-2; column=[%P]i; table_row_number=10; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-3; column=[%P]i; table_row_number=11; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=B-4; column=[%P]i; table_row_number=12; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-0; column=[%P]i; table_row_number=13; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=14; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=15; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-1; column=[%P]i; table_row_number=16; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=17; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=18; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=19; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=20; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-2; column=[%P]i; table_row_number=21; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=22; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=23; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-3; column=[%P]i; table_row_number=24; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=C-4; column=[%P]i; table_row_number=25; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-1; column=[%P]i; table_row_number=26; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=27; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=28; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(I)
+      note: row_label=D-2; column=[%P]i; table_row_number=29; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=E; column=[%P]i; table_row_number=1; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=F; column=[%P]i; table_row_number=2; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=G; column=[%P]i; table_row_number=3; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=H; column=[%P]i; table_row_number=4; table_column_number=3
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
+    locator:
+      page: 2
+      published_page: 122
+      pdf_page_index: 1
+      table: 1(II)
+      note: row_label=I; column=[%P]i; table_row_number=5; table_column_number=3
+- work_id: 10.2355/isijinternational1966.26.121
+  source: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+  why: unsupported quantity 'printed_non_equilibrium_slag_composition_endpoint'
+  axes:
+  - quantity
+  observations:
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
+  - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
+    locator:
+      page: 3
+      published_page: 123
+      pdf_page_index: 2
+      note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
 - work_id: 10.2355/isijinternational1966.28.164
   source: data/literature/extracts/tsukihashi-1988-na2o-v-nb-mn-ti-partition.yaml
   why: extract yielded no observations
@@ -253707,6 +256264,327 @@ entries:
       published_page: 549
       pdf_page_index: 1
       note: Synopsis gamma0_W(s)=7.6(+/-1.1), epsilon_W^W=-2.2(+/-0.8) at 1873 K
+- work_id: 10.2355/tetsutohagane1955.71.15_1765
+  source: data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=1; table_row_number=3; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_2_p002_t01_r04_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=2; table_row_number=4; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_3_p002_t01_r05_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=3; table_row_number=5; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_4_p002_t01_r06_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=4; table_row_number=6; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_5_p002_t01_r07_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=5; table_row_number=7; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_6_p002_t01_r08_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=6; table_row_number=8; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_7_p002_t01_r09_c05
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '1'
+      note: row_label=7; table_row_number=9; table_column_number=5
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=10; table_row_number=14; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=10; table_row_number=14; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=11; table_row_number=15; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=11; table_row_number=15; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=12; table_row_number=16; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=12; table_row_number=16; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=13; table_row_number=19; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=13; table_row_number=19; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=15; table_row_number=20; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=15; table_row_number=20; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=16; table_row_number=21; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=16; table_row_number=21; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=17; table_row_number=17; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=17; table_row_number=17; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=18; table_row_number=12; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=18; table_row_number=12; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=1; table_row_number=3; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=1; table_row_number=3; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=20; table_row_number=18; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=20; table_row_number=18; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=24; table_row_number=6; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=24; table_row_number=6; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=25; table_row_number=7; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=25; table_row_number=7; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=2; table_row_number=4; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=2; table_row_number=4; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=3; table_row_number=5; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=3; table_row_number=5; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=5; table_row_number=8; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=5; table_row_number=8; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=6; table_row_number=9; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=6; table_row_number=9; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=7; table_row_number=10; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=7; table_row_number=10; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=8; table_row_number=11; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=8; table_row_number=11; table_column_number=8
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=9; table_row_number=13; table_column_number=7
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c08
+    locator:
+      page: 2
+      published_page: 1766
+      pdf_page_index: 1
+      table: '2'
+      note: row_label=9; table_row_number=13; table_column_number=8
 - work_id: 10.2355/tetsutohagane1955.71.16_1911
   source: data/literature/extracts/kems-057-kambayashi-1985.yaml
   why: declared quantity is unknown; refusing to pick a number
@@ -475845,6 +478723,1612 @@ entries:
     locator:
       note: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
       record: PENDING-KEMS#CrO3
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'fusion_temperature_slightly_above_last_measurement'; refusing to
+    pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_fusion_slightly_above_last_measurement
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'irreversible_crystal_structure_change_temperature_lower_bound';
+    refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_irreversible_structure_change_above_1309
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'polymorphic_transition_temperature_range'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_frischat_oel_transition_range
+    locator:
+      page: 14
+      published_page: 7
+      pdf_page_index: 13
+      section: Discussion
+      note: attribution=Frischat and Oel (3)
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'relative_entropy_increment_S_T_minus_S_298_15'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T830_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T830_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T750_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T750_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'sample_chemical_analysis_wt_percent'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=measured analysis
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'solid_solid_transition_enthalpy'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 transition enthalpy
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 transition enthalpy
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: declared quantity is unknown; unsupported quantity 'theoretical_sample_composition_wt_percent'; refusing to pick a
+    number
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=theoretical analysis
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: 'no mapped H_minus_H298 field selected; source fields: quantity, method_class, fit_form, equation_as_printed, reference_temperature_K,
+    fit_range_K, fit_range_as_printed, average_deviation_percent'
+  axes:
+  - value
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 alpha fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 beta fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si2O7 crystalline fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 alpha fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 beta fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na4CaSi3O9 crystalline fit
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: regime "Authors' chemical analysis; analytical method is not stated." is not a closed method token (kems_effusion alone
+    is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=measured analysis
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: regime 'Copper-block drop calorimetry; Table 2 measured value not included in a printed equation fit range.' is not
+    a closed method token (kems_effusion alone is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table2_measured_outside_fit_range::T=1309.0:h=54959b8eac14
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: measured point outside every printed fit range; row=Na2CaSiO4
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table2_measured_outside_fit_range::T=1300.3:h=1765674b3cde
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: measured point outside every printed fit range; row=Na2Ca2Si2O7
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table2_measured_outside_fit_range::T=1504.4:h=34a57912b8b7
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: measured point outside every printed fit range; row=Na2Ca2Si3O9
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: regime 'Copper-block drop calorimetry; Table 2 measured values.' is not a closed method token (kems_effusion alone
+    is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table2_measured::T=395.1:h=7e40d822682b
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 298–830 K; row=Na2CaSiO4
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table2_measured::T=1003.0:h=8b2f70bb6943
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 830–1300 K; row=Na2CaSiO4
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table2_measured::T=1001.3:h=64459c9ced29
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 298–1300 K; row=Na2Ca2Si2O7
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table2_measured::T=405.0:h=5c591b3a16a2
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 298–750 K; row=Na2Ca2Si3O9
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table2_measured::T=1001.3:h=eae498b572ed
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 750–1500 K; row=Na2Ca2Si3O9
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table2_measured::T=1008.3:h=d7bd1ca48a14
+    locator:
+      page: 10
+      published_page: 3
+      pdf_page_index: 9
+      table: '2'
+      note: fit-input subset 298–1400 K; row=Na4CaSi3O9
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: regime 'Theoretical percentages printed in parentheses in Table 1.' is not a closed method token (kems_effusion alone
+    is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=theoretical analysis
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: source does not state a numeric total_pressure_Pa
+  axes:
+  - total_pressure_Pa
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_polymorphic_transition_temperature
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 transition
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_polymorphic_transition_temperature
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 transition
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 alpha fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T830_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_smooth_heat_content::T=400:h=adc559690038
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na2CaSiO4; column=H_T-H_298.15 smooth values
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 beta fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T830_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_smooth_heat_content::T=1000:h=a2620e9b78bf
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na2CaSiO4; column=H_T-H_298.15 smooth values
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_irreversible_structure_change_above_1309
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_polymorphic_transition_temperature
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 transition
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 transition enthalpy
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si2O7 crystalline fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_smooth_heat_content::T=1000:h=e7f2d110bb65
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na2Ca2Si2O7; column=H_T-H_298.15 smooth values
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 alpha fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T750_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_smooth_heat_content::T=400:h=f23c69e8fcca
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na2Ca2Si3O9; column=H_T-H_298.15 smooth values
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 beta fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T750_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_smooth_heat_content::T=1000:h=10d0f11b8bf7
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na2Ca2Si3O9; column=H_T-H_298.15 smooth values
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_frischat_oel_transition_range
+    locator:
+      page: 14
+      published_page: 7
+      pdf_page_index: 13
+      section: Discussion
+      note: attribution=Frischat and Oel (3)
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_fusion_slightly_above_last_measurement
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_polymorphic_transition_temperature
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 transition
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 transition enthalpy
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_fit_equation
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na4CaSi3O9 crystalline fit
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_smooth_heat_content::T=1000:h=af7d30512936
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: row=Na4CaSi3O9; column=H_T-H_298.15 smooth values
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'fusion_temperature_slightly_above_last_measurement'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_fusion_slightly_above_last_measurement
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'irreversible_crystal_structure_change_temperature_lower_bound'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_irreversible_structure_change_above_1309
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      section: Measurements and results
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'polymorphic_transition_temperature_range'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_frischat_oel_transition_range
+    locator:
+      page: 14
+      published_page: 7
+      pdf_page_index: 13
+      section: Discussion
+      note: attribution=Frischat and Oel (3)
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'relative_entropy_increment_S_T_minus_S_298_15'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_alpha_table3_relative_entropy_increment_T830_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T830_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=830 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2CaSiO4; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si2O7; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_alpha_table3_relative_entropy_increment_T750_α
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T1500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1500 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T750_β
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=750 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_beta_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na2Ca2Si3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1000
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1000 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1100
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1100 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1200
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1200 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1300
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1300 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T1400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=1400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T400
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=400 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T500
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=500 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T600
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=600 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T700
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=700 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T800
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=800 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table3_relative_entropy_increment_T900
+    locator:
+      page: 13
+      published_page: 6
+      pdf_page_index: 12
+      table: '3'
+      note: T=900 K; row=Na4CaSi3O9; column=S_T-S_298.15 increments
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'sample_chemical_analysis_wt_percent'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=measured analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_measured_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=measured analysis
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'solid_solid_transition_enthalpy'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2CaSiO4 transition enthalpy
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_solid_solid_transition_enthalpy
+    locator:
+      page: 12
+      published_page: 5
+      pdf_page_index: 11
+      section: Measurements and results
+      note: row=Na2Ca2Si3O9 transition enthalpy
+- work_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09
+  source: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+  why: unsupported quantity 'theoretical_sample_composition_wt_percent'
+  axes:
+  - quantity
+  observations:
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2CaSiO4; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si2O7; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na2Ca2Si3O9; column=theoretical analysis
+  - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_theoretical_chemical_analysis
+    locator:
+      page: 9
+      published_page: 2
+      pdf_page_index: 8
+      table: '1'
+      note: row=Na4CaSi3O9; column=theoretical analysis
 - work_id: 9a98df67990f4c619e45f89fa10072507ef0fd8184468c0e26fa4af878f4c35d
   source: data/literature/extracts/bonnell-hastie-1990-htsci-26-313.yaml
   why: model-derived cohort excluded by ruling

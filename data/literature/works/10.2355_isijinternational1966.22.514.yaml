@@ -1,0 +1,1813 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.22.514
+  citation: Inoue, R. and Suito, H. (1982), “Sulfur Partitions between Carbon-saturated Iron Melt and Na2O-SiO2 Slags”, Transactions
+    of the Iron and Steel Institute of Japan, 22, 514–523.
+  source_ids:
+  - inoue-suito-1982-na-silicate-sulfur-partitions
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9be13c6816d4d54f6819300d2ff8d273028bebc4
+    files:
+    - asset_id: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
+      role: pdf
+      path: raw/inoue-suito-1982-na-silicate-sulfur-partitions/inoue-suito-1982-na-silicate-sulfur-partitions.pdf
+      sha256:
+        tag: value
+        value: fc30a0fbbb83d14cf7d4550cd7ed66588a52a6a66ab4282aea8b863842dc80cc
+    - asset_id: pdftotext:inoue-suito-1982-na-silicate-sulfur-partitions
+      role: pdftotext
+      path: text/inoue-suito-1982-na-silicate-sulfur-partitions
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:inoue-suito-1982-na-silicate-sulfur-partitions
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational1966.22.514
+experiments:
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-100
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '32'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=100; column_header=sample row; printed_cell=100
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-101
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '13'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=101; column_header=sample row; printed_cell=101
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-105
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '87'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=105; column_header=sample row; printed_cell=105
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-106
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '36'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=106; column_header=sample row; printed_cell=106
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-107
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '9'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=107; column_header=sample row; printed_cell=107
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-108
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '6'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=108; column_header=sample row; printed_cell=108
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-15
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=15; column_header=sample row; printed_cell=15
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-151
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '175'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=151; column_header=sample row; printed_cell=151
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-152
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '113'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=152; column_header=sample row; printed_cell=152
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-153
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '116'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=153; column_header=sample row; printed_cell=153
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-154
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '55'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=154; column_header=sample row; printed_cell=154
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-16
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=16; column_header=sample row; printed_cell=16
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-19
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=19; column_header=sample row; printed_cell=19
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-20
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=20; column_header=sample row; printed_cell=20
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-22
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=22; column_header=sample row; printed_cell=22
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-24
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=24; column_header=sample row; printed_cell=24
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-28
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '240'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=28; column_header=sample row; printed_cell=28
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-29
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '240'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=29; column_header=sample row; printed_cell=29
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-98
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '115'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=98; column_header=sample row; printed_cell=98
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table1-sample-99
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+    time_min:
+      state:
+        tag: value
+        value: '67'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    table: '1'
+    note: row_label=99; column_header=sample row; printed_cell=99
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-100
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=100; column_header=Si_obs / Charles / Callow; printed_cell=tr.
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-101
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=101; column_header=Si_obs / Charles / Callow; printed_cell=tr.
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-105
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=105; column_header=Si_obs / Charles / Callow; printed_cell=.256
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-106
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=106; column_header=Si_obs / Charles / Callow; printed_cell=.083
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-151
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=151; column_header=Si_obs / Charles / Callow; printed_cell=.124
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-98
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=98; column_header=Si_obs / Charles / Callow; printed_cell=.079
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table2-sample-99
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 5
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 6
+    table: '2'
+    note: row_label=99; column_header=Si_obs / Charles / Callow; printed_cell=.027
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-102
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '34'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=102; column_header=sample row; printed_cell=102
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-103
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '38'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=103; column_header=sample row; printed_cell=103
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-104
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '38'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=104; column_header=sample row; printed_cell=104
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-155
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '13'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=155; column_header=sample row; printed_cell=155
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-156
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '11'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=156; column_header=sample row; printed_cell=156
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table3-sample-157
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 7
+        table: '3'
+    time_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 7
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 7
+    table: '3'
+    note: row_label=157; column_header=sample row; printed_cell=157
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 8
+        table: '4'
+    composition_ratio_Na2O_to_SiO2_as_printed:
+      state:
+        tag: value
+        value: '0.3'
+      locator:
+        page: 8
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 8
+    table: '4'
+    note: row_label=.3; column_header=Na2O/SiO2 mole ratio; printed_cell=.3
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 8
+        table: '4'
+    composition_ratio_Na2O_to_SiO2_as_printed:
+      state:
+        tag: value
+        value: '0.6'
+      locator:
+        page: 8
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 8
+    table: '4'
+    note: row_label=.6; column_header=Na2O/SiO2 mole ratio; printed_cell=.6
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 8
+        table: '4'
+    composition_ratio_Na2O_to_SiO2_as_printed:
+      state:
+        tag: value
+        value: '0.9'
+      locator:
+        page: 8
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 8
+    table: '4'
+    note: row_label=.9; column_header=Na2O/SiO2 mole ratio; printed_cell=.9
+- experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-1.3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        page: 8
+        table: '4'
+    composition_ratio_Na2O_to_SiO2_as_printed:
+      state:
+        tag: value
+        value: '1.3'
+      locator:
+        page: 8
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 8
+    table: '4'
+    note: row_label=1.3; column_header=Na2O/SiO2 mole ratio; printed_cell=1.3
+- experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.22.514
+  locator:
+    page: 5
+    paragraph: sulfur activity coefficient
+    equation: '13'
+    note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.74
+context:
+- observation_id: inoue_suito_1982_context_experimental_methods
+  type: method_context
+  locator:
+    page: 2
+    section: Experimental
+  values:
+    crucibles: Magnesia 21 mm ID × 45 mm; graphite 23 mm ID × 50 mm; alumina stirrer 6 mm.
+    analysis_methods: Na by AAS; sulfur in slag by gravimetric BaSO4; SiO2 by gravimetric dehydration after alkali fusion;
+      CaO and MgO by EDTA/AAS; total iron by EDTA/AAS; Al2O3 by AAS/eriochrome-cyanine R; metal S/C by coulometric titration;
+      metal Si by molybdenum blue.
+    quench_statement: Not stated.
+    atmosphere: Ar 200 ml/min dried by P2O5 and deoxidized over Cu at 400°C; selected Na2O/SiO2=1 and 1.5 trials used Ar;
+      CO flow 100 ml/min was used otherwise. Flow is not pressure.
+  units: context
+  context_id: inoue-suito-1982-na-silicate-sulfur-partitions::context::inoue_suito_1982_context_experimental_methods
+  work_id: 10.2355/isijinternational1966.22.514
+  source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  species: Na2O
+- observation_id: inoue_suito_1982_context_printed_capacity_and_figure_values
+  type: capacity_context
+  locator:
+    page: 1
+    table: abstract
+  values:
+    figure_candidates:
+    - Figs. 1–11; no plotted values digitized
+    printed_current_work_sulfide_capacity_range: 10^-2 to 10^-4, as stated in the abstract
+    range_conditions_as_printed: Na2O/SiO2 molar ratios 3/2, 1/1, 2/3, and 1/3 at 1250 and 1350°C; no per-row capacity values
+      are tabulated
+    printed_pure_liquid_log_C_S:
+      Na2O(l), 1250°C: '3.44'
+      CaO(l), 1500°C: '0.23'
+    quoted_prior_log_C_S_at_1250C:
+      ratio_0.5:
+        Nagashima and Katsura: '-4'
+        Denier: '-4'
+      ratio_1.0:
+        Nagashima and Katsura: '-3.0'
+        Denier: '-2.0'
+    printed_log_fS_at_1250_and_1350C:
+    - '.74'
+    - '.75'
+    evidence_note: Capacity values are author-derived or quoted as attributed; no capacity was recomputed from assay values.
+  units: context
+  context_id: inoue-suito-1982-na-silicate-sulfur-partitions::context::inoue_suito_1982_context_printed_capacity_and_figure_values
+  work_id: 10.2355/isijinternational1966.22.514
+  source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  species: S
+- observation_id: inoue_suito_1982_sodium_evaporation_summary
+  type: printed_context
+  locator:
+    page: 5
+    paragraph: Na2O-CaO-SiO2 sulfur partition experiments
+  units: percent as printed
+  values:
+    printed_sodium_loss_by_evaporation: about 5% at maximum
+    associated_experiment_series: Table 3; the source does not identify the row or denominator for this maximum
+    temperature: Table 3 rows are at 1250°C
+    schema_note: The aggregate maximum is retained as context; it is not assigned to an individual row or converted to a fraction.
+  context_id: inoue-suito-1982-na-silicate-sulfur-partitions::context::inoue_suito_1982_sodium_evaporation_summary
+  work_id: 10.2355/isijinternational1966.22.514
+  source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  species: Na
+- observation_id: inoue_suito_1982_table1_starting_compositions
+  type: table_context
+  locator:
+    page: 5
+    table: '1'
+    note: Initial metal and slag columns; rows continue through the Table 1 continuation.
+  units: wt%
+  values:
+    method_class: measured_direct
+    table_transcription:
+    - sample_id: '15'
+      metal_S: '.290'
+      metal_C: '4.45'
+      slag_Na2O: '60.0'
+      slag_SiO2: '40.02'
+      slag_Na2S: —
+    - sample_id: '16'
+      metal_S: '.003'
+      metal_C: '4.47'
+      slag_Na2O: '54.6'
+      slag_SiO2: '43.18'
+      slag_Na2S: '2.18'
+    - sample_id: '20'
+      metal_S: '.294'
+      metal_C: '4.45'
+      slag_Na2O: '50.4'
+      slag_SiO2: '49.60'
+      slag_Na2S: —
+    - sample_id: '19'
+      metal_S: '.003'
+      metal_C: '4.47'
+      slag_Na2O: '48.9'
+      slag_SiO2: '49.20'
+      slag_Na2S: '1.86'
+    - sample_id: '24'
+      metal_S: '.574'
+      metal_C: '4.43'
+      slag_Na2O: '40.7'
+      slag_SiO2: '59.27'
+      slag_Na2S: —
+    - sample_id: '22'
+      metal_S: '.010'
+      metal_C: '4.47'
+      slag_Na2O: '39.2'
+      slag_SiO2: '59.03'
+      slag_Na2S: '1.76'
+    - sample_id: '29'
+      metal_S: '.994'
+      metal_C: '4.31'
+      slag_Na2O: '26.1'
+      slag_SiO2: '73.89'
+      slag_Na2S: —
+    - sample_id: '28'
+      metal_S: '.003'
+      metal_C: '4.47'
+      slag_Na2O: '27.3'
+      slag_SiO2: '70.69'
+      slag_Na2S: '2.04'
+    - sample_id: '98'
+      metal_S: '.994'
+      metal_C: —
+      slag_Na2O: '26.1'
+      slag_SiO2: '73.89'
+      slag_Na2S: —
+    - sample_id: '99'
+      metal_S: '.574'
+      metal_C: —
+      slag_Na2O: '41.2'
+      slag_SiO2: '58.79'
+      slag_Na2S: —
+    - sample_id: '100'
+      metal_S: '.574'
+      metal_C: —
+      slag_Na2O: '50.8'
+      slag_SiO2: '49.23'
+      slag_Na2S: —
+    - sample_id: '101'
+      metal_S: '.994'
+      metal_C: —
+      slag_Na2O: '60.6'
+      slag_SiO2: '39.36'
+      slag_Na2S: —
+    - sample_id: '151'
+      metal_S: '.003'
+      metal_C: —
+      slag_Na2O: '27.3'
+      slag_SiO2: '70.69'
+      slag_Na2S: '2.04'
+    - sample_id: '152'
+      metal_S: '.003'
+      metal_C: —
+      slag_Na2O: '39.2'
+      slag_SiO2: '59.03'
+      slag_Na2S: '1.76'
+    - sample_id: '105'
+      metal_S: '.574'
+      metal_C: —
+      slag_Na2O: '26.1'
+      slag_SiO2: '73.89'
+      slag_Na2S: —
+    - sample_id: '106'
+      metal_S: '.574'
+      metal_C: —
+      slag_Na2O: '41.2'
+      slag_SiO2: '58.79'
+      slag_Na2S: —
+    - sample_id: '107'
+      metal_S: '.574'
+      metal_C: —
+      slag_Na2O: '50.8'
+      slag_SiO2: '49.23'
+      slag_Na2S: —
+    - sample_id: '108'
+      metal_S: '.994'
+      metal_C: —
+      slag_Na2O: '60.6'
+      slag_SiO2: '39.36'
+      slag_Na2S: —
+    - sample_id: '153'
+      metal_S: '.003'
+      metal_C: —
+      slag_Na2O: '27.3'
+      slag_SiO2: '70.69'
+      slag_Na2S: '2.04'
+    - sample_id: '154'
+      metal_S: '.003'
+      metal_C: —
+      slag_Na2O: '39.2'
+      slag_SiO2: '59.03'
+      slag_Na2S: '1.76'
+  context_id: inoue-suito-1982-na-silicate-sulfur-partitions::context::inoue_suito_1982_table1_starting_compositions
+  work_id: 10.2355/isijinternational1966.22.514
+  source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  species: Na2O
+- observation_id: inoue_suito_1982_table3_starting_compositions
+  type: table_context
+  locator:
+    page: 7
+    table: '3'
+    note: Initial metal S and starting slag oxide columns.
+  units: wt%
+  values:
+    method_class: measured_direct
+    table_transcription:
+    - sample_id: '102'
+      metal_S: '.574'
+      slag_Na2O: '42.2'
+      slag_SiO2: '49.51'
+      slag_CaO: '8.33'
+    - sample_id: '103'
+      metal_S: '.574'
+      slag_Na2O: '34.7'
+      slag_SiO2: '51.25'
+      slag_CaO: '14.1'
+    - sample_id: '104'
+      metal_S: '.574'
+      slag_Na2O: '28.4'
+      slag_SiO2: '56.33'
+      slag_CaO: '15.3'
+    - sample_id: '155'
+      metal_S: '.994'
+      slag_Na2O: '53.0'
+      slag_SiO2: '40.38'
+      slag_CaO: '6.58'
+    - sample_id: '156'
+      metal_S: '.994'
+      slag_Na2O: '47.5'
+      slag_SiO2: '40.51'
+      slag_CaO: '12.0'
+    - sample_id: '157'
+      metal_S: '.994'
+      slag_Na2O: '41.9'
+      slag_SiO2: '40.26'
+      slag_CaO: '17.9'
+  context_id: inoue-suito-1982-na-silicate-sulfur-partitions::context::inoue_suito_1982_table3_starting_compositions
+  work_id: 10.2355/isijinternational1966.22.514
+  source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  species: Na2O

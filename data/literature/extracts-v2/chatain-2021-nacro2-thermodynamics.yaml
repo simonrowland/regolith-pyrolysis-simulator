@@ -1,0 +1,2362 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+observations:
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_298
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '94.53'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_298
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 15
+    paragraph: inputs to formation Gibbs-energy calculation
+    section: 6.1 Heat capacity measurements
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 15
+        paragraph: inputs to formation Gibbs-energy calculation
+        section: 6.1 Heat capacity measurements
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_29815
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '94.5'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_29815
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 13
+    paragraph: theoretical standard Cp and entropy values
+    section: 5.2 Results
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 13
+        paragraph: theoretical standard Cp and entropy values
+        section: 5.2 Results
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: transition_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1092.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ±4 °C
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' DTA result.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 2
+    section: Abstract
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1092.15'
+      locator:
+        page: 2
+        section: Abstract
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '819'
+            locator:
+              page: 2
+              section: Abstract
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              section: Abstract
+        output_unit: K
+        references: []
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_experimental_cp_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: quantity, method_class, attribution, measurement_method_as_printed,
+      sample_scope_as_printed, temperature_range_C_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level,
+      mean_point_dispersion_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' DSC data fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 14
+    section: 6.1 Heat capacity measurements
+    equation: experimental Cp fit
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_formation_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, equation_as_printed,
+      uncertainty_as_printed, confidence_level, calculation_inputs_as_printed, unavailable_inputs, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), abstract and section 6.1
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 15
+    section: 6.1 Heat capacity measurements
+    equation: formation Gibbs-energy fit
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_gross_formation_enthalpy_298
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-874.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim: ±7.3 kJ/mol
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gross et al. [13], as cited by Chatain et al.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_gross_formation_enthalpy_298
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 3
+    paragraph: Gross et al. value
+    section: literature enthalpy of formation
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        paragraph: Gross et al. value
+        section: literature enthalpy of formation
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_jain_dft_formation_enthalpy_298
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-883.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jain et al. [16], as cited by Chatain et al.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_jain_dft_formation_enthalpy_298
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 4
+    paragraph: Jain et al. DFT value
+    section: literature enthalpy of formation
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        paragraph: Jain et al. DFT value
+        section: literature enthalpy of formation
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_iyer_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: quantity, method_class, attribution, equation_as_printed,
+      temperature_range_C_as_printed, measurement_method_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Iyer et al. [17], as cited by Chatain et al. on page 4; a page 14 comparison prints [16].
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 4
+    section: literature heat-capacity measurements
+    equation: Cp fit
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_sreedharan_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: quantity, method_class, attribution, equation_as_printed,
+      temperature_range_C_as_printed, measurement_method_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Sreedharan et al. [6], as cited by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 4
+    section: literature heat-capacity measurements
+    equation: Cp fit
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [573, 773]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [10], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=8
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [510, 1000]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, equilibrium_as_printed, equation_as_printed, intercept_as_printed, slope_as_printed,
+      uncertainty_as_printed, confidence_level, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [11], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: I
+    note: row=11
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [660, 890]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, equilibrium_as_printed, equation_as_printed, intercept_as_printed, slope_as_printed,
+      uncertainty_as_printed, confidence_level, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [11], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: II
+    note: row=11
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [930, 1044]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [12], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=10
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [573, 773]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, fit_note_as_printed, T_range_as_printed, status, schema_gap,
+      method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [3], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=1; column=Δf,TG°(NaCrO2)
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [700, 1100]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level,
+      T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [4], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: Average
+    note: row=2
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [700, 1100]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [4], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: I
+    note: row=2
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [700, 1100]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [4], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: II
+    note: row=2
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [800, 980]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [5], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=3
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [784, 1012]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [6], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=4
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [782, 1014]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed,
+      confidence_level, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [7], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: I
+    note: row=6
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [809, 1040]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, fit_label_as_printed, cell_scheme_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed,
+      confidence_level, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [7], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: II
+    note: row=6
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [657, 825]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [8], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: EMF
+    note: row=5
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [825, 1025]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, T_range_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [8], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    equation: KEMS
+    note: row=9
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [820, 1006]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, attribution, reference_as_printed,
+      method_as_printed, equilibrium_as_printed, equation_as_printed, uncertainty_as_printed, confidence_level, T_range_as_printed,
+      status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 reference [9], as printed by Chatain et al.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 6
+    table: '1'
+    note: row=7
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_29815
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '82.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp output.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_29815
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 13
+    paragraph: theoretical standard Cp and entropy values
+    section: 5.2 Results
+  read_from: pdf:chatain-2021-nacro2-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 13
+        paragraph: theoretical standard Cp and entropy values
+        section: 5.2 Results
+- observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_fit
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaCrO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: quantity, method_class, attribution, calculation_method_as_printed,
+      equation_as_printed, status, schema_gap, method_class_reason'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp fit.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: chatain-2021-nacro2-thermodynamics
+  locator:
+    page: 13
+    section: 5.2 Results
+    equation: theoretical Cp regression
+  read_from: pdf:chatain-2021-nacro2-thermodynamics

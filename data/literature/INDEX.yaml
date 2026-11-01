@@ -9,14 +9,14 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 715
-  extracts: 713
+  sources: 722
+  extracts: 720
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 713
-  alias_groups_needing_resolution: 78
+  extracts_without_pdf: 720
+  alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
@@ -53,6 +53,7 @@ gaps:
   - banchor-matsui-naito-1986
   - banya-2004-sulphide-capacity-cao-al2o3
   - banya-chiba-hikosaka-1980-feto-binary-solid-iron
+  - banya-hino-takezoe-1985-na-fe-silicate-redox
   - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
   - banya-watanabe-1977-feto-p2o5-solid-iron
   - barcza-1979-mn-slag-metal-equilibrium
@@ -98,6 +99,7 @@ gaps:
   - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   - cardiff-2007-vacuum-pyrolysis-gsfc
   - charnoz-2023-hydrogen-magma-ocean
+  - chatain-2021-nacro2-thermodynamics
   - chaudary-1997-v-redox-binary-silicate
   - chen-2019-sioch-cp-entropy-gibbs
   - chen-2022-mgo-sio2-tio2-phase-equilibria
@@ -185,6 +187,7 @@ gaps:
   - iapws-95-psat-liquid
   - inada-2026-forsterite-h2-h2o
   - inoue-1991-n-s-partition-cao-al2o3
+  - inoue-suito-1982-na-silicate-sulfur-partitions
   - inoue-suito-1982-vanadium-mgo-saturated-slag
   - itoh-1985-beta-alumina-na2o-emf
   - itoh-1989-zno-solid-zinc-silicate
@@ -329,6 +332,8 @@ gaps:
   - kroger-kreitlow-1956-soda-lime-silicate-calorimetry
   - kropf-2009-alkalis-chondrules-thesis
   - kume-2000-cao-activities
+  - kunisada-1986-na-silicate-dephosphorization
+  - kunisada-iwai-1993-na-silicate-sulfide-capacity
   - kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
   - kushiro-1971-apollo12-phase-equilibria
   - lamoreaux-hildenbrand-1984
@@ -441,6 +446,7 @@ gaps:
   - pahlevan-2026-protolunar-volatile-outflows
   - pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   - panda-2019-ten-oxide-thermodynamics
+  - pankratz-1968-ri7201-sodium-calcium-silicates
   - park-2021-vanadium-thermodynamics-thesis
   - park-min-2004-carbide-capacity-fluoride-soda-slags
   - park-morita-2025-vanadium-activity
@@ -659,6 +665,7 @@ gaps:
   - ta-yamanaka-1997-metsoc
   - tachibana-2002-enstatite-evaporation-kinetics
   - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  - takeda-1986-liquid-copper-soda-slag
   - takeda-1990-sn-slag-matertrans
   - taniguchi-1997-feo-cas
   - terashima-2026-sro-slag-activity-preprint
@@ -1047,6 +1054,12 @@ gaps:
     - ref-032-zr
     resolution: owner/controller
   - type: source_id_alias
+    key: banya-1985
+    source_ids:
+    - banya-hino-takezoe-1985-na-fe-silicate-redox
+    - banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
+    resolution: owner/controller
+  - type: source_id_alias
     key: bischof-2023
     source_ids:
     - kems-137-bischof-2023
@@ -1120,6 +1133,12 @@ gaps:
     source_ids:
     - kems-112-ichise-1989
     - kems-198-ichise-ueshima-1989
+    resolution: owner/controller
+  - type: source_id_alias
+    key: inoue-1982
+    source_ids:
+    - inoue-suito-1982-na-silicate-sulfur-partitions
+    - inoue-suito-1982-vanadium-mgo-saturated-slag
     resolution: owner/controller
   - type: source_id_alias
     key: jeon-2025
@@ -3359,6 +3378,64 @@ sources:
       last_stage: null
       date: null
     commit: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+- source_id: banya-hino-takezoe-1985-na-fe-silicate-redox
+  aliases: []
+  citation: Ban-ya, S., Hino, M. and Takezoe, H. (1985), ‘Activities of the Constituents and Fe3+/Fe2+
+    Equilibrium in FetO-Na2O and FetO-SiO2-Na2O Slags’, Tetsu-to-Hagane 71(15), 1765–1772.
+  doi: 10.2355/tetsutohagane1955.71.15_1765
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.71.15_1765
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
+    review_status: draft
+    rows: 45
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/banya-hino-takezoe-1985-na-fe-silicate-redox/banya-hino-takezoe-1985-na-fe-silicate-redox.pdf
+      present: true
+      sha256: 77d173e312ab9d3155938d10bed4b291acd9c673929d376e0492592e46ad5750
+      matches_simulator: null
+    sidecar:
+      path: raw/banya-hino-takezoe-1985-na-fe-silicate-redox/sidecar.yaml
+      present: true
+    text:
+      path: text/banya-hino-takezoe-1985-na-fe-silicate-redox
+      exists: true
+      file_count: 58
+    tables:
+      path: tables/banya-hino-takezoe-1985-na-fe-silicate-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
   aliases: []
   citation: Ban-ya, S., Hino, M. and Yuge, N. (1985), ‘Activity of the Constituents in FetO-SiO2-MnO Slags
@@ -5987,6 +6064,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: chatain-2021-nacro2-thermodynamics
+  aliases: []
+  citation: Chatain, S., David, N., Bonina, D., Flèche, J.-L., Bonnet, C., Courouau, J.-L. & Rouhard,
+    M. (2021). Thermodynamic study of the sodium chromite NaCrO2. Journal of Alloys and Compounds 882,
+    160784.
+  doi: 10.1016/j.jallcom.2021.160784
+  report_number: null
+  identifier: 10.1016/j.jallcom.2021.160784
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml
+    review_status: draft
+    rows: 26
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/chatain-2021-nacro2-thermodynamics/chatain-2021-nacro2-thermodynamics.pdf
+      present: true
+      sha256: 4dacbef187b68fa24a03743165119c3d21c00abb98f33186b126dce6e3c90402
+      matches_simulator: null
+    sidecar:
+      path: raw/chatain-2021-nacro2-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/chatain-2021-nacro2-thermodynamics
+      exists: true
+      file_count: 44
+    tables:
+      path: tables/chatain-2021-nacro2-thermodynamics
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/chatain-2021-nacro2-thermodynamics.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/chatain-2021-nacro2-thermodynamics.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: chaudary-1997-v-redox-binary-silicate
   aliases: []
   citation: Chaudary, H., Miller, D. M., Brungs, M. P. and Belton, G. R. (1997). Redox chemistry of vanadium
@@ -11079,6 +11215,64 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+  aliases: []
+  citation: Inoue, R. and Suito, H. (1982), “Sulfur Partitions between Carbon-saturated Iron Melt and
+    Na2O-SiO2 Slags”, Transactions of the Iron and Steel Institute of Japan, 22, 514–523.
+  doi: 10.2355/isijinternational1966.22.514
+  report_number: null
+  identifier: 10.2355/isijinternational1966.22.514
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+    review_status: draft
+    rows: 267
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/inoue-suito-1982-na-silicate-sulfur-partitions/inoue-suito-1982-na-silicate-sulfur-partitions.pdf
+      present: true
+      sha256: fc30a0fbbb83d14cf7d4550cd7ed66588a52a6a66ab4282aea8b863842dc80cc
+      matches_simulator: null
+    sidecar:
+      path: raw/inoue-suito-1982-na-silicate-sulfur-partitions/sidecar.yaml
+      present: true
+    text:
+      path: text/inoue-suito-1982-na-silicate-sulfur-partitions
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/inoue-suito-1982-na-silicate-sulfur-partitions
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: inoue-suito-1982-vanadium-mgo-saturated-slag
   aliases: []
   citation: Inoue, R. and Suito, H. (1982), “Distribution of Vanadium between Liquid Iron and MgO Saturated
@@ -19406,6 +19600,122 @@ sources:
       last_stage: extracted
       date: '2026-10-03'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kunisada-1986-na-silicate-dephosphorization
+  aliases: []
+  citation: Kunisada, K. & Iwai, H. (1986). Dephosphorization of Liquid Iron by Na2O-SiO2 Slag. Transactions
+    of the Iron and Steel Institute of Japan 26(2), 121-127.
+  doi: 10.2355/isijinternational1966.26.121
+  report_number: null
+  identifier: 10.2355/isijinternational1966.26.121
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+    review_status: draft
+    rows: 278
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kunisada-1986-na-silicate-dephosphorization/kunisada-1986-na-silicate-dephosphorization.pdf
+      present: true
+      sha256: 1240ff2154d201671ea18b25adb9ba8322267c37be72d939f2e9deaa9acaac60
+      matches_simulator: null
+    sidecar:
+      path: raw/kunisada-1986-na-silicate-dephosphorization/sidecar.yaml
+      present: true
+    text:
+      path: text/kunisada-1986-na-silicate-dephosphorization
+      exists: true
+      file_count: 35
+    tables:
+      path: tables/kunisada-1986-na-silicate-dephosphorization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kunisada-1986-na-silicate-dephosphorization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kunisada-1986-na-silicate-dephosphorization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: d2cfb582f0a2173d99c23c79d7257b56ed252063
+- source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  aliases: []
+  citation: K. Kunisada and H. Iwai (1993), “Effects of CaO, MnO, MgO and Al2O3 on the Sulfide Capacities
+    of Na2O-SiO2 Slags,” ISIJ International 33(1), 43–47.
+  doi: 10.2355/isijinternational.33.43
+  report_number: null
+  identifier: 10.2355/isijinternational.33.43
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kunisada-iwai-1993-na-silicate-sulfide-capacity.yaml
+    review_status: draft
+    rows: 214
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kunisada-iwai-1993-na-silicate-sulfide-capacity/kunisada-iwai-1993-na-silicate-sulfide-capacity.pdf
+      present: true
+      sha256: 7079a601d757767d683b3d7553a607056ba7e249e2cd7112a27a9ad7621a6b6d
+      matches_simulator: null
+    sidecar:
+      path: raw/kunisada-iwai-1993-na-silicate-sulfide-capacity/sidecar.yaml
+      present: true
+    text:
+      path: text/kunisada-iwai-1993-na-silicate-sulfide-capacity
+      exists: true
+      file_count: 42
+    tables:
+      path: tables/kunisada-iwai-1993-na-silicate-sulfide-capacity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kunisada-iwai-1993-na-silicate-sulfide-capacity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kunisada-iwai-1993-na-silicate-sulfide-capacity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
   aliases: []
   citation: Kupčák, J. and Mališ, A. (1992). Use of oxygen probes in the study of thermodynamic properties
@@ -26041,6 +26351,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: pankratz-1968-ri7201-sodium-calcium-silicates
+  aliases: []
+  citation: Pankratz, L. B. (1968), High-Temperature Heat Contents and Entropies of Four Crystalline Sodium-Calcium
+    Silicates, U.S. Bureau of Mines Report of Investigations 7201.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+    review_status: draft
+    rows: 83
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/pankratz-1968-ri7201-sodium-calcium-silicates/pankratz-1968-ri7201-sodium-calcium-silicates.pdf
+      present: true
+      sha256: f1b774aaf5c74047b05ce9bd386308c7e9b923991bbab30333825208a7d9f8f9
+      matches_simulator: null
+    sidecar:
+      path: raw/pankratz-1968-ri7201-sodium-calcium-silicates/sidecar.yaml
+      present: true
+    text:
+      path: text/pankratz-1968-ri7201-sodium-calcium-silicates
+      exists: true
+      file_count: 17
+    tables:
+      path: tables/pankratz-1968-ri7201-sodium-calcium-silicates
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: d2cfb582f0a2173d99c23c79d7257b56ed252063
 - source_id: park-2021-vanadium-thermodynamics-thesis
   aliases: []
   citation: Park, Donghwi (2021). Investigation of thermodynamic properties of vanadium oxide in CaO-SiO2-VOx
@@ -38782,6 +39150,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: takeda-1986-liquid-copper-soda-slag
+  aliases: []
+  citation: Takeda, Y., Riveros, G., Park, Y.-J., and Yazawa, A. (1986). Equilibria between Liquid Copper
+    and Soda Slag. Transactions of the Japan Institute of Metals, 27(8), 608–615.
+  doi: 10.2320/matertrans1960.27.608
+  report_number: null
+  identifier: 10.2320/matertrans1960.27.608
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/takeda-1986-liquid-copper-soda-slag/takeda-1986-liquid-copper-soda-slag.pdf
+      present: true
+      sha256: e392311987b4ede32eb3a6e8ff5d3c856e61fdaa05fbea85f50172c7f8a953ff
+      matches_simulator: null
+    sidecar:
+      path: raw/takeda-1986-liquid-copper-soda-slag/sidecar.yaml
+      present: true
+    text:
+      path: text/takeda-1986-liquid-copper-soda-slag
+      exists: true
+      file_count: 17
+    tables:
+      path: tables/takeda-1986-liquid-copper-soda-slag
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/takeda-1986-liquid-copper-soda-slag.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/takeda-1986-liquid-copper-soda-slag.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: takeda-1990-sn-slag-matertrans
   aliases: []
   citation: Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and

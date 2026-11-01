@@ -8434,6 +8434,9 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
                 return amount / as_decimal("1000")
             if unit in {"kj/mol", "kjmol-1", "kjmol^-1", "kj_per_mol"}:
                 return amount
+            if unit in {"cal/mol", "cal/mole"}:
+                # Pankratz 1968 prints heat content in thermochemical calories.
+                return amount * as_decimal("0.004184")
             if unit in {"kcal/mol", "kcal/mole"}:
                 converted = _convert_compilation_amount(
                     amount, Quantity.H_MINUS_H298, units
@@ -8873,13 +8876,19 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
     # Schumm (1981) adds 123 temperature rows each for cp, H-H298, delta_fH,
     # and delta_fG, plus eight printed entropy points; mismatches stay 0.
-    assert census.get("H_minus_H298") == 259
+    # Pankratz (1968) adds 71 measured and 47 smoothed H-H298 cells. Its
+    # relative entropy increments remain typed refusals; it prints no Cp or
+    # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
+    assert census.get("H_minus_H298") == 377
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
         "delta_fH": 123,
         "delta_fG": 123,
         "S": 8,
+    }
+    assert per_source.get("pankratz-1968-ri7201-sodium-calcium-silicates") == {
+        "H_minus_H298": 118
     }
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
@@ -8911,7 +8920,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8700, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8818, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
