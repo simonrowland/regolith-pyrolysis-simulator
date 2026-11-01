@@ -1559,22 +1559,7 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
-    printed = _printed_map_payload(wt)
-    raw_by_component = {
-        _mass_percent_component_key(name)[0]: amount
-        for name, amount in raw_components.items()
-    }
-    for name in printed:
-        if name in raw_by_component:
-            printed[name] = raw_by_component[name]
-    for name, amount in raw_components.items():
-        normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
-        if (
-            _classify_composition_cell(amount)[0] == "blank"
-            and _volatile_closure_component(normalized_name) is not None
-        ):
-            printed[name] = amount
-    return located_value(printed, locator)
+    return located_value(_printed_map_payload(raw_components), locator)
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -22996,16 +22981,20 @@ class Migrator:
                             and isinstance(starting.state.value, Mapping)
                         ):
                             starting_map = starting.state.value
-                            starting_wt = _oxide_mass_percent_components(
-                                starting_map
-                            )
                             composition = (
                                 _wt_percent_conversion_state(
-                                    starting_wt,
+                                    {
+                                        name: amount
+                                        for name, raw_amount in starting_map.items()
+                                        for kind, amount in (
+                                            _classify_composition_cell(raw_amount),
+                                        )
+                                        if kind == "number" and amount is not None
+                                    },
                                     closure_context=starting_map,
                                     declared_component_map=starting_map,
                                 )
-                                if starting_wt
+                                if starting_map
                                 else State.unknown(
                                     "source has no located starting composition for this run"
                                 )

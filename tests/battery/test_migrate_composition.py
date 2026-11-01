@@ -2990,22 +2990,25 @@ def test_residue_fallback_refuses_malformed_printed_start_without_aborting(
     composition = observations[0].identity.composition
     assert composition is not None
     assert composition.is_unknown
-    assert "malformed printed component amount for 'SiO2'" in composition.reason
+    assert "missing major oxides: SiO2" in composition.reason
 
 
 def test_mass_percent_printed_provenance_keeps_source_component_names() -> None:
-    printed = migrate_module._mass_percent_printed_from_plain(
+    sample = migrate_module._sample_from_plain(
         {
-            "state": {
-                "tag": "value",
-                "value": {
-                    "amount_basis": "mass_percent",
-                    "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "amount_basis": "mass_percent",
+                        "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
+                    },
                 },
-            },
-            "locator": {"table": "2", "row": "4"},
+                "locator": {"table": "2", "row": "4"},
+            }
         }
     )
+    printed = sample.printed_composition
 
     assert printed is not None
     assert printed.state.is_value
