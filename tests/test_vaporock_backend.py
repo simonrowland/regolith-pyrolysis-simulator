@@ -3762,10 +3762,11 @@ def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data()
     equilibrium = types.SimpleNamespace(
         vapor_pressures_Pa={},
         vaporock_full_speciation_Pa={"Na": 1000.0},
-        activity_coefficients={"Na2O": 0.25},
+        activity_coefficients={},
         status="non_authoritative",
         warnings=(),
         diagnostics={
+            "oxide_activity": {"Na2O": 0.25},
             "oxide_activity_standard_state": (
                 "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
             )
@@ -3804,6 +3805,30 @@ def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data()
     ).as_diagnostic()
     assert "oxide_activity" not in default_payload
     assert "oxide_activity_standard_state" not in default_payload
+
+
+def test_opt_in_oxide_activity_stays_out_of_generic_equilibrium_field(monkeypatch):
+    state = "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+    monkeypatch.setattr(
+        backend,
+        "_call_vaporock",
+        lambda **_: ({"Na(g)": 1.0}, {"Na2O": 0.25}, state),
+    )
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.activity_coefficients == {}
+    assert result.diagnostics["oxide_activity"] == {"Na2O": 0.25}
+    assert result.diagnostics["oxide_activity_standard_state"] == state
 
 
 def test_provider_selection_falls_back_with_native_init_failure_reason(
