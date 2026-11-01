@@ -27,7 +27,7 @@ def test_default_reference_metadata_refactor_pin():
 
     for value, digest in (
         (MRE_DECOMP_VOLTAGE_PROVENANCE,
-         "f1c021f78ee2c59123a4c2f1ca34492458a1be74a0a288ff2f88f61beaa25f08"),
+         "2b404a0dba77b9106986c6f777204b65a048a76e3823f326a6dff76ec135692b"),
         (mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK,
          "c819e9613adc6c0081d24c4a5d51faad6892da99497c74354ff75e73afb4864b"),
     ):
@@ -122,7 +122,7 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
     assert [entry["voltage"] for entry in sequence] == pytest.approx([
         0.023465,
         0.386419,
-        0.408926,
+        0.4087987172075457,  # merged canonical Na2O(l) reference at 1873.15 K
         0.804340,
         1.059135,
         1.254731,
