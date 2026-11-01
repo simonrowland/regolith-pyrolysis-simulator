@@ -5993,3 +5993,34 @@ def test_hashimoto_starting_average_columns_form_identity_composition() -> None:
             "CaO": Decimal("2.53"),
         }
     )
+
+
+def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/lu-2024-mgsio3-levitation.yaml"
+    )
+    migrator.finalize()
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.startswith(
+            "lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::"
+            "T=2623:row=m01:"
+        )
+    ]
+
+    assert rows
+    expected = wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("53.62"),
+            "MgO": Decimal("44.44"),
+            "CaO": Decimal("1.64"),
+        }
+    )
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and observation.identity.composition.value == expected
+        for observation in rows
+    )
