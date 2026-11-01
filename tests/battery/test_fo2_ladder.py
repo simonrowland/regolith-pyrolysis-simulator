@@ -264,15 +264,23 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         observation=observation,
     )
     blocked = [item for item in requests if item.readiness.engine in _COMPARABLE]
+    assert {item.readiness.engine for item in blocked} == set(_COMPARABLE)
     assert all(item.payload is None for item in blocked)
-    assert all(
-        any(
-            gap.waypoint == "normalized_composition"
-            and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    expected_gaps = {
+        "alphamelts": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
+        "thermoengine": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
+        "openimcc": ("normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM),
+        "internal-analytical": (
+            "normalized_composition",
+            GapReason.UNSUPPORTED_PRINT_FORM,
+        ),
+    }
+    for item in blocked:
+        waypoint, reason = expected_gaps[item.readiness.engine]
+        assert any(
+            gap.waypoint == waypoint and gap.reason is reason
             for gap in item.readiness.gaps
-        )
-        for item in blocked
-    )
+        ), (item.readiness.engine, item.readiness.gaps)
 
     unavailable = replace(
         observation,
