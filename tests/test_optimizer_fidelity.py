@@ -5,6 +5,10 @@ import inspect
 import json
 import math
 import os
+import signal
+import subprocess
+import sys
+import textwrap
 import time
 from pathlib import Path
 from types import SimpleNamespace
@@ -311,6 +315,65 @@ def test_fidelity_victims_keep_on_time_results_unread_until_worker_join(
         in note
         for note in notes
     )
+
+
+def test_fidelity_timeout_drains_large_multiprocessing_result_before_join_watchdog() -> None:
+    script = textwrap.dedent(
+        """
+        import time
+
+        import simulator.optimize.fidelity as fidelity
+        from simulator.optimize.fidelity import _FidelityTask, _drop, _run_eval_batch
+        from simulator.optimize.recipe import RecipePatch
+
+        def large_drop(task):
+            time.sleep(0.1)
+            return {
+                "kind": "drop",
+                "drop": _drop(task.index, task.tier, task.candidate_id, "error", "test"),
+                "large_payload": b"x" * (2 * 1024 * 1024),
+            }
+
+        fidelity._evaluate_fidelity_task = large_drop
+        task = _FidelityTask(
+            index=0,
+            tier="high",
+            fn=eval,
+            patch=RecipePatch({}),
+            feedstock_id="test-feedstock",
+            fidelity="high",
+            profile={},
+            candidate_id="large-queue-payload",
+            kwargs={},
+        )
+        outcome = _run_eval_batch([task], timeout_s=0.02, max_workers=1)
+        assert outcome[("high", 0)][1]["reason"] == "timeout"
+        print("large multiprocessing result drained")
+        """
+    )
+    env = {
+        **os.environ,
+        "PYTEST_CURRENT_TEST": "fidelity-large-queue-watchdog",
+        WARM_WORKERS_ENV: "0",
+    }
+    process = subprocess.Popen(
+        [sys.executable, "-c", script],
+        cwd=Path(__file__).resolve().parents[1],
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=5.0)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.communicate()
+        pytest.fail("fidelity result queue join/drain exceeded the 5-second watchdog")
+
+    assert process.returncode == 0, stderr
+    assert "large multiprocessing result drained" in stdout
 
 
 def test_fidelity_worker_stamps_elapsed_time_on_completion(
