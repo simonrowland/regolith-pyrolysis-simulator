@@ -44,7 +44,11 @@ from simulator.battery.score import (
     residual_to_plain,
     score_store,
 )
-from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
+from simulator.battery.waypoints import (
+    GapReason,
+    ReadinessStatus,
+    oxygen_condition,
+)
 from simulator.fe_redox import (
     intrinsic_melt_fO2,
     kress91_log10_fO2_from_fe3_over_sigma_fe,
@@ -217,16 +221,26 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
 def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> None:
     from simulator.battery.consumer_inputs import collect_consumer_inputs
     from simulator.battery.generators.bench import melt_activity_requests
-    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from pathlib import Path
 
-    _works, experiments, observations = load_migrated_store(
-        sources=("basu-2008-feo-steelmaking",)
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root=root, index={}, aliases={})
+    migrator._migrate_extract(
+        root / "data/literature/extracts/basu-2008-feo-steelmaking.yaml"
     )
+    migrator.finalize()
+    experiments = migrator.result.experiments
+    observations = migrator.result.observations
     observation = observations[
         "basu-2008-feo-steelmaking::basu_2008_tii_s01_a_feo_1873k"
     ]
     experiment = experiments[observation.experiment_id]
-    bench = load_migrated_benches()[experiment.bench_id]
+    bench = migrator.result.benches[experiment.bench_id]
+    composition = observation.identity.composition
+    assert composition.is_unknown
+    assert "kept sum=94.18 wt% is below 95 wt%" in composition.reason
     resolved = resolve_row_fo2(experiment, bench, observation)
     assert resolved is not None
     assert resolved.tier == 3
@@ -245,17 +259,17 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         bench=bench,
         observation=observation,
     )
-    comparable = [
-        item for item in requests
-        if item.readiness.engine in _COMPARABLE and item.payload is not None
-    ]
-    assert comparable
-    assert all(not item.readiness.flags for item in comparable)
-    assert {item.payload["fO2_log"] for item in comparable} == {
-        resolved.log10_fO2_bar
-    }
-    assert {item.payload["fO2_tier"] for item in comparable} == {3}
-    assert {item.payload["fO2_route"] for item in comparable} == {resolved.route}
+    blocked = [item for item in requests if item.readiness.engine in _COMPARABLE]
+    assert blocked
+    assert all(item.payload is None for item in blocked)
+    assert all(
+        any(
+            gap.waypoint == "normalized_composition"
+            and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            for gap in item.readiness.gaps
+        )
+        for item in blocked
+    )
 
     unavailable = replace(
         observation,
@@ -263,6 +277,9 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     )
     assert resolve_row_fo2(experiment, bench, unavailable) is None
 
+    # The printed bulk map totals 94.18 wt%, below b-704's 95 wt% floor.
+    # Metal saturation still resolves from the printed activity above, but an
+    # activity engine also needs the whole melt and must retain that refusal.
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
         observation,
@@ -270,91 +287,18 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         bench=bench,
         isolated=False,
     )
-    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+
     context = ScoreContext(
-        works=_works,
+        works=migrator.result.works,
         experiments=experiments,
         observations=observations,
         extract_review={observation.source_id: "reviewed"},
         hostname="test",
-        benches={bench.id: bench},
+        benches=migrator.result.benches,
+        root=root,
     )
-    residual, _candidate = compile_residual(
-        observation,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        prediction=prediction,
-    )
-    assert residual.numeric is not None, residual.refusal
-    assert float(residual.numeric.value) == pytest.approx(
-        -0.3047447378614776, abs=1e-12
-    )
-    assert any(
-        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-        for notice in residual.notices
-    )
-    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND not in flagged_strata(
-        residual.notices
-    )
-
-    intrinsic, _candidate = compile_residual(
-        observation,
-        Engine.INTERNAL_ANALYTICAL,
-        context=context,
-        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-    )
-    assert intrinsic.numeric is not None, intrinsic.refusal
-    assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
-    # Green 6f90106c6 internal-analytical result before the shared ladder.
-    assert float(intrinsic.numeric.value).hex() == "-0x1.380f012af8f98p-2"
-    assert intrinsic.fo2_mode is not residual.fo2_mode
-    assert not any(
-        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-        for notice in intrinsic.notices
-    )
-    assert any(
-        notice.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
-        for notice in intrinsic.notices
-    )
-    assert any(
-        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in residual.notices
-    )
-    assert residual.fo2_mode is Fo2Mode.SHARED_LADDER
-    assert residual.numeric is not None
-    assert float(residual.numeric.value).hex() == float(intrinsic.numeric.value).hex()
-    assert residual.key != intrinsic.key
-    assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
-    assert any(
-        notice.get("fo2_mode") == "engine_intrinsic"
-        for notice in residual_to_plain(intrinsic)["notices"]
-    )
-    assert any(
-        notice.get("fo2_mode") == "shared_ladder"
-        for notice in residual_to_plain(residual)["notices"]
-    )
-
-    from simulator.battery.generators.bench import activity_request_for_engine
-
-    intrinsic_request = activity_request_for_engine(
-        experiment,
-        observation,
-        Engine.INTERNAL_ANALYTICAL.value,
-        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
-    )
-    assert intrinsic_request is not None and intrinsic_request.payload is not None
-    assert "fO2_log" not in intrinsic_request.payload
-
-    scored, _candidates = score_store(
-        context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        rail=Rail.MELT_ACTIVITY,
-    )
-    paired = [item for item in scored if item.reference == observation.observation_id]
-    assert {item.fo2_mode for item in paired} == {
-        Fo2Mode.ENGINE_INTRINSIC,
-        Fo2Mode.SHARED_LADDER,
-    }
-
     borrowed_notice = fo2_tier_notice(
         Quantity.ACTIVITY,
         ResolvedFo2(-9.0, 4, "intrinsic_melt_fO2", True),

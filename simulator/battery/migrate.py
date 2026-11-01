@@ -22182,6 +22182,18 @@ class Migrator:
                 if isinstance(quantity, State) and quantity.is_value
                 else (quantity if isinstance(quantity, Quantity) else None)
             )
+            parent_printed_map = _named_printed_composition_map(parent_values)
+            row_bound_redox_composition = (
+                q_for_species in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+                and parent_printed_map is not None
+                and not _has_explicit_composition_field(raw_item)
+            )
+            if row_bound_redox_composition:
+                # Ratio series cells can repeat only the iron pair used to
+                # calculate the ratio. A named composition on their parent
+                # row is the sample bulk and owns closure and identity.
+                point_composition_context = parent_values
+                point_declared_component_map = parent_printed_map
             sample = raw_item.get("sample") or raw_item.get("id")
             sample_label = sample.strip() if isinstance(sample, str) else None
             point_map_declared = _declared_wt_composition_point_map(
@@ -22210,6 +22222,15 @@ class Migrator:
                 point_composition_axis_required = True
             if not point_composition_axis_required:
                 point_oxide_map = None
+            elif row_bound_redox_composition:
+                point_oxide_map = _oxide_map_from_mapping(
+                    parent_values,
+                    refusal_reason=point_composition_refusal,
+                    declared_map=True,
+                    declared_component_map=parent_printed_map,
+                    closure_context=parent_values,
+                    preserve_printed_map_on_refusal=True,
+                )
             elif q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 point_oxide_map = (
                     dict(source_point_oxide_map)
@@ -22359,7 +22380,7 @@ class Migrator:
                 else Located(State.of(point_composition), locator=point_locator)
             )
             if (
-                q_for_species is Quantity.FE3_FE2_RATIO
+                q_for_species in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
                 and point_oxide_map is not None
                 and point_composition_located is None
             ):
@@ -22367,10 +22388,8 @@ class Migrator:
                     _located_printed_and_initial(
                         point_oxide_map,
                         point_locator,
-                        closure_context=raw_item,
-                        declared_component_map=_named_printed_composition_map(
-                            raw_item
-                        ),
+                        closure_context=point_composition_context,
+                        declared_component_map=point_declared_component_map,
                     )
                 )
             point_catalogue = _catalogue_composition_located_from_values(
@@ -22914,7 +22933,9 @@ class Migrator:
                 )
             else:
                 printed = _preserve_printed_composition_context(
-                    point_printed_composition, point_oxide_map, raw_item
+                    point_printed_composition,
+                    point_oxide_map,
+                    point_composition_context,
                 )
                 residual = point_composition_located
         if point_composition_role_refusal is not None:
