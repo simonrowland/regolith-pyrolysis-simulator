@@ -358,7 +358,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
     # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
     # Two in-process evaluations and the cross-process test pin determinism.
-    assert key_hash == "aa4dd3b20f35e622b503841d42cc094556dea5607ebbd4ec91f2257fda19358b"
+    # 2026-10-31 b-929: Studio-2 canonical bytes after gate replay identity
+    # began embedding the owner freeze-gate key. The key now binds the submitted
+    # post-inert composition and inert membership, plus water/formula identity.
+    assert key_hash == "4cee08747e68f2c46df68ef2fbbe4b5141cd1395c9345d8315daa83305d5a2df"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -815,13 +818,161 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
+    # Studio-2 canonical bytes at 35c987e96 after the equilibrium key was
+    # narrowed to the submitted inert-filtered composition and its formulas.
     assert _key_hash(base) == (
-        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+        "79d74e79f9f00d458f048acbcd1da25f19cad645d0d0efc8f060cba22dd9373d"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
     assert _key_hash(base) != _key_hash(thermoengine)
     assert _key_hash(base) == _key_hash(next_engine)
+
+
+def test_equilibrium_key_tracks_inert_and_refuses_cross_replay() -> None:
+    capture = PT0DeterminismStore("capture")
+    sodium_sim, result = _pt0_equilibrium_capture_context(capture)
+    sodium_sim.inventory.inert_melt_components_kg.clear()
+    sodium_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    sodium_key = capture._equilibrium_key(sodium_sim)
+    capture._store(
+        "equilibrium_post_record",
+        sodium_key,
+        rrd.equilibrium_payload(sodium_sim, result),
+        repair_notices=(),
+    )
+
+    replay = capture._clone_for_context("replay", persistent_cache=False)
+    silica_sim, _ = _pt0_equilibrium_capture_context(replay)
+    silica_sim.inventory.inert_melt_components_kg.clear()
+    silica_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    silica_key = replay._equilibrium_key(silica_sim)
+
+    assert sodium_key != silica_key
+    replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    with pytest.raises(PT0CacheMiss):
+        replay.replay_equilibrium(silica_sim)
+
+
+def test_equilibrium_key_ignores_absent_species_formula_changes() -> None:
+    from simulator.accounting.formulas import SpeciesFormula
+
+    store = PT0DeterminismStore("capture")
+    sim, _result = _pt0_equilibrium_capture_context(store)
+    cleaned_mol = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert float(cleaned_mol.get("CoO", 0.0)) <= 0.0
+    baseline_key = store._equilibrium_key(sim)
+    formula_species = {
+        species for species, _elements in baseline_key["submitted_formula_identity"]
+    }
+    assert "SiO2" in formula_species
+    assert "CoO" not in formula_species
+
+    sim.species_formula_registry = dict(sim.species_formula_registry)
+    sim.species_formula_registry["CoO"] = SpeciesFormula.from_atoms(
+        "CoO",
+        {"Co": 1, "O": 2},
+    )
+
+    assert store._equilibrium_key(sim) == baseline_key
+
+    sim.species_formula_registry["SiO2"] = SpeciesFormula.from_atoms(
+        "SiO2",
+        {"Si": 1, "O": 1},
+    )
+    assert store._equilibrium_key(sim) != baseline_key
+
+
+def test_equilibrium_key_uses_submitted_amount_when_inert_amount_changes() -> None:
+    from simulator.accounting.ledger import AtomLedger
+
+    store = PT0DeterminismStore("capture")
+    first, _first_result = _pt0_equilibrium_capture_context(store)
+    second, _second_result = _pt0_equilibrium_capture_context(store)
+    cleaned_account = "process.cleaned_melt"
+
+    for sim, na2o_mol in ((first, 1.0), (second, 2.0)):
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            cleaned_account,
+            {"SiO2": 1.0, "FeO": 2.0, "Na2O": na2o_mol},
+            source="b-929 inert amount identity",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim.inventory.inert_melt_components_kg.clear()
+        sim.inventory.inert_melt_components_kg["Na2O"] = (
+            ledger.project_account_kg(cleaned_account)["Na2O"]
+        )
+
+    first_na2o_kg = first.atom_ledger.project_account_kg(
+        cleaned_account
+    )["Na2O"]
+    second_na2o_kg = second.atom_ledger.project_account_kg(
+        cleaned_account
+    )["Na2O"]
+
+    first_mol = first.atom_ledger.project_account_mol(cleaned_account)
+    second_mol = second.atom_ledger.project_account_mol(cleaned_account)
+    first_payload = first._silicate_provider_melt_inputs(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        first_mol,
+    )
+    second_payload = second._silicate_provider_melt_inputs(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        second_mol,
+    )
+    assert first_payload == second_payload
+    assert first_na2o_kg != second_na2o_kg
+    assert store._equilibrium_key(first) == store._equilibrium_key(second)
+
+
+def test_gate_replay_key_uses_pt0_quantized_pressure_for_provider_identity() -> None:
+    def key_at(pressure_bar: float) -> dict[str, Any]:
+        store = PT0DeterminismStore("capture")
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim.melt.p_total_mbar = pressure_bar * 1000.0
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=-9.0,
+            fe_redox_policy="intrinsic",
+            control_quantization=store._control_quantization,
+        )
+
+    lower = key_at(0.014999)
+    upper = key_at(0.015001)
+
+    assert (
+        lower["controls"]["pressure_bar"]
+        == upper["controls"]["pressure_bar"]
+    )
+    assert lower["freeze_gate_cache_key"] == upper["freeze_gate_cache_key"]
+    assert lower == upper
+
+
+def test_gate_replay_key_uses_pt0_quantized_fO2_for_provider_identity() -> None:
+    def key_at(fO2_log: float) -> dict[str, Any]:
+        store = PT0DeterminismStore("capture")
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=fO2_log,
+            fe_redox_policy="intrinsic",
+            control_quantization=store._control_quantization,
+        )
+
+    lower = key_at(-9.500001)
+    upper = key_at(-9.499999)
+
+    assert lower["controls"]["log_fO2"] == upper["controls"]["log_fO2"]
+    assert lower["freeze_gate_cache_key"] == upper["freeze_gate_cache_key"]
+    assert lower == upper
 
 
 def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
@@ -945,20 +1096,19 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        (None, "aba38d237aa4c4e57ce0b1d4331e646e5f224e7baa349354b085aacff441637e"),
+        ("", "20a65e05d5acf3303c5ac794dc455d45359c34f61602ddd7e10ecb5b06b6ce76"),
+        (DEFAULT_ALPHAMELTS_MODEL, "250646f69b23a91fe5d1f0904fdeab2f206432e6f28f9472bff84ee032b54cb3"),
+        ("pMELTS", "7b50ed0b4168c94d12ca1ae38e7a64b2e049942f16757765ea359ad52106eef1"),
+        ("MELTSv1.1.0", "238d7c7582835a6d4983861344fbc8fa8cc05dbdb96c45eec242f58f5b83614d"),
+        ("MELTSv1.2.0", "70ed32461ba7e9755beb1e95a34b356837e7ae09f3090b1ca150a08f4e39b273"),
     ],
 )
-def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
     model: str | None,
     expected_hash: str,
 ) -> None:
-    # Hashes captured by the review probe at base
-    # 05b6309d30cfed84d5e2ecd0467106d5702ce628.
+    # Studio-2 canonical hashes at 35c987e96 after keying on submitted inputs.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
@@ -968,15 +1118,15 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        (None, "70082de80468f7c4239446ac453e340ccc53c58e7f06d30ed4340a97abf9dae1"),
+        ("", "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
+        (DEFAULT_ALPHAMELTS_MODEL, "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
+        ("pMELTS", "bba92d10ca74b54a58eb5457558079a5c5ce4e196bac55dbeab2937ecf2afd97"),
+        ("MELTSv1.1.0", "4a6ccd886a196e09ad376cb783b9c689d5210e5d5e797409355dccd13e8cdfb5"),
+        ("MELTSv1.2.0", "771a9c502a0e0b789ca0f2fc1ccb95015cfcf7015d972777a6469adf02a9611f"),
     ],
 )
-def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+def test_cached_real_python_api_replay_key_hashes_include_provider_input_identity(
     tmp_path: Path,
     model: str | None,
     expected_hash: str,
@@ -1003,17 +1153,25 @@ def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
     key = store._equilibrium_key(sim)
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
 
-    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 reviewer probe.
+    # Studio-2 canonical hashes at 35c987e96 after identity was narrowed to
+    # submitted provider inputs. The cached-real fixture has no PT-0 store,
+    # while the live fixture uses fine PT-0 quantization; their submitted oxide
+    # values differ by a few last-place digits, so those replay identities must
+    # differ even though their backend model fields match.
     assert actual_hash == expected_hash
     if model is None:
         live_key, _authority = _alphamelts_pt0_identity(
             model,
             mode="python_api",
         )
-        assert key == live_key
+        assert key["model"] == live_key["model"]
+        assert key["composition_mol_fraction"] != (
+            live_key["composition_mol_fraction"]
+        )
         payload = {"authority": _alphamelts_record_authority()}
         store._store("equilibrium_post_record", live_key, payload)
-        assert store._lookup("equilibrium_post_record", key) == payload
+        with pytest.raises(PT0CacheMiss):
+            store._lookup("equilibrium_post_record", key)
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
@@ -1096,8 +1254,49 @@ def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
     assert _key_hash(ig) != _key_hash(igad)
 
 
+def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+    from simulator.accounting.ledger import AtomLedger
+
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"SiO2": 1.0, "FeO": 2.0, "Na2O": 4.0},
+        source="b-929 dispatch identity pin",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger = ledger
+    sim.inventory.inert_melt_components_kg.clear()
+    sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    observed: dict[str, Any] = {}
+
+    class CapturingKernel:
+        def dispatch(self, _intent, **kwargs):
+            observed.update(kwargs)
+            return None
+
+    monkeypatch.setattr(sim, "_require_chem_kernel", lambda: CapturingKernel())
+    sim._dispatch_only(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        control_inputs={},
+        fO2_log=-9.0,
+    )
+
+    submitted_mol = observed["account_mol_overrides"]["process.cleaned_melt"]
+    # Literal values captured from the base 952e7730f dispatch path: PT-0
+    # canonicalizes the whole ledger before excluding inert Na2O.
+    assert submitted_mol == {
+        "FeO": 1.9999700000000002,
+        "SiO2": 1.00002,
+    }
+    assert "Na2O" not in submitted_mol
+
+
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
-    # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    # Studio-2 canonical bytes at 35c987e96 after gate keys began embedding the
+    # owner freeze-gate provider-input identity.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1114,9 +1313,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 1648
+    assert len(magemin_bytes) == 1319
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "13ada0c3401a52f88761e3a2b0abcd64caefc16765e943e9812398bf3fcb7d90"
+        "00f40658d0a344757029e661d4574a75c72b13521066689f205e6194a5dcea0a"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1127,6 +1326,162 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     assert len(generic_bytes) == 1687
     assert hashlib.sha256(generic_bytes).hexdigest() == (
         "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+    )
+
+
+def test_gate_replay_key_uses_freeze_gate_provider_input_identity() -> None:
+    from simulator.accounting.formulas import SpeciesFormula
+    from simulator.evaporation import _FREEZE_GATE_COMPOSITION_SPECIES
+
+    class AlphaMELTSKeyBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+        _model = "MELTSv1.0.2"
+        _mode = "subprocess"
+
+        def is_available(self):
+            return True
+
+    def build_sim():
+        sim = _build_pt0_sim(PT0DeterminismStore("capture"))
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        return sim
+
+    def gate_key(sim):
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=-9.0,
+            fe_redox_policy="intrinsic",
+        )
+
+    def legacy_identity(key):
+        return {
+            name: value
+            for name, value in key.items()
+            if name != "freeze_gate_cache_key"
+        }
+
+    inert_sim = build_sim()
+    cleaned_before = inert_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    )
+    inert_sim.inventory.inert_melt_components_kg.clear()
+    inert_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    sodium_inert_key = gate_key(inert_sim)
+    assert gate_key(inert_sim) == sodium_inert_key
+
+    inert_sim.inventory.inert_melt_components_kg.clear()
+    inert_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    silica_inert_key = gate_key(inert_sim)
+    assert inert_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    ) == cleaned_before
+    assert legacy_identity(sodium_inert_key) != legacy_identity(
+        silica_inert_key
+    )
+    assert sodium_inert_key != silica_inert_key
+    assert (
+        sodium_inert_key["freeze_gate_cache_key"]
+        != silica_inert_key["freeze_gate_cache_key"]
+    )
+    legacy_sim = build_sim()
+    legacy_sim.inventory.inert_melt_components_kg.clear()
+    legacy_key = legacy_identity(gate_key(legacy_sim))
+    legacy_store = PT0DeterminismStore("capture")
+    legacy_store._store(
+        "freeze_gate_curve",
+        legacy_key,
+        {
+            "curve": {
+                "source": "gate_liquid_fraction:legacy",
+                "status": "in_range",
+                "solidus_T_C": 1000.0,
+                "liquidus_T_C": 1200.0,
+            }
+        },
+        repair_notices=(),
+    )
+    legacy_replay = legacy_store._clone_for_context(
+        "replay",
+        persistent_cache=False,
+    )
+    legacy_replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    replay_sim = build_sim()
+    replay_sim.inventory.inert_melt_components_kg.clear()
+    replay_sim.inventory.inert_melt_components_kg["Na2O"] = 1.0
+    assert legacy_identity(gate_key(replay_sim)) != legacy_key
+    with pytest.raises(PT0CacheMiss):
+        legacy_replay.replay_gate_curve(replay_sim, fO2_log=-9.0)
+
+    current_store = PT0DeterminismStore("capture")
+    sodium_curve = {
+        "source": "gate_liquid_fraction:test-sodium-inert",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1200.0,
+    }
+    current_store._store(
+        "freeze_gate_curve",
+        sodium_inert_key,
+        {"curve": sodium_curve},
+        repair_notices=(),
+    )
+    current_replay = current_store._clone_for_context(
+        "replay",
+        persistent_cache=False,
+    )
+    current_replay._authorize_cached_real_replay = lambda *args, **kwargs: None
+    silica_replay_sim = build_sim()
+    silica_replay_sim.inventory.inert_melt_components_kg.clear()
+    silica_replay_sim.inventory.inert_melt_components_kg["SiO2"] = 1.0
+    assert legacy_identity(gate_key(silica_replay_sim)) != legacy_identity(
+        sodium_inert_key
+    )
+    with pytest.raises(PT0CacheMiss):
+        current_replay.replay_gate_curve(
+            silica_replay_sim,
+            fO2_log=-9.0,
+        )
+    assert len(current_replay.misses) == 1
+
+    water_sim = build_sim()
+    water_sim._chem_registry = None
+    water_sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    water_sim.backend = AlphaMELTSKeyBackend()
+    dry_key = gate_key(water_sim)
+    cleaned_mol = water_sim.atom_ledger.project_account_mol(
+        "process.cleaned_melt"
+    )
+    oxide_total_mol = sum(
+        float(cleaned_mol.get(species, 0.0))
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES
+    )
+    water_sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"H2O": oxide_total_mol * 0.004 / 100.0},
+        source="b-929 replay key water identity",
+        material_origin="feedstock",
+    )
+    wet_key = gate_key(water_sim)
+    assert wet_key != dry_key
+    assert wet_key["freeze_gate_cache_key"] != dry_key["freeze_gate_cache_key"]
+
+    formula_sim = build_sim()
+    formula_sim._chem_registry = None
+    formula_sim._register_freeze_gate_liquid_fraction_providers = lambda: None
+    formula_sim.backend = None
+    baseline_formula_key = gate_key(formula_sim)
+    formula_sim.species_formula_registry = dict(
+        formula_sim.species_formula_registry
+    )
+    formula_sim.species_formula_registry["SiO2"] = (
+        SpeciesFormula.from_atoms("SiO2", {"Si": 1, "O": 1})
+    )
+    changed_formula_key = gate_key(formula_sim)
+    assert changed_formula_key != baseline_formula_key
+    assert (
+        changed_formula_key["freeze_gate_cache_key"]
+        != baseline_formula_key["freeze_gate_cache_key"]
     )
 
 
