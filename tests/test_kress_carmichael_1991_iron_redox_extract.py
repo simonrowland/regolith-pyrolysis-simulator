@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity
+from simulator.battery.enums import AmountBasis, EvidenceClass, Quantity
 from simulator.battery.migrate import (
     Migrator,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -319,30 +319,44 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         )
         assert expected_ratio is not None
         assert record.value.point == expected_ratio
-    refused_compositions = [
-        record
-        for record in reduced
-        if record.identity.composition.is_unknown
-    ]
-    # b-704 retains the Fe-oxide assays as typed partial-analysis refusals.
-    # Derive each closure total from the independent render-grounded cells.
-    assert len(refused_compositions) == 13
-    for record in refused_compositions:
-        source_id = next(
-            source_id
-            for source_id in TABLE45_RENDER_FE_OXIDES
-            if source_id in record.observation_id
+    table5_redox_ids = tuple(
+        observation_id
+        for observation_id in TABLE45_RENDER_FE_OXIDES
+        if observation_id.startswith("kc91_fe3_t5_")
+    )
+    assert len(table5_redox_ids) == 13
+    for observation_id in table5_redox_ids:
+        record = next(item for item in reduced if observation_id in item.observation_id)
+        point_composition = record.point_conditions["composition"]
+        assert point_composition.state.is_value
+        partial = point_composition.state.value
+        assert partial.amount_basis is AmountBasis.MASS_PERCENT
+        assert partial.analysis_selection_rule == (
+            "partial composition, redox-ratio scope"
         )
-        fe2o3, feo = TABLE45_RENDER_FE_OXIDES[source_id]
-        total = Decimal(fe2o3) + Decimal(feo)
-        reason = record.identity.composition.reason or ""
-        assert "mass-percent composition is a partial analysis" in reason
-        assert f"kept sum={total} wt% is below 95 wt%" in reason
+        fe2o3, feo = TABLE45_RENDER_FE_OXIDES[observation_id]
+        assert partial.as_map() == {
+            "Fe2O3": Decimal(fe2o3),
+            "FeO": Decimal(feo),
+        }
+
+        # The redox scorer consumes the same full sample map it consumed on
+        # green; the row-local Fe pair is only a partial redox input.
+        source_composition = rows_by_id[observation_id]["values"][
+            "composition_wt_pct"
+        ]
+        expected_mole_fractions = wt_pct_to_mole_fraction(
+            {oxide: Decimal(amount) for oxide, amount in source_composition.items()}
+        )
+        assert record.identity.composition.is_value
+        assert record.identity.composition.value.as_map() == (
+            expected_mole_fractions.as_map()
+        )
     assert all(
         record.identity.composition.is_value or record.identity.composition.is_unknown
         for record in reduced
     )
-    assert sum(record.identity.composition.is_value for record in reduced) == 33
+    assert all(record.identity.composition.is_value for record in reduced)
     assert all(
         record.identity.total_pressure_Pa.is_value
         and record.identity.total_pressure_Pa.value == Decimal("101325")
@@ -356,16 +370,6 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         source = rows_by_id[observation_id]
         assert source["values"]["composition_wt_pct"] == expected_composition
         record = next(item for item in reduced if observation_id in item.observation_id)
-        if observation_id == "kc91_fe3_t5_B27":
-            # This ratio row only carries Fe2O3 + FeO (12.96 wt%) as its
-            # composition identity. The separate table-5 sample assay remains
-            # pinned above, while b-704 refuses this partial ratio-row map.
-            assert record.identity.composition.is_unknown
-            assert (
-                "mass-percent composition is a partial analysis: kept sum=12.96 wt%"
-                in record.identity.composition.reason
-            )
-            continue
         expected_mole_fractions = wt_pct_to_mole_fraction(
             {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
         )
