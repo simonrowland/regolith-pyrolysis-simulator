@@ -407,12 +407,7 @@ def _run_eval_batch(
                 # the parent is being rescheduled; its own elapsed time decides
                 # whether that completion met the per-evaluation limit.
                 timed_out = drain_result_queue() or timed_out
-                now = time.monotonic()
-                expired = [
-                    key
-                    for key, start in started.items()
-                    if key in pending and now - start >= timeout_s
-                ]
+                expired = [key for key in expired if key in pending]
             if timed_out or expired:
                 for key in expired:
                     task = pending.pop(key)
