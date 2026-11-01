@@ -11874,6 +11874,32 @@ def compile_residual(
                         "source_oxygen_fallback": oxygen.reason.value,
                     },
                 )
+        incomplete_composition = (source_reference.provenance or {}).get(
+            "incomplete_composition"
+        )
+        if (
+            isinstance(incomplete_composition, Mapping)
+            and incomplete_composition.get("engine_input") == "wrong"
+        ):
+            detail: dict[str, object] = {
+                "reason": "missing_input",
+                "input": "composition",
+                "omitted_oxides": incomplete_composition.get("omitted_oxides", ()),
+                "omitted_oxide_wt_pct_by_sample": incomplete_composition.get(
+                    "omitted_oxide_wt_pct_by_sample", {}
+                ),
+            }
+            source_oxygen_condition = (reference.provenance or {}).get(
+                "source_oxygen_condition"
+            )
+            if source_oxygen_condition is not None:
+                detail["source_oxygen_condition"] = source_oxygen_condition
+            return _refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                detail,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                exclusions=("engine_composition_complete",),
+            )
         predictor_kwargs: dict[str, object] = {
             "handles": handles,
             "experiment": experiment,

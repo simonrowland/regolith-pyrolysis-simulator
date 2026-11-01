@@ -767,12 +767,18 @@ species:
         values:
           quantity: partial_pressure
           gas_species: O(g)
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: measured_reduced
+          evidence_class: measured_reduced
           admission_status: admitted
-          attribution: Experimental values cited to Shornikov [15].
-          source_note: "The text on pp. 726–728 does not name an oxide equilibrium for the Mo cell; this attributed reducing value remains untyped for source-oxygen selection."
-          method: Knudsen-cell mass spectrometry, as stated for Table 2.
+          attribution: Measured experimental values cited to Shornikov [15].
+          method: Measured atomic oxygen pressure by Knudsen-cell mass spectrometry in the Mo cell.
+          provenance: &shornikov_t2_composition_provenance
+            incomplete_composition:
+              omitted_oxide_wt_pct_by_sample: {"1": "14.5", "2": "29.85"}
+              omitted_oxides: [K2O, Na2O, TiO2, Cr2O3, P4O10]
+              engine_input: wrong
+            source_disagreement:
+              implied_gamma_FeO_by_sample: {"1": "0.35", "2": "0.027"}
           points:
             - sample_number: 1
               pressure_atm: 6.95e-9
@@ -797,6 +803,7 @@ species:
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: O(g)
           method_class: model_derived
@@ -834,6 +841,7 @@ species:
         uncertainty:
           note: No numerical uncertainty is stated for Table 2.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Ca(g)
           method_class: measured_tabulated
@@ -865,6 +873,7 @@ species:
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Ca(g)
           method_class: model_derived
@@ -903,6 +912,7 @@ species:
         uncertainty:
           note: No numerical uncertainty is stated for Table 2.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Mg(g)
           method_class: measured_tabulated
@@ -934,6 +944,7 @@ species:
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Mg(g)
           method_class: model_derived
@@ -972,6 +983,7 @@ species:
         uncertainty:
           note: No numerical uncertainty is stated for Table 2.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Fe(g)
           method_class: measured_tabulated
@@ -1003,6 +1015,7 @@ species:
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Fe(g)
           method_class: model_derived
@@ -1041,6 +1054,7 @@ species:
         uncertainty:
           note: No numerical uncertainty is stated for Table 2.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Al(g)
           method_class: measured_tabulated
@@ -1069,10 +1083,10 @@ species:
         experiment: table2_melt_series
         regime: knudsen_effusion
         units: atm as printed
-        reason: "source_internally_inconsistent: Table 2 prints Al reducing-to-neutral ratios of 717 and 517, while the discussion says both samples' partial-pressure ratios differ by no more than 20%."
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: Al(g)
           method_class: model_derived
@@ -1111,6 +1125,7 @@ species:
         uncertainty:
           note: No numerical uncertainty is stated for Table 2.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: SiO(g)
           method_class: measured_tabulated
@@ -1142,6 +1157,7 @@ species:
         uncertainty:
           note: Model-derived neutral-condition values; no numerical uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: partial_pressure
           gas_species: SiO(g)
           method_class: model_derived
@@ -1202,6 +1218,7 @@ species:
         uncertainty:
           note: No numerical activity uncertainty is stated.
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: activity
           method_class: measured_reduced
           admission_status: admitted
@@ -1243,6 +1260,7 @@ species:
         units: dimensionless activity as printed
         uncertainty: {note: No numerical activity uncertainty is stated.}
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: activity
           method_class: measured_reduced
           admission_status: admitted
@@ -1276,6 +1294,7 @@ species:
         units: dimensionless activity as printed
         uncertainty: {note: No numerical activity uncertainty is stated.}
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: activity
           method_class: measured_reduced
           admission_status: admitted
@@ -1309,6 +1328,7 @@ species:
         units: dimensionless activity as printed
         uncertainty: {note: No numerical activity uncertainty is stated.}
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: activity
           method_class: measured_reduced
           admission_status: admitted
@@ -1342,6 +1362,7 @@ species:
         units: dimensionless activity as printed
         uncertainty: {note: No numerical activity uncertainty is stated.}
         values:
+          provenance: *shornikov_t2_composition_provenance
           quantity: activity
           method_class: measured_reduced
           admission_status: admitted

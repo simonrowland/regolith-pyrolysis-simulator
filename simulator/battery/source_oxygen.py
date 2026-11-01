@@ -18,6 +18,7 @@ from simulator.physical_constants import GAS_CONSTANT
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
 CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
+MEASURED_ATOMIC_OXYGEN_MO_METHOD = "fO2 from measured p(O), Mo effusion cell"
 
 
 def oxygen_pressure_point(row: Observation) -> Located | None:
@@ -259,9 +260,15 @@ def _janaf_atomic_oxygen(temperature_K: Decimal) -> tuple[Decimal, float, Locato
 
 
 def _po2_pa_from_atomic_oxygen(pressure_pa: Decimal, constant: float) -> Decimal:
-    # Premise: JANAF O-001 is 1/2 O2 = O, o=K_O(T)*sqrt(q),
-    # with o=pO/(1 bar), q=pO2/(1 bar), so q=(o/K_O)^2.
-    # Source atm -> Pa -> bar BEFORE squaring; 1 atm=1.01325 bar.
+    # JANAF O-001 gives 1/2 O2 = O and K_O=exp(-ΔfG/(RT)). For the
+    # requested O2 ⇌ 2O equilibrium, dimensionless Kp(T) =
+    # (pO/1 bar)^2/(pO2/1 bar) = K_O(T)^2. Thus pO2=(pO/1 bar)^2/Kp
+    # times 1 bar. pressure_pa is pO in Pa; 1 bar=100000 Pa, and the
+    # source's atm values are converted with 1 atm=101325 Pa before use.
+    # At 2000 K the repo's JANAF O-001 gives ΔfG=121.552 kJ/mol,
+    # K_O=6.690360251e-4 and Kp=4.476092029e-7. Sample 1's measured
+    # pO=6.95e-9 atm=7.0420875e-4 Pa gives pO2=1.107908328e-5 Pa;
+    # at this low pressure fO2 is taken as pO2. Existing 1933 K pins:
     # At 1933 K JANAF G=126.02894 kJ/mol, K_O=3.930428016e-4:
     # W pO=6.8e-10 atm gives q=3.073062243e-12 bar. Shornikov's
     # 2.65e-9 atm O gives 4.667080363e-11 bar, agreeing within 0.36%
@@ -595,6 +602,7 @@ def resolve_source_oxygen(
     else:
         source, used = candidates[0]
     assumption = "" if measured else "; cell-metal activity as assumed by the source"
+    source_oxygen_method = None
     # A printed O2 reduction downstream of the selected atomic-O observation
     # is the same condition, not a second independent oxygen estimate.
     if not measured:
@@ -645,6 +653,9 @@ def resolve_source_oxygen(
             )
         )
         arithmetic = "pO2_Pa=100000*(pO_Pa/100000/K_O)^2; JANAF O-001"
+        if measured and metal == "Mo":
+            source_oxygen_method = MEASURED_ATOMIC_OXYGEN_MO_METHOD
+            arithmetic += f"; {source_oxygen_method}"
     else:
         pressure = source.value.point
         arithmetic = "printed pO2 in Pa (recorded source-unit conversion)"
@@ -654,6 +665,9 @@ def resolve_source_oxygen(
         relation=SOURCE_OXYGEN_RELATION + arithmetic + assumption,
         inputs=tuple(sorted(used)), parameters=tuple(params), output_unit="Pa",
     )
+    provenance = dict(source.provenance or {})
+    if source_oxygen_method is not None:
+        provenance["source_oxygen_method"] = source_oxygen_method
     condition = replace(
         source,
         observation_id=f"derived:source-oxygen:{source.observation_id}",
@@ -667,6 +681,7 @@ def resolve_source_oxygen(
             source.evidence, class_=State.of(EvidenceClass.MODEL_DERIVED),
             model="source oxygen conditioning reduction (d-216)",
         ),
+        provenance=provenance or None,
         notices=(*source.notices, consistency) if consistency is not None else source.notices,
         derived_from=tuple(sorted(used)), derivation=derivation,
     )

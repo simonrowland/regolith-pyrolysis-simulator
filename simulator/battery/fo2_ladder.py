@@ -361,14 +361,23 @@ def _is_tier1(route: Waypoint, observation: Observation | None) -> bool:
     if route.route == "observation_fO2_log":
         return route.authority is WaypointAuthority.PRINTED
     if route.route == "observation_fO2_Pa_to_log_fO2":
-        if observation is None or derived_fo2_condition(observation):
+        if observation is None:
             return False
         from simulator.battery.source_oxygen import (
+            MEASURED_ATOMIC_OXYGEN_MO_METHOD,
             oxygen_pressure_point,
             pressure_has_only_unit_conversion,
         )
 
         point = oxygen_pressure_point(observation)
+        if (
+            point is not None
+            and point.inference is not None
+            and MEASURED_ATOMIC_OXYGEN_MO_METHOD in point.inference.relation
+        ):
+            return True
+        if derived_fo2_condition(observation):
+            return False
         return point is not None and pressure_has_only_unit_conversion(point)
     return route.route in _TIER1_DIRECT_ROUTES
 

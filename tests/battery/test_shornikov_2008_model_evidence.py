@@ -162,6 +162,9 @@ def test_measured_atomic_oxygen_maps_the_mo_cell_fo2(
         "fO2 from measured p(O), Mo effusion cell"
         in selected.observation.derivation.relation
     )
+    assert selected.observation.provenance["source_oxygen_method"] == (
+        "fO2 from measured p(O), Mo effusion cell"
+    )
 
     mapped = replace(
         target,
@@ -228,5 +231,6 @@ def test_incomplete_sample_oxide_input_is_labeled_and_refused(
     )
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert residual.refusal.detail["reason"] == "composition_incomplete"
+    assert residual.refusal.detail["reason"] == "missing_input"
+    assert residual.refusal.detail["input"] == "composition"
     assert "source_oxygen_condition" in residual.refusal.detail
