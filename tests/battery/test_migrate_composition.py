@@ -2772,6 +2772,7 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
         ("decimal string", "5.00", Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
         ("decimal object", Decimal("5.00"), Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
         ("integer", 5, Decimal("5"), Decimal("5"), Decimal("5")),
+        ("float", 5.0, Decimal("5.0"), Decimal("5.0"), Decimal("5.0")),
         ("exponent", "5e0", Decimal("5"), Decimal("5"), Decimal("5")),
         ("unicode uncertainty", "5.00 ± 0.1", None, Decimal("5.00"), None),
         ("ascii uncertainty", "5.00+/-0.1", None, Decimal("5.00"), None),
@@ -2800,6 +2801,13 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
         ("sigma marker", "5.00 (σ)", None, None, None),
         ("range", "5.00–6.00", None, None, None),
         ("bound", ">5.00", None, None, None),
+        (
+            "structured bound",
+            {"kind": "bound", "bound_operator": ">", "bound_value": "5.00"},
+            None,
+            None,
+            None,
+        ),
         ("structured range", {"range": ["5.00", "6.00"]}, None, None, None),
     )
 
