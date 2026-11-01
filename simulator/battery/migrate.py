@@ -20338,6 +20338,38 @@ class Migrator:
                     origin=obs_id,
                 )
             )
+            initial = (
+                experiment.sample.initial_composition
+                if experiment is not None
+                else None
+            )
+            starting_printed = (
+                experiment.sample.printed_composition
+                if experiment is not None
+                else None
+            )
+            if (
+                projection_notice is None
+                and initial is not None
+                and initial.state.is_value
+                and ident_kwargs.get("composition") == initial.state
+                and starting_printed is not None
+                and starting_printed.state.is_value
+                and isinstance(starting_printed.state.value, Mapping)
+            ):
+                starting_map = starting_printed.state.value
+                projection_notice = _composition_projection_notice(
+                    starting_map,
+                    closure_context={"printed_composition": starting_map},
+                    quantity=q_token
+                    if isinstance(q_token, Quantity)
+                    else None,
+                    origin=obs_id,
+                    declared_component_map=starting_map,
+                )
+                projection_notices = (
+                    () if projection_notice is None else (projection_notice,)
+                )
             if _is_printed_phase_mass_stamp(
                 ident_kwargs.get("composition")
             ):

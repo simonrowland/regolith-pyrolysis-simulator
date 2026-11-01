@@ -2191,6 +2191,14 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
     assert composition is not None
     assert (composition.is_value) is accepted
     if accepted:
+        projection_notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(projection_notices) == 1
+        assert projection_notices[0].dropped == ("XxO",)
+        assert "XxO=0.3 wt%" in projection_notices[0].reason
         assert initial.inference is not None
         assert any("XxO" in item for item in initial.inference.inputs)
         assert composition == initial.state
