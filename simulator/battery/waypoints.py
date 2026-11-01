@@ -850,6 +850,7 @@ def normalized_composition(
     printed_species: set[str] | None = None
     printed_path = None
     printed_basis_exempt: set[str] = set()
+    rejected_printed_mass_locator: Locator | None = None
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
@@ -878,6 +879,21 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        if (
+            field == "initial_composition"
+            and isinstance(raw, Composition)
+            and located.inference is not None
+            and located.inference.relation == "wt_pct_to_mole_fraction"
+            and rejected_printed_mass_locator is not None
+            and located.locator is not None
+            and replace(located.locator, note=None)
+            == replace(rejected_printed_mass_locator, note=None)
+        ):
+            # The matching source locator and wt% derivation tie this route to
+            # the printed table entry whose mass analysis failed closure.
+            unsupported = True
+            missing.append(path)
+            continue
         if field == "initial_composition" and not isinstance(raw, Composition):
             unsupported = True
             missing.append(path)
@@ -953,19 +969,8 @@ def normalized_composition(
                         declared_component_map=mass_percent_map,
                     )
                     if closure_refusal is not None:
-                        # A rejected printed mass analysis cannot fall through
-                        # to a lower-ranked composition route and bypass its
-                        # closure refusal.
-                        return WaypointResult(
-                            "normalized_composition",
-                            None,
-                            (),
-                            WaypointAbsence(
-                                "normalized_composition",
-                                GapReason.UNSUPPORTED_PRINT_FORM,
-                                (path,),
-                            ),
-                        )
+                        rejected_printed_mass_locator = located.locator
+                        raw = None
                 if raw is not None:
                     try:
                         engine_oxides = _engine_printed_oxides(raw)

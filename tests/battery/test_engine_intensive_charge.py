@@ -103,7 +103,8 @@ def test_printed_wt_percent_outside_closure_refuses_even_with_derived_initial_co
     waypoint = invalid_inputs.waypoints["normalized_composition"]
     assert waypoint.selected is None
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert waypoint.absence.missing == ("experiment.sample.printed_composition",)
+    assert "experiment.sample.printed_composition" in waypoint.absence.missing
+    assert "experiment.sample.initial_composition" in waypoint.absence.missing
     invalid_requests = engine_point_requests(invalid_inputs)
     assert invalid_requests
     assert all(request.payload is None for request in invalid_requests)
@@ -138,6 +139,30 @@ def test_mass_inventory_scale_preserves_engine_composition():
         })
     assert compositions[0] == compositions[1]
     assert charges[1] == {species: amount * 10 for species, amount in charges[0].items()}
+
+
+def test_rejected_print_does_not_veto_independent_initial_mole_fraction():
+    experiment, bench, observation = case()
+    experiment = replace(experiment, sample=Sample(
+        mass_kg=Located(State.unknown("would_invent")),
+        printed_composition=f.located({"MgO": D("500"), "SiO2": D("500")}),
+        initial_composition=f.located(Composition(
+            "measured", (("MgO", D("0.25")), ("SiO2", D("0.75"))),
+            AmountBasis.MOLE_FRACTION,
+        )),
+    ))
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    selected = inputs.waypoints["normalized_composition"].selected
+    assert selected is not None
+    assert selected.route == "normalized_initial_composition"
+    assert selected.value == {"MgO": D("0.25"), "SiO2": D("0.75")}
+    requests = engine_point_requests(inputs)
+    assert all(request.payload is not None for request in requests)
+    assert all(
+        request.payload["composition_mol"] == {"MgO": 0.25, "SiO2": 0.75}
+        for request in requests
+    )
 
 
 def test_printed_inventory_precedes_wt_derivation():
