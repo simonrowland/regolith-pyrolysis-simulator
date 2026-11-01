@@ -2010,7 +2010,7 @@ def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() ->
     serialized = {"tag": "value", "value": composition}
 
     located = migrate_module._composition_located_from_plain(serialized)
-    printed = migrate_module._mass_percent_printed_from_plain(serialized)
+    printed = migrate_module._mass_percent_printed_from_plain(composition)
     identity = migrate_module._identity_from_plain(
         {
             "quantity": {"tag": "value", "value": "activity"},
@@ -2786,7 +2786,13 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
             None,
             Decimal("5.00"),
         ),
-        ("bare value wrapper", {"value": "5.00"}, None, None, None),
+        (
+            "bare value wrapper",
+            {"value": "5.00"},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
         ("sigma uncertainty", "5.00 (1σ)", None, None, None),
         ("range", "5.00–6.00", None, None, None),
         ("bound", ">5.00", None, None, None),
