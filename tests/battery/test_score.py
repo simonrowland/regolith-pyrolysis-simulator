@@ -8881,6 +8881,83 @@ def _score_sample_phase_vapour(reference, experiment, engine):
     return residual, calls
 
 
+_LIQUID_MODEL_SUBSOLIDUS_SAMPLE = "liquid_model_vs_subsolidus_sample"
+_COSTA_FO93FA7_SAMPLE = (
+    "Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately stated)"
+)
+
+
+def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
+    """A classified solid sample keeps its existing liquid-engine score."""
+
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            form=None,
+            characterization=F.located(_COSTA_FO93FA7_SAMPLE),
+        ),
+    )
+    baseline_experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, characterization=None),
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+    baseline, baseline_calls = _score_sample_phase_vapour(
+        reference, baseline_experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == baseline_calls == [reference.observation_id]
+    assert residual.numeric is not None
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+    assert residual.status is baseline.status
+    assert residual.score_eligible is baseline.score_eligible
+    assert score_mod.flagged_strata(residual.notices) == score_mod.flagged_strata(
+        baseline.notices
+    )
+    assert score_mod._headline_payload_admits(
+        residual_to_plain(residual), tier="measured"
+    ) == score_mod._headline_payload_admits(
+        residual_to_plain(baseline), tier="measured"
+    )
+
+
+def test_liquid_sample_vapour_has_no_subsolidus_domain_notice() -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_liquid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+def test_unknown_sample_phase_vapour_has_no_subsolidus_domain_notice() -> None:
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
 def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> None:
     """Vapour over a typed crystal does not test a liquid-engine score."""
 
