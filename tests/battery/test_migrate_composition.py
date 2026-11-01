@@ -5942,3 +5942,54 @@ def test_nasa_bulk_oxide_row_keeps_its_closure_refusal() -> None:
     composition = observation.identity.composition
     assert composition is not None and composition.is_unknown
     assert "kept sum=92.7 wt% is below 95 wt%" in composition.reason
+
+
+def test_richter_starting_bulk_map_is_identity_for_evaporation_rows() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith("::richter_2007_mg_rate_series_geometry")
+    )
+
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value == wt_pct_to_mole_fraction(
+        {
+            "MgO": Decimal("11.48"),
+            "SiO2": Decimal("46.0"),
+            "Al2O3": Decimal("19.39"),
+            "CaO": Decimal("23.12"),
+        }
+    )
+
+
+def test_hashimoto_starting_average_columns_form_identity_composition() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::hashimoto_1983_table1_starting_composition"
+        )
+    )
+
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("35.43"),
+            "Al2O3": Decimal("3.16"),
+            "FeO": Decimal("35.04"),
+            "MgO": Decimal("23.84"),
+            "CaO": Decimal("2.53"),
+        }
+    )
