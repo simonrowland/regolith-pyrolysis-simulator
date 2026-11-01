@@ -22539,6 +22539,8 @@ class Migrator:
             q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
             and bool(point_declared_component_map)
         )
+        printed: Located[Mapping[str, Any]] | None = None
+        residual: Located[Composition] | None = None
         if has_residue_composition_cells:
             printed, residual = _located_printed_and_initial(
                 point_oxide_map or {},
