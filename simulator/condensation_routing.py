@@ -34,6 +34,47 @@ COLLECTOR_STAGE_KEY_BY_NUMBER: dict[int, str] = {
     7: 'stage_7_accumulator',
 }
 
+
+def stage_key_for_stage(
+    stage: object,
+    *,
+    fallback_stage_number: int | None = None,
+    falsey_sub_order_is_zero: bool = False,
+    include_collector_fallback: bool = False,
+) -> str:
+    """Resolve a stage key from its explicit key, then its identity tuple.
+
+    Callers select their own missing-number and unknown-collector behavior:
+    report projections leave unknown identities unrouted, while the runner
+    assigns them a collector-number key or ``stage_N``.
+    """
+
+    try:
+        stage_number = int(getattr(stage, 'stage_number'))
+    except AttributeError:
+        if fallback_stage_number is None:
+            raise
+        stage_number = int(fallback_stage_number)
+
+    sub_order = getattr(stage, 'sub_order', 0)
+    if falsey_sub_order_is_zero:
+        sub_order = sub_order or 0
+    identity_key = STAGE_KEY_BY_IDENTITY.get(
+        (stage_number, int(sub_order))
+    )
+
+    explicit_key = getattr(stage, 'stage_key', '') or ''
+    if explicit_key:
+        return str(explicit_key)
+    if identity_key:
+        return identity_key
+    if include_collector_fallback:
+        return COLLECTOR_STAGE_KEY_BY_NUMBER.get(
+            stage_number, f'stage_{stage_number}'
+        )
+    return ''
+
+
 STAGE_NUMBER_BY_KEY: dict[str, int] = {
     key: number for number, key in STAGE_KEY_BY_NUMBER.items()
 }

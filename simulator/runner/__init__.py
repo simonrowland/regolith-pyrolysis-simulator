@@ -71,7 +71,7 @@ from simulator.condensation_routing import (
     COLLECTOR_STAGE_KEY_BY_NUMBER,
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
-    STAGE_KEY_BY_IDENTITY,
+    stage_key_for_stage,
 )
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
@@ -3535,17 +3535,11 @@ def _industrial_sio_verdict(yield_pct: float) -> str:
 def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
     by_stage_key: dict[str, float] = {}
     for stage in sim.train.stages:
-        stage_number = int(stage.stage_number)
-        stage_identity = (
-            stage_number,
-            int(getattr(stage, "sub_order", 0) or 0),
-        )
-        stage_key = (
-            getattr(stage, "stage_key", "")
-            or STAGE_KEY_BY_IDENTITY.get(stage_identity)
-            or COLLECTOR_STAGE_KEY_BY_NUMBER.get(
-                stage_number, f"stage_{stage_number}"
-            )
+        stage_key = stage_key_for_stage(
+            stage,
+            fallback_stage_number=None,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=True,
         )
         by_stage_key[stage_key] = (
             by_stage_key.get(stage_key, 0.0)
