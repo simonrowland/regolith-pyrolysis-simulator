@@ -97,7 +97,7 @@ def test_table3_ce_log_ratio_rows_match_render_and_migrate_with_conditions():
         converted = battery_migrate._wt_percent_conversion_state(
             printed,
             closure_context=source_row,
-            declared_component_map=source_row["values"]["composition_wt_pct"],
+            declared_component_map=source_row["composition_wt_pct"],
         )
         assert converted.is_value
         expected = converted.value

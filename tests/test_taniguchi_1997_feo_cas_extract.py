@@ -200,8 +200,8 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         for observation in observations
         if observation.identity.composition.is_unknown
     ]
-    # b-704 refuses the 110 partial/non-oxide Fe assays; only 31 complete
-    # mass-percent oxide compositions remain usable for identity.
+    # b-704 refuses the partial/non-oxide assays and any composition above
+    # the allowed kept-sum window; only 31 complete maps remain usable.
     assert len(accepted_compositions) == 31
     assert len(refused_compositions) == 110
     assert all(
@@ -209,6 +209,7 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         and (
             "kept sum=0 wt% is below 95 wt%" in item.identity.composition.reason
             or "unsupported component(s) above 0.5 wt%" in item.identity.composition.reason
+            or "mass-percent composition exceeds the accepted kept-sum limit" in item.identity.composition.reason
         )
         for item in refused_compositions
     )
@@ -219,6 +220,10 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             ("Fe" if name == "T.Fe" else name): Decimal(amount)
             for name, amount in printed_map.items()
         }
+        # b-704 projects only the printed metallic-iron trace at or below the
+        # 0.5 wt% dropped-component threshold from an otherwise closed assay.
+        if expected.get("Fe", Decimal("0")) <= Decimal("0.5"):
+            expected.pop("Fe", None)
         if observation.identity.composition.is_value:
             assert observation.identity.composition.value.amount_basis.value == "mass_percent"
             assert observation.identity.composition.value.as_map() == expected

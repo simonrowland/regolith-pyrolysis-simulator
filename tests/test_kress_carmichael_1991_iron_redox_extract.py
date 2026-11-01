@@ -324,17 +324,20 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         for record in reduced
         if record.identity.composition.is_unknown
     ]
-    # b-704 retains the Fe-oxide assays, but their 12.84 or 12.96 wt% totals
-    # are partial analyses below the 95 wt% minimum closure window.
+    # b-704 retains the Fe-oxide assays as typed partial-analysis refusals.
+    # Derive each closure total from the independent render-grounded cells.
     assert len(refused_compositions) == 13
-    assert all(
-        "mass-percent composition is a partial analysis" in record.identity.composition.reason
-        and any(
-            f"kept sum={total} wt% is below 95 wt%" in record.identity.composition.reason
-            for total in ("12.84", "12.96")
+    for record in refused_compositions:
+        source_id = next(
+            source_id
+            for source_id in TABLE45_RENDER_FE_OXIDES
+            if source_id in record.observation_id
         )
-        for record in refused_compositions
-    )
+        fe2o3, feo = TABLE45_RENDER_FE_OXIDES[source_id]
+        total = Decimal(fe2o3) + Decimal(feo)
+        reason = record.identity.composition.reason or ""
+        assert "mass-percent composition is a partial analysis" in reason
+        assert f"kept sum={total} wt% is below 95 wt%" in reason
     assert all(
         record.identity.composition.is_value or record.identity.composition.is_unknown
         for record in reduced
@@ -353,6 +356,16 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         source = rows_by_id[observation_id]
         assert source["values"]["composition_wt_pct"] == expected_composition
         record = next(item for item in reduced if observation_id in item.observation_id)
+        if observation_id == "kc91_fe3_t5_B27":
+            # This ratio row only carries Fe2O3 + FeO (12.96 wt%) as its
+            # composition identity. The separate table-5 sample assay remains
+            # pinned above, while b-704 refuses this partial ratio-row map.
+            assert record.identity.composition.is_unknown
+            assert (
+                "mass-percent composition is a partial analysis: kept sum=12.96 wt%"
+                in record.identity.composition.reason
+            )
+            continue
         expected_mole_fractions = wt_pct_to_mole_fraction(
             {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
         )
