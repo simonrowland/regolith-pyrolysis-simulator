@@ -18903,14 +18903,19 @@ class Migrator:
             if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             else values.get("subtype"),
         )
+        declared_printed_map = _named_printed_composition_map(values)
+        composition_role, composition_role_error = _declared_composition_role(values)
         if (
             not composition_axis_required
-            and q_token is None
-            and values.get("quantity") == "chemical_composition"
-            and _named_printed_composition_map(values) is not None
+            and declared_printed_map is not None
+            and (
+                q_token is None
+                or q_token in _BULK_PROPERTY_QUANTITIES
+                or composition_role == "datum_state"
+            )
         ):
-            # This explicit source quantity is outside the closed v2 enum, but
-            # its named oxide map still declares the composition identity axis.
+            # A named map carries composition identity even when its quantity
+            # is outside the enum; bulk properties and datum_state use it too.
             composition_axis_required = True
         row_oxide_map = (
             _oxide_map_from_mapping(values, closure_context=values)
@@ -19241,7 +19246,6 @@ class Migrator:
             () if projection_notice is None else (projection_notice,)
         )
         composition_role_refusal: list[str] = []
-        composition_role, composition_role_error = _declared_composition_role(values)
         if (
             composition_role is None
             and composition_role_error is None
@@ -19286,10 +19290,8 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        catalogue_composition = (
-            _catalogue_composition_located_from_values(values, locator)
-            if composition_axis_required
-            else None
+        catalogue_composition = _catalogue_composition_located_from_values(
+            values, locator
         )
         malformed_composition_amount: str | None = None
         if composition_axis_required:
@@ -20334,33 +20336,44 @@ class Migrator:
             # A refused composition_role stays queued and untyped (b716).
             # A row with no role still derives, which is the Basu recovery.
             derived = None
-            declared_order = False
-            if "composition" not in (point_conditions or {}) and not composition_role_refusal:
-                derived = row_sample.initial_composition
-                if derived is None:
-                    printed = row_sample.printed_composition
-                    # The printed fingerprint sorts keys so two maps compare
-                    # equal. Mole conversion adds in that order, and the last
-                    # digit follows it. A declared derivation names this wt%
-                    # map, so convert that map in printed order and record
-                    # composition before printed_composition, which is the
-                    # typed-path order. A row with no derivation keeps the
-                    # fingerprint order.
-                    wt_for_conversion = printed.state.value
-                    declared_note = (
-                        values.get("composition_derivation")
-                        if isinstance(values, Mapping)
-                        else None
+            source_order_selected = False
+            printed = row_sample.printed_composition
+            if (
+                isinstance(printed, Located)
+                and printed.state.is_value
+                and not composition_role_refusal
+                and "composition" not in (point_conditions or {})
+            ):
+                source_order_map = initial_oxide_map
+                if source_order_map is None and composition_role == "datum_state":
+                    source_order_map = _initial_oxide_map_from_values(
+                        values,
+                        declared_map=True,
+                        closure_context=values,
                     )
-                    if (
-                        isinstance(declared_note, str)
-                        and declared_note.strip()
-                        and initial_oxide_map
-                        and _printed_fingerprint(initial_oxide_map)
-                        == _printed_fingerprint(wt_for_conversion)
-                    ):
-                        wt_for_conversion = initial_oxide_map
-                        declared_order = True
+                if (
+                    source_order_map
+                    and _oxide_mass_percent_components(source_order_map)
+                    == _oxide_mass_percent_components(printed.state.value)
+                ):
+                    _printed, source_ordered = _located_printed_and_initial(
+                        source_order_map,
+                        printed.locator or locator,
+                        closure_context=values,
+                        declared_component_map=_named_printed_composition_map(
+                            values
+                        ),
+                    )
+                    if source_ordered is not None and source_ordered.state.is_value:
+                        derived = source_ordered
+                        source_order_selected = True
+            if "composition" not in (point_conditions or {}) and not composition_role_refusal:
+                if derived is None:
+                    derived = row_sample.initial_composition
+                if derived is None:
+                    # When no matching source-ordered map is available, retain
+                    # the stable order of the printed fingerprint.
+                    wt_for_conversion = printed.state.value
                     _printed, derived = _located_printed_and_initial(
                         wt_for_conversion,
                         printed.locator or locator,
@@ -20369,7 +20382,7 @@ class Migrator:
                             values
                         ),
                     )
-            if declared_order and derived is not None:
+            if source_order_selected and derived is not None:
                 point_conditions = {
                     **(point_conditions or {}),
                     "composition": derived,
@@ -20413,11 +20426,14 @@ class Migrator:
                 "printed_composition": row_printed_composition,
             }
             if (
-                not declared_order
+                not source_order_selected
                 and derived is not None
                 and "composition" not in point_conditions
             ):
-                point_conditions["composition"] = derived
+                point_conditions = {
+                    "composition": derived,
+                    **point_conditions,
+                }
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and (
@@ -22243,12 +22259,8 @@ class Migrator:
                         ),
                     )
                 )
-            point_catalogue = (
-                _catalogue_composition_located_from_values(
-                    raw_item, point_locator
-                )
-                if point_composition_axis_required
-                else None
+            point_catalogue = _catalogue_composition_located_from_values(
+                raw_item, point_locator
             )
             if point_catalogue is not None:
                 point_oxide_map = None
