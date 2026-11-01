@@ -18935,9 +18935,12 @@ class Migrator:
         )
         declared_printed_map = _named_printed_composition_map(values)
         composition_role, composition_role_error = _declared_composition_role(values)
-        declares_composition_datum = _has_explicit_composition_field(values) or any(
-            isinstance(token, str) and "composition" in token.casefold()
-            for token in (obs_type, values.get("quantity"))
+        declares_composition_datum = _has_explicit_composition_field(values) or (
+            q_token is None
+            and any(
+                isinstance(token, str) and "composition" in token.casefold()
+                for token in (obs_type, values.get("quantity"))
+            )
         )
         if (
             not composition_axis_required
@@ -18952,10 +18955,9 @@ class Migrator:
                 )
             )
         ):
-            # Declared composition types/quantities and mole-composition fields
-            # establish a composition axis even when the data is row-local or
-            # stored in starting-material columns. A generic assay map alone
-            # does not make an unknown quantity's identity a composition.
+            # A recognized identity profile remains authoritative. Explicit
+            # composition fields, or unresolved composition labels, can supply
+            # an axis when no profile already decides it.
             composition_axis_required = True
         row_oxide_map = (
             _oxide_map_from_mapping(values, closure_context=values)
