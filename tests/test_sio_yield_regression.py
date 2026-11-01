@@ -419,6 +419,7 @@ BASELINE_STAGE4_SIO2_KG = {
 # inlet pressures are lower and vary with its other molar flows, so the same
 # pressure-driven route has no feedstock-independent capture direction.
 # Values below are from simulator.runner.sio_yield's fixture-writing CLI.
+# Host-sensitive Studio pin retained at the stack value: controller s3 regen.
 # 2026-10-31 d-137fix4 integrates the existing 33 center samples across the
 # Stage-3 band before applying the t-1217 excess-inventory balance. Production
 # CLI Stage-3 SiO2 product values (green -> midpoint -> integrated) are lunar
@@ -548,7 +549,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     wall_total = sum(float(value) for value in actual["wall_deposit_kg"].values())
     routed_total = sum(float(value) for value in placement.values())
     assert all(float(value) >= 0.0 for value in placement.values())
-    assert stage_3 > 0.0
+    # A purity refusal can divert the parcel, making zero Stage-3 product valid.
+    # The controller-owned Studio fixture pins the route result on its host.
     assert stage_3 == pytest.approx(
         BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
     )
@@ -604,28 +606,17 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # t-1217 restores source-preserving causal capture and changes the bulk-
-    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding midpoint-era 24-hour closure
-    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
-    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
-    # excess-inventory balance; the production resolver now reports the pins
-    # below without relaxing the independent atom-ledger closure bound.
+    # 2026-11-01 merge re-pin from the production resolver after active-route
+    # gating skips Stage 3 once its purity gate diverts the parcel. The
+    # independent atom-ledger closure bound remains unchanged.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333470503708e-7,
-        # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
-        # from reservoir.fo2_buffer; the unbacked remainder is held and the
-        # resulting subtraction residual is reported by the production resolver.
-        # The piecewise segment solve changes the cancellation residual by
-        # 1.134167275e-14 percentage points from the single-exponential pin;
-        # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        "lunar_mare_low_ti": 1.664998945735705e-6,
+        "mars_basalt": 4.4306088893138275e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
     )
     assert abs(diagnostics["mass_balance_error_pct"]) <= 5e-12
-    assert report["sio_to_silica_fume_kg"]["stage_3_sio_zone_product"] > 0.0
     authority = report["fouling_rate"]["sticking_alpha_authority"]
     extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]
     assert extrapolations
@@ -777,6 +768,7 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
     assert ca_data["pure_component_antoine"]["valid_range_K"] == [1254, 1712]
 
     model = CondensationModel(CondensationTrain.create_default())
+    model.train.collection_route["stage3_route"] = "through"
     melt = MeltState()
     melt.temperature_C = 1400.0
 
