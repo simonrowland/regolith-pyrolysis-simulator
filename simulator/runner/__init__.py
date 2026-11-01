@@ -67,6 +67,12 @@ from simulator.campaigns import (
     CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
 )
+from simulator.condensation_routing import (
+    COLLECTOR_STAGE_KEY_BY_NUMBER,
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+    STAGE_KEY_BY_IDENTITY,
+)
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
@@ -178,11 +184,12 @@ SIO_ALPHA_PROVENANCE = (
 )
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
-SIO_YIELD_STAGE_KEYS: dict[int, str] = {
-    1: "stage_1_fe_condenser_impurity",
-    3: "stage_3_sio_zone_product",
-    4: "stage_4_alkali_mg_carryover",
-    5: "stage_5_dust_filter_carryover",
+SIO_YIELD_STAGE_KEYS: dict[str, str] = {
+    COLLECTOR_STAGE_KEY_BY_NUMBER[1]: "stage_1_fe_condenser_impurity",
+    COLLECTOR_STAGE_KEY_BY_NUMBER[3]: "stage_3_sio_zone_product",
+    NA_COLLECTOR_STAGE_KEY: "stage_4_alkali_mg_carryover",
+    K_TRAP_STAGE_KEY: "stage_4b_k_trap_carryover",
+    COLLECTOR_STAGE_KEY_BY_NUMBER[5]: "stage_5_dust_filter_carryover",
 }
 SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
@@ -3526,15 +3533,38 @@ def _industrial_sio_verdict(yield_pct: float) -> str:
 
 
 def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
-    by_stage = {stage.stage_number: stage for stage in sim.train.stages}
-    return {
-        key: _clean_report_float(
-            by_stage.get(stage_number).collected_kg.get("SiO2", 0.0)
-            if by_stage.get(stage_number) is not None
-            else 0.0
+    by_stage_key: dict[str, float] = {}
+    for stage in sim.train.stages:
+        stage_number = int(stage.stage_number)
+        stage_identity = (
+            stage_number,
+            int(getattr(stage, "sub_order", 0) or 0),
         )
-        for stage_number, key in SIO_YIELD_STAGE_KEYS.items()
+        stage_key = (
+            getattr(stage, "stage_key", "")
+            or STAGE_KEY_BY_IDENTITY.get(stage_identity)
+            or COLLECTOR_STAGE_KEY_BY_NUMBER.get(
+                stage_number, f"stage_{stage_number}"
+            )
+        )
+        by_stage_key[stage_key] = (
+            by_stage_key.get(stage_key, 0.0)
+            + float(stage.collected_kg.get("SiO2", 0.0))
+        )
+
+    reported_stage_silica = {
+        report_key: _clean_report_float(by_stage_key.get(stage_key, 0.0))
+        for stage_key, report_key in SIO_YIELD_STAGE_KEYS.items()
     }
+    reported_stage_silica["unreported_stage_silica_capture"] = (
+        _clean_report_float(
+            sum(
+                kg for stage_key, kg in by_stage_key.items()
+                if stage_key not in SIO_YIELD_STAGE_KEYS
+            )
+        )
+    )
+    return reported_stage_silica
 
 
 def _kg_by_species_from_mol_state(
@@ -4663,17 +4693,15 @@ def build_sio_yield_report(
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
-    reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
     sio_to_silica_fume_kg = _safe_failure_value(
         lambda: {
             **_stage_silica_fume_kg(sim),
+            "condensation_train_silicon_coproduct": _clean_report_float(
+                si_terminal_mol * MOLAR_MASS["Si"] / 1000.0
+            ),
             "terminal_offgas_escape": _clean_report_float(
-                sum(
-                    stage.collected_kg.get("SiO2", 0.0)
-                    for stage in sim.train.stages
-                    if stage.stage_number not in reported_stage_numbers
-                )
-                + sio_escape_mol * sio_molar_mass_kg_mol
+                (sio_escape_mol + sio2_gas_escape_mol)
+                * sio_molar_mass_kg_mol
             ),
         },
         section="sio_yield_report.sio_to_silica_fume_kg",
