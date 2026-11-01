@@ -2719,12 +2719,12 @@ def test_printed_composition_uncertainty_uses_central_amount_in_every_reader(
 ) -> None:
     printed_map = {"SiO2": printed, "MgO": "25", "CaO": "25"}
     valid, refusal, components = _composition_reader_outcome(
-        tmp_path, reader, printed_map
+        tmp_path / "uncertainty", reader, printed_map
     )
 
     assert valid, refusal
     baseline_valid, baseline_refusal, baseline = _composition_reader_outcome(
-        tmp_path, reader, {"SiO2": "50", "MgO": "25", "CaO": "25"}
+        tmp_path / "baseline", reader, {"SiO2": "50", "MgO": "25", "CaO": "25"}
     )
     assert baseline_valid, baseline_refusal
     assert components == baseline
