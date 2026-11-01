@@ -2202,6 +2202,48 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
         assert composition.reason == initial.state.reason
 
 
+def test_phase_printed_blank_major_oxide_is_refused(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "phase-blank-major",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": None, "MgO": "50", "CaO": "50"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "phase-blank-major",
+            "experiment": "phase-blank-major",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    row["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "50",
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
 def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
     tmp_path: Path,
 ) -> None:

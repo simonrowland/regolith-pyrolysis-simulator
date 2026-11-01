@@ -20293,11 +20293,16 @@ class Migrator:
                 if experiment is not None
                 else None
             )
+            phase_closure_context = values
             if (
                 printed is not None
                 and printed.state.is_value
                 and isinstance(printed.state.value, Mapping)
             ):
+                phase_closure_context = {
+                    **(values if isinstance(values, Mapping) else {}),
+                    "printed_composition": printed.state.value,
+                }
                 components = tuple(
                     (str(formula), amount)
                     for formula, raw_amount in printed.state.value.items()
@@ -20354,7 +20359,7 @@ class Migrator:
                     composition_state = _mass_percent_composition_state(
                         dict(components),
                         basis="printed_phase_composition",
-                        closure_context=values,
+                        closure_context=phase_closure_context,
                         declared_component_map=printed.state.value,
                     )
                     located_composition = Located(
