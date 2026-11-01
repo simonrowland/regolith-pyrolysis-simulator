@@ -302,7 +302,9 @@ def test_fused_silica_sio_stage_and_liner_share_uncertified_proxy() -> None:
     assert liner_record["output_status"] == "status_bearing"
     assert liner_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
 
-    route, _ = _route_wall_deposit_authority("SiO", wall_temperature_C=1700.0)
+    route, _ = _route_wall_deposit_authority(
+        "SiO", wall_temperature_C=1700.0, stage3_route="through"
+    )
     route_provenance = route.sticking_alpha_provenance_notice[
         "alpha_s_provenance_by_species"
     ]["SiO"]
@@ -404,9 +406,12 @@ def _route_wall_deposit_authority(
     *,
     materials: dict[str, object] | None = None,
     wall_temperature_C: float = 900.0,
+    stage3_route: str = "divert",
 ) -> tuple[object, dict[str, object]]:
+    train = CondensationTrain.create_default()
+    train.collection_route["stage3_route"] = stage3_route
     model = CondensationModel(
-        CondensationTrain.create_default(),
+        train,
         wall_temperature_C=wall_temperature_C,
         materials=materials,
     )
