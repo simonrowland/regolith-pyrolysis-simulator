@@ -499,13 +499,9 @@ def _phase_for_recorded_vapour_sample(
     )
     if isinstance(state, str) and state.strip():
         phase = _phase_for_sample_description(state)
-        if phase is None:
-            phase = _pressure_condensed_phase(state)
         return True, phase
     if _printed_phase_names_sample_source(sample_phase):
         phase = _phase_for_sample_description(sample_phase)
-        if phase is None:
-            phase = _pressure_condensed_phase(sample_phase)
         return True, phase
     return False, None
 
