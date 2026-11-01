@@ -101,6 +101,8 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # from the runner JSON because its public envelope does not include raw flux maps.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
+        # car1: studio-3 production regen after Na2O/JANAF, silica, MRE, and
+        # diverted-route condensation changes.
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
@@ -111,8 +113,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # Stage-3 capture, typed saturation refusal): flux unchanged; the
         # ledger digest moves with the additive unrecovered_metal_phase /
         # source-account fields. Regenerated on studio-3 at b0b70903d.
-        "flux_maps_sha256": "15c212d781da125be67e7f8e265450bcbfe4c11d8f8bfb8afc4a93f079d9bdf3",
-        "ledger_sha256": "958be30db7c2b1677301036473e8025d49cdd89480283bbd6bbf68071349978f",
+        "flux_maps_sha256": "2e8f724eeae5d56fa012fc91142041b61149ea00e712dfa7676ea207033c7051",
+        "ledger_sha256": "e4c21f3079401e0459661a6e0f3d9d26ac8fc50afd112e1472c7a6c0bd544fcc",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -120,7 +122,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
         "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
-        "ledger_sha256": "fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348",
+        "ledger_sha256": "e57eb891d3804521d05deadc1b0a3db56a484667d3d94f5364bcc0854548bec7",
     },
 }
 
