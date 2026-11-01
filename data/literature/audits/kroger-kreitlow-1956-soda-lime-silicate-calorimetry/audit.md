@@ -75,22 +75,22 @@ No values were read from figures. Table 7's row cited to [23] is stored as a
 separate quoted_attributed typed refusal; its solution-derived and direct rows
 are separate measured_reduced and measured_direct refusals. The solution,
 devitrification, and batch reaction quantities have no exact token in
-`Quantity` (`simulator/battery/enums.py:84-112`), `TYPE_QUANTITY`
-(`simulator/battery/migrate.py:435-444`), or `QUANTITY_ALIASES`
-(`simulator/battery/migrate.py:453-512`). `heat_of_fusion` is not a heat of
+`Quantity` (`simulator/battery/enums.py::Quantity`), `TYPE_QUANTITY`
+(`simulator/battery/migrate.py::TYPE_QUANTITY`), or `QUANTITY_ALIASES`
+(`simulator/battery/migrate.py::QUANTITY_ALIASES`). `heat_of_fusion` is not a heat of
 solution or devitrification and is not reused. `OBSERVATION_TYPES` is a closed
-set (`tools/validate_literature_extracts.py:79-95`); `gibbs_table` remains the
-container for these typed refusals (`simulator/battery/migrate.py:435-444`).
+set (`tools/validate_literature_extracts.py::OBSERVATION_TYPES`); `gibbs_table` remains the
+container for these typed refusals (`simulator/battery/migrate.py::TYPE_QUANTITY`).
 For oxide-basis heats, `Quantity.DELTA_FH` is the exact `delta_fH` token
-(`simulator/battery/enums.py:84`), and the formation identity requires
-`reaction` plus `formation_elements` (`simulator/battery/identity.py:58-59,
-849`, where `formation_elements` are elements with elemental reference phases);
+(`simulator/battery/enums.py::Quantity.DELTA_FH`), and the formation identity requires
+`reaction` plus `formation_elements` (`simulator/battery/identity.py::profile_for`,
+where `formation_elements` are elements with elemental reference phases);
 there is no exact token for formation from oxides. The three element-
 basis values retain `delta_fH`. Crystal and glass are mapped phases
-(`PHASE_MAP`, `simulator/battery/migrate.py:380`); `PhaseRole.GLASS` and
-`PhaseRole.MELT` are existing roles (`simulator/battery/enums.py:301`), and
+(`PHASE_MAP`, `simulator/battery/migrate.py::PHASE_MAP`); `PhaseRole.GLASS` and
+`PhaseRole.MELT` are existing roles (`simulator/battery/enums.py::PhaseRole`), and
 the phase basis tokens include `wt_percent` and `mole_fraction`
-(`simulator/battery/enums.py:663`). The isolated migration yields 36
+(`simulator/battery/enums.py::PHASE_BASIS_TOKENS`). The isolated migration yields 36
 observations, 0 hard issues, and 33 unavailable values, exactly the rows in the
 quantity-unknown set.
 

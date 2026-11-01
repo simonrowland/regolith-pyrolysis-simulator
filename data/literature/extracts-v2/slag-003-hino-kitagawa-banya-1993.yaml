@@ -44,9 +44,13 @@ observations:
       Al] was assumed to be 0.01 mass% in the present work.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq10_logLs
   source_id: slag-003-hino-kitagawa-banya-1993
   locator:
     page: 6
@@ -113,9 +117,13 @@ observations:
     attribution: 1/2 O2(g) = O .....................(3). log K3 = log{aO/P^{1/2}_O2} = 6070/T + 0.210^{17} ......(4)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq4_logK3
   source_id: slag-003-hino-kitagawa-banya-1993
   locator:
     page: 5
@@ -169,9 +177,13 @@ observations:
     attribution: 1/2 S2(g) = S ...............(5). log K5 = log{aS/P^{1/2}_S2} = 6535/T − 0.964^{17} ......(6)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq6_logK5
   source_id: slag-003-hino-kitagawa-banya-1993
   locator:
     page: 5
@@ -226,9 +238,13 @@ observations:
       + 1.174 ......(7)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq7_log_S_over_aS
   source_id: slag-003-hino-kitagawa-banya-1993
   locator:
     page: 5
@@ -283,9 +299,13 @@ observations:
       ......(9)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq9_logK8
   source_id: slag-003-hino-kitagawa-banya-1993
   locator:
     page: 5

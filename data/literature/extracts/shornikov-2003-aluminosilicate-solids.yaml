@@ -28,11 +28,13 @@ experiments:
 - experiment_id: shornikov-2003-rjpc-solid-kems
   kind: kems
   locator:
-    page: 2
-    published_page: 1038
-    pdf_page_index: 1
-  method: Knudsen effusion mass spectrometry. Hertz–Knudsen partial pressures. Partial evaporation coefficients
-    of mullite were assumed equal to those of the simple oxides via Komlev. Not measured in this paper.
+    page: 1
+    published_page: 1037
+    pdf_page_index: 0
+    section: Abstract
+    note: Hertz–Knudsen partial pressures; mullite partial evaporation coefficients were assumed equal to those of the simple oxides via Komlev and were not measured in this paper.
+  method: knudsen_effusion
+  method_as_printed: The thermodynamic properties of solid phases in the Al2O3–SiO2 system were studied by Knudsen effusion mass spectrometry.
 species:
   Al2O3:
     observations: []

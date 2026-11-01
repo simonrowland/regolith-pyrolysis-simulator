@@ -31,10 +31,10 @@ Operator note: beneficiation (magnetic pre-separation) is preferred before C0b t
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C0b_p_cleanup`.
 
-### C2A_continuous — Continuous Adaptive pN₂ Ramp (Path A default)
+### C2A_continuous — Continuous Adaptive Carrier-gas Ramp (N₂ default)
 
 **Temperature**: 1050–1600 °C, adaptive ramp.  
-**Atmosphere**: recirculating pN₂ sweep (5–15 mbar total, 8–12 mbar optimal); Fe-granule sorbent holds pO₂ < 1×10⁻⁸ bar.  
+**Atmosphere**: selectable carrier/buffer gas (N₂ default) at 5–15 mbar total, 8–12 mbar optimal; Fe-granule sorbent holds pO₂ < 1×10⁻⁸ bar.
 **Target species**: Na, K, Fe, SiO, CrO₂.  
 **Typical duration**: 18–28 h.  
 **Endpoint**: Na/K/Fe signals decay to <5 % peak; SiO signal reaches target a(SiO₂) reduction.
@@ -47,10 +47,10 @@ Product metrics for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8�
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C2A_continuous`.
 
-### C2A_staged — Staged pN₂ Bakeout (Path A staged variant)
+### C2A_staged — Staged Carrier-gas Bakeout (N₂ default)
 
 **Temperature**: 1250–1750 °C (furnace ceiling 1800 °C).  
-**Atmosphere**: pN₂ sweep, same as C2A_continuous.  
+**Atmosphere**: selectable carrier/buffer gas (N₂ default), same pressure band as C2A_continuous.
 **Target species**: Na, K, SiO, Fe (in sequence).  
 **Default hold temperature**: 1750 °C.
 
@@ -73,6 +73,8 @@ Note on `hold_temp_C`: this is a cycle-time lever, not a thermal-yield ceiling b
 **Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per JANAF-4th multiphase) and refuses Na→FeO above the 1181.5 °C crossover (2026-07-09 multiphase re-ground). The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
 
 Source: `data/setpoints.yaml` campaign key `campaigns.C2A_staged`.
+
+The operator selects a run-fixed carrier through `runtime_campaign_overrides.C2A.carrier_gas` or `runtime_campaign_overrides.C2A_staged.carrier_gas`. N₂ is the default; accepted spellings include `pN2`, `pKr`, `pHe`, and the configured gas tokens. A declared laboratory schedule's `gas_boundary` controls the melt during its scheduled step, while the operator carrier remains stored for the next unscheduled step. This identity setting does not add a carrier to the optimizer recipe patch.
 
 ### C2B — pO₂-Managed Fe Pyrolysis (Path B)
 
@@ -108,7 +110,7 @@ Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for ba
 
 The former `~0.5 bar at 1600 °C` claim confused pure-metal volatility with release from MgO and is withdrawn. With `a_MgO = 0.0926`, `P_Mg = 0.01 bar`, and the melt oxygen potential assumed to have reached the CF-1 ambient floor, the current runtime's Mg-metal-phase-correct targets are 1892 °C (Moon) and 1768 °C (asteroid), with derived roots 1892.647/1768.703 °C. These are diagnostic thresholds, not universal body-only constants: stage composition changes `a_MgO`, and the surface must actually reach the ambient fO₂. The current 1670 °C C4 hold is therefore below the grounded lunar opening threshold and its legacy 18–42 kg/t yield is not certified by this threshold calculation.
 
-Under the pN₂ variant, sweep pressure changes gas transport but does not replace the melt fO₂ in the MgO dissociation equilibrium. No `~0.1 bar` Mg claim is certified for the legacy 1500–1580 °C band; use that range only as an explicitly ungrounded experimental sweep until a stage-specific melt-redox trajectory supports it.
+With the default N₂ carrier, buffer pressure changes gas transport but does not replace the melt fO₂ in the MgO dissociation equilibrium. No `~0.1 bar` Mg claim is certified for the legacy 1500–1580 °C band; use that range only as an explicitly ungrounded experimental sweep until a stage-specific melt-redox trajectory supports it.
 
 Branch One fallback: skip C4, electrolyse Mg in C5 at up to 2.5 V. This costs 5–10× electrode life and 2650–4050 kWh/t versus 1200–2000 kWh/t for Branch Two (C4 + C6).
 
@@ -214,12 +216,12 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 
 **Alkali dose** (`Na_additive_kg`, default 12 kg): the yield-ceiling lever for the cool C3_NA shuttle. The shuttle cannot reduce more FeO than the additive dose permits (subject to the Na₂O solubility cap of ~10 wt% in the melt). Increasing the dose raises the Fe extraction ceiling; decreasing it leaves more residual FeO for C5. (`K_additive_kg` is accepted by the runner but ignored by the post-V1c shuttle gate, which refuses K→FeO at any practical melt T.)
 
-**pN₂ setpoint** (5–15 mbar band): provides engineering margin above the viscous-flow boundary and controls transport capacity. For the hot-wall pipe, the boundary is about 0.318 mbar at 1500 °C; the transport limit at 8–12 mbar is 7–16 g/s SiO. Pressures below 5 mbar reduce the margin but do not by themselves imply molecular flow. See [the pN₂ boundary derivation](concepts.md#pn₂-sweep-gas).
+**Carrier/buffer pressure** (5–15 mbar band): provides engineering margin above the viscous-flow boundary and controls transport capacity. The N₂-default hot-wall pipe boundary is about 0.318 mbar at 1500 °C; the transport limit at 8–12 mbar is 7–16 g/s SiO. Pressures below 5 mbar reduce the margin but do not by themselves imply molecular flow. See [the carrier-gas boundary derivation](concepts.md#carrier--buffer-gas-n₂-default).
 
 ## Diagnostic patterns
 
 - **Rump approaching 10–15 kg**: the refractory floor is being reached after a full C0–C6 sequence on low-Ti mare.
-- **`wall_deposit_kg[SiO]` growing fast**: the pN₂ sweep is insufficient or a cold wall is upstream of Stage 3. Check pN₂ setpoint and liner temperature schedule (see `data/setpoints.yaml` §14 `overhead_headspace.liner_temperature_C`).
+- **`wall_deposit_kg[SiO]` growing fast**: carrier/buffer pressure is insufficient or a cold wall is upstream of Stage 3. Check the pressure setpoint and liner temperature schedule (see `data/setpoints.yaml` §14 `overhead_headspace.liner_temperature_C`).
 - **Fe yield plateau around 88–90 % in C2A_staged**: expected thermal extraction limit; residual FeO (20–24 kg) is the shuttle's feed. This is correct behavior, not a failure.
 - **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when the Na additive is not loaded. Confirm `--additive=Na=12` is present for C2A_staged, or that Na shuttle stock has accumulated from prior C2 cycles. (`--additive=K=...` is accepted but ignored by the post-V1c shuttle gate; it will not raise Fe yield.)
 

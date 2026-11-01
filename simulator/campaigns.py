@@ -564,9 +564,11 @@ class CampaignManager:
     })
     _PHASE_OVERRIDE_FIELDS = {
         CampaignPhase.C2A: frozenset({
+            'carrier_gas',
             'threshold_kg_hr',
         }),
         CampaignPhase.C2A_STAGED: frozenset({
+            'carrier_gas',
             'depletion_flux_decay_fraction',
             'hold_temp_C',
             'hold_temperature_C',
@@ -625,6 +627,21 @@ class CampaignManager:
     def _campaign_config(self, campaign: CampaignPhase) -> dict:
         cfg = self.campaigns.get(self._campaign_config_key(campaign), {})
         return cfg if isinstance(cfg, dict) else {}
+
+    def _carrier_gas_for_campaign(
+        self,
+        campaign: CampaignPhase,
+        cfg: Mapping[str, object],
+        default: str,
+    ) -> str:
+        runtime_carrier = self._campaign_overrides(campaign).get('carrier_gas')
+        configured_carrier = cfg.get('carrier_gas', default)
+        carrier = (
+            runtime_carrier
+            if runtime_carrier is not None
+            else configured_carrier
+        )
+        return _canonical_carrier_gas_key(carrier)
 
     @classmethod
     def _campaign_phases_for_override_key(
@@ -752,16 +769,36 @@ class CampaignManager:
         return fields
 
     @classmethod
-    def validate_runtime_campaign_overrides(
-            cls,
-            overrides: Mapping[str, Mapping[str, object]]) -> None:
+    def _canonicalize_runtime_carrier_overrides(
+        cls,
+        overrides: Mapping[str, Mapping[str, object]],
+    ) -> dict[str, dict[str, object]]:
         if not isinstance(overrides, Mapping):
             raise ValueError('runtime_campaign_overrides must be a mapping')
+        canonical: dict[str, dict[str, object]] = {}
         for campaign_name, fields in overrides.items():
             if not isinstance(fields, Mapping):
                 raise ValueError(
                     f'runtime_campaign_overrides[{campaign_name!r}] '
                     'must be a mapping')
+            clean_fields: dict[str, object] = {}
+            for field_name, value in fields.items():
+                field_key = str(field_name)
+                clean_fields[field_key] = (
+                    _canonical_carrier_gas_key(value)
+                    if field_key == 'carrier_gas'
+                    else value
+                )
+            canonical[str(campaign_name)] = clean_fields
+        return canonical
+
+    @classmethod
+    def validate_runtime_campaign_overrides(
+        cls,
+        overrides: Mapping[str, Mapping[str, object]],
+    ) -> None:
+        canonical = cls._canonicalize_runtime_carrier_overrides(overrides)
+        for campaign_name, fields in canonical.items():
             cls._refuse_unknown_override_fields(str(campaign_name), fields)
 
     @classmethod
@@ -787,6 +824,8 @@ class CampaignManager:
                 f'unknown runtime_campaign_overrides[{campaign_name!r}].'
                 f'{unknown[0]}; known overridable fields for '
                 f'{campaign_name}: {", ".join(known_fields)}')
+        if 'carrier_gas' in fields:
+            _canonical_carrier_gas_key(fields['carrier_gas'])
 
     def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
         merged: dict = {}
@@ -1590,9 +1629,10 @@ class CampaignManager:
             # the CONFIGURED carrier, canonically resolved (raises on an
             # unknown carrier, so a typo fails loudly instead of running
             # mislabelled). Default remains pN2 -> 'N2' (golden-neutral).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
+            melt.background_gas_species = self._carrier_gas_for_campaign(
+                CampaignPhase.C2A_STAGED,
+                cfg if isinstance(cfg, Mapping) else {},
+                'pN2',
             )
             melt.background_gas_mole_fraction = 1.0
         else:
@@ -1779,9 +1819,10 @@ class CampaignManager:
             # for a Kr carrier (double-counted buffer). Stamp the configured
             # carrier; the condensation resolver reads the same config, so
             # its answer is unchanged (golden-neutral for the pN2 default).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
+            melt.background_gas_species = self._carrier_gas_for_campaign(
+                campaign,
+                cfg,
+                'pN2',
             )
             melt.pO2_mbar = self._pressure_config_float(
                 campaign, 'pO2_mbar', 'pO2_mbar_default')

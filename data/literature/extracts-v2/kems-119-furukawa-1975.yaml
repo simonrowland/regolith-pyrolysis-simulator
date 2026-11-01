@@ -155,9 +155,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-119-furukawa-1975::furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -211,9 +215,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-119-furukawa-1975::furukawa_1975_fig12_ternary_activities_figure_only
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3058
@@ -266,9 +274,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-119-furukawa-1975::furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3054
@@ -322,9 +334,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-119-furukawa-1975::furukawa_1975_fig6_fe_v_activities_figure_only
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3055
@@ -377,9 +393,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-119-furukawa-1975::furukawa_1975_fig7_av_comparison_figure_only
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3056

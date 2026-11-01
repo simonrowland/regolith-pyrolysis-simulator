@@ -250,6 +250,11 @@ class NoticeKind(StrEnum):
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
     COMPOSITION_BINARY_COMPLEMENT = "composition_binary_complement"
+    # Oxide mole fractions from printed element mass percent, when those
+    # oxides account for the whole sample. Exact stoichiometry, flagged.
+    COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT = (
+        "composition_oxide_from_element_mass_percent"
+    )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
@@ -271,6 +276,9 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    # admission_status carried an evidence label. The reason names the legacy token.
+    # Not a flagged stratum and not a reviewer decision.
+    ADMISSION_FROM_LEGACY_TOKEN = "admission_from_legacy_token"
     VALIDATION_HARD_ISSUE_LABEL = "validation_hard_issue_label"
     FIGURE_ONLY = "figure_only"
     APPROXIMATE_VALUE = "approximate_value"

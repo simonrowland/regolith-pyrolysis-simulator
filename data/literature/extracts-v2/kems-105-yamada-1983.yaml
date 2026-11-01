@@ -1431,9 +1431,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig1_Si_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 52
@@ -1486,9 +1490,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig2_Al_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 53
@@ -1541,9 +1549,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig3_3d_metals_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 53
@@ -1596,9 +1608,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig4_Nb_Mo_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -1651,9 +1667,13 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 55
@@ -1709,9 +1729,13 @@ observations:
     original_method_class: quoted_measurement
     attribution: G. K. Sigworth and J. F. Elliott, Metal Science, 8 (1974), 298 (ref 16)
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-105-yamada-1983::yamada_1983_fig5b_epsilon_S_quoted_figure_only
   source_id: kems-105-yamada-1983
   locator:
     published_page: 55

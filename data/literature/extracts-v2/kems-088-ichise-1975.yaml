@@ -377,9 +377,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig10_e_S_comparison_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 119
@@ -418,13 +422,17 @@ observations:
       note: figure-only; scatter not digitised
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
+      tag: value
+      value: figure_only
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig1_chamber_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 116
@@ -463,13 +471,17 @@ observations:
       note: figure-only; scatter not digitised
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
+      tag: value
+      value: figure_only
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig2_cell_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 116
@@ -512,9 +524,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 117
@@ -558,9 +574,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig4_integration_1550C_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 117
@@ -614,9 +634,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig5_integration_1600C_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 117
@@ -670,9 +694,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig6_integration_1650C_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 117
@@ -726,9 +754,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig7_log_gamma_S_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 117
@@ -785,9 +817,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig8_pure_iron_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 118
@@ -831,9 +867,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-088-ichise-1975::ichise_1975_fig9_holder_heating_figure_only
   source_id: kems-088-ichise-1975
   locator:
     published_page: 118

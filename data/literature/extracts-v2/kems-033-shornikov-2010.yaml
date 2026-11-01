@@ -80,9 +80,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-033-shornikov-2010::shornikov_2010_fig1_cai_calc_figure_only
   source_id: kems-033-shornikov-2010
   locator:
     published_page: 1
@@ -126,9 +130,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-033-shornikov-2010::shornikov_2010_fig2_lunar_calc_figure_only
   source_id: kems-033-shornikov-2010
   locator:
     published_page: 2

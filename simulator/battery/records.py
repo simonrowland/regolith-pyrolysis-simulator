@@ -564,6 +564,7 @@ class Notice:
             if self.kind not in {
                 NoticeKind.FIGURE_ONLY,
                 NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
+                NoticeKind.ADMISSION_FROM_LEGACY_TOKEN,
             }:
                 raise ValueError("Notice.affected_quantities is required")
         if not self.reason:

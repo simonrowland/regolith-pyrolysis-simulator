@@ -968,8 +968,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1107,8 +1121,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1249,8 +1277,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1388,8 +1430,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1495,12 +1551,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2
+        - 'printed_oxide_sum_wt_percent: 100.204223'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -1571,8 +1627,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1679,12 +1749,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2
+        - 'printed_oxide_sum_wt_percent: 100.204223'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -1740,8 +1810,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1847,12 +1931,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2
+        - 'printed_oxide_sum_wt_percent: 100.204223'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -1924,8 +2008,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2032,12 +2130,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2
+        - 'printed_oxide_sum_wt_percent: 100.204223'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -2214,12 +2312,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS2
+        - 'printed_oxide_sum_wt_percent: 100.204223'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -2291,8 +2389,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2398,12 +2510,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4
+        - 'printed_oxide_sum_wt_percent: 99.976350'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -2474,8 +2586,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2582,12 +2708,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4
+        - 'printed_oxide_sum_wt_percent: 99.976350'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -2643,8 +2769,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2750,12 +2890,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4
+        - 'printed_oxide_sum_wt_percent: 99.976350'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -2826,8 +2966,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2934,12 +3088,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4
+        - 'printed_oxide_sum_wt_percent: 99.976350'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -3116,12 +3270,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row ACS4
+        - 'printed_oxide_sum_wt_percent: 99.976350'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -3192,8 +3346,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3331,8 +3499,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3473,8 +3655,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3612,8 +3808,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3719,12 +3929,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5
+        - 'printed_oxide_sum_wt_percent: 100.225360'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -3795,8 +4005,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3903,12 +4127,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5
+        - 'printed_oxide_sum_wt_percent: 100.225360'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -3964,8 +4188,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4071,12 +4309,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5
+        - 'printed_oxide_sum_wt_percent: 100.225360'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -4147,8 +4385,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4255,12 +4507,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5
+        - 'printed_oxide_sum_wt_percent: 100.225360'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -4437,12 +4689,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS5
+        - 'printed_oxide_sum_wt_percent: 100.225360'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -4513,8 +4765,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4623,12 +4889,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8
+        - 'printed_oxide_sum_wt_percent: 99.254073'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -4698,8 +4964,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4809,12 +5089,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8
+        - 'printed_oxide_sum_wt_percent: 99.254073'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -4870,8 +5150,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4980,12 +5274,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8
+        - 'printed_oxide_sum_wt_percent: 99.254073'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -5055,8 +5349,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5166,12 +5474,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8
+        - 'printed_oxide_sum_wt_percent: 99.254073'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -5351,12 +5659,12 @@ observations:
         note: Table 2 printed slag elemental mass percent (Ca), (Si), (Al) for this slag group; oxide mole fraction is derived,
           not a Table 5 cell.
       inference:
-        relation: extract_inference
+        relation: oxide_from_element_mass_percent
         inputs:
-        - inferred=true
-        - oxide mole fractions are derived from the Table 2 elemental (Ca), (Si), (Al) mass percent by oxide stoichiometry
+        - Table 2 printed slag elemental mass percent (Ca), (Si), (Al); locator page 2 published_page 178 table 2 row CAS8
+        - 'printed_oxide_sum_wt_percent: 99.254073'
         parameters: []
-        output_unit: as_published
+        output_unit: mole_fraction
         references: []
     temperature_K:
       state:
@@ -5426,8 +5734,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5565,8 +5887,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; Al2O3(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5705,8 +6041,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5844,8 +6194,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6137,8 +6501,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: 'source standard_state is not typed: relative to the solid standard state; CaO(s)'
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CaO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: CaO
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir

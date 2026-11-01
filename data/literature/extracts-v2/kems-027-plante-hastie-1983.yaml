@@ -334,13 +334,18 @@ observations:
       as given by Gurvich and Veits [1983].
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
   notices:
   - kind: source_disagreement
     affected_quantities:
     - activity
     reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:model_output_not_measurement
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -428,9 +433,13 @@ observations:
     attribution: log P(atm) {CsBO2} = (3.45 ± 0.3) - (1.288 ± 0.04) x 10^4/T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -514,9 +523,14 @@ observations:
     attribution: a(CsBO2)calc = 4 x 10^-4
     model: ideal_mixing
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 35
@@ -4906,13 +4920,18 @@ observations:
       of LiBO2 in the SNW glass is about 0.1, with some temperature dependence.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
   notices:
   - kind: source_disagreement
     affected_quantities:
     - activity
     reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:model_output_not_measurement
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -4992,9 +5011,13 @@ observations:
     attribution: log P(atm) {LiBO2} = (4.73 ± 0.2) - (1.292 ± 0.02) x 10^4/T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -5233,13 +5256,18 @@ observations:
       0.01 with a slight temperature dependence.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
   notices:
   - kind: source_disagreement
     affected_quantities:
     - activity
     reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - activity
+    reason: admission_from_legacy_token:model_output_not_measurement
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -5319,9 +5347,13 @@ observations:
     attribution: log P(atm) {NaBO2} = (4.09 ± 0.2) - (1.190 ± 0.02) x 10^4/T
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -5420,13 +5452,18 @@ observations:
     attribution: Oxygen pressure vs 10^4/T(K) for SNW glass vapor, series I, run 1-5 data; the five lowest temperature points
       were rejected in the least squares analysis.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
   notices:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
     reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -5668,9 +5705,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: NASA CEC 76, Gordon and McBride (1971), Table 4
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 33
@@ -6357,9 +6398,13 @@ observations:
       set equal to oxide component mole fractions.
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45

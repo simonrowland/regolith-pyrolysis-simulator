@@ -40,9 +40,13 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_alpha_figure_only
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1

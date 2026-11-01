@@ -5779,9 +5779,13 @@ observations:
     attribution: ΔHv(1267) = 65.9 ± 3 kcal/mol, and ΔSv(1267) = 22.3 ± 2.8 cal/deg mol
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law_quoted_20260906
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 19
@@ -5896,9 +5900,13 @@ observations:
     attribution: ΔHv(1550) = 69.8 ± 3 (71.7 ± 0.6) kcal/mol, and ΔSv(1550) = 27.8 ± 3 (29.7) cal/deg mol
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose_quoted_20260906
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 18
@@ -6013,9 +6021,13 @@ observations:
     attribution: -ΔHd(1300) = 46.4 ± 0.7 (47.1 ± 3.5) kcal/mol, and -ΔSd(1300) = 30.2 ± 0.6 (29.7 ± 1.0) cal/deg mol
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law_quoted_20260906
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 18

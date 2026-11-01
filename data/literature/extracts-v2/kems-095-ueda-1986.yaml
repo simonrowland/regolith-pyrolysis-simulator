@@ -38,9 +38,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig10_activities_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1086
@@ -83,9 +87,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig11_enthalpy_integrand_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1086
@@ -129,9 +137,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig12_partial_enthalpies_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1086
@@ -175,9 +187,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig13_mixing_1873K_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1086
@@ -230,9 +246,13 @@ observations:
       value: quoted_unattributed
     original_method_class: quoted_measurement
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig1_phase_diagram_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1082
@@ -271,13 +291,17 @@ observations:
       note: figure-only; scatter not digitised
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
+      tag: value
+      value: figure_only
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig2_apparatus_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1082
@@ -316,13 +340,17 @@ observations:
       note: figure-only; scatter not digitised
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
+      tag: value
+      value: figure_only
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig3_cell_assembly_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1082
@@ -366,9 +394,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig4_time_dependence_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1083
@@ -421,9 +453,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig5_ion_ratio_vs_1_over_T_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1083
@@ -466,9 +502,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig6_oxygen_vs_N_Co_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1084
@@ -512,9 +552,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig7_integration_path_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1084
@@ -559,9 +603,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig8_binary_integration_1973K_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1084
@@ -616,9 +664,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-095-ueda-1986::ueda_1986_fig9_ternary_integration_1973K_figure_only
   source_id: kems-095-ueda-1986
   locator:
     published_page: 1085

@@ -74,7 +74,18 @@ def _canonical_runtime_campaign_overrides(
     )
     if source is None:
         return {}
-    return {str(campaign): dict(fields) for campaign, fields in source.items()}
+    from simulator.campaigns import CampaignManager
+
+    canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
+        {str(campaign): dict(fields) for campaign, fields in source.items()}
+    )
+    for campaign, fields in canonical.items():
+        if "carrier_gas" in fields:
+            CampaignManager._refuse_unknown_override_fields(
+                campaign,
+                {"carrier_gas": fields["carrier_gas"]},
+            )
+    return canonical
 
 
 def _has_runtime_surface_temperature_schedule(
@@ -493,6 +504,8 @@ class SimSession:
             for field_name, value in overrides.items():
                 if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
                     target[str(field_name)] = normalize_lab_schedule(value)
+                elif str(field_name) == "carrier_gas":
+                    target[str(field_name)] = value
                 else:
                     target[str(field_name)] = _finite_float(
                         value,
@@ -635,7 +648,33 @@ class SimSession:
                 raise ValueError(
                     "campaign_override requires campaign and field keywords"
                 )
-            if field_name == "stir_factor":
+            if field_name == "carrier_gas":
+                canonical = sim.campaign_mgr._canonicalize_runtime_carrier_overrides(
+                    {campaign_name: {field_name: value}}
+                )[campaign_name][field_name]
+                sim.campaign_mgr.validate_runtime_campaign_overrides(
+                    {campaign_name: {field_name: canonical}}
+                )
+                active_campaign = sim.melt.campaign
+                active_carrier_phase = active_campaign in {
+                    CampaignPhase.C2A,
+                    CampaignPhase.C2A_STAGED,
+                }
+                active_campaign_keys = {
+                    active_campaign.name,
+                    sim.campaign_mgr._campaign_config_key(active_campaign),
+                }
+                apply_to_melt = (
+                    active_carrier_phase
+                    and campaign_name in active_campaign_keys
+                    and sim.campaign_mgr._lab_schedule(active_campaign) is None
+                )
+                target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
+                target[field_name] = canonical
+                if apply_to_melt:
+                    sim.melt.background_gas_species = str(canonical)
+                    sim.melt.background_gas_mole_fraction = 1.0
+            elif field_name == "stir_factor":
                 sim.campaign_mgr._refuse_unknown_override_fields(
                     campaign_name,
                     {field_name: value},
