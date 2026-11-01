@@ -106,6 +106,23 @@ def _charge(single: bool = True) -> Sample:
     )
 
 
+def test_nonfinite_printed_mass_component_refuses_charge_before_value_build() -> None:
+    sample = replace(
+        _charge(single=False),
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=None,
+        printed_composition=factories.located(
+            {"MgO": Decimal("40"), "SiO2": Decimal("Infinity")}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert not result.by_species
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
 def test_charge_moles_sanity_and_typed_absence() -> None:
     experiment = replace(factories.kems_experiment(), sample=_charge())
     result = charge_moles_by_species(experiment, _bench())
