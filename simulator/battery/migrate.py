@@ -767,11 +767,8 @@ def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
         value = value.strip()
         if not value or value.casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS:
             return "blank", None
-    try:
-        amount = as_decimal(value)
-    except (TypeError, ValueError, ArithmeticError):
-        return "malformed", None
-    if not amount.is_finite():
+    amount = _printed_composition_amount(value)
+    if amount is None:
         return "malformed", None
     return "number", amount
 
@@ -779,10 +776,17 @@ def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
 def _printed_composition_amount(value: object) -> Decimal | None:
     """Read a printed central composition amount, dropping its stated ± value."""
 
+    if value is None or isinstance(value, bool):
+        return None
     if isinstance(value, str):
-        value = re.split(r"\s*(?:±|\+/-)\s*", value, maxsplit=1)[0].strip()
-    _kind, amount = _classify_composition_cell(value)
-    return amount
+        value = re.split(r"\s*(?:±|\+/-)\s*", value.strip(), maxsplit=1)[0].strip()
+        if not value:
+            return None
+    try:
+        amount = as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    return amount if amount.is_finite() else None
 
 
 def _canonical_printed_oxide_name(name: str) -> str:
@@ -5217,7 +5221,11 @@ def _declared_wt_composition_point_map(values: object, units: object) -> bool:
         rows = values.get(key)
         if isinstance(rows, list) and any(
             isinstance(row, Mapping)
-            and sum(_as_dec_or_none(value) is not None for value in row.values()) >= 2
+            and sum(
+                _classify_composition_cell(value)[0] == "number"
+                for value in row.values()
+            )
+            >= 2
             for row in rows
         ):
             return True
@@ -13111,16 +13119,17 @@ def select_declared_source(
         for field in ("residue_ppm", *oxide_fields):
             if field not in payload:
                 continue
-            amount = _as_dec_or_none(payload.get(field))
-            if amount is not None:
+            raw_amount = payload.get(field)
+            kind, amount = _classify_composition_cell(raw_amount)
+            if kind == "number" and amount is not None:
                 return _point_selection(
                     amount, field, "identity:as_published", payload, condition_ranges
                 )
             return _unavailable_selection(
                 (
                     f"{field} is null; absence is not a measured zero"
-                    if payload.get(field) is None or payload.get(field) == ""
-                    else f"{field} is not numeric: {payload.get(field)!r}"
+                    if kind == "blank"
+                    else f"{field} is not numeric: {raw_amount!r}"
                 ),
                 condition_ranges=condition_ranges,
                 field_name=field,
@@ -20855,6 +20864,9 @@ class Migrator:
                 )
                 point_index = int(point.get("index", 0))
                 for field in component_fields:
+                    component_name, has_mass_suffix = _mass_percent_component_key(
+                        field
+                    )
                     if field == "residue_ppm":
                         component_index = 0
                     elif field in _RESIDUE_COMPONENT_SLOT_FIELDS:
@@ -20863,7 +20875,7 @@ class Migrator:
                         component_index = len(_RESIDUE_COMPONENT_SLOT_FIELDS)
                     cell_units = str(obs.get("units") or "")
                     if (
-                        field.endswith("_wt_pct")
+                        has_mass_suffix
                         and cell_units
                         == "wt % (100% normalized) and VF wt % as published"
                     ):
@@ -20878,9 +20890,12 @@ class Migrator:
                         if other != field:
                             cell_item.pop(other, None)
                     point_species = species
-                    if field.endswith("_wt_pct"):
+                    component_formula = (
+                        "FeO" if component_name == "FeOT" else component_name
+                    )
+                    if has_mass_suffix:
                         point_species = make_species(
-                            field.removesuffix("_wt_pct"),
+                            component_formula,
                             species.phase,
                             polymorph=species.polymorph,
                             charge=species.charge,
@@ -20918,10 +20933,15 @@ class Migrator:
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
                         ),
+                        source_point_composition_context=(
+                            raw_item
+                            if _residue_component_field_sets(raw_item)[0]
+                            else None
+                        ),
                         ordinal_point_id=(
                             series_point_id(
                                 obs_id,
-                                field=field.removesuffix("_wt_pct"),
+                                field=component_formula,
                                 extra=f"row:{point_index}",
                             )
                             if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
@@ -21752,11 +21772,27 @@ class Migrator:
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
+        source_point_composition_context: Mapping[str, Any] | None = None,
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
     ) -> bool:
         raw_item = item.get("item")
+        point_composition_context = (
+            source_point_composition_context
+            if source_point_composition_context is not None
+            else raw_item
+        )
+        if source_point_composition_context is None:
+            point_declared_component_map = _named_printed_composition_map(raw_item)
+        else:
+            residue_fields, _invalid_fields = _residue_component_field_sets(
+                source_point_composition_context
+            )
+            point_declared_component_map = {
+                field: source_point_composition_context[field]
+                for field in residue_fields
+            }
         index = item.get("index", 0)
         row_method_class = (
             raw_item.get("method_class") if isinstance(raw_item, Mapping) else None
@@ -21832,7 +21868,7 @@ class Migrator:
                     not _is_composition_condition_key(str(key))
                     and (
                         key in _COMPOSITION_COMPONENTS
-                        or str(key).endswith("_wt_pct")
+                        or _mass_percent_component_key(str(key))[1]
                     )
                     for key in raw_item
                 )
@@ -22501,10 +22537,8 @@ class Migrator:
                 printed, residual = _located_printed_and_initial(
                     point_oxide_map,
                     point_locator,
-                    closure_context=raw_item,
-                    declared_component_map=_named_printed_composition_map(
-                        raw_item
-                    ),
+                    closure_context=point_composition_context,
+                    declared_component_map=point_declared_component_map,
                 )
             else:
                 printed = _preserve_printed_composition_context(
@@ -23025,12 +23059,12 @@ class Migrator:
         child_notices = list(notices)
         projection_notice = _composition_projection_notice(
             point_oxide_map,
-            closure_context=raw_item,
+            closure_context=point_composition_context,
             quantity=(
                 q_token_point if isinstance(q_token_point, Quantity) else None
             ),
             origin=point_id,
-            declared_component_map=_named_printed_composition_map(raw_item),
+            declared_component_map=point_declared_component_map,
         )
         if projection_notice is not None and not any(
             notice.kind is NoticeKind.COMPOSITION_PROJECTED
