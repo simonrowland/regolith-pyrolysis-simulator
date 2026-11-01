@@ -1,6 +1,7 @@
 import json
 import math
 import subprocess
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -30,6 +31,7 @@ from simulator.accounting.queries import (
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
+from tests._cpu_budget import DEFAULT_CPU_BUDGET_SECONDS
 from web.events import _clear_simulation_state, _simulations
 from web.run_store import RunArtifactStore
 
@@ -53,8 +55,7 @@ _START = {
 }
 
 
-@pytest.fixture(autouse=True)
-def _deterministic_web_run(monkeypatch):
+def _patch_deterministic_web_run(monkeypatch):
     curve = {
         "source": "test_web_functional_qa",
         "solidus_T_C": 1000.0,
@@ -89,8 +90,12 @@ def _deterministic_web_run(monkeypatch):
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
 
 
-@pytest.fixture
-def web_driver(monkeypatch, tmp_path):
+@pytest.fixture(autouse=True)
+def _deterministic_web_run(monkeypatch):
+    _patch_deterministic_web_run(monkeypatch)
+
+
+def _create_web_driver(monkeypatch, tmp_path):
     tasks = []
 
     def backend(_name):
@@ -113,21 +118,73 @@ def web_driver(monkeypatch, tmp_path):
     client = app_module.socketio.test_client(app, flask_test_client=http)
     assert client.is_connected()
     client.get_received()
-    before = set(_simulations)
+    return {
+        "app": app,
+        "client": client,
+        "tasks": tasks,
+        "before": set(_simulations),
+        "run_dir": run_dir,
+        "html": html_response.get_data(as_text=True),
+    }
+
+
+def _close_web_driver(driver):
+    client = driver["client"]
+    if client.is_connected():
+        client.disconnect()
+    for sid in set(_simulations) - driver["before"]:
+        _clear_simulation_state(sid)
+
+
+@pytest.fixture
+def web_driver(monkeypatch, tmp_path):
+    driver = _create_web_driver(monkeypatch, tmp_path)
     try:
-        yield {
-            "app": app,
-            "client": client,
-            "tasks": tasks,
-            "before": before,
-            "run_dir": run_dir,
-            "html": html_response.get_data(as_text=True),
-        }
+        yield driver
     finally:
-        if client.is_connected():
-            client.disconnect()
-        for sid in set(_simulations) - before:
-            _clear_simulation_state(sid)
+        _close_web_driver(driver)
+
+
+def displayed_species_kg(species_kg):
+    return {
+        species: round(float(mass), 2)
+        for species, mass in species_kg.items()
+        if round(float(mass), 2) > 0.0
+    }
+
+
+@pytest.fixture(scope="module")
+def headless_full_run_product_story(tmp_path_factory):
+    monkeypatch = pytest.MonkeyPatch()
+    driver = None
+    try:
+        started_cpu = time.process_time()
+        started_wall = time.monotonic()
+        _patch_deterministic_web_run(monkeypatch)
+        driver = _create_web_driver(
+            monkeypatch,
+            tmp_path_factory.mktemp("headless-full-run"),
+        )
+        sid, state, events, decisions, completion = _drive(
+            driver,
+            perturb_every_gate=True,
+            reject_first=True,
+        )
+        return_values = {
+            "driver": driver,
+            "sid": sid,
+            "state": state,
+            "events": events,
+            "decisions": decisions,
+            "completion": completion,
+            "web_phase_cpu_seconds": time.process_time() - started_cpu,
+            "web_phase_wall_seconds": time.monotonic() - started_wall,
+        }
+        yield return_values
+    finally:
+        if driver is not None:
+            _close_web_driver(driver)
+        monkeypatch.undo()
 
 
 @pytest.mark.parametrize(
@@ -381,16 +438,19 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Report: docs-private/research/2026-07-19-webqa/report.md
 # Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
 @pytest.mark.nightly
-def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
-    from dataclasses import replace
-
-    from simulator.run_executor import RunExecutor
-
-    sid, state, events, decisions, completion = _drive(
-        web_driver,
-        perturb_every_gate=True,
-        reject_first=True,
-    )
+def test_headless_full_run_ledgers_and_product_story_web(
+    headless_full_run_product_story,
+):
+    test_started_cpu = time.process_time()
+    test_started_wall = time.monotonic()
+    web_driver = headless_full_run_product_story["driver"]
+    sid = headless_full_run_product_story["sid"]
+    state = headless_full_run_product_story["state"]
+    events = headless_full_run_product_story["events"]
+    decisions = headless_full_run_product_story["decisions"]
+    completion = headless_full_run_product_story["completion"]
+    sim = state["session"].simulator
+    story = completion["product_story"]
     assert [kind for kind, _choice in decisions] == [
         "PATH_AB",
         "BRANCH_ONE_TWO",
@@ -422,29 +482,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         status="ok",
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
-    sim = state["session"].simulator
-    from simulator.accounting.queries import TERMINAL_RUMP_ACCOUNTS
-
-    # Replay the same inputs through a fresh AUTO_APPLY runner session. The
-    # web envelope above is built from its live session, so it cannot by itself
-    # establish web-versus-runner parity.
-    runner_execution = RunExecutor().execute(
-        replace(
-            state["session"]._config,
-            hours=int(sim.melt.hour),
-            result_document_factory=None,
-        )
-    )
-    assert runner_execution.status == "ok"
-    assert [
-        (row["decision_type"], row["choice"])
-        for row in runner_execution.operator_decisions
-    ] == decisions
-    runner_sim = runner_execution.simulator
-    for account in TERMINAL_RUMP_ACCOUNTS:
-        assert dict(runner_sim.atom_ledger.project_account_mol(account)) == dict(
-            sim.atom_ledger.project_account_mol(account)
-        )
     assert (
         sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
         is False
@@ -463,56 +500,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
     assert completion["mass_balance_error_breached"] is False
 
-    story = completion["product_story"]
-    from simulator.runner import _product_classification_report
-
-    runner_classification = _product_classification_report(
-        runner_sim,
-        feedstock_id=runner_sim.record.feedstock_key,
-        campaign=runner_sim.melt.campaign.name,
-    )["classification"]
-
-    def displayed_species_kg(species_kg):
-        return {
-            species: round(float(mass), 2)
-            for species, mass in species_kg.items()
-            if round(float(mass), 2) > 0.0
-        }
-
-    assert story["metal_ingots"]["species_kg"] == displayed_species_kg(
-        runner_classification["ingots_metals"]["species_kg"]
-    )
-    assert story["metal_ingots"]["source_accounts_by_species"] == (
-        runner_classification["ingots_metals"]["source_accounts_by_species"]
-    )
-    assert story["unrecovered_metal_phase"]["species_kg"] == (
-        displayed_species_kg(
-            runner_classification["unrecovered_metal_phase"]["species_kg"]
-        )
-    )
-    assert story["unrecovered_metal_phase"]["source_accounts_by_species"] == (
-        runner_classification["unrecovered_metal_phase"][
-            "source_accounts_by_species"
-        ]
-    )
-    assert story["glass"]["species_kg"] == displayed_species_kg(
-        runner_classification["glass"]["species_kg"]
-    )
-    assert story["captured_volatiles"]["species_kg"] == displayed_species_kg(
-        runner_classification["captured_volatiles"]["kg_by_species"]
-    )
-    oxygen_partition = runner_classification["oxygen"]["partition_kg"]
-    assert story["oxygen"]["class_total_kg"] == round(
-        oxygen_partition["stored"] + oxygen_partition["captured"], 2
-    )
-    rump_by_species = runner_classification["refractory_ceramic_rump"][
-        "rump_kg_by_species"
-    ]
-    story_rump_by_species = {
-        **story["refractory_ceramic"]["species_kg"],
-        **story["terminal_residue"]["species_kg"],
-    }
-    assert story_rump_by_species == displayed_species_kg(rump_by_species)
     assert story["input"] == {
         "feedstock": "lunar_mare_low_ti",
         "feedstock_label": sim.record.feedstock_label,
@@ -823,6 +810,113 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert "class total kg: 0 kg" in empty_text
 
     assert sid in _simulations
+    web_cpu = headless_full_run_product_story["web_phase_cpu_seconds"]
+    web_wall = headless_full_run_product_story["web_phase_wall_seconds"]
+    test_cpu = time.process_time() - test_started_cpu
+    test_wall = time.monotonic() - test_started_wall
+    assert web_cpu + test_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    print(
+        "HEADLESS_WEB_PHASE "
+        f"cpu={web_cpu:.3f}s wall={web_wall:.3f}s "
+        f"test_cpu={web_cpu + test_cpu:.3f}s "
+        f"test_wall={web_wall + test_wall:.3f}s "
+        f"wall_cpu={((web_wall + test_wall) / (web_cpu + test_cpu)):.3f}"
+    )
+
+
+@pytest.mark.nightly
+def test_headless_full_run_ledgers_and_product_story_match_runner(
+    headless_full_run_product_story,
+):
+    from dataclasses import replace
+
+    from simulator.accounting.queries import TERMINAL_RUMP_ACCOUNTS
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import _product_classification_report
+
+    test_started_cpu = time.process_time()
+    test_started_wall = time.monotonic()
+    state = headless_full_run_product_story["state"]
+    decisions = headless_full_run_product_story["decisions"]
+    completion = headless_full_run_product_story["completion"]
+    sim = state["session"].simulator
+    story = completion["product_story"]
+
+    # Replay the same inputs through a fresh AUTO_APPLY runner session. The
+    # web envelope above is built from its live session, so it cannot by itself
+    # establish web-versus-runner parity.
+    runner_started_cpu = time.process_time()
+    runner_started_wall = time.monotonic()
+    runner_execution = RunExecutor().execute(
+        replace(
+            state["session"]._config,
+            hours=int(sim.melt.hour),
+            result_document_factory=None,
+        )
+    )
+    runner_cpu = time.process_time() - runner_started_cpu
+    runner_wall = time.monotonic() - runner_started_wall
+    assert runner_execution.status == "ok"
+    assert [
+        (row["decision_type"], row["choice"])
+        for row in runner_execution.operator_decisions
+    ] == decisions
+    runner_sim = runner_execution.simulator
+    for account in TERMINAL_RUMP_ACCOUNTS:
+        assert dict(runner_sim.atom_ledger.project_account_mol(account)) == dict(
+            sim.atom_ledger.project_account_mol(account)
+        )
+
+    runner_classification = _product_classification_report(
+        runner_sim,
+        feedstock_id=runner_sim.record.feedstock_key,
+        campaign=runner_sim.melt.campaign.name,
+    )["classification"]
+    assert story["metal_ingots"]["species_kg"] == displayed_species_kg(
+        runner_classification["ingots_metals"]["species_kg"]
+    )
+    assert story["metal_ingots"]["source_accounts_by_species"] == (
+        runner_classification["ingots_metals"]["source_accounts_by_species"]
+    )
+    assert story["unrecovered_metal_phase"]["species_kg"] == (
+        displayed_species_kg(
+            runner_classification["unrecovered_metal_phase"]["species_kg"]
+        )
+    )
+    assert story["unrecovered_metal_phase"]["source_accounts_by_species"] == (
+        runner_classification["unrecovered_metal_phase"][
+            "source_accounts_by_species"
+        ]
+    )
+    assert story["glass"]["species_kg"] == displayed_species_kg(
+        runner_classification["glass"]["species_kg"]
+    )
+    assert story["captured_volatiles"]["species_kg"] == displayed_species_kg(
+        runner_classification["captured_volatiles"]["kg_by_species"]
+    )
+    oxygen_partition = runner_classification["oxygen"]["partition_kg"]
+    assert story["oxygen"]["class_total_kg"] == round(
+        oxygen_partition["stored"] + oxygen_partition["captured"], 2
+    )
+    rump_by_species = runner_classification["refractory_ceramic_rump"][
+        "rump_kg_by_species"
+    ]
+    story_rump_by_species = {
+        **story["refractory_ceramic"]["species_kg"],
+        **story["terminal_residue"]["species_kg"],
+    }
+    assert story_rump_by_species == displayed_species_kg(rump_by_species)
+
+    test_cpu = time.process_time() - test_started_cpu
+    test_wall = time.monotonic() - test_started_wall
+    assert test_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    assert runner_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    print(
+        "HEADLESS_RUNNER_PARITY_PHASE "
+        f"cpu={runner_cpu:.3f}s wall={runner_wall:.3f}s "
+        f"test_cpu={test_cpu:.3f}s test_wall={test_wall:.3f}s "
+        f"wall_cpu={(test_wall / test_cpu):.3f}"
+    )
 
 
 # Nightly (2026-08-02 CI tiering): serial web full path (~327 s junit).
