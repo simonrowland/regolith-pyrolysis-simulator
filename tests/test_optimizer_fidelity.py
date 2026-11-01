@@ -7,6 +7,7 @@ import math
 import os
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -66,6 +67,116 @@ def test_fidelity_timeout_refuses_non_finite_or_non_positive_values(
             feedstock_id=FEEDSTOCK_ID,
             per_eval_timeout_s=timeout_s,
         )
+
+
+def test_fidelity_keeps_completed_result_when_parent_wakes_after_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="fast",
+        fn=_authoritative_cached_real_fast,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="fast",
+        profile={"fidelities": {"fast": {"backend_name": "cached-real"}}},
+        candidate_id="fidelity-doe-000000-fast",
+        kwargs={},
+    )
+    result = _result(
+        task.candidate_id,
+        oxygen_kg=1.0,
+        energy_kwh=2.0,
+        backend_name="cached-real",
+        backend_status="ok",
+    )
+
+    class _Queue:
+        def __init__(self) -> None:
+            self.items: list[object] = []
+            self.on_task: object | None = None
+
+        def put(self, value: object) -> None:
+            if not isinstance(value, fidelity_module._FidelityTask):
+                return
+            assert callable(self.on_task)
+            emit = self.on_task
+            emit({"kind": "started", "tier": value.tier, "index": value.index})
+            emit(
+                {
+                    "kind": "done",
+                    "tier": value.tier,
+                    "index": value.index,
+                    "payload": {"kind": "result", "result": result},
+                }
+            )
+
+        def get(self, timeout: float | None = None) -> object:
+            del timeout
+            if not self.items:
+                raise fidelity_module.Empty
+            return self.items.pop(0)
+
+        def get_nowait(self) -> object:
+            if not self.items:
+                raise fidelity_module.Empty
+            return self.items.pop(0)
+
+        def close(self) -> None:
+            pass
+
+    class _Worker:
+        alive = True
+
+        def start(self) -> None:
+            pass
+
+        def is_alive(self) -> bool:
+            return self.alive
+
+        def terminate(self) -> None:
+            self.alive = False
+
+        def join(self, timeout: float | None = None) -> None:
+            del timeout
+            self.alive = False
+
+    queues: list[_Queue] = []
+
+    def make_queue() -> _Queue:
+        queue = _Queue()
+        queues.append(queue)
+        if len(queues) == 2:
+            queues[0].on_task = queues[1].items.append
+        return queue
+
+    context = SimpleNamespace(
+        Queue=make_queue,
+        Process=lambda **kwargs: _Worker(),
+    )
+    actual_mp = fidelity_module.mp
+    monkeypatch.setattr(
+        fidelity_module,
+        "mp",
+        SimpleNamespace(
+            get_all_start_methods=actual_mp.get_all_start_methods,
+            get_context=lambda _method: context,
+        ),
+    )
+    clock_values = iter((10.0, 12.0))
+    monkeypatch.setattr(
+        fidelity_module,
+        "time",
+        SimpleNamespace(monotonic=lambda: next(clock_values)),
+    )
+
+    outcomes = fidelity_module._run_eval_batch((task,), 1.0, max_workers=1)
+
+    completed, drop = outcomes[("fast", 0)]
+    assert completed is result
+    assert drop is None
+    arm = fidelity_module._arm_backend_authority("fast", "fast", (task,), (completed,))
+    assert arm["backend_status"] == "ok"
 
 
 def test_t155_fidelity_tasks_propagate_conditional_context_to_both_arms(
