@@ -759,6 +759,17 @@ def _as_dec_or_none(value: object) -> Decimal | None:
 def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
     """Classify one printed composition cell without raising."""
 
+    if isinstance(value, Mapping):
+        state = value.get("state")
+        if isinstance(state, Mapping):
+            if str(state.get("tag") or "value") != "value":
+                return "malformed", None
+            return _classify_composition_cell(state.get("value"))
+        if "value" in value:
+            if str(value.get("tag") or "value") != "value":
+                return "malformed", None
+            return _classify_composition_cell(value["value"])
+        return "malformed", None
     if value is None:
         return "blank", None
     if isinstance(value, bool):
@@ -1368,11 +1379,17 @@ def _percent_pairs(
         if not isinstance(item, (list, tuple)) or len(item) != 2:
             return None
         name = str(item[0])
-        kind, amount = _classify_composition_cell(item[1])
-        if kind != "number" or amount is None:
-            return None
         if amount_basis is AmountBasis.MASS_PERCENT:
             name, _has_mass_suffix = _mass_percent_component_key(name)
+        kind, amount = _classify_composition_cell(item[1])
+        if (
+            amount_basis is AmountBasis.MASS_PERCENT
+            and kind == "blank"
+            and _volatile_closure_component(name) is not None
+        ):
+            continue
+        if kind != "number" or amount is None:
+            return None
         result.append((name, amount))
     return result or None
 
@@ -1475,41 +1492,43 @@ def _percent_composition_closure_error(
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
+    body: object = payload
+    if isinstance(payload, Mapping) and "state" in payload:
+        state = payload.get("state")
+        body = (
+            state.get("value")
+            if isinstance(state, Mapping)
+            and str(state.get("tag") or "value") == "value"
+            else None
+        )
+    components = body.get("components") if isinstance(body, Mapping) else None
+    items = (
+        tuple(components.items())
+        if isinstance(components, Mapping)
+        else tuple(components)
+        if isinstance(components, (list, tuple))
+        else ()
+    )
+    raw_components = (
+        {str(name): amount for name, amount in items}
+        if all(isinstance(item, (list, tuple)) and len(item) == 2 for item in items)
+        else {}
+    )
+    raw_components_are_unique = len(raw_components) == len(items)
+
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
-        body: object = payload
-        if isinstance(payload, Mapping) and "state" in payload:
-            state = payload.get("state")
-            body = (
-                state.get("value")
-                if isinstance(state, Mapping)
-                and str(state.get("tag") or "value") == "value"
-                else None
-            )
         if isinstance(body, Mapping):
             basis = body.get("amount_basis")
             if isinstance(basis, AmountBasis):
                 basis = basis.value
-            components = body.get("components")
-            items = (
-                tuple(components.items())
-                if isinstance(components, Mapping)
-                else tuple(components)
-                if isinstance(components, (list, tuple))
-                else ()
-            )
             if (
                 str(basis or "") == AmountBasis.MASS_PERCENT.value
                 and items
-                and all(
-                    isinstance(item, (list, tuple)) and len(item) == 2
-                    for item in items
-                )
+                and raw_components_are_unique
             ):
-                raw_components = {str(name): amount for name, amount in items}
                 if (
-                    len(raw_components) == len(items)
-                    and any(
+                    any(
                         _classify_composition_cell(amount)[0] != "number"
                         for _name, amount in items
                     )
@@ -1520,7 +1539,7 @@ def _mass_percent_printed_from_plain(
                         else None
                     )
                     return located_value(
-                        _printed_map_payload(raw_components), locator
+                        raw_components, locator
                     )
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
@@ -1530,7 +1549,22 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
-    return located_value(_printed_map_payload(wt), locator)
+    printed = _printed_map_payload(wt)
+    raw_by_component = {
+        _mass_percent_component_key(name)[0]: amount
+        for name, amount in raw_components.items()
+    }
+    for name in printed:
+        if name in raw_by_component:
+            printed[name] = raw_by_component[name]
+    for name, amount in raw_components.items():
+        normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
+        if (
+            _classify_composition_cell(amount)[0] == "blank"
+            and _volatile_closure_component(normalized_name) is not None
+        ):
+            printed[name] = amount
+    return located_value(printed, locator)
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -4070,15 +4104,6 @@ def _is_closure_only_volatile(name: str) -> bool:
 
 
 def _printed_mass_percent_number(value: object) -> Decimal | None:
-    if isinstance(value, Mapping):
-        state = value.get("state")
-        if isinstance(state, Mapping):
-            if str(state.get("tag") or "value") != "value":
-                return None
-            return _printed_mass_percent_number(state.get("value"))
-        if set(value) == {"value"}:
-            return _printed_mass_percent_number(value["value"])
-        return None
     _kind, amount = _classify_composition_cell(value)
     return amount
 
