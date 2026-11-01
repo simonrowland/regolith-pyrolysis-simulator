@@ -5,7 +5,10 @@ from decimal import Decimal
 
 import pytest
 
-from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    _wt_percent_conversion_state,
+    wt_pct_to_mole_fraction,
+)
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, FO2Channel, MethodToken, ValueKind
 from simulator.battery.records import (
@@ -802,6 +805,33 @@ def test_g2_uses_explicit_evaporation_alpha() -> None:
 @pytest.mark.parametrize("silica,expected_mass", [("50", "0.0009"), ("60", "0.001")])
 def test_partial_printed_oxide_inventory_preserves_printed_mass_basis(silica, expected_mass) -> None:
     printed = {"MgO": Decimal("40"), "SiO2": Decimal(silica)}
+    if silica == "50":
+        refusal = _wt_percent_conversion_state(
+            printed, declared_component_map=printed
+        )
+        # b-704 does not turn this 90 wt% partial assay into a charge vector.
+        assert refusal.is_unknown
+        assert "kept sum=90 wt% is below 95 wt%" in refusal.reason
+        sample = replace(
+            _charge(single=False),
+            mass_kg=factories.located(Value.point_of("0.001")),
+            initial_composition=factories.located(
+                wt_pct_to_mole_fraction(
+                    {"MgO": Decimal("40"), "SiO2": Decimal("60")}
+                )
+            ),
+            printed_composition=factories.located(printed),
+        )
+        result = charge_moles_by_species(
+            replace(factories.kems_experiment(), sample=sample), _bench()
+        )
+        assert set(result) == {"MgO", "SiO2"}
+        assert all(
+            route.route == "mass_times_mole_fraction"
+            for item in result.values()
+            for route in item.routes
+        )
+        return
     sample = replace(
         _charge(single=False),
         mass_kg=factories.located(Value.point_of("0.001")),

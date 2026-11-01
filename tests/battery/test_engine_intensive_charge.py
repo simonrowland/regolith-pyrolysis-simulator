@@ -10,7 +10,7 @@ from simulator.battery.enums import AmountBasis
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
 from simulator.battery.records import Composition, Derivation, Located, Sample, State
 from simulator.battery.migrate import (
-    load_yaml, _sample_from_plain, wt_pct_to_mole_fraction, wt_pct_to_mole_fraction_derivation,
+    load_yaml, _sample_from_plain, _wt_percent_conversion_state,
 )
 from simulator.battery.waypoints import GapReason, ReadinessStatus, WaypointAuthority
 from tests.battery import factories as f
@@ -96,12 +96,25 @@ def test_printed_species_dropped_by_sibling_refuses(extra):
     experiment, bench, observation = case()
     wt = {"SiO2": D(50), "MgO": D(30)}
     key = next(iter(extra))
+    printed = {**wt, **extra}
+    closure = _wt_percent_conversion_state(
+        wt, closure_context=printed, declared_component_map=printed
+    )
+    if key == "LOI":
+        assert closure.is_value
+    else:
+        # b-704 excludes the printed total and refuses the remaining 80 wt%.
+        assert closure.is_unknown
+        assert "kept sum=80 wt% is below 95 wt%" in closure.reason
     experiment = replace(experiment, sample=Sample(
         mass_kg=Located(State.unknown("would_invent")),
-        printed_composition=f.located({**wt, **extra}),
+        printed_composition=f.located(printed),
         initial_composition=Located(
-            State.of(wt_pct_to_mole_fraction(wt)), locator=f.loc(),
-            inference=wt_pct_to_mole_fraction_derivation(wt, f.loc()))))
+            State.of(Composition(
+                "printed_oxides",
+                (("SiO2", D(".5")), ("MgO", D(".5"))),
+                AmountBasis.MOLE_FRACTION,
+            )), locator=f.loc())))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     waypoint = inputs.waypoints["normalized_composition"]
     assert waypoint.selected is None

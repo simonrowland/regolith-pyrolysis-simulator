@@ -47,10 +47,10 @@ def test_ivanova_2018_residue_series_migrates_and_pins_table_1_values():
         assert elapsed.state.is_value
         assert elapsed.locator is not None
     series = document["species"]["CaO"]["observations"][0]["values"]["series"]
-    oxides = ("SiO2", "Al2O3", "MgO", "CaO")
+    oxides = ("SiO2_wt_pct", "Al2O3_wt_pct", "MgO_wt_pct", "CaO_wt_pct")
     rows_by_composition = {
         tuple(
-            (oxide, Decimal(str(row[f"{oxide}_wt_pct"])))
+            (oxide, Decimal(str(row[oxide])))
             for oxide in oxides
         ): row
         for row in series

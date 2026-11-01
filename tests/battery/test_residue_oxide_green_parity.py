@@ -1,4 +1,4 @@
-"""write=False residue migrations match green a822c275f.
+"""write=False residue migrations match green 5dd775292.
 
 The temp-root setup copies tests/battery/test_migrate.py::_migrate_real_extract
 (original extract text, one INDEX row, migrate(root, write=False)). Importing
@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-GREEN = "a822c275f29fe3e16fad41f4ccfe16606c01aa73"
+GREEN = "5dd775292"
 SOURCES = (
     "ivanova-2018-spinel-rich-cai-evaporation",
     "kems-026-markova-1984",

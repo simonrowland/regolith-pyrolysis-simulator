@@ -319,7 +319,27 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         )
         assert expected_ratio is not None
         assert record.value.point == expected_ratio
-    assert all(record.identity.composition.is_value for record in reduced)
+    refused_compositions = [
+        record
+        for record in reduced
+        if record.identity.composition.is_unknown
+    ]
+    # b-704 retains the Fe-oxide assays, but their 12.84 or 12.96 wt% totals
+    # are partial analyses below the 95 wt% minimum closure window.
+    assert len(refused_compositions) == 13
+    assert all(
+        "mass-percent composition is a partial analysis" in record.identity.composition.reason
+        and any(
+            f"kept sum={total} wt% is below 95 wt%" in record.identity.composition.reason
+            for total in ("12.84", "12.96")
+        )
+        for record in refused_compositions
+    )
+    assert all(
+        record.identity.composition.is_value or record.identity.composition.is_unknown
+        for record in reduced
+    )
+    assert sum(record.identity.composition.is_value for record in reduced) == 33
     assert all(
         record.identity.total_pressure_Pa.is_value
         and record.identity.total_pressure_Pa.value == Decimal("101325")
