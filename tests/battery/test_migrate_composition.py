@@ -2654,7 +2654,7 @@ def test_malformed_minor_component_is_not_treated_as_missing_major() -> None:
         "SiO2": "50",
         "MgO": "25",
         "CaO": "25",
-        "K2O": "abc",
+        "ZrO2": "abc",
     }
     _printed, initial = migrate_module._located_printed_and_initial(
         printed_map,
