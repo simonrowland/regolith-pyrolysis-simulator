@@ -2765,6 +2765,9 @@ def test_composition_cell_classifier_matches_printed_amount_reader(
 
 
 def test_composition_cell_classifier_matches_green_numeric_reader_union() -> None:
+    # Green's typed map / point-map scalar readers use as_decimal via
+    # _as_dec_or_none; its printed-oxide reader additionally strips ±, and
+    # _point_condition_from_plain unwraps state/value wrappers.
     cases = (
         ("decimal string", "5.00", Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
         ("decimal object", Decimal("5.00"), Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
@@ -2826,6 +2829,13 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
             ),
             None,
         )
+        typed_components = migrate_module._mass_percent_components(
+            {"amount_basis": "mass_percent", "components": [["SiO2", raw]]}
+        )
+        assert (
+            typed_components.get("SiO2") if typed_components is not None else None
+        ) == expected, label
+        assert migrate_module._printed_mass_percent_number(raw) == expected, label
         assert (kind, amount) == (
             ("number", expected) if expected is not None else ("malformed", None)
         ), label
