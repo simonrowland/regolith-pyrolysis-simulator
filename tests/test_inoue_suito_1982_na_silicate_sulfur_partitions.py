@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import re
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -10,7 +11,9 @@ import yaml
 
 from simulator.battery.migrate import to_plain
 from simulator.battery.enums import EvidenceClass, ValueKind
+from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.generators.bench import activity_request_for_engine
+from tests.battery.test_bench_generators import case as consumer_case
 from tests.battery.factories import migrate_one_extract
 
 
@@ -375,6 +378,7 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
     assert sum(row.value.kind is ValueKind.POINT for row in result.observations.values()) == 240
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 27
     assert set(by_id) == set(source_rows)
+    _, consumer_bench, _ = consumer_case()
     for row in result.observations.values():
         plain = to_plain(row)
         assert plain["identity"]["temperature_K"]["tag"] == "value"
@@ -410,8 +414,24 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
         assert composition_value["amount_basis"] == "mole_fraction"
         assert dict(composition_value["components"]) == composition_map["components"]
         assert composition["locator"]["page"] == int(expected["composition_page"])
+        experiment = replace(
+            result.experiments[migrated.experiment_id],
+            bench_id=consumer_bench.id,
+        )
+        consumer_inputs = collect_consumer_inputs(
+            experiment, consumer_bench, migrated
+        )
+        normalized = consumer_inputs.waypoints["normalized_composition"].selected
+        assert normalized is not None
+        assert normalized.value == {
+            species: Decimal(amount)
+            for species, amount in composition_map["components"].items()
+        }
+        assert normalized.notice is not None
+        assert "identity-derived" in normalized.notice
+        assert f"relation={derived_basis}" in normalized.notice
         request = activity_request_for_engine(
-            result.experiments[migrated.experiment_id], migrated, "openimcc"
+            experiment, migrated, "openimcc"
         )
         readiness = to_plain(request.readiness)
         assert not any(gap["waypoint"] == "normalized_composition" for gap in readiness["gaps"])

@@ -932,6 +932,8 @@ def normalized_composition(
                         "printed recipe/aimed target",
                     "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
                         "measured composition",
+                    "identity_derived_binary_mole_fraction":
+                        "identity-derived composition",
                 }
                 relation = located.inference.relation
                 origin = origins.get(relation)
