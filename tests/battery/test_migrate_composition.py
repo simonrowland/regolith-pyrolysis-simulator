@@ -5876,3 +5876,69 @@ def test_nonclosing_mass_percent_conversion_is_refused() -> None:
                 payload
             ),
         )
+
+
+def test_miki_explicit_mole_composition_is_not_lost_for_unknown_quantity() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT
+        / "data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::miki_1999_t1_sample_1_si_rich_composition"
+        )
+    )
+
+    composition = observation.identity.composition
+    assert observation.identity.quantity.is_unknown
+    assert composition is not None and composition.is_value
+    assert composition.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert dict(composition.value.components) == {
+        "Al": Decimal("0.00199"),
+        "Pb": Decimal("0.0231"),
+        "Si": Decimal("0.975"),
+    }
+
+
+def test_thomas_wood_row_composition_keeps_its_closure_refusal() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT
+        / "data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.startswith(
+            "thomas-wood-2021-chlorine-silicate-melts::"
+            "thomas_wood_2021_table2_experimental_rows::T=1673.15:row=agi/cl-007:"
+        )
+    )
+
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_unknown
+    assert "missing major oxides: FeO" in composition.reason
+
+
+def test_nasa_bulk_oxide_row_keeps_its_closure_refusal() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/nasa-tm-2024-simulant-guide.yaml"
+    )
+    migrator.finalize()
+    observation = next(
+        item
+        for item in migrator.result.observations.values()
+        if item.observation_id.endswith(
+            "::nasa_tm_2024_table7_bulk_chemistry::rows:h=278c5b9d52be"
+        )
+    )
+
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_unknown
+    assert "kept sum=92.7 wt% is below 95 wt%" in composition.reason
