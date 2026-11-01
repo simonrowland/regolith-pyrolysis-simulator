@@ -844,6 +844,36 @@ def normalized_composition(
     if observation is not None and observation.experiment_id != experiment.experiment_id:
         raise ValueError("Observation belongs to a different experiment")
     point = (observation.point_conditions or {}) if observation else {}
+    residue_component_cell = False
+    if (
+        observation is not None
+        and observation.identity.quantity is not None
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species is not None
+    ):
+        point_composition = point.get("composition")
+        has_typed_point_composition = (
+            isinstance(point_composition, Located)
+            and point_composition.state.is_value
+            and isinstance(point_composition.state.value, Composition)
+        )
+        printed_point = point.get("printed_composition")
+        point_pairs = (
+            _printed_component_pairs(printed_point.state.value)
+            if isinstance(printed_point, Located) and printed_point.state.is_value
+            else None
+        )
+        if point_pairs is not None and len(point_pairs) == 1:
+            point_species, _amount = point_pairs[0]
+            point_species, _has_mass_suffix = _mass_percent_component_key(
+                point_species
+            )
+            residue_component_cell = (
+                not has_typed_point_composition
+                and point_species == observation.identity.species.formula
+                and _is_engine_oxide_component(point_species)
+            )
     routes = []
     evidence_ranks = []
     absent = []
@@ -855,12 +885,16 @@ def normalized_composition(
     rejected_printed_mass = False
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
-        located = point.get(key) if key in point else getattr(experiment.sample, field)
-        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
-                if key in point else f"experiment.sample.{field}")
+        use_point = key in point and not residue_component_cell
+        located = point.get(key) if use_point else getattr(experiment.sample, field)
+        path = (
+            f"observation[{observation.observation_id}].point_conditions.{key}"
+            if use_point
+            else f"experiment.sample.{field}"
+        )
         if (
             field == "initial_composition"
-            and key in point
+            and use_point
             and located is not None
             and (
                 not located.state.is_value
