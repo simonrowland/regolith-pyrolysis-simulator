@@ -638,6 +638,30 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
             assert event["reason"]
 
 
+def test_c2a_wall_saturation_refusal_events_are_deterministic():
+    events_by_run = []
+    for _ in range(2):
+        report, _ = build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=24,
+            include_diagnostics=True,
+            allow_unmeasured_alpha_fallback=True,
+        )
+        refusals = report["fouling_rate"]["sticking_alpha_authority"].get(
+            "wall_saturation_pressure_refusals_by_species", {}
+        )
+        events_by_run.append(
+            tuple(
+                (species, segment, record)
+                for species, by_segment in refusals.items()
+                for segment, record in by_segment.items()
+            )
+        )
+
+    assert events_by_run[0]
+    assert events_by_run[1] == events_by_run[0]
+
+
 def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     report, diagnostics = build_sio_yield_report(
         feedstock_id="lunar_mare_low_ti",
