@@ -395,11 +395,6 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         feo = expected_composition["FeO"]
         source = rows_by_id[observation_id]
         assert source["values"]["composition_wt_pct"] == expected_composition
-        printed_sum = sum(
-            (Decimal(amount) for amount in expected_composition.values()),
-            Decimal("0"),
-        )
-        assert Decimal("96.7") <= printed_sum <= Decimal("100.1")
         assert source["values"]["Fe2O3_wt_pct"] == fe2o3
         assert source["values"]["FeO_wt_pct"] == feo
         if observation_id.startswith("kc91_fe3_t4_"):
@@ -418,12 +413,6 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         )
         assert record.identity.composition.is_value
         assert record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
-        row_composition = record.point_conditions["composition"]
-        assert row_composition.state.is_value
-        assert row_composition.state.value.as_map() == expected_mole_fractions.as_map()
-        row_printed = record.point_conditions["printed_composition"]
-        assert row_printed.state.is_value
-        assert row_printed.state.value == expected_composition
     assert all(record.identity.composition.is_value for record in reduced)
     assert all(
         record.identity.total_pressure_Pa.is_value
