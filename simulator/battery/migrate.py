@@ -20491,30 +20491,17 @@ class Migrator:
                     and _printed_fingerprint(candidate_values)
                     == row_printed_fingerprint
                 ):
-                    row_printed_values = candidate_values
                     if row_printed_locator is None:
                         row_printed_locator = _composition_source_locator(
                             source_values, fallback=source_fallback
                         )
                     break
+            if row_printed_fingerprint is not None:
+                row_printed_values = dict(row_printed_fingerprint)
             row_printed_composition = replace(
                 row_sample.printed_composition,
                 state=(
-                    State.of(
-                        (
-                            _printed_map_payload(
-                                row_printed_values,
-                                numeric_values_as=(
-                                    "decimal"
-                                    if source_id == "lpi-lunar-soils"
-                                    else "string"
-                                    if source_id
-                                    == "banya-watanabe-1977-feto-p2o5-solid-iron"
-                                    else "source"
-                                ),
-                            )
-                        )
-                    )
+                    State.of(_printed_map_payload(row_printed_values))
                     if row_printed_locator is not None
                     else State.unknown(
                         "printed composition has no source locator"

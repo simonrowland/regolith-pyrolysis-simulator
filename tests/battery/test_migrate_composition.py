@@ -3217,7 +3217,12 @@ def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
     assert "XxO=10 wt%" in point.identity.composition.reason
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
-    assert printed.state.value == components
+    assert printed.state.value == {
+        "SiO2": Decimal("54.90"),
+        "MgO": Decimal("40.00"),
+        "XxO": Decimal("10"),
+        "H2O_wt_pct": Decimal("5.10"),
+    }
 
 
 @pytest.mark.parametrize(
@@ -3540,6 +3545,9 @@ def test_b704_jsc_partial_oxide_map_refuses_engine_composition_with_missing_majo
     observation = migrator.result.observations[
         "jsc-lunar-catalog-12023::jsc_12023_table1_warren78_composition"
     ]
+    row_printed = observation.point_conditions["printed_composition"]
+    assert row_printed.state.is_value
+    assert row_printed.state.value == sample.printed_composition.state.value
 
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
@@ -3859,9 +3867,10 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                             "printed_composition"
                         )
                         assert row_printed is not None and row_printed.state.is_value
-                        assert row_printed.state.value["S"] == as_decimal(
-                            raw_composition["S"]
-                        )
+                        assert isinstance(row_printed.state.value["S"], str)
+                        assert row_printed.state.value["S"] == dict(
+                            migrate_module._printed_fingerprint(raw_composition)
+                        )["S"]
                     if "FeOT" in raw_composition:
                         assert observation.identity.quantity.is_unknown
                         assert not any(
@@ -4607,8 +4616,8 @@ def test_flat_refused_point_preserves_blank_and_missing_major_oxide(
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
     assert printed.state.value["FeO"] == missing_marker
-    assert printed.state.value["SiO2"] == "54.90"
-    assert printed.state.value["MgO"] == "40.00"
+    assert printed.state.value["SiO2"] == Decimal("54.90")
+    assert printed.state.value["MgO"] == Decimal("40.00")
 
 
 def test_flat_point_refuses_large_unknown_and_preserves_printed_components(
@@ -4644,9 +4653,9 @@ def test_flat_point_refuses_large_unknown_and_preserves_printed_components(
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
     assert printed.state.value == {
-        "SiO2": "60",
-        "MgO": "40",
-        "XxO": "10",
+        "SiO2": Decimal("60"),
+        "MgO": Decimal("40"),
+        "XxO": Decimal("10"),
     }
 
 
@@ -4682,9 +4691,9 @@ def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
     assert printed.state.value == {
-        "SiO2": "49.85",
-        "MgO": "49.85",
-        "XxO": "0.3",
+        "SiO2": Decimal("49.85"),
+        "MgO": Decimal("49.85"),
+        "XxO": Decimal("0.3"),
     }
     projected = [
         notice
