@@ -5082,6 +5082,45 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         }
 
 
+def test_hashimoto_20b2_engine_payload_keeps_green_starting_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-015-hashimoto-1983.yaml", write=False
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if (
+            "hashimoto_1983_table3_cao_residue_series_quoted__run_20b2"
+            in row.observation_id
+        )
+    )
+    printed = observation.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value == {"CaO_wt_pct": "3.72"}
+
+    experiment = result.experiments[observation.experiment_id]
+    requests = engine_point_requests(
+        collect_consumer_inputs(
+            experiment, result.benches[experiment.bench_id], observation
+        )
+    )
+    expected_green_payload = {
+        "SiO2": 0.3379238246485715,
+        "Al2O3": 0.017760541249646305,
+        "FeO": 0.2794942400441881,
+        "MgO": 0.33896696103658575,
+        "CaO": 0.025854433021008306,
+    }
+    assert requests
+    assert all(request.payload is not None for request in requests)
+    assert all(
+        request.payload["composition_mol"] == expected_green_payload
+        for request in requests
+    )
+
+
 @pytest.mark.parametrize(
     ("source", "row_token", "expected_oxides"),
     (
