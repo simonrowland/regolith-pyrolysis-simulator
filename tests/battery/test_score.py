@@ -8936,6 +8936,44 @@ def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
     assert headline_with_notice is headline_without_notice
 
 
+@pytest.mark.parametrize(
+    "measured_phase",
+    (
+        {
+            "measured_condensed_form": {
+                "state": "liquid_melt",
+                "basis": "explicit_author",
+            }
+        },
+        {"measured_sample_phase": "K2O-SiO2_binary_silicate_melt"},
+    ),
+)
+def test_recorded_liquid_measurement_phase_overrides_solid_sample_description(
+    measured_phase: dict[str, object],
+) -> None:
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            form=None,
+            characterization=F.located(_COSTA_FO93FA7_SAMPLE),
+        ),
+    )
+    reference = replace(reference, provenance=measured_phase)
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
 def test_liquid_sample_vapour_has_no_subsolidus_domain_notice() -> None:
     experiment, reference = _vapour_over_sample_form("condensed_liquid")
     residual, calls = _score_sample_phase_vapour(
