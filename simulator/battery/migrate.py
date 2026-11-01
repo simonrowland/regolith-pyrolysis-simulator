@@ -5111,7 +5111,7 @@ def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         kind, amount = _classify_composition_cell(obj.get(field))
         if kind == "number" and amount is not None:
             components[name] = amount
-    return components if len(components) >= 2 else None
+    return components or None
 
 
 def _initial_oxide_map_from_values(
@@ -5602,7 +5602,10 @@ def _located_printed_and_initial(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> tuple[Located[Mapping[str, Any]] | None, Located[Composition] | None]:
-    if not isinstance(wt, Mapping) or not wt:
+    if not isinstance(wt, Mapping) or (
+        not wt
+        and not (isinstance(declared_component_map, Mapping) and declared_component_map)
+    ):
         return None, None
     printed_map = _source_printed_composition_values(wt, closure_context)
     printed = located_value(_printed_map_payload(printed_map), locator)
@@ -22532,7 +22535,18 @@ class Migrator:
             point_locator,
             fallback=(parent_values,) if isinstance(parent_values, Mapping) else (),
         )
-        if point_oxide_map:
+        has_residue_composition_cells = (
+            q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and bool(point_declared_component_map)
+        )
+        if has_residue_composition_cells:
+            printed, residual = _located_printed_and_initial(
+                point_oxide_map or {},
+                point_locator,
+                closure_context=point_composition_context,
+                declared_component_map=point_declared_component_map,
+            )
+        elif point_oxide_map:
             if point_printed_composition is None:
                 printed, residual = _located_printed_and_initial(
                     point_oxide_map,
@@ -22545,22 +22559,22 @@ class Migrator:
                     point_printed_composition, point_oxide_map, raw_item
                 )
                 residual = point_composition_located
-            if point_composition_role_refusal is not None:
-                self.result.add_queue(
-                    work.work_id,
-                    point_locator,
-                    ["composition"],
-                    point_composition_role_refusal,
-                    source=source_key,
-                    observation_id=point_id,
-                )
-            extra_pc: dict[str, Located[Any]] = {}
-            if printed is not None:
-                extra_pc["printed_composition"] = printed
-            if residual is not None:
-                extra_pc["composition"] = residual
-            if extra_pc:
-                point_conditions = {**(point_conditions or {}), **extra_pc}
+        if point_composition_role_refusal is not None:
+            self.result.add_queue(
+                work.work_id,
+                point_locator,
+                ["composition"],
+                point_composition_role_refusal,
+                source=source_key,
+                observation_id=point_id,
+            )
+        extra_pc: dict[str, Located[Any]] = {}
+        if printed is not None:
+            extra_pc["printed_composition"] = printed
+        if residual is not None:
+            extra_pc["composition"] = residual
+        if extra_pc:
+            point_conditions = {**(point_conditions or {}), **extra_pc}
         if point_composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
