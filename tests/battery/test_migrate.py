@@ -96,6 +96,7 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
+    _named_fraction_bound_selection,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -9470,6 +9471,70 @@ def test_structured_named_mass_loss_bounds_migrate_as_typed_values(
     assert source_extract["species"]["Na"]["observations"][0]["values"][
         "value_as_printed"
     ] == f"more than {printed_bound} mass pct V2O5 extracted"
+
+
+@pytest.mark.parametrize(
+    (
+        "field_name",
+        "units",
+        "operator",
+        "printed_bound",
+        "expected_bound",
+        "unit_trail",
+    ),
+    (
+        (
+            "remaining_fraction",
+            "fraction",
+            ">",
+            "0.45",
+            Decimal("0.45"),
+            "identity",
+        ),
+        (
+            "mass_loss_wt_pct",
+            "wt_pct",
+            "<=",
+            "77",
+            Decimal("0.77"),
+            "percent_to_fraction",
+        ),
+    ),
+)
+def test_structured_named_fraction_bound_selection_keeps_metadata(
+    field_name: str,
+    units: str,
+    operator: str,
+    printed_bound: str,
+    expected_bound: Decimal,
+    unit_trail: str,
+) -> None:
+    condition_ranges = (
+        ("T_range_K", Decimal("1000"), Decimal("1200")),
+    )
+    payload = {
+        field_name: {
+            "kind": "bound",
+            "bound_operator": operator,
+            "bound_value": printed_bound,
+        },
+        "p_Ga_Pa": "unselected pressure",
+        "delta_IW": "unselected buffer offset",
+    }
+
+    selection = _named_fraction_bound_selection(
+        payload, field_name, units, condition_ranges
+    )
+
+    assert selection is not None
+    assert selection.available
+    assert selection.value.kind is ValueKind.BOUND
+    assert selection.value.bound_operator == operator
+    assert selection.value.bound_value == expected_bound
+    assert selection.unit_trail == unit_trail
+    assert selection.unused_ancillary == ("p_Ga_Pa", "delta_IW")
+    assert selection.condition_ranges == condition_ranges
+    assert selection.field_name == field_name
 
 
 def test_named_mass_loss_percent_point_remains_a_fraction(tmp_path: Path) -> None:
