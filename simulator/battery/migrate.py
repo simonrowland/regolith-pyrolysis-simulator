@@ -5870,6 +5870,13 @@ def _owner_initial_from_printed(
         )
     refusal_reason: list[str] = []
     pairs = _mass_percent_pairs(raw)
+    if pairs is None and isinstance(raw, Mapping):
+        pairs = _mass_percent_pairs(
+            {
+                "amount_basis": AmountBasis.MASS_PERCENT.value,
+                "components": raw,
+            }
+        )
     if pairs is not None:
         duplicates = _duplicate_mass_percent_component_names(pairs)
         if duplicates:
@@ -5879,6 +5886,13 @@ def _owner_initial_from_printed(
             wt = None
         else:
             wt = dict(pairs)
+            if not _oxide_mass_percent_components(wt):
+                wt = _initial_oxide_map_from_values(
+                    raw,
+                    refusal_reason=refusal_reason,
+                    declared_map=True,
+                    declared_component_map=raw,
+                )
     else:
         wt = _initial_oxide_map_from_values(
             raw,

@@ -2155,29 +2155,26 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
         "component_amount": "49.85",
     }
 
-    phase_mass_checks: list[dict[str, Decimal]] = []
-    convert = migrate_module._mass_percent_composition_state
+    mass_closure_checks: list[dict[str, Decimal]] = []
+    convert = migrate_module._wt_percent_conversion_or_refusal
 
-    def track_phase_mass_check(
+    def track_mass_closure(
         components: dict[str, Decimal],
         *,
-        basis: str,
         closure_context: object = None,
         declared_component_map: dict[str, object] | None = None,
     ):
-        if basis == "printed_phase_composition":
-            phase_mass_checks.append(dict(components))
+        mass_closure_checks.append(dict(components))
         return convert(
             components,
-            basis=basis,
             closure_context=closure_context,
             declared_component_map=declared_component_map,
         )
 
     monkeypatch.setattr(
         migrate_module,
-        "_mass_percent_composition_state",
-        track_phase_mass_check,
+        "_wt_percent_conversion_or_refusal",
+        track_mass_closure,
     )
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observation = next(iter(result.observations.values()))
@@ -2185,7 +2182,8 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
     initial = experiment.sample.initial_composition
     assert initial is not None
     assert (initial.state.is_value) is accepted
-    assert phase_mass_checks == []
+    # Exact count rejects a skipped guard (0) and a repeated guard (2).
+    assert len(mass_closure_checks) == 1, mass_closure_checks
 
     composition = observation.identity.composition
     assert composition is not None
@@ -2250,6 +2248,70 @@ def test_phase_printed_blank_major_oxide_is_refused(tmp_path: Path) -> None:
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
     assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
+def test_printed_phase_vector_checks_mass_closure_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "phase-vector",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": "60", "MgO": "40"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                }
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "phase-vector",
+            "experiment": "phase-vector",
+            "type": "composition_series",
+            "units": "wt percent",
+        }
+    )
+    row["values"] = {
+        "quantity": "equilibrium_phase_composition",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "phase_label": "melt",
+        "basis": "wt_percent",
+        "component_amount": "60",
+    }
+
+    mass_closure_checks: list[dict[str, Decimal]] = []
+    convert = migrate_module._wt_percent_conversion_or_refusal
+
+    def track_mass_closure(
+        components: dict[str, Decimal],
+        *,
+        closure_context: object = None,
+        declared_component_map: dict[str, object] | None = None,
+    ):
+        mass_closure_checks.append(dict(components))
+        return convert(
+            components,
+            closure_context=closure_context,
+            declared_component_map=declared_component_map,
+        )
+
+    monkeypatch.setattr(
+        migrate_module, "_wt_percent_conversion_or_refusal", track_mass_closure
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert len(mass_closure_checks) == 1, mass_closure_checks
+    assert mass_closure_checks[0] == {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
 
 
 def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
