@@ -179,6 +179,26 @@ def test_fidelity_keeps_completed_result_when_parent_wakes_after_timeout(
     assert arm["backend_status"] == "ok"
 
 
+def test_fidelity_skips_stage0_route_lookup_when_warm_workers_are_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    task = _warm_task()
+
+    def unexpected_route_lookup(_task: fidelity_module._FidelityTask) -> bool:
+        pytest.fail("disabled warm workers do not need a stage-0 route lookup")
+
+    monkeypatch.setattr(
+        fidelity_module,
+        "_task_stage0_subprocess_required",
+        unexpected_route_lookup,
+    )
+
+    result = fidelity_module._call_evaluate_fn(task)
+
+    assert result.candidate_id == task.candidate_id
+
+
 def test_t155_fidelity_tasks_propagate_conditional_context_to_both_arms(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
