@@ -2908,32 +2908,41 @@ def test_printed_composition_uncertainty_uses_central_amount_in_every_reader(
     assert migrate_module._printed_composition_amount(printed) == amount
 
 
-def _migrate_residue_oxide_columns(tmp_path: Path, columns: dict[str, object]):
+def _migrate_residue_oxide_columns(
+    tmp_path: Path,
+    columns: dict[str, object],
+    *,
+    printed_starting_map: dict[str, object] | None = None,
+    include_initial_composition: bool = True,
+):
     extract = deepcopy(FIXTURE_EXTRACT)
     experiment_id = "residue-oxide-columns"
+    sample = {
+        "printed_composition": {
+            "state": {
+                "tag": "value",
+                "value": printed_starting_map
+                or {"SiO2": "50", "MgO": "50"},
+            },
+            "locator": {"table": "1", "row": "1"},
+        }
+    }
+    if include_initial_composition:
+        sample["initial_composition"] = {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "measured",
+                    "amount_basis": "mole_fraction",
+                    "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+                },
+            },
+            "locator": {"table": "1"},
+        }
     extract["experiments"] = [
         {
             "experiment_id": experiment_id,
-            "sample": {
-                "initial_composition": {
-                    "state": {
-                        "tag": "value",
-                        "value": {
-                            "basis": "measured",
-                            "amount_basis": "mole_fraction",
-                            "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
-                        },
-                    },
-                    "locator": {"table": "1"},
-                },
-                "printed_composition": {
-                    "state": {
-                        "tag": "value",
-                        "value": {"SiO2": "50", "MgO": "50"},
-                    },
-                    "locator": {"table": "1", "row": "1"},
-                },
-            },
+            "sample": sample,
         }
     ]
     row = extract["species"]["Na"]["observations"][0]
@@ -2965,6 +2974,42 @@ def _migrate_residue_oxide_columns(tmp_path: Path, columns: dict[str, object]):
         and observation.identity.quantity.value
         is migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION
     ]
+
+
+def test_residue_fallback_refuses_malformed_printed_start_without_aborting(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path,
+        {"residue_ppm": "12"},
+        printed_starting_map={"SiO2": "abc", "MgO": "100"},
+        include_initial_composition=False,
+    )
+
+    assert len(observations) == 1
+    composition = observations[0].identity.composition
+    assert composition is not None
+    assert composition.is_unknown
+    assert "malformed printed component amount for 'SiO2'" in composition.reason
+
+
+def test_mass_percent_printed_provenance_keeps_source_component_names() -> None:
+    printed = migrate_module._mass_percent_printed_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "amount_basis": "mass_percent",
+                    "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
+                },
+            },
+            "locator": {"table": "2", "row": "4"},
+        }
+    )
+
+    assert printed is not None
+    assert printed.state.is_value
+    assert printed.state.value == {"SiO2_wt_pct": "60", "AlO1.5": "40"}
 
 
 @pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))
