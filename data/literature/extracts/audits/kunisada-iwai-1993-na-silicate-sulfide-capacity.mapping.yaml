@@ -4,28 +4,41 @@ table_mapping:
   pdf_page: 2
   published_page: 44
   caption: Chemical compositions of slags (wt%)
-  table_context_target: species.S.context[kunisada_iwai_1993_table1_slag_compositions].values.rows_as_printed
   printed_row_count: 57
+  row_number_column: No.
+  observation_type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  phase: l
+  basis: wt_percent
+  method_class: measured_direct
+  observation_count: 214
   columns:
-  - {column: 1, header: No., destination: sample number}
-  - {column: 2, header: Na2O, destination: Na2O mass percent as printed}
-  - {column: 3, header: SiO2, destination: SiO2 mass percent as printed}
-  - {column: 4, header: CaO, destination: CaO mass percent as printed; blank stays blank}
-  - {column: 5, header: MnO, destination: MnO mass percent as printed; blank stays blank}
-  - {column: 6, header: MgO, destination: MgO mass percent as printed; blank stays blank}
-  - {column: 7, header: Al2O3, destination: Al2O3 mass percent as printed; blank stays blank}
-  - {column: 8, header: S, destination: analyzed sulfur mass percent as printed}
-  evidence:
-    table_rows: measured_direct sample-characterization values; retained as a context table because the pointwise
-      sulfide capacities are equation-derived and their evidence class is blocked by the current migrator behavior.
-    verification: Every populated cell and row/column assignment was checked against the 600-dpi render of PDF page 2.
-    expected_sample_number_groups: [1-14, 101-111, 201-211, 301-311, 401-410]
-    pointwise_capacity_values: not taken from figures
+  - {column: 1, header: No., destination: sample id}
+  - {column: 2, header: Na2O, destination: 57 measured composition observations}
+  - {column: 3, header: SiO2, destination: 57 measured composition observations}
+  - {column: 4, header: CaO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 5, header: MnO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 6, header: MgO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 7, header: Al2O3, destination: 10 measured composition observations; blanks remain unreported}
+  - {column: 8, header: S, destination: 57 measured sulfur-composition observations}
+  observation_fields:
+    component_amount: printed cell value with canonical unit wt%
+    composition_wt_pct: all printed oxide components in the same sample row
+    T_C: 1500, printed in section 2 on PDF page 1
+    point_conditions.gas_mix: printed gas percentages, PDF page 1
+    point_conditions.pO2_Pa: printed calculated gas partial pressure, PDF page 2
+    point_conditions.pS2_Pa: printed calculated gas partial pressure, PDF page 2
+    point_conditions.total_pressure_Pa: unknown; paper does not report total pressure
+  verification: Every populated table cell and row/column assignment checked against the 600-dpi render of PDF page 2.
 capacity_mapping:
-  printed_quantity: sulfide capacity C_S; definition C_S = (wt% S) (P_O2 / P_S2)^(1/2)
-  available_quantity_token: sulfide_capacity
-  printed_log_field: log C_S; no base subscript is printed
-  numeric_inputs: Table 1 sulfur assay plus the printed 1500°C gas partial pressures
-  required_method_class: measured_reduced per extraction evidence-class rule
-  current_migrator_behavior: PRINTED_CAPACITY_QUANTITIES requires author_derived and the capacity branch forces AUTHOR_ESTIMATE
-  disposition: Hold capacity observations for controller ruling; no figure points are digitized.
+  quantity: sulfide_capacity
+  printed_definition: C_S = (wt% S) (P_O2 / P_S2)^(1/2)
+  printed_log_field: log C_S; the paper does not print a base subscript
+  printed_point_values: none in Table 1 or text; plotted values are not digitized
+  printed_correlations:
+  - log C_S = 4.64 B - 6.88 at 1500 °C, σ = 0.37
+  - log C_S = 4.64 B' - 6.88 with the printed m and m' factors
+  - log C_S = 27.0 Λ_th - 21.2 at 1500 °C
+  correlation_storage: author-derived equation relations in context; no per-point Cs scalar is printed
+  pointwise_capacity_gap: 57 sample values are computable from the sulfur assays but not printed; do not calculate in this task
+  follow_up: separate decision required before any capacity rows can be generated
