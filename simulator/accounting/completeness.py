@@ -257,50 +257,6 @@ class TargetSpeciesYield:
     provenance_rule: str = TARGET_YIELD_PROVENANCE_RULE
 
 
-def _target_element_set(
-    sim: Any,
-    target_species: str | tuple[str, ...] | None,
-) -> tuple[set[str] | None, Mapping[str, Any]]:
-    registry = getattr(sim, "species_formula_registry", {})
-    if target_species is None:
-        return None, registry
-    targets = (
-        (target_species,)
-        if isinstance(target_species, str)
-        else tuple(target_species)
-    )
-    target_elements: set[str] = set()
-    for target in targets:
-        try:
-            atoms = set(resolve_species_formula(str(target), registry).elements)
-        except (AccountingError, ValueError):
-            continue
-        target_elements.update(atoms if len(atoms) == 1 else atoms - {"O"})
-    return target_elements, registry
-
-
-def _authority_record_matches_target(
-    target_elements: set[str] | None,
-    registry: Mapping[str, Any],
-    species: str,
-    parent_oxide: str,
-) -> bool:
-    if target_elements is None:
-        return True
-    try:
-        affected = set(resolve_species_formula(species, registry).elements)
-    except (AccountingError, ValueError):
-        return False
-    if parent_oxide:
-        try:
-            affected.update(
-                resolve_species_formula(parent_oxide, registry).elements
-            )
-        except (AccountingError, ValueError):
-            pass
-    return bool(target_elements & affected)
-
-
 def evaporation_quantity_unavailability(
     sim: Any,
     target_species: str | tuple[str, ...] | None,
@@ -326,56 +282,6 @@ def evaporation_quantity_unavailabilities(
         sim, target_species, snapshots=snapshots
     )
     return unavailable
-
-
-def _cached_vapor_contract_unavailability(
-    queries: Any,
-    target_species: str,
-) -> dict[str, Any] | None:
-    sim = getattr(queries, "sim", None)
-    record = getattr(sim, "record", None)
-    snapshots = getattr(record, "snapshots", None)
-    if not isinstance(snapshots, (list, tuple)):
-        return evaporation_quantity_unavailability(sim, target_species)
-
-    diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", None)
-    # Core reuses one query object across this hour's target contracts. Its
-    # recorded snapshots are append-only, and the live diagnostic is rebound
-    # each hour, so this identity key keeps the scan valid only for that input.
-    cache_key = (
-        id(snapshots),
-        tuple(id(snapshot) for snapshot in snapshots),
-        id(diagnostic),
-    )
-    cached = getattr(queries, "_vapor_authority_unavailability_cache", None)
-    if isinstance(cached, tuple) and cached[0] == cache_key:
-        unavailable = cached[1]
-    else:
-        unavailable, _estimated = _evaporation_quantity_authority_contributions(
-            sim, None, snapshots=snapshots
-        )
-        unavailable = tuple(unavailable)
-        try:
-            queries._vapor_authority_unavailability_cache = (
-                cache_key,
-                unavailable,
-            )
-        except (AttributeError, TypeError):
-            return evaporation_quantity_unavailability(sim, target_species)
-
-    target_elements, registry = _target_element_set(sim, target_species)
-    return next(
-        (
-            row for row in unavailable
-            if _authority_record_matches_target(
-                target_elements,
-                registry,
-                str(row.get("species") or ""),
-                str(row.get("parent_oxide") or ""),
-            )
-        ),
-        None,
-    )
 
 
 def _evaporation_quantity_authority_contributions(
@@ -591,7 +497,39 @@ def _evaporation_quantity_authority_contributions(
                         ),
                     )
 
-    target_elements, registry = _target_element_set(sim, target_species)
+    target_elements: set[str] | None = None
+    registry = getattr(sim, "species_formula_registry", {})
+    if target_species is not None:
+        targets = (
+            (target_species,)
+            if isinstance(target_species, str)
+            else tuple(target_species)
+        )
+        target_elements = set()
+        for target in targets:
+            try:
+                atoms = set(
+                    resolve_species_formula(str(target), registry).elements
+                )
+            except (AccountingError, ValueError):
+                continue
+            target_elements.update(atoms if len(atoms) == 1 else atoms - {"O"})
+
+    def matches_target(species: str, parent_oxide: str) -> bool:
+        if target_elements is None:
+            return True
+        try:
+            affected = set(resolve_species_formula(species, registry).elements)
+        except (AccountingError, ValueError):
+            return False
+        if parent_oxide:
+            try:
+                affected.update(
+                    resolve_species_formula(parent_oxide, registry).elements
+                )
+            except (AccountingError, ValueError):
+                pass
+        return bool(target_elements & affected)
 
     unavailable = [
         {
@@ -606,18 +544,14 @@ def _evaporation_quantity_authority_contributions(
             "account": record["account"],
         }
         for species, record in sorted(unavailable_by_species.items())
-        if _authority_record_matches_target(
-            target_elements, registry, species, record["parent_oxide"]
-        )
+        if matches_target(species, record["parent_oxide"])
     ]
     estimates = [
         record
         for (species, _account), record in sorted(
             estimated_by_species_account.items()
         )
-        if _authority_record_matches_target(
-            target_elements, registry, species, ""
-        )
+        if matches_target(species, "")
     ]
     return unavailable, estimates
 
@@ -1141,7 +1075,10 @@ def vapor_contract_completeness(
     _validate_contract(contract)
 
     target = contract.target_species or contract.target_key
-    unavailable = _cached_vapor_contract_unavailability(queries, target)
+    unavailable = evaporation_quantity_unavailability(
+        getattr(queries, "sim", None),
+        target,
+    )
     if unavailable:
         raise CompletionContractBlocked(
             f"{contract.contract_id}: {unavailable['reason']}"
