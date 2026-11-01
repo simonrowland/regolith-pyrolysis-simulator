@@ -246,7 +246,8 @@ _SPECIATION_STAT_KEYS = (
     'speciation_other_nonfinite_count',
 )
 _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE = (
-    'pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)'
+    'melts_endmember_transformed_oxide_component; '
+    'mu_i = mu_i0 + R*T*ln(a_i)'
 )
 
 

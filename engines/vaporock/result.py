@@ -17,7 +17,12 @@ Schema:
   Builtin-side ``a_oxide`` proxy; left empty for VapoRock which has
   no activity map on the default path).
 * ``oxide_activity`` -- optional ``parent oxide -> activity`` values from
-  VapoRock's liquid chemical potentials, with their standard state.
+  VapoRock's liquid chemical potentials in the
+  ``melts_endmember_transformed_oxide_component`` basis. VapoRock constructs
+  ``mu0_oxide = MOL_LIQ_OXIDES @ mu0_endmem`` (``src/vaporock/equil.py``,
+  lines 351-356); it does not convert this to the JANAF pure-liquid-oxide
+  reference. Consumers comparing with JANAF Kp must apply the corresponding
+  standard Gibbs-energy correction in that comparison.
 * ``pO2_bar`` -- commanded oxygen partial pressure echoed back for
   trace.
 * ``mode`` -- which VapoRock entry point produced the result
