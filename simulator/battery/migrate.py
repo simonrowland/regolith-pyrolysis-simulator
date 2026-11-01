@@ -6016,9 +6016,9 @@ def _apply_equilibrium_starting_bulk(
     evaporation, or a flux) still carries that bulk, with a typed notice:
     predict and flag, never a silent use and never a refusal. A printed
     anhydrous normalization still carries the oxide bulk and says that
-    identity.composition omits H2O. A missing or
-    unusable start, including a dash or blank the loader did not accept as
-    a component, stays missing. A row that already prints ``composition``
+    identity.composition omits H2O. A missing or unusable start stays
+    missing, except a b-704 mass-percent refusal, which remains an explicit
+    unknown on the observation. A row that already prints ``composition``
     or ``initial_composition_as_published`` as unknown keeps that blank:
     the experiment bulk is not this row's printed start. Residue quantities
     do not call this.
@@ -6027,28 +6027,26 @@ def _apply_equilibrium_starting_bulk(
     if experiment is None:
         return point_conditions, []
     initial = experiment.sample.initial_composition
-    if (
-        initial is None
-        or not initial.state.is_value
-        or not isinstance(initial.state.value, Composition)
-    ):
+    if initial is None:
         return point_conditions, []
-    composition = initial.state.value
-    if composition.amount_basis not in {
-        AmountBasis.MOLE_FRACTION,
-        AmountBasis.MOL_INVENTORY,
-    }:
+    mass_percent_refusal = (
+        initial.state.is_unknown
+        and (initial.state.reason or "").startswith(
+            "mass-percent composition is not usable:"
+        )
+    )
+    if not mass_percent_refusal and (
+        not initial.state.is_value
+        or not isinstance(initial.state.value, Composition)
+        or initial.state.value.amount_basis
+        not in {AmountBasis.MOLE_FRACTION, AmountBasis.MOL_INVENTORY}
+    ):
         return point_conditions, []
     if _row_printed_composition_unknown(point_conditions):
         return point_conditions, []
     if _keeps_existing_composition(ident_kwargs.get("composition")):
         return point_conditions, []
-    located = Located(
-        initial.state,
-        locator=initial.locator,
-        inference=initial.inference,
-    )
-    ident_kwargs["composition"] = located.state
+    ident_kwargs["composition"] = initial.state
     existing_point = (point_conditions or {}).get("composition")
     if not (
         isinstance(existing_point, Located)
@@ -6056,8 +6054,10 @@ def _apply_equilibrium_starting_bulk(
     ):
         point_conditions = {
             **(point_conditions or {}),
-            "composition": located,
+            "composition": initial,
         }
+    if mass_percent_refusal:
+        return point_conditions, []
     notices: list[Notice] = []
     causes = _open_system_starting_bulk_causes(experiment)
     if causes:
@@ -6189,12 +6189,34 @@ def _owner_initial_from_printed(
             locator=locator,
         )
     refusal_reason: list[str] = []
+    source_values = raw
+    if (
+        isinstance(raw, Mapping)
+        and _enum(AmountBasis, raw.get("amount_basis")) is AmountBasis.MASS_PERCENT
+    ):
+        components = raw.get("components")
+        items = (
+            tuple(components.items())
+            if isinstance(components, Mapping)
+            else tuple(components)
+            if isinstance(components, (list, tuple))
+            else ()
+        )
+        if all(isinstance(item, (list, tuple)) and len(item) == 2 for item in items):
+            names = tuple(
+                _mass_percent_component_key(str(name))[0]
+                for name, _amount in items
+            )
+            if not _duplicate_mass_percent_component_names(
+                tuple((name, Decimal("0")) for name in names)
+            ):
+                source_values = {name: amount for name, amount in items}
     pairs = _mass_percent_pairs(raw)
     if pairs is None and isinstance(raw, Mapping):
         pairs = _mass_percent_pairs(
             {
                 "amount_basis": AmountBasis.MASS_PERCENT.value,
-                "components": raw,
+                "components": source_values,
             }
         )
     if pairs is not None:
@@ -6208,13 +6230,13 @@ def _owner_initial_from_printed(
             wt = dict(pairs)
     else:
         wt = _initial_oxide_map_from_values(
-            raw,
+            source_values,
             refusal_reason=refusal_reason,
             declared_map=True,
-            declared_component_map=raw,
+            declared_component_map=source_values,
         )
     if wt:
-        source_map = _source_printed_composition_values(wt, closure_context)
+        source_map = _source_printed_composition_values(wt, source_values)
         if source_map:
             ordered_wt = {
                 name: wt[name]
@@ -6230,8 +6252,10 @@ def _owner_initial_from_printed(
         _printed, initial = _located_printed_and_initial(
             wt,
             locator,
-            closure_context=raw if closure_context is None else closure_context,
-            declared_component_map=raw,
+            closure_context=(
+                source_values if closure_context is None else closure_context
+            ),
+            declared_component_map=source_values,
         )
         if (
             initial is not None
