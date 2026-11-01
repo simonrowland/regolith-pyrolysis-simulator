@@ -2010,6 +2010,7 @@ def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() ->
     serialized = {"tag": "value", "value": composition}
 
     located = migrate_module._composition_located_from_plain(serialized)
+    printed = migrate_module._mass_percent_printed_from_plain(serialized)
     identity = migrate_module._identity_from_plain(
         {
             "quantity": {"tag": "value", "value": "activity"},
@@ -2019,6 +2020,8 @@ def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() ->
 
     assert located.state.is_value
     assert set(dict(located.state.value.components)) == {"SiO2", "MgO"}
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value == {"SiO2": "50", "MgO": "50", "H2O": None}
     assert identity.composition is not None and identity.composition.is_value
     assert set(dict(identity.composition.value.components)) == {"SiO2", "MgO"}
 
@@ -2027,13 +2030,13 @@ def test_typed_mass_percent_printed_map_keeps_uncertainty_text_verbatim() -> Non
     payload = {
         "basis": "printed_oxides",
         "amount_basis": "mass_percent",
-        "components": [["SiO2", "100.0 ± 2.0"], ["MgO", None]],
+        "components": [["SiO2", "50.0 ± 2.0"], ["MgO", "50.0"]],
     }
 
     printed = migrate_module._mass_percent_printed_from_plain(payload)
 
     assert printed is not None and printed.state.is_value
-    assert printed.state.value == {"SiO2": "100.0 ± 2.0", "MgO": None}
+    assert printed.state.value == {"SiO2": "50.0 ± 2.0", "MgO": "50.0"}
 
 
 @pytest.mark.parametrize(
@@ -3297,6 +3300,7 @@ def test_plain_identity_with_recognized_oxide_composition_round_trips() -> None:
     "water_context",
     (
         {"H2O_wt_pct": "5.00"},
+        {"H2O_wt_pct": {"state": {"tag": "value", "value": "5.00"}}},
         {
             "point_conditions": {
                 "H2O_EMPA": {"state": {"tag": "value", "value": "5.00"}}
