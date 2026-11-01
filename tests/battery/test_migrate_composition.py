@@ -46,6 +46,7 @@ from simulator.battery.records import (
     Composition,
     Located,
     Locator,
+    State,
     as_decimal,
 )
 from tests.battery.factories import migrate_one_extract, tabulation_experiment
@@ -5065,6 +5066,70 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         assert actual != {
             oxide: as_decimal(str(value)) for oxide, value in starting.items()
         }
+
+
+@pytest.mark.parametrize(
+    ("source", "row_token", "expected_oxides"),
+    (
+        (
+            "kems-015-hashimoto-1983.yaml",
+            "::T=2073.15:row=b8-(2):",
+            {"SiO2", "Al2O3", "FeO", "MgO", "CaO"},
+        ),
+        (
+            "smythe-brenan-2015-cerium-redox.yaml",
+            "row=ds11-c38:",
+            {
+                "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
+                "Na2O", "K2O", "P2O5", "Ce2O3",
+            },
+        ),
+        (
+            "smythe-brenan-2015-cerium-redox.yaml",
+            "row=ds08-c1-02:",
+            {
+                "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
+                "Na2O", "K2O", "P2O5", "Ce2O3",
+            },
+        ),
+    ),
+)
+def test_b704_waypoints_use_oxide_only_map_after_row_closure(
+    tmp_path: Path,
+    source: str,
+    row_token: str,
+    expected_oxides: set[str],
+) -> None:
+    from simulator.battery.waypoints import normalized_composition
+
+    result = _migrate_real_extract(tmp_path, source, write=False)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row_token in row.observation_id
+    )
+    if row_token == "row=ds08-c1-02:":
+        point_conditions = dict(observation.point_conditions)
+        printed = point_conditions["printed_composition"]
+        oxide_only = {
+            name: amount
+            for name, amount in printed.state.value.items()
+            if name not in {"total", "H2O_wt_pct"}
+        }
+        point_conditions["printed_composition"] = replace(
+            printed, state=State.of(oxide_only)
+        )
+        observation = replace(observation, point_conditions=point_conditions)
+    experiment = result.experiments[observation.experiment_id]
+
+    waypoint = normalized_composition(experiment, _bench(), observation)
+
+    assert waypoint.absence is None
+    assert waypoint.selected is not None
+    assert set(waypoint.selected.value) == expected_oxides
+    assert abs(sum(waypoint.selected.value.values()) - Decimal("1")) <= Decimal(
+        "1e-25"
+    )
 
 
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:

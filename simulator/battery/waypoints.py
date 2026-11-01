@@ -15,6 +15,8 @@ from simulator.battery.migrate import (
     _is_engine_oxide_component,
     _is_composition_condition_key,
     _knudsen_effusion_chamber_background_not_for_identity,
+    _mass_percent_component_key,
+    _volatile_closure_component,
     _wt_percent_conversion_or_refusal,
 )
 from simulator.battery.records import (
@@ -977,6 +979,26 @@ def normalized_composition(
                 elif basis is None and isinstance(raw, Mapping):
                     mass_percent_map = raw
                 if mass_percent_map is not None:
+                    engine_map: dict[str, object] = {}
+                    duplicate_names: set[str] = set()
+                    for species, printed_amount in mass_percent_map.items():
+                        name, _has_mass_suffix = _mass_percent_component_key(
+                            str(species)
+                        )
+                        volatile = _volatile_closure_component(name)
+                        if (
+                            name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+                            or _is_composition_condition_key(name)
+                            or (volatile is not None and volatile[0] == "H2O")
+                        ):
+                            continue
+                        if name in engine_map:
+                            duplicate_names.add(name)
+                        else:
+                            engine_map[name] = printed_amount
+                    printed_species = set(engine_map) | duplicate_names
+                    printed_path = path
+
                     # The shared b-704 owner decides whether the printed mass
                     # map closes before this waypoint can emit engine ratios.
                     # Classify cells first so malformed/non-finite source values
@@ -986,14 +1008,40 @@ def normalized_composition(
                         kind, amount = _classify_composition_cell(printed_amount)
                         if kind == "number" and amount is not None:
                             closure_wt[str(species)] = amount
+                    closure_context = raw
+                    if key in point:
+                        row_volatiles: dict[str, Decimal] = {}
+                        for name, located in point.items():
+                            if _volatile_closure_component(str(name)) is None:
+                                continue
+                            if isinstance(located, Located):
+                                if (
+                                    not located.state.is_value
+                                    or located.inference is not None
+                                ):
+                                    continue
+                                located = located.state.value
+                            kind, amount = _classify_composition_cell(located)
+                            if kind == "number" and amount is not None:
+                                row_volatiles[str(name)] = amount
+                        if row_volatiles:
+                            closure_context = {
+                                "printed_composition": raw,
+                                **row_volatiles,
+                            }
                     _, closure_refusal = _wt_percent_conversion_or_refusal(
                         closure_wt,
-                        closure_context=raw,
+                        closure_context=closure_context,
                         declared_component_map=mass_percent_map,
                     )
                     if closure_refusal is not None:
                         rejected_printed_mass = True
                         raw = None
+                    elif duplicate_names:
+                        refused_components = tuple(sorted(duplicate_names))
+                        raw = None
+                    else:
+                        raw = engine_map
                 if raw is not None:
                     try:
                         engine_oxides = _engine_printed_oxides(raw)
