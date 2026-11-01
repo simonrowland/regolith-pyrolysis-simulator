@@ -6013,14 +6013,21 @@ def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() 
     assert rows
     expected = wt_pct_to_mole_fraction(
         {
-            "SiO2": Decimal("53.62"),
-            "MgO": Decimal("44.44"),
-            "CaO": Decimal("1.64"),
+            "SiO2": Decimal("63.26"),
+            "MgO": Decimal("35.19"),
+            "CaO": Decimal("1.27"),
         }
     )
-    assert all(
-        observation.identity.composition is not None
-        and observation.identity.composition.is_value
-        and observation.identity.composition.value == expected
-        for observation in rows
-    )
+    for observation in rows:
+        printed = observation.point_conditions["printed_composition"]
+        starting = observation.point_conditions["starting_composition"]
+        assert printed.state.value == {
+            "SiO2_wt_pct": "53.62",
+            "MgO_wt_pct": "44.44",
+            "CaO_wt_pct": "1.64",
+        }
+        assert starting.state.value["Nb_ppm"] == "84"
+        assert starting.state.value["Ta_ppm"] == "204"
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert observation.identity.composition.value == expected
