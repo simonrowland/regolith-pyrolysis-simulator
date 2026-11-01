@@ -347,6 +347,42 @@ def _run_eval_batch(
     outcomes: dict[tuple[str, int], EvalOutcome] = {}
     pending = {(task.tier, task.index): task for task in tasks}
     started: dict[tuple[str, int], float] = {}
+
+    def record_message(message: Mapping[str, Any]) -> bool:
+        key = (message["tier"], int(message["index"]))
+        task = pending.get(key)
+        if task is None:
+            return False
+        if message["kind"] == "started":
+            started[key] = time.monotonic()
+        elif message["kind"] == "done":
+            pending.pop(key, None)
+            started.pop(key, None)
+            elapsed_s = float(message["elapsed_s"])
+            if elapsed_s >= timeout_s:
+                outcomes[key] = (
+                    None,
+                    _drop(
+                        task.index,
+                        task.tier,
+                        task.candidate_id,
+                        "timeout",
+                        "per-eval timeout",
+                    ),
+                )
+                return True
+            outcomes[key] = _payload_outcome(message["payload"])
+        return False
+
+    def drain_result_queue() -> bool:
+        timed_out = False
+        while True:
+            try:
+                message = result_queue.get_nowait()
+            except Empty:
+                return timed_out
+            timed_out = record_message(message) or timed_out
+
     try:
         for worker in workers:
             worker.start()
@@ -358,28 +394,26 @@ def _run_eval_batch(
             try:
                 message = result_queue.get(timeout=0.05)
             except Empty:
-                message = None
-            # A parent process can resume after the timeout threshold even though
-            # the worker already queued its completion. Drain that queue before
-            # comparing elapsed time so parent scheduling delay cannot discard it.
-            while message is not None:
-                key = (message["tier"], int(message["index"]))
-                if key in pending:
-                    if message["kind"] == "started":
-                        started[key] = time.monotonic()
-                    elif message["kind"] == "done":
-                        outcomes[key] = _payload_outcome(message["payload"])
-                        pending.pop(key, None)
-                        started.pop(key, None)
-                try:
-                    message = result_queue.get_nowait()
-                except Empty:
-                    message = None
+                timed_out = False
+            else:
+                timed_out = record_message(message)
+            timed_out = drain_result_queue() or timed_out
             now = time.monotonic()
             expired = [
                 key for key, start in started.items() if key in pending and now - start >= timeout_s
             ]
             if expired:
+                # Recheck after observing the deadline. A worker can finish while
+                # the parent is being rescheduled; its own elapsed time decides
+                # whether that completion met the per-evaluation limit.
+                timed_out = drain_result_queue() or timed_out
+                now = time.monotonic()
+                expired = [
+                    key
+                    for key, start in started.items()
+                    if key in pending and now - start >= timeout_s
+                ]
+            if timed_out or expired:
                 for key in expired:
                     task = pending.pop(key)
                     started.pop(key, None)
@@ -401,16 +435,7 @@ def _run_eval_batch(
                     )
                 pending.clear()
             elif not any(worker.is_alive() for worker in workers):
-                while True:
-                    try:
-                        message = result_queue.get_nowait()
-                    except Empty:
-                        break
-                    key = (message["tier"], int(message["index"]))
-                    if key in pending and message["kind"] == "done":
-                        outcomes[key] = _payload_outcome(message["payload"])
-                        pending.pop(key, None)
-                        started.pop(key, None)
+                timed_out = drain_result_queue() or timed_out
                 for key, task in list(pending.items()):
                     outcomes[key] = (
                         None,
@@ -418,8 +443,12 @@ def _run_eval_batch(
                             task.index,
                             task.tier,
                             task.candidate_id,
-                            "engine_bug",
-                            "fidelity worker pool exited without result",
+                            "timeout" if timed_out else "engine_bug",
+                            (
+                                "fidelity pool aborted after per-eval timeout"
+                                if timed_out
+                                else "fidelity worker pool exited without result"
+                            ),
                         ),
                     )
                 pending.clear()
@@ -440,13 +469,16 @@ def _fidelity_worker_loop(
         task = task_queue.get()
         if task is None:
             return
+        started_at = time.monotonic()
         result_queue.put({"kind": "started", "tier": task.tier, "index": task.index})
+        payload = _evaluate_fidelity_task(task)
         result_queue.put(
             {
                 "kind": "done",
                 "tier": task.tier,
                 "index": task.index,
-                "payload": _evaluate_fidelity_task(task),
+                "elapsed_s": time.monotonic() - started_at,
+                "payload": payload,
             }
         )
 
