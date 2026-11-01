@@ -431,6 +431,7 @@ PHASE_MAP: dict[str, Phase] = {
 _SAMPLE_SOURCE_PHASE_LABELS = frozenset(
     {
         "basaltic_silicate_melt",
+        "k2o-sio2_binary_silicate_melt",
         "silicate_melt_ferrobasalt_fcmas",
         "cao-al2o3-sio2 liquid oxide melt",
     }
@@ -454,13 +455,19 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
 
 
 _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
-    # Reviewed solid KEMS sample descriptions. These are exact labels; words
-    # embedded in mixed or temperature-dependent descriptions stay unknown.
+    # Reviewed KEMS sample descriptions and states. These are exact labels;
+    # words embedded in mixed or temperature-dependent descriptions stay unknown.
     "solid": Phase.CR,
     "crystalline": Phase.CR,
     "solid stoichiometric mgal2o4 spinel": Phase.CR,
     "solid lump": Phase.CR,
-    "crystalline k2si2o5": Phase.CR,
+    "liquid": Phase.L,
+    "liquid_melt": Phase.L,
+    "melt": Phase.L,
+    "solution": Phase.L,
+    "liquid solution": Phase.L,
+    "liquid_solution": Phase.L,
+    "k2o-sio2_binary_silicate_melt": Phase.L,
     # Costa & Jacobson (2015)'s pressure experiments record this sample as
     # crystalline olivine; the physics ruling confirms it remained solid.
     (
@@ -477,6 +484,30 @@ def _phase_for_sample_description(description: str | None) -> Phase | None:
     if phase is not None or description is None:
         return phase
     return _SAMPLE_DESCRIPTION_PHASE_MAP.get(description.strip().casefold())
+
+
+def _phase_for_recorded_vapour_sample(
+    condensed_form: object,
+    sample_phase: object,
+) -> tuple[bool, Phase | None]:
+    """Read a row's explicit condensed state before its experiment's sample."""
+
+    state = (
+        condensed_form.get("state")
+        if isinstance(condensed_form, Mapping)
+        else condensed_form
+    )
+    if isinstance(state, str) and state.strip():
+        phase = _phase_for_sample_description(state)
+        if phase is None:
+            phase = _pressure_condensed_phase(state)
+        return True, phase
+    if _printed_phase_names_sample_source(sample_phase):
+        phase = _phase_for_sample_description(sample_phase)
+        if phase is None:
+            phase = _pressure_condensed_phase(sample_phase)
+        return True, phase
+    return False, None
 
 
 TYPE_QUANTITY = {
@@ -824,6 +855,15 @@ def _provenance_from_extract(
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
+    if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}:
+        condensed_form = obs.get("condensed_form", values.get("condensed_form"))
+        if condensed_form is not None:
+            selected = dict(selected or {})
+            selected["measured_condensed_form"] = condensed_form
+        sample_phase = obs.get("phase", values.get("phase"))
+        if _printed_phase_names_sample_source(sample_phase):
+            selected = dict(selected or {})
+            selected["measured_sample_phase"] = sample_phase
     if quantity is Quantity.LOG10_K_REACTION:
         for name in (
             "reaction_as_printed",
