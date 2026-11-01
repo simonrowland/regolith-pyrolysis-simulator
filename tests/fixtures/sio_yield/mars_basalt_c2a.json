@@ -3294,19 +3294,65 @@
           },
           "stage_2_to_stage_3": {
             "species": "SiO",
-            "alpha_s": 0.0,
-            "source": "data/wall_materials.yaml::materials.fused_silica.stickiness.SiO",
-            "source_class": "fail_closed_no_direct_sticking_coefficient",
+            "alpha_s": 0.07080594980098856,
+            "source": "Wetzel & Gail 2013 solid-SiO particle-growth coefficient used as a proxy for fused-silica SiO sticking.",
+            "source_class": "fused_silica_sio_wetzel_gail_growth_proxy",
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
+            "alpha_s_form": "arrhenius",
             "alpha_s_temperature_K": 1848.15,
-            "alpha_s_extrapolated": false,
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": true,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "UNCERTIFIED",
+            "alpha_s_temperature_above_valid_range": true,
+            "alpha_s_extrapolation_warning": "SiO alpha_s arrhenius coefficient extrapolated beyond valid_range_K [1000, 1800] at 1848.15 K",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "uncertified_wetzel_gail_solid_sio_growth_proxy; no direct SiO-on-fused-silica sticking measurement (seekq sio-sticking-on-silica)",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::liner_materials.fused_silica_baffles.alpha_s_by_species.SiO",
             "liner_material": "fused_silica_baffles",
             "segment": "stage_2_to_stage_3",
-            "basis": "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7.",
-            "citation_status": "UNCERTIFIED",
-            "certification_status_reason": "materials.yaml liner alpha_s override lacks CITED/UNCERTIFIED certification status"
+            "basis": "The Wetzel & Gail 2013 solid-SiO particle-growth coefficient remains an uncertified proxy; it is not a measured fused-silica sticking coefficient.",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "UNCERTIFIED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "alpha_s_domain_status": "out_of_domain",
+            "alpha_s_authoritative_at_temperature": false
           },
           "stage_0": {
             "species": "SiO",
@@ -3427,8 +3473,8 @@
           "stage_3": {
             "species": "SiO",
             "alpha_s": 0.03209846522805303,
-            "source": "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit.",
-            "source_class": "solid_film_growth_proxy_not_evaporation_evidence",
+            "source": "Wetzel & Gail 2013 solid-SiO particle-growth coefficient used as a proxy for fused-silica SiO sticking.",
+            "source_class": "fused_silica_sio_wetzel_gail_growth_proxy",
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
             "alpha_s_form": "arrhenius",
@@ -3456,9 +3502,10 @@
               0.003,
               0.067
             ],
-            "uncertainty_flag": "solid_film_growth_proxy_not_silicate_melt_evaporation_measurement",
+            "uncertainty_flag": "uncertified_wetzel_gail_solid_sio_growth_proxy; no direct SiO-on-fused-silica sticking measurement (seekq sio-sticking-on-silica)",
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
             "material_source": "data/materials.yaml::stages.3.alpha_s_by_species.SiO",
+            "basis": "The Wetzel & Gail 2013 solid-SiO particle-growth coefficient remains an uncertified proxy; it is not a measured fused-silica sticking coefficient.",
             "alpha_s_coefficient_spec": {
               "form": "arrhenius",
               "A": 0.52,
@@ -8772,6 +8819,21 @@
             "band_scope": "wall_saturation_pressure",
             "refusal_type": "WallSaturationPressureRefusal"
           },
+          "stage_2_to_stage_3": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1848.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1848.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1848.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
+          },
           "stage_0_to_stage_1#2": {
             "status": "refused",
             "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
@@ -8801,6 +8863,21 @@
             ],
             "band_scope": "wall_saturation_pressure",
             "refusal_type": "WallSaturationPressureRefusal"
+          },
+          "stage_2_to_stage_3#2": {
+            "status": "refused",
+            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
+            "output_status": "status_bearing",
+            "wall_temperature_K": 1923.15,
+            "wall_saturation_pressure_pa": null,
+            "temperature_K": 1923.15,
+            "authority_level": "unavailable",
+            "valid_range_K": [
+              1400.0,
+              2273.15
+            ],
+            "band_scope": "wall_saturation_pressure",
+            "refusal_type": "WallSaturationPressureRefusal"
           }
         }
       }
@@ -8816,7 +8893,7 @@
       "authoritative_for_resinter": false,
       "severity": "warning",
       "output_status": "status_bearing",
-      "refusal_events": 4,
+      "refusal_events": 6,
       "affected_species": [
         "SiO"
       ],
