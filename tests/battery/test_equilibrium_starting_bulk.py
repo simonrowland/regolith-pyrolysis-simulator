@@ -344,6 +344,55 @@ def test_gorojovsky_rows_do_not_gain_the_anhydrous_notice() -> None:
         for observation in rows
         for notice in observation.notices
     )
+    gorojovsky = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith("::t2-r002-al2o3")
+    )
+    assert gorojovsky.identity.composition is not None
+    assert gorojovsky.identity.composition.is_value
+    assert "locator" not in dict(gorojovsky.identity.composition.value.components)
+
+
+def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    evans = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:h=1e9620f6f131"
+        )
+    )
+
+    assert evans.identity.composition is not None
+    assert evans.identity.composition.is_not_applicable
+
+
+def test_ivanova_scalar_starting_description_is_a_typed_refusal() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    ivanova = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::ivanova_2018_table1_residue_composition::point:0"
+        )
+    )
+    starting = (ivanova.point_conditions or {}).get("starting_composition")
+
+    assert starting is not None
+    assert starting.state.is_unknown
+    assert "not a component map" in (starting.state.reason or "")
+    assert starting.locator is not None
 
 
 def test_wang_2001_residue_keeps_the_starting_charge_contextual() -> None:
