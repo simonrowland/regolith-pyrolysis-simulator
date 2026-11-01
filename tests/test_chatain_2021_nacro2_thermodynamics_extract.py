@@ -92,6 +92,39 @@ def test_render_pins_table_rows_and_detects_cell_mutation() -> None:
     ]
     assert entropy_function["values"]["final_log_term_as_rendered"] == "x_D"
 
+    observations = species["observations"]
+    gross_enthalpy = _by_id(
+        observations, "chatain_2021_gross_formation_enthalpy_298"
+    )
+    assert gross_enthalpy["locator"]["page"] == 3
+    assert gross_enthalpy["point_conditions"]["temperature_K"]["locator"][
+        "page"
+    ] == 3
+    reaction_enthalpies = _by_id(
+        species["context"], "chatain_2021_reaction_enthalpy_context"
+    )
+    assert reaction_enthalpies["locator"]["page"] == 3
+    assert reaction_enthalpies["values"]["gross_et_al_locator"]["page"] == 3
+    assert reaction_enthalpies["values"]["van_vuuren_locator"]["page"] == 4
+
+    entropy_29815 = _by_id(
+        observations, "chatain_2021_absolute_standard_entropy_29815"
+    )
+    assert entropy_29815["locator"]["page"] == 13
+    assert entropy_29815["point_conditions"]["temperature_K"]["state"][
+        "value"
+    ] == "298.15"
+    entropy_298 = _by_id(
+        observations, "chatain_2021_absolute_standard_entropy_298"
+    )
+    assert entropy_298["locator"]["page"] == 15
+    assert entropy_298["point_conditions"]["temperature_K"]["state"][
+        "value"
+    ] == "298"
+    assert "Both printed temperatures are retained" in entropy_298["values"][
+        "temperature_discrepancy_note"
+    ]
+
     assert check_all_fidelity_samples_match(document, label=EXTRACT.stem) == []
     mutated = copy.deepcopy(document)
     mutated_table3 = _by_id(
@@ -112,14 +145,14 @@ def test_isolated_real_migration_and_j01_series_census(tmp_path: Path) -> None:
     )
     assert result.validation is not None
     assert result.validation.hard_issues == ()
-    assert len(result.observations) == 25
+    assert len(result.observations) == 26
     assert check_all_fidelity_samples_match(document, label="post-migration source pins") == []
 
     observations = list(result.observations.values())
     unavailable = [row for row in observations if row.value.kind.value == "unavailable"]
     points = [row for row in observations if row.value.kind.value == "point"]
     assert len(unavailable) == 20
-    assert len(points) == 5
+    assert len(points) == 6
     assert all(row.identity.quantity.tag.value == "value" for row in observations)
     assert all(row.identity.species.phase.tag.value == "value" for row in observations)
     assert all(row.identity.total_pressure_Pa.tag.value != "value" for row in observations)
@@ -134,20 +167,23 @@ def test_isolated_real_migration_and_j01_series_census(tmp_path: Path) -> None:
     assert str(by_suffix["chatain_2021_gross_formation_enthalpy_298"].value.point) == "-874.2"
     assert str(by_suffix["chatain_2021_jain_dft_formation_enthalpy_298"].value.point) == "-883.1"
     assert str(by_suffix["chatain_2021_theoretical_cp_29815"].value.point) == "82.9"
-    assert str(by_suffix["chatain_2021_absolute_standard_entropy_29815"].value.point) == "94.53"
+    assert str(by_suffix["chatain_2021_absolute_standard_entropy_29815"].value.point) == "94.5"
+    assert str(by_suffix["chatain_2021_absolute_standard_entropy_298"].value.point) == "94.53"
     assert str(by_suffix["chatain_2021_dta_transition_temperature"].value.point) == "1092.15"
 
-    for observation_id, temperature in (
-        ("chatain_2021_gross_formation_enthalpy_298", "298"),
-        ("chatain_2021_jain_dft_formation_enthalpy_298", "298"),
-        ("chatain_2021_theoretical_cp_29815", "298.15"),
-        ("chatain_2021_absolute_standard_entropy_29815", "298.15"),
+    for observation_id, temperature, page in (
+        ("chatain_2021_gross_formation_enthalpy_298", "298", 3),
+        ("chatain_2021_jain_dft_formation_enthalpy_298", "298", 4),
+        ("chatain_2021_theoretical_cp_29815", "298.15", 13),
+        ("chatain_2021_absolute_standard_entropy_29815", "298.15", 13),
+        ("chatain_2021_absolute_standard_entropy_298", "298", 15),
     ):
-        condition = by_suffix[observation_id].point_conditions["temperature_K"]
+        observation = by_suffix[observation_id]
+        condition = observation.point_conditions["temperature_K"]
         assert condition.state.value == Decimal(temperature)
-        assert by_suffix[observation_id].identity.temperature_K.value == Decimal(
-            temperature
-        )
+        assert condition.locator.page == page
+        assert observation.locator.page == page
+        assert observation.identity.temperature_K.value == Decimal(temperature)
 
     gross_identity = by_suffix["chatain_2021_gross_formation_enthalpy_298"].identity
     cp_identity = by_suffix["chatain_2021_theoretical_cp_29815"].identity

@@ -14,7 +14,7 @@ extraction:
   worker: w1031nc-chat21
   provenance_path: text/chatain-2021-nacro2-thermodynamics/pdftotext-layout.txt
   source_note: >-
-    No numerical Cp(T), H(T)-H(298), or S-S298 series is printed: Cp and G plots are figure-only and were not digitized. The paper prints absolute theoretical S at 298.15 K and a theoretical entropy function. Cp and G fits are retained as typed refusals because the coefficient-only function form has no point-series representation. No numerical vapour-pressure values or raw EMF/KEMS readings are printed; Table 1 reports attributed Gibbs-energy fits. No source supplement was present in the corpus or supporting-files location.
+    No numerical Cp(T), H(T)-H(298), or S-S298 series is printed: Cp and G plots are figure-only and were not digitized. The paper prints absolute theoretical S as 94.5 at 298.15 K on page 13 and as 94.53 with S°298K on page 15; both printed temperatures are retained with separate locators, along with the theoretical entropy function. Cp and G fits are retained as typed refusals because the coefficient-only function form has no point-series representation. No numerical vapour-pressure values or raw EMF/KEMS readings are printed; Table 1 reports attributed Gibbs-energy fits. No source supplement was present in the corpus or supporting-files location.
 review_status: draft
 fidelity_samples:
   - path: species.NaCrO2.observations[chatain_2021_table1_ref7_ii].values.equation_as_printed
@@ -543,7 +543,7 @@ species:
           uncertainty_as_printed: ±2%
           confidence_level: not_stated
           calculation_inputs_as_printed: >-
-            Experimental Cp, ΔfH° at 298 K, theoretical S° at 298.15 K, and JANAF functions for the elements.
+            Experimental Cp, ΔfH° at 298 K, theoretical S°298K=94.53, and JANAF functions for the elements.
           unavailable_inputs: >-
             Numerical Cp curve points are figure-only and the JANAF elemental function inputs are not reproduced in this extract.
           status: typed_refused_schema_gap
@@ -554,7 +554,7 @@ species:
       - observation_id: chatain_2021_gross_formation_enthalpy_298
         type: heat_capacity_and_heat_content_series
         locator:
-          page: 4
+          page: 3
           section: literature enthalpy of formation
           paragraph: Gross et al. value
         phase: cr
@@ -563,7 +563,7 @@ species:
           temperature_K:
             state: {tag: value, value: '298'}
             locator:
-              page: 4
+              page: 3
               section: literature enthalpy of formation
         values:
           quantity: delta_fH
@@ -626,6 +626,30 @@ species:
       - observation_id: chatain_2021_absolute_standard_entropy_29815
         type: heat_capacity_and_heat_content_series
         locator:
+          page: 13
+          section: 5.2 Results
+          paragraph: theoretical standard Cp and entropy values
+        phase: cr
+        units: J/mol K
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298.15'}
+            locator:
+              page: 13
+              section: 5.2 Results
+        values:
+          quantity: S
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
+          calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
+          entropy_basis: absolute standard entropy, not S-S298
+          T_K: '298.15'
+          entropy: '94.5'
+          model_class_reason: >-
+            This is the theoretical entropy value reported at 298.15 K; its inputs are not fully stored, so quoted_attributed is used under d-110.
+      - observation_id: chatain_2021_absolute_standard_entropy_298
+        type: heat_capacity_and_heat_content_series
+        locator:
           page: 15
           section: 6.1 Heat capacity measurements
           paragraph: inputs to formation Gibbs-energy calculation
@@ -633,7 +657,7 @@ species:
         units: J/mol K
         point_conditions:
           temperature_K:
-            state: {tag: value, value: '298.15'}
+            state: {tag: value, value: '298'}
             locator:
               page: 15
               section: 6.1 Heat capacity measurements
@@ -643,12 +667,10 @@ species:
           attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
           calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
           entropy_basis: absolute standard entropy, not S-S298
-          T_K: '298.15'
+          T_K: '298'
           entropy: '94.53'
-          rounded_summary_as_printed: '94.5'
-          rounded_summary_locator:
-            page: 13
-            section: 5.2 Results
+          temperature_discrepancy_note: >-
+            Page 13 prints S=94.5 at 298.15 K; page 15 prints S°298K=94.53. Both printed temperatures are retained without conversion.
           model_class_reason: >-
             This is a reported model output; the E(V) input values are plotted only in Figure 5 and were not digitized, so quoted_attributed is used under d-110.
       - observation_id: chatain_2021_dta_transition_temperature
@@ -843,7 +865,7 @@ species:
       - observation_id: chatain_2021_reaction_enthalpy_context
         type: thermochemical_cycle_context
         locator:
-          page: 4
+          page: 3
           section: literature enthalpy of formation
         units: kJ/mol as printed
         values:
@@ -855,10 +877,16 @@ species:
             The paper reports reaction enthalpy values, not standard formation enthalpies. No exact general reaction-enthalpy quantity is present in simulator/battery/enums.py::Quantity or mapped by simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY; delta_fH would change the printed meaning.
           gross_et_al_reaction_enthalpy_as_printed: '-101.4±1.0'
           gross_et_al_attribution: Gross et al. [13], as cited by Chatain et al.
+          gross_et_al_locator:
+            page: 3
+            section: literature enthalpy of formation
           gross_et_al_basis_as_printed: heat of combination of Na2O and Cr2O3 oxides and heat of solution in hydrochloric acid
           gross_et_al_uncertainty_note: confidence level not stated
           van_vuuren_reaction_enthalpy_as_printed: '-142.0±3.8'
           van_vuuren_attribution: Van Vuuren [15], as cited by Chatain et al.
+          van_vuuren_locator:
+            page: 4
+            section: literature enthalpy of formation
           van_vuuren_method_as_printed: DSC, 240-490 °C
           van_vuuren_reaction_as_described: formation of NaCrO2 from Na2O and Cr2O3
           van_vuuren_uncertainty_note: confidence level not stated

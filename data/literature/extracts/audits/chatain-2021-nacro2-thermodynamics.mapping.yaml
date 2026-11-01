@@ -73,22 +73,26 @@ table_mappings:
     disposition: typed-refused model context; no exact harmonic-frequency or mode-degeneracy quantity token
     render_verification: PDF page 13 render confirms all row assignments and digits.
 non_table_mappings:
+  - page: 3
+    quantity: delta_fH
+    stored: Gross reaction enthalpy context and Gross formation enthalpy point
+    disposition: Gross values are located before the physical page break; reaction enthalpy remains typed-refused context
   - page: 4
     quantities: delta_fH, cp
-    stored: Gross formation enthalpy; Gross and Van Vuuren reaction-enthalpy context; attributed Sreedharan and Iyer Cp fits
-    disposition: numeric formation enthalpies are point observations; reaction enthalpies and coefficient-only Cp fits are typed-refused context/observations as appropriate
+    stored: Jain formation enthalpy; Van Vuuren reaction-enthalpy context; attributed Sreedharan and Iyer Cp fits
+    disposition: the Jain formation enthalpy is a point; reaction enthalpy and coefficient-only Cp fits remain typed-refused context/observations as appropriate
   - page: 13
     quantities: cp, S
-    stored: theoretical Cp fit, theoretical Cp at 298.15 K, absolute S at 298.15 K, theoretical entropy formula
-    disposition: numeric point values are stored; coefficient-only Cp and entropy formula are typed-refused
+    stored: theoretical Cp fit, theoretical Cp at 298.15 K, absolute S=94.5 at 298.15 K, theoretical entropy formula
+    disposition: numeric point values are stored with the printed temperature; coefficient-only Cp and entropy formula are typed-refused
   - page: 14
     quantity: cp
     stored: authors' experimental Cp polynomial, temperature range, uncertainty and point dispersion
     disposition: typed-refused; the Cp data points are figure-only
   - page: 15
-    quantity: delta_fG
-    stored: authors' Gibbs-energy fit and equations (6)-(8)
-    disposition: typed-refused fit plus thermochemical-cycle context; no fitted temperature range is printed
+    quantities: delta_fG, S
+    stored: authors' Gibbs-energy fit, equations (6)-(8), and S°298K=94.53
+    disposition: S=94.53 is stored at 298 K as printed; page 13 separately reports S=94.5 at 298.15 K, and both printed temperatures are retained
   - page: 2
     quantity: transition_temperature
     stored: DTA transition temperature 819±4 °C, extrapolated to zero heating rate
@@ -122,6 +126,16 @@ identity_axis_samples:
     total_pressure_Pa: not_applicable
     fO2_Pa: not_applicable
     temperature_K: 298.15
+  - observation_id: chatain_2021_absolute_standard_entropy_29815
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298.15
+  - observation_id: chatain_2021_absolute_standard_entropy_298
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298
   - observation_id: chatain_2021_dta_transition_temperature
     composition: not_applicable
     total_pressure_Pa: unknown, not printed
@@ -131,4 +145,4 @@ j01_census:
   numeric_series_cells: 0
   unavailable_series_cells: 0
   source_contribution: {}
-store_regeneration: not run; expected new-source delta is 25 observations (20 unavailable and 5 points); no committed battery-store regen
+store_regeneration: not run; expected new-source delta is 26 observations (20 unavailable and 6 points); no committed battery-store regen

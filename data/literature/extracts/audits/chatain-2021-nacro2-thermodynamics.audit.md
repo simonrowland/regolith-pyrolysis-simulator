@@ -103,23 +103,24 @@ The caption identifies these as harmonic Γ-point CASTEP frequencies and degener
 
 ## Other stored numeric cells and printed equations
 
-Every numeric value retained from prose or a figure caption was read from the machine text and checked against the listed page render. These are source cells, not figure-coordinate readings.
+Every numeric value retained from prose or a figure caption was read from the machine text and checked against the listed page render. I rechecked every extract locator against its physical PDF page with `pdftotext -f N -l N -layout`; the Gross values are on page 3, while the Van Vuuren result is on page 4. These are source cells, not figure-coordinate readings.
 
 | PDF page and locator | Stored values and verification |
 |---|---|
 | 2, Abstract | DTA transition temperature `819±4 °C`; page 2 render. |
-| 4, literature thermochemistry | Gross reaction enthalpy `-101.4±1.0 kJ mol-1`; standard formation enthalpy `-874.2±7.3 kJ mol-1`; Jain et al. GGA/GGA+U formation enthalpy `-883.1 kJ mol-1`; Van Vuuren reaction enthalpy `-142.0±3.8 kJ mol-1`, measured over `240–490 °C`; page 4 render. Uncertainty confidence is not stated. |
+| 3, literature thermochemistry | Gross reaction enthalpy `-101.4±1.0 kJ mol-1` and standard formation enthalpy `-874.2±7.3 kJ mol-1`; both precede the page break and are checked against the page 3 text. Uncertainty confidence is not stated. |
+| 4, literature thermochemistry | Van Vuuren reaction enthalpy `-142.0±3.8 kJ mol-1`, measured over `240–490 °C`; Jain et al. GGA/GGA+U formation enthalpy `-883.1 kJ mol-1`; page 4 text and render. Uncertainty confidence is not stated. |
 | 4, prior Cp fits | Sreedharan: `27.15+0.1247xT(K)`, reported for `77–327 °C`. Iyer: `-75.364+0.02512xT(K)`, reported for `50–566 °C`. Page 4 render. The citation is [17] in the text on page 4 and the reference list, while one page 14 comparison prints [16]; both source spellings are retained in the extract note. |
 | 7, sample preparation | Commercial purity `99%`, chip size `1–10 mm`; precursor charges `0.0322 mol` each; Na2CO3 purity `99.9%`, Cr2O3 purity `99%`; heating rate `7.8 °C min-1`, Ar flow about `7 L h-1`, `850–900 °C`, `5 h`. Page 7 render. |
 | 8, Figure 3 caption | Hexagonal R\bar{3}m, `Z=3`, reference cell parameters `a=2.9747±0.0001 Å`, `c=15.9538±0.0003 Å`; attributed to [23]. Page 8 render. The XRD method-error statement on page 7 is `0.5% in volume`; page 7 render. |
 | 9, Table 2 prose | Silver-pellet purity `99.999%`; page 9 render. The table caption and its `<0.1 µg g-1` omission rule are on page 10; page 10 render. |
 | 10, DSC and DTA protocols | DSC: `30 °C`, `30 min`, `20 °C` steps to about `600 °C`, `1 h` per step, heating/cooling at `10 °C min-1`. DTA: Ar purity `99.9997%`, flow `1 L h-1`, heating rates `5, 7, 10 °C min-1`, extrapolated to rate `0`. Page 10 render. No total pressure or fO2 is printed. |
-| 13, theoretical calculation | Cp regression as printed: `97.42+1.46x10-6T^2+0,00792T-1532260T^-2`; decimal comma, signs, and exponents confirmed at 600 dpi. At `298.15 K`, theoretical Cp is `82.9 J K-1 mol-1` and absolute S is printed as `94.5 J K-1 mol-1`. The separate absolute entropy value `94.53 J mol-1 K-1` is printed on page 15. Theoretical entropy formula was transcribed from the page 13 render; its last logarithm is printed with subscript D and is preserved as printed. |
+| 13, theoretical calculation | Cp regression as printed: `97.42+1.46x10-6T^2+0,00792T-1532260T^-2`; decimal comma, signs, and exponents confirmed at 600 dpi. At `298.15 K`, theoretical Cp is `82.9 J K-1 mol-1` and absolute S is printed as `94.5 J K-1 mol-1`; each is stored as a separate point at its printed temperature. Theoretical entropy formula was transcribed from the page 13 render; its last logarithm is printed with subscript D and is preserved as printed. |
 | 14, experimental Cp | Measured domain `25–600 °C`; polynomial `-80.575+0.04736xT(K)-2.9x10-5xT(K)^2-1641963/T(K)^2 (±1.5%)`; average point dispersion `3%` experimental powder and `2%` commercial powder. Page 14 render. No plotted Cp points were digitized. |
-| 15, Gibbs calculation | S° at `298.15 K` is `94.53 J mol-1 K-1`; Gross ΔfH° at `298 K` is `-874.2±7.3 kJ mol-1`; equations (6)–(8) are preserved as thermochemical-cycle context. Fitted Gibbs energy is `-876.094+0.191xT (±2%)`; no fit range is stated. Page 15 render. |
+| 15, Gibbs calculation | Page 15 prints `S°298K=94.53 J mol-1 K-1`; the point is stored at `298 K` as printed. Page 13 separately prints `94.5` at `298.15 K`; both temperatures are retained with their own locators, without conversion. Gross ΔfH° at `298 K` is `-874.2±7.3 kJ mol-1`; equations (6)–(8) are preserved as thermochemical-cycle context. Fitted Gibbs energy is `-876.094+0.191xT (±2%)`; no fit range is stated. Page 15 render. |
 | 16, decomposition discussion | A second report of `819±4 °C`; XRD check at `825 °C` for `5 h` in a sealed quartz ampoule; only NaCrO2 was observed. Page 16 render. |
 
-No relative S-S298 column or table is present. The printed entropy equation on page 13 is an absolute theoretical entropy function; the absolute values at 298.15 K are stored separately from any formation-entropy relation. Equation (8) is ΔfS°(T), not a relative S-S298 series. No numerical H(T)-H(298) values or separate enthalpy-increment table is printed.
+No relative S-S298 column or table is present. The printed entropy equation on page 13 is an absolute theoretical entropy function; the values printed on pages 13 and 15 are stored separately at 298.15 K and 298 K respectively. Equation (8) is ΔfS°(T), not a relative S-S298 series. No numerical H(T)-H(298) values or separate enthalpy-increment table is printed.
 
 ## Figure-only candidates
 
@@ -137,20 +138,24 @@ All MinerU `<details>` blocks, including chart-derived artificial tables, were i
 
 ## Migration and j01 census
 
-The real migrator was run in isolation on the extract. It produced 25 observations: 5 point values and 20 unavailable typed refusals; there were 0 hard issues, 0 quantity-unknown observations, and 0 phase-unknown observations. The Table 2 sample-analysis contexts remain outside the scored observation store because their quantity has no exact token.
+The real migrator was run in isolation on the extract. It produced 26 observations: 6 point values and 20 unavailable typed refusals; there were 0 hard issues, 0 quantity-unknown observations, and 0 phase-unknown observations. The Table 2 sample-analysis contexts remain outside the scored observation store because their quantity has no exact token.
 
 | Migrated row | Composition | Total pressure | fO2 | Identity temperature |
 |---|---|---|---|---:|
 | Gross ΔfH° at 298 K | N/A | N/A | N/A | 298 K |
 | theoretical Cp at 298.15 K | N/A | N/A | N/A | 298.15 K |
+| theoretical absolute S=94.5 at 298.15 K (PDF p. 13) | N/A | N/A | N/A | 298.15 K |
+| absolute S=94.53 at 298 K (PDF p. 15) | N/A | N/A | N/A | 298 K |
 | DTA transition temperature | N/A | Unknown; total pressure is not printed | N/A | N/A; result is `point_conditions.temperature_K = 1092.15 K` |
 
-The j01 series census is zero numeric cells and zero unavailable series cells for this source. The paper prints no numeric thermo series; the scalar values and unavailable equation records do not contribute to the series census. No battery-store regeneration was committed. Expected regenerated delta: +25 observations (20 unavailable, 5 points).
+The j01 series census is zero numeric cells and zero unavailable series cells for this source. The paper prints no numeric thermo series; the scalar values and unavailable equation records do not contribute to the series census. No battery-store regeneration was committed. Expected regenerated delta: +26 observations (20 unavailable, 6 points).
 
 ## Tool comparison and focused test
 
-`tools/mineru_table_qa.py` found 17 Table 3 numeric cells with 1.000 agreement and no flagged cells; Table 1 and Table 4 were misclassified as header rows with zero numeric candidates, so renders verified them manually. `tools/mineru_table_draft.py compare` is committed as `chatain-2021-nacro2-thermodynamics.compare.csv`. It finds no draft candidates for the two page 4 scalar formation-enthalpy points because they are prose values, and it marks the Table 2 page 9 row locators unverifiable because the Table 2 caption is on page 10. The rendered page 9 and page 10 checks establish those locators; no context-table mismatch is hidden by the compare result.
+`tools/mineru_table_qa.py` found 17 Table 3 numeric cells with 1.000 agreement and no flagged cells; Table 1 and Table 4 were misclassified as header rows with zero numeric candidates, so renders verified them manually. `tools/mineru_table_draft.py compare` is committed as `chatain-2021-nacro2-thermodynamics.compare.csv`. It finds no draft candidates for the page 3 Gross and page 4 Jain scalar formation-enthalpy points because they are prose values, and it marks the Table 2 page 9 row locators unverifiable because the Table 2 caption is on page 10. The rendered page 9 and page 10 checks establish those locators; no context-table mismatch is hidden by the compare result.
 
-The focused test pins the Table 1 row 6 II equation, both Table 2 Fe values, Table 3 `V0=127.022` and `B0=121.14`, Table 4's final frequency, the Figure 3 caption cell parameter, and printed row counts. After isolated migration it also confirms migrated scalar values, temperatures, and absent pressure/fO2 conditions. A mutation changing Table 3 `V0` from `127.022` to `127.023` fails the independent fidelity-sample check.
+The focused test pins the Table 1 row 6 II equation, both Table 2 Fe values, Table 3 `V0=127.022` and `B0=121.14`, Table 4's final frequency, the Figure 3 caption cell parameter, and printed row counts. It pins the Gross physical page and separate Gross/Van Vuuren locators, then confirms both entropy values retain their printed temperatures through isolated migration. It also confirms absent pressure/fO2 conditions. The Table 3 `V0` mutation fails the independent fidelity-sample check; restoring page 4 for the Gross locator makes the focused regression fail.
 
 Verification: the focused extraction test passed (2 tests), `tests/test_yaml_flow_scalar_commas.py` passed (17 tests), and all 872 collected cases in `tests/test_literature_extracts.py` passed in bounded `-k` slices (255 other cases and 617 per-extract fidelity samples). The full-file invocation exceeded the 300-second cap, so the suite was partitioned without omitting cases.
+
+FIX-FIRST rerun on 2026-10-31: the focused extraction test passed (2 tests), `tests/test_yaml_flow_scalar_commas.py` passed (17 tests), and `tests/test_literature_extracts.py -k chatain-2021-nacro2-thermodynamics` passed the source's fidelity sample (1 passed, 871 deselected). The isolated migration now returns 26 observations (20 unavailable, 6 points), with no hard issues; both entropy temperatures and their physical-page locators reach the migrated identities and point conditions. Temporarily restoring page 4 for the Gross formation-enthalpy locator made both focused tests fail at the page assertions (2 failed); the locator was restored to page 3 and the focused test passed again.
