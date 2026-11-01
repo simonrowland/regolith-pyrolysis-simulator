@@ -4929,40 +4929,42 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
     # Hashimoto 1983, Table 3, p. 116. The two C3-(2) run observations at
     # 1700 and 1800 C are the explicitly labelled run rows; the other two
     # pins cover the remaining printed temperatures.
+    # Printed provenance retains the source's *_wt_pct column names; only the
+    # converted identity uses normalized oxide names.
     expected_by_row = {
         (
             "table3_residue_composition_series_quoted__run_17c3-2::"
             "T=1973.15:row=c3-(2):"
         ): {
-            "SiO2": Decimal("39.09"),
-            "Al2O3": Decimal("3.57"),
-            "FeO": Decimal("27.92"),
-            "MgO": Decimal("26.32"),
-            "CaO": Decimal("3.09"),
+            "SiO2_wt_pct": Decimal("39.09"),
+            "Al2O3_wt_pct": Decimal("3.57"),
+            "FeO_wt_pct": Decimal("27.92"),
+            "MgO_wt_pct": Decimal("26.32"),
+            "CaO_wt_pct": Decimal("3.09"),
         },
         (
             "table3_residue_composition_series_quoted__run_18c3-2::"
             "T=2073.15:row=c3-(2):"
         ): {
-            "SiO2": Decimal("45.30"),
-            "Al2O3": Decimal("4.33"),
-            "FeO": Decimal("12.87"),
-            "MgO": Decimal("33.57"),
-            "CaO": Decimal("3.93"),
+            "SiO2_wt_pct": Decimal("45.30"),
+            "Al2O3_wt_pct": Decimal("4.33"),
+            "FeO_wt_pct": Decimal("12.87"),
+            "MgO_wt_pct": Decimal("33.57"),
+            "CaO_wt_pct": Decimal("3.93"),
         },
         "table3_residue_composition_series::T=2173.15:row=19b2:": {
-            "SiO2": Decimal("37.94"),
-            "Al2O3": Decimal("3.55"),
-            "FeO": Decimal("29.14"),
-            "MgO": Decimal("26.09"),
-            "CaO": Decimal("3.29"),
+            "SiO2_wt_pct": Decimal("37.94"),
+            "Al2O3_wt_pct": Decimal("3.55"),
+            "FeO_wt_pct": Decimal("29.14"),
+            "MgO_wt_pct": Decimal("26.09"),
+            "CaO_wt_pct": Decimal("3.29"),
         },
         "table3_residue_composition_series::T=2273.15:row=20b2:": {
-            "SiO2": Decimal("40.87"),
-            "Al2O3": Decimal("4.14"),
-            "FeO": Decimal("20.46"),
-            "MgO": Decimal("30.81"),
-            "CaO": Decimal("3.72"),
+            "SiO2_wt_pct": Decimal("40.87"),
+            "Al2O3_wt_pct": Decimal("4.14"),
+            "FeO_wt_pct": Decimal("20.46"),
+            "MgO_wt_pct": Decimal("30.81"),
+            "CaO_wt_pct": Decimal("3.72"),
         },
     }
     rows = [
@@ -5136,7 +5138,7 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 charge
                 if source_point.get("T_C_is_initial_composition")
                 else {
-                    oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                    f"{oxide}_wt_pct": as_decimal(source_point[f"{oxide}_wt_pct"])
                     for oxide in charge
                 }
             )
@@ -5158,9 +5160,10 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
                 and as_decimal(point["T_C"]) == temperature_c
             )
             expected = {
-                oxide: as_decimal(source_point[f"{oxide}_wt_pct"])
+                f"{oxide}_wt_pct": as_decimal(source_point[f"{oxide}_wt_pct"])
                 for oxide in charges[panel]
             }
+            # The point map is provenance, so it keeps each source column name.
             assert _printed_wt_map(row) == expected
             composition_entry = (
                 (row.get("point_conditions") or {}).get("composition") or {}
@@ -5284,11 +5287,11 @@ def test_markova_residue_uses_its_point_map_without_parent_lookup(
             matches.append(row)
     assert len(matches) == 1
     assert _printed_wt_map(matches[0]) == {
-        "SiO2": Decimal("44.4"),
-        "Al2O3": Decimal("4.62"),
-        "FeO": Decimal("7.01"),
-        "MgO": Decimal("36.92"),
-        "CaO": Decimal("7.05"),
+        "SiO2_wt_pct": Decimal("44.4"),
+        "Al2O3_wt_pct": Decimal("4.62"),
+        "FeO_wt_pct": Decimal("7.01"),
+        "MgO_wt_pct": Decimal("36.92"),
+        "CaO_wt_pct": Decimal("7.05"),
     }
 
 
