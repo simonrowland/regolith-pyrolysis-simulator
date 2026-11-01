@@ -461,6 +461,7 @@ _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
     "crystalline": Phase.CR,
     "solid stoichiometric mgal2o4 spinel": Phase.CR,
     "solid lump": Phase.CR,
+    "solid ceramic sample": Phase.CR,
     "liquid": Phase.L,
     "liquid_melt": Phase.L,
     "melt": Phase.L,
