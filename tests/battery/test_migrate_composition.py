@@ -2797,6 +2797,13 @@ def test_composition_cell_classifier_matches_green_numeric_reader_union() -> Non
             None,
             Decimal("5.00"),
         ),
+        (
+            "tagged value wrapper",
+            {"tag": "value", "value": "5.00"},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
         ("sigma uncertainty", "5.00 (1σ)", None, None, None),
         ("sigma marker", "5.00 (σ)", None, None, None),
         ("range", "5.00–6.00", None, None, None),
