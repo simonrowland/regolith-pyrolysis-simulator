@@ -130,6 +130,57 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
 
 
+def test_lpi_trace_sulfur_is_excluded_from_engine_point_composition():
+    from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
+    from simulator.battery.waypoints import _engine_printed_oxides, normalized_composition
+
+    migrator = Migrator()
+    migrator._migrate_extract(
+        REPO_ROOT / "data/literature/extracts/lpi-lunar-soils.yaml"
+    )
+    lpi_observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if "lpi_1983_soil_10002_provenance_and_characterization"
+        in row.observation_id
+    )
+    printed = lpi_observation.point_conditions["printed_composition"]
+    assert printed.state.is_value
+    assert printed.state.value["S"] == "0.12"
+
+    experiment, bench, template = case()
+    observation = replace(
+        lpi_observation,
+        experiment_id=experiment.experiment_id,
+        point_conditions={
+            **template.point_conditions,
+            **lpi_observation.point_conditions,
+        },
+    )
+    normalized = normalized_composition(experiment, bench, observation).selected
+    assert normalized is not None
+    assert "S" not in normalized.value
+    assert "SO3" not in normalized.value
+
+    engine_wt, _exempt, _notice, _feot = _engine_printed_oxides(printed.state.value)
+    assert engine_wt is not None
+    expected = wt_pct_to_mole_fraction(engine_wt).as_map()
+    expected_payload = {name: float(amount) for name, amount in expected.items()}
+    assert {name: float(amount) for name, amount in normalized.value.items()} == pytest.approx(
+        expected_payload, abs=1e-12
+    )
+
+    requests = engine_point_requests(
+        collect_consumer_inputs(experiment, bench, observation)
+    )
+    assert requests and all(request.payload is not None for request in requests)
+    for request in requests:
+        composition_mol = request.payload["composition_mol"]
+        assert "S" not in composition_mol
+        assert "SO3" not in composition_mol
+        assert composition_mol == pytest.approx(expected_payload, abs=1e-12)
+
+
 def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
     experiment, bench, observation = case(oxygen=False, pressure="1e-4")
     experiment = _as_langmuir(experiment)
