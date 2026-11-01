@@ -2490,7 +2490,10 @@ class _FakeWarmPool:
 
 
 def test_warm_pool_activity_request_is_opt_in_and_projects_payload():
-    state = "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+    state = (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
     base_request = {
         "composition_wt_pct": {"Na2O": 100.0},
         "temperature_K": 1600.0,
@@ -2502,6 +2505,17 @@ def test_warm_pool_activity_request_is_opt_in_and_projects_payload():
     backend._warm_pool = default_pool
     default_pressures = backend._call_vaporock_via_pool(**base_request)
     assert default_pool.requests == [base_request]
+    from multiprocessing.reduction import ForkingPickler
+
+    default_wire_request = default_pool.requests[0]
+    assert set(default_wire_request) == {
+        "composition_wt_pct",
+        "temperature_K",
+        "fO2_log",
+    }
+    assert bytes(ForkingPickler.dumps(default_wire_request)) == bytes(
+        ForkingPickler.dumps(base_request)
+    )
     assert default_pressures["Na"] == pytest.approx(10.0 ** -0.5 * 1.0e5)
 
     pool = _FakeWarmPool(
@@ -3660,8 +3674,16 @@ def test_system_call_warm_and_cold_paths_match_float_hex_golden():
 
 
 def test_warm_worker_default_response_serialization_is_golden():
-    """The absent opt-in flag keeps the existing warm-worker wire bytes."""
+    """The absent opt-in flag keeps the existing warm-worker wire payload.
+
+    EnginePool's Connection.send serializes ('ok', result) with
+    multiprocessing's ForkingPickler. Compare the actual transport bytes to
+    the explicit green payload using the same runtime pickler, so this pins the
+    transported fields without binding to Python-version-specific pickle
+    framing.
+    """
     import json
+    from multiprocessing.reduction import ForkingPickler
 
     class FakeSystem:
         def set_melt_comp(self, _composition):
@@ -3697,6 +3719,24 @@ def test_warm_worker_default_response_serialization_is_golden():
         '"speciation_other_nonfinite_count":0,"path":"system",'
         '"system_construct_count":1,"reuse_mode":"fresh",'
         '"reuse_latched_fresh":false}'
+    )
+    expected_payload = {
+        "log10_bar": {"Na(g)": -0.5, "SiO(g)": -1.25},
+        "speciation_row_count": 2,
+        "speciation_finite_count": 2,
+        "speciation_nan_count": 0,
+        "speciation_neginf_count": 0,
+        "speciation_other_nonfinite_count": 0,
+        "path": "system",
+        "system_construct_count": 1,
+        "reuse_mode": "fresh",
+        "reuse_latched_fresh": False,
+    }
+    assert set(payload) == set(expected_payload)
+    actual_wire_result = ("ok", payload)
+    expected_wire_result = ("ok", expected_payload)
+    assert bytes(ForkingPickler.dumps(actual_wire_result)) == bytes(
+        ForkingPickler.dumps(expected_wire_result)
     )
 
 
@@ -3752,7 +3792,8 @@ def test_warm_worker_opt_in_returns_present_oxide_activities_only():
         "Na2O": pytest.approx(0.25),
     }
     assert payload["oxide_activity_standard_state"] == (
-        "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
     )
 
 
@@ -3768,7 +3809,8 @@ def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data()
         diagnostics={
             "oxide_activity": {"Na2O": 0.25},
             "oxide_activity_standard_state": (
-                "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+                "melts_endmember_transformed_oxide_component; "
+                "mu_i = mu_i0 + R*T*ln(a_i)"
             )
         },
     )
@@ -3786,7 +3828,8 @@ def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data()
     payload = diagnostics.as_diagnostic()
     assert payload["oxide_activity"] == {"Na2O": 0.25}
     assert payload["oxide_activity_standard_state"] == (
-        "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
     )
 
     without_activities = types.SimpleNamespace(
@@ -3808,7 +3851,10 @@ def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data()
 
 
 def test_opt_in_oxide_activity_stays_out_of_generic_equilibrium_field(monkeypatch):
-    state = "pure_liquid_oxide_endmember; mu_i = mu_i0 + R*T*ln(a_i)"
+    state = (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
     backend = VapoRockBackend()
     backend._available = True
     backend._warm_pool = object()
