@@ -206,8 +206,12 @@ def test_dash_in_starting_bulk_is_not_zero(tmp_path: Path) -> None:
     oxides = tuple(
         (name, "-" if name == "MnO" else amount) for name, amount in _OXIDES
     )
-    with pytest.raises((ArithmeticError, ValueError, TypeError)):
-        _migrate_fixture(tmp_path, _extract(_initial(oxides)))
+    observation = _migrate_fixture(tmp_path, _extract(_initial(oxides)))
+    composition = observation.identity.composition
+    # A printed dash is retained as a missing major oxide and refuses the
+    # starting composition; it is never interpreted as zero wt%.
+    assert composition is not None and composition.is_unknown
+    assert "missing major oxides: MnO" in composition.reason
 
 
 def test_residue_row_does_not_take_the_starting_bulk(tmp_path: Path) -> None:
