@@ -2314,6 +2314,94 @@ def test_printed_phase_vector_checks_mass_closure_once(
     assert observation.identity.composition.is_value
 
 
+def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["experiments"] = [
+        {
+            "experiment_id": "residue-run",
+            "sample": {
+                "initial_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "measured",
+                            "amount_basis": "mole_fraction",
+                            "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+                        },
+                    },
+                    "locator": {"table": "1"},
+                },
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": None, "MgO": "50", "CaO": "50"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                },
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": "residue-blank-major",
+            "experiment": "residue-run",
+            "type": "residue_component_composition",
+            "units": "ppm",
+        }
+    )
+    row["values"] = {
+        "quantity": "residue_component_composition",
+        "method_class": "measured_direct",
+        "series": [
+            {"T_C": "1200", "run_id": "residue-run", "residue_ppm": "12.59"}
+        ],
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.identity.quantity.is_value
+        and item.identity.quantity.value is migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
+def test_owner_starting_map_ambiguous_iron_is_typed_unknown() -> None:
+    printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
+    sample = _sample_from_plain(
+        {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "printed_composition": {
+                "state": {"tag": "value", "value": printed_map},
+                "locator": {"table": "1"},
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "FeOT with FeO" in sample.initial_composition.state.reason
+
+
+def test_located_starting_map_ambiguous_iron_is_typed_unknown() -> None:
+    printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
+    _printed, initial = migrate_module._located_printed_and_initial(
+        printed_map,
+        None,
+        closure_context={"printed_composition": printed_map},
+        declared_component_map=printed_map,
+    )
+
+    assert initial is not None
+    assert initial.state.is_unknown
+    assert "FeOT with FeO" in initial.state.reason
+
+
 def test_mass_percent_refusal_matches_for_flat_hydrous_unknown_component(
     tmp_path: Path,
 ) -> None:
