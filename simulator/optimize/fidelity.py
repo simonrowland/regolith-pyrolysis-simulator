@@ -8,7 +8,6 @@ import multiprocessing as mp
 import os
 import time
 from dataclasses import dataclass, replace
-from functools import lru_cache
 import inspect
 from pathlib import Path
 from queue import Empty
@@ -27,15 +26,17 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.backends import requires_stage0_subprocess
-from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveValue,
     canonical_objective_metric,
     objective_metric_aliases,
 )
-from simulator.optimize.pool import resolve_eval_timeout_seconds
+from simulator.optimize.pool import (
+    _default_feedstocks,
+    _task_stage0_subprocess_required,
+    resolve_eval_timeout_seconds,
+)
 from simulator.optimize.result_trust import (
     ResultTrustCarriers,
     collect_result_trust_carriers,
@@ -508,7 +509,9 @@ def _call_evaluate_fn(task: _FidelityTask) -> ScoredResult:
     if warm_workers_enabled():
         worker_runtime = get_worker_runtime(
             feedstock_id=task.feedstock_id,
-            stage0_subprocess_required=_task_stage0_subprocess_required(task),
+            stage0_subprocess_required=_task_stage0_subprocess_required(
+                task.feedstock_id
+            ),
         )
     call_kwargs: dict[str, Any] = {
         "profile": dict(task.profile),
@@ -553,9 +556,8 @@ def _initialize_fidelity_worker(
         warm_worker_runtime(warm_runtime)
         return
     feedstocks = _default_feedstocks()
-    subprocess_required = warm_runtime.stage0_subprocess_required or requires_stage0_subprocess(
-        warm_runtime.feedstock_id,
-        feedstocks,
+    subprocess_required = warm_runtime.stage0_subprocess_required or (
+        _task_stage0_subprocess_required(warm_runtime.feedstock_id)
     )
     warm_worker_runtime(
         warm_runtime.backend_name,
@@ -580,21 +582,14 @@ def _warm_runtime_spec(tasks: Sequence[_FidelityTask]) -> _FidelityWarmRuntimeSp
     if name in {"auto", "cached-real"}:
         return None
     feedstock_id = next(iter(feedstocks))
-    subprocess_required = any(_task_stage0_subprocess_required(task) for task in tasks)
+    subprocess_required = any(
+        _task_stage0_subprocess_required(task.feedstock_id) for task in tasks
+    )
     return _FidelityWarmRuntimeSpec(
         backend_name=name,
         feedstock_id=feedstock_id,
         stage0_subprocess_required=subprocess_required,
     )
-
-
-def _task_stage0_subprocess_required(task: _FidelityTask) -> bool:
-    return requires_stage0_subprocess(task.feedstock_id, _default_feedstocks())
-
-
-@lru_cache(maxsize=1)
-def _default_feedstocks() -> Mapping[str, Any]:
-    return load_config_bundle(DEFAULT_DATA_DIR).feedstocks
 
 
 def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
