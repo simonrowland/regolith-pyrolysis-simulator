@@ -117,6 +117,7 @@ from simulator.battery.migrate import (
     observation_matches_source_tokens,
     path_matches_source_tokens,
     _phase_for_sample_description,
+    _phase_for_recorded_vapour_sample,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -1158,6 +1159,8 @@ def liquid_model_subsolidus_sample_notice(
     *,
     engine: Engine,
     experiment: Experiment | None,
+    measured_condensed_form: object = None,
+    measured_sample_phase: object = None,
     origin: str,
 ) -> Notice | None:
     """Nonblocking notice for a liquid model scored against a solid sample.
@@ -1178,8 +1181,17 @@ def liquid_model_subsolidus_sample_notice(
         Rail.SIO_EVOLUTION,
     }:
         return None
+    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
+        measured_condensed_form,
+        measured_sample_phase,
+    )
+    if not row_phase_recorded:
+        sample_phase = _experiment_sample_phase(
+            experiment,
+            include_characterization=True,
+        )
     sample_phase_detail = crystalline_sample_detail(
-        _experiment_sample_phase(experiment, include_characterization=True),
+        sample_phase,
         quantity=quantity,
         reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
     )
@@ -11488,6 +11500,12 @@ def compile_residual(
             identity,
             engine=engine,
             experiment=experiment,
+            measured_condensed_form=(
+                (reference.provenance or {}).get("measured_condensed_form")
+            ),
+            measured_sample_phase=(
+                (reference.provenance or {}).get("measured_sample_phase")
+            ),
             origin=reference.observation_id,
         )
         if isinstance(identity, Identity)
