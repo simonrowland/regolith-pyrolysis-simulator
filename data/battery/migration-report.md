@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 86723
-records out (observations): 176254
-works: 717
-experiments: 6689
-queue size: 116489
+rows in: 87084
+records out (observations): 176718
+works: 719
+experiments: 6723
+queue size: 116920
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 715
+index sources: 717
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,18 +196,18 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 714 (mismatch) |
-| doi_works | 56 | 386 (mismatch) |
-| no_doi_works | 91 | 331 (mismatch) |
-| admission_statuses | 374 | 28820 (mismatch) |
+| citations | 147 | 716 (mismatch) |
+| doi_works | 56 | 387 (mismatch) |
+| no_doi_works | 91 | 332 (mismatch) |
+| admission_statuses | 374 | 29154 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
-| series | 60 | 1323 (mismatch) |
+| series | 60 | 1338 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 21064 (mismatch) |
+| formulas | 1625 | 21266 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 14777 (mismatch) |
+| absent_admissions | 3511 | 14804 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2796 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
@@ -19334,6 +19334,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml` | 36 | 36 | 102 |
 | `data/literature/extracts/kropf-2009-alkalis-chondrules-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kume-2000-cao-activities.yaml` | 375 | 375 | 687 |
+| `data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml` | 278 | 278 | 220 |
 | `data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml` | 21 | 21 | 56 |
 | `data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml` | 8 | 8 | 1 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 84 |
@@ -19446,6 +19447,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
 | `data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml` | 46 | 46 | 160 |
 | `data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml` | 2 | 2 | 2 |
+| `data/literature/extracts/pankratz-1968-ri7201-sodium-calcium-silicates.yaml` | 83 | 186 | 211 |
 | `data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml` | 14 | 14 | 0 |
 | `data/literature/extracts/park-min-2004-carbide-capacity-fluoride-soda-slags.yaml` | 111 | 111 | 0 |
 | `data/literature/extracts/park-morita-2025-vanadium-activity.yaml` | 56 | 56 | 0 |
@@ -19814,8 +19816,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 293128
+advisory issues: 293700
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 293128 |
+| `identity_incomplete` | 293700 |
