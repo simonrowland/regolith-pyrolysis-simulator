@@ -850,7 +850,7 @@ def normalized_composition(
     printed_species: set[str] | None = None
     printed_path = None
     printed_basis_exempt: set[str] = set()
-    rejected_printed_mass_locator: Locator | None = None
+    rejected_printed_mass = False
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
         located = point.get(key) if key in point else getattr(experiment.sample, field)
@@ -881,19 +881,42 @@ def normalized_composition(
         raw = located.state.value
         if (
             field == "initial_composition"
+            and rejected_printed_mass
             and isinstance(raw, Composition)
             and located.inference is not None
             and located.inference.relation == "wt_pct_to_mole_fraction"
-            and rejected_printed_mass_locator is not None
-            and located.locator is not None
-            and replace(located.locator, note=None)
-            == replace(rejected_printed_mass_locator, note=None)
         ):
-            # The matching source locator and wt% derivation tie this route to
-            # the printed table entry whose mass analysis failed closure.
-            unsupported = True
-            missing.append(path)
-            continue
+            # A second derived mass-percent route is usable only when its own
+            # typed original-weight parameters prove closure. Prose inputs
+            # alone cannot establish the printed total.
+            inferred_wt: dict[str, Decimal] = {}
+            inputs_available = True
+            for parameter_name, parameter in located.inference.parameters:
+                name = str(parameter_name)
+                if not name.startswith("original_") or not name.endswith("_wt_pct"):
+                    continue
+                component = name[len("original_") : -len("_wt_pct")]
+                if not component or component in inferred_wt or not parameter.state.is_value:
+                    inputs_available = False
+                    break
+                kind, amount = _classify_composition_cell(parameter.state.value)
+                if kind != "number" or amount is None:
+                    inputs_available = False
+                    break
+                inferred_wt[component] = amount
+            if not inputs_available or not inferred_wt:
+                unsupported = True
+                missing.append(path)
+                continue
+            _, inference_refusal = _wt_percent_conversion_or_refusal(
+                inferred_wt,
+                closure_context=inferred_wt,
+                declared_component_map=inferred_wt,
+            )
+            if inference_refusal is not None:
+                unsupported = True
+                missing.append(path)
+                continue
         if field == "initial_composition" and not isinstance(raw, Composition):
             unsupported = True
             missing.append(path)
@@ -969,7 +992,7 @@ def normalized_composition(
                         declared_component_map=mass_percent_map,
                     )
                     if closure_refusal is not None:
-                        rejected_printed_mass_locator = located.locator
+                        rejected_printed_mass = True
                         raw = None
                 if raw is not None:
                     try:
