@@ -383,6 +383,37 @@ def _run_eval_batch(
                 return timed_out
             timed_out = record_message(message) or timed_out
 
+    def join_workers_while_draining() -> bool:
+        timed_out = False
+        grace_deadline = time.monotonic() + 1.0
+        while time.monotonic() < grace_deadline and any(
+            worker.is_alive() for worker in workers
+        ):
+            timed_out = drain_result_queue() or timed_out
+            for worker in workers:
+                if worker.is_alive():
+                    worker.join(timeout=0.01)
+            timed_out = drain_result_queue() or timed_out
+
+        alive = [worker for worker in workers if worker.is_alive()]
+        if alive:
+            # A terminated multiprocessing.Queue writer can leave a partial frame.
+            # Once a worker must be killed, abandon the queue and time out any
+            # pending task whose complete result was not drained above.
+            for worker in alive:
+                worker.terminate()
+            for worker in alive:
+                worker.join(timeout=1.0)
+            for worker in alive:
+                if worker.is_alive() and hasattr(worker, "kill"):
+                    worker.kill()
+                    worker.join(timeout=1.0)
+            return timed_out
+
+        # A normally exited process has flushed its queue feeder, so this last
+        # drain is safe and captures messages that arrived during the last join.
+        return drain_result_queue() or timed_out
+
     try:
         for worker in workers:
             worker.start()
@@ -403,11 +434,10 @@ def _run_eval_batch(
                 key for key, start in started.items() if key in pending and now - start >= timeout_s
             ]
             if timed_out or expired:
-                # Stop and join before the final drain. Completed results are
-                # classified by their worker elapsed time; pending tasks without
-                # a completion message are the timeout cases.
-                _join_or_stop_workers(workers)
-                timed_out = drain_result_queue() or timed_out
+                # Drain while workers finish flushing their queue messages. If a
+                # worker must be terminated, its queue may be corrupt, so never
+                # read it again; only tasks without a drained result time out.
+                timed_out = join_workers_while_draining() or timed_out
                 expired = [key for key in expired if key in pending]
                 for key in expired:
                     task = pending.pop(key, None)
