@@ -2811,29 +2811,68 @@ def _migrate_residue_oxide_columns(tmp_path: Path, columns: dict[str, object]):
     ]
 
 
+@pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))
 def test_residue_explosion_keeps_blank_oxide_sibling_for_closure(
     tmp_path: Path,
+    surviving_numeric_count: int,
 ) -> None:
-    observations = _migrate_residue_oxide_columns(
-        tmp_path,
-        {
-            "SiO2_wt_pct": None,
-            "MgO_wt_pct": "50",
-            "CaO_wt_pct": "50",
-        },
-    )
+    columns: dict[str, object] = {
+        "SiO2_wt_pct": None,
+        "MgO_wt_pct": None,
+        "CaO_wt_pct": None,
+    }
+    if surviving_numeric_count == 1:
+        columns["MgO_wt_pct"] = "100"
+    elif surviving_numeric_count == 2:
+        columns["MgO_wt_pct"] = "50"
+        columns["CaO_wt_pct"] = "50"
 
+    if surviving_numeric_count == 0:
+        printed, composition = migrate_module._located_printed_and_initial(
+            {}, None, closure_context=columns, declared_component_map=columns
+        )
+        assert printed is not None
+        assert printed.state.value == columns
+        assert composition is not None
+        assert composition.state.is_unknown
+        assert "missing major oxides: SiO2" in composition.state.reason
+        return
+
+    observations = _migrate_residue_oxide_columns(tmp_path, columns)
     component_rows = [
         observation
         for observation in observations
         if observation.identity.species.formula in {"MgO", "CaO"}
     ]
-    assert component_rows
+    assert len(component_rows) == surviving_numeric_count
     for observation in component_rows:
         composition = (observation.point_conditions or {}).get("composition")
         assert isinstance(composition, Located)
         assert composition.state.is_unknown
         assert "missing major oxides: SiO2" in composition.state.reason
+        printed = (observation.point_conditions or {}).get("printed_composition")
+        assert isinstance(printed, Located)
+        assert printed.state.is_value
+        assert printed.state.value == columns
+
+
+def test_residue_explosion_accepts_a_declared_pure_oxide_map(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path, {"MgO_wt_pct": "100"}
+    )
+
+    component_rows = [
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "MgO"
+    ]
+    assert len(component_rows) == 1
+    composition = component_rows[0].point_conditions["composition"]
+    assert isinstance(composition, Located)
+    assert composition.state.is_value
+    assert dict(composition.state.value.components) == {"MgO": Decimal("1")}
 
 
 @pytest.mark.parametrize(
