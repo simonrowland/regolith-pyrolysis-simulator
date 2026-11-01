@@ -1,0 +1,4776 @@
+schema_version: literature_extract.v1
+source_id: banya-hino-takezoe-1985-na-fe-silicate-redox
+review_status: draft
+source:
+  citation: Ban-ya, S., Hino, M. and Takezoe, H. (1985), ‘Activities of the Constituents and Fe3+/Fe2+ Equilibrium
+    in FetO-Na2O and FetO-SiO2-Na2O Slags’, Tetsu-to-Hagane 71(15), 1765–1772.
+  doi: 10.2355/tetsutohagane1955.71.15_1765
+  year: 1985
+  corpus_asset: raw/banya-hino-takezoe-1985-na-fe-silicate-redox/banya-hino-takezoe-1985-na-fe-silicate-redox.pdf
+  corpus_sha256: 77d173e312ab9d3155938d10bed4b291acd9c673929d376e0492592e46ad5750
+extraction:
+  method: Tables 1–3 transcribed from MinerU machine text and pdftotext-layout. MinerU QA found numeric agreement
+    0.086 for Table 1 and 0.039 for Table 2 because pdftotext did not extract their cell values; every table cell
+    was checked against the page render. Table 3 and the explicit interaction parameters were also render-checked.
+    Figures were not digitised.
+  date: '2026-10-31'
+  worker: w1031nd-bany85n
+  provenance_path: text/banya-hino-takezoe-1985-na-fe-silicate-redox/pdftotext-layout.txt
+fidelity_samples:
+- path: species.Fe.observations[banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05].values.FeO_wt_percent_as_printed
+  value: '11.31'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '1'
+    row_label: '1'
+    note: Table 1 cell checked against page 2 render.
+- path: species.Fe.observations[banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05].values.Na2O_wt_percent_as_printed
+  value: '17.20'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '1'
+    row_label: '1'
+    note: Table 1 cell checked against page 2 render.
+- path: species.Fe.observations[banya_hino_takezoe_1985_t1_run_7_p002_t01_r09_c05].values.Fe3_over_Fe2_as_printed
+  value: '1.278'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '1'
+    row_label: '7'
+    note: Table 1 cell checked against page 2 render.
+- path: species.Fe.observations[banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07].values.SiO2_wt_percent_as_printed
+  value: '44.95'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '2'
+    row_label: '1'
+    note: Table 2 cell checked against page 2 render.
+- path: species.Fe_tO.observations[banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c08].values.a_FetO_as_printed
+  value: '0.452'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '2'
+    row_label: '1'
+    note: Table 2 cell checked against page 2 render; printed header is a_FetO.
+- path: species.Fe_tO.observations[banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c08].values.a_FetO_as_printed
+  value: '0.696'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1766
+    table: '2'
+    row_label: '16'
+    note: Table 2 cell checked against page 2 render.
+experiments:
+- experiment_id: banya_hino_takezoe_1985_t1_co2_equilibrium
+  method: quench_equilibration
+  method_as_printed: A 4.0 g synthetic slag charge was held 6 h at 1610°C in pure CO2 in a platinum crucible. After
+    equilibration, it was rapidly lowered near the water-cooled cap while the atmosphere was switched to Ar and
+    quenched.
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1765
+    section: '2.1'
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1610'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+    gas_mixture_as_printed:
+      state:
+        tag: value
+        value: pure CO2 atmosphere
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1765
+        section: '2.1'
+    P_CO2_as_printed:
+      state:
+        tag: value
+        value: 1 atm
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+    quench:
+      state:
+        tag: value
+        value: After 6 h at 1610°C in pure CO2, the sample was rapidly lowered near the water-cooled cap as the
+          atmosphere was switched to Ar and quenched.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1765
+        section: '2.1'
+- experiment_id: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+  method: quench_equilibration
+  method_as_printed: A 4.0 g synthetic slag charge was held 7 h at 1400°C in H2O/H2 in an iron crucible suspended
+    on Mo wire. After equilibration, it was rapidly lowered into the lower water-cooled copper tube kept under Ar.
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1765
+    section: '2.2'
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+    gas_mixture_as_printed:
+      state:
+        tag: value
+        value: H2O/H2 mixed gas; the run-specific ratio is printed in Table 2
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+    iron_saturation:
+      state:
+        tag: value
+        value: solid iron crucible
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1765
+        section: '2.2'
+    quench:
+      state:
+        tag: value
+        value: After 7 h at 1400°C in H2O/H2, the sample was rapidly lowered into the lower water-cooled copper
+          quench tube kept under Ar.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 1765
+        section: '2.2'
+species:
+  Fe:
+    observations:
+    - observation_id: banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id001
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '1'
+        table_row_number: 3
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '11.31'
+              - - Fe2O3
+                - '70.20'
+              - - Na2O
+                - '17.20'
+          locator: *id001
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '5.585'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '1'
+        Fe3_over_Fe2_as_printed: '5.585'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '11.31'
+        Fe2O3_wt_percent_as_printed: '70.20'
+        Na2O_wt_percent_as_printed: '17.20'
+        composition_wt_pct:
+          FeO: '11.31'
+          Fe2O3: '70.20'
+          Na2O: '17.20'
+        composition_role:
+          value: datum_state
+          locator: *id001
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_2_p002_t01_r04_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id002
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '2'
+        table_row_number: 4
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id002
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '15.80'
+              - - Fe2O3
+                - '67.86'
+              - - Na2O
+                - '14.12'
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '3.865'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '2'
+        Fe3_over_Fe2_as_printed: '3.865'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '15.80'
+        Fe2O3_wt_percent_as_printed: '67.86'
+        Na2O_wt_percent_as_printed: '14.12'
+        composition_wt_pct:
+          FeO: '15.80'
+          Fe2O3: '67.86'
+          Na2O: '14.12'
+        composition_role:
+          value: datum_state
+          locator: *id002
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_3_p002_t01_r05_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id003
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '3'
+        table_row_number: 5
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '23.81'
+              - - Fe2O3
+                - '65.25'
+              - - Na2O
+                - '7.74'
+          locator: *id003
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '2.466'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '3'
+        Fe3_over_Fe2_as_printed: '2.466'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '23.81'
+        Fe2O3_wt_percent_as_printed: '65.25'
+        Na2O_wt_percent_as_printed: '7.74'
+        composition_wt_pct:
+          FeO: '23.81'
+          Fe2O3: '65.25'
+          Na2O: '7.74'
+        composition_role:
+          value: datum_state
+          locator: *id003
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_4_p002_t01_r06_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id004
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '4'
+        table_row_number: 6
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id004
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '27.41'
+              - - Fe2O3
+                - '64.27'
+              - - Na2O
+                - '5.63'
+          locator: *id004
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '2.110'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '4'
+        Fe3_over_Fe2_as_printed: '2.110'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '27.41'
+        Fe2O3_wt_percent_as_printed: '64.27'
+        Na2O_wt_percent_as_printed: '5.63'
+        composition_wt_pct:
+          FeO: '27.41'
+          Fe2O3: '64.27'
+          Na2O: '5.63'
+        composition_role:
+          value: datum_state
+          locator: *id004
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_5_p002_t01_r07_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id005
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '5'
+        table_row_number: 7
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id005
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '31.07'
+              - - Fe2O3
+                - '62.72'
+              - - Na2O
+                - '3.48'
+          locator: *id005
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '1.816'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '5'
+        Fe3_over_Fe2_as_printed: '1.816'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '31.07'
+        Fe2O3_wt_percent_as_printed: '62.72'
+        Na2O_wt_percent_as_printed: '3.48'
+        composition_wt_pct:
+          FeO: '31.07'
+          Fe2O3: '62.72'
+          Na2O: '3.48'
+        composition_role:
+          value: datum_state
+          locator: *id005
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_6_p002_t01_r08_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id006
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '6'
+        table_row_number: 8
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '35.82'
+              - - Fe2O3
+                - '60.91'
+              - - Na2O
+                - '2.42'
+          locator: *id006
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '1.530'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '6'
+        Fe3_over_Fe2_as_printed: '1.530'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '35.82'
+        Fe2O3_wt_percent_as_printed: '60.91'
+        Na2O_wt_percent_as_printed: '2.42'
+        composition_wt_pct:
+          FeO: '35.82'
+          Fe2O3: '60.91'
+          Na2O: '2.42'
+        composition_role:
+          value: datum_state
+          locator: *id006
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t1_run_7_p002_t01_r09_c05
+      experiment: banya_hino_takezoe_1985_t1_co2_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id007
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '1'
+        row_label: '7'
+        table_row_number: 9
+        table_column_number: 5
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1610'
+          locator: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '41.21'
+              - - Fe2O3
+                - '58.51'
+              - - Na2O
+                - '0.20'
+          locator: *id007
+        gas_mix:
+          state:
+            tag: value
+            value: pure CO2 atmosphere; P_CO2 = 1 atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1766
+            table: '1'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+            note: Quenching is stated; redox preservation or alteration is not.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '1.278'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '7'
+        Fe3_over_Fe2_as_printed: '1.278'
+        T_C: '1610'
+        gas_condition_as_printed: pure CO2; P_CO2 = 1 atm
+        FeO_wt_percent_as_printed: '41.21'
+        Fe2O3_wt_percent_as_printed: '58.51'
+        Na2O_wt_percent_as_printed: '0.20'
+        composition_wt_pct:
+          FeO: '41.21'
+          Fe2O3: '58.51'
+          Na2O: '0.20'
+        composition_role:
+          value: datum_state
+          locator: *id007
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered rapidly near the water-cooled cap while
+            the atmosphere was switched to Ar and quenched.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.1'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO and Fe2O3.
+    - observation_id: banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id008
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '1'
+        table_row_number: 3
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '40.25'
+              - - Fe2O3
+                - '1.95'
+              - - SiO2
+                - '44.95'
+              - - Na2O
+                - '13.14'
+          locator: *id008
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.395
+          locator: *id008
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id008
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.044'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '1'
+        P_H2O_over_PH2_as_printed: '0.395'
+        Fe3_over_Fe2_as_printed: '0.044'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '40.25'
+        Fe2O3_wt_percent_as_printed: '1.95'
+        SiO2_wt_percent_as_printed: '44.95'
+        Na2O_wt_percent_as_printed: '13.14'
+        composition_wt_pct:
+          FeO: '40.25'
+          Fe2O3: '1.95'
+          SiO2: '44.95'
+          Na2O: '13.14'
+        composition_role:
+          value: datum_state
+          locator: *id008
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id009
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '2'
+        table_row_number: 4
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id009
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '48.44'
+              - - Fe2O3
+                - '3.53'
+              - - SiO2
+                - '40.78'
+              - - Na2O
+                - '5.89'
+          locator: *id009
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.394
+          locator: *id009
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id009
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.066'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '2'
+        P_H2O_over_PH2_as_printed: '0.394'
+        Fe3_over_Fe2_as_printed: '0.066'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '48.44'
+        Fe2O3_wt_percent_as_printed: '3.53'
+        SiO2_wt_percent_as_printed: '40.78'
+        Na2O_wt_percent_as_printed: '5.89'
+        composition_wt_pct:
+          FeO: '48.44'
+          Fe2O3: '3.53'
+          SiO2: '40.78'
+          Na2O: '5.89'
+        composition_role:
+          value: datum_state
+          locator: *id009
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id010
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '3'
+        table_row_number: 5
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '28.14'
+              - - Fe2O3
+                - '3.61'
+              - - SiO2
+                - '42.58'
+              - - Na2O
+                - '25.06'
+          locator: *id010
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.393
+          locator: *id010
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id010
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.115'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '3'
+        P_H2O_over_PH2_as_printed: '0.393'
+        Fe3_over_Fe2_as_printed: '0.115'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '28.14'
+        Fe2O3_wt_percent_as_printed: '3.61'
+        SiO2_wt_percent_as_printed: '42.58'
+        Na2O_wt_percent_as_printed: '25.06'
+        composition_wt_pct:
+          FeO: '28.14'
+          Fe2O3: '3.61'
+          SiO2: '42.58'
+          Na2O: '25.06'
+        composition_role:
+          value: datum_state
+          locator: *id010
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id011
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '24'
+        table_row_number: 6
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id011
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.10'
+              - - Fe2O3
+                - '3.87'
+              - - SiO2
+                - '41.93'
+              - - Na2O
+                - '24.82'
+          locator: *id011
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.394
+          locator: *id011
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id011
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.120'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '24'
+        P_H2O_over_PH2_as_printed: '0.394'
+        Fe3_over_Fe2_as_printed: '0.120'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.10'
+        Fe2O3_wt_percent_as_printed: '3.87'
+        SiO2_wt_percent_as_printed: '41.93'
+        Na2O_wt_percent_as_printed: '24.82'
+        composition_wt_pct:
+          FeO: '29.10'
+          Fe2O3: '3.87'
+          SiO2: '41.93'
+          Na2O: '24.82'
+        composition_role:
+          value: datum_state
+          locator: *id011
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id012
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '25'
+        table_row_number: 7
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.79'
+              - - Fe2O3
+                - '2.94'
+              - - SiO2
+                - '42.84'
+              - - Na2O
+                - '24.00'
+          locator: *id012
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.392
+          locator: *id012
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id012
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.089'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '25'
+        P_H2O_over_PH2_as_printed: '0.392'
+        Fe3_over_Fe2_as_printed: '0.089'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.79'
+        Fe2O3_wt_percent_as_printed: '2.94'
+        SiO2_wt_percent_as_printed: '42.84'
+        Na2O_wt_percent_as_printed: '24.00'
+        composition_wt_pct:
+          FeO: '29.79'
+          Fe2O3: '2.94'
+          SiO2: '42.84'
+          Na2O: '24.00'
+        composition_role:
+          value: datum_state
+          locator: *id012
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id013
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '5'
+        table_row_number: 8
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id013
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '52.04'
+              - - Fe2O3
+                - '3.74'
+              - - SiO2
+                - '37.20'
+              - - Na2O
+                - '5.67'
+          locator: *id013
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id013
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id013
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.065'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '5'
+        P_H2O_over_PH2_as_printed: '0.482'
+        Fe3_over_Fe2_as_printed: '0.065'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '52.04'
+        Fe2O3_wt_percent_as_printed: '3.74'
+        SiO2_wt_percent_as_printed: '37.20'
+        Na2O_wt_percent_as_printed: '5.67'
+        composition_wt_pct:
+          FeO: '52.04'
+          Fe2O3: '3.74'
+          SiO2: '37.20'
+          Na2O: '5.67'
+        composition_role:
+          value: datum_state
+          locator: *id013
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id014
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '6'
+        table_row_number: 9
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.67'
+              - - Fe2O3
+                - '5.01'
+              - - SiO2
+                - '39.93'
+              - - Na2O
+                - '25.15'
+          locator: *id014
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id014
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id014
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.152'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '6'
+        P_H2O_over_PH2_as_printed: '0.482'
+        Fe3_over_Fe2_as_printed: '0.152'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.67'
+        Fe2O3_wt_percent_as_printed: '5.01'
+        SiO2_wt_percent_as_printed: '39.93'
+        Na2O_wt_percent_as_printed: '25.15'
+        composition_wt_pct:
+          FeO: '29.67'
+          Fe2O3: '5.01'
+          SiO2: '39.93'
+          Na2O: '25.15'
+        composition_role:
+          value: datum_state
+          locator: *id014
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id015
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '7'
+        table_row_number: 10
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '43.44'
+              - - Fe2O3
+                - '0.68'
+              - - SiO2
+                - '41.71'
+              - - Na2O
+                - '14.13'
+          locator: *id015
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id015
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id015
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.014'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '7'
+        P_H2O_over_PH2_as_printed: '0.482'
+        Fe3_over_Fe2_as_printed: '0.014'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '43.44'
+        Fe2O3_wt_percent_as_printed: '0.68'
+        SiO2_wt_percent_as_printed: '41.71'
+        Na2O_wt_percent_as_printed: '14.13'
+        composition_wt_pct:
+          FeO: '43.44'
+          Fe2O3: '0.68'
+          SiO2: '41.71'
+          Na2O: '14.13'
+        composition_role:
+          value: datum_state
+          locator: *id015
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id016
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '8'
+        table_row_number: 11
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '28.02'
+              - - Fe2O3
+                - '4.93'
+              - - SiO2
+                - '41.62'
+              - - Na2O
+                - '24.35'
+          locator: *id016
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.481
+          locator: *id016
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id016
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.158'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '8'
+        P_H2O_over_PH2_as_printed: '0.481'
+        Fe3_over_Fe2_as_printed: '0.158'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '28.02'
+        Fe2O3_wt_percent_as_printed: '4.93'
+        SiO2_wt_percent_as_printed: '41.62'
+        Na2O_wt_percent_as_printed: '24.35'
+        composition_wt_pct:
+          FeO: '28.02'
+          Fe2O3: '4.93'
+          SiO2: '41.62'
+          Na2O: '24.35'
+        composition_role:
+          value: datum_state
+          locator: *id016
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id017
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '18'
+        table_row_number: 12
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '55.72'
+              - - Fe2O3
+                - '3.68'
+              - - SiO2
+                - '36.38'
+              - - Na2O
+                - '4.50'
+          locator: *id017
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id017
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id017
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.059'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '18'
+        P_H2O_over_PH2_as_printed: '0.482'
+        Fe3_over_Fe2_as_printed: '0.059'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '55.72'
+        Fe2O3_wt_percent_as_printed: '3.68'
+        SiO2_wt_percent_as_printed: '36.38'
+        Na2O_wt_percent_as_printed: '4.50'
+        composition_wt_pct:
+          FeO: '55.72'
+          Fe2O3: '3.68'
+          SiO2: '36.38'
+          Na2O: '4.50'
+        composition_role:
+          value: datum_state
+          locator: *id017
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id018
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '9'
+        table_row_number: 13
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '37.55'
+              - - Fe2O3
+                - '4.91'
+              - - SiO2
+                - '37.17'
+              - - Na2O
+                - '20.63'
+          locator: *id018
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.571
+          locator: *id018
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id018
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.118'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '9'
+        P_H2O_over_PH2_as_printed: '0.571'
+        Fe3_over_Fe2_as_printed: '0.118'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '37.55'
+        Fe2O3_wt_percent_as_printed: '4.91'
+        SiO2_wt_percent_as_printed: '37.17'
+        Na2O_wt_percent_as_printed: '20.63'
+        composition_wt_pct:
+          FeO: '37.55'
+          Fe2O3: '4.91'
+          SiO2: '37.17'
+          Na2O: '20.63'
+        composition_role:
+          value: datum_state
+          locator: *id018
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id019
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '10'
+        table_row_number: 14
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '57.51'
+              - - Fe2O3
+                - '3.04'
+              - - SiO2
+                - '32.82'
+              - - Na2O
+                - '5.19'
+          locator: *id019
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.572
+          locator: *id019
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id019
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.048'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '10'
+        P_H2O_over_PH2_as_printed: '0.572'
+        Fe3_over_Fe2_as_printed: '0.048'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '57.51'
+        Fe2O3_wt_percent_as_printed: '3.04'
+        SiO2_wt_percent_as_printed: '32.82'
+        Na2O_wt_percent_as_printed: '5.19'
+        composition_wt_pct:
+          FeO: '57.51'
+          Fe2O3: '3.04'
+          SiO2: '32.82'
+          Na2O: '5.19'
+        composition_role:
+          value: datum_state
+          locator: *id019
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id020
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '11'
+        table_row_number: 15
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '30.42'
+              - - Fe2O3
+                - '6.97'
+              - - SiO2
+                - '36.19'
+              - - Na2O
+                - '27.55'
+          locator: *id020
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.569
+          locator: *id020
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id020
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.206'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '11'
+        P_H2O_over_PH2_as_printed: '0.569'
+        Fe3_over_Fe2_as_printed: '0.206'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '30.42'
+        Fe2O3_wt_percent_as_printed: '6.97'
+        SiO2_wt_percent_as_printed: '36.19'
+        Na2O_wt_percent_as_printed: '27.55'
+        composition_wt_pct:
+          FeO: '30.42'
+          Fe2O3: '6.97'
+          SiO2: '36.19'
+          Na2O: '27.55'
+        composition_role:
+          value: datum_state
+          locator: *id020
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id021
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '12'
+        table_row_number: 16
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '49.94'
+              - - Fe2O3
+                - '2.87'
+              - - SiO2
+                - '35.68'
+              - - Na2O
+                - '11.03'
+          locator: *id021
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.568
+          locator: *id021
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id021
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.052'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '12'
+        P_H2O_over_PH2_as_printed: '0.568'
+        Fe3_over_Fe2_as_printed: '0.052'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '49.94'
+        Fe2O3_wt_percent_as_printed: '2.87'
+        SiO2_wt_percent_as_printed: '35.68'
+        Na2O_wt_percent_as_printed: '11.03'
+        composition_wt_pct:
+          FeO: '49.94'
+          Fe2O3: '2.87'
+          SiO2: '35.68'
+          Na2O: '11.03'
+        composition_role:
+          value: datum_state
+          locator: *id021
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id022
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '17'
+        table_row_number: 17
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '61.75'
+              - - Fe2O3
+                - '3.55'
+              - - SiO2
+                - '30.59'
+              - - Na2O
+                - '2.61'
+          locator: *id022
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.566
+          locator: *id022
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id022
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.052'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '17'
+        P_H2O_over_PH2_as_printed: '0.566'
+        Fe3_over_Fe2_as_printed: '0.052'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '61.75'
+        Fe2O3_wt_percent_as_printed: '3.55'
+        SiO2_wt_percent_as_printed: '30.59'
+        Na2O_wt_percent_as_printed: '2.61'
+        composition_wt_pct:
+          FeO: '61.75'
+          Fe2O3: '3.55'
+          SiO2: '30.59'
+          Na2O: '2.61'
+        composition_role:
+          value: datum_state
+          locator: *id022
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id023
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '20'
+        table_row_number: 18
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id023
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '39.91'
+              - - Fe2O3
+                - '4.30'
+              - - SiO2
+                - '36.65'
+              - - Na2O
+                - '18.54'
+          locator: *id023
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.568
+          locator: *id023
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id023
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.097'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '20'
+        P_H2O_over_PH2_as_printed: '0.568'
+        Fe3_over_Fe2_as_printed: '0.097'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '39.91'
+        Fe2O3_wt_percent_as_printed: '4.30'
+        SiO2_wt_percent_as_printed: '36.65'
+        Na2O_wt_percent_as_printed: '18.54'
+        composition_wt_pct:
+          FeO: '39.91'
+          Fe2O3: '4.30'
+          SiO2: '36.65'
+          Na2O: '18.54'
+        composition_role:
+          value: datum_state
+          locator: *id023
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id024
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '13'
+        table_row_number: 19
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '52.97'
+              - - Fe2O3
+                - '6.60'
+              - - SiO2
+                - '31.74'
+              - - Na2O
+                - '7.28'
+          locator: *id024
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.615
+          locator: *id024
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id024
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.112'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '13'
+        P_H2O_over_PH2_as_printed: '0.615'
+        Fe3_over_Fe2_as_printed: '0.112'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '52.97'
+        Fe2O3_wt_percent_as_printed: '6.60'
+        SiO2_wt_percent_as_printed: '31.74'
+        Na2O_wt_percent_as_printed: '7.28'
+        composition_wt_pct:
+          FeO: '52.97'
+          Fe2O3: '6.60'
+          SiO2: '31.74'
+          Na2O: '7.28'
+        composition_role:
+          value: datum_state
+          locator: *id024
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id025
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '15'
+        table_row_number: 20
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id025
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '62.85'
+              - - Fe2O3
+                - '4.74'
+              - - SiO2
+                - '28.70'
+              - - Na2O
+                - '2.89'
+          locator: *id025
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.611
+          locator: *id025
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id025
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.068'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '15'
+        P_H2O_over_PH2_as_printed: '0.611'
+        Fe3_over_Fe2_as_printed: '0.068'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '62.85'
+        Fe2O3_wt_percent_as_printed: '4.74'
+        SiO2_wt_percent_as_printed: '28.70'
+        Na2O_wt_percent_as_printed: '2.89'
+        composition_wt_pct:
+          FeO: '62.85'
+          Fe2O3: '4.74'
+          SiO2: '28.70'
+          Na2O: '2.89'
+        composition_role:
+          value: datum_state
+          locator: *id025
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+    - observation_id: banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c07
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: equilibrium_phase_composition
+      locator: &id026
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '16'
+        table_row_number: 21
+        table_column_number: 7
+      phase: glass
+      units: dimensionless Fe3+/Fe2+ ratio as printed; oxide composition in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '46.72'
+              - - Fe2O3
+                - '5.62'
+              - - SiO2
+                - '33.98'
+              - - Na2O
+                - '12.82'
+          locator: *id026
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.610
+          locator: *id026
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id026
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+            note: The sample was lowered into the Ar-protected water-cooled copper quench tube; redox preservation
+              or alteration is not stated.
+      values:
+        quantity: valence_ratio
+        method_class: measured_tabulated
+        species: Fe
+        value: '0.108'
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 2
+          value_form: ratio
+        run_number_as_printed: '16'
+        P_H2O_over_PH2_as_printed: '0.610'
+        Fe3_over_Fe2_as_printed: '0.108'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '46.72'
+        Fe2O3_wt_percent_as_printed: '5.62'
+        SiO2_wt_percent_as_printed: '33.98'
+        Na2O_wt_percent_as_printed: '12.82'
+        composition_wt_pct:
+          FeO: '46.72'
+          Fe2O3: '5.62'
+          SiO2: '33.98'
+          Na2O: '12.82'
+        composition_role:
+          value: datum_state
+          locator: *id026
+          quote: The table reports analysed oxide mass percentages for each run.
+        quench_statement:
+          status: not_stated
+          text_as_translated: After equilibration, the sample was lowered into the lower water-cooled copper tube
+            kept under Ar.
+          preservation_or_alteration_as_printed: not stated
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 1765
+            section: '2.2'
+        analysis_method_as_printed: Fe2+ and total Fe were determined by potassium dichromate titration; analyses
+          are reported as FeO, Fe2O3, SiO2 and Na2O.
+  Fe_tO:
+    observations:
+    - observation_id: banya_hino_takezoe_1985_t2_run_1_p002_t02_r03_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id027
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '1'
+        table_row_number: 3
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id027
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '40.25'
+              - - Fe2O3
+                - '1.95'
+              - - SiO2
+                - '44.95'
+              - - Na2O
+                - '13.14'
+          locator: *id027
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.395
+          locator: *id027
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id027
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.452'
+        a_FetO_as_printed: '0.452'
+        Fe3_over_Fe2_as_printed: '0.044'
+        run_number_as_printed: '1'
+        P_H2O_over_PH2_as_printed: '0.395'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '40.25'
+        Fe2O3_wt_percent_as_printed: '1.95'
+        SiO2_wt_percent_as_printed: '44.95'
+        Na2O_wt_percent_as_printed: '13.14'
+        composition_wt_pct:
+          FeO: '40.25'
+          Fe2O3: '1.95'
+          SiO2: '44.95'
+          Na2O: '13.14'
+        composition_role:
+          value: datum_state
+          locator: *id027
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_2_p002_t02_r04_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id028
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '2'
+        table_row_number: 4
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '48.44'
+              - - Fe2O3
+                - '3.53'
+              - - SiO2
+                - '40.78'
+              - - Na2O
+                - '5.89'
+          locator: *id028
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.394
+          locator: *id028
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id028
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.450'
+        a_FetO_as_printed: '0.450'
+        Fe3_over_Fe2_as_printed: '0.066'
+        run_number_as_printed: '2'
+        P_H2O_over_PH2_as_printed: '0.394'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '48.44'
+        Fe2O3_wt_percent_as_printed: '3.53'
+        SiO2_wt_percent_as_printed: '40.78'
+        Na2O_wt_percent_as_printed: '5.89'
+        composition_wt_pct:
+          FeO: '48.44'
+          Fe2O3: '3.53'
+          SiO2: '40.78'
+          Na2O: '5.89'
+        composition_role:
+          value: datum_state
+          locator: *id028
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_3_p002_t02_r05_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id029
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '3'
+        table_row_number: 5
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id029
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '28.14'
+              - - Fe2O3
+                - '3.61'
+              - - SiO2
+                - '42.58'
+              - - Na2O
+                - '25.06'
+          locator: *id029
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.393
+          locator: *id029
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id029
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.449'
+        a_FetO_as_printed: '0.449'
+        Fe3_over_Fe2_as_printed: '0.115'
+        run_number_as_printed: '3'
+        P_H2O_over_PH2_as_printed: '0.393'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '28.14'
+        Fe2O3_wt_percent_as_printed: '3.61'
+        SiO2_wt_percent_as_printed: '42.58'
+        Na2O_wt_percent_as_printed: '25.06'
+        composition_wt_pct:
+          FeO: '28.14'
+          Fe2O3: '3.61'
+          SiO2: '42.58'
+          Na2O: '25.06'
+        composition_role:
+          value: datum_state
+          locator: *id029
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_24_p002_t02_r06_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id030
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '24'
+        table_row_number: 6
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.10'
+              - - Fe2O3
+                - '3.87'
+              - - SiO2
+                - '41.93'
+              - - Na2O
+                - '24.82'
+          locator: *id030
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.394
+          locator: *id030
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id030
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.450'
+        a_FetO_as_printed: '0.450'
+        Fe3_over_Fe2_as_printed: '0.120'
+        run_number_as_printed: '24'
+        P_H2O_over_PH2_as_printed: '0.394'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.10'
+        Fe2O3_wt_percent_as_printed: '3.87'
+        SiO2_wt_percent_as_printed: '41.93'
+        Na2O_wt_percent_as_printed: '24.82'
+        composition_wt_pct:
+          FeO: '29.10'
+          Fe2O3: '3.87'
+          SiO2: '41.93'
+          Na2O: '24.82'
+        composition_role:
+          value: datum_state
+          locator: *id030
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_25_p002_t02_r07_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id031
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '25'
+        table_row_number: 7
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id031
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.79'
+              - - Fe2O3
+                - '2.94'
+              - - SiO2
+                - '42.84'
+              - - Na2O
+                - '24.00'
+          locator: *id031
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.392
+          locator: *id031
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id031
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.448'
+        a_FetO_as_printed: '0.448'
+        Fe3_over_Fe2_as_printed: '0.089'
+        run_number_as_printed: '25'
+        P_H2O_over_PH2_as_printed: '0.392'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.79'
+        Fe2O3_wt_percent_as_printed: '2.94'
+        SiO2_wt_percent_as_printed: '42.84'
+        Na2O_wt_percent_as_printed: '24.00'
+        composition_wt_pct:
+          FeO: '29.79'
+          Fe2O3: '2.94'
+          SiO2: '42.84'
+          Na2O: '24.00'
+        composition_role:
+          value: datum_state
+          locator: *id031
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_5_p002_t02_r08_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id032
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '5'
+        table_row_number: 8
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id032
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '52.04'
+              - - Fe2O3
+                - '3.74'
+              - - SiO2
+                - '37.20'
+              - - Na2O
+                - '5.67'
+          locator: *id032
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id032
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id032
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.551'
+        a_FetO_as_printed: '0.551'
+        Fe3_over_Fe2_as_printed: '0.065'
+        run_number_as_printed: '5'
+        P_H2O_over_PH2_as_printed: '0.482'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '52.04'
+        Fe2O3_wt_percent_as_printed: '3.74'
+        SiO2_wt_percent_as_printed: '37.20'
+        Na2O_wt_percent_as_printed: '5.67'
+        composition_wt_pct:
+          FeO: '52.04'
+          Fe2O3: '3.74'
+          SiO2: '37.20'
+          Na2O: '5.67'
+        composition_role:
+          value: datum_state
+          locator: *id032
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_6_p002_t02_r09_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id033
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '6'
+        table_row_number: 9
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id033
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '29.67'
+              - - Fe2O3
+                - '5.01'
+              - - SiO2
+                - '39.93'
+              - - Na2O
+                - '25.15'
+          locator: *id033
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id033
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id033
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.550'
+        a_FetO_as_printed: '0.550'
+        Fe3_over_Fe2_as_printed: '0.152'
+        run_number_as_printed: '6'
+        P_H2O_over_PH2_as_printed: '0.482'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '29.67'
+        Fe2O3_wt_percent_as_printed: '5.01'
+        SiO2_wt_percent_as_printed: '39.93'
+        Na2O_wt_percent_as_printed: '25.15'
+        composition_wt_pct:
+          FeO: '29.67'
+          Fe2O3: '5.01'
+          SiO2: '39.93'
+          Na2O: '25.15'
+        composition_role:
+          value: datum_state
+          locator: *id033
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_7_p002_t02_r10_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id034
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '7'
+        table_row_number: 10
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id034
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '43.44'
+              - - Fe2O3
+                - '0.68'
+              - - SiO2
+                - '41.71'
+              - - Na2O
+                - '14.13'
+          locator: *id034
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id034
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id034
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.551'
+        a_FetO_as_printed: '0.551'
+        Fe3_over_Fe2_as_printed: '0.014'
+        run_number_as_printed: '7'
+        P_H2O_over_PH2_as_printed: '0.482'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '43.44'
+        Fe2O3_wt_percent_as_printed: '0.68'
+        SiO2_wt_percent_as_printed: '41.71'
+        Na2O_wt_percent_as_printed: '14.13'
+        composition_wt_pct:
+          FeO: '43.44'
+          Fe2O3: '0.68'
+          SiO2: '41.71'
+          Na2O: '14.13'
+        composition_role:
+          value: datum_state
+          locator: *id034
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_8_p002_t02_r11_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id035
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '8'
+        table_row_number: 11
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id035
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '28.02'
+              - - Fe2O3
+                - '4.93'
+              - - SiO2
+                - '41.62'
+              - - Na2O
+                - '24.35'
+          locator: *id035
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.481
+          locator: *id035
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id035
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.550'
+        a_FetO_as_printed: '0.550'
+        Fe3_over_Fe2_as_printed: '0.158'
+        run_number_as_printed: '8'
+        P_H2O_over_PH2_as_printed: '0.481'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '28.02'
+        Fe2O3_wt_percent_as_printed: '4.93'
+        SiO2_wt_percent_as_printed: '41.62'
+        Na2O_wt_percent_as_printed: '24.35'
+        composition_wt_pct:
+          FeO: '28.02'
+          Fe2O3: '4.93'
+          SiO2: '41.62'
+          Na2O: '24.35'
+        composition_role:
+          value: datum_state
+          locator: *id035
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_18_p002_t02_r12_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id036
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '18'
+        table_row_number: 12
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id036
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '55.72'
+              - - Fe2O3
+                - '3.68'
+              - - SiO2
+                - '36.38'
+              - - Na2O
+                - '4.50'
+          locator: *id036
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.482
+          locator: *id036
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id036
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.551'
+        a_FetO_as_printed: '0.551'
+        Fe3_over_Fe2_as_printed: '0.059'
+        run_number_as_printed: '18'
+        P_H2O_over_PH2_as_printed: '0.482'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '55.72'
+        Fe2O3_wt_percent_as_printed: '3.68'
+        SiO2_wt_percent_as_printed: '36.38'
+        Na2O_wt_percent_as_printed: '4.50'
+        composition_wt_pct:
+          FeO: '55.72'
+          Fe2O3: '3.68'
+          SiO2: '36.38'
+          Na2O: '4.50'
+        composition_role:
+          value: datum_state
+          locator: *id036
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_9_p002_t02_r13_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id037
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '9'
+        table_row_number: 13
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id037
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '37.55'
+              - - Fe2O3
+                - '4.91'
+              - - SiO2
+                - '37.17'
+              - - Na2O
+                - '20.63'
+          locator: *id037
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.571
+          locator: *id037
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id037
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.653'
+        a_FetO_as_printed: '0.653'
+        Fe3_over_Fe2_as_printed: '0.118'
+        run_number_as_printed: '9'
+        P_H2O_over_PH2_as_printed: '0.571'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '37.55'
+        Fe2O3_wt_percent_as_printed: '4.91'
+        SiO2_wt_percent_as_printed: '37.17'
+        Na2O_wt_percent_as_printed: '20.63'
+        composition_wt_pct:
+          FeO: '37.55'
+          Fe2O3: '4.91'
+          SiO2: '37.17'
+          Na2O: '20.63'
+        composition_role:
+          value: datum_state
+          locator: *id037
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_10_p002_t02_r14_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id038
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '10'
+        table_row_number: 14
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id038
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '57.51'
+              - - Fe2O3
+                - '3.04'
+              - - SiO2
+                - '32.82'
+              - - Na2O
+                - '5.19'
+          locator: *id038
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.572
+          locator: *id038
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id038
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.654'
+        a_FetO_as_printed: '0.654'
+        Fe3_over_Fe2_as_printed: '0.048'
+        run_number_as_printed: '10'
+        P_H2O_over_PH2_as_printed: '0.572'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '57.51'
+        Fe2O3_wt_percent_as_printed: '3.04'
+        SiO2_wt_percent_as_printed: '32.82'
+        Na2O_wt_percent_as_printed: '5.19'
+        composition_wt_pct:
+          FeO: '57.51'
+          Fe2O3: '3.04'
+          SiO2: '32.82'
+          Na2O: '5.19'
+        composition_role:
+          value: datum_state
+          locator: *id038
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_11_p002_t02_r15_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id039
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '11'
+        table_row_number: 15
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id039
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '30.42'
+              - - Fe2O3
+                - '6.97'
+              - - SiO2
+                - '36.19'
+              - - Na2O
+                - '27.55'
+          locator: *id039
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.569
+          locator: *id039
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id039
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.650'
+        a_FetO_as_printed: '0.650'
+        Fe3_over_Fe2_as_printed: '0.206'
+        run_number_as_printed: '11'
+        P_H2O_over_PH2_as_printed: '0.569'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '30.42'
+        Fe2O3_wt_percent_as_printed: '6.97'
+        SiO2_wt_percent_as_printed: '36.19'
+        Na2O_wt_percent_as_printed: '27.55'
+        composition_wt_pct:
+          FeO: '30.42'
+          Fe2O3: '6.97'
+          SiO2: '36.19'
+          Na2O: '27.55'
+        composition_role:
+          value: datum_state
+          locator: *id039
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_12_p002_t02_r16_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id040
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '12'
+        table_row_number: 16
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id040
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '49.94'
+              - - Fe2O3
+                - '2.87'
+              - - SiO2
+                - '35.68'
+              - - Na2O
+                - '11.03'
+          locator: *id040
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.568
+          locator: *id040
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id040
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.649'
+        a_FetO_as_printed: '0.649'
+        Fe3_over_Fe2_as_printed: '0.052'
+        run_number_as_printed: '12'
+        P_H2O_over_PH2_as_printed: '0.568'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '49.94'
+        Fe2O3_wt_percent_as_printed: '2.87'
+        SiO2_wt_percent_as_printed: '35.68'
+        Na2O_wt_percent_as_printed: '11.03'
+        composition_wt_pct:
+          FeO: '49.94'
+          Fe2O3: '2.87'
+          SiO2: '35.68'
+          Na2O: '11.03'
+        composition_role:
+          value: datum_state
+          locator: *id040
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_17_p002_t02_r17_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id041
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '17'
+        table_row_number: 17
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id041
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '61.75'
+              - - Fe2O3
+                - '3.55'
+              - - SiO2
+                - '30.59'
+              - - Na2O
+                - '2.61'
+          locator: *id041
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.566
+          locator: *id041
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id041
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.647'
+        a_FetO_as_printed: '0.647'
+        Fe3_over_Fe2_as_printed: '0.052'
+        run_number_as_printed: '17'
+        P_H2O_over_PH2_as_printed: '0.566'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '61.75'
+        Fe2O3_wt_percent_as_printed: '3.55'
+        SiO2_wt_percent_as_printed: '30.59'
+        Na2O_wt_percent_as_printed: '2.61'
+        composition_wt_pct:
+          FeO: '61.75'
+          Fe2O3: '3.55'
+          SiO2: '30.59'
+          Na2O: '2.61'
+        composition_role:
+          value: datum_state
+          locator: *id041
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_20_p002_t02_r18_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id042
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '20'
+        table_row_number: 18
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id042
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '39.91'
+              - - Fe2O3
+                - '4.30'
+              - - SiO2
+                - '36.65'
+              - - Na2O
+                - '18.54'
+          locator: *id042
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.568
+          locator: *id042
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id042
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.648'
+        a_FetO_as_printed: '0.648'
+        Fe3_over_Fe2_as_printed: '0.097'
+        run_number_as_printed: '20'
+        P_H2O_over_PH2_as_printed: '0.568'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '39.91'
+        Fe2O3_wt_percent_as_printed: '4.30'
+        SiO2_wt_percent_as_printed: '36.65'
+        Na2O_wt_percent_as_printed: '18.54'
+        composition_wt_pct:
+          FeO: '39.91'
+          Fe2O3: '4.30'
+          SiO2: '36.65'
+          Na2O: '18.54'
+        composition_role:
+          value: datum_state
+          locator: *id042
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_13_p002_t02_r19_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id043
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '13'
+        table_row_number: 19
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id043
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '52.97'
+              - - Fe2O3
+                - '6.60'
+              - - SiO2
+                - '31.74'
+              - - Na2O
+                - '7.28'
+          locator: *id043
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.615
+          locator: *id043
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id043
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.702'
+        a_FetO_as_printed: '0.702'
+        Fe3_over_Fe2_as_printed: '0.112'
+        run_number_as_printed: '13'
+        P_H2O_over_PH2_as_printed: '0.615'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '52.97'
+        Fe2O3_wt_percent_as_printed: '6.60'
+        SiO2_wt_percent_as_printed: '31.74'
+        Na2O_wt_percent_as_printed: '7.28'
+        composition_wt_pct:
+          FeO: '52.97'
+          Fe2O3: '6.60'
+          SiO2: '31.74'
+          Na2O: '7.28'
+        composition_role:
+          value: datum_state
+          locator: *id043
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_15_p002_t02_r20_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id044
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '15'
+        table_row_number: 20
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id044
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '62.85'
+              - - Fe2O3
+                - '4.74'
+              - - SiO2
+                - '28.70'
+              - - Na2O
+                - '2.89'
+          locator: *id044
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.611
+          locator: *id044
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id044
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.698'
+        a_FetO_as_printed: '0.698'
+        Fe3_over_Fe2_as_printed: '0.068'
+        run_number_as_printed: '15'
+        P_H2O_over_PH2_as_printed: '0.611'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '62.85'
+        Fe2O3_wt_percent_as_printed: '4.74'
+        SiO2_wt_percent_as_printed: '28.70'
+        Na2O_wt_percent_as_printed: '2.89'
+        composition_wt_pct:
+          FeO: '62.85'
+          Fe2O3: '4.74'
+          SiO2: '28.70'
+          Na2O: '2.89'
+        composition_role:
+          value: datum_state
+          locator: *id044
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    - observation_id: banya_hino_takezoe_1985_t2_run_16_p002_t02_r21_c08
+      experiment: banya_hino_takezoe_1985_t2_solid_iron_equilibrium
+      type: activity_coefficient
+      locator: &id045
+        page: 2
+        pdf_page_index: 1
+        published_page: 1766
+        table: '2'
+        row_label: '16'
+        table_row_number: 21
+        table_column_number: 8
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe_tO
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Fe_tO
+        inferred: false
+        note: The printed equilibrium reaction names Fe_tO(l); the source defines N_FetO = N_FeO + N_Fe2O3. Fe_tO
+          is kept distinct from ferrous FeO.
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '1'
+      units: dimensionless activity; oxide analyses as printed in wt%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator: *id045
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - FeO
+                - '46.72'
+              - - Fe2O3
+                - '5.62'
+              - - SiO2
+                - '33.98'
+              - - Na2O
+                - '12.82'
+          locator: *id045
+        gas_mix:
+          state:
+            tag: value
+            value: H2O/H2 mixed gas; P_H2O/P_H2 = 0.610
+          locator: *id045
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with solid iron
+          locator: *id045
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        component: FetO
+        activity: '0.696'
+        a_FetO_as_printed: '0.696'
+        Fe3_over_Fe2_as_printed: '0.108'
+        run_number_as_printed: '16'
+        P_H2O_over_PH2_as_printed: '0.610'
+        T_C: '1400'
+        FeO_wt_percent_as_printed: '46.72'
+        Fe2O3_wt_percent_as_printed: '5.62'
+        SiO2_wt_percent_as_printed: '33.98'
+        Na2O_wt_percent_as_printed: '12.82'
+        composition_wt_pct:
+          FeO: '46.72'
+          Fe2O3: '5.62'
+          SiO2: '33.98'
+          Na2O: '12.82'
+        composition_role:
+          value: datum_state
+          locator: *id045
+          quote: The table reports analysed oxide mass percentages for each run.
+        calculation_as_printed: The source calculates a_FetO using the H2O/H2 gas ratio, the 1400°C equilibrium
+          constant K1 and Eq. (2). Table 3 gives the standard free-energy expression for reaction (1) and cites
+          Ref. 10.
+        calculation_locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1767
+          section: '3.2'
+          equation: '2'
+        attribution: Ban-ya, Hino and Takezoe (1985), Table 2; activity calculated by the authors using Eq. (2).
+        iron_saturation_as_printed: Table 2 states equilibrium with solid iron.
+        activity_component_as_printed: FetO (total iron as FeO); not ferrous FeO.
+    context:
+    - observation_id: banya_hino_takezoe_1985_table3_standard_free_energy_expressions
+      type: thermodynamic_equations
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1767
+        table: '3'
+      units: cal as printed in Table 3
+      values:
+        method_class: quoted_attributed
+        quantity_as_printed: standard free-energy expressions for the reactions in Table 3
+        rows:
+        - reaction_number: '1'
+          reaction_as_printed: Fe_tO(l) + H2(g) = tFe(δ) + H2O(g)
+          free_energy_change_as_printed: ΔG° = −7 265 + 4.607 T
+          references_as_printed: '10'
+        - reaction_number: '2'
+          reaction_as_printed: FeO1.5(R.S.) = FeO(R.S.) + 1/4 O2(g)
+          free_energy_change_as_printed: ΔG° = 30 310 − 12.67 T
+          references_as_printed: '9'
+        - reaction_number: '3'
+          reaction_as_printed: FeO1.5(R.S.) + 1/2 H2(g) = FeO(R.S.) + 1/2 H2O(g)
+          free_energy_change_as_printed: ΔG° = 317 − 5.77 T
+          references_as_printed: 9, 25, 26
+        - reaction_number: '4'
+          reaction_as_printed: Fe(δ) + H2O(g) = FeO(R.S.) + H2(g)
+          free_energy_change_as_printed: ΔG° = 5 225 − 2.90 T
+          references_as_printed: 9, 25, 26, 29
+        - reaction_number: '5'
+          reaction_as_printed: Fe(δ) + 1/2 O2(g) = FeO(R.S.)
+          free_energy_change_as_printed: ΔG° = −54 761 + 10.89 T
+          references_as_printed: 9, 25, 26
+        - reaction_number: '6'
+          reaction_as_printed: Fe(δ) = Fe(l)
+          free_energy_change_as_printed: ΔG° = 3 630 − 2.01 T
+          references_as_printed: '29'
+        - reaction_number: '7'
+          reaction_as_printed: Fe_tO(l) + (1−t) Fe(s or l) = FeO(R.S.)
+          free_energy_change_as_printed: ΔG = −2 040 + 1.707 T
+          references_as_printed: '18'
+        - reaction_number: '8'
+          reaction_as_printed: SiO2(β-tr) = SiO2(R.S.)
+          free_energy_change_as_printed: ΔG = 6 490 − 0.491 T
+          references_as_printed: '18'
+        - reaction_number: '9'
+          reaction_as_printed: SiO2(β-cr) = SiO2(R.S.)
+          free_energy_change_as_printed: ΔG = 6 462 − 0.474 T
+          references_as_printed: '18'
+        - reaction_number: '10'
+          reaction_as_printed: SiO2(l) = SiO2(R.S.)
+          free_energy_change_as_printed: ΔG = 4 172 + 0.674 T
+          references_as_printed: '18'
+        - reaction_number: '11'
+          reaction_as_printed: Na2O(l) + 2 SiO2(β-cr) = Na2O·2SiO2(l)
+          free_energy_change_as_printed: ΔG° = −57 891 − 1.000 T
+          references_as_printed: '37'
+        note: All 11 printed rows are retained as context, not observations; no expression is evaluated at a selected
+          temperature.
+    - observation_id: banya_hino_takezoe_1985_regular_solution_parameters
+      type: context_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1767
+        section: '4.1'
+        equation: '3'
+      units: cal as printed
+      values:
+        method_class: model_context
+        quantity_as_printed: Lumsden regular-solution interaction parameters and coefficient expressions
+        general_form_as_printed: RT ln γ_i = Σ_j α_ij X_j² + Σ_j Σ_k (α_ij + α_ik − α_jk) X_j X_k
+        interaction_parameters:
+        - equation: '5'
+          parameter_as_printed: α12(Fe2+−Fe3+) = −4 460 cal
+          references_as_printed: '9'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1767
+            equation: '5'
+        - equation: '8'
+          parameter_as_printed: α14 − α24 = 22 500 cal
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1768
+            equation: '8'
+        - equation: '12'
+          parameter_as_printed: α14(Fe2+−Na+) = 4 600 cal
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1768
+            equation: '12'
+        - equation: '13'
+          parameter_as_printed: α24(Fe3+−Na+) = −17 900 cal
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1768
+            equation: '13'
+        - equation: '14'
+          parameter_as_printed: α34(Si4+−Na+) = −26 600 cal
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 1768
+            equation: '14'
+        activity_coefficient_expressions_as_printed:
+        - equation: '15'
+          expression_as_printed: RT ln γ_FeO = −4460 X_FeO1.5² −10000 X_SiO2² +4600 X_NaO0.5² −22260 X_FeO1.5 X_SiO2
+            +18040 X_FeO1.5 X_NaO0.5 +21200 X_SiO2 X_NaO0.5
+        - equation: '16'
+          expression_as_printed: RT ln γ_FeO1.5 = +7800 X_SiO2² −17900 X_NaO0.5² −4460 X_FeO² +16500 X_SiO2 X_NaO0.5
+            +13340 X_SiO2 X_FeO −26960 X_NaO0.5 X_FeO
+        - equation: '17'
+          expression_as_printed: RT ln γ_SiO2 = −26600 X_NaO0.5² −10000 X_FeO² +7800 X_FeO1.5² −41200 X_NaO0.5 X_FeO
+            −900 X_NaO0.5 X_FeO1.5 +2260 X_FeO X_FeO1.5
+        - equation: '18'
+          expression_as_printed: RT ln γ_NaO0.5 = +4600 X_FeO² −17900 X_FeO1.5² −26600 X_SiO2² −8840 X_FeO X_FeO1.5
+            −12000 X_FeO X_SiO2 −52300 X_FeO1.5 X_SiO2
+        note: Model parameters and expressions are retained as printed context only; they are not observation rows.
+  Na2O:
+    observations: []
+    context:
+    - observation_id: banya_hino_takezoe_1985_fig11_printed_na2o_activity_bound
+      type: context_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1771
+        section: 4.4.4
+        figure: '11'
+      units: dimensionless activity
+      values:
+        method_class: model_derived
+        quantity_as_printed: a_Na2O(l) in the displayed Figure 11 composition domain
+        activity_upper_bound_as_printed: 10^-5.5
+        inequality_as_printed: ≤
+        note: The prose states a_Na2O(l) is no greater than 10^-5.5 in the composition domain shown; no plotted
+          point was read.

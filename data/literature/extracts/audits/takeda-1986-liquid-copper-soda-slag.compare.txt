@@ -1,0 +1,5 @@
+compare: matched=0 no-match=1 mismatch=0 presence-only=0 needs_mapping=0 locator-error=0 unverifiable=0 total=1
+species,observation_id,point_index,pdf_page,value,status,matched_cell,draft_candidate_count,locator_issue,path
+Cu2O,takeda_1986_cu2o_melting_point,,2,1503,no-match,null,0,,species.Cu2O.observations[takeda_1986_cu2o_melting_point].values.value
+
+The index has zero printed MinerU tables, so there is no table cell for the prose melting-point value to match. This is not a digit mismatch; the source prose value is independently checked against the page render in the cell audit and focused test.

@@ -1,0 +1,69 @@
+source_id: banya-hino-takezoe-1985-na-fe-silicate-redox
+source:
+  citation: Ban-ya, S., Hino, M. and Takezoe, H. (1985), ‘Activities of the Constituents and Fe3+/Fe2+ Equilibrium
+    in FetO-Na2O and FetO-SiO2-Na2O Slags’, Tetsu-to-Hagane 71(15), 1765–1772.
+  doi: 10.2355/tetsutohagane1955.71.15_1765
+extraction:
+  machine_inputs:
+  - MinerU content-list HTML tables
+  - pdftotext-layout text
+  render_check: All numeric cells in Tables 1 and 2 checked on PDF page 2; Table 3 checked on PDF page 3. The complete
+    cell-level audit is in the companion cells CSV.
+  printed_row_count:
+    Table 1: 7
+    Table 2: 19
+    Table 3: 11
+  numeric_agreement_from_mineru_table_qa:
+    Table 1: '0.086'
+    Table 2: '0.039'
+    Table 3: '0.529'
+tables:
+- page: 2
+  table: '1'
+  published_page: 1766
+  printed_rows: 7
+  observations: 7 measured_tabulated valence_ratio glass rows (Fe3+/Fe2+) with each row's FeO, Fe2O3 and Na2O wt%
+    composition.
+  columns:
+    '1': run_number_as_printed
+    '2': FeO_wt_percent_as_printed
+    '3': Fe2O3_wt_percent_as_printed
+    '4': Na2O_wt_percent_as_printed
+    '5': Fe3_over_Fe2_as_printed
+  conditions: 1610°C; pure CO2; printed P_CO2=1 atm. P_CO2 is retained in gas_mix context, not mapped to total pressure
+    or fO2.
+- page: 2
+  table: '2'
+  published_page: 1766
+  printed_rows: 19
+  observations: 19 measured_tabulated valence_ratio glass rows plus 19 quoted_attributed Fe_tO(l) activity rows
+    calculated by the authors.
+  columns:
+    '1': run_number_as_printed
+    '2': P_H2O_over_PH2_as_printed
+    '3': FeO_wt_percent_as_printed
+    '4': Fe2O3_wt_percent_as_printed
+    '5': SiO2_wt_percent_as_printed
+    '6': Na2O_wt_percent_as_printed
+    '7': Fe3_over_Fe2_as_printed
+    '8': a_FetO_as_printed
+  conditions: 1400°C; solid iron; run-specific P_H2O/P_H2. Total pressure and fO2 are not printed.
+  header_correction: MinerU read the last header as a_Fe2O; the page render and Eq. (1) show a_FetO.
+- page: 3
+  table: '3'
+  published_page: 1767
+  printed_rows: 11
+  context_only: true
+  columns:
+    '1': reaction_as_printed
+    '2': free_energy_change_as_printed
+    '3': references_as_printed
+  handling: All 11 standard free-energy expressions retained as context, not observations.
+evidence_decisions:
+  table_1_and_2_valence_ratios: 'measured_tabulated: the authors'' own Fe2+ and total-Fe wet-chemical analysis;
+    the printed ratios are retained as ratios.'
+  table_2_feto_activity: 'quoted_attributed: the authors calculate each activity from the printed P_H2O/P_H2 condition
+    and Eq. (2); the condition and Table 3 free-energy context are stored, but neither is a stored observation parent
+    accepted by the derivation lineage.'
+na2o_activity_for_openimcc: No Na2O activity point values are tabulated. Prose on PDF page 7 says a_Na2O(l) <= 10^-5.5
+  over the composition domain shown in Fig. 11; it is retained as context, not as a digitised observation.
