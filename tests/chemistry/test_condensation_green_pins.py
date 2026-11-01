@@ -48,6 +48,10 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     if runner_output is not None:
         serialized = json.dumps(runner_output, sort_keys=True)
         (tmp_path / f"{name}-runner.json").write_text(serialized)
+        # runner_sha256 hashes the whole runner result, including engine
+        # capability metadata that depends on the host's engine configuration,
+        # so the committed digests are the studio-3 gate box's values (the
+        # route measurements above are host-independent and match exactly).
         actual["runner_sha256"] = hashlib.sha256(serialized.encode()).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
     expected = json.loads(PINS.read_text())[name]
