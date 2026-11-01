@@ -149,7 +149,13 @@ def test_measured_atomic_oxygen_maps_the_mo_cell_fo2(
 
     measured_o = sample_row("shornikov_2008_t2_o_reducing")
     target = sample_row("shornikov_2008_t2_sio_reducing")
-    assert measured_o.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert measured_o.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert not measured_o.derived_from
+    assert result.validation is not None
+    assert not any(
+        issue.path.startswith(f"observation[{measured_o.observation_id}]")
+        for issue in result.validation.hard_issues
+    )
     experiment = context.experiments[target.experiment_id]
     bench = _bench_for_score(experiment, context.benches)
     selected = resolve_source_oxygen(target, context.observations.values(), bench)
