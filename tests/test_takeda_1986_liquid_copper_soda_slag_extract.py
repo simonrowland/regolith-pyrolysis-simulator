@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from decimal import Decimal
 
 import yaml
@@ -15,11 +16,18 @@ MAPPING = (
     / "data/literature/extracts/audits"
     / f"{SOURCE_ID}.mapping.yaml"
 )
+CELLS = (
+    REPO_ROOT
+    / "data/literature/extracts/audits"
+    / f"{SOURCE_ID}.cells.csv"
+)
 
 
 def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     mapping = yaml.safe_load(MAPPING.read_text(encoding="utf-8"))
+    with CELLS.open(encoding="utf-8", newline="") as cells_file:
+        cells = list(csv.DictReader(cells_file))
     source_species = document["species"]["Cu2O"]
     assert len(source_species["observations"]) == 1
     assert mapping["table_draft"]["tables_found"] == 0
@@ -59,6 +67,7 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     assert observation.locator is not None
     assert observation.locator.page == 2
     assert observation.locator.published_page == 609
+    assert observation.locator.pdf_page_index == 1
     assert observation.point_conditions["temperature_K"].state.value == Decimal("1503")
     assert set(observation.point_conditions) == {"temperature_K"}
     assert (
@@ -73,13 +82,144 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
         observation.identity.composition is None
         or observation.identity.composition.is_not_applicable
     )
+    source_observation = source_species["observations"][0]
+    assert source_observation["point_conditions"]["temperature_K"]["locator"] == {
+        "page": 2,
+        "published_page": 609,
+        "pdf_page_index": 1,
+        "section": "Binary slag of Cu2O-Na2O or Cu2O-SiO2 system",
+    }
 
     context = {
         row["observation_id"]: row
         for rows in result.context_by_work.values()
         for row in rows
     }
-    assert len(context) == 21
+    assert len(context) == 24
+    expected_context_pages = {
+        "takeda_1986_experimental_conditions": (1, 608, 0),
+        "takeda_1986_oxygen_cell_equation_and_reference": (1, 608, 0),
+        "takeda_1986_cu_cu2o_reference_oxygen_potential": (3, 610, 2),
+        "takeda_1986_cuo05_equilibrium_constants_and_copper_activity": (3, 610, 2),
+        "takeda_1986_miscibility_gap_endpoints": (4, 611, 3),
+        "takeda_1986_soda_composition_and_carbonate_ratio": (2, 609, 1),
+        "takeda_1986_cuo05_activity_ranges": (5, 612, 4),
+        "takeda_1986_na2o_activity_depression": (6, 613, 5),
+        "takeda_1986_carbonate_co2_stoichiometric_reference": (6, 613, 5),
+        "takeda_1986_carbonate_co2_observations": (6, 613, 5),
+        "takeda_1986_acid_oxide_carbonate_decomposition_ratios": (6, 613, 5),
+        "takeda_1986_intermediate_compound_stoichiometries": (7, 614, 6),
+        "takeda_1986_cited_binary_phase_diagram_composition": (4, 611, 3),
+        "takeda_1986_co2_analytical_method": (2, 609, 1),
+        "takeda_1986_alumina_binary_slag_composition": (2, 609, 1),
+        "takeda_1986_alumina_silica_slag_ratio": (3, 610, 2),
+        "takeda_1986_alumina_cu2o_slag_composition": (7, 614, 6),
+        "takeda_1986_abstract_activity_minimum_composition": (1, 608, 0),
+        "takeda_1986_copper_solubility_and_activity_summary": (5, 612, 4),
+        "takeda_1986_kojo_external_comparison": (5, 612, 4),
+        "takeda_1986_yamato_external_comparison": (7, 614, 6),
+        "takeda_1986_summary_binary_composition": (7, 614, 6),
+        "takeda_1986_summary_activity_coefficient_minimum": (8, 615, 7),
+        "takeda_1986_figures_not_digitized": (2, 609, 1),
+    }
+    assert set(context) == set(expected_context_pages)
+    for row_id, expected_pages in expected_context_pages.items():
+        locator = context[row_id]["locator"]
+        assert (
+            locator["page"],
+            locator["published_page"],
+            locator["pdf_page_index"],
+        ) == expected_pages
+    assert mapping["context_row_count"] == len(context)
+    assert {
+        row["observation_id"]: (row["page"], row["published_page"])
+        for row in mapping["context_rows"]
+    } == {
+        row_id: (pages[0], pages[1])
+        for row_id, pages in expected_context_pages.items()
+    }
+    expected_fidelity_pages = {
+        "takeda_1986_cu2o_melting_point": (2, 609, 1),
+        "takeda_1986_cu_cu2o_reference_oxygen_potential": (3, 610, 2),
+        "takeda_1986_soda_composition_and_carbonate_ratio": (2, 609, 1),
+        "takeda_1986_miscibility_gap_endpoints": (4, 611, 3),
+        "takeda_1986_cited_binary_phase_diagram_composition": (4, 611, 3),
+        "takeda_1986_carbonate_co2_stoichiometric_reference": (6, 613, 5),
+    }
+    assert {
+        sample["observation_id"]: (
+            sample["locator"]["page"],
+            sample["locator"]["published_page"],
+            sample["locator"]["pdf_page_index"],
+        )
+        for sample in document["fidelity_samples"]
+    } == expected_fidelity_pages
+
+    expected_corrected_cells = {
+        ("takeda_1986_alumina_silica_slag_ratio", "Al2O3_over_SiO2"): (
+            "3",
+            "610",
+            "about 0.6",
+        ),
+        ("takeda_1986_intermediate_compound_stoichiometries", "compound_formula"):
+            ("7", "614", "2Na2O·SiO2"),
+        ("takeda_1986_summary_binary_composition", "binary_addition"):
+            ("7", "614", "up to 20 per cent"),
+        ("takeda_1986_summary_activity_coefficient_minimum", "activity_coefficient_minimum_composition"):
+            ("8", "615", "nNa2X/nSiO2 = 2"),
+        ("takeda_1986_na2o_activity_depression", "activity_depression"):
+            ("6", "613", "Na2O activity considerably depressed at 2Na2O·SiO2"),
+        ("takeda_1986_figures_not_digitized", "figure_7_caption_temperature"):
+            ("6", "613", "1523 K"),
+    }
+    csv_cells = {(row["record_id"], row["field"]): row for row in cells}
+    for key, (page, published_page, printed_value) in expected_corrected_cells.items():
+        cell = csv_cells[key]
+        assert (cell["pdf_page"], cell["published_page"], cell["printed_value"]) == (
+            page,
+            published_page,
+            printed_value,
+        )
+
+    activity_ranges = context["takeda_1986_cuo05_activity_ranges"]["values"]
+    assert activity_ranges["method_class"] == "quoted_attributed"
+    assert "numerical oxygen-potential inputs are not printed" in activity_ranges[
+        "attribution"
+    ]
+    assert activity_ranges["status"] == "typed_refused_schema_gap"
+    assert "derived_from" not in activity_ranges
+    assert "raw_inputs" not in activity_ranges
+
+    sodium_activity = context["takeda_1986_na2o_activity_depression"]["values"]
+    assert sodium_activity["compound_as_printed"] == "2Na2O·SiO2"
+    assert sodium_activity["numerical_activity"] == "not numerically stated"
+    compound_stoichiometries = context[
+        "takeda_1986_intermediate_compound_stoichiometries"
+    ]["values"]
+    assert compound_stoichiometries["Na2O_SiO2_compound_as_printed"] == "2Na2O·SiO2"
+    assert "n_Na2O_over_n_SiO2_compound_as_printed" not in compound_stoichiometries
+
+    figures = context["takeda_1986_figures_not_digitized"]["values"]["figures"]
+    expected_figure_pages = {
+        "1": (2, 609, 1),
+        "2": (2, 609, 1),
+        "3": (3, 610, 2),
+        "4": (4, 611, 3),
+        "5": (4, 611, 3),
+        "6": (5, 612, 4),
+        "7": (6, 613, 5),
+        "8": (6, 613, 5),
+        "9": (6, 613, 5),
+        "10": (7, 614, 6),
+        "11": (7, 614, 6),
+    }
+    assert {figure["figure"] for figure in figures} == set(expected_figure_pages)
+    for figure in figures:
+        assert (
+            figure["page"],
+            figure["published_page"],
+            figure["pdf_page_index"],
+        ) == expected_figure_pages[figure["figure"]]
     anchors = (
         (
             "takeda_1986_cu_cu2o_reference_oxygen_potential",
@@ -164,6 +304,4 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     assert cited_diagram["values"]["liquid_miscibility_gap_composition_as_printed"] == (
         "liquid SiO2 coexisting with a 30% SiO2-Cu2O melt"
     )
-    figures = context["takeda_1986_figures_not_digitized"]["values"]["figures"]
-    assert len(figures) == 11
     assert all("caption_as_printed" in figure for figure in figures)

@@ -52,26 +52,28 @@ context_rows:
   - {observation_id: takeda_1986_cuo05_activity_ranges, page: 5, published_page: 612}
   - {observation_id: takeda_1986_carbonate_co2_stoichiometric_reference, page: 6, published_page: 613}
   - {observation_id: takeda_1986_carbonate_co2_observations, page: 6, published_page: 613}
+  - {observation_id: takeda_1986_na2o_activity_depression, page: 6, published_page: 613}
   - {observation_id: takeda_1986_acid_oxide_carbonate_decomposition_ratios, page: 6, published_page: 613}
   - {observation_id: takeda_1986_intermediate_compound_stoichiometries, page: 7, published_page: 614}
   - {observation_id: takeda_1986_cited_binary_phase_diagram_composition, page: 4, published_page: 611}
   - {observation_id: takeda_1986_co2_analytical_method, page: 2, published_page: 609}
   - {observation_id: takeda_1986_alumina_binary_slag_composition, page: 2, published_page: 609}
+  - {observation_id: takeda_1986_alumina_silica_slag_ratio, page: 3, published_page: 610}
   - {observation_id: takeda_1986_alumina_cu2o_slag_composition, page: 7, published_page: 614}
   - {observation_id: takeda_1986_abstract_activity_minimum_composition, page: 1, published_page: 608}
   - {observation_id: takeda_1986_copper_solubility_and_activity_summary, page: 5, published_page: 612}
   - {observation_id: takeda_1986_kojo_external_comparison, page: 5, published_page: 612}
   - {observation_id: takeda_1986_yamato_external_comparison, page: 7, published_page: 614}
-  - {observation_id: takeda_1986_summary_binary_composition, page: 8, published_page: 615}
+  - {observation_id: takeda_1986_summary_binary_composition, page: 7, published_page: 614}
+  - {observation_id: takeda_1986_summary_activity_coefficient_minimum, page: 8, published_page: 615}
   - {observation_id: takeda_1986_figures_not_digitized, page: 2, published_page: 609}
 figure_policy:
   figures: 11
   numeric_figure_points_digitized: false
   captions_retained_in: species.Cu2O.context[takeda_1986_figures_not_digitized]
-context_row_count: 21
+context_row_count: 24
 verification:
-  pdf_pages_1_to_4: page renders at 300 dpi checked against pdftotext prose cells
-  pdf_pages_5_to_8: MinerU markdown and pdftotext numeric prose agree
+  all_pdf_pages: all 8 physical pages rendered with pdftoppm and checked against pdftotext -layout output page by page
   numeric_prose_cells: takeda-1986-liquid-copper-soda-slag.cells.csv
   isolated_migration: {observations: 1, hard_issues: 0, unavailable_queue_entries: 2}
   unavailable_axes: [method, total_pressure_Pa]

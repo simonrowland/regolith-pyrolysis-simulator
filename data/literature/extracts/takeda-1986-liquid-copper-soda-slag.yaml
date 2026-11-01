@@ -10,10 +10,9 @@ source:
   provenance_path: raw/takeda-1986-liquid-copper-soda-slag/takeda-1986-liquid-copper-soda-slag.pdf
 extraction:
   method: >-
-    Hand transcription of the prose from pdftotext-layout. PDF pages 1–4 were checked against 300 dpi renders;
-    numeric prose on pages 5–8 agrees between pdftotext-layout and the available MinerU markdown. The MinerU
-    table converter and QA found zero printed tables. Values shown only in figures are not digitized; all eleven
-    captions are retained in context.
+    Hand transcription of the prose from pdftotext-layout. All eight physical PDF pages were checked page by
+    page against pdftotext -layout output and pdftoppm renders. The MinerU table converter and QA found zero
+    printed tables. Values shown only in figures are not digitized; all eleven captions are retained in context.
   date: '2026-10-31'
   worker: w1031nb-take86
   note: >-
@@ -253,7 +252,8 @@ species:
           section: Activity of CuO0.5 in Cu2O-SiO2-Na2X slag
         units: dimensionless activity ranges as printed
         values:
-          method_class: measured_reduced
+          method_class: quoted_attributed
+          attribution: Takeda et al. (1986), Section III.4; the authors derive these ranges from oxygen-potential measurements, but the numerical oxygen-potential inputs are not printed.
           quantity_as_printed: activity of CuO0.5
           ranges_as_printed:
             - miscibility_gap: cuprous oxide and sodium silicate
@@ -271,6 +271,22 @@ species:
             activity_coefficient_quantity: simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT
             quantity_aliases: simulator/battery/migrate.py::QUANTITY_ALIASES
             phase_roles: simulator/battery/enums.py::PhaseRole
+      - observation_id: takeda_1986_na2o_activity_depression
+        type: thermodynamic_example
+        locator:
+          page: 6
+          published_page: 613
+          pdf_page_index: 5
+          section: Decomposition of sodium carbonate
+        units: qualitative statement as printed
+        values:
+          method_class: author_interpretation
+          activity_species_as_printed: Na2O
+          activity_as_printed: considerably depressed
+          compound_as_printed: 2Na2O·SiO2
+          numerical_activity: not numerically stated
+          status: typed_refused_schema_gap
+          schema_gap: The source gives a qualitative activity interpretation at a compound composition but prints no numerical Na2O activity.
       - observation_id: takeda_1986_carbonate_co2_stoichiometric_reference
         type: composition
         locator:
@@ -338,15 +354,15 @@ species:
           published_page: 614
           pdf_page_index: 6
           section: Decomposition of sodium carbonate
-        units: mole ratios as printed
+        units: mole ratios and compound formula as printed
         values:
           method_class: author_interpretation
           n_As2O5_over_n_Na2O_as_printed: 1/3
           n_Sb2O5_over_n_Na2O_as_printed: 1/3
-          n_Na2O_over_n_SiO2_compound_as_printed: 2/1
+          Na2O_SiO2_compound_as_printed: 2Na2O·SiO2
           sodium_component_definition_as_printed: Na2O, as printed for these compound ratios
           status: typed_refused_schema_gap
-          schema_gap: These printed stoichiometric mole ratios are not point compositions or phase-distribution ratios.
+          schema_gap: The printed mole ratios and compound formula are context, not point compositions or phase-distribution ratios.
           schema_code_checks:
             quantity: simulator/battery/enums.py::Quantity
             distribution_ratio: simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO
@@ -395,13 +411,25 @@ species:
         values:
           method_class: measured_direct
           Al2O3_in_Cu2O_Na2X_slag_as_printed: less than 1%
-          Al2O3_over_SiO2_in_Cu2O_SiO2_slag_as_printed: about 0.6
           status: typed_refused_schema_gap
           schema_gap: Approximate percent composition is printed without a mass or mole basis; no basis is supplied by the figures because figure values are not digitized.
           schema_code_checks:
             observation_types: tools/validate_literature_extracts.py::OBSERVATION_TYPES
             quantity: simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             phase_basis_tokens: simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      - observation_id: takeda_1986_alumina_silica_slag_ratio
+        type: composition
+        locator:
+          page: 3
+          published_page: 610
+          pdf_page_index: 2
+          section: Binary slag of Cu2O-Na2O or Cu2O-SiO2 system
+        units: ratio of printed percentages as written
+        values:
+          method_class: measured_direct
+          Al2O3_over_SiO2_in_Cu2O_SiO2_slag_as_printed: about 0.6
+          status: typed_refused_schema_gap
+          schema_gap: The prose reports a ratio of alumina to silica percentages, not a row-wise slag composition.
       - observation_id: takeda_1986_alumina_cu2o_slag_composition
         type: composition
         locator:
@@ -432,7 +460,6 @@ species:
           method_class: author_summary
           activity_coefficient_minimum_composition_as_printed: n_Na2O/n_SiO2 = 2
           activity_coefficient_minimum_value: not numerically stated
-          activity_of_Na2O: not numerically stated; described as depressed at 2Na2O·SiO2
           sodium_component_note: The abstract prints Na2O here; Na2X elsewhere remains Na2O + Na2CO3.
           status: typed_refused_schema_gap
           schema_gap: The printed intra-slag mole ratio is not a point composition or phase-distribution ratio.
@@ -493,27 +520,40 @@ species:
       - observation_id: takeda_1986_summary_binary_composition
         type: thermodynamic_example
         locator:
-          page: 8
-          published_page: 615
-          pdf_page_index: 7
+          page: 7
+          published_page: 614
+          pdf_page_index: 6
           section: Summary
         units: percent as printed; mass or mole basis not stated
         values:
           method_class: author_summary
           Cu2O_binary_slag_SiO2_or_Na2O_content_as_printed: up to 20 per cent
-          activity_coefficient_minimum_composition_as_printed: n_Na2X/n_SiO2 = 2
-          activity_coefficient_minimum_value: not numerically stated
-          activity_of_Na2O: not numerically stated; described as depressed at 2Na2O·SiO2
           experimental_temperature_K_as_printed: '1523'
           atmosphere_as_printed: argon gas flow
           status: typed_refused_schema_gap
-          schema_gap: The binary-addition percent basis is not stated; the soda-ratio is an intra-slag mole ratio without an exact composition token.
+          schema_gap: The binary-addition percent basis is not stated.
           schema_code_checks:
             observation_types: tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            phase_basis_tokens: simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      - observation_id: takeda_1986_summary_activity_coefficient_minimum
+        type: thermodynamic_example
+        locator:
+          page: 8
+          published_page: 615
+          pdf_page_index: 7
+          section: Summary
+        units: mole ratio as printed
+        values:
+          method_class: author_summary
+          activity_coefficient_minimum_species_as_printed: CuO0.5
+          activity_coefficient_minimum_composition_as_printed: n_Na2X/n_SiO2 = 2
+          activity_coefficient_minimum_value: not numerically stated
+          status: typed_refused_schema_gap
+          schema_gap: The printed intra-slag mole ratio is not a point composition or phase-distribution ratio.
+          schema_code_checks:
             quantity: simulator/battery/enums.py::Quantity
             distribution_ratio: simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO
             quantity_aliases: simulator/battery/migrate.py::QUANTITY_ALIASES
-            phase_basis_tokens: simulator/battery/enums.py::PHASE_BASIS_TOKENS
       - observation_id: takeda_1986_figures_not_digitized
         type: figure_context
         locator:
@@ -558,9 +598,9 @@ species:
               pdf_page_index: 4
               caption_as_printed: Copper solubility in sodium silicate slag and sodium carbonate plotted against logarithmic partial pressure of oxygen at 1523 K.
             - figure: '7'
-              page: 5
-              published_page: 612
-              pdf_page_index: 4
+              page: 6
+              published_page: 613
+              pdf_page_index: 5
               caption_as_printed: Activity coefficient of CuO0.5 for CuO0.5-SiO2-NaX0.5 system plotted against logarithmic partial pressure of oxygen at 1523 K.
             - figure: '8'
               page: 6
