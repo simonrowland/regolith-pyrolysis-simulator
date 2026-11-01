@@ -2701,6 +2701,27 @@ def test_composition_cell_classifier_matches_printed_amount_reader(
         assert (kind, amount) == ("number", expected)
 
 
+def test_uncertainty_cells_count_as_a_declared_wt_composition_point() -> None:
+    assert _declared_wt_composition_point_map(
+        {
+            "quantity": "equilibrium_phase_composition",
+            "points": [{"SiO2": "50 ± 1", "MgO": "50±1"}],
+        },
+        "wt percent",
+    )
+
+
+def test_residue_component_reader_uses_printed_central_amount() -> None:
+    selection = migrate_module.select_declared_source(
+        migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        "ppm",
+        {"residue_ppm": "12.59 ± 0.2"},
+    )
+
+    assert selection.available
+    assert selection.amount == Decimal("12.59")
+
+
 @pytest.mark.parametrize(
     ("printed", "amount"),
     [
