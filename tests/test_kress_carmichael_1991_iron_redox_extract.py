@@ -81,68 +81,102 @@ TABLE3_RENDER = """
 211-213 final 45.59 3.37 17.48 17.59 0.23 4.33 7.08 3.43 1.04
 """
 
-TABLE4_Q01_COMPOSITION = {
-    "SiO2": "38.86", "TiO2": "0.00", "Al2O3": "17.00",
-    "Fe2O3": "16.93", "FeO": "5.41", "MnO": "0.00",
-    "MgO": "0.00", "CaO": "20.89", "Na2O": "0.00",
-    "K2O": "0.00", "P2O5": "0.00",
-}
-TABLE5_B27_COMPOSITION = {
-    "SiO2": "50.46", "TiO2": "1.88", "Al2O3": "13.87",
-    "Fe2O3": "9.54", "FeO": "3.42", "MnO": "0.17",
-    "MgO": "6.84", "CaO": "10.65", "Na2O": "2.68", "K2O": "0.19",
-}
+# Printed composition cells transcribed from the PDF page 5 render (published
+# page 86) and checked against the pdftotext and MinerU tables.
+TABLE4_OXIDES = (
+    "SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "MnO", "MgO", "CaO",
+    "Na2O", "K2O", "P2O5",
+)
+TABLE4_RENDER_COMPOSITIONS = """
+Q01 38.86 0.00 17.00 16.93 5.41 0.00 0.00 20.89 0.00 0.00 0.00
+Q02 38.94 0.00 17.02 16.81 5.41 0.00 0.00 20.82 0.00 0.00 0.00
+Q03 37.73 0.00 17.67 16.73 5.29 0.00 0.00 21.09 0.00 0.00 0.00
+Q04 39.20 0.00 17.60 16.61 5.29 0.00 0.00 20.95 0.00 0.00 0.00
+Q05 68.61 0.00 0.00 20.45 1.58 0.00 0.00 0.03 8.30 0.00 0.00
+Q06 66.02 0.00 1.83 20.08 1.83 0.00 0.00 0.01 8.87 0.00 0.00
+Q11 66.97 0.00 0.01 19.46 2.70 0.00 0.00 0.01 9.98 0.00 0.00
+Q12 68.44 0.00 0.00 19.07 2.69 0.00 0.00 0.01 9.87 0.00 0.00
+Q13 66.38 0.00 0.00 19.06 2.87 0.00 0.00 0.01 10.60 0.00 0.00
+Q14 62.32 0.00 5.93 17.45 2.84 0.00 0.00 0.02 10.65 0.00 0.00
+Q15 67.72 0.00 0.02 19.40 2.89 0.00 0.00 0.00 9.09 0.00 0.00
+Q18 55.79 0.00 1.13 22.08 3.39 0.00 0.00 0.01 16.88 0.00 0.00
+Q19 52.17 0.00 4.02 19.63 2.45 0.00 0.00 0.02 18.44 0.00 0.00
+Q21 66.87 0.00 0.04 22.10 0.14 0.00 0.00 0.04 9.56 0.00 0.00
+Q22 65.80 0.00 0.00 21.99 0.23 0.00 0.00 0.01 10.27 0.00 0.00
+Q23 66.19 0.00 0.00 21.44 0.34 0.00 0.00 0.01 10.69 0.00 0.00
+Q27 33.16 0.00 2.71 37.58 0.28 0.00 0.00 0.04 24.55 0.00 0.00
+Q29 47.98 0.00 3.92 22.06 0.27 0.00 0.00 0.02 24.76 0.00 0.00
+Q31 27.97 0.00 1.83 33.31 1.98 0.00 0.00 33.64 0.09 0.00 0.00
+Q32 42.32 0.00 11.91 19.38 2.77 0.00 0.00 22.48 0.09 0.00 0.00
+Q34 42.86 0.00 6.66 22.58 2.91 0.00 0.00 23.45 0.05 0.00 0.00
+Q41 28.74 0.00 1.63 28.73 5.98 0.00 0.00 34.18 0.01 0.00 0.00
+Q42 40.04 0.00 12.09 16.46 7.20 0.00 0.00 22.40 0.08 0.00 0.00
+Q43 38.54 0.00 18.77 14.84 6.69 0.00 0.00 20.85 0.07 0.00 0.00
+Q44 43.23 0.00 6.75 17.34 7.69 0.00 0.00 23.82 0.04 0.00 0.00
+Q51 44.71 3.00 13.00 17.05 5.10 0.18 5.46 9.06 0.68 0.54 0.31
+Q52 46.56 3.56 15.25 13.75 5.05 0.25 4.65 7.48 1.10 0.85 0.38
+Q53 45.56 2.95 13.02 16.72 5.00 0.16 5.45 9.11 0.70 0.57 0.31
+Q61 45.36 2.98 12.77 15.50 6.97 0.16 5.47 9.09 0.74 0.46 0.32
+Q62 47.91 3.60 15.23 11.89 6.33 0.22 4.59 7.45 1.31 0.74 0.26
+Q64 46.66 3.51 15.35 12.44 6.36 0.26 4.69 7.52 1.36 0.70 0.26
+Q65 46.86 3.40 18.19 11.30 5.82 0.21 4.17 7.01 2.06 0.79 0.24
+Q66 46.66 3.29 19.32 10.59 5.83 0.21 4.11 6.91 1.98 0.80 0.26
+"""
+TABLE5_OXIDES = (
+    "SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "MnO", "MgO", "CaO",
+    "Na2O", "K2O",
+)
+TABLE5_RENDER_COMPOSITIONS = """
+B27 50.46 1.88 13.87 9.54 3.42 0.17 6.84 10.65 2.68 0.19
+B34 50.64 1.89 13.93 10.01 2.83 0.17 6.76 10.66 2.66 0.19
+B44 50.61 1.90 14.03 8.39 4.45 0.17 6.66 10.61 2.43 0.17
+B54 51.09 1.89 13.94 8.41 4.43 0.17 6.77 10.67 2.43 0.17
+B64 51.00 1.92 13.96 7.59 5.13 0.17 6.86 10.69 2.32 0.16
+B74 50.85 1.89 13.73 6.82 5.56 0.17 6.75 10.78 2.20 0.16
+B76 51.24 1.91 13.81 7.56 5.14 0.17 6.78 10.52 2.67 0.21
+B79 50.90 1.91 13.85 8.18 4.71 0.17 6.82 10.61 2.69 0.20
+B82 50.38 1.93 13.70 8.91 3.99 0.17 6.93 10.54 2.70 0.20
+B105 52.41 2.00 14.26 0.52 10.89 0.22 6.79 11.17 0.56 0.13
+B108 50.19 1.89 13.50 2.11 12.61 0.22 6.54 10.53 1.48 0.15
+B118 52.27 1.95 13.95 1.82 10.39 0.21 6.69 10.90 1.23 0.14
+B120 52.83 1.95 13.95 1.80 10.38 0.23 6.87 10.93 0.87 0.13
+"""
 
-# Fe2O3 and FeO cells transcribed independently from the 600 dpi render of
-# physical PDF page 5, Tables 4 and 5.
-TABLE45_RENDER_FE_OXIDES = {
-    "kc91_fe3_t4_Q01": ("16.93", "5.41"),
-    "kc91_fe3_t4_Q02": ("16.81", "5.41"),
-    "kc91_fe3_t4_Q03": ("16.73", "5.29"),
-    "kc91_fe3_t4_Q04": ("16.61", "5.29"),
-    "kc91_fe3_t4_Q05": ("20.45", "1.58"),
-    "kc91_fe3_t4_Q06": ("20.08", "1.83"),
-    "kc91_fe3_t4_Q11": ("19.46", "2.70"),
-    "kc91_fe3_t4_Q12": ("19.07", "2.69"),
-    "kc91_fe3_t4_Q13": ("19.06", "2.87"),
-    "kc91_fe3_t4_Q14": ("17.45", "2.84"),
-    "kc91_fe3_t4_Q15": ("19.40", "2.89"),
-    "kc91_fe3_t4_Q18": ("22.08", "3.39"),
-    "kc91_fe3_t4_Q19": ("19.63", "2.45"),
-    "kc91_fe3_t4_Q21": ("22.10", "0.14"),
-    "kc91_fe3_t4_Q22": ("21.99", "0.23"),
-    "kc91_fe3_t4_Q23": ("21.44", "0.34"),
-    "kc91_fe3_t4_Q27": ("37.58", "0.28"),
-    "kc91_fe3_t4_Q29": ("22.06", "0.27"),
-    "kc91_fe3_t4_Q31": ("33.31", "1.98"),
-    "kc91_fe3_t4_Q32": ("19.38", "2.77"),
-    "kc91_fe3_t4_Q34": ("22.58", "2.91"),
-    "kc91_fe3_t4_Q41": ("28.73", "5.98"),
-    "kc91_fe3_t4_Q42": ("16.46", "7.20"),
-    "kc91_fe3_t4_Q43": ("14.84", "6.69"),
-    "kc91_fe3_t4_Q44": ("17.34", "7.69"),
-    "kc91_fe3_t4_Q51": ("17.05", "5.10"),
-    "kc91_fe3_t4_Q52": ("13.75", "5.05"),
-    "kc91_fe3_t4_Q53": ("16.72", "5.00"),
-    "kc91_fe3_t4_Q61": ("15.50", "6.97"),
-    "kc91_fe3_t4_Q62": ("11.89", "6.33"),
-    "kc91_fe3_t4_Q64": ("12.44", "6.36"),
-    "kc91_fe3_t4_Q65": ("11.30", "5.82"),
-    "kc91_fe3_t4_Q66": ("10.59", "5.83"),
-    "kc91_fe3_t5_B27": ("9.54", "3.42"),
-    "kc91_fe3_t5_B34": ("10.01", "2.83"),
-    "kc91_fe3_t5_B44": ("8.39", "4.45"),
-    "kc91_fe3_t5_B54": ("8.41", "4.43"),
-    "kc91_fe3_t5_B64": ("7.59", "5.13"),
-    "kc91_fe3_t5_B74": ("6.82", "5.56"),
-    "kc91_fe3_t5_B76": ("7.56", "5.14"),
-    "kc91_fe3_t5_B79": ("8.18", "4.71"),
-    "kc91_fe3_t5_B82": ("8.91", "3.99"),
-    "kc91_fe3_t5_B105": ("0.52", "10.89"),
-    "kc91_fe3_t5_B108": ("2.11", "12.61"),
-    "kc91_fe3_t5_B118": ("1.82", "10.39"),
-    "kc91_fe3_t5_B120": ("1.80", "10.38"),
-}
+
+def _expected_table45_compositions() -> dict[str, dict[str, str]]:
+    expected = {}
+    for table, oxides, render in (
+        ("4", TABLE4_OXIDES, TABLE4_RENDER_COMPOSITIONS),
+        ("5", TABLE5_OXIDES, TABLE5_RENDER_COMPOSITIONS),
+    ):
+        for line in render.strip().splitlines():
+            row, *cells = line.split()
+            assert len(cells) == len(oxides)
+            expected[f"kc91_fe3_t{table}_{row}"] = dict(zip(oxides, cells, strict=True))
+    return expected
+
+
+def _actual_table45_compositions(document: dict) -> dict[str, dict | None]:
+    return {
+        observation["observation_id"]: observation.get("values", {}).get("composition_wt_pct")
+        for observation in document["species"]["Fe"]["observations"]
+        if observation["observation_id"].startswith("kc91_fe3_t")
+    }
+
+
+def _assert_table45_compositions_match(document: dict, expected: dict) -> None:
+    observations = {
+        observation["observation_id"]: observation
+        for observation in document["species"]["Fe"]["observations"]
+        if observation["observation_id"].startswith("kc91_fe3_t")
+    }
+    assert _actual_table45_compositions(document) == expected
+    for observation_id in expected:
+        table, row = observation_id.removeprefix("kc91_fe3_t").split("_", 1)
+        locator = observations[observation_id]["locator"]
+        assert locator["page"] == 5
+        assert locator["table"] == table
+        assert locator["row"] == row
 
 
 def _document() -> dict:
@@ -236,6 +270,57 @@ def test_table3_render_grid_and_extract_cell_mutations_fail() -> None:
         _assert_table3_matches(mutated_extract, expected)
 
 
+def test_table45_full_compositions_match_independent_render_cells_and_locators() -> None:
+    document = _document()
+    expected = _expected_table45_compositions()
+
+    assert len(expected) == 46
+    assert Counter(
+        "t4" if observation_id.startswith("kc91_fe3_t4_") else "t5"
+        for observation_id in expected
+    ) == {
+        "t4": 33,
+        "t5": 13,
+    }
+    _assert_table45_compositions_match(document, expected)
+
+
+def test_table45_composition_cell_map_and_locator_mutations_fail() -> None:
+    document = _document()
+    expected = _expected_table45_compositions()
+    _assert_table45_compositions_match(document, expected)
+
+    mutated_extract = deepcopy(document)
+    q01 = next(
+        observation
+        for observation in mutated_extract["species"]["Fe"]["observations"]
+        if observation["observation_id"] == "kc91_fe3_t4_Q01"
+    )
+    q01["values"]["composition_wt_pct"]["SiO2"] = "38.87"
+    with pytest.raises(AssertionError):
+        _assert_table45_compositions_match(mutated_extract, expected)
+
+    mutated_extract = deepcopy(document)
+    b34 = next(
+        observation
+        for observation in mutated_extract["species"]["Fe"]["observations"]
+        if observation["observation_id"] == "kc91_fe3_t5_B34"
+    )
+    b34["values"].pop("composition_wt_pct")
+    with pytest.raises(AssertionError):
+        _assert_table45_compositions_match(mutated_extract, expected)
+
+    mutated_extract = deepcopy(document)
+    b34 = next(
+        observation
+        for observation in mutated_extract["species"]["Fe"]["observations"]
+        if observation["observation_id"] == "kc91_fe3_t5_B34"
+    )
+    b34["locator"]["row"] = "B27"
+    with pytest.raises(AssertionError):
+        _assert_table45_compositions_match(mutated_extract, expected)
+
+
 def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() -> None:
     document, migrator = _migrated()
     records = migrator.result.observations
@@ -303,9 +388,13 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
     ]
     assert len(reduced) == 46
     assert all(record.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for record in reduced)
-    assert len(TABLE45_RENDER_FE_OXIDES) == 46
-    for observation_id, (fe2o3, feo) in TABLE45_RENDER_FE_OXIDES.items():
+    expected_compositions = _expected_table45_compositions()
+    assert len(expected_compositions) == 46
+    for observation_id, expected_composition in expected_compositions.items():
+        fe2o3 = expected_composition["Fe2O3"]
+        feo = expected_composition["FeO"]
         source = rows_by_id[observation_id]
+        assert source["values"]["composition_wt_pct"] == expected_composition
         assert source["values"]["Fe2O3_wt_pct"] == fe2o3
         assert source["values"]["FeO_wt_pct"] == feo
         if observation_id.startswith("kc91_fe3_t4_"):
@@ -319,24 +408,17 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         )
         assert expected_ratio is not None
         assert record.value.point == expected_ratio
+        expected_mole_fractions = wt_pct_to_mole_fraction(
+            {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
+        )
+        assert record.identity.composition.is_value
+        assert record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
     assert all(record.identity.composition.is_value for record in reduced)
     assert all(
         record.identity.total_pressure_Pa.is_value
         and record.identity.total_pressure_Pa.value == Decimal("101325")
         for record in reduced
     )
-
-    for observation_id, expected_composition in (
-        ("kc91_fe3_t4_Q01", TABLE4_Q01_COMPOSITION),
-        ("kc91_fe3_t5_B27", TABLE5_B27_COMPOSITION),
-    ):
-        source = rows_by_id[observation_id]
-        assert source["values"]["composition_wt_pct"] == expected_composition
-        record = next(item for item in reduced if observation_id in item.observation_id)
-        expected_mole_fractions = wt_pct_to_mole_fraction(
-            {oxide: Decimal(amount) for oxide, amount in expected_composition.items()}
-        )
-        assert record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
 
     table4_ratio = next(record for record in reduced if "kc91_fe3_t4_Q01" in record.observation_id)
     assert table4_ratio.point_conditions["fO2_log"].state.is_unknown
