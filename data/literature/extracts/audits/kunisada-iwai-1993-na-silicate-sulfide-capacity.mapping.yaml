@@ -1,0 +1,44 @@
+source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+table_mapping:
+  printed_table: '1'
+  pdf_page: 2
+  published_page: 44
+  caption: Chemical compositions of slags (wt%)
+  printed_row_count: 57
+  row_number_column: No.
+  observation_type: equilibrium_phase_composition
+  quantity: equilibrium_phase_composition
+  phase: l
+  basis: wt_percent
+  method_class: measured_direct
+  observation_count: 214
+  columns:
+  - {column: 1, header: No., destination: sample id}
+  - {column: 2, header: Na2O, destination: 57 measured composition observations}
+  - {column: 3, header: SiO2, destination: 57 measured composition observations}
+  - {column: 4, header: CaO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 5, header: MnO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 6, header: MgO, destination: 11 measured composition observations; blanks remain unreported}
+  - {column: 7, header: Al2O3, destination: 10 measured composition observations; blanks remain unreported}
+  - {column: 8, header: S, destination: 57 measured sulfur-composition observations}
+  observation_fields:
+    component_amount: printed cell value with canonical unit wt%
+    composition_wt_pct: all printed oxide components in the same sample row
+    T_C: 1500, printed in section 2 on PDF page 1
+    point_conditions.gas_mix: printed gas percentages, PDF page 1
+    point_conditions.pO2_Pa: printed calculated gas partial pressure, PDF page 2
+    point_conditions.pS2_Pa: printed calculated gas partial pressure, PDF page 2
+    point_conditions.total_pressure_Pa: unknown; paper does not report total pressure
+  verification: Every populated table cell and row/column assignment checked against the 600-dpi render of PDF page 2.
+capacity_mapping:
+  quantity: sulfide_capacity
+  printed_definition: C_S = (wt% S) (P_O2 / P_S2)^(1/2)
+  printed_log_field: log C_S; the paper does not print a base subscript
+  printed_point_values: none in Table 1 or text; plotted values are not digitized
+  printed_correlations:
+  - log C_S = 4.64 B - 6.88 at 1500 °C, σ = 0.37
+  - log C_S = 4.64 B' - 6.88 with the printed m and m' factors
+  - log C_S = 27.0 Λ_th - 21.2 at 1500 °C
+  correlation_storage: author-derived equation relations in context; no per-point Cs scalar is printed
+  pointwise_capacity_gap: 57 sample values are computable from the sulfur assays but not printed; do not calculate in this task
+  follow_up: separate decision required before any capacity rows can be generated
