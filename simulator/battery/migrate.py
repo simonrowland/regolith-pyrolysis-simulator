@@ -1551,9 +1551,12 @@ def _mass_percent_printed_from_plain(
                         for _name, amount in items
                     )
                 ):
-                    # Keep the declared typed envelope and every source cell,
-                    # including blanks and malformed tokens, as provenance.
-                    return _located_from_plain(payload, lambda value: value)
+                    locator = (
+                        _locator_from_plain(payload.get("locator"))
+                        if isinstance(payload, Mapping)
+                        else None
+                    )
+                    return located_value(raw_components, locator)
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
@@ -4271,18 +4274,11 @@ def _unrecognized_printed_chemical_components(
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
-        volatile = _volatile_closure_component(name)
         # A declared map may retain trace analyses in ppm beside its wt% oxides.
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or name.casefold().endswith(("_ppm", " ppm"))
-            or (
-                volatile is not None
-                and (
-                    volatile[0] in {"H2O", "CO2", "LOI"}
-                    or name not in declared_names
-                )
-            )
+            or _volatile_closure_component(name) is not None
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
             or _is_composition_condition_key(name)
@@ -5617,15 +5613,7 @@ def _mole_fraction_composition_from_values(
 
 
 def _printed_map_payload(wt: Mapping[str, Any]) -> dict[str, Any]:
-    printed: dict[str, Any] = {}
-    for key, value in wt.items():
-        kind, amount = _classify_composition_cell(value)
-        printed[str(key)] = (
-            _dec_str(amount)
-            if kind == "number" and amount is not None
-            else value
-        )
-    return printed
+    return {str(key): value for key, value in wt.items()}
 
 
 def wt_pct_to_mole_fraction_derivation(
@@ -6189,34 +6177,12 @@ def _owner_initial_from_printed(
             locator=locator,
         )
     refusal_reason: list[str] = []
-    source_values = raw
-    if (
-        isinstance(raw, Mapping)
-        and _enum(AmountBasis, raw.get("amount_basis")) is AmountBasis.MASS_PERCENT
-    ):
-        components = raw.get("components")
-        items = (
-            tuple(components.items())
-            if isinstance(components, Mapping)
-            else tuple(components)
-            if isinstance(components, (list, tuple))
-            else ()
-        )
-        if all(isinstance(item, (list, tuple)) and len(item) == 2 for item in items):
-            names = tuple(
-                _mass_percent_component_key(str(name))[0]
-                for name, _amount in items
-            )
-            if not _duplicate_mass_percent_component_names(
-                tuple((name, Decimal("0")) for name in names)
-            ):
-                source_values = {name: amount for name, amount in items}
     pairs = _mass_percent_pairs(raw)
     if pairs is None and isinstance(raw, Mapping):
         pairs = _mass_percent_pairs(
             {
                 "amount_basis": AmountBasis.MASS_PERCENT.value,
-                "components": source_values,
+                "components": raw,
             }
         )
     if pairs is not None:
@@ -6230,13 +6196,13 @@ def _owner_initial_from_printed(
             wt = dict(pairs)
     else:
         wt = _initial_oxide_map_from_values(
-            source_values,
+            raw,
             refusal_reason=refusal_reason,
             declared_map=True,
-            declared_component_map=source_values,
+            declared_component_map=raw,
         )
     if wt:
-        source_map = _source_printed_composition_values(wt, source_values)
+        source_map = _source_printed_composition_values(wt, closure_context)
         if source_map:
             ordered_wt = {
                 name: wt[name]
@@ -6252,10 +6218,8 @@ def _owner_initial_from_printed(
         _printed, initial = _located_printed_and_initial(
             wt,
             locator,
-            closure_context=(
-                source_values if closure_context is None else closure_context
-            ),
-            declared_component_map=source_values,
+            closure_context=raw if closure_context is None else closure_context,
+            declared_component_map=raw,
         )
         if (
             initial is not None
