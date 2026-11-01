@@ -1,0 +1,34 @@
+source_id: inoue-suito-1982-na-silicate-sulfur-partitions
+mapping_version: mineru_table_draft.v1
+tables:
+  - printed_table: '1'
+    pages: [5, 6]
+    printed_rows: 20
+    scope: final slag and metal assays, starting charge/slag analyses, and normalized sodium-loss rates
+    phase: l
+    units: wt%
+    method_class: measured_direct
+    notes: Page 5 used studio MinerU OCR as machine read 1; every numeric cell reconciled to page render and pdftotext. Page 6 continuation checked against MinerU, pdftotext, and render. The printed rate column is schema-gap context; it is not re-scaled.
+  - printed_table: '2'
+    page: 6
+    printed_rows: 7
+    scope: observed metal silicon and Charles/Callow calculated comparisons
+    phase: l
+    method_class: measured_direct / quoted_attributed
+    notes: Trace cells remain the printed token tr.; not zero.
+  - printed_table: '3'
+    page: 7
+    printed_rows: 6
+    scope: final metal and slag assays
+    phase: l
+    units: wt%
+    method_class: measured_direct
+  - printed_table: '4'
+    page: 8
+    printed_rows: 4
+    scope: gamma_FeO and N_FeO
+    phase: l
+    method_class: quoted_attributed
+figures:
+  digitised: false
+  candidates: [2, 3, 4, 5]
