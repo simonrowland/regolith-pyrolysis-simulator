@@ -8883,7 +8883,8 @@ def _score_sample_phase_vapour(reference, experiment, engine):
 
 _LIQUID_MODEL_SUBSOLIDUS_SAMPLE = "liquid_model_vs_subsolidus_sample"
 _COSTA_FO93FA7_SAMPLE = (
-    "Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately stated)"
+    "Crystalline olivine Fo93Fa7 (93% forsterite, 7% fayalite; "
+    "percent basis not separately stated)"
 )
 
 
@@ -8920,16 +8921,19 @@ def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
     )
     assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
     assert notice.affected_quantities == (Quantity.P_PARTIAL,)
-    assert residual.status is baseline.status
+    assert residual.status is baseline.status is ResidualStatus.NO_BAND
     assert residual.score_eligible is baseline.score_eligible
     assert score_mod.flagged_strata(residual.notices) == score_mod.flagged_strata(
         baseline.notices
     )
-    assert score_mod._headline_payload_admits(
+    headline_with_notice = score_mod._headline_payload_admits(
         residual_to_plain(residual), tier="measured"
-    ) == score_mod._headline_payload_admits(
+    )
+    headline_without_notice = score_mod._headline_payload_admits(
         residual_to_plain(baseline), tier="measured"
     )
+    assert headline_without_notice is True
+    assert headline_with_notice is headline_without_notice
 
 
 def test_liquid_sample_vapour_has_no_subsolidus_domain_notice() -> None:
@@ -8947,6 +8951,10 @@ def test_liquid_sample_vapour_has_no_subsolidus_domain_notice() -> None:
 
 def test_unknown_sample_phase_vapour_has_no_subsolidus_domain_notice() -> None:
     experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=None, characterization=None),
+    )
     residual, calls = _score_sample_phase_vapour(
         reference, experiment, Engine.INTERNAL_ANALYTICAL
     )
