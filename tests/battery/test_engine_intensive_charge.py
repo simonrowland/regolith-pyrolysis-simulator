@@ -280,16 +280,26 @@ def test_printed_species_dropped_by_sibling_refuses(extra):
             )), locator=f.loc())))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     waypoint = inputs.waypoints["normalized_composition"]
-    assert waypoint.selected is None
-    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-    assert waypoint.absence.missing == (f"experiment.sample.printed_composition.{key}",)
-    for result in engine_point_requests(inputs):
-        assert result.payload is None
-        assert result.readiness.status is ReadinessStatus.GAP
-        assert any(g.waypoint == "normalized_composition"
-                   and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
-                   and any(key in path for path in g.missing)
-                   for g in result.readiness.gaps)
+    if key == "Total":
+        # b-704 rejects this 80 wt% print, but it does not veto the
+        # independently measured mole-fraction initial composition.
+        assert waypoint.selected is not None
+        assert waypoint.selected.route == "normalized_initial_composition"
+        assert waypoint.selected.value == {"SiO2": D(".5"), "MgO": D(".5")}
+        for result in engine_point_requests(inputs):
+            assert result.payload is not None
+            assert result.payload["composition_mol"] == {"SiO2": 0.5, "MgO": 0.5}
+    else:
+        assert waypoint.selected is None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert waypoint.absence.missing == (f"experiment.sample.printed_composition.{key}",)
+        for result in engine_point_requests(inputs):
+            assert result.payload is None
+            assert result.readiness.status is ReadinessStatus.GAP
+            assert any(g.waypoint == "normalized_composition"
+                       and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
+                       and any(key in path for path in g.missing)
+                       for g in result.readiness.gaps)
 
 
 def test_losing_single_species_charge_does_not_veto_intensive():

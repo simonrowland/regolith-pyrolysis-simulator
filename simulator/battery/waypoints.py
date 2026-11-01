@@ -1011,17 +1011,17 @@ def normalized_composition(
                     closure_context = raw
                     if key in point:
                         row_volatiles: dict[str, Decimal] = {}
-                        for name, located in point.items():
+                        for name, condition_value in point.items():
                             if _volatile_closure_component(str(name)) is None:
                                 continue
-                            if isinstance(located, Located):
+                            if isinstance(condition_value, Located):
                                 if (
-                                    not located.state.is_value
-                                    or located.inference is not None
+                                    not condition_value.state.is_value
+                                    or condition_value.inference is not None
                                 ):
                                     continue
-                                located = located.state.value
-                            kind, amount = _classify_composition_cell(located)
+                                condition_value = condition_value.state.value
+                            kind, amount = _classify_composition_cell(condition_value)
                             if kind == "number" and amount is not None:
                                 row_volatiles[str(name)] = amount
                         if row_volatiles:

@@ -1279,6 +1279,7 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     point["composition_wt_pct"] = dict(
         point["composition_wt_pct"], XxO=10
     )
+    expected_printed_map = dict(point["composition_wt_pct"])
     prefix = f"{doc['source_id']}::{raw['observation_id']}"
     target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
     migrator = Migrator(REPO_ROOT)
@@ -1301,7 +1302,7 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     assert composition is not None and composition.is_unknown
     assert "per-run composition is not published" in composition.reason
     printed = row.point_conditions["printed_composition"]
-    assert printed.state.is_value and printed.state.value["XxO"] == Decimal("10")
+    assert printed.state.is_value and printed.state.value == expected_printed_map
     condition = row.point_conditions["composition"]
     assert condition.state.is_unknown
     assert "per-run composition is not published" in condition.state.reason
