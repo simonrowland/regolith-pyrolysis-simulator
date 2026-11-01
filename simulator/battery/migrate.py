@@ -5666,8 +5666,8 @@ def _printed_map_payload(
         if str(key) == "locator":
             continue
         if numeric_values_as == "decimal":
-            kind, amount = _classify_composition_cell(value)
-            if kind == "number" and amount is not None:
+            amount = _as_dec_or_none(value)
+            if amount is not None:
                 value = amount
         elif numeric_values_as == "string" and not isinstance(value, str):
             kind, amount = _classify_composition_cell(value)

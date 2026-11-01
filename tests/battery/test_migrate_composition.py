@@ -2039,6 +2039,25 @@ def test_typed_mass_percent_printed_map_keeps_uncertainty_text_verbatim() -> Non
     assert printed.state.value == {"SiO2": "50.0 ± 2.0", "MgO": "50.0"}
 
 
+def test_point_condition_printed_map_keeps_uncertainty_text_verbatim() -> None:
+    payload = {
+        "state": {
+            "tag": "value",
+            "value": {"SiO2": "50 ± 1", "MgO": "50.0"},
+        }
+    }
+
+    printed = migrate_module._point_condition_from_plain(
+        payload, key="printed_composition"
+    )
+
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": "50 ± 1",
+        "MgO": Decimal("50.0"),
+    }
+
+
 @pytest.mark.parametrize(
     ("amount_basis", "components_parser"),
     (
