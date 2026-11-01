@@ -1279,7 +1279,11 @@ def test_markova_point_unsupported_map_refuses_without_parent_fallback(
     point["composition_wt_pct"] = dict(
         point["composition_wt_pct"], XxO=10
     )
-    expected_printed_map = dict(point["composition_wt_pct"])
+    expected_printed_map = {
+        name: Decimal(str(amount))
+        for name, amount in point["composition_wt_pct"].items()
+    }
+    expected_printed_map["XxO"] = Decimal("10")
     prefix = f"{doc['source_id']}::{raw['observation_id']}"
     target_t = migrate_module.as_decimal(point["T_C"]) + Decimal("273.15")
     migrator = Migrator(REPO_ROOT)

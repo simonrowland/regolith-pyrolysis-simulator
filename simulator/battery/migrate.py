@@ -23435,7 +23435,7 @@ class Migrator:
                     **(point_conditions or {}),
                     "printed_composition": located_value(
                         _printed_map_payload(
-                            child_printed_map, numeric_values_as="source"
+                            child_printed_map, numeric_values_as="decimal"
                         ),
                         point_locator,
                     ),
