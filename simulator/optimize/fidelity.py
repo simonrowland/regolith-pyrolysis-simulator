@@ -358,7 +358,10 @@ def _run_eval_batch(
                 message = result_queue.get(timeout=0.05)
             except Empty:
                 message = None
-            if message is not None:
+            # A parent process can resume after the timeout threshold even though
+            # the worker already queued its completion. Drain that queue before
+            # comparing elapsed time so parent scheduling delay cannot discard it.
+            while message is not None:
                 key = (message["tier"], int(message["index"]))
                 if key in pending:
                     if message["kind"] == "started":
@@ -367,6 +370,10 @@ def _run_eval_batch(
                         outcomes[key] = _payload_outcome(message["payload"])
                         pending.pop(key, None)
                         started.pop(key, None)
+                try:
+                    message = result_queue.get_nowait()
+                except Empty:
+                    message = None
             now = time.monotonic()
             expired = [
                 key for key, start in started.items() if key in pending and now - start >= timeout_s
@@ -492,15 +499,21 @@ def _queue_safe_run_reference(result: ScoredResult) -> Any | None:
 
 
 def _call_evaluate_fn(task: _FidelityTask) -> ScoredResult:
-    from simulator.optimize.worker_runtime import get_worker_runtime
+    from simulator.optimize.worker_runtime import (
+        get_worker_runtime,
+        warm_workers_enabled,
+    )
 
+    worker_runtime = None
+    if warm_workers_enabled():
+        worker_runtime = get_worker_runtime(
+            feedstock_id=task.feedstock_id,
+            stage0_subprocess_required=_task_stage0_subprocess_required(task),
+        )
     call_kwargs: dict[str, Any] = {
         "profile": dict(task.profile),
         "candidate_id": task.candidate_id,
-        "worker_runtime": get_worker_runtime(
-            feedstock_id=task.feedstock_id,
-            stage0_subprocess_required=_task_stage0_subprocess_required(task),
-        ),
+        "worker_runtime": worker_runtime,
     }
     call_kwargs.update(dict(task.kwargs))
     signature = inspect.signature(task.fn)
