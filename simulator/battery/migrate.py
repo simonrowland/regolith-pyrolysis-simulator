@@ -771,6 +771,12 @@ def _canonical_printed_oxide_name(name: str) -> str:
     return "FeOT" if token in {"FeO_T", "FeO*"} else token
 
 
+def _mass_percent_component_key(name: str) -> str:
+    """Strip the mass-percent column suffix before oxide alias handling."""
+
+    return str(name).strip().removesuffix("_wt_pct")
+
+
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
@@ -4502,7 +4508,7 @@ def _missing_major_oxide_names(
     )
     missing: list[str] = []
     for name in names:
-        token = _canonical_printed_oxide_name(str(name))
+        token = _canonical_printed_oxide_name(_mass_percent_component_key(name))
         major = "FeO" if token == "FeOT" else token
         if major in _MAJOR_OXIDE_COMPONENT_KEYS and major not in missing:
             missing.append(major)
@@ -4990,7 +4996,7 @@ def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         return None
     fields, _invalid = _residue_component_field_sets(obj)
     components = {
-        field.removesuffix("_wt_pct"): amount
+        _mass_percent_component_key(field): amount
         for field in fields
         if (amount := _as_dec_or_none(obj.get(field))) is not None
     }
@@ -14166,30 +14172,39 @@ def _merge_located_mapping(
     return out or None
 
 
-PrintedFingerprint = tuple[tuple[str, str], ...]
+PrintedFingerprint = tuple[tuple[str, str | None], ...]
 
 
 def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     """Identity of a printed composition map (b-718: the one owner).
 
-    Numeric components only, keys sorted, decimals normalised by _dec_str, so
-    ``{"Al2O3": "26.0"}`` and ``{"Al2O3": 26}`` agree. ``locator``/skip keys and
-    non-numeric cells are ignored. A ``{"components": {...}}`` wrapper is
-    unwrapped. Returns None when no numeric component is left.
+    Numeric components and printed missing-cell markers, keys sorted, decimals
+    normalised by _dec_str, so ``{"Al2O3": "26.0"}`` and ``{"Al2O3": 26}``
+    agree. ``locator``/skip keys and other non-numeric cells are ignored. A
+    ``{"components": {...}}`` wrapper is unwrapped.
     """
 
     if isinstance(raw, Mapping) and isinstance(raw.get("components"), Mapping):
         raw = raw["components"]
     if not isinstance(raw, Mapping):
         return None
-    pairs: list[tuple[str, str]] = []
+    pairs: list[tuple[str, str | None]] = []
     for key, value in raw.items():
         if key in _WALK_SKIP_KEYS or key == "locator":
             continue
         number = _as_dec_or_none(value)
         if number is None:
-            continue
-        pairs.append((str(key), _dec_str(number)))
+            if value is None:
+                pairs.append((str(key), None))
+            elif value == "":
+                pairs.append((str(key), ""))
+            elif (
+                isinstance(value, str)
+                and value.strip().casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS
+            ):
+                pairs.append((str(key), value))
+        else:
+            pairs.append((str(key), _dec_str(number)))
     return tuple(sorted(pairs)) or None
 
 
