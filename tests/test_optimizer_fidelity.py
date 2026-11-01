@@ -76,6 +76,7 @@ def _install_delayed_fidelity_results(
     *,
     worker_elapsed_s: float,
     parent_wake_s: float,
+    release_done_on_join: bool = False,
 ) -> None:
     class _Queue:
         def __init__(self, *, result_queue: bool) -> None:
@@ -124,12 +125,18 @@ def _install_delayed_fidelity_results(
         def get_nowait(self) -> dict[str, object]:
             return self._pop()
 
+        def release_held_done(self) -> None:
+            self.items.extend(self.held_done)
+            self.held_done.clear()
+            self.released = True
+
         def close(self) -> None:
             pass
 
     class _Worker:
-        def __init__(self) -> None:
+        def __init__(self, result_queue: _Queue) -> None:
             self.alive = True
+            self.result_queue = result_queue
 
         def start(self) -> None:
             pass
@@ -142,6 +149,8 @@ def _install_delayed_fidelity_results(
 
         def join(self, timeout: float | None = None) -> None:
             del timeout
+            if release_done_on_join:
+                self.result_queue.release_held_done()
             self.alive = False
 
     class _Context:
@@ -162,7 +171,8 @@ def _install_delayed_fidelity_results(
 
         def Process(self, **kwargs: object) -> _Worker:
             del kwargs
-            return _Worker()
+            assert self.result_queue is not None
+            return _Worker(self.result_queue)
 
     context = _Context()
     actual_mp = fidelity_module.mp
@@ -185,6 +195,8 @@ def _install_delayed_fidelity_results(
             and result_queue.started_seen == result_queue.total_started
             and result_queue.held_done
         ):
+            if release_done_on_join:
+                return parent_wake_s
             result_queue.items.extend(result_queue.held_done)
             result_queue.held_done.clear()
             result_queue.released = True
@@ -276,6 +288,29 @@ def test_fidelity_victims_report_exact_values_for_late_worker_results(
 
     assert cached_status == "not_run"
     assert confidence == "low"
+
+
+def test_fidelity_victims_keep_on_time_results_unread_until_worker_join(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    _install_delayed_fidelity_results(
+        monkeypatch,
+        worker_elapsed_s=0.5,
+        parent_wake_s=2.0,
+        release_done_on_join=True,
+    )
+
+    cached_status, confidence, notes = _run_fidelity_timeout_victims(tmp_path)
+
+    assert cached_status == "ok"
+    assert confidence == "inconclusive"
+    assert any(
+        f"declared objective '{ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC}' missing in high arm"
+        in note
+        for note in notes
+    )
 
 
 def test_fidelity_worker_stamps_elapsed_time_on_completion(
@@ -1035,7 +1070,8 @@ def test_cached_real_all_ok_arm_without_inherited_evidence_degrades_without_cras
         _authoritative_cached_real_fast,
         _authoritative_mixed_perfect_high,
         top_k=(3,),
-        # Use the production timeout as a hang guard; short timeout cases use injected clocks.
+        # The production timeout is a hang guard, not a performance budget: these use test
+        # evaluators, and the 1 s timing branch is forced by the injected clock above.
         per_eval_timeout_s=DEFAULT_EVAL_TIMEOUT_SECONDS,
         feedstock_id=FEEDSTOCK_ID,
         profile={
@@ -1550,7 +1586,8 @@ def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metr
         _perfect_fast,
         _authoritative_high_missing_energy_objective,
         top_k=(3,),
-        # Use the production timeout as a hang guard; short timeout cases use injected clocks.
+        # The production timeout is a hang guard, not a performance budget: these use test
+        # evaluators, and the 1 s timing branch is forced by the injected clock above.
         per_eval_timeout_s=DEFAULT_EVAL_TIMEOUT_SECONDS,
         feedstock_id=FEEDSTOCK_ID,
         profile={"fidelities": {"fast": {"backend_name": "internal-analytical"}, "high": {"backend_name": "alphamelts"}}},
