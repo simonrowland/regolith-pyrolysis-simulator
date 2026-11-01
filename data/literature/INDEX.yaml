@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 722
-  extracts: 720
+  sources: 723
+  extracts: 721
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 720
+  extracts_without_pdf: 721
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -124,6 +124,7 @@ gaps:
   - datz-smith-taylor-1961-nacl-vapor
   - day-2020-trinitite-volatility
   - de-abreu-2024-li2o-sio2-thermochemistry
+  - de-maria-1969-rend-lincei
   - decapitani-kirschen-1998-excess-function
   - deffrennes-2020-ca-o-calphad
   - deguzman-2026-simulant-physicochemical
@@ -7530,6 +7531,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: de-maria-1969-rend-lincei
+  aliases: []
+  citation: Giovanni De Maria and Vincenzo Piacente, “Mass spectrometric study of rock like lunar surface
+    material”, Atti della Accademia Nazionale dei Lincei, Rendiconti, Serie 8, 47(6), 525–536 (1969).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+    review_status: draft
+    rows: 39
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/de-maria-1969-rend-lincei/de-maria-1969-rend-lincei.pdf
+      present: true
+      sha256: 866c1fb512c7e856d4bf9fb392d126b8fc6f1e8960f3325930f1255966e675d7
+      matches_simulator: null
+    sidecar:
+      path: raw/de-maria-1969-rend-lincei/sidecar.yaml
+      present: true
+    text:
+      path: text/de-maria-1969-rend-lincei
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/de-maria-1969-rend-lincei
+      exists: true
+      file_count: 4
+    extract:
+      path: extracts/de-maria-1969-rend-lincei.yaml
+      present: true
+      matches_simulator: false
+    ledger:
+      path: ledger/de-maria-1969-rend-lincei.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-05'
+    commit: 9be13c6816d4d54f6819300d2ff8d273028bebc4
 - source_id: decapitani-kirschen-1998-excess-function
   aliases: []
   citation: DeCapitani, C. and Kirschen, M. (1998), “A generalized multicomponent excess function with
