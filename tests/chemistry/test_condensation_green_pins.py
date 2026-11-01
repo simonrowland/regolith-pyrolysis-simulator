@@ -15,6 +15,7 @@ from tests.chemistry.conftest import full_builtin_provider_run
 
 SPECIES = ("Fe", "Na", "K", "Mg", "SiO", "Cr")
 PINS = Path(__file__).parents[1] / "fixtures" / "condensation_green.json"
+ENGINE_VERSION_COUNTS = {"lunar_24h": 1, "c2a_staged": 1}
 
 
 @pytest.fixture
@@ -79,9 +80,11 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
                 authoritative[intent] = slots["authoritative"]
         assert active == authoritative
         assert active
-        # Assert the emitted provider maps above, but keep their host-specific
-        # registrations out of this digest; every other result field remains.
-        digest_payload = _runner_digest_payload(runner_output)
+        # Engine registration maps and engine_version strings are excluded
+        # because host-specific registrations and builds are not run results.
+        digest_payload, engine_version_count = _runner_digest_payload(runner_output)
+        assert engine_version_count >= 1
+        assert engine_version_count == ENGINE_VERSION_COUNTS[name]
         digest_serialized = json.dumps(digest_payload, sort_keys=True)
         actual["runner_sha256"] = hashlib.sha256(
             digest_serialized.encode()
@@ -102,9 +105,9 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
 
 
 def _runner_digest_payload(runner_output):
-    # active and registry are projections of capability registrations, which
-    # vary with each host's engine configuration; requested and all other
-    # metadata remain in the hash so unrelated result changes still fail it.
+    # The active/registry maps and engine_version strings describe host-local
+    # registrations/builds, not run results, so exclude both from this digest.
+    # Requested registrations and the rest of the runner output remain hashed.
     payload = dict(runner_output)
     metadata = dict(payload["run_metadata"])
     engines_used = dict(metadata["engines_used"])
@@ -112,25 +115,31 @@ def _runner_digest_payload(runner_output):
     del engines_used["registry"]
     metadata["engines_used"] = engines_used
     payload["run_metadata"] = metadata
-    # engine_version strings carry the local engine binary's build digest
-    # (e.g. MAGEMin 1.9.6 built separately on the laptop and on studio-3), so
-    # they are host provenance, not results. A laptop-vs-studio-3 field diff of
-    # the full runner result found them to be the only remaining difference.
     return _without_engine_versions(payload)
 
 
 def _without_engine_versions(value):
     if isinstance(value, dict):
         stripped = {}
+        count = 0
         for key, item in value.items():
             if key == "engine_version":
                 assert isinstance(item, str) and item.strip()
+                count += 1
                 continue
-            stripped[key] = _without_engine_versions(item)
-        return stripped
+            stripped_item, nested_count = _without_engine_versions(item)
+            stripped[key] = stripped_item
+            count += nested_count
+        return stripped, count
     if isinstance(value, list):
-        return [_without_engine_versions(item) for item in value]
-    return value
+        stripped = []
+        count = 0
+        for item in value:
+            stripped_item, nested_count = _without_engine_versions(item)
+            stripped.append(stripped_item)
+            count += nested_count
+        return stripped, count
+    return value, 0
 
 
 @pytest.mark.nightly
