@@ -4199,6 +4199,21 @@ def _named_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
     return None
 
 
+def _has_explicit_composition_field(payload: object) -> bool:
+    if not isinstance(payload, Mapping):
+        return False
+    # composition_mass_percent is also used for single-analyte assays; its
+    # key alone cannot establish that an unknown-quantity row is a bulk mix.
+    return any(
+        key != "composition_mass_percent"
+        and isinstance(payload.get(key), Mapping)
+        for key in _PRINTED_COMPOSITION_MAP_KEYS
+    ) or any(
+        isinstance(payload.get(key), Mapping)
+        for key in ("composition_mol", "composition_mole_fraction")
+    )
+
+
 def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | None:
     named = _named_printed_composition_map(payload)
     if named is not None:
@@ -4267,8 +4282,10 @@ def _unrecognized_printed_chemical_components(
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+        # A declared map may retain trace analyses in ppm beside its wt% oxides.
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            or name.casefold().endswith(("_ppm", " ppm"))
             or _volatile_closure_component(name) is not None
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
@@ -5268,6 +5285,19 @@ def _initial_oxide_map_from_values(
         )
     if quantity and "composition" not in quantity and not declared_map:
         return None
+    starting_average = {
+        str(key)[len("starting_Ave_") :]: value
+        for key, value in values.items()
+        if str(key).startswith("starting_Ave_")
+    }
+    if starting_average:
+        return _oxide_map_from_mapping(
+            starting_average,
+            refusal_reason=refusal_reason,
+            declared_map=True,
+            declared_component_map=starting_average,
+            closure_context=(values if closure_context is None else closure_context),
+        )
     missing = _missing_major_oxide_names(values, declared_component_map)
     missing_reason = "missing major oxides: " + ", ".join(missing) if missing else None
     ranked = _point_rows(values)
@@ -18905,17 +18935,27 @@ class Migrator:
         )
         declared_printed_map = _named_printed_composition_map(values)
         composition_role, composition_role_error = _declared_composition_role(values)
+        declares_composition_datum = _has_explicit_composition_field(values) or any(
+            isinstance(token, str) and "composition" in token.casefold()
+            for token in (obs_type, values.get("quantity"))
+        )
         if (
             not composition_axis_required
-            and declared_printed_map is not None
             and (
-                q_token is None
-                or q_token in _BULK_PROPERTY_QUANTITIES
-                or composition_role == "datum_state"
+                declares_composition_datum
+                or (
+                    declared_printed_map is not None
+                    and (
+                        q_token in _BULK_PROPERTY_QUANTITIES
+                        or composition_role == "datum_state"
+                    )
+                )
             )
         ):
-            # A named map carries composition identity even when its quantity
-            # is outside the enum; bulk properties and datum_state use it too.
+            # Declared composition types/quantities and mole-composition fields
+            # establish a composition axis even when the data is row-local or
+            # stored in starting-material columns. A generic assay map alone
+            # does not make an unknown quantity's identity a composition.
             composition_axis_required = True
         row_oxide_map = (
             _oxide_map_from_mapping(values, closure_context=values)
@@ -21015,6 +21055,7 @@ class Migrator:
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
+                    composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
                 )
@@ -21142,6 +21183,7 @@ class Migrator:
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
                         parent_values=values,
+                        composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
@@ -21276,6 +21318,7 @@ class Migrator:
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
+                    composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
                 )
@@ -21477,6 +21520,7 @@ class Migrator:
                             if non_yield_points
                             else values
                         ),
+                        composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=(
                             point_parent_conditions if non_yield_points else point_conditions
@@ -21987,6 +22031,7 @@ class Migrator:
         equipment: object = None,
         parent_reason: str | None = None,
         parent_values: object = None,
+        composition_datum_declared: bool = False,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
@@ -22094,6 +22139,14 @@ class Migrator:
                     for key in raw_item
                 )
             )
+            if (
+                not point_composition_axis_required
+                and (
+                    _has_explicit_composition_field(raw_item)
+                    or (composition_datum_declared and point_map_explicit)
+                )
+            ):
+                point_composition_axis_required = True
             if not point_composition_axis_required:
                 point_oxide_map = None
             elif q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
