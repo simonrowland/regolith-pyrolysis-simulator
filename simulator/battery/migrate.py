@@ -4476,17 +4476,24 @@ def oxide_molar_mass(oxide: str) -> Decimal:
     )
 
 
-def _missing_major_oxide_names(values: object) -> tuple[str, ...]:
-    if not isinstance(values, Mapping):
-        return ()
-    absent = values.get("absent_table_entries")
-    names = [str(name) for name in absent] if isinstance(absent, (list, tuple)) else []
-    candidates = [values]
-    candidates.extend(
-        nested
-        for key in _PRINTED_COMPOSITION_MAP_KEYS
-        if isinstance((nested := values.get(key)), Mapping)
-    )
+def _missing_major_oxide_names(
+    values: object,
+    declared_component_map: Mapping[str, Any] | None = None,
+) -> tuple[str, ...]:
+    names: list[str] = []
+    candidates: list[Mapping[str, Any]] = []
+    if isinstance(values, Mapping):
+        absent = values.get("absent_table_entries")
+        if isinstance(absent, (list, tuple)):
+            names.extend(str(name) for name in absent)
+        candidates.append(values)
+        candidates.extend(
+            nested
+            for key in _PRINTED_COMPOSITION_MAP_KEYS
+            if isinstance((nested := values.get(key)), Mapping)
+        )
+    if declared_component_map is not None:
+        candidates.append(declared_component_map)
     names.extend(
         str(name)
         for candidate in candidates
@@ -4588,7 +4595,9 @@ def _wt_percent_conversion_or_refusal(
         closure_wt = {**oxide_wt, **volatile_wt}
 
         errors: list[str] = []
-        missing_major = _missing_major_oxide_names(closure_context)
+        missing_major = _missing_major_oxide_names(
+            closure_context, declared_component_map
+        )
         if missing_major:
             errors.append("missing major oxides: " + ", ".join(missing_major))
         closure_error = _percent_composition_closure_error(closure_wt, "mass")
@@ -5012,7 +5021,7 @@ def _initial_oxide_map_from_values(
         )
     if quantity and "composition" not in quantity and not declared_map:
         return None
-    missing = _missing_major_oxide_names(values)
+    missing = _missing_major_oxide_names(values, declared_component_map)
     missing_reason = "missing major oxides: " + ", ".join(missing) if missing else None
     ranked = _point_rows(values)
     if ranked and declared_map:
@@ -5476,31 +5485,28 @@ def _located_printed_and_initial(
     if not isinstance(wt, Mapping) or not wt:
         return None, None
     printed_map = _source_printed_composition_values(wt, closure_context)
-    conversion_map = _oxide_mass_percent_components(wt)
-    if not conversion_map:
-        return None, None
     printed = located_value(_printed_map_payload(printed_map), locator)
     state = _wt_percent_conversion_state(
         wt,
         closure_context=closure_context or wt,
         declared_component_map=declared_component_map,
     )
-    if state.is_value:
-        initial = Located(
-            state,
-            locator=locator,
-            inference=wt_pct_to_mole_fraction_derivation(
-                conversion_map,
-                locator,
-                source_note=_wt_percent_derivation_source_note(
-                    wt,
-                    closure_context,
-                    declared_component_map=declared_component_map,
-                ),
+    if not state.is_value:
+        return printed, Located(state, locator=locator)
+    conversion_map = _oxide_mass_percent_components(wt)
+    initial = Located(
+        state,
+        locator=locator,
+        inference=wt_pct_to_mole_fraction_derivation(
+            conversion_map,
+            locator,
+            source_note=_wt_percent_derivation_source_note(
+                wt,
+                closure_context,
+                declared_component_map=declared_component_map,
             ),
         )
-    else:
-        initial = Located(state, locator=locator)
+    )
     return printed, initial
 
 
@@ -5886,13 +5892,6 @@ def _owner_initial_from_printed(
             wt = None
         else:
             wt = dict(pairs)
-            if not _oxide_mass_percent_components(wt):
-                wt = _initial_oxide_map_from_values(
-                    raw,
-                    refusal_reason=refusal_reason,
-                    declared_map=True,
-                    declared_component_map=raw,
-                )
     else:
         wt = _initial_oxide_map_from_values(
             raw,
