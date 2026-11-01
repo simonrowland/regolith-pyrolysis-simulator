@@ -373,6 +373,25 @@ def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable(
     assert evans.identity.composition.is_not_applicable
 
 
+def test_unknown_quantity_does_not_infer_identity_composition_from_assay_map() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assay = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::kang_2007_t2_sample_309_cu_assay"
+        )
+    )
+
+    assert assay.identity.quantity.is_unknown
+    assert assay.identity.composition is None
+
+
 def test_ivanova_scalar_starting_description_is_a_typed_refusal() -> None:
     from simulator.battery.migrate import Migrator
 
