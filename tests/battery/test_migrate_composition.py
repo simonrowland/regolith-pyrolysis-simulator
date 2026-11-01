@@ -2642,7 +2642,7 @@ def test_valid_major_map_is_unchanged_through_every_reader(
         {name: Decimal(value) for name, value in printed_map.items()}
     ).components
     if reader in {"nested_oxide_wt_percent", "mass_loss_t0", "residue_ppm"}:
-        assert components == {
+        assert dict(components) == {
             name: Decimal(value) for name, value in printed_map.items()
         }
     else:
