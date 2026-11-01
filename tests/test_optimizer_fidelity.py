@@ -27,6 +27,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
+from simulator.optimize.pool import DEFAULT_EVAL_TIMEOUT_SECONDS
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.worker_runtime import WARM_WORKERS_ENV
 
@@ -69,64 +70,65 @@ def test_fidelity_timeout_refuses_non_finite_or_non_positive_values(
         )
 
 
-def test_fidelity_keeps_completed_result_when_parent_wakes_after_timeout(
+def _install_delayed_fidelity_results(
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    worker_elapsed_s: float,
+    parent_wake_s: float,
 ) -> None:
-    task = fidelity_module._FidelityTask(
-        index=0,
-        tier="fast",
-        fn=_authoritative_cached_real_fast,
-        patch=RecipePatch({}),
-        feedstock_id=FEEDSTOCK_ID,
-        fidelity="fast",
-        profile={"fidelities": {"fast": {"backend_name": "cached-real"}}},
-        candidate_id="fidelity-doe-000000-fast",
-        kwargs={},
-    )
-    result = _result(
-        task.candidate_id,
-        oxygen_kg=1.0,
-        energy_kwh=2.0,
-        backend_name="cached-real",
-        backend_status="ok",
-    )
-
     class _Queue:
-        def __init__(self) -> None:
-            self.items: list[object] = []
-            self.on_task: object | None = None
+        def __init__(self, *, result_queue: bool) -> None:
+            self.items: list[dict[str, object]] = []
+            self.held_done: list[dict[str, object]] = []
+            self.is_result_queue = result_queue
+            self.peer: _Queue | None = None
+            self.total_started = 0
+            self.started_seen = 0
+            self.last_message_kind: str | None = None
+            self.released = False
 
         def put(self, value: object) -> None:
-            if not isinstance(value, fidelity_module._FidelityTask):
+            if self.is_result_queue or not isinstance(value, fidelity_module._FidelityTask):
                 return
-            assert callable(self.on_task)
-            emit = self.on_task
-            emit({"kind": "started", "tier": value.tier, "index": value.index})
-            emit(
+            assert self.peer is not None
+            payload = fidelity_module._evaluate_fidelity_task(value)
+            self.peer.total_started += 1
+            self.peer.items.append(
+                {"kind": "started", "tier": value.tier, "index": value.index}
+            )
+            self.peer.held_done.append(
                 {
                     "kind": "done",
                     "tier": value.tier,
                     "index": value.index,
-                    "payload": {"kind": "result", "result": result},
+                    "elapsed_s": worker_elapsed_s,
+                    "payload": payload,
                 }
             )
 
-        def get(self, timeout: float | None = None) -> object:
-            del timeout
+        def _pop(self) -> dict[str, object]:
             if not self.items:
+                self.last_message_kind = None
                 raise fidelity_module.Empty
-            return self.items.pop(0)
+            message = self.items.pop(0)
+            self.last_message_kind = str(message["kind"])
+            if self.last_message_kind == "started":
+                self.started_seen += 1
+            return message
 
-        def get_nowait(self) -> object:
-            if not self.items:
-                raise fidelity_module.Empty
-            return self.items.pop(0)
+        def get(self, timeout: float | None = None) -> dict[str, object]:
+            del timeout
+            return self._pop()
+
+        def get_nowait(self) -> dict[str, object]:
+            return self._pop()
 
         def close(self) -> None:
             pass
 
     class _Worker:
-        alive = True
+        def __init__(self) -> None:
+            self.alive = True
 
         def start(self) -> None:
             pass
@@ -141,19 +143,27 @@ def test_fidelity_keeps_completed_result_when_parent_wakes_after_timeout(
             del timeout
             self.alive = False
 
-    queues: list[_Queue] = []
+    class _Context:
+        def __init__(self) -> None:
+            self.queue_count = 0
+            self.task_queue: _Queue | None = None
+            self.result_queue: _Queue | None = None
 
-    def make_queue() -> _Queue:
-        queue = _Queue()
-        queues.append(queue)
-        if len(queues) == 2:
-            queues[0].on_task = queues[1].items.append
-        return queue
+        def Queue(self) -> _Queue:
+            self.queue_count += 1
+            if self.queue_count % 2:
+                self.task_queue = _Queue(result_queue=False)
+                return self.task_queue
+            self.result_queue = _Queue(result_queue=True)
+            assert self.task_queue is not None
+            self.task_queue.peer = self.result_queue
+            return self.result_queue
 
-    context = SimpleNamespace(
-        Queue=make_queue,
-        Process=lambda **kwargs: _Worker(),
-    )
+        def Process(self, **kwargs: object) -> _Worker:
+            del kwargs
+            return _Worker()
+
+    context = _Context()
     actual_mp = fidelity_module.mp
     monkeypatch.setattr(
         fidelity_module,
@@ -163,20 +173,143 @@ def test_fidelity_keeps_completed_result_when_parent_wakes_after_timeout(
             get_context=lambda _method: context,
         ),
     )
-    clock_values = iter((10.0, 12.0))
+
+    def parent_clock() -> float:
+        result_queue = context.result_queue
+        if result_queue is None:
+            return 0.0
+        if (
+            result_queue.last_message_kind != "started"
+            and result_queue.total_started > 0
+            and result_queue.started_seen == result_queue.total_started
+            and result_queue.held_done
+        ):
+            result_queue.items.extend(result_queue.held_done)
+            result_queue.held_done.clear()
+            result_queue.released = True
+            return parent_wake_s
+        return parent_wake_s if result_queue.released else 0.0
+
+    monkeypatch.setattr(
+        fidelity_module,
+        "time",
+        SimpleNamespace(monotonic=parent_clock),
+    )
+
+
+def _run_fidelity_timeout_victims(tmp_path: Path) -> tuple[str, str, tuple[str, ...]]:
+    cached_real = run_fidelity_correlation(
+        _doe(),
+        _authoritative_cached_real_fast,
+        _authoritative_mixed_perfect_high,
+        top_k=(3,),
+        per_eval_timeout_s=1.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={
+            "fidelities": {
+                "fast": {"backend_name": "cached-real"},
+                "high": {"backend_name": "alphamelts"},
+            }
+        },
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path / "cached-real",
+    )
+    cached_payload = json.loads(Path(cached_real.artifact_paths["json"]).read_text())
+    missing_objective = run_fidelity_correlation(
+        _doe(),
+        _perfect_fast,
+        _authoritative_high_missing_energy_objective,
+        top_k=(3,),
+        per_eval_timeout_s=1.0,
+        feedstock_id=FEEDSTOCK_ID,
+        profile={
+            "fidelities": {
+                "fast": {"backend_name": "internal-analytical"},
+                "high": {"backend_name": "alphamelts"},
+            }
+        },
+        objective_names=("oxygen_kg", "energy_kWh"),
+        artifact_dir=tmp_path / "missing-objective",
+    )
+    return (
+        str(cached_payload["backend_arms"]["fast"]["backend_status"]),
+        missing_objective.confidence,
+        missing_objective.notes,
+    )
+
+
+def test_fidelity_victims_keep_on_time_results_when_parent_wakes_late(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    _install_delayed_fidelity_results(
+        monkeypatch,
+        worker_elapsed_s=0.5,
+        parent_wake_s=2.0,
+    )
+
+    cached_status, confidence, notes = _run_fidelity_timeout_victims(tmp_path)
+
+    assert cached_status == "ok"
+    assert confidence == "inconclusive"
+    assert any(
+        f"declared objective '{ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC}' missing in high arm"
+        in note
+        for note in notes
+    )
+
+
+def test_fidelity_victims_report_exact_values_for_late_worker_results(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    _install_delayed_fidelity_results(
+        monkeypatch,
+        worker_elapsed_s=1.5,
+        parent_wake_s=0.5,
+    )
+
+    cached_status, confidence, _notes = _run_fidelity_timeout_victims(tmp_path)
+
+    assert cached_status == "not_run"
+    assert confidence == "low"
+
+
+def test_fidelity_worker_stamps_elapsed_time_on_completion(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(WARM_WORKERS_ENV, "0")
+    task = _warm_task()
+
+    class _InputQueue:
+        def __init__(self) -> None:
+            self.items = [task, None]
+
+        def get(self) -> object:
+            return self.items.pop(0)
+
+    class _OutputQueue:
+        def __init__(self) -> None:
+            self.items: list[dict[str, object]] = []
+
+        def put(self, value: dict[str, object]) -> None:
+            self.items.append(value)
+
+    monkeypatch.setattr(fidelity_module, "_initialize_fidelity_worker", lambda _spec: None)
+    clock_values = iter((4.0, 4.25))
     monkeypatch.setattr(
         fidelity_module,
         "time",
         SimpleNamespace(monotonic=lambda: next(clock_values)),
     )
+    result_queue = _OutputQueue()
 
-    outcomes = fidelity_module._run_eval_batch((task,), 1.0, max_workers=1)
+    fidelity_module._fidelity_worker_loop(_InputQueue(), result_queue, None)
 
-    completed, drop = outcomes[("fast", 0)]
-    assert completed is result
-    assert drop is None
-    arm = fidelity_module._arm_backend_authority("fast", "fast", (task,), (completed,))
-    assert arm["backend_status"] == "ok"
+    assert [message["kind"] for message in result_queue.items] == ["started", "done"]
+    assert result_queue.items[1]["elapsed_s"] == pytest.approx(0.25)
 
 
 def test_fidelity_skips_stage0_route_lookup_when_warm_workers_are_disabled(
@@ -897,7 +1030,8 @@ def test_cached_real_all_ok_arm_without_inherited_evidence_degrades_without_cras
         _authoritative_cached_real_fast,
         _authoritative_mixed_perfect_high,
         top_k=(3,),
-        per_eval_timeout_s=2.0,
+        # Use the production timeout as a hang guard; short timeout cases use injected clocks.
+        per_eval_timeout_s=DEFAULT_EVAL_TIMEOUT_SECONDS,
         feedstock_id=FEEDSTOCK_ID,
         profile={
             "fidelities": {
@@ -1411,7 +1545,8 @@ def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metr
         _perfect_fast,
         _authoritative_high_missing_energy_objective,
         top_k=(3,),
-        per_eval_timeout_s=2.0,
+        # Use the production timeout as a hang guard; short timeout cases use injected clocks.
+        per_eval_timeout_s=DEFAULT_EVAL_TIMEOUT_SECONDS,
         feedstock_id=FEEDSTOCK_ID,
         profile={"fidelities": {"fast": {"backend_name": "internal-analytical"}, "high": {"backend_name": "alphamelts"}}},
         objective_names=("oxygen_kg", "energy_kWh"),
