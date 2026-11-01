@@ -2875,6 +2875,17 @@ def test_residue_explosion_accepts_a_declared_pure_oxide_map(
     assert dict(composition.state.value.components) == {"MgO": Decimal("1")}
 
 
+def test_residue_ppm_without_oxide_cells_skips_point_composition_guard(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path, {"residue_ppm": "12"}
+    )
+
+    assert len(observations) == 1
+    assert "printed_composition" not in (observations[0].point_conditions or {})
+
+
 @pytest.mark.parametrize(
     "field",
     ("MgO_wt_pct", "MgO_wt_percent", "MgO wt%", "MgO_wt%"),
