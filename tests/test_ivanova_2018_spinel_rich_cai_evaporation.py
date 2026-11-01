@@ -80,3 +80,32 @@ def test_ivanova_2018_residue_series_migrates_and_pins_table_1_values():
     later = next(row for row in series if row["sample"] == "5aN-2")
     assert first["MgO_wt_pct"] == 16.02
     assert later["SiO2_wt_pct"] == 13.95
+
+
+def test_ivanova_scalar_printed_composition_is_preserved_and_not_converted():
+    from simulator.battery.migrate import _owner_initial_from_printed
+
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    experiment_id = document["experiments"][0]["experiment_id"]
+    migrator = migrate_one_extract(
+        ROOT,
+        EXTRACT,
+        index={document["source_id"]: dict(document["source"])},
+        aliases={},
+    )
+    migrator.finalize()
+
+    experiment = next(
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.experiment_id.endswith(f"::experiment::{experiment_id}")
+    )
+    printed = experiment.sample.printed_composition
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value == (
+        "CAI 5aN-like composition; target CaO/Al2O3 ratio ~0.3"
+    )
+
+    refused_initial = _owner_initial_from_printed(printed)
+    assert refused_initial is not None
+    assert refused_initial.state.is_unknown
