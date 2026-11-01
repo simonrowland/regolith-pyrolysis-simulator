@@ -2451,7 +2451,16 @@ _BLANK_MAJOR_KEYS = (
     "SiO2 wt%",
     "AlO1.5",
 )
-_BAD_COMPOSITION_CELLS = (None, "", " ", "n/a", "not reported", False, "abc")
+_BAD_COMPOSITION_CELLS = (
+    None,
+    "",
+    " ",
+    "n/a",
+    "not reported",
+    False,
+    "abc",
+    "50 (1)",
+)
 
 
 def _composition_map_with_bad_major(key: str, cell: object) -> tuple[dict, str]:
@@ -2666,6 +2675,163 @@ def test_malformed_minor_component_is_not_treated_as_missing_major() -> None:
     assert initial is not None
     assert initial.state.is_unknown
     assert "missing major oxides" not in initial.state.reason
+
+
+@pytest.mark.parametrize(
+    ("printed", "expected"),
+    [
+        ("50 ± 1", Decimal("50")),
+        ("50±1", Decimal("50")),
+        ("50 +/- 1", Decimal("50")),
+        ("50+/-1", Decimal("50")),
+        ("50 (1)", None),
+    ],
+)
+def test_composition_cell_classifier_matches_printed_amount_reader(
+    printed: str,
+    expected: Decimal | None,
+) -> None:
+    assert migrate_module._printed_composition_amount(printed) == expected
+    kind, amount = migrate_module._classify_composition_cell(printed)
+
+    if expected is None:
+        assert kind == "malformed"
+        assert amount is None
+    else:
+        assert (kind, amount) == ("number", expected)
+
+
+@pytest.mark.parametrize(
+    ("printed", "amount"),
+    [
+        ("50 ± 1", Decimal("50")),
+        ("50±1", Decimal("50")),
+        ("50 +/- 1", Decimal("50")),
+        ("50+/-1", Decimal("50")),
+    ],
+)
+@pytest.mark.parametrize("reader", _BLANK_MAJOR_READERS)
+def test_printed_composition_uncertainty_uses_central_amount_in_every_reader(
+    tmp_path: Path,
+    reader: str,
+    printed: str,
+    amount: Decimal,
+) -> None:
+    printed_map = {"SiO2": printed, "MgO": "25", "CaO": "25"}
+    valid, refusal, components = _composition_reader_outcome(
+        tmp_path, reader, printed_map
+    )
+
+    assert valid, refusal
+    baseline_valid, baseline_refusal, baseline = _composition_reader_outcome(
+        tmp_path, reader, {"SiO2": "50", "MgO": "25", "CaO": "25"}
+    )
+    assert baseline_valid, baseline_refusal
+    assert components == baseline
+    assert migrate_module._printed_composition_amount(printed) == amount
+
+
+def _migrate_residue_oxide_columns(tmp_path: Path, columns: dict[str, object]):
+    extract = deepcopy(FIXTURE_EXTRACT)
+    experiment_id = "residue-oxide-columns"
+    extract["experiments"] = [
+        {
+            "experiment_id": experiment_id,
+            "sample": {
+                "initial_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "measured",
+                            "amount_basis": "mole_fraction",
+                            "components": [["SiO2", "0.5"], ["MgO", "0.5"]],
+                        },
+                    },
+                    "locator": {"table": "1"},
+                },
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": "50", "MgO": "50"},
+                    },
+                    "locator": {"table": "1", "row": "1"},
+                },
+            },
+        }
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": experiment_id,
+            "experiment": experiment_id,
+            "type": "residue_component_composition",
+            "units": "ppm",
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_C": "1200",
+                        "run_id": experiment_id,
+                        **columns,
+                    }
+                ],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(f"fixture-source::{experiment_id}")
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+
+def test_residue_explosion_keeps_blank_oxide_sibling_for_closure(
+    tmp_path: Path,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path,
+        {
+            "SiO2_wt_pct": None,
+            "MgO_wt_pct": "50",
+            "CaO_wt_pct": "50",
+        },
+    )
+
+    component_rows = [
+        observation
+        for observation in observations
+        if observation.identity.species.formula in {"MgO", "CaO"}
+    ]
+    assert component_rows
+    for observation in component_rows:
+        composition = (observation.point_conditions or {}).get("composition")
+        assert isinstance(composition, Located)
+        assert composition.state.is_unknown
+        assert "missing major oxides: SiO2" in composition.state.reason
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("MgO_wt_pct", "MgO_wt_percent", "MgO wt%", "MgO_wt%"),
+)
+def test_residue_oxide_column_suffix_selects_its_species(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    observations = _migrate_residue_oxide_columns(
+        tmp_path,
+        {"SiO2_wt_pct": "50", field: "50"},
+    )
+
+    assert any(
+        observation.identity.species.formula == "MgO"
+        for observation in observations
+    )
 
 
 def test_owner_starting_map_ambiguous_iron_is_typed_unknown() -> None:
