@@ -373,6 +373,28 @@ def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable(
     assert evans.identity.composition.is_not_applicable
 
 
+def test_inoue_elemental_assay_keeps_composition_context_out_of_identity() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assay = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::inoue_1991_n_s_partition_cao_al2o3_p002_t01_r05_c03"
+        )
+    )
+
+    assert assay.identity.quantity.is_value
+    assert assay.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert assay.identity.composition is not None
+    assert assay.identity.composition.is_not_applicable
+    assert assay.point_conditions["composition"].state.is_unknown
+
+
 def test_unknown_quantity_does_not_infer_identity_composition_from_assay_map() -> None:
     from simulator.battery.migrate import Migrator
 
