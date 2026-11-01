@@ -191,7 +191,14 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
 
     captions = mapping["figures"]["captions"]
     assert [caption["figure"] for caption in captions] == list(range(1, 12))
-    assert [caption["page"] for caption in captions] == [2, 3, 3, 4, 4, 6, 6, 6, 7, 8, 8]
+    assert [caption["page"] for caption in captions] == [2, 3, 3, 4, 4, 6, 6, 6, 8, 9, 9]
+    figure_candidates = [
+        context["values"]["figure_candidates"]
+        for species in doc["species"].values()
+        for context in species.get("context", [])
+        if "figure_candidates" in context.get("values", {})
+    ]
+    assert figure_candidates == [["Figs. 1–11; no plotted values digitized"]]
     assert "activities of Na2O" in captions[1]["caption"]
     assert "Sulfide capacities" in captions[6]["caption"]
     audit_md = (ROOT / "data/literature/extracts/audits/inoue-suito-1982-na-silicate-sulfur-partitions.audit.md").read_text(
