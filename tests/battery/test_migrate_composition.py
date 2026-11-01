@@ -2371,6 +2371,71 @@ def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> N
     assert "missing major oxides: SiO2" in observation.identity.composition.reason
 
 
+def test_initial_charge_mass_loss_map_refuses_blank_suffixed_major_oxide() -> None:
+    values = {
+        "quantity": "composition_wt_pct",
+        "points": [
+            {
+                "T_C": 0,
+                "mass_loss_pct": 0,
+                "SiO2_wt_pct": None,
+                "MgO_wt_pct": 50,
+                "CaO_wt_pct": 50,
+            }
+        ],
+    }
+    refusal: list[str] = []
+
+    assert (
+        _initial_oxide_map_from_values(
+            values,
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        is None
+    )
+    assert refusal and "missing major oxides: SiO2" in refusal[0]
+
+
+def test_nested_oxide_wt_percent_parser_refuses_blank_major_oxide() -> None:
+    values = {
+        "quantity": "composition_wt_pct",
+        "oxide_wt_percent": {"SiO2": None, "MgO": 50, "CaO": 50},
+    }
+    refusal: list[str] = []
+
+    assert (
+        _initial_oxide_map_from_values(
+            values,
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        is None
+    )
+    assert refusal and "missing major oxides: SiO2" in refusal[0]
+
+
+def test_equipment_printed_fingerprint_retains_blank_major_oxide() -> None:
+    sample = sample_from_equipment(
+        {
+            "locator": {"table": "1"},
+            "starting_glass_wt_pct": {
+                "SiO2": None,
+                "MgO": "50",
+                "CaO": "50",
+            },
+        },
+        values={},
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.is_value
+    assert sample.printed_composition.state.value["SiO2"] is None
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "missing major oxides: SiO2" in sample.initial_composition.state.reason
+
+
 def test_owner_starting_map_ambiguous_iron_is_typed_unknown() -> None:
     printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
     sample = _sample_from_plain(
