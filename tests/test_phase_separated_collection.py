@@ -93,7 +93,7 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 
 
 def test_diverted_alkali_sio_numeric_pin():
-    """Pre-change pin: the isolated cartridge must preserve existing routing."""
+    """Pin the merged bypass route while the silica cartridge is isolated."""
     model = _model("divert", hard_gate=False)
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
@@ -101,14 +101,14 @@ def test_diverted_alkali_sio_numeric_pin():
     )
     assert 3 not in result.condensed_by_stage_species
     assert {sp: kg.hex() for sp, kg in result.condensed_by_stage_species[4].items()} == {
-        "SiO": "0x1.1ac1c176ddee6p-1",
-        "Na": "0x1.d08a5cd1c9aefp-12",
-        "K": "0x1.d96ca206ef36dp-15",
+        "SiO": "0x1.ff5588f508b46p-1",
+        "Na": "0x1.6f0068db875fdp-11",
+        "K": "0x1.a36e24edb9570p-14",
     }
     assert {sp: kg.hex() for sp, kg in result.remaining_by_species.items()} == {
-        "SiO": "0x1.5e35b5418eb60p-5",
-        "Na": "0x1.0d7674e54da9ep-12",
-        "K": "0x1.6d6fbb5c992edp-15",
+        "SiO": "0x0.0p+0",
+        "Na": "0x0.0p+0",
+        "K": "0x1.65a8247d00000p-55",
     }
 
 

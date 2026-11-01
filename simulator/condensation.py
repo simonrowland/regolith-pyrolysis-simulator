@@ -3452,12 +3452,13 @@ class CondensationModel:
             )
         inlet_rates = dict(evap_flux.species_kg_hr)
         flowing_rates = dict(inlet_rates)
+        active_pipe_segments = self.active_pipe_segments
         wall_hkl_by_species: dict[str, dict[str, float]] = {}
         self.wall_species_partial_pressures_pa_by_segment = {}
         # The train is causal: each entering wall and then its stage consume
         # one shared inlet mixture. Recompute Dalton partials only AFTER all
         # species at that location have been evaluated, preserving carrier flow.
-        for stage in sorted(self.train.stages, key=stage_visit_key):
+        for stage in sorted(self.train.active_stages, key=stage_visit_key):
             # Validate this destination's coefficient before its incoming wall
             # can consume the supply; a clean stage cannot hide missing alpha.
             alpha_surface = _stage_alpha_surface_key(stage)
@@ -3467,7 +3468,7 @@ class CondensationModel:
                 record = _stage_alpha_record(stage, species, self.materials)
                 _required_record_alpha_s(record, species=species, site='stage_deposition')
                 route['stage_alpha_records_by_stage'][alpha_surface] = record
-            for segment in self.pipe_segments:
+            for segment in active_pipe_segments:
                 # The K trap shares stage number 4 and has no duct. The
                 # stage_3_to_stage_4 wall belongs to the Na collector only.
                 if int(stage.sub_order) != 0:
@@ -3500,7 +3501,7 @@ class CondensationModel:
                         melt_temperature_C=float(melt.temperature_C),
                         supply_by_segment_kg={
                             item.name: supply if item.name == segment.name else 0.0
-                            for item in self.pipe_segments
+                            for item in active_pipe_segments
                         },
                         antoine_extrapolations=antoine_extrapolations,
                         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
@@ -3802,7 +3803,8 @@ class CondensationModel:
                 )
                 wall_deposit_account_fractions_by_species[species] = (
                     _wall_segment_account_fractions(
-                        wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
+                        wall_deposit_by_segment_species, species, wall_hkl_kg,
+                        active_pipe_segments,
                     )
                 )
             impurity_stages = stage_route.get('impurity_stage_numbers', ())
