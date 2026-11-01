@@ -453,6 +453,32 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     return PHASE_MAP.get(token)
 
 
+_SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
+    # Reviewed solid KEMS sample descriptions. These are exact labels; words
+    # embedded in mixed or temperature-dependent descriptions stay unknown.
+    "solid": Phase.CR,
+    "crystalline": Phase.CR,
+    "solid stoichiometric mgal2o4 spinel": Phase.CR,
+    "solid lump": Phase.CR,
+    "crystalline k2si2o5": Phase.CR,
+    # Costa & Jacobson (2015)'s pressure experiments record this sample as
+    # crystalline olivine; the physics ruling confirms it remained solid.
+    (
+        "crystalline olivine fo93fa7 (93% forsterite, 7% fayalite; "
+        "percent basis not separately stated)"
+    ): Phase.CR,
+}
+
+
+def _phase_for_sample_description(description: str | None) -> Phase | None:
+    """Classify a reviewed sample description without loosening PHASE_MAP."""
+
+    phase = phase_for_sample_form(description)
+    if phase is not None or description is None:
+        return phase
+    return _SAMPLE_DESCRIPTION_PHASE_MAP.get(description.strip().casefold())
+
+
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
     "fugacity_series": Quantity.FUGACITY,
