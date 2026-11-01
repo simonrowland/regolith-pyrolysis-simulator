@@ -2436,6 +2436,238 @@ def test_equipment_printed_fingerprint_retains_blank_major_oxide() -> None:
     assert "missing major oxides: SiO2" in sample.initial_composition.state.reason
 
 
+_BLANK_MAJOR_READERS = (
+    "untyped_observation",
+    "nested_oxide_wt_percent",
+    "mass_loss_t0",
+    "equipment_starting_glass",
+    "residue_ppm",
+    "phase_vector",
+)
+_BLANK_MAJOR_KEYS = (
+    "SiO2",
+    "SiO2_wt_pct",
+    "SiO2_wt_percent",
+    "SiO2 wt%",
+    "AlO1.5",
+)
+_BAD_COMPOSITION_CELLS = (None, "", " ", "n/a", "not reported", False, "abc")
+
+
+def _composition_map_with_bad_major(key: str, cell: object) -> tuple[dict, str]:
+    if key == "AlO1.5":
+        return {"SiO2": "50", "MgO": "25", "CaO": "25", key: cell}, "Al2O3"
+    return {"MgO": "50", "CaO": "50", key: cell}, "SiO2"
+
+
+def _migrate_composition_reader_case(
+    tmp_path: Path,
+    reader: str,
+    printed_map: dict,
+):
+    extract = deepcopy(FIXTURE_EXTRACT)
+    experiment_id = f"blank-cell-{reader}"
+    sample = {
+        "printed_composition": {
+            "state": {"tag": "value", "value": printed_map},
+            "locator": {"table": "1", "row": "1"},
+        }
+    }
+    if reader == "residue_ppm":
+        sample["initial_composition"] = {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "measured",
+                    "amount_basis": "mole_fraction",
+                    "components": [
+                        ["SiO2", "0.5"],
+                        ["MgO", "0.25"],
+                        ["CaO", "0.25"],
+                    ],
+                },
+            },
+            "locator": {"table": "1"},
+        }
+    else:
+        sample["composition_role"] = INITIAL_CHARGE_ONLY_PROXY_FLAG
+    extract["experiments"] = [
+        {"experiment_id": experiment_id, "sample": sample}
+    ]
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "observation_id": experiment_id,
+            "experiment": experiment_id,
+            "type": (
+                "residue_component_composition"
+                if reader == "residue_ppm"
+                else "composition_series"
+            ),
+            "units": "ppm" if reader == "residue_ppm" else "wt percent",
+        }
+    )
+    if reader == "residue_ppm":
+        row["values"] = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "series": [
+                {
+                    "T_C": "1200",
+                    "run_id": experiment_id,
+                    "residue_ppm": "12.59",
+                }
+            ],
+        }
+    else:
+        row["values"] = {
+            "quantity": "equilibrium_phase_composition",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "phase_label": "melt",
+            "basis": "wt_percent",
+            "component_amount": "50",
+        }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            f"fixture-source::{experiment_id}"
+        )
+    )
+    return observation.identity.composition
+
+
+def _composition_reader_outcome(
+    tmp_path: Path,
+    reader: str,
+    printed_map: dict,
+) -> tuple[bool, str | None, object]:
+    if reader == "untyped_observation":
+        _printed, initial = migrate_module._located_printed_and_initial(
+            printed_map,
+            Locator(table="1"),
+            closure_context=printed_map,
+            declared_component_map=printed_map,
+        )
+        assert initial is not None
+        if initial.state.is_unknown:
+            return False, initial.state.reason, None
+        return True, None, initial.state.value.components
+    if reader == "nested_oxide_wt_percent":
+        refusal: list[str] = []
+        components = _initial_oxide_map_from_values(
+            {"quantity": "composition_wt_pct", "oxide_wt_percent": printed_map},
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        return components is not None, "; ".join(refusal) or None, components
+    if reader == "mass_loss_t0":
+        refusal = []
+        components = _initial_oxide_map_from_values(
+            {
+                "quantity": "composition_wt_pct",
+                "points": [
+                    {
+                        "T_C": 0,
+                        "mass_loss_pct": 0,
+                        **printed_map,
+                    }
+                ],
+            },
+            declared_map=True,
+            refusal_reason=refusal,
+        )
+        return components is not None, "; ".join(refusal) or None, components
+    if reader == "equipment_starting_glass":
+        sample = sample_from_equipment(
+            {
+                "locator": {"table": "1"},
+                "starting_glass_wt_pct": printed_map,
+            },
+            values={},
+        )
+        initial = sample.initial_composition
+        if initial is None:
+            return False, "equipment reader did not produce an initial state", None
+        if initial.state.is_unknown:
+            return False, initial.state.reason, None
+        return True, None, initial.state.value.components
+
+    composition = _migrate_composition_reader_case(tmp_path, reader, printed_map)
+    if composition is None:
+        return False, "migration reader did not produce a composition state", None
+    if composition.is_unknown:
+        return False, composition.reason, None
+    return True, None, composition.value.components
+
+
+@pytest.mark.parametrize(
+    ("reader", "key", "cell"),
+    [
+        (reader, key, cell)
+        for reader in _BLANK_MAJOR_READERS
+        for key in _BLANK_MAJOR_KEYS
+        for cell in _BAD_COMPOSITION_CELLS
+    ],
+)
+def test_bad_declared_major_cells_refuse_through_every_reader(
+    tmp_path: Path,
+    reader: str,
+    key: str,
+    cell: object,
+) -> None:
+    printed_map, missing_major = _composition_map_with_bad_major(key, cell)
+    valid, refusal, _components = _composition_reader_outcome(
+        tmp_path, reader, printed_map
+    )
+
+    assert not valid, (reader, key, cell)
+    assert refusal and f"missing major oxides: {missing_major}" in refusal
+
+
+@pytest.mark.parametrize("reader", _BLANK_MAJOR_READERS)
+def test_valid_major_map_is_unchanged_through_every_reader(
+    tmp_path: Path,
+    reader: str,
+) -> None:
+    printed_map = {"SiO2": "50", "MgO": "25", "CaO": "25"}
+    valid, refusal, components = _composition_reader_outcome(
+        tmp_path, reader, printed_map
+    )
+
+    assert valid, refusal
+    expected = wt_pct_to_mole_fraction(
+        {name: Decimal(value) for name, value in printed_map.items()}
+    ).components
+    if reader in {"nested_oxide_wt_percent", "mass_loss_t0"}:
+        assert components == {
+            name: Decimal(value) for name, value in printed_map.items()
+        }
+    else:
+        assert components == expected
+
+
+def test_malformed_minor_component_is_not_treated_as_missing_major() -> None:
+    printed_map = {
+        "SiO2": "50",
+        "MgO": "25",
+        "CaO": "25",
+        "K2O": "abc",
+    }
+    _printed, initial = migrate_module._located_printed_and_initial(
+        printed_map,
+        Locator(table="1"),
+        closure_context=printed_map,
+        declared_component_map=printed_map,
+    )
+
+    assert initial is not None
+    assert initial.state.is_unknown
+    assert "missing major oxides" not in initial.state.reason
+
+
 def test_owner_starting_map_ambiguous_iron_is_typed_unknown() -> None:
     printed_map = {"SiO2": "50", "FeOT": "20", "FeO": "30"}
     sample = _sample_from_plain(
