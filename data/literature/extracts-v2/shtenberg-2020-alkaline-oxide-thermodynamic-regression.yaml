@@ -1,0 +1,5202 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml
+observations:
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2B4O7_reference_cp::T=298.15:row=k2b4o7:h=e279f051731f
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '170.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.7'
+      basis: absolute
+      as_printed: ±1.7
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2B4O7; column=Cp° (ref. data); table_row_number=3; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2B4O7; column=Cp° (ref. data); table_row_number=3; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2B6O10_reference_cp::T=298.15:row=k2b6o10:h=1bc9d1ebcea7
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '261.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2.5'
+      basis: absolute
+      as_printed: ±2.5
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2B6O10; column=Cp° (ref. data); table_row_number=4; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2B6O10; column=Cp° (ref. data); table_row_number=4; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2B8O13_reference_cp::T=298.15:row=k2b8o13:h=881ec775702b
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '321.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '3.35'
+      basis: absolute
+      as_printed: ±3.35
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2B8O13; column=Cp° (ref. data); table_row_number=5; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2B8O13; column=Cp° (ref. data); table_row_number=5; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2GeO3_reference_cp::T=298.15:row=k2geo3:h=7d1bb58f4fb7
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2GeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '129.08'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.42'
+      basis: absolute
+      as_printed: ±0.42
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2GeO3; column=Cp° (ref. data); table_row_number=26; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2GeO3; column=Cp° (ref. data); table_row_number=26; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2Si2O5_reference_cp::T=298.15:row=k2si2o5:h=64364c94efd5
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '160.95'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.44'
+      basis: absolute
+      as_printed: ±0.44
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2Si2O5; column=Cp° (ref. data); table_row_number=15; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2Si2O5; column=Cp° (ref. data); table_row_number=15; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2Si4O9_reference_cp::T=298.15:row=k2si4o9:h=d4c4918e4787
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2Si4O9
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '247.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2'
+      basis: absolute
+      as_printed: ±2.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2Si4O9; column=Cp° (ref. data); table_row_number=16; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2Si4O9; column=Cp° (ref. data); table_row_number=16; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_K2SiO3_reference_cp::T=298.15:row=k2sio3:h=1fc9fb032b78
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '118.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.62'
+      basis: absolute
+      as_printed: ±0.62
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=K2SiO3; column=Cp° (ref. data); table_row_number=17; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=K2SiO3; column=Cp° (ref. data); table_row_number=17; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_KBO2_reference_cp::T=298.15:row=kbo2:h=9c5c1ccf0f8c
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '67'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.21'
+      basis: absolute
+      as_printed: ±0.21
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=KBO2; column=Cp° (ref. data); table_row_number=6; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=KBO2; column=Cp° (ref. data); table_row_number=6; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2B4O7_reference_cp::T=298.15:row=li2b4o7:h=8d184f455c10
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '183'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.67'
+      basis: absolute
+      as_printed: ±1.67
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2B4O7; column=Cp° (ref. data); table_row_number=7; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2B4O7; column=Cp° (ref. data); table_row_number=7; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2B6O10_reference_cp::T=298.15:row=li2b6o10:h=2091ec00027f
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '293.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1.5'
+      basis: absolute
+      as_printed: ±1.5
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2B6O10; column=Cp° (ref. data); table_row_number=9; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2B6O10; column=Cp° (ref. data); table_row_number=9; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2B8O13_reference_cp::T=298.15:row=li2b8o13:h=af7151696812
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '325.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '4.2'
+      basis: absolute
+      as_printed: ±4.2
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2B8O13; column=Cp° (ref. data); table_row_number=8; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2B8O13; column=Cp° (ref. data); table_row_number=8; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2GeO3_reference_cp::T=298.15:row=li2geo3:h=700c2bd99475
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2GeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '101.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.42'
+      basis: absolute
+      as_printed: ±0.42
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2GeO3; column=Cp° (ref. data); table_row_number=24; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2GeO3; column=Cp° (ref. data); table_row_number=24; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2Si2O5_reference_cp::T=298.15:row=li2si2o5:h=6418c806935b
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '138.77'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.42'
+      basis: absolute
+      as_printed: ±0.42
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2Si2O5; column=Cp° (ref. data); table_row_number=18; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2Si2O5; column=Cp° (ref. data); table_row_number=18; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li2SiO3_reference_cp::T=298.15:row=li2sio3:h=f37a95406bc6
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '100'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.29'
+      basis: absolute
+      as_printed: ±0.29
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li2SiO3; column=Cp° (ref. data); table_row_number=19; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li2SiO3; column=Cp° (ref. data); table_row_number=19; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Li4SiO4_reference_cp::T=298.15:row=li4sio4:h=b602359fcdce
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '155.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2'
+      basis: absolute
+      as_printed: ±2.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Li4SiO4; column=Cp° (ref. data); table_row_number=20; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Li4SiO4; column=Cp° (ref. data); table_row_number=20; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_LiBO2_reference_cp::T=298.15:row=libo2:h=00df64a93090
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: LiBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '60.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.6'
+      basis: absolute
+      as_printed: ±0.6
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=LiBO2; column=Cp° (ref. data); table_row_number=10; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=LiBO2; column=Cp° (ref. data); table_row_number=10; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2B4O7_reference_cp::T=298.15:row=na2b4o7:h=6817fd655ded
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '186.77'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.63'
+      basis: absolute
+      as_printed: ±0.63
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2B4O7; column=Cp° (ref. data); table_row_number=11; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2B4O7; column=Cp° (ref. data); table_row_number=11; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2B6O10_reference_cp::T=298.15:row=na2b6o10:h=69fd0ac6ae14
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '243.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2.5'
+      basis: absolute
+      as_printed: ±2.5
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2B6O10; column=Cp° (ref. data); table_row_number=12; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2B6O10; column=Cp° (ref. data); table_row_number=12; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2B8O13_reference_cp::T=298.15:row=na2b8o13:h=bf4b3f5448b7
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '304.89'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '8.4'
+      basis: absolute
+      as_printed: ±8.4
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2B8O13; column=Cp° (ref. data); table_row_number=13; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2B8O13; column=Cp° (ref. data); table_row_number=13; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2GeO3_reference_cp::T=298.15:row=na2geo3:h=3d708de1afee
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2GeO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '121.75'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.42'
+      basis: absolute
+      as_printed: ±0.42
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2GeO3; column=Cp° (ref. data); table_row_number=25; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2GeO3; column=Cp° (ref. data); table_row_number=25; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2Si2O5_reference_cp::T=298.15:row=na2si2o5:h=19f6a9575eca
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '156.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.87'
+      basis: absolute
+      as_printed: ±0.87
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2Si2O5; column=Cp° (ref. data); table_row_number=21; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2Si2O5; column=Cp° (ref. data); table_row_number=21; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na2SiO3_reference_cp::T=298.15:row=na2sio3:h=e0c9a6892f8f
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '111.81'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.26'
+      basis: absolute
+      as_printed: ±0.26
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na2SiO3; column=Cp° (ref. data); table_row_number=22; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na2SiO3; column=Cp° (ref. data); table_row_number=22; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_Na4SiO4_reference_cp::T=298.15:row=na4sio4:h=d33ba4cd1912
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '184.72'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.84'
+      basis: absolute
+      as_printed: ±0.84
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=Na4SiO4; column=Cp° (ref. data); table_row_number=23; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=Na4SiO4; column=Cp° (ref. data); table_row_number=23; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table1_NaBO2_reference_cp::T=298.15:row=nabo2:h=25338b6c9f46
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '65.94'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.21'
+      basis: absolute
+      as_printed: ±0.21
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 1, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 3
+    published_page: 254
+    pdf_page_index: 2
+    table: '1'
+    note: row=NaBO2; column=Cp° (ref. data); table_row_number=14; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 254
+        pdf_page_index: 2
+        table: '1'
+        note: row=NaBO2; column=Cp° (ref. data); table_row_number=14; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:J_per_mol_K
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: J/mol/K
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2B4O7_reference_delta_fH::T=298.15:row=k2b4o7:h=f57f278632d2
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3334'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '6.3'
+      basis: absolute
+      as_printed: ±6.3
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2B4O7; column=ΔfH° reference data; table_row_number=3; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2B4O7; column=ΔfH° reference data; table_row_number=3; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2B6O10_reference_delta_fH::T=298.15:row=k2b6o10:h=038f77e053e1
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4633'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '10.4'
+      basis: absolute
+      as_printed: ±10.4
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2B6O10; column=ΔfH° reference data; table_row_number=4; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2B6O10; column=ΔfH° reference data; table_row_number=4; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2B8O13_reference_delta_fH::T=298.15:row=k2b8o13:h=a997dc420eab
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-5945'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '5.9'
+      basis: absolute
+      as_printed: ±5.9
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2B8O13; column=ΔfH° reference data; table_row_number=5; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2B8O13; column=ΔfH° reference data; table_row_number=5; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2Si2O5_reference_delta_fH::T=298.15:row=k2si2o5:h=bcd919853e89
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2496'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '18'
+      basis: absolute
+      as_printed: ±18.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2Si2O5; column=ΔfH° reference data; table_row_number=15; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2Si2O5; column=ΔfH° reference data; table_row_number=15; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2Si4O9_reference_delta_fH::T=298.15:row=k2si4o9:h=b7e9687bf18f
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2Si4O9
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '11'
+      basis: absolute
+      as_printed: ±11.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2Si4O9; column=ΔfH° reference data; table_row_number=16; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2Si4O9; column=ΔfH° reference data; table_row_number=16; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_K2SiO3_reference_delta_fH::T=298.15:row=k2sio3:h=7657502e62f8
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1568'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '12'
+      basis: absolute
+      as_printed: ±12.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=K2SiO3; column=ΔfH° reference data; table_row_number=17; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=K2SiO3; column=ΔfH° reference data; table_row_number=17; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_KBO2_reference_delta_fH::T=298.15:row=kbo2:h=781365852200
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-995'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '8'
+      basis: absolute
+      as_printed: ±8.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=KBO2; column=ΔfH° reference data; table_row_number=6; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=KBO2; column=ΔfH° reference data; table_row_number=6; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li2B4O7_reference_delta_fH::T=298.15:row=li2b4o7:h=456720dc964c
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3362'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '6.3'
+      basis: absolute
+      as_printed: ±6.3
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li2B4O7; column=ΔfH° reference data; table_row_number=7; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li2B4O7; column=ΔfH° reference data; table_row_number=7; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li2B6O10_reference_delta_fH::T=298.15:row=li2b6o10:h=58aa277462c8
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4660'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '5.6'
+      basis: absolute
+      as_printed: ±5.6
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li2B6O10; column=ΔfH° reference data; table_row_number=9; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li2B6O10; column=ΔfH° reference data; table_row_number=9; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li2B8O13_reference_delta_fH::T=298.15:row=li2b8o13:h=ffbc04ade29a
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-5914'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '6.8'
+      basis: absolute
+      as_printed: ±6.8
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li2B8O13; column=ΔfH° reference data; table_row_number=8; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li2B8O13; column=ΔfH° reference data; table_row_number=8; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li2Si2O5_reference_delta_fH::T=298.15:row=li2si2o5:h=8d46b7466b04
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2561'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '4'
+      basis: absolute
+      as_printed: ±4.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li2Si2O5; column=ΔfH° reference data; table_row_number=18; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li2Si2O5; column=ΔfH° reference data; table_row_number=18; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li2SiO3_reference_delta_fH::T=298.15:row=li2sio3:h=d7b78193b725
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1630'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '24'
+      basis: absolute
+      as_printed: ±24.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li2SiO3; column=ΔfH° reference data; table_row_number=19; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li2SiO3; column=ΔfH° reference data; table_row_number=19; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Li4SiO4_reference_delta_fH::T=298.15:row=li4sio4:h=02823b43b3c1
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Li4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2311.66'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2.1'
+      basis: absolute
+      as_printed: ±2.1
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Li4SiO4; column=ΔfH° reference data; table_row_number=20; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Li4SiO4; column=ΔfH° reference data; table_row_number=20; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_LiBO2_reference_delta_fH::T=298.15:row=libo2:h=109cdc3a9a0e
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: LiBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1019.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.8'
+      basis: absolute
+      as_printed: ±0.8
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=LiBO2; column=ΔfH° reference data; table_row_number=10; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=LiBO2; column=ΔfH° reference data; table_row_number=10; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na2B4O7_reference_delta_fH::T=298.15:row=na2b4o7:h=e57e6ba976b2
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3277'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '8'
+      basis: absolute
+      as_printed: ±8.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na2B4O7; column=ΔfH° reference data; table_row_number=11; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na2B4O7; column=ΔfH° reference data; table_row_number=11; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na2B6O10_reference_delta_fH::T=298.15:row=na2b6o10:h=abeb795c186a
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2B6O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4580'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '9.2'
+      basis: absolute
+      as_printed: ±9.2
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na2B6O10; column=ΔfH° reference data; table_row_number=12; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na2B6O10; column=ΔfH° reference data; table_row_number=12; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na2B8O13_reference_delta_fH::T=298.15:row=na2b8o13:h=60bf8a6e48ad
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2B8O13
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-5912'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '8'
+      basis: absolute
+      as_printed: ±8.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na2B8O13; column=ΔfH° reference data; table_row_number=13; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na2B8O13; column=ΔfH° reference data; table_row_number=13; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na2Si2O5_reference_delta_fH::T=298.15:row=na2si2o5:h=66b6114622cf
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2439.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '39.5'
+      basis: absolute
+      as_printed: ±39.5
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na2Si2O5; column=ΔfH° reference data; table_row_number=21; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na2Si2O5; column=ΔfH° reference data; table_row_number=21; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na2SiO3_reference_delta_fH::T=298.15:row=na2sio3:h=d034ddf7a46b
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1544.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '23.5'
+      basis: absolute
+      as_printed: ±23.5
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na2SiO3; column=ΔfH° reference data; table_row_number=22; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na2SiO3; column=ΔfH° reference data; table_row_number=22; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_Na4SiO4_reference_delta_fH::T=298.15:row=na4sio4:h=a1fd3f1c7dac
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2180'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '50'
+      basis: absolute
+      as_printed: ±50.0
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=Na4SiO4; column=ΔfH° reference data; table_row_number=23; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=Na4SiO4; column=ΔfH° reference data; table_row_number=23; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table2_NaBO2_reference_delta_fH::T=298.15:row=nabo2:h=705b0bea57c8
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaBO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-975.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '2.1'
+      basis: absolute
+      as_printed: ±2.1
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References [28–30] as cited in Table 2, reference-data column
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 4
+    published_page: 255
+    pdf_page_index: 3
+    table: '2'
+    note: row=NaBO2; column=ΔfH° reference data; table_row_number=14; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 255
+        pdf_page_index: 3
+        table: '2'
+        note: row=NaBO2; column=ΔfH° reference data; table_row_number=14; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []
+- observation_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression::shtenberg20_table4_K2B2Ge3O10_reference_delta_fH::T=298.15:row=k2b2ge3o10:h=ff55c39f10ba
+  experiment_id: 10.5541/ijot.764760::shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2B2Ge3O10
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3937.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '4.7'
+      basis: absolute
+      as_printed: ±4.7
+      confidence_level: not_stated
+      note: Printed width; confidence level not stated
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference [16] as cited in Table 4
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  locator:
+    page: 6
+    published_page: 257
+    pdf_page_index: 5
+    table: '4'
+    note: row=K2B2Ge3O10; column=reference ΔfH°; table_row_number=3; table_phase_column=2
+    source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  read_from: pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 6
+        published_page: 257
+        pdf_page_index: 5
+        table: '4'
+        note: row=K2B2Ge3O10; column=reference ΔfH°; table_row_number=3; table_phase_column=2
+        source_path: raw/shtenberg-2020-alkaline-oxide-thermodynamic-regression/shtenberg-2020-alkaline-oxide-thermodynamic-regression.pdf
+  derivation:
+    relation: identity:kJ_per_mol
+    inputs:
+    - pdf:shtenberg-2020-alkaline-oxide-thermodynamic-regression
+    parameters: []
+    output_unit: kJ/mol
+    references: []

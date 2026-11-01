@@ -74,20 +74,38 @@ IMAGE_VERIFIED_METADATA = {
             "Liquid 1153° to 1200°K."
         )
     },
+    99: {"formula_as_published": "Al2O3"},
     100: {"formula_as_published": "AlO(OH)"},
     109: {
         "name_as_published": "PORTLANDITE",
         "formula_as_published": "Ca(OH)2",
         "phase": "Crystals 298.15° to 700°K.",
     },
+    117: {"formula_as_published": "Fe2O3"},
     134: {"name_as_published": "BUNSENITE"},
-    145: {"phase": "α tridymite 298.15° to 390°K. β tridymite 390° to 2000°K."},
+    143: {"formula_as_published": "SiO2"},
+    144: {"formula_as_published": "SiO2"},
+    145: {
+        "formula_as_published": "SiO2",
+        "phase": "α tridymite 298.15° to 390°K. β tridymite 390° to 2000°K.",
+    },
     153: {"phase": "Crystals 298.15° to 1300°K."},
+    160: {"formula_as_published": "FeCr2O4"},
+    164: {"formula_as_published": "MgAl2O4"},
+    190: {"formula_as_published": "MgCO3"},
+    208: {"formula_as_published": "Al2SiO5"},
+    209: {"formula_as_published": "Al2SiO5"},
+    210: {"formula_as_published": "Al2SiO5"},
+    214: {"formula_as_published": "Ca2Al2SiO7"},
+    217: {"formula_as_published": "Ca2MgSi2O7"},
+    219: {"formula_as_published": "Fe2SiO4"},
+    224: {"formula_as_published": "CaSiO3"},
     206: {"formula_as_published": "Ca5(PO4)3OH"},
     228: {"formula_as_published": "MgSiO3"},
     233: {"phase": "Crystals 298.15° to 1400°K."},
     237: {"phase": "Crystals 298.15° to 1400°K."},
     238: {"phase": "Crystals 298.15° to 1400°K."},
+    232: {"formula_as_published": "CaAl2Si2O8"},
 }
 IMAGE_VERIFIED_LAYOUT_RAWS = {
     (91, "phase"): "Crystals 298.15° to 1000°K.",
@@ -96,6 +114,22 @@ IMAGE_VERIFIED_LAYOUT_RAWS = {
         "                   point 1153°K.     Liquid 1153° to 1200°K."
     ),
     (109, "phase"): "Crystals 298.15° to 700°K.",
+    (99, "formula_as_published"): "Al O",
+    (117, "formula_as_published"): "Fe 2 0 3",
+    (143, "formula_as_published"): "Si0 2",
+    (144, "formula_as_published"): "SiO",
+    (145, "formula_as_published"): "SiO_",
+    (160, "formula_as_published"): "FeCr.O,",
+    (164, "formula_as_published"): "MgAl2 0 4",
+    (190, "formula_as_published"): "MgCO",
+    (208, "formula_as_published"): "Al 2 Si0 5",
+    (209, "formula_as_published"): "Al 2 Si0 5",
+    (210, "formula_as_published"): "Al Si0 5",
+    (214, "formula_as_published"): "Ca 2 Al Si0 7",
+    (217, "formula_as_published"): "Ca 2 MgSi 20 7",
+    (219, "formula_as_published"): "Fe 2 Si0 4",
+    (224, "formula_as_published"): "CaSi0 3",
+    (232, "formula_as_published"): "CaAl Si_0 0",
     (134, "name_as_published"): "8UNSENITE",
     (145, "phase"): "a tridymite 298. 15° to 390°K.       & tridymite 390° to 2000°K.",
     (153, "phase"): "Crystals 298. 15°' to 1300°K.",
@@ -119,6 +153,31 @@ IMAGE_VERIFIED_298K_IDENTITIES = {
     'U"1"1"1"1" aqueous ion': ("U++++ aqueous ion", "U++++", 20),
     "V 1 ' ' aqueous ion": ("V+++ aqueous ion", "V+++", 20),
     'Zn"1"1" aqueous ion': ("Zn++ aqueous ion", "Zn++", 20),
+}
+IMAGE_VERIFIED_298K_FORMULAS = {
+    (22, "Corundum"): ("b1259-298k-0122-corundum", "A1 2°3", "Al2O3"),
+    (23, "Hematite"): ("b1259-298k-0147-hematite", "Fe 2°3", "Fe2O3"),
+    (24, "a- quartz"): ("b1259-298k-0182-a-quartz", "Si02", "SiO2"),
+    (24, "o-Cristobalite"): ("b1259-298k-0184-o-cristobalite", "Si02", "SiO2"),
+    (24, "o-Tridymite"): ("b1259-298k-0185-o-tridymite", "Si°2", "SiO2"),
+    (24, "Rutile"): ("b1259-298k-0193-rutile", "Ti0 2", "TiO2"),
+    (25, "Chromite"): ("b1259-298k-0203-chromite", "FeCr204", "FeCr2O4"),
+    (25, "Spinel"): ("b1259-298k-0207-spinel", "MgAl204", "MgAl2O4"),
+    (27, "Magnesite"): ("b1259-298k-0239-magnesite", "MgC0 3", "MgCO3"),
+    (29, "Kyanite"): ("b1259-298k-0281-kyanite", "A1 2 Si°5", "Al2SiO5"),
+    (29, "Andalusite"): ("b1259-298k-0282-andalusite", "Al 2 Si0 5", "Al2SiO5"),
+    (29, "Sillimanite"): ("b1259-298k-0283-sillimanite", "A12 Si°5", "Al2SiO5"),
+    (29, "Gehlenite"): ("b1259-298k-0288-gehlenite", "Ca 2 Al2 Si0 7", "Ca2Al2SiO7"),
+    (29, "Akermanite"): ("b1259-298k-0293-akermanite", "Ca 2 MgSi20 7", "Ca2MgSi2O7"),
+    (29, "Fayalite"): ("b1259-298k-0295-fayalite", "Fe 2 Si04", "Fe2SiO4"),
+    (29, "Wollastonite"): ("b1259-298k-0301-wollastonite", "CaSiOj", "CaSiO3"),
+    (30, "Anorthite"): ("b1259-298k-0310-anorthite", "CaAl2 Si20 8", "CaAl2Si2O8"),
+}
+IMAGE_VERIFIED_298K_POLYMORPHS = {
+    (30, "Hexagonal Anorthite"): (
+        "b1259-298k-0311-hexagonal-anorthite",
+        "hexagonal",
+    ),
 }
 IMAGE_VERIFIED_CELLS = {
     47: [(700, 2, "H_minus_H298", "2.808")],
@@ -1840,6 +1899,56 @@ def _apply_298k_image_verified_identity(record: dict) -> None:
         )
 
 
+def _apply_298k_image_verified_formula(record: dict) -> None:
+    correction = IMAGE_VERIFIED_298K_FORMULAS.get(
+        (record.get("pdf_page"), record.get("name_as_published"))
+    )
+    if correction is None:
+        return
+    record_id, raw, printed = correction
+    if record.get("formula_as_published") != raw:
+        raise ValueError(
+            f"{record.get('record_id')}: expected extracted formula {raw!r}, "
+            f"got {record.get('formula_as_published')!r}"
+        )
+    record["formula_as_published"] = printed
+    record["formula"] = printed
+    record.setdefault("corrections", []).append(
+        {
+            "correction_id": (
+                f"b1259-p{record['pdf_page']}-formula_as_published-298k-"
+                f"{record_id.removeprefix('b1259-298k-')}"
+            ),
+            "record_id": record_id,
+            "pdf_page": record["pdf_page"],
+            "field": "formula_as_published",
+            "layout_as_extracted": raw,
+            "printed_token": printed,
+            "evidence": f"PDF page {record['pdf_page']} image visibly prints {printed!r}",
+        }
+    )
+
+
+def _apply_298k_image_verified_polymorph(record: dict) -> None:
+    correction = IMAGE_VERIFIED_298K_POLYMORPHS.get(
+        (record.get("pdf_page"), record.get("name_as_published"))
+    )
+    if correction is None:
+        return
+    record_id, printed = correction
+    record.setdefault("corrections", []).append(
+        {
+            "correction_id": f"b1259-p{record['pdf_page']}-polymorph-298k-{record_id.removeprefix('b1259-298k-')}",
+            "record_id": record_id,
+            "pdf_page": record["pdf_page"],
+            "field": "polymorph",
+            "layout_as_extracted": "",
+            "printed_token": printed,
+            "evidence": f"PDF page {record['pdf_page']} image visibly prints the qualifier {printed!r}",
+        }
+    )
+
+
 def _apply_298k_image_verified_cells(record: dict) -> None:
     for field in ("gram_formula_weight", "entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf"):
         cell = record.get(field) or {}
@@ -2032,6 +2141,8 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
                     "ambiguities": ambiguities,
                     "_seq": seq,
                 }
+            _apply_298k_image_verified_formula(record)
+            _apply_298k_image_verified_polymorph(record)
             _apply_298k_image_verified_identity(record)
             _apply_298k_image_verified_cells(record)
             records.append(record)

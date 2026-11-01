@@ -15,7 +15,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -135,7 +135,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -255,7 +255,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -375,7 +375,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -495,7 +495,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -615,7 +615,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -735,7 +735,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -855,7 +855,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -975,7 +975,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1095,7 +1095,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1202,7 +1202,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=iodine-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=iodine-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:tabulation
   identity:
     quantity:
@@ -1212,10 +1212,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -1331,11 +1331,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1397,21 +1398,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='1.232'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1451,11 +1439,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1517,21 +1506,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='4.941'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1572,10 +1548,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1691,11 +1667,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1757,21 +1734,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='16.348'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1811,11 +1775,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1877,21 +1842,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='6.322'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1935,7 +1887,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2055,7 +2007,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2175,7 +2127,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2303,7 +2255,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2423,7 +2375,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2543,7 +2495,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2663,7 +2615,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2783,7 +2735,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2903,7 +2855,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3023,7 +2975,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3143,7 +3095,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3263,7 +3215,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3383,7 +3335,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3503,7 +3455,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3623,7 +3575,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3743,7 +3695,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3850,7 +3802,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:S:shared:T=298.15:col=entropy:name=iodine-(reference-state):v=7a18a3d353
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:S:shared:T=298.15:col=entropy:name=iodine-(reference-state):v=7a18a3d353:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:tabulation
   identity:
     quantity:
@@ -3860,10 +3812,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -3979,11 +3931,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4045,21 +3998,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='31.312'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4099,11 +4039,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4165,21 +4106,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='40.901'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4220,10 +4148,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4339,11 +4267,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4405,21 +4334,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 49
-        pdf_page_index: 55
-        table: b1259-ht-0024-iodine-reference-state
-        note: as_published='44.221'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json
-        record: b1259-ht-0024-iodine-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4463,7 +4379,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4583,7 +4499,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4703,7 +4619,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4831,7 +4747,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4951,7 +4867,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5071,7 +4987,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5098,7 +5014,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5231,7 +5147,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5258,7 +5174,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5391,7 +5307,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5418,7 +5334,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5551,7 +5467,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5578,7 +5494,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5711,7 +5627,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5738,7 +5654,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5871,7 +5787,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5898,7 +5814,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6031,7 +5947,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6058,7 +5974,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6191,7 +6107,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6218,7 +6134,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6351,7 +6267,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6378,7 +6294,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6511,7 +6427,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6538,7 +6454,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6671,7 +6587,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6698,7 +6614,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6818,7 +6734,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=iodine-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=iodine-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:tabulation
   identity:
     quantity:
@@ -6828,10 +6744,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -6855,10 +6771,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -6987,11 +6903,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7100,10 +7017,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7127,10 +7044,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7259,11 +7176,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7375,7 +7293,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7402,7 +7320,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7535,7 +7453,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7562,7 +7480,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7695,7 +7613,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7722,7 +7640,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7855,7 +7773,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7882,7 +7800,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8015,7 +7933,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8042,7 +7960,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8175,7 +8093,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8202,7 +8120,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8335,7 +8253,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8362,7 +8280,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8495,7 +8413,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8522,7 +8440,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8655,7 +8573,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8682,7 +8600,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8815,7 +8733,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8842,7 +8760,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8975,7 +8893,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9002,7 +8920,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9135,7 +9053,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9162,7 +9080,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9295,7 +9213,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9322,7 +9240,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9455,7 +9373,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9482,7 +9400,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9615,7 +9533,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9642,7 +9560,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9775,7 +9693,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9802,7 +9720,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9922,7 +9840,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=iodine-(reference-state):v=900e6181ee
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=iodine-(reference-state):v=900e6181ee:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:tabulation
   identity:
     quantity:
@@ -9932,10 +9850,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -9959,10 +9877,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -10091,11 +10009,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10204,10 +10123,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10231,10 +10150,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10363,11 +10282,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10479,7 +10399,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10506,7 +10426,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10639,7 +10559,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10666,7 +10586,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10799,7 +10719,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10826,7 +10746,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10959,7 +10879,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10986,7 +10906,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11119,7 +11039,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11146,7 +11066,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11279,7 +11199,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11306,7 +11226,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11430,7 +11350,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11457,7 +11377,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11581,7 +11501,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11608,7 +11528,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11732,7 +11652,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11759,7 +11679,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11883,7 +11803,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11910,7 +11830,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12034,7 +11954,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12061,7 +11981,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12185,7 +12105,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12212,7 +12132,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12336,7 +12256,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12363,7 +12283,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12487,7 +12407,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12514,7 +12434,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12638,7 +12558,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12665,7 +12585,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12789,7 +12709,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12816,7 +12736,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12927,7 +12847,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=iodine-(reference-state):v=725af3071b
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=iodine-(reference-state):v=725af3071b:poly=reference
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0024-iodine-reference-state:tabulation
   identity:
     quantity:
@@ -12937,10 +12857,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: cr
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: value
+        value: reference
       charge:
         tag: value
         value: 0
@@ -12964,10 +12884,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: cr
             polymorph:
-              tag: not_applicable
-              reason: not crystal
+              tag: value
+              value: reference
             charge:
               tag: value
               value: 0
@@ -13087,11 +13007,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 386.75 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13191,10 +13112,10 @@ observations:
       formula: I2
       phase:
         tag: value
-        value: g
+        value: l
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13218,10 +13139,10 @@ observations:
             formula: I2
             phase:
               tag: value
-              value: g
+              value: l
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13341,11 +13262,12 @@ observations:
     species:
       formula: I2
       phase:
-        tag: value
-        value: g
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
       polymorph:
-        tag: not_applicable
-        reason: not crystal
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 458.39 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13448,7 +13370,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13475,7 +13397,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13599,7 +13521,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13626,7 +13548,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13750,7 +13672,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13777,7 +13699,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13901,7 +13823,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13928,7 +13850,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -14052,7 +13974,7 @@ observations:
         value: g
       polymorph:
         tag: not_applicable
-        reason: not crystal
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -14079,7 +14001,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0

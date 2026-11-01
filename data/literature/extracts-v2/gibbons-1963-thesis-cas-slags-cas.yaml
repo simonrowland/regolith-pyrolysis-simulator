@@ -119,8 +119,8 @@ observations:
       tag: value
       value: dimensionless
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1608.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -197,6 +197,38 @@ observations:
     section: Thermodynamic Discussion
   read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.15'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1335'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: K
+        references: []
     composition:
       state:
         tag: value
@@ -316,8 +348,8 @@ observations:
       tag: value
       value: dimensionless
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1608.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -394,6 +426,38 @@ observations:
     section: Thermodynamic Discussion
   read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.15'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1335'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: K
+        references: []
     composition:
       state:
         tag: value
@@ -605,8 +669,8 @@ observations:
       tag: value
       value: dimensionless
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1608.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -683,6 +747,38 @@ observations:
     section: Thermodynamic Discussion
   read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.15'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1335'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: K
+        references: []
     composition:
       state:
         tag: value
@@ -802,8 +898,8 @@ observations:
       tag: value
       value: dimensionless
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1608.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -880,6 +976,38 @@ observations:
     section: Thermodynamic Discussion
   read_from: pdf:gibbons-1963-thesis-cas-slags-cas
   point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.15'
+      locator:
+        published_page: 63
+        pdf_page_index: 98
+        section: Thermodynamic Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1335'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 63
+              pdf_page_index: 98
+              section: Thermodynamic Discussion
+        output_unit: K
+        references: []
     composition:
       state:
         tag: value

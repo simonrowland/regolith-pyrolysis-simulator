@@ -33,11 +33,99 @@ def test_berry_2006_table1_migrates_all_rows_and_render_pinned_values():
 
     # Table 1 has 27 composition rows and three log fO2 columns. Five rows
     # repeat three italicized Berry and O'Neill (2004) values in addition to
-    # the 2006 measurements. The seven unavailable table cells remain rows.
-    assert len(observations) == 96
+    # the 2006 measurements. Seven typed unavailable cells are queued, not
+    # stored: six daggers and the row 27 en dash, each reason source_omission.
+    assert len(observations) == 89
     assert len({row.locator.note for row in observations}) == 27
     assert sum(row.value.kind is ValueKind.POINT for row in observations) == 89
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 7
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 0
+    omitted = [
+        entry
+        for entry in result.queue
+        if entry.why.endswith("source_omission")
+    ]
+    assert [
+        (entry.observation_id, entry.why, entry.axes, entry.locator)
+        for entry in omitted
+    ] == [
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_10_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 10 Longhi5",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_14_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 14 Osborn3",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_15_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 15 Osborn4",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_16_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 16 Osborn5",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_17_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 17 Osborn6",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_25_measured::point:points:1",
+            "printed '\u2020'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 25 CAS\u20133",
+            },
+        ),
+        (
+            "berry-2006-chromium-composition::berry_2006_table1_row_27_measured::point:points:2",
+            "printed '\u2013'; source_omission",
+            ["value"],
+            {
+                "published_page": 1902,
+                "pdf_page_index": 1,
+                "table": "1",
+                "note": "Table 1 row 27 MAS\u20131",
+            },
+        ),
+    ]
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
@@ -95,7 +183,7 @@ def test_berry_2006_table1_migrates_all_rows_and_render_pinned_values():
     assert sum(
         row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         for row in observations
-    ) == 81
+    ) == 74
     quoted = [
         row
         for row in observations

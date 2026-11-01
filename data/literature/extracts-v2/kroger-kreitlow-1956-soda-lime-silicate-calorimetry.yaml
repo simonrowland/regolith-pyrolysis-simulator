@@ -1,0 +1,4310 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml
+observations:
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_batch_formation_reaction_heats_equations1_3
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch formation reaction heats
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        note: equations=1–3
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    note: equations=1–3
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  derivation:
+    relation: Author calculations from the stored measured solution heats, the quoted quartz solution heat and printed input
+      compound heats.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '2'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 3
+    published_page: 395
+    pdf_page_index: 2
+    table: '2'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '2'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_na2ca3si3o8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: 2Na2O·CaO·3SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4672.85856'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_na2ca3si3o8
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    paragraph: section 4.2
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+  derivation:
+    relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_na2ca6si6o13
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O·3CaO·6SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-8138.67496'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_na2ca6si6o13
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    paragraph: section 4.2
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+  derivation:
+    relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_naca2si3o8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O·2CaO·3SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-4777.9188'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_element_formation_naca2si3o8
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    paragraph: section 4.2
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_naca2si3o8
+  derivation:
+    relation: Combined with the printed element formation enthalpies of Na2O, CaO, and SiO2.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_naca2si3o8
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '3'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 3
+    published_page: 395
+    pdf_page_index: 2
+    table: '3'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '3'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_devitrification_heat_direct_kroger_janetzko
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'devitrification_heat'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'devitrification_heat'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kröger and Janetzko [2], direct measurement
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for devitrification heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        published_page: 396
+        pdf_page_index: 3
+        section: '3.2'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 4
+    published_page: 396
+    pdf_page_index: 3
+    section: '3.2'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_devitrification_heat_solution_difference
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'devitrification_heat'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'devitrification_heat'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for devitrification heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        published_page: 396
+        pdf_page_index: 3
+        section: '3.2'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 4
+    published_page: 396
+    pdf_page_index: 3
+    section: '3.2'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_glass_solution_table4
+  derivation:
+    relation: Difference of the measured glass and crystal solution heats, reported as the disilicate devitrification heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_glass_solution_table4
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_formation_reaction_heat_direct_kroger_janetzko
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'formation_reaction_enthalpy'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'formation_reaction_enthalpy'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kröger and Janetzko [2], direct measurement
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed soda-quartz formation reaction enthalpy
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        published_page: 396
+        pdf_page_index: 3
+        section: '3.3'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 4
+    published_page: 396
+    pdf_page_index: 3
+    section: '3.3'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_formation_reaction_heat_from_solution_heats
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'formation_reaction_enthalpy'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'formation_reaction_enthalpy'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed soda-quartz formation reaction enthalpy
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 4
+        published_page: 396
+        pdf_page_index: 3
+        section: '3.3'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 4
+    published_page: 396
+    pdf_page_index: 3
+    section: '3.3'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+  derivation:
+    relation: Printed reaction enthalpy from soda and quartz solution heats and crystalline disilicate solution heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_crystal_solution_table3
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_nadisilicate_glass_solution_table4
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '4'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 3
+    published_page: 395
+    pdf_page_index: 2
+    table: '4'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '4'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: 2Na2O·CaO·3SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        equation: '5'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    equation: '5'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed oxide-formation equation (5), calculated from solution heats and the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: Na2O·3CaO·6SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        equation: '6'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    equation: '6'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed oxide-formation equation (6), calculated from solution heats and the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_naca2si3o8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: Na2O·2CaO·3SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        equation: '4'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    equation: '4'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed oxide-formation equation (4), calculated from solution heats and the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Roth and Troitzsch [16], measured at 77°C and corrected by the authors to 22°C
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        section: '2'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 3
+    published_page: 395
+    pdf_page_index: 2
+    section: '2'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        section: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              section: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              section: '2'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: DE FORCRAND [22], as cited by Kröger and Kreitlow
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the cited soda dissociation heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        paragraph: section 4.2
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    paragraph: section 4.2
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '1'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 3
+    published_page: 395
+    pdf_page_index: 2
+    table: '1'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 3
+        published_page: 395
+        pdf_page_index: 2
+        table: '1'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '1'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 395
+              pdf_page_index: 2
+              table: '1'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table5_crystalline_solution_and_devitrification_heats
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        table: '5'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    table: '5'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        table: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 5
+              published_page: 397
+              pdf_page_index: 4
+              table: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 397
+              pdf_page_index: 4
+              table: '5'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table5_glass_solution_heats
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        table: '5'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    table: '5'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        table: '5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 5
+              published_page: 397
+              pdf_page_index: 4
+              table: '5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 397
+              pdf_page_index: 4
+              table: '5'
+        output_unit: K
+        references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1525099349758697562954268645'
+        - - CaO
+          - '0.1081691743550197127475552335'
+        - - SiO2
+          - '0.7393208906691105309570179018'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:0.71:4.85
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    section: '5'
+    note: row=1:0.71:4.85
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:0.71:4.85
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1525099349758697562954268645'
+          - - CaO
+            - '0.1081691743550197127475552335'
+          - - SiO2
+            - '0.7393208906691105309570179018'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:0.71:4.85
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.77'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.12'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.11'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:0.71:4.85
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.12'
+          Na2O: '15.77'
+          SiO2: '74.11'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:0.71:4.85
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1471699635797002133044539707'
+        - - CaO
+          - '0.1469892163946145380824792796'
+        - - SiO2
+          - '0.7058408200256852486130667495'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:4.8
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    section: '5'
+    note: row=1:1:4.8
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:4.8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1471699635797002133044539707'
+          - - CaO
+            - '0.1469892163946145380824792796'
+          - - SiO2
+            - '0.7058408200256852486130667495'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:4.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.79'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '70.95'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:4.8
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.79'
+          Na2O: '15.26'
+          SiO2: '70.95'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:4.8
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '295.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_solution'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for heat of solution
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:6
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    section: '5'
+    note: row=1:1:6
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '295.15'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '22'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        output_unit: K
+        references: []
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              section: '5'
+              note: row=1:1:6
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        section: '5'
+        note: row=1:1:6
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_glass_formation_heat_1_0_71_4_85
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1525099349758697562954268645'
+        - - CaO
+          - '0.1081691743550197127475552335'
+        - - SiO2
+          - '0.7393208906691105309570179018'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=direct calorimetry
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:0.71:4.85; subrow=direct calorimetry
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1525099349758697562954268645'
+          - - CaO
+            - '0.1081691743550197127475552335'
+          - - SiO2
+            - '0.7393208906691105309570179018'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=direct calorimetry
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.77'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.12'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.11'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=direct calorimetry
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.12'
+          Na2O: '15.77'
+          SiO2: '74.11'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=direct calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_glass_formation_heat_1_1_4_8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1471699635797002133044539707'
+        - - CaO
+          - '0.1469892163946145380824792796'
+        - - SiO2
+          - '0.7058408200256852486130667495'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=direct calorimetry
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:4.8; subrow=direct calorimetry
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1471699635797002133044539707'
+          - - CaO
+            - '0.1469892163946145380824792796'
+          - - SiO2
+            - '0.7058408200256852486130667495'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=direct calorimetry
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.79'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '70.95'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=direct calorimetry
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.79'
+          Na2O: '15.26'
+          SiO2: '70.95'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=direct calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_glass_formation_heat_1_1_6
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=direct calorimetry
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:6; subrow=direct calorimetry
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=direct calorimetry
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=direct calorimetry
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=direct calorimetry
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_0_71_4_85
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1525099349758697562954268645'
+        - - CaO
+          - '0.1081691743550197127475552335'
+        - - SiO2
+          - '0.7393208906691105309570179018'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=prior calculation
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:0.71:4.85; subrow=prior calculation
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1525099349758697562954268645'
+          - - CaO
+            - '0.1081691743550197127475552335'
+          - - SiO2
+            - '0.7393208906691105309570179018'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=prior calculation
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.77'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.12'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.11'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=prior calculation
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.12'
+          Na2O: '15.77'
+          SiO2: '74.11'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=prior calculation
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_4_8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1471699635797002133044539707'
+        - - CaO
+          - '0.1469892163946145380824792796'
+        - - SiO2
+          - '0.7058408200256852486130667495'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=prior calculation
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:4.8; subrow=prior calculation
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1471699635797002133044539707'
+          - - CaO
+            - '0.1469892163946145380824792796'
+          - - SiO2
+            - '0.7058408200256852486130667495'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=prior calculation
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.79'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '70.95'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=prior calculation
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.79'
+          Na2O: '15.26'
+          SiO2: '70.95'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=prior calculation
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_prior_formation_heat_reference_23_1_1_6
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Earlier calculation cited as [23] by Kröger and Kreitlow
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=prior calculation
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:6; subrow=prior calculation
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=prior calculation
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=prior calculation
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=prior calculation
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_0_71_4_85
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1525099349758697562954268645'
+        - - CaO
+          - '0.1081691743550197127475552335'
+        - - SiO2
+          - '0.7393208906691105309570179018'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=solution-derived
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:0.71:4.85; subrow=solution-derived
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1525099349758697562954268645'
+          - - CaO
+            - '0.1081691743550197127475552335'
+          - - SiO2
+            - '0.7393208906691105309570179018'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=solution-derived
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.77'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.12'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.11'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:0.71:4.85; subrow=solution-derived
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.12'
+          Na2O: '15.77'
+          SiO2: '74.11'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:0.71:4.85; subrow=solution-derived
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda
+      dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_4_8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1471699635797002133044539707'
+        - - CaO
+          - '0.1469892163946145380824792796'
+        - - SiO2
+          - '0.7058408200256852486130667495'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=solution-derived
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:4.8; subrow=solution-derived
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1471699635797002133044539707'
+          - - CaO
+            - '0.1469892163946145380824792796'
+          - - SiO2
+            - '0.7058408200256852486130667495'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=solution-derived
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.79'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '70.95'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:4.8; subrow=solution-derived
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.79'
+          Na2O: '15.26'
+          SiO2: '70.95'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:4.8; subrow=solution-derived
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda
+      dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table7_solution_derived_formation_heat_1_1_6
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=solution-derived
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '7'
+    note: row=1:1:6; subrow=solution-derived
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=solution-derived
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '7'
+              note: row=1:1:6; subrow=solution-derived
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '7'
+        note: row=1:1:6; subrow=solution-derived
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed batch-to-glass reaction heat calculated from the glass and component solution heats with the cited soda
+      dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table8_direct_glass_formation_runs
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed batch-to-glass reaction heat
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '8'
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 7
+    published_page: 399
+    pdf_page_index: 6
+    table: '8'
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '8'
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 7
+              published_page: 399
+              pdf_page_index: 6
+              table: '8'
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 7
+        published_page: 399
+        pdf_page_index: 6
+        table: '8'
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_0_71_4_85
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1525099349758697562954268645'
+        - - CaO
+          - '0.1081691743550197127475552335'
+        - - SiO2
+          - '0.7393208906691105309570179018'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:0.71:4.85
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    paragraph: glass formation from crystalline oxides
+    note: row=1:0.71:4.85
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1525099349758697562954268645'
+          - - CaO
+            - '0.1081691743550197127475552335'
+          - - SiO2
+            - '0.7393208906691105309570179018'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:0.71:4.85
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.77'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.12'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '74.11'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:0.71:4.85
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10.12'
+          Na2O: '15.77'
+          SiO2: '74.11'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:0.71:4.85
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats
+      with the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_0_71_4_85
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_1_4_8
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1471699635797002133044539707'
+        - - CaO
+          - '0.1469892163946145380824792796'
+        - - SiO2
+          - '0.7058408200256852486130667495'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:4.8
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    paragraph: glass formation from crystalline oxides
+    note: row=1:1:4.8
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1471699635797002133044539707'
+          - - CaO
+            - '0.1469892163946145380824792796'
+          - - SiO2
+            - '0.7058408200256852486130667495'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:4.8
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '15.26'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.79'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '70.95'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:4.8
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '13.79'
+          Na2O: '15.26'
+          SiO2: '70.95'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:4.8
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats
+      with the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_4_8
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_technical_glass_oxide_formation_heat_1_1_6
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_formation_from_oxides'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1251808718864388413013741862'
+        - - CaO
+          - '0.1251274424400616667077754315'
+        - - SiO2
+          - '0.7496916856734994919908503822'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_formation_from_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for formation heat from oxides
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:6
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 6
+    published_page: 398
+    pdf_page_index: 5
+    paragraph: glass formation from crystalline oxides
+    note: row=1:1:6
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.1251808718864388413013741862'
+          - - CaO
+            - '0.1251274424400616667077754315'
+          - - SiO2
+            - '0.7496916856734994919908503822'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:6
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '12.97'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.73'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.3'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 6
+              published_page: 398
+              pdf_page_index: 5
+              paragraph: glass formation from crystalline oxides
+              note: row=1:1:6
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '11.73'
+          Na2O: '12.97'
+          SiO2: '75.3'
+      locator:
+        page: 6
+        published_page: 398
+        pdf_page_index: 5
+        paragraph: glass formation from crystalline oxides
+        note: row=1:1:6
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+  derivation:
+    relation: Printed formation heat from crystalline oxides, calculated from measured glass and component solution heats
+      with the cited soda dissociation heat.
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_table6_technical_glass_solution_heat_1_1_6
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_solution_table1
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_cao_solution_table2
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_quartz_solution_heat_roth_troitzsch
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_soda_dissociation_enthalpy_de_forcrand
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_ternary_reaction_heats_from_binary_silicates_equations7_9
+  experiment_id: 5365dcacc8b2a22aa786e1f8f9727ff88056f8a161a05658fd03bfd0ff134fc1::kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na2O-CaO-SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: no exact migrated quantity token exists for the printed formation reactions
+    decided_by:
+      worker: w1028naE2-kroger56-cal
+      date: '2026-10-28'
+      evidence:
+        page: 5
+        published_page: 397
+        pdf_page_index: 4
+        note: equations=7–9
+  notices: []
+  source_id: kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  locator:
+    page: 5
+    published_page: 397
+    pdf_page_index: 4
+    note: equations=7–9
+  read_from: pdf:kroger-kreitlow-1956-soda-lime-silicate-calorimetry
+  derived_from:
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_naca2si3o8
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+  - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+  derivation:
+    relation: printed enthalpy of formation from binary silicates, calculated using the oxide-formation heats cited by the
+      authors
+    inputs:
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_naca2si3o8
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca3si3o8
+    - kroger-kreitlow-1956-soda-lime-silicate-calorimetry::kroger_kreitlow_1956_oxide_formation_na2ca6si6o13
+    parameters: []
+    output_unit: as_published
+    references: []

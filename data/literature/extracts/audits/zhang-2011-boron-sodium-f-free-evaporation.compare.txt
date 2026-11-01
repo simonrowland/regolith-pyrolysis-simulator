@@ -1,0 +1,22 @@
+Source: Zhang, Sridhar & Cho (2011), DOI 10.2355/isijinternational.51.80
+Method: table tool unavailable: born-digital, pdftotext + image audit
+Table-tool compare: unavailable because born-digital PDF has no MinerU table blocks.
+Manual compare: every stored numeric table cell was read from the extract and checked against the rendered absolute PDF page.
+
+| Table | PDF page | Printed body rows | Numeric cells | Row/column assignment | Result |
+|---|---:|---:|---:|---|---|
+| 1 | 2 | 6 oxide rows; 5 slag columns | 30 | Brand plus CaO, SiO2, Al2O3, Na2O, B2O3, TiO2 | All 30 cells match render |
+| 2 | 2 | 6 oxide rows; 5 slag columns | 30 | Brand plus CaO, SiO2, Al2O3, Na2O, B2O3, TiO2 | All 30 cells match render |
+| 3 | 7 | 4 property rows; 3 gas columns | 12 | Ar, NaBO2(g), B2O3(g) | All 12 cells match render |
+| 4 | 7 | 2 gas rows; 3 temperature columns | 6 | NaBO2-Ar and B2O3-Ar, at 1300, 1350, 1400 C | All 6 cells match render |
+| 5 | 7 | 2 gas rows; 3 temperature columns | 6 | NaBO2 and B2O3 vapor pressures, at 1300, 1350, 1400 C | All 6 cells match render |
+| 6 | 8 | 3 temperature rows; 5 columns | 15 | Temperature, three measured compositions, estimated gas-film flux | All 15 cells match render |
+
+Total: 99 numeric cells; 99 render-confirmed; 0 disagreements. Cell-to-page/row/column results are in `zhang-2011-boron-sodium-f-free-evaporation.cells.csv`.
+
+Source-specific checks:
+- Table 1 and Table 2 row labels were checked against every oxide column. Table 2's caption says post-measured slag; section 3.1 identifies these XRF compositions as pre-melting measurements.
+- Table 6 has 3 printed temperature rows and 9 measured values (3 slags x 3 temperatures), plus 3 calculated gas-film values under a distinct 10^-3 multiplier.
+- The CS-3 plus ZrO2 sample is kept as CS-3 with the printed 2 wt% ZrO2 addition; no post-addition assay is claimed.
+- Figure 9 apparent activation energies remain a figure-read candidate and are not transcribed.
+- Table 6 values use a mass/area/time unit. The extract keeps the exact printed multiplier and the migrator's typed refusal records the schema gap.

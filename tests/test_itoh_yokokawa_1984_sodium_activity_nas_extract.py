@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.migrate import Migrator, to_plain
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,9 +71,13 @@ def test_table2_render_transcription_and_mutation_checks() -> None:
         _assert_render_grid(changed_extract)
 
 
-def test_context_only_migration_has_no_unavailable_or_hard_rows() -> None:
+def test_table_context_and_eq5_rows_migrate_with_point_conditions() -> None:
     document = _document()
-    assert document["species"]["Na2O"]["observations"] == []
+    observations = document["species"]["Na2O"]["observations"]
+    assert {row["observation_id"] for row in observations} == {
+        "itoh_yokokawa_1984_eq5_absolute_activity",
+        "itoh_yokokawa_1984_eq5_printed_log_input",
+    }
     assert len(_grid(document)) == 28
     raw_emf = next(
         item for item in document["species"]["Na2O"]["context"]
@@ -84,11 +89,49 @@ def test_context_only_migration_has_no_unavailable_or_hard_rows() -> None:
     assert equations["itoh_yokokawa_1984_equation_2_formation_from_oxides"]["values"]["reaction_delta_G_kJ_per_mol"] == -244.5
     assert equations["itoh_yokokawa_1984_equation_3_partial_molar_gibbs_relation"]["values"]["right_hand_side_kJ_per_mol"] == -81.5
     assert equations["itoh_yokokawa_1984_equation_4_log_activity_silica"]["values"]["reference"] == "pure solid SiO2, tridymite"
-    assert equations["itoh_yokokawa_1984_equation_5_log_activity_sodium_oxide"]["values"]["reference"] == "pure solid Na2O"
+    activity = next(row for row in observations if row["observation_id"] == "itoh_yokokawa_1984_eq5_absolute_activity")
+    printed_log = next(row for row in observations if row["observation_id"] == "itoh_yokokawa_1984_eq5_printed_log_input")
+    assert activity["values"]["log10_activity_as_published"] == "-9.0"
+    assert activity["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
+    assert activity["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
+    assert activity["values"]["T_K"] == "1300"
+    assert activity["values"]["point_conditions"]["temperature_K"]["locator"]["page"] == 4
+    assert activity["values"]["point_conditions"]["composition"]["locator"]["page"] == 3
+    assert printed_log["values"]["value_as_printed"] == "-9.0"
+    for observation in observations:
+        conditions = observation["values"]["point_conditions"]
+        for name in ("temperature_K", "composition", "fO2_log", "total_pressure_Pa"):
+            assert conditions[name]["state"]["tag"] in {"value", "unknown"}
+            assert conditions[name]["locator"]
 
     migrator = Migrator(root=ROOT)
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
-    assert not tuple(item for item in migrator.result.observations.values() if item.source_id == EXTRACT.stem)
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+        if row.source_id == EXTRACT.stem
+    }
+    assert set(migrated) == {row["observation_id"] for row in observations}
+    assert len(migrated) == 2
     assert migrator.result.registry_issues == []
     assert not migrator.result.validation.hard_issues
+    for row in migrated.values():
+        assert row.identity.temperature_K.is_value
+        assert row.identity.composition.is_value
+        assert row.point_conditions["temperature_K"].state.is_value
+        assert row.point_conditions["temperature_K"].locator is not None
+
+    linear = migrated["itoh_yokokawa_1984_eq5_absolute_activity"]
+    linear_identity = to_plain(linear)["identity"]
+    assert linear_identity["composition"]["tag"] == "value"
+    assert dict(linear_identity["composition"]["value"]["components"]) == {
+        "Na2O": "0.33",
+        "SiO2": "0.67",
+    }
+    assert linear.value.kind.value == "point"
+    assert Decimal(str(linear.value.point)) == Decimal("1e-9")
+    assert linear.admission.status.value == "admitted"
+    support = migrated["itoh_yokokawa_1984_eq5_printed_log_input"]
+    assert support.value.kind.value == "unavailable"
+    assert support.admission.status.value == "rejected"

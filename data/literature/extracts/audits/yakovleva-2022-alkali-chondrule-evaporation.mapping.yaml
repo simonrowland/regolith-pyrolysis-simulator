@@ -1,0 +1,40 @@
+source_id: yakovleva-2022-alkali-chondrule-evaporation
+table_1:
+  locator: {page: 2, published_page: 402, table: '1'}
+  printed_rows: 8 oxide rows x 5 composition columns
+  printed_data_cells: 40
+  printed_numeric_cells: 36
+  printed_em_dash_cells: 4
+  stored_context_rows: 5
+  values: retain printed wt% strings and en dash (U+2013) glyphs; no conversion; all five rows carry the printed note that analytical results are rounded and normalized to 100 wt%
+  compilation_sources:
+    compositions_1_2: Richter et al. (2011)
+    compositions_3_4: Yakovlev et al. (1973)
+    composition_5: Yakovlev et al. (1987)
+  audit:
+    method: Born-digital pdftotext text layer and MinerU table draft compared on the 40 body cells; numeric cell strings agree and dash positions agree after glyph normalization. Table 1 row/column assignment and dash glyphs visually checked against the page render.
+    numeric_cells: 36
+    en_dash_cells: 4
+    mineru_pdftotext_agreement: 40/40 body cells (36/36 numeric strings; 4/4 dash positions after normalizing MinerU hyphen to the printed en dash U+2013)
+    render_checks: All 8 oxide row labels and 5 composition columns checked against the PDF page-2 render. The four printed en dashes (U+2013) are TiO2 compositions 1–3 and FeO composition 3.
+    count_reconciliation: "8 oxide rows x 5 composition columns = 40 data cells: 36 numeric values and 4 printed en dash cells. Header cells are excluded."
+    index: INDEX.yaml and INDEX.md intentionally not regenerated on this branch; controller rebuilds them once at batch assembly to avoid cross-branch conflicts.
+figures_not_transcribed:
+  - figure: '6'
+    locator: {page: 7, published_page: 407}
+    axes: x K2O/(K2O + Na2O), wt%; y pK/pNa, linear dimensionless ratio
+    series: ['1: calculated in this paper, 35 wt% SiO2', '2: calculated in this paper, 55 wt% SiO2', '3: quoted data from Yakovlev et al. (1987), Saratov chondrules']
+    conditions: 1200°C; no time condition printed
+    approximate_symbols_in_caption: 0
+  - figure: '7'
+    locator: {page: 7, published_page: 407}
+    axes: x T, °C; y pK/pNa, linear dimensionless ratio
+    series: ['1: calculated in this paper, 35 wt% SiO2 and K2O/Na2O ≈ 3/4', '2: calculated in this paper, 55 wt% SiO2 and K2O/Na2O ≈ 3/4', '3: quoted data from Yakovlev et al. (1987), Saratov chondrules']
+    conditions: temperature axis 1100–1400°C; no time condition printed
+    approximate_symbols_in_caption: 1
+  - figure: '8'
+    locator: {page: 8, published_page: 408}
+    axes: x T, °C; y log p_i, bar
+    series: "['1: Na, quoted from Yakovlev et al. (1987)', '2: K, quoted from Yakovlev et al. (1987)', '3: Fe, quoted from Yakovlev et al. (1987)', '4: SiO, quoted from Yakovlev et al. (1987)', '5: Mg, quoted from Yakovlev et al. (1987)']; Saratov chondrule melt, composition 5 in Table 1. The caption says ‘according to (Yakovlev et al., 1987)’; series are quoted, not measured in this paper."
+    conditions: evaporation; displayed temperature axis 1100–1700°C; no time condition printed
+    approximate_symbols_in_caption: 0

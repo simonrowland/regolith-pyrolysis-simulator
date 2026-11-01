@@ -1,0 +1,1914 @@
+schema_version: literature_extract.v1
+source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+source:
+  citation: Fujisawa, Toshiharu; Fukuyama, Hiroyuki; Shimotori, Jun; Yamauchi, Chikabumi (1994). Thermodynamics
+    of NaO0.5-CO2-SnO2 Slag and Estimation of Distribution Ratio of Sn between the Slag and Molten Copper. Materials
+    Transactions, JIM 35(6), 414-422.
+  doi: 10.2320/matertrans1989.35.414
+  year: 1994
+  version: English translation of the Japanese 1993 publication; same experiment family.
+extraction:
+  method: Transcribed from MinerU table HTML and independently checked with Tesseract OCR; all three tables checked
+    against page renders.
+  date: '2026-10-27'
+  worker: w1027na7b-fuji94
+  provenance_path: data/literature/extracts/audits/fujisawa-1994-na-sn-carbonate-thermodynamics.mapping.yaml
+review_status: draft
+fidelity_samples:
+- species: SnO2
+  observation_id: fujisawa94_t2_r1
+  field: log10_activity_as_printed
+  value: '-1.598'
+  locator:
+    page: 5
+    published_page: 418
+    table: '2'
+- species: SnO2
+  observation_id: fujisawa94_t2_r6
+  field: reaction_delta_G16_kJ_as_printed
+  value: '-160.5'
+  locator:
+    page: 5
+    published_page: 418
+    table: '2'
+- species: SnO2
+  observation_id: fujisawa94_t3_r1
+  field: X_SnO2_as_printed
+  value: 8.0 x 10^-4
+  locator:
+    page: 6
+    published_page: 419
+    table: '3'
+- species: SnO2
+  observation_id: fujisawa94_t3_r9
+  field: log10_activity_as_printed
+  value: '-2.437'
+  locator:
+    page: 6
+    published_page: 419
+    table: '3'
+experiments:
+- experiment_id: fujisawa94-table2-saturated-slag-1523k
+  method: distribution_equilibrium
+  locator:
+    page: 5
+    published_page: 418
+    table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1523
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Table 2 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  point_conditions_note: Table rows report CO2 and O2 partial pressures. No complete run-wise slag composition,
+    total pressure, or gas flow is stated for the distribution experiment.
+- experiment_id: fujisawa94-table3-homogeneous-melt-1523k
+  method: distribution_equilibrium
+  locator:
+    page: 6
+    published_page: 419
+    table: '3'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1523
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Table 3 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  point_conditions_note: Table rows report CO2 and O2 partial pressures. No complete run-wise slag composition,
+    total pressure, or gas flow is stated for the distribution experiment.
+species:
+  SnO2:
+    observations:
+    - observation_id: fujisawa94_t2_r1
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.598'
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '0.427'
+        metal_Sn_mass_percent_as_printed: '0.020'
+        slag_Cu_mass_percent_as_printed: '0.328'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        method: Activity reduced from Sn distribution equilibrium in molten copper using equations (12)-(15).
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: 1523
+            locator:
+              page: 5
+              table: '2'
+          CO2_partial_pressure_MPa:
+            state:
+              tag: value
+              value: '0.08'
+            locator:
+              page: 5
+              table: '2'
+          oxygen_partial_pressure_Pa:
+            state:
+              tag: value
+              value: '0.427'
+            locator:
+              page: 5
+              table: '2'
+        points:
+        - value: '-1.598'
+          phase: null
+          table_row_number: 2
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.427'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.427'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r2
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.499'
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '1.070'
+        metal_Sn_mass_percent_as_printed: '0.010'
+        slag_Cu_mass_percent_as_printed: '0.614'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        method: Activity reduced from Sn distribution equilibrium in molten copper using equations (12)-(15).
+        points:
+        - value: '-1.499'
+          phase: null
+          table_row_number: 3
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '1.070'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '1.070'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r3
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.315'
+        group_average_log10_activity_as_printed: '-1.544'
+        log10_activity_NaO0.5_as_printed: '-1.960'
+        reaction_delta_G16_kJ_as_printed: '-159.4'
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '1.260'
+        metal_Sn_mass_percent_as_printed: '0.013'
+        slag_Cu_mass_percent_as_printed: '0.426'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        method: Activity reduced from Sn distribution equilibrium in molten copper using equations (12)-(15).
+        points:
+        - value: '-1.315'
+          phase: null
+          table_row_number: 4
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '1.260'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '1.260'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r4
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.934'
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '0.562'
+        metal_Sn_mass_percent_as_printed: '0.007'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-1.934'
+          phase: null
+          table_row_number: 5
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.562'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.562'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r5
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.374'
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '0.550'
+        metal_Sn_mass_percent_as_printed: '0.026'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-1.374'
+          phase: null
+          table_row_number: 6
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.550'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.550'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r6
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.972'
+        group_average_log10_activity_as_printed: '-1.972'
+        log10_activity_NaO0.5_as_printed: '-1.765'
+        reaction_delta_G16_kJ_as_printed: '-160.5'
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.014'
+        metal_Sn_mass_percent_as_printed: '0.255'
+        slag_Cu_mass_percent_as_printed: '0.276'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        source_render_note: Render confirms the minus sign in -160.5; OCR omitted it.
+        points:
+        - value: '-1.972'
+          phase: null
+          table_row_number: 7
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.014'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.014'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r7
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.250'
+        group_average_log10_activity_as_printed: '-2.293'
+        log10_activity_NaO0.5_as_printed: '-1.530'
+        reaction_delta_G16_kJ_as_printed: '-156.1'
+        P_CO2_MPa_as_printed: '0.01'
+        P_O2_Pa_as_printed: '0.021'
+        metal_Sn_mass_percent_as_printed: '0.091'
+        slag_Cu_mass_percent_as_printed: '0.483'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.250'
+          phase: null
+          table_row_number: 8
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.021'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.01'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.021'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t2_r8
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.335'
+        P_CO2_MPa_as_printed: '0.01'
+        P_O2_Pa_as_printed: '0.019'
+        metal_Sn_mass_percent_as_printed: '0.082'
+        slag_Cu_mass_percent_as_printed: '0.437'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.335'
+          phase: null
+          table_row_number: 9
+          locator:
+            page: 5
+            table: '2'
+        attribution: Fujisawa et al. (1994), Table 2
+        oxygen_partial_pressure:
+          value: '0.019'
+          units: Pa
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            table: '2'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.01'
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.019'
+          locator:
+            page: 5
+            table: '2'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            table: '2'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            table: '2'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r1
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.414'
+        log10_LSn_as_printed: '-0.724'
+        X_SnO2_as_printed: 8.0 x 10^-4
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '0.0091'
+        metal_Sn_mass_percent_as_printed: '1.420'
+        slag_Sn_mass_percent_as_printed: '0.268'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: 1523
+            locator:
+              page: 6
+              table: '3'
+          CO2_partial_pressure_MPa:
+            state:
+              tag: value
+              value: '0.08'
+            locator:
+              page: 6
+              table: '3'
+          oxygen_partial_pressure_Pa:
+            state:
+              tag: value
+              value: '0.0091'
+            locator:
+              page: 6
+              table: '3'
+        points:
+        - value: '-1.414'
+          phase: null
+          table_row_number: 2
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0091'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0091'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r2
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-1.434'
+        log10_LSn_as_printed: '-0.718'
+        X_SnO2_as_printed: 7.8 x 10^-4
+        P_CO2_MPa_as_printed: '0.08'
+        P_O2_Pa_as_printed: '0.0091'
+        metal_Sn_mass_percent_as_printed: '1.358'
+        slag_Sn_mass_percent_as_printed: '0.260'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-1.434'
+          phase: null
+          table_row_number: 3
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0091'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0091'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r3
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.086'
+        log10_LSn_as_printed: '0.256'
+        X_SnO2_as_printed: 1.6 x 10^-3
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0091'
+        metal_Sn_mass_percent_as_printed: '0.304'
+        slag_Sn_mass_percent_as_printed: '0.548'
+        slag_Cu_mass_percent_as_printed: '0.160'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.086'
+          phase: null
+          table_row_number: 4
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0091'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0091'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r4
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.091'
+        log10_LSn_as_printed: '0.253'
+        X_SnO2_as_printed: 1.8 x 10^-3
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0081'
+        metal_Sn_mass_percent_as_printed: '0.337'
+        slag_Sn_mass_percent_as_printed: '0.604'
+        slag_Cu_mass_percent_as_printed: '0.166'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.091'
+          phase: null
+          table_row_number: 5
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0081'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0081'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r5
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.339'
+        log10_LSn_as_printed: '0.234'
+        X_SnO2_as_printed: 6.4 x 10^-4
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0123'
+        metal_Sn_mass_percent_as_printed: '0.126'
+        slag_Sn_mass_percent_as_printed: '0.216'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.339'
+          phase: null
+          table_row_number: 6
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0123'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0123'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r6
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.349'
+        log10_LSn_as_printed: '0.151'
+        X_SnO2_as_printed: 5.7 x 10^-4
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0112'
+        metal_Sn_mass_percent_as_printed: '0.135'
+        slag_Sn_mass_percent_as_printed: '0.191'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.349'
+          phase: null
+          table_row_number: 7
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0112'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0112'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r7
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.092'
+        log10_LSn_as_printed: '1.286'
+        X_SnO2_as_printed: 1.6 x 10^-3
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0977'
+        metal_Sn_mass_percent_as_printed: '0.028'
+        slag_Sn_mass_percent_as_printed: '0.541'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.092'
+          phase: null
+          table_row_number: 8
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0977'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0977'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r8
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.147'
+        log10_LSn_as_printed: '1.264'
+        X_SnO2_as_printed: 1.6 x 10^-3
+        P_CO2_MPa_as_printed: '0.03'
+        P_O2_Pa_as_printed: '0.0832'
+        metal_Sn_mass_percent_as_printed: '0.029'
+        slag_Sn_mass_percent_as_printed: '0.532'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.147'
+          phase: null
+          table_row_number: 9
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0832'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0832'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    - observation_id: fujisawa94_t3_r9
+      experiment: fujisawa94-table3-homogeneous-melt-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+      units: log10 activity
+      dimensionless: null
+      as printed: null
+      values:
+        quantity_as_published: log a_SnO2(s)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
+          independently stored as observations and the schema has no log-activity form.
+        log10_activity_as_printed: '-2.437'
+        log10_LSn_as_printed: '1.305'
+        X_SnO2_as_printed: 4.4 x 10^-3
+        P_CO2_MPa_as_printed: '0.01'
+        P_O2_Pa_as_printed: '0.0195'
+        metal_Sn_mass_percent_as_printed: '0.078'
+        slag_Sn_mass_percent_as_printed: '1.573'
+        slag_Cu_mass_percent_as_printed: '0.410'
+        T_K: '1523'
+        printed_standard_state: pure solid SnO2(s)
+        points:
+        - value: '-2.437'
+          phase: null
+          table_row_number: 10
+          locator:
+            page: 6
+            table: '3'
+        attribution: Fujisawa et al. (1994), Table 3
+        oxygen_partial_pressure:
+          value: '0.0195'
+          units: Pa
+          locator:
+            page: 6
+            published_page: 419
+            table: '3'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 6
+            table: '3'
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.01'
+          locator:
+            page: 6
+            table: '3'
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '0.0195'
+          locator:
+            page: 6
+            table: '3'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 6
+            table: '3'
+            note: Only gas partial pressures are printed.
+        composition:
+          state:
+            tag: unknown
+            reason: Table 3 prints X_SnO2 only; the full ternary NaO0.5-CO2-SnO2 melt composition is not published.
+          locator:
+            page: 6
+            table: '3'
+            note: No complete run-wise slag composition is printed.
+      standard_state: pure solid SnO2(s)
+    context:
+    - observation_id: fujisawa94_table1_parameter_context
+      type: thermodynamic_parameter_table
+      locator:
+        page: 5
+        published_page: 418
+        table: '1'
+      units: As printed; supporting Cu-Sn-O calculation parameters, not slag activity observations.
+      values:
+        method_class: quoted_attributed
+        schema_gap: Table 1 interaction parameters and activity-coefficient functions are calculation inputs rather
+          than a supported quantity for the requested melt-activity observations.
+        rows:
+        - expression: log gamma_O^0 = (-3999/T) + 2.03
+          temperature_range_K: 1373-1673
+          references: (11)(12)
+        - expression: log gamma_Sn(l)^0 = (-2805/T) + 0.6557
+          temperature_range_K: 1373-1523
+          references: (13)
+        - expression: epsilon_O^O = (-31929/T) + 14.157
+          temperature_range_K: 1373-1673
+          references: (11)(12)
+        - expression: epsilon_Sn^Sn = 10.79
+          temperature_range_K: '1593'
+          references: (14)
+        - expression: epsilon_Sn^O = (-18575/T) + 10.1
+          temperature_range_K: 1373-1573
+          references: (15)
+  NaO0.5:
+    observations:
+    - observation_id: fujisawa94_t2_group_1_log_a_NaO05
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 4; represents Table 2 run rows 1-5.
+      units: log10 activity, dimensionless, as printed
+      values:
+        quantity_as_published: log a_NaO0.5(l)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
+          inputs are not stored separately.
+        attribution: Fujisawa et al. (1994), Table 2
+        log10_activity_as_printed: '-1.960'
+        P_CO2_MPa_as_printed: '0.08'
+        T_K: '1523'
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+        method: Activity determined by the EMF method using equations (1)-(5).
+        points:
+        - value: '-1.960'
+          phase: null
+          table_row_number: 4
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure:
+          value: '0.02'
+          units: MPa
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 4; represents Table 2 run rows 1-5.
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.08'
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 4; represents Table 2 run rows 1-5.
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '20000'
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+            note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 4; represents Table 2 run rows 1-5.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 4; represents Table 2 run rows 1-5.
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'
+    - observation_id: fujisawa94_t2_group_2_log_a_NaO05
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 7; represents Table 2 run rows 6.
+      units: log10 activity, dimensionless, as printed
+      values:
+        quantity_as_published: log a_NaO0.5(l)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
+          inputs are not stored separately.
+        attribution: Fujisawa et al. (1994), Table 2
+        log10_activity_as_printed: '-1.765'
+        P_CO2_MPa_as_printed: '0.03'
+        T_K: '1523'
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+        method: Activity determined by the EMF method using equations (1)-(5).
+        points:
+        - value: '-1.765'
+          phase: null
+          table_row_number: 7
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure:
+          value: '0.02'
+          units: MPa
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 7; represents Table 2 run rows 6.
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.03'
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 7; represents Table 2 run rows 6.
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '20000'
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+            note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 7; represents Table 2 run rows 6.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 7; represents Table 2 run rows 6.
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'
+    - observation_id: fujisawa94_t2_group_3_log_a_NaO05
+      experiment: fujisawa94-table2-saturated-slag-1523k
+      type: activity_coefficient
+      phase: l
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Group average printed on row 8; represents Table 2 run rows 7-8.
+      units: log10 activity, dimensionless, as printed
+      values:
+        quantity_as_published: log a_NaO0.5(l)
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
+          inputs are not stored separately.
+        attribution: Fujisawa et al. (1994), Table 2
+        log10_activity_as_printed: '-1.530'
+        P_CO2_MPa_as_printed: '0.01'
+        T_K: '1523'
+        printed_standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log
+          a*_NaO0.5 = -(4770.9/T)+0.0715 (1223-1473 K).'
+        method: Activity determined by the EMF method using equations (1)-(5).
+        points:
+        - value: '-1.530'
+          phase: null
+          table_row_number: 8
+          locator:
+            page: 5
+            table: '2'
+        oxygen_partial_pressure:
+          value: '0.02'
+          units: MPa
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1523
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 8; represents Table 2 run rows 7-8.
+        CO2_partial_pressure_MPa:
+          state:
+            tag: value
+            value: '0.01'
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 8; represents Table 2 run rows 7-8.
+        oxygen_partial_pressure_Pa:
+          state:
+            tag: value
+            value: '20000'
+          locator:
+            page: 2
+            published_page: 415
+            section: II. Activity of NaO0.5(l)
+            note: The EMF measurements state PO2=0.02 MPa; converted to Pa as a unit conversion.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 8; represents Table 2 run rows 7-8.
+        composition:
+          state:
+            tag: unknown
+            reason: No complete row-wise NaO0.5-CO2-SnO2 melt composition is published for this distribution row.
+          locator:
+            page: 5
+            published_page: 418
+            table: '2'
+            note: Group average printed on row 8; represents Table 2 run rows 7-8.
+      standard_state: 'Reference melt: NaO0.5-SiO2-FeO1.5; reference activity relation in eq. (5): log a*_NaO0.5
+        = -(4770.9/T)+0.0715 (1223-1473 K).'

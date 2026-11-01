@@ -242,7 +242,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1143.2:col=H_minus_H298:name=zirconium-(reference-state):v=0a7f91bea7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1143.2:col=H_minus_H298:name=zirconium-(reference-state):v=0a7f91bea7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -251,11 +251,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +318,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 78
-        pdf_page_index: 84
-        table: b1259-ht-0053-zirconium-reference-state
-        note: as_published='7.049'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json
-        record: b1259-ht-0053-zirconium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -362,7 +350,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1143.2:col=H_minus_H298:name=zirconium-(reference-state):v=a79b660958:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1143.2:col=H_minus_H298:name=zirconium-(reference-state):v=a79b660958
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -371,11 +359,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +426,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 78
-        pdf_page_index: 84
-        table: b1259-ht-0053-zirconium-reference-state
-        note: as_published='6.087'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json
-        record: b1259-ht-0053-zirconium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -482,7 +458,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=zirconium-(reference-state):v=acd32ec4c1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=zirconium-(reference-state):v=acd32ec4c1:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -495,7 +471,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -602,7 +578,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=zirconium-(reference-state):v=742026992c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=zirconium-(reference-state):v=742026992c:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -615,7 +591,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -722,7 +698,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=zirconium-(reference-state):v=4f2fcfd86f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=zirconium-(reference-state):v=4f2fcfd86f:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -735,7 +711,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -842,7 +818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=zirconium-(reference-state):v=ba7087563b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=zirconium-(reference-state):v=ba7087563b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -855,7 +831,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -962,7 +938,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=zirconium-(reference-state):v=9af24ef261:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=zirconium-(reference-state):v=9af24ef261:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -975,7 +951,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1082,7 +1058,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=zirconium-(reference-state):v=20b7dd884c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=zirconium-(reference-state):v=20b7dd884c:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -1095,7 +1071,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1202,7 +1178,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=zirconium-(reference-state):v=b825f73ada:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=zirconium-(reference-state):v=b825f73ada:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -1215,7 +1191,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1322,7 +1298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=zirconium-(reference-state):v=a7ef65e7da:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=zirconium-(reference-state):v=a7ef65e7da:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -1335,7 +1311,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -1442,7 +1418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=zirconium-(reference-state):v=0248e3cd3b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=zirconium-(reference-state):v=0248e3cd3b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -1455,7 +1431,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -2642,7 +2618,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1143.2:col=entropy:name=zirconium-(reference-state):v=52f2445a48:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1143.2:col=entropy:name=zirconium-(reference-state):v=52f2445a48
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -2651,11 +2627,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2717,21 +2694,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 78
-        pdf_page_index: 84
-        table: b1259-ht-0053-zirconium-reference-state
-        note: as_published='19.594'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json
-        record: b1259-ht-0053-zirconium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2762,7 +2726,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1143.2:col=entropy:name=zirconium-(reference-state):v=5729c78a18:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1143.2:col=entropy:name=zirconium-(reference-state):v=5729c78a18
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -2771,11 +2735,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2837,21 +2802,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 78
-        pdf_page_index: 84
-        table: b1259-ht-0053-zirconium-reference-state
-        note: as_published='18.752'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json
-        record: b1259-ht-0053-zirconium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2882,7 +2834,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1200:col=entropy:name=zirconium-(reference-state):v=762f14f5b6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1200:col=entropy:name=zirconium-(reference-state):v=762f14f5b6:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -2895,7 +2847,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3002,7 +2954,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1300:col=entropy:name=zirconium-(reference-state):v=111dd25587:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1300:col=entropy:name=zirconium-(reference-state):v=111dd25587:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3015,7 +2967,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3122,7 +3074,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1400:col=entropy:name=zirconium-(reference-state):v=01e726c08f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1400:col=entropy:name=zirconium-(reference-state):v=01e726c08f:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3135,7 +3087,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3242,7 +3194,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1500:col=entropy:name=zirconium-(reference-state):v=96dc068276:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1500:col=entropy:name=zirconium-(reference-state):v=96dc068276:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3255,7 +3207,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3362,7 +3314,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1600:col=entropy:name=zirconium-(reference-state):v=26844661f5:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1600:col=entropy:name=zirconium-(reference-state):v=26844661f5:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3375,7 +3327,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3482,7 +3434,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1700:col=entropy:name=zirconium-(reference-state):v=8b82f10f16:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1700:col=entropy:name=zirconium-(reference-state):v=8b82f10f16:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3495,7 +3447,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3602,7 +3554,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1800:col=entropy:name=zirconium-(reference-state):v=5749082fa6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1800:col=entropy:name=zirconium-(reference-state):v=5749082fa6:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3615,7 +3567,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -3722,7 +3674,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1900:col=entropy:name=zirconium-(reference-state):v=9ced472bd6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:S:shared:T=1900:col=entropy:name=zirconium-(reference-state):v=9ced472bd6:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -3735,7 +3687,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5002,7 +4954,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1143.2:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1143.2:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5011,11 +4963,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5114,7 +5067,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5127,7 +5080,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5154,7 +5107,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5274,7 +5227,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5287,7 +5240,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5314,7 +5267,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5434,7 +5387,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5447,7 +5400,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5474,7 +5427,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5594,7 +5547,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5607,7 +5560,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5634,7 +5587,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5754,7 +5707,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5767,7 +5720,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5794,7 +5747,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5914,7 +5867,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -5927,7 +5880,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -5954,7 +5907,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6074,7 +6027,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -6087,7 +6040,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -6114,7 +6067,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6234,7 +6187,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -6247,7 +6200,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -6274,7 +6227,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6394,7 +6347,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -6407,7 +6360,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -6434,7 +6387,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -7834,7 +7787,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1143.2:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1143.2:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -7843,11 +7796,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7946,7 +7900,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -7959,7 +7913,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -7986,7 +7940,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8106,7 +8060,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8119,7 +8073,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8146,7 +8100,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8266,7 +8220,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8279,7 +8233,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8306,7 +8260,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8426,7 +8380,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8439,7 +8393,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8466,7 +8420,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8586,7 +8540,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8599,7 +8553,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8626,7 +8580,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8746,7 +8700,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8759,7 +8713,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8786,7 +8740,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -8906,7 +8860,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -8919,7 +8873,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -8946,7 +8900,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -9066,7 +9020,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -9079,7 +9033,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -9106,7 +9060,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -9226,7 +9180,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=zirconium-(reference-state):v=900e6181ee:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -9239,7 +9193,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -9266,7 +9220,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -10808,7 +10762,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1143.2:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1143.2:col=log_Kf:name=zirconium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -10817,11 +10771,12 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1143.2 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10911,7 +10866,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -10924,7 +10879,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -10951,7 +10906,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11062,7 +11017,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11075,7 +11030,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11102,7 +11057,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11213,7 +11168,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11226,7 +11181,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11253,7 +11208,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11364,7 +11319,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11377,7 +11332,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11404,7 +11359,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11515,7 +11470,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11528,7 +11483,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11555,7 +11510,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11666,7 +11621,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11679,7 +11634,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11706,7 +11661,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11817,7 +11772,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11830,7 +11785,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -11857,7 +11812,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -11968,7 +11923,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -11981,7 +11936,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -12008,7 +11963,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -12119,7 +12074,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=zirconium-(reference-state):v=725af3071b:poly=bcc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0053-zirconium-reference-state:tabulation
   identity:
     quantity:
@@ -12132,7 +12087,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: bcc
       charge:
         tag: value
         value: 0
@@ -12159,7 +12114,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0

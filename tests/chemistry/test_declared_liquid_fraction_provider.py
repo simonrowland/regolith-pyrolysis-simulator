@@ -231,6 +231,90 @@ def test_missing_declared_engine_refuses_before_first_hour(
     assert sim.record.snapshots == []
 
 
+def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    monkeypatch.setattr(
+        MAGEMinBackend, '_resolve_binary_path', lambda _self: None,
+    )
+
+    campaign_sim = _sim(
+        'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    with pytest.raises(EvaporationFluxRefusal) as campaign_error:
+        campaign_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    assert campaign_error.value.diagnostic['reason'] == 'missing_input'
+    assert campaign_error.value.diagnostic['provider'] == 'magemin'
+
+    gate_sim = _sim(
+        'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    with pytest.raises(EvaporationFluxRefusal) as gate_error:
+        gate_sim._melt_redox_liquidus_gate_curve()
+    assert (
+        gate_error.value.diagnostic['reason']
+        == 'liquid_fraction_provider_failed'
+    )
+    assert gate_error.value.diagnostic['provider'] == 'magemin'
+    assert gate_sim._last_melt_redox_liquidus_gate_diagnostic == {}
+
+
+def test_pool_init_timeout_refuses_direct_gate_read_and_retries_next_call(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    timeout = EngineWorkerTimeout(
+        'MAGEMin subprocess pool slot 0', 30.0, phase='startup',
+    )
+    pool_initializations = []
+
+    class ReadyPool:
+        def close(self, **_kwargs):
+            pass
+
+    def initialize_pool(_worker_factory, *, size):
+        pool_initializations.append(size)
+        if len(pool_initializations) == 1:
+            raise timeout
+        return ReadyPool()
+
+    monkeypatch.setattr(
+        MAGEMinBackend, '_resolve_binary_path',
+        lambda _self: Path('/fake/MAGEMin'),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend, '_import_magemin_bridge',
+        lambda _self, *, requested: ('subprocess', None),
+    )
+    monkeypatch.setattr(
+        magemin_module, 'EngineWorkerPool', initialize_pool,
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend, 'find_liquidus_solidus',
+        lambda _self, **_kwargs: SimpleNamespace(
+            status='unavailable', diagnostics={}, warnings=(),
+        ),
+    )
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    )
+    for attempt in range(2):
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim._melt_redox_liquidus_gate_curve()
+        assert (
+            error.value.diagnostic['reason']
+            == 'liquid_fraction_provider_failed'
+        )
+        if attempt == 0:
+            assert provider._backend is None
+        else:
+            assert provider._backend is not None
+            assert provider._backend.is_available()
+    assert pool_initializations == [1, 1]
+
+
 def test_analytical_gate_never_probes_magemin_and_flags_each_hour(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
@@ -661,7 +745,10 @@ def test_optimizer_resolves_gate_declared_in_loaded_setpoints(monkeypatch):
     assert spec.chemistry_kernel['liquid_fraction_provider'] == 'analytical'
 
 
-@pytest.mark.parametrize('failure', ['numerical', 'projected_numerical', 'aggregate_timeout', 'warm_timeout'])
+@pytest.mark.parametrize('failure', [
+    'numerical', 'missing_bracket', 'non_monotone', 'projected_numerical',
+    'aggregate_timeout', 'warm_timeout',
+])
 @pytest.mark.parametrize('prior_good', [False, True])
 def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     monkeypatch, failure, prior_good,
@@ -692,6 +779,16 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
             return SimpleNamespace(status='not_converged', diagnostic={
                 'backend_status_reason': 'no_convergence',
             }, warnings=('non-monotone frac_M(T)',))
+        if failure == 'missing_bracket':
+            return SimpleNamespace(status='not_converged', diagnostic={}, warnings=(
+                'solidus bracket absent: frac_M never crossed 0.001',
+                'liquidus bracket absent: frac_M never reached 0.995',
+            ))
+        if failure == 'non_monotone':
+            return SimpleNamespace(status='not_converged', diagnostic={}, warnings=(
+                'non-monotone frac_M(T): 450.000 C gives 0 below '
+                '400.000 C value 0.9',
+            ))
         return SimpleNamespace(status='out_of_domain', diagnostic={
             'backend_status_reason': 'composition_projected',
             'backend_diagnostics': {
@@ -711,24 +808,51 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         store = PT0DeterminismStore('capture')
         sim.configure_pt0_determinism_store(store)
         curve = sim._melt_redox_liquidus_gate_curve()
-        expected = sim._freeze_gate_kress_floor_curve(None, [])
-        assert {k: v for k, v in curve.items() if k != 'gate_provider_refusal'} == expected
+        assert {
+            key: curve[key]
+            for key in ('source', 'solidus_T_C', 'liquidus_T_C', 'path')
+        } == {
+            'source': 'kress91_liquid_calibration_floor',
+            'solidus_T_C': 1200.0,
+            'liquidus_T_C': 1200.000001,
+            'path': ((1200.0, 0.0), (1200.000001, 1.0)),
+        }
         notice = curve['gate_provider_refusal']
         assert notice['authority'] == 'extrapolated (lower-rung)'
         assert notice['qualification'] == 'first_call_kress91_floor_prediction'
         assert notice['failure_hour'] == 7
         assert notice['failure_temperature_C'] == 1500.0
         assert notice['status'] == ('unavailable' if failure == 'warm_timeout' else (
-            'not_converged' if failure == 'numerical' else 'out_of_domain'
+            'not_converged' if failure in {
+                'numerical', 'missing_bracket', 'non_monotone',
+            } else 'out_of_domain'
         ))
-        assert notice['provider_diagnostic']
+        if failure in {'missing_bracket', 'non_monotone'}:
+            assert notice['provider_diagnostic'] == {}
+        else:
+            assert notice['provider_diagnostic']
         assert 'calibration-floor step' in notice['detail']
         assert 'not a fresh solve or a melting measurement' in notice['detail']
         if timed_out:
             assert notice['backend_failure_disposition'] == 'environment'
+            assert notice['reason'] == (
+                'aggregate_budget_exceeded'
+                if failure == 'aggregate_timeout'
+                else 'engine_worker_timeout'
+            )
         else:
             assert notice['outcome'] == 'numerical_failure'
             assert notice['warnings']
+            if failure in {'missing_bracket', 'non_monotone'}:
+                assert notice['reason'] == 'liquid_fraction_provider_failed'
+        if failure == 'warm_timeout':
+            assert notice['availability_notice'] == {
+                'type': 'typed_notice',
+                'kind': 'freeze_gate_magemin_source_fallback',
+                'reason': 'engine_worker_timeout',
+                'attempted_source': 'magemin',
+                'source_used': 'kress91_liquid_calibration_floor',
+            }
         assert sim._freeze_gate_last_good_curve is None
         assert sim._freeze_gate_liquid_fraction_cache is None
         assert sim._freeze_gate_liquid_fraction_curve_memo == {}
@@ -750,10 +874,23 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
         recovered = sim._melt_redox_liquidus_gate_curve()
         assert recovered['liquidus_T_C'] == 1500.0
         assert 'gate_provider_refusal' not in recovered
+        assert 'availability_notice' not in recovered.get(
+            'gate_provider_refusal', {},
+        )
         assert sim._freeze_gate_last_good_curve['computed_hour'] == 9
         return
 
+    expected_held_curve = {
+        'source': 'gate_liquid_fraction:fallback:magemin-shadow',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((1000.0, 0.0), (1300.0, 1.0)),
+    }
     good = sim._melt_redox_liquidus_gate_curve()
+    assert {
+        key: good[key]
+        for key in ('source', 'solidus_T_C', 'liquidus_T_C', 'path')
+    } == expected_held_curve
     memo_keys = set(sim._freeze_gate_liquid_fraction_curve_memo)
     shared_keys = set(shared)
     assert memo_keys and shared_keys
@@ -765,20 +902,40 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     sim.configure_pt0_determinism_store(store)
     held = sim._melt_redox_liquidus_gate_curve()
     notice = held['gate_provider_refusal']
-    assert held['source'] == good['source']
-    assert held['liquidus_T_C'] == good['liquidus_T_C']
+    assert {
+        key: held[key]
+        for key in ('source', 'solidus_T_C', 'liquidus_T_C', 'path')
+    } == expected_held_curve
     assert notice['provider'] == 'magemin'
     assert notice['authority'] == 'extrapolated (held)'
     assert notice['failure_hour'] == 8
     assert notice['failure_temperature_C'] == 1500.0
     assert notice['computed_hour'] == 7
     assert notice['composition_distance_wt_pct'] == 20.0
-    assert notice['provider_diagnostic']
+    if failure in {'missing_bracket', 'non_monotone'}:
+        assert notice['provider_diagnostic'] == {}
+    else:
+        assert notice['provider_diagnostic']
     if timed_out:
         assert notice['backend_failure_disposition'] == 'environment'
+        assert notice['reason'] == (
+            'aggregate_budget_exceeded'
+            if failure == 'aggregate_timeout'
+            else 'engine_worker_timeout'
+        )
     else:
         assert notice['warnings']
         assert notice['outcome'] == 'numerical_failure'
+        if failure in {'missing_bracket', 'non_monotone'}:
+            assert notice['reason'] == 'liquid_fraction_provider_failed'
+    if failure == 'warm_timeout':
+        assert notice['availability_notice'] == {
+            'type': 'typed_notice',
+            'kind': 'freeze_gate_magemin_source_fallback',
+            'reason': 'engine_worker_timeout',
+            'attempted_source': 'magemin',
+            'source_used': 'gate_liquid_fraction:fallback:magemin-shadow',
+        }
     assert set(sim._freeze_gate_liquid_fraction_curve_memo) == memo_keys
     assert set(shared) == shared_keys
     assert store.capture_sequence == []
@@ -805,6 +962,9 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     recovered = sim._melt_redox_liquidus_gate_curve()
     assert recovered['liquidus_T_C'] == 1500.0
     assert 'gate_provider_refusal' not in recovered
+    assert 'availability_notice' not in recovered.get(
+        'gate_provider_refusal', {},
+    )
     sim.melt.hour = 11
     sim.melt.p_total_mbar += 100.0
     phase['good'] = False

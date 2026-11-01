@@ -9,10 +9,35 @@ extraction:
   date: '2026-10-14'
   worker: codex
 review_status: draft
+benches:
+  - id: shornikov-1997-mo-kems
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: mass-spectrometric effusion Knudsen cell}
+      locator:
+        published_page: 174
+        pdf_page_index: 0
+        paragraph: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells.
+    cell_materials:
+      - state: {tag: value, value: Mo}
+        locator:
+          published_page: 174
+          pdf_page_index: 0
+          paragraph: In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells.
+    geometry:
+      orifice_to_sample_area_ratio:
+        state: {tag: value, value: {kind: bound, bound_operator: '>=', bound_value: '0.0025'}}
+        locator:
+          published_page: 174
+          pdf_page_index: 0
+          section: Experimental
+          paragraph: "In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells with the area ratio between the effusion orifice and the vaporization surface not less than 1 : 400."
+          note: The printed lower bound is 1:400; typed as a lower bound on orifice area divided by vaporization surface area.
 experiments:
   - experiment_id: shornikov-1997-diopside-kems
+    bench_id: shornikov-1997-mo-kems
     method: knudsen_effusion
-    locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'The study used mass-spectrometric effusion Knudsen measurements on diopside in molybdenum cells.'}
+    locator: {page: 1, published_page: 174, pdf_page_index: 0, section: Experimental, note: 'In this work, the mass-spectrometric effusion Knudsen method was applied to study vaporization of diopside from molybdenum cells.'}
 fidelity_samples:
 - path: species.Ca.observations[shornikov_1997_ca_pressure_table1].values.points[0].temperature_K
   value: 1566

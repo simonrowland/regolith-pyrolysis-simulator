@@ -288,6 +288,35 @@ status is located by the derivation's locator or the row's locator. It is not
 complete lineage. When some inputs resolve, those ids stay in `inputs` and
 `raw_inputs` stays absent.
 
+### Printed values that are not in the stored form
+
+- **Measured quantity printed:** store the authors' printed measured quantity
+  as `measured_tabulated`. Raw inputs with no scorable quantity (such as EMF
+  in mV) belong in species `context`; no `derived_from` is required. Example:
+  Kim 2004 float-glass EMF (`review/x-kim-2004-na2o-float-glass-emf` @
+  `0a6d0ac05`, landed).
+- **Printed log value:** retain the printed log cell as a sibling
+  `typed_refused` observation (`value_as_printed` string and locator); store
+  the linear value `a = 10^(log a)` as `measured_reduced`, with
+  `derived_from` naming that sibling, a `derivation.relation`, and uncertainty
+  propagated from printed precision (`ln(10) × 0.5 × 10^-d`). Examples: Pak
+  1989 (`review/x-pak-ito-fruehan-1989-na2o-activity` @ `9edde05bd`, landed);
+  Itoh 1984 (`review/x-itoh-yokokawa-1984-na-activity` @ `d9e7bcf84`, landed).
+- **Value relative to a reference melt:** refuse the absolute quantity while
+  recording it as a `typed_refused` observation carrying the printed relative
+  value, uncertainty, and reference-melt identity and normalisation verbatim.
+  Do not convert to an absolute value or invent a reference activity. Examples:
+  Asai 1982
+  (`review/x-asai-yokokawa-maekawa-1982-na-borate` @ `0fdec807a`, landed);
+  Borisov 2009 (`review/x-borisov-2009-alkali-gamma` @ `20c6bd12d`, landed).
+- **Condition printed only as a log:** keep the located printed log condition;
+  leave the identity's linear field (for example, `fO2_Pa`) unknown. Do not
+  convert a printed condition to fill an identity field.
+
+Open schema gaps: **t-1563** — lineage for raw inputs that cannot be
+observations, and a log-activity value form; **t-1565** — a residue
+component-ratio quantity (for example, K2O/Na2O mass ratio).
+
 Exactly one of:
 
 | `type` | Payload intent |

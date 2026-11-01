@@ -9,7 +9,7 @@ import json
 import re
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from functools import lru_cache
@@ -43,7 +43,10 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
 )
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
-from simulator.battery.polymorph_dictionary import resolve_printed_name_polymorph
+from simulator.battery.polymorph_dictionary import (
+    resolve_printed_name_polymorph,
+    unrecognised_polymorph_state,
+)
 from simulator.battery.stable_ids import tabulated_cell_suffix
 from simulator.battery.records import (
     Admission,
@@ -352,6 +355,17 @@ def _numeric_payload(token: str) -> str:
     text = token.strip()
     text = _TRAILING_JUNK_RE.sub("", text)
     return text.strip()
+
+
+def _published_cell_value(cell: object) -> tuple[Decimal, Decimal] | None:
+    published = _as_published_cell(cell)
+    if published is None or published[1]:
+        return None
+    value = _published_decimal(_numeric_payload(published[0]))
+    if value is None:
+        return None
+    half_place = Decimal("0.5").scaleb(value.as_tuple().exponent)
+    return value, half_place
 
 
 def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
@@ -1353,6 +1367,16 @@ def _phase_state(record: Mapping[str, Any]) -> tuple[State[Phase], State[Polymor
         named = _polymorph_from_text(name_text)
         if named.is_value:
             polymorph = named
+    explicit_polymorph = next(
+        (
+            str(correction.get("printed_token"))
+            for correction in (record.get("corrections") or ())
+            if correction.get("field") == "polymorph"
+        ),
+        None,
+    )
+    if explicit_polymorph:
+        polymorph = unrecognised_polymorph_state(explicit_polymorph)
     return phase, polymorph
 
 
@@ -1386,6 +1410,206 @@ def _element_reference_species(
         else State.not_applicable("not crystalline")
     )
     return make_species(formula, phase, polymorph_state, charge=0), atom_count
+
+
+def _element_reference_species_for_transition_entropy(
+    record: Mapping[str, Any],
+    token: RawToken,
+    formula: str,
+    temperature: Decimal,
+) -> tuple[Species, Fraction] | None:
+    """Resolve a duplicate entropy row at a printed condensed-to-gas transition."""
+
+    counts = _parse_counts(formula)
+    if (
+        token.column != "entropy"
+        or token.row_index is None
+        or counts is None
+        or len(counts) != 1
+    ):
+        return None
+    symbol = next(iter(counts))
+    schedule = _B1259_ELEMENT_REFERENCE_STATES.get(symbol)
+    if schedule is None:
+        return None
+
+    _page, _pdf_page, phase, polymorph, scheduled_formula, transitions = schedule
+    for transition, gas_phase, gas_polymorph, gas_formula in transitions:
+        transition_temperature = Decimal(transition)
+        if transition_temperature == temperature:
+            if (
+                phase is Phase.G
+                or gas_phase is not Phase.G
+                or scheduled_formula != formula
+                or gas_formula != formula
+            ):
+                return None
+            break
+        if temperature < transition_temperature:
+            return None
+        phase, polymorph, scheduled_formula = (
+            gas_phase,
+            gas_polymorph,
+            gas_formula,
+        )
+    else:
+        return None
+
+    rows = record.get("rows")
+    if not isinstance(rows, list):
+        return None
+    pair: list[tuple[int, Decimal, Decimal, Decimal, Decimal]] = []
+
+    for row_index, row in enumerate(rows):
+        if not isinstance(row, Mapping) or row.get("kind") != "data":
+            continue
+        row_temperature = _published_cell_value(row.get("temperature"))
+        if row_temperature is None or row_temperature[0] != temperature:
+            continue
+        entropy = _published_cell_value(row.get("entropy"))
+        if entropy is None:
+            continue
+        enthalpy = _published_cell_value(row.get("H_minus_H298"))
+        if enthalpy is None:
+            return None
+        pair.append(
+            (
+                row_index,
+                entropy[0],
+                entropy[1],
+                enthalpy[0],
+                enthalpy[1],
+            )
+        )
+    if len(pair) != 2 or all(row[0] != token.row_index for row in pair):
+        return None
+
+    condensed, gas = sorted(pair, key=lambda row: row[1])
+    (
+        _condensed_row,
+        condensed_s,
+        condensed_s_half,
+        condensed_h,
+        condensed_h_half,
+    ) = condensed
+    _gas_row, gas_s, gas_s_half, gas_h, gas_h_half = gas
+
+    # At T_b, S_gas-S_condensed = (H_gas-H_condensed)/T_b. Convert the
+    # printed S difference from cal/(mol K) to J/(mol K), and H from kcal/mol
+    # to J/mol before dividing by K. For K at 1043.7 K, the table gives
+    # (44.547-26.300)*4.184 = 76.345448 J/(mol K), versus
+    # (25.014-5.970)*4184/1043.7 = 76.343869 J/(mol K). The allowed residual
+    # is the sum of half-last-place errors for each printed S and H value,
+    # propagated through those same conversions and division: 0.008193 J/(mol K).
+    entropy_gap_J_per_mol_K = (gas_s - condensed_s) * CAL_TH_TO_J
+    enthalpy_gap_over_T_J_per_mol_K = (
+        (gas_h - condensed_h) * Decimal("1000") * CAL_TH_TO_J / temperature
+    )
+    rounding_bound_J_per_mol_K = (
+        (gas_s_half + condensed_s_half) * CAL_TH_TO_J
+        + (gas_h_half + condensed_h_half)
+        * Decimal("1000")
+        * CAL_TH_TO_J
+        / temperature
+    )
+    if (
+        gas_s - condensed_s <= gas_s_half + condensed_s_half
+        or gas_h <= condensed_h
+        or abs(entropy_gap_J_per_mol_K - enthalpy_gap_over_T_J_per_mol_K)
+        > rounding_bound_J_per_mol_K
+    ):
+        return None
+
+    if token.row_index == gas[0]:
+        selected_phase, selected_polymorph = gas_phase, gas_polymorph
+    else:
+        selected_phase, selected_polymorph = phase, polymorph
+    polymorph_state = (
+        State.of(selected_polymorph)
+        if selected_polymorph is not None
+        else State.not_applicable("not crystalline")
+    )
+    atom_count = counts[symbol]
+    return make_species(formula, selected_phase, polymorph_state, charge=0), atom_count
+
+
+def _element_reference_state_gas_entropy_is_consistent(
+    record: Mapping[str, Any],
+    token: RawToken,
+    formula: str,
+    symbol: str,
+    temperature: Decimal,
+    gas_atoms_per_formula: Fraction,
+) -> bool:
+    if token.row_index is None:
+        return False
+    rows = record.get("rows")
+    if not isinstance(rows, list) or token.row_index >= len(rows):
+        return False
+    target_row = rows[token.row_index]
+    if not isinstance(target_row, Mapping):
+        return False
+    target_temperature = _published_cell_value(target_row.get("temperature"))
+    target_entropy = _published_cell_value(target_row.get("entropy"))
+    if (
+        target_temperature is None
+        or target_temperature[0] != temperature
+        or target_entropy is None
+    ):
+        return False
+
+    def per_atom(value: Decimal, atoms: Fraction) -> Decimal:
+        return value * Decimal(atoms.denominator) / Decimal(atoms.numerator)
+
+    gas_entropy_per_atom = per_atom(target_entropy[0], gas_atoms_per_formula)
+    same_temperature_condensed: list[Decimal] = []
+    earlier_condensed: list[Decimal] = []
+    for row_index, row in enumerate(rows):
+        if not isinstance(row, Mapping) or row.get("kind") != "data":
+            continue
+        row_temperature = _published_cell_value(row.get("temperature"))
+        row_entropy = _published_cell_value(row.get("entropy"))
+        if (
+            row_temperature is None
+            or row_entropy is None
+            or row_temperature[0] > temperature
+            or row_index == token.row_index
+        ):
+            continue
+        reference = _element_reference_species(symbol, row_temperature[0])
+        if reference is None:
+            transition_token = replace(
+                token, row_index=row_index, column="entropy"
+            )
+            reference = _element_reference_species_for_transition_entropy(
+                record, transition_token, formula, row_temperature[0]
+            )
+        if reference is None:
+            continue
+        condensed_species, atoms_per_formula = reference
+        if phase_token(condensed_species) not in {Phase.CR, Phase.L}:
+            continue
+        entropy_per_atom = per_atom(row_entropy[0], atoms_per_formula)
+        if row_temperature[0] == temperature:
+            same_temperature_condensed.append(entropy_per_atom)
+        else:
+            earlier_condensed.append(entropy_per_atom)
+
+    # Stable-phase S increases with temperature (Cp/T > 0), and these phase
+    # transitions add entropy. Without a same-temperature condensed row, the
+    # highest earlier condensed S is a conservative consistency floor.
+    # Normalize per atom so formula changes such as P to P2 compare.
+    condensed_candidates = same_temperature_condensed or earlier_condensed
+    return not condensed_candidates or gas_entropy_per_atom > max(condensed_candidates)
+
+
+def _is_element_reference_state_record_id(record_id: str, formula: str) -> bool:
+    counts = _parse_counts(formula)
+    return (
+        "reference-state" in record_id
+        and counts is not None
+        and len(counts) == 1
+    )
 
 
 def reference_enthalpy_zero_is_ideal_gas(formula: str) -> bool:
@@ -1521,7 +1745,45 @@ def _observation(
     reconstruction: Mapping[str, Any] | None = None,
 ) -> Observation:
     record_id = str(record["record_id"])
-    phase, polymorph = _phase_state(record)
+    if _is_element_reference_state_record_id(record_id, formula):
+        counts = _parse_counts(formula)
+        symbol = next(iter(counts)) if counts is not None and len(counts) == 1 else None
+        if symbol is None:
+            reference = None
+        else:
+            reference = _element_reference_species(symbol, temperature)
+            if reference is None:
+                reference = _element_reference_species_for_transition_entropy(
+                    record, token, formula, temperature
+                )
+            if reference is not None:
+                reference_species, atoms_per_formula = reference
+                if (
+                    phase_token(reference_species) is Phase.G
+                    and not _element_reference_state_gas_entropy_is_consistent(
+                        record,
+                        token,
+                        formula,
+                        symbol,
+                        temperature,
+                        atoms_per_formula,
+                    )
+                ):
+                    reference = None
+        if reference is None:
+            unresolved = (
+                "B1259 elemental reference-state identity is unresolved at "
+                f"{temperature} K"
+            )
+            phase = State.unknown(unresolved)
+            polymorph = State.unknown(unresolved)
+        else:
+            reference_species, _atoms = reference
+            formula = reference_species.formula
+            phase = reference_species.phase
+            polymorph = reference_species.polymorph
+    else:
+        phase, polymorph = _phase_state(record)
     if (
         phase.is_value
         and phase.value is Phase.AQ

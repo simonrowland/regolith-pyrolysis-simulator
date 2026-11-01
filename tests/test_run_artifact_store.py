@@ -251,6 +251,22 @@ def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
     assert "wall_lifetime" not in artifact["terminal"]
 
 
+def test_build_run_artifact_preserves_shuttle_refusal_history() -> None:
+    refusal_history = [
+        {
+            "reaction_family": "C3_K",
+            "hour": 0,
+            "temperature_C": 1150.0,
+        }
+    ]
+    payload = _runner_payload()
+    payload["shuttle_refusal_history"] = refusal_history
+
+    artifact = build_run_artifact(payload, run_id="run-shuttle-refusal")
+
+    assert artifact["terminal"]["shuttle_refusal_history"] == refusal_history
+
+
 def test_build_run_artifact_omits_yield_disposition_when_runner_omits_it() -> None:
     payload = _runner_payload()
     payload.pop("yield_disposition")

@@ -1,0 +1,65 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc
+  citation: Brewer, L. and Margrave, J. (1952), Vaporization of Alkali Metal Oxides, University of California Radiation Laboratory
+    report UCRL-1864.
+  source_ids:
+  - brewer-margrave-1952-alkali-oxides-ucrl1864
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+      role: pdf
+      path: raw/brewer-margrave-1952-alkali-oxides-ucrl1864/brewer-margrave-1952-alkali-oxides-ucrl1864.pdf
+      sha256:
+        tag: value
+        value: f36be7e9a9323786a4acb9223748d1dd545f9bb2febe5adc7ff7b7477f2e1d6a
+    - asset_id: pdftotext:brewer-margrave-1952-alkali-oxides-ucrl1864
+      role: pdftotext
+      path: text/brewer-margrave-1952-alkali-oxides-ucrl1864
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:brewer-margrave-1952-alkali-oxides-ucrl1864
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: Table 3, Vaporization Data on Na2O; absolute PDF page 17.

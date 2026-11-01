@@ -1,0 +1,45 @@
+source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
+mineru_tables: []
+excluded_mineru_details_tables: 8
+hand_transcribed:
+  - observation_id: tsukihashi_sano_1997_eq12_na2o_gamma_fit
+    source: pdftotext-layout plus MinerU equation/text blocks
+    locator: {page: 4, published_page: 732, equation: '12'}
+    fields: [slope_numerator_as_published, slope_uncertainty_as_published, intercept_as_published, intercept_uncertainty_as_published]
+    audit: all four cells agree between both machine reads; page render confirms Eq. 12
+    mapping: {species: Na2O, quantity: activity_coefficient_temperature_fit, method_class: quoted_attributed, phase: l}
+    printed_row_count: 1 fitted relation; no tabular run rows
+    row_assignment: Eq. 12 states the fitted temperature dependence for Na2O at 4 mass% in the named flux system
+    render_verified: true
+printed_numeric_table_rows: 0
+excluded_figure_read_candidates: [Fig. 6, Fig. 7, Fig. 8]
+prose_numeric_audit:
+  - locator: {page: 1, published_page: 729}
+    cells: ['18,600', '±1,100', '7.53', '±0.08', '1423', '1623']
+    audit: MinerU and pdftotext agree; 200-dpi render confirms abstract fit and stated range
+  - locator: {page: 2, published_page: 730, section: '2.2'}
+    cells: ['20 g', '13 g', '1423', '1623']
+    audit: MinerU and pdftotext agree; 200-dpi render confirms charge sizes and equilibration range
+  - locator: {page: 4, published_page: 732, section: '3.2', figure: '6'}
+    cells: ['4 mass% Na2O', '18,600', '±1,100', '7.23', '±0.08']
+    audit: MinerU and pdftotext agree; 200-dpi render confirms figure composition and Eq. 12; Fig. 6 plotted markers remain excluded
+  - locator: {page: 3, published_page: 731, section: '3.2'}
+    cells: ['0.01', '10']
+    audit: MinerU and pdftotext agree; 200-dpi render confirms the P_CO2/P_CO gas-ratio range
+isolated_migration:
+  observations: 1
+  hard_issues: 0
+  unavailable: 0
+  validation_issues: 0
+  profile_axes: composition, total_pressure_Pa, fO2_Pa, temperature_K are not applicable/unknown for this fit profile
+  conditions: composition and atmosphere reach point_conditions; no total pressure is mapped because the source states none
+source_conflict:
+  - locator: {page: 1, published_page: 729}
+    reading: abstract intercept 7.53
+    audit: MinerU and pdftotext agree; page render confirms
+  - locator: {page: 4, published_page: 732, equation: '12'}
+    reading: Eq. 12 intercept 7.23
+    audit: MinerU and pdftotext agree; page render confirms; conclusion also prints 7.23
+  - locator: {page: 1, published_page: 729}
+    reading: abstract says 0.4 mass% K2O gives a tenfold phosphorus-partition increase; conclusion says 0.4 mass% Na2O
+    audit: printed conflict recorded as out of scope; neither phosphorus-partition result is extracted as an Na2O activity

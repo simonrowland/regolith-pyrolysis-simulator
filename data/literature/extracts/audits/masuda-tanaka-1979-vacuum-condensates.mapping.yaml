@@ -1,0 +1,57 @@
+source_id: masuda-tanaka-1979-vacuum-condensates
+source: raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
+extraction_mode: MinerU machine-text transcription; full-page PDF renders required because pdftotext has only ADS
+  watermarks
+audit:
+  numeric_cells_csv: masuda-tanaka-1979-vacuum-condensates.cells.csv
+  numeric_cells_render_checked: 327
+  rendered_pdf_pages:
+  - 5
+  - 6
+  row_column_assignment: Each table layout and every numeric cell was checked against its page render; page 5 is
+    printed p. 17, page 6 is printed p. 18.
+  missing_marks: Printed dashes are retained as '-' in rows_as_published and omitted from numeric-cell audit counts.
+mappings:
+- table: '1'
+  page: 5
+  published_page: 17
+  columns:
+  - Run No.
+  - 6-16-3Condens.
+  - IU-1Condens.
+  - IU-4Condens.
+  - 9-26-1Condens.
+  - 9-26-3Condens.
+  - 9-26-2Condens.
+  - 9-26-4**Condens.
+  - 9-26-5**Residue
+  - JB-1*
+  rows: 22
+  numeric_cells: 178
+  disposition: residue trace elements as observations; condensate analyses typed-refused; full table retained as
+    context
+  basis: ppm trace elements; percent selected major oxides; Ta-free basis
+  reason: The seven condensate analyses are non-closed and mix ppm elemental values with selected oxide percentages.
+    The existing condensate vector quantity requires mole fractions, which cannot be reconstructed from absent components.
+    The interrupted residue has 13 trace-element ppm values and uses the existing residue_composition_vs_time /
+    residue_ppm path; major-oxide cells for the residue are printed as dashes.
+- table: '2'
+  page: 6
+  published_page: 18
+  columns:
+  - Run No.
+  - 6-16-3
+  - IU-1
+  - IU-4
+  - 9-26-1
+  - 9-26-3
+  - 9-26-2
+  - 9-26-4
+  - 9-26-5
+  rows: 21
+  numeric_cells: 149
+  disposition: typed-refused context
+  basis: dimensionless relative enrichment factors
+  reason: Author-calculated enrichment factors do not have an existing distribution-ratio or condensate-vector meaning,
+    and the printed input records cannot be represented as compatible observation lineage. Table values are preserved
+    verbatim, attributed, and not treated as independent measurements.

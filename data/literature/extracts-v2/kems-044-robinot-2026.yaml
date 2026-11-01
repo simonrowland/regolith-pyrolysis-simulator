@@ -684,9 +684,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-044-robinot-2026::robinot_2026_fig1_hsc_figure_only
   source_id: kems-044-robinot-2026
   locator:
     published_page: 4
@@ -729,9 +733,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-044-robinot-2026::robinot_2026_fig5_eds_figure_only
   source_id: kems-044-robinot-2026
   locator:
     published_page: 8
@@ -775,9 +783,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-044-robinot-2026::robinot_2026_fig8_80kg_astronaut_o2
   source_id: kems-044-robinot-2026
   locator:
     published_page: 12
@@ -1015,9 +1027,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-044-robinot-2026::robinot_2026_o2_fig4ab_figure_only
   source_id: kems-044-robinot-2026
   locator:
     published_page: 8
@@ -1063,9 +1079,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-044-robinot-2026::robinot_2026_o2_hsc_expected_1p37_model
   source_id: kems-044-robinot-2026
   locator:
     published_page: 11
@@ -1164,12 +1184,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'EAC-1_solar_vacuum_pyrolysis' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1266,12 +1285,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'EAC-1_solar_vacuum_pyrolysis' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O2
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -57,12 +56,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,9 +81,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_al2o_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -102,12 +104,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -146,12 +147,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -172,9 +172,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_al_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -191,12 +195,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -217,9 +220,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_alo_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -236,12 +243,11 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -262,9 +268,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_ca_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -281,12 +291,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -307,9 +316,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_cao_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -3843,12 +3856,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3869,9 +3881,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_k_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -5888,12 +5904,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5934,12 +5949,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5960,9 +5974,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_na_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -5979,12 +5997,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6025,12 +6042,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6071,12 +6087,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6117,12 +6132,11 @@ observations:
     species:
       formula: PO
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6163,12 +6177,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6189,9 +6202,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_sio_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461
@@ -6208,12 +6225,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'high_Al_melts_highland_rocks' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6254,12 +6270,11 @@ observations:
     species:
       formula: TiO
       phase:
-        tag: unknown
-        reason: phase string 'residual_high_Al_melts' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6280,9 +6295,13 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-025-markova-1983::markova_1983_tio_psat_figs_figure_only
   source_id: kems-025-markova-1983
   locator:
     published_page: 461

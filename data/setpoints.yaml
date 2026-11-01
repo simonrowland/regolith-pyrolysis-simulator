@@ -164,13 +164,26 @@ campaigns:
         note: "recyclable shuttle stock; quantitative collection"
       Fe:
         mass_kg: [85, 130]
+        target_status: unverified_design_target
+        decision: d-310
+        reason: >-
+          Design target not verified against frozen-hour engine yields.
         condensation_T_C: [1100, 1400]
       SiO2_glass:
         mass_kg: [100, 160]
+        target_status: unverified_design_target
+        decision: d-310
+        reason: >-
+          Design target not verified against frozen-hour engine yields.
         condensation_T_C: [900, 1200]
         note: "fused silica on removable Stage 2 cartridge"
       O2:
         mass_kg: [48, 70]
+        target_status: unverified_design_target
+        decision: d-310
+        reason: >-
+          Design target not verified against frozen-hour engine yields and
+          conflicts with oxygen implied by glass chemistry.
         note: "from Fe sorbent reheat"
     recovery_NaK_pct: [88, 96]
     SiO_transport_capacity_g_per_s: [7, 16]

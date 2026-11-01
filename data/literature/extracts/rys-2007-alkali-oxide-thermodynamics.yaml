@@ -27,6 +27,33 @@ fidelity_samples:
   - path: species.SiO2.observations[rys_2007_table9_eutectic].values.points[0].T_C
     value: 1029
     locator: {page: 97, published_page: 85, pdf_page_index: 96, table: '9', row: '63Na2O-37SiO2', column: 'eutectic up'}
+benches:
+  - id: rys-2007-kems-cell
+    identity: {basis: described_in_this_work}
+    cell_materials:
+      - state: {tag: value, value: Ir}
+        locator: &rys_2007_cell_locator
+          page: 49
+          published_page: 37
+          pdf_page_index: 48
+          section: 4.1.1 Apparatus
+          note: >-
+            "The effusion orifice of the Knudsen cell was 0.3mm. The cell was
+            made of iridium."
+    geometry:
+      orifice_diameter_m:
+        state: {tag: value, value: {kind: point, point: '0.0003'}}
+        locator: *rys_2007_cell_locator
+experiments:
+  - experiment_id: rys-2007-kems-series
+    bench_id: rys-2007-kems-cell
+    method: knudsen_effusion
+    locator:
+      page: 49
+      published_page: 37
+      pdf_page_index: 48
+      section: 4.1 Knudsen effusion mass spectrometry (KEMS)
+      note: "Section heading: Knudsen effusion mass spectrometry (KEMS)"
 species:
   SiO2:
     observations:
@@ -2364,6 +2391,7 @@ species:
                   total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 126, published_page: 114, pdf_page_index: 125, table: '19'}}
                 locator: {page: 126, published_page: 114, pdf_page_index: 125, table: '19'}
         - observation_id: rys_2007_appendix_na2o_partial_pressures_table1
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -2396,6 +2424,7 @@ species:
               - {sample_as_printed: Na2O_1, gas_species: Na2O, T_K: '1016.928', pressure_Pa: '3.10E-05', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 18, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
               - {sample_as_printed: Na2O_1, gas_species: Na2O, T_K: '1138.177', pressure_Pa: '0.000213', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
         - observation_id: rys_2007_appendix_na2o_partial_pressures_table2
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -2422,6 +2451,7 @@ species:
               - {sample_as_printed: Na2O_2, gas_species: Na2O, T_K: '1072.968', pressure_Pa: '3.00E-05', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 9, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
               - {sample_as_printed: Na2O_2, gas_species: Na2O, T_K: '1144.291', pressure_Pa: '0.000219', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 10, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
         - observation_id: rys_2007_appendix_na2o_partial_pressures_table3
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4424,6 +4454,7 @@ species:
   Na:
       observations:
         - observation_id: rys_2007_appendix_na_partial_pressures
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}
@@ -4487,6 +4518,7 @@ species:
               - {sample_as_printed: NaKAlSi_2, gas_species: Na, T_K: 1755.631, pressure_Pa: 0.071947, composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: '11a'}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: '11a'}, composition_mol_basis: printed_mole_fraction}
               - {sample_as_printed: NaKAlSi_5, gas_species: Na, T_K: 1759.706, pressure_Pa: 0.045899, composition_mol: {Na2O: '0.0400', Al2O3: '0.1325', SiO2: '0.7953', K2O: '0.0322'}, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: '12a'}}}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: '12a'}, composition_mol_basis: printed_mole_fraction}
         - observation_id: rys_2007_appendix_na_partial_pressures_table4
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4530,6 +4562,7 @@ species:
               - {sample_as_printed: NaAlSi_1, gas_species: Na, T_K: '1601.777', pressure_Pa: '0.00188', composition_mol: {Na2O: '0.0705', Al2O3: '0.0648', SiO2: '0.8647'}, composition_mol_basis: printed_mole_fraction, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '4'}}}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '4'}}
               - {sample_as_printed: NaAlSi_1, gas_species: Na, T_K: '1841.218', pressure_Pa: '0.132494', composition_mol: {Na2O: '0.0705', Al2O3: '0.0648', SiO2: '0.8647'}, composition_mol_basis: printed_mole_fraction, source_row: 17, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '4'}}}, locator: {page: 138, published_page: 126, pdf_page_index: 137, table: '4'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table5
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4579,6 +4612,7 @@ species:
               - {sample_as_printed: NaAlSi_2, gas_species: Na, T_K: '1866.691', pressure_Pa: '0.518687', composition_mol: {Na2O: '0.1352', Al2O3: '0.1251', SiO2: '0.7397'}, composition_mol_basis: printed_mole_fraction, source_row: 17, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '5'}}}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '5'}}
               - {sample_as_printed: NaAlSi_2, gas_species: Na, T_K: '1861.596', pressure_Pa: '0.362364', composition_mol: {Na2O: '0.1352', Al2O3: '0.1251', SiO2: '0.7397'}, composition_mol_basis: printed_mole_fraction, source_row: 17, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '5'}}}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '5'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table6
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4622,6 +4656,7 @@ species:
               - {sample_as_printed: NaAlSi_3, gas_species: Na, T_K: '1653.741', pressure_Pa: '0.04954', composition_mol: {Na2O: '0.2017', Al2O3: '0.1900', SiO2: '0.6083'}, composition_mol_basis: printed_mole_fraction, source_row: 17, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '6'}}}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '6'}}
               - {sample_as_printed: NaAlSi_3, gas_species: Na, T_K: '1848.351', pressure_Pa: '0.834677', composition_mol: {Na2O: '0.2017', Al2O3: '0.1900', SiO2: '0.6083'}, composition_mol_basis: printed_mole_fraction, source_row: 18, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '6'}}}, locator: {page: 139, published_page: 127, pdf_page_index: 138, table: '6'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table7
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4674,6 +4709,7 @@ species:
               - {sample_as_printed: NaAlSi_4, gas_species: Na, T_K: '1625.211', pressure_Pa: '0.025391', composition_mol: {Na2O: '0.2628', Al2O3: '0.2411', SiO2: '0.4961'}, composition_mol_basis: printed_mole_fraction, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '7'}}}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '7'}}
               - {sample_as_printed: NaAlSi_4, gas_species: Na, T_K: '1832.048', pressure_Pa: '0.5706', composition_mol: {Na2O: '0.2628', Al2O3: '0.2411', SiO2: '0.4961'}, composition_mol_basis: printed_mole_fraction, source_row: 20, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '7'}}}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '7'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table8
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4727,6 +4763,7 @@ species:
               - {sample_as_printed: NaAlSi_5, gas_species: Na, T_K: '1832.048', pressure_Pa: '0.137721', composition_mol: {Na2O: '0.0722', Al2O3: '0.1365', SiO2: '0.7914'}, composition_mol_basis: printed_mole_fraction, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '8'}}}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '8'}}
               - {sample_as_printed: NaAlSi_5, gas_species: Na, T_K: '1831.029', pressure_Pa: '0.105397', composition_mol: {Na2O: '0.0722', Al2O3: '0.1365', SiO2: '0.7914'}, composition_mol_basis: printed_mole_fraction, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '8'}}}, locator: {page: 140, published_page: 128, pdf_page_index: 139, table: '8'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table9
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4779,6 +4816,7 @@ species:
               - {sample_as_printed: NaAlSi_6, gas_species: Na, T_K: '1675.138', pressure_Pa: '3.064268', composition_mol: {Na2O: '0.4353', Al2O3: '0.0804', SiO2: '0.4843'}, composition_mol_basis: printed_mole_fraction, source_row: 18, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 141, published_page: 129, pdf_page_index: 140, table: '9'}}}, locator: {page: 141, published_page: 129, pdf_page_index: 140, table: '9'}}
               - {sample_as_printed: NaAlSi_6, gas_species: Na, T_K: '1682.27', pressure_Pa: '2.905891', composition_mol: {Na2O: '0.4353', Al2O3: '0.0804', SiO2: '0.4843'}, composition_mol_basis: printed_mole_fraction, source_row: 18, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 141, published_page: 129, pdf_page_index: 140, table: '9'}}}, locator: {page: 141, published_page: 129, pdf_page_index: 140, table: '9'}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table10a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4808,6 +4846,7 @@ species:
               - {sample_as_printed: NaKAlSi_1, gas_species: Na, T_K: '1690.421', pressure_Pa: '0.005997', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 13, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}
               - {sample_as_printed: NaKAlSi_1, gas_species: Na, T_K: '1855.483', pressure_Pa: '0.098981', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table10b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4837,6 +4876,7 @@ species:
               - {sample_as_printed: NaKAlSi_1, gas_species: Na, T_K: '1698.572', pressure_Pa: '0.008162', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 13, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}
               - {sample_as_printed: NaKAlSi_1, gas_species: Na, T_K: '1848.351', pressure_Pa: '0.107036', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table11a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4867,6 +4907,7 @@ species:
               - {sample_as_printed: NaKAlSi_2, gas_species: Na, T_K: '1678.194', pressure_Pa: '0.017852', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}
               - {sample_as_printed: NaKAlSi_2, gas_species: Na, T_K: '1851.407', pressure_Pa: '0.24762', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table11b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4899,6 +4940,7 @@ species:
               - {sample_as_printed: NaKAlSi_2, gas_species: Na, T_K: '1674.119', pressure_Pa: '0.019248', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}
               - {sample_as_printed: NaKAlSi_2, gas_species: Na, T_K: '1861.596', pressure_Pa: '0.311687', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table12a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4929,6 +4971,7 @@ species:
               - {sample_as_printed: NaKAlSi_5, gas_species: Na, T_K: '1650.684', pressure_Pa: '0.005797', composition_mol: {Na2O: '0.0400', Al2O3: '0.1325', SiO2: '0.7953', K2O: '0.0322'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}
               - {sample_as_printed: NaKAlSi_5, gas_species: Na, T_K: '1831.029', pressure_Pa: '0.111308', composition_mol: {Na2O: '0.0400', Al2O3: '0.1325', SiO2: '0.7953', K2O: '0.0322'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}
         - observation_id: rys_2007_appendix_na_partial_pressures_table12b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4960,6 +5003,7 @@ species:
   K:
       observations:
         - observation_id: rys_2007_appendix_k_partial_pressures_table10a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -4990,6 +5034,7 @@ species:
               - {sample_as_printed: NaKAlSi_1, gas_species: K, T_K: '1690.421', pressure_Pa: '0.001778', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 13, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}
               - {sample_as_printed: NaKAlSi_1, gas_species: K, T_K: '1855.483', pressure_Pa: '0.035086', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10a}}
         - observation_id: rys_2007_appendix_k_partial_pressures_table10b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5019,6 +5064,7 @@ species:
               - {sample_as_printed: NaKAlSi_1, gas_species: K, T_K: '1698.572', pressure_Pa: '0.001666', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 13, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}
               - {sample_as_printed: NaKAlSi_1, gas_species: K, T_K: '1848.351', pressure_Pa: '0.033168', composition_mol: {Na2O: '0.0380', Al2O3: '0.0647', SiO2: '0.8659', K2O: '0.0314'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}}, locator: {page: 142, published_page: 130, pdf_page_index: 141, table: 10b}}
         - observation_id: rys_2007_appendix_k_partial_pressures_table11a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5051,6 +5097,7 @@ species:
               - {sample_as_printed: NaKAlSi_2, gas_species: K, T_K: '1678.194', pressure_Pa: '0.007725', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}
               - {sample_as_printed: NaKAlSi_2, gas_species: K, T_K: '1851.407', pressure_Pa: '0.155319', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11a}}
         - observation_id: rys_2007_appendix_k_partial_pressures_table11b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5083,6 +5130,7 @@ species:
               - {sample_as_printed: NaKAlSi_2, gas_species: K, T_K: '1674.119', pressure_Pa: '0.01001', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}
               - {sample_as_printed: NaKAlSi_2, gas_species: K, T_K: '1861.596', pressure_Pa: '0.22681', composition_mol: {Na2O: '0.0723', Al2O3: '0.1171', SiO2: '0.7528', K2O: '0.0578'}, composition_mol_basis: printed_mole_fraction, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}}, locator: {page: 143, published_page: 131, pdf_page_index: 142, table: 11b}}
         - observation_id: rys_2007_appendix_k_partial_pressures_table12a
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5114,6 +5162,7 @@ species:
               - {sample_as_printed: NaKAlSi_5, gas_species: K, T_K: '1650.684', pressure_Pa: '0.001524', composition_mol: {Na2O: '0.0400', Al2O3: '0.1325', SiO2: '0.7953', K2O: '0.0322'}, composition_mol_basis: printed_mole_fraction, source_row: 14, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}
               - {sample_as_printed: NaKAlSi_5, gas_species: K, T_K: '1831.029', pressure_Pa: '0.037455', composition_mol: {Na2O: '0.0400', Al2O3: '0.1325', SiO2: '0.7953', K2O: '0.0322'}, composition_mol_basis: printed_mole_fraction, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}}, locator: {page: 144, published_page: 132, pdf_page_index: 143, table: 12a}}
         - observation_id: rys_2007_appendix_k_partial_pressures_table12b
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5145,6 +5194,7 @@ species:
   NaO:
       observations:
         - observation_id: rys_2007_appendix_nao_partial_pressures_table1
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5174,6 +5224,7 @@ species:
               - {sample_as_printed: Na2O_1, gas_species: NaO, T_K: '1102.516', pressure_Pa: '0.000194', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 16, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
               - {sample_as_printed: Na2O_1, gas_species: NaO, T_K: '1138.177', pressure_Pa: '0.000469', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
         - observation_id: rys_2007_appendix_nao_partial_pressures_table2
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5199,6 +5250,7 @@ species:
               - {sample_as_printed: Na2O_2, gas_species: NaO, T_K: '1072.968', pressure_Pa: '8.43E-05', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 9, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
               - {sample_as_printed: Na2O_2, gas_species: NaO, T_K: '1144.291', pressure_Pa: '0.000635', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 10, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
         - observation_id: rys_2007_appendix_nao_partial_pressures_table3
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5229,6 +5281,7 @@ species:
   O2:
       observations:
         - observation_id: rys_2007_appendix_o2_partial_pressures_table1
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5256,6 +5309,7 @@ species:
               - {sample_as_printed: Na2O_1, gas_species: O2, T_K: '1130.026', pressure_Pa: '0.758686', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 15, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
               - {sample_as_printed: Na2O_1, gas_species: O2, T_K: '1138.177', pressure_Pa: '0.862817', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 19, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '1'}}
         - observation_id: rys_2007_appendix_o2_partial_pressures_table2
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:
@@ -5281,6 +5335,7 @@ species:
               - {sample_as_printed: Na2O_2, gas_species: O2, T_K: '1072.968', pressure_Pa: '0.384448', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 9, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
               - {sample_as_printed: Na2O_2, gas_species: O2, T_K: '1144.291', pressure_Pa: '1.200289', composition_mol: {Na2O: '1'}, composition_mol_basis: pure_oxide_system, source_row: 10, point_conditions: {total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}}, locator: {page: 137, published_page: 125, pdf_page_index: 136, table: '2'}}
         - observation_id: rys_2007_appendix_o2_partial_pressures_table3
+          experiment: rys-2007-kems-series
           type: partial_pressure
           phase: gas
           locator:

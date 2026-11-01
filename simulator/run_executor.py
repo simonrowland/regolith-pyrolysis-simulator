@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any
 
 from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
@@ -15,6 +16,7 @@ from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
 )
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -53,6 +55,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    CampaignSetpointMissingRefusal,
     EvaporationFluxRefusal,
     MREElectrolysisRefusal,
     *_TYPED_PHYSICS_REFUSALS,
@@ -213,7 +216,11 @@ class RunExecutor:
                 config,
                 backend=_backend_from_worker_runtime(config, worker_runtime),
             )
-        except (CampaignPressureSetpointRefusal, EvaporationFluxRefusal) as exc:
+        except (
+            CampaignPressureSetpointRefusal,
+            CampaignSetpointMissingRefusal,
+            EvaporationFluxRefusal,
+        ) as exc:
             return self.execute_session(
                 session,
                 hours=hours,
@@ -231,7 +238,10 @@ class RunExecutor:
         hours: int,
         stop_at_stage0_exit: bool | None = None,
         initial_refusal: (
-            CampaignPressureSetpointRefusal | EvaporationFluxRefusal | None
+            CampaignPressureSetpointRefusal
+            | CampaignSetpointMissingRefusal
+            | EvaporationFluxRefusal
+            | None
         ) = None,
     ) -> RunExecution:
         sim = session.simulator
@@ -405,6 +415,7 @@ class RunExecutor:
             KnudsenRegimeRefusal,
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
+            CampaignSetpointMissingRefusal,
             EvaporationFluxRefusal,
             MREElectrolysisRefusal,
         ) as exc:
@@ -457,11 +468,12 @@ class RunExecutor:
             all_snapshots = tuple(getattr(sim.record, "snapshots", ()))
             snapshots = all_snapshots[snapshot_start:]
             sim.record.cost_rollup = build_cost_rollup_diagnostic(
+                sim=sim,
                 cost_ledger=sim.cost_ledger,
                 per_hour=tuple(per_hour),
                 products_kg=sim.product_ledger(),
                 pumping_context=pumping_context_from_sim(sim, snapshots),
-                snapshots=snapshots,
+                snapshots=all_snapshots,
             )
             trace = _slice_trace(PhysicsTrace.from_simulator(sim), snapshot_start)
             reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)

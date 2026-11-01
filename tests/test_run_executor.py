@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from copy import deepcopy
 from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
 
-from simulator.accounting.ledger import AtomLedger
+from simulator.accounting.ledger import AtomLedger, snapshot_atom_ledger
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
@@ -60,6 +62,52 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.trace, PhysicsTrace)
     assert execution.trace.snapshots == execution.snapshots
     assert isinstance(execution.operator_decisions, tuple)
+
+
+def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
+    run = _run()
+    execution = RunExecutor().execute(run._session_config())
+    payload = run._build_output(execution)
+    payload_bytes = (
+        json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
+    ).encode("utf-8")
+
+    # Pin the complete serialized runner result and the authoritative ledger
+    # projections before changing the per-hour refusal snapshot ownership.
+    ledger = snapshot_atom_ledger(execution.simulator.atom_ledger)
+    ledger_state = {
+        "gross_account_flows": ledger.gross_account_flows(),
+        "gross_account_flow_events": ledger.gross_account_flow_events(),
+        "cumulative_origin_unattributed_atom_moles": (
+            ledger.cumulative_origin_unattributed_atom_moles()
+        ),
+        "origin_atom_moles_by_account": ledger.origin_atom_moles_by_account(),
+        "unresolved_origin_atom_moles_by_account": (
+            ledger.unresolved_origin_atom_moles_by_account()
+        ),
+        "origin_attribution_methods_by_account": (
+            ledger.origin_attribution_methods_by_account()
+        ),
+        "external_origin_atom_moles": ledger.external_origin_atom_moles(),
+        "initial_unattributed_atom_moles": (
+            ledger.initial_unattributed_atom_moles()
+        ),
+    }
+    ledger_bytes = json.dumps(
+        ledger_state,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+
+    assert execution.status == "ok"
+    assert len(execution.snapshots) == 2
+    assert hashlib.sha256(payload_bytes).hexdigest() == (
+        "48f5ef924f554599242f2cbabd8c12b594cf69b0033a7d2cb4412624e76471b9"
+    )
+    assert hashlib.sha256(ledger_bytes).hexdigest() == (
+        "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
+    )
 
 
 def test_run_executor_uses_campaigns_elapsed_override_without_history():
@@ -1093,6 +1141,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     # Recorded on parent 5672e61d9 by the non-binding fallback probe:
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
+    # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
     expected_rates = {
         "Al": 1.776974630811854e-10,
         "AlO": 2.622990526227972e-10,
@@ -1110,6 +1159,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "Na": 5.142690508092712e-03,
         "Na2": 3.013634463408095e-08,
         "Na2O_gas": 3.0031933641137976e-11,
+        "Si": 1.2046947950628297e-10,
         "SiO": 7.769179203709372e-09,
         "SiO2_gas": 4.598894711291365e-06,
         "TiO": 2.8635316467141483e-09,

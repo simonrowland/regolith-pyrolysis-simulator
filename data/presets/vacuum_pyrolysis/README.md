@@ -11,7 +11,7 @@ Required top-level fields:
 - `paper_id`
 - `paper_citation_id`
 - `measurement_id`
-- `preset_kind`: `faithful_reproduction` or `faithful_with_remediation_twin`
+- `preset_kind`: `faithful_with_remediation_twin`
 - `extraction_status`: a named package-completeness and certification disposition
 - `lab_schedule`
 - `lab_geometry`

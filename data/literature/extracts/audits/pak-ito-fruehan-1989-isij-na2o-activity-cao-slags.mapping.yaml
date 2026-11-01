@@ -1,0 +1,27 @@
+source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
+table: '1'
+page: 3
+printed_page: 320
+mineru_table_key: p003-t01
+columns:
+  sample: 1
+  temperature_C: 2
+  reference_mol_percent: 3
+  sample_Na2O_mol_percent: 4
+  sample_CaO_mol_percent: 5
+  sample_SiO2_mol_percent: 6
+  EMF_mV: 7
+  negative_log10_activity_Na2O: 8
+stored_observation:
+  quantity: activity
+  species: Na2O
+  method_class: measured_reduced
+  value: 10^(-printed negative log10 activity)
+  input_parent_form: typed-refused negative-log activity cell; no closed quantity token
+  composition: sample mol% columns 4-6, represented as mole fractions for identity mapping
+  temperature: printed column 2 in T_C and converted T_K identity axis
+  standard_state: retain table reference and Yamaguchi footnote calibration; pure-component standard state not named
+render_audit:
+  result: all numeric cells in the 22 body rows checked against PDF page 3 render
+  triggers: MinerU QA flagged comma_dot_decimal=1, multiple_numbers=22, numeric_mismatch=47; numeric agreement 0.753
+  tool_compare_output: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags-mineru-compare.csv

@@ -1,0 +1,813 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml
+observations:
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k2o_fig6_model_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: vapour pressure of pure K2O'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: plotted SiO2 and K2O mole fractions vary between curves
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, label, method_as_published, method_class,
+      attribution, status, reason, admission_status, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Witthohn et al. (2000), Fig. 6; FACT calculation curves
+  admission:
+    status: rejected
+    reason: Figure-only model values are outside this extraction wave; no measured K2O activity data are tabulated.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 18
+        figure: '6'
+        note: FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these as calculated activities, not measured
+          activity points.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 18
+    figure: '6'
+    note: FACT calculation curves for K2O-SiO2-Al2O3; the paper describes these as calculated activities, not measured activity
+      points.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: five temperature curves are grouped in one figure-level refusal
+      locator:
+        page: 18
+        figure: '6'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted SiO2 and K2O mole fractions vary between curves
+      locator:
+        page: 18
+        figure: '6'
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig2_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: plotted series combine samples A through D
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, label, method_class, derivation, status,
+      reason, admission_status, plotted_series, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 16
+        figure: '2'
+        note: Alkali release from laboratory ashes A-D. Plotted marker values only; no numeric table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 16
+    figure: '2'
+    note: Alkali release from laboratory ashes A-D. Plotted marker values only; no numeric table is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: plotted temperature varies and no individual point is transcribed
+      locator:
+        page: 16
+        figure: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted series combine samples A through D
+      locator:
+        page: 16
+        figure: '2'
+  derivation:
+    relation: Partial pressure reduced from detector signal using temperature, isotopic abundance, ionisation cross-section
+      and the pure-silver calibration constant.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        note: Detector-signal rows and calibration inputs are not tabulated.
+    references: []
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig3_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: K
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: plotted series combine samples E through G
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, label, method_class, derivation, status,
+      reason, admission_status, plotted_series, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 17
+        figure: '3'
+        note: Alkali release from hard-coal ash E and plant slags F-G. Plotted marker values only; no numeric table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 17
+    figure: '3'
+    note: Alkali release from hard-coal ash E and plant slags F-G. Plotted marker values only; no numeric table is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: plotted temperature varies and no individual point is transcribed
+      locator:
+        page: 17
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted series combine samples E through G
+      locator:
+        page: 17
+        figure: '3'
+  derivation:
+    relation: Partial pressure reduced from detector signal using temperature, isotopic abundance, ionisation cross-section
+      and the pure-silver calibration constant.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        note: Detector-signal rows and calibration inputs are not tabulated.
+    references: []
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig4_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: vapour pressure of pure Na2O'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: plotted composition varies along the X(Na2O) axis
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, label, method_as_published, method_class,
+      attribution, status, reason, admission_status, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980); Yamaguchi et al. (1982); Rego et al. (1985); Tsukihashi and Sano (1985)
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 17
+        figure: '4'
+        note: Quasi-binary Na2O-SiO2 comparison; experimental points attributed in the legend to prior studies. No numeric
+          table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 17
+    figure: '4'
+    note: Quasi-binary Na2O-SiO2 comparison; experimental points attributed in the legend to prior studies. No numeric table
+      is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: six temperature series are grouped in one figure-level refusal
+      locator:
+        page: 17
+        figure: '4'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted composition varies along the X(Na2O) axis
+      locator:
+        page: 17
+        figure: '4'
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig5_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: vapour pressure of pure Na2O'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: N(CaO) and the printed Na2O:SiO2 ratios vary between plotted series
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, label, T_K, method_as_published, method_class,
+      attribution, status, reason, admission_status, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980)
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 18
+        figure: '5'
+        note: Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed to Neudorf and Elliott (1980). No numeric
+          table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 18
+    figure: '5'
+    note: Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed to Neudorf and Elliott (1980). No numeric
+      table is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: N(CaO) and the printed Na2O:SiO2 ratios vary between plotted series
+      locator:
+        page: 18
+        figure: '5'
+    temperature_K:
+      state:
+        tag: value
+        value: '1343'
+      locator:
+        page: 18
+        figure: '5'
+        note: Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed to Neudorf and Elliott (1980). No numeric
+          table is printed.
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig2_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: plotted series combine samples A through D
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, label, method_class, derivation, status,
+      reason, admission_status, plotted_series, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 16
+        figure: '2'
+        note: Alkali release from laboratory ashes A-D. Plotted marker values only; no numeric table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 16
+    figure: '2'
+    note: Alkali release from laboratory ashes A-D. Plotted marker values only; no numeric table is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: plotted temperature varies and no individual point is transcribed
+      locator:
+        page: 16
+        figure: '2'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted series combine samples A through D
+      locator:
+        page: 16
+        figure: '2'
+  derivation:
+    relation: Partial pressure reduced from detector signal using temperature, isotopic abundance, ionisation cross-section
+      and the pure-silver calibration constant.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        note: Detector-signal rows and calibration inputs are not tabulated.
+    references: []
+- observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig3_figure_only
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: plotted series combine samples E through G
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, label, method_class, derivation, status,
+      reason, admission_status, plotted_series, value_cells_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: Figure-only plotted values are outside this extraction wave.
+    decided_by:
+      worker: fam22-1020
+      date: '2026-10-20'
+      evidence:
+        page: 17
+        figure: '3'
+        note: Alkali release from hard-coal ash E and plant slags F-G. Plotted marker values only; no numeric table is printed.
+  notices: []
+  source_id: witthohn-2000-coal-slag-alkali-vaporisation
+  locator:
+    page: 17
+    figure: '3'
+    note: Alkali release from hard-coal ash E and plant slags F-G. Plotted marker values only; no numeric table is printed.
+  read_from: pdf:witthohn-2000-coal-slag-alkali-vaporisation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: plotted temperature varies and no individual point is transcribed
+      locator:
+        page: 17
+        figure: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: plotted series combine samples E through G
+      locator:
+        page: 17
+        figure: '3'
+  derivation:
+    relation: Partial pressure reduced from detector signal using temperature, isotopic abundance, ionisation cross-section
+      and the pure-silver calibration constant.
+    inputs: []
+    parameters: []
+    output_unit: Pa
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        note: Detector-signal rows and calibration inputs are not tabulated.
+    references: []

@@ -1,0 +1,513 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826
+  citation: Kelley, K. K., Todd, S. S., Orr, R. L., King, E. G., and Bonnickson, K. R. (1953), Thermodynamic Properties of
+    Sodium-Aluminum and Potassium-Aluminum Silicates, U.S. Bureau of Mines Report of Investigations 4955.
+  source_ids:
+  - kelley-1953-alkali-aluminosilicate-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:kelley-1953-alkali-aluminosilicate-thermodynamics
+      role: pdf
+      path: raw/kelley-1953-alkali-aluminosilicate-thermodynamics/kelley-1953-alkali-aluminosilicate-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 121b4ea4d78ae0d8f2246725b9a134d610bb5e558478b88e78c11f480657902a
+    - asset_id: pdftotext:kelley-1953-alkali-aluminosilicate-thermodynamics
+      role: pdftotext
+      path: text/kelley-1953-alkali-aluminosilicate-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kelley-1953-alkali-aluminosilicate-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826::kelley-1953-alkali-aluminosilicate-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826
+  locator:
+    page: 16
+    pdf_page_index: 15
+    table: '9'
+    note: row=all printed rows
+context:
+- observation_id: kelley_1953_table34_reaction_thermochemistry
+  type: reaction_thermochemistry
+  locator:
+    page: 35
+    pdf_page_index: 34
+    table: '34'
+  units: cal/mol
+  values:
+    quantity: reaction_thermochemistry
+    reaction_as_printed: albite + nephelite = 2 jadeite
+    pressure_as_printed: 1 atm. pressure
+    phase_notation_as_printed: The reaction names the mineral phases; no (s) or (cr) suffix is printed.
+    schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100) has no reaction-level type, and iter_extract_observations
+      (simulator/battery/migrate.py:13482-13496) walks species-keyed observations only. gibbs_table maps to delta_fG for one
+      substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf (Quantity.LOG10_KF, simulator/battery/enums.py:69)
+      is a formation equilibrium constant. Neither is an exact type or quantity for these reaction enthalpies and free energies,
+      so the printed cells remain in context.
+    candidate_types_and_quantities_considered:
+    - gibbs_table -> delta_fG
+    - log10_Kf
+    reason_not_typed: These are reaction enthalpy and reaction free-energy values for multi-species reactions, not delta_fG
+      for one substance or log10 formation equilibrium constants. The extract schema has no reaction-level observation type;
+      assigning them to one mineral would misattribute the reaction.
+    basis_at_298_16_as_printed: -5,530 ± 430 cal.
+    runs:
+    - T_K: '298.16'
+      T_K_as_printed: '298.16'
+      delta_r_H_cal_mol: -5530
+      delta_r_H_as_printed: -5,530
+      delta_r_H_source_kind: measured
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: -730
+      delta_r_F_as_printed: '-730'
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '400'
+      T_K_as_printed: '400'
+      delta_r_H_cal_mol: -5530
+      delta_r_H_as_printed: -5,530
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 930
+      delta_r_F_as_printed: '+930'
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '500'
+      T_K_as_printed: '500'
+      delta_r_H_cal_mol: -5800
+      delta_r_H_as_printed: -5,800
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 2570
+      delta_r_F_as_printed: 2,570
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '600'
+      T_K_as_printed: '600'
+      delta_r_H_cal_mol: -5770
+      delta_r_H_as_printed: -5,770
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 4240
+      delta_r_F_as_printed: 4,240
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '700'
+      T_K_as_printed: '700'
+      delta_r_H_cal_mol: -5650
+      delta_r_H_as_printed: -5,650
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 5910
+      delta_r_F_as_printed: 5,910
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '800'
+      T_K_as_printed: '800'
+      delta_r_H_cal_mol: -5500
+      delta_r_H_as_printed: -5,500
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 7550
+      delta_r_F_as_printed: 7,550
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '900'
+      T_K_as_printed: '900'
+      delta_r_H_cal_mol: -5390
+      delta_r_H_as_printed: -5,390
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 9170
+      delta_r_F_as_printed: 9,170
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '1000'
+      T_K_as_printed: 1,000
+      delta_r_H_cal_mol: -5320
+      delta_r_H_as_printed: -5,320
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 10780
+      delta_r_F_as_printed: 10,780
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '1100'
+      T_K_as_printed: 1,100
+      delta_r_H_cal_mol: -5380
+      delta_r_H_as_printed: -5,380
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 12400
+      delta_r_F_as_printed: 12,400
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    - T_K: '1200'
+      T_K_as_printed: 1,200
+      delta_r_H_cal_mol: -5600
+      delta_r_H_as_printed: -5,600
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: At 298.16 K, measured by Kracek, Neuvonen, and Burley as cited in the source; other table
+        temperatures are derived by the authors by combining that determination with this report’s heat-content data.
+      delta_r_F_cal_mol: 14010
+      delta_r_F_as_printed: 14,010
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors by combining the cited 298.16 K heat-of-reaction determination with
+        this report’s entropy and high-temperature heat-content tables.
+    formula_reaction_as_printed: NaAlSi3O8 + NaAlSiO4 = 2 NaAlSi2O6
+    formula_labels_as_printed: page 35 table text labels the printed formulas albite, nephelite, and jadeite
+  context_id: kelley-1953-alkali-aluminosilicate-thermodynamics::context::kelley_1953_table34_reaction_thermochemistry
+  work_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826
+  source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+  species: reaction_albite_nephelite_to_jadeite
+- observation_id: kelley_1953_table36_reaction_thermochemistry
+  type: reaction_thermochemistry
+  locator:
+    page: 37
+    pdf_page_index: 36
+    table: '36'
+  units: cal/mol
+  values:
+    quantity: reaction_thermochemistry
+    reaction_as_printed: albite = jadeite + quartz
+    pressure_as_printed: 1 atm. pressure
+    phase_notation_as_printed: The reaction names the mineral phases; no (s) or (cr) suffix is printed.
+    schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100) has no reaction-level type, and iter_extract_observations
+      (simulator/battery/migrate.py:13482-13496) walks species-keyed observations only. gibbs_table maps to delta_fG for one
+      substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf (Quantity.LOG10_KF, simulator/battery/enums.py:69)
+      is a formation equilibrium constant. Neither is an exact type or quantity for these reaction enthalpies and free energies,
+      so the printed cells remain in context.
+    candidate_types_and_quantities_considered:
+    - gibbs_table -> delta_fG
+    - log10_Kf
+    reason_not_typed: These are reaction enthalpy and reaction free-energy values for multi-species reactions, not delta_fG
+      for one substance or log10 formation equilibrium constants. The extract schema has no reaction-level observation type;
+      assigning them to one mineral would misattribute the reaction.
+    runs:
+    - T_K: '298.16'
+      T_K_as_printed: '298.16'
+      delta_r_H_cal_mol: 140
+      delta_r_H_as_printed: '140'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 2610
+      delta_r_F_as_printed: 2,610
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '400'
+      T_K_as_printed: '400'
+      delta_r_H_cal_mol: 180
+      delta_r_H_as_printed: '180'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 3460
+      delta_r_F_as_printed: 3,460
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '500'
+      T_K_as_printed: '500'
+      delta_r_H_cal_mol: 280
+      delta_r_H_as_printed: '280'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 4260
+      delta_r_F_as_printed: 4,260
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '600'
+      T_K_as_printed: '600'
+      delta_r_H_cal_mol: 320
+      delta_r_H_as_printed: '320'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 5060
+      delta_r_F_as_printed: 5,060
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '700'
+      T_K_as_printed: '700'
+      delta_r_H_cal_mol: 440
+      delta_r_H_as_printed: '440'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 5850
+      delta_r_F_as_printed: 5,850
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '800'
+      T_K_as_printed: '800'
+      delta_r_H_cal_mol: 630
+      delta_r_H_as_printed: '630'
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 6610
+      delta_r_F_as_printed: 6,610
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '900'
+      T_K_as_printed: '900'
+      delta_r_H_cal_mol: 1060
+      delta_r_H_as_printed: 1,060
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 7320
+      delta_r_F_as_printed: 7,320
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '1000'
+      T_K_as_printed: 1,000
+      delta_r_H_cal_mol: 1080
+      delta_r_H_as_printed: 1,080
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 8020
+      delta_r_F_as_printed: 8,020
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '1100'
+      T_K_as_printed: 1,100
+      delta_r_H_cal_mol: 1110
+      delta_r_H_as_printed: 1,110
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 8710
+      delta_r_F_as_printed: 8,710
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+    - T_K: '1200'
+      T_K_as_printed: 1,200
+      delta_r_H_cal_mol: 1210
+      delta_r_H_as_printed: 1,210
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+      delta_r_F_cal_mol: 9390
+      delta_r_F_as_printed: 9,390
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from data in this report and the cited quartz entropy and heat-content
+        data.
+  context_id: kelley-1953-alkali-aluminosilicate-thermodynamics::context::kelley_1953_table36_reaction_thermochemistry
+  work_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826
+  source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+  species: reaction_albite_to_jadeite_quartz
+- observation_id: kelley_1953_table37_reaction_thermochemistry
+  type: reaction_thermochemistry
+  locator:
+    page: 37
+    pdf_page_index: 36
+    table: '37'
+  units: cal/mol
+  values:
+    quantity: reaction_thermochemistry
+    reaction_as_printed: nephelite + quartz = jadeite
+    pressure_as_printed: 1 atm. pressure
+    phase_notation_as_printed: The reaction names the mineral phases; no (s) or (cr) suffix is printed.
+    schema_gap: OBSERVATION_TYPES (tools/validate_literature_extracts.py:71-100) has no reaction-level type, and iter_extract_observations
+      (simulator/battery/migrate.py:13482-13496) walks species-keyed observations only. gibbs_table maps to delta_fG for one
+      substance (TYPE_QUANTITY, simulator/battery/migrate.py:435-450); log10_Kf (Quantity.LOG10_KF, simulator/battery/enums.py:69)
+      is a formation equilibrium constant. Neither is an exact type or quantity for these reaction enthalpies and free energies,
+      so the printed cells remain in context.
+    candidate_types_and_quantities_considered:
+    - gibbs_table -> delta_fG
+    - log10_Kf
+    reason_not_typed: These are reaction enthalpy and reaction free-energy values for multi-species reactions, not delta_fG
+      for one substance or log10 formation equilibrium constants. The extract schema has no reaction-level observation type;
+      assigning them to one mineral would misattribute the reaction.
+    runs:
+    - T_K: '298.16'
+      T_K_as_printed: '298.16'
+      delta_r_H_cal_mol: -5670
+      delta_r_H_as_printed: -5,670
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: -3340
+      delta_r_F_as_printed: -3,340
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '400'
+      T_K_as_printed: '400'
+      delta_r_H_cal_mol: -5720
+      delta_r_H_as_printed: -5,720
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: -2540
+      delta_r_F_as_printed: -2,540
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '500'
+      T_K_as_printed: '500'
+      delta_r_H_cal_mol: -6080
+      delta_r_H_as_printed: -6,080
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: -1700
+      delta_r_F_as_printed: -1,700
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '600'
+      T_K_as_printed: '600'
+      delta_r_H_cal_mol: -6090
+      delta_r_H_as_printed: -6,090
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: -820
+      delta_r_F_as_printed: '-820'
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '700'
+      T_K_as_printed: '700'
+      delta_r_H_cal_mol: -6090
+      delta_r_H_as_printed: -6,090
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 60
+      delta_r_F_as_printed: '+60'
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '800'
+      T_K_as_printed: '800'
+      delta_r_H_cal_mol: -6130
+      delta_r_H_as_printed: -6,130
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 940
+      delta_r_F_as_printed: '940'
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '900'
+      T_K_as_printed: '900'
+      delta_r_H_cal_mol: -6450
+      delta_r_H_as_printed: -6,450
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 1850
+      delta_r_F_as_printed: 1,850
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '1000'
+      T_K_as_printed: 1,000
+      delta_r_H_cal_mol: -6400
+      delta_r_H_as_printed: -6,400
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 2760
+      delta_r_F_as_printed: 2,760
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '1100'
+      T_K_as_printed: 1,100
+      delta_r_H_cal_mol: -6490
+      delta_r_H_as_printed: -6,490
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 3690
+      delta_r_F_as_printed: 3,690
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+    - T_K: '1200'
+      T_K_as_printed: 1,200
+      delta_r_H_cal_mol: -6810
+      delta_r_H_as_printed: -6,810
+      delta_r_H_source_kind: derived
+      delta_r_H_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+      delta_r_F_cal_mol: 4610
+      delta_r_F_as_printed: 4,610
+      delta_r_F_source_kind: derived
+      delta_r_F_source_as_printed: Derived by the authors from the data listed earlier in the report or from the sources cited
+        there.
+  context_id: kelley-1953-alkali-aluminosilicate-thermodynamics::context::kelley_1953_table37_reaction_thermochemistry
+  work_id: ac206842f2d3bcb3c1b6e9d276ba91d94b97845ce9cd2ba76632d1445e948826
+  source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
+  species: reaction_nephelite_quartz_to_jadeite

@@ -1,0 +1,639 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml
+observations:
+- observation_id: seto-2010-na2o-activity-glass-emf-summary::seto_2010_table1_r1_sls_1473k
+  experiment_id: 1bf0e1f582c48f16d4ec0250896f8ecf63759e753ceb3fad395c603e040de26b::seto-2010-na2o-activity-glass-emf-summary
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Thermodynamic standard state not stated in this summary; authors use the
+        Na2O-SiO2 melt activity values [2] as the reference.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent
+        components:
+        - - SiO2
+          - '0.84'
+        - - Na2O
+          - '0.16'
+        - - CaO
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed field activity is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[2]'
+  admission:
+    status: rejected
+    reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+    decided_by:
+      worker: codex
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        table: '1'
+        note: row 1
+  notices: []
+  source_id: seto-2010-na2o-activity-glass-emf-summary
+  locator:
+    page: 2
+    table: '1'
+    note: row 1
+  read_from: pdf:seto-2010-na2o-activity-glass-emf-summary
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.84'
+          - - Na2O
+            - '0.16'
+          - - CaO
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+        note: row 1 composition
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 2
+        table: '1'
+        note: row 1
+- observation_id: seto-2010-na2o-activity-glass-emf-summary::seto_2010_table1_r2_sls_1473k
+  experiment_id: 1bf0e1f582c48f16d4ec0250896f8ecf63759e753ceb3fad395c603e040de26b::seto-2010-na2o-activity-glass-emf-summary
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Thermodynamic standard state not stated in this summary; authors use the
+        Na2O-SiO2 melt activity values [2] as the reference.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent
+        components:
+        - - SiO2
+          - '0.74'
+        - - Na2O
+          - '0.16'
+        - - CaO
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed field activity is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: This study
+  admission:
+    status: rejected
+    reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+    decided_by:
+      worker: codex
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        table: '1'
+        note: row 2
+  notices: []
+  source_id: seto-2010-na2o-activity-glass-emf-summary
+  locator:
+    page: 2
+    table: '1'
+    note: row 2
+  read_from: pdf:seto-2010-na2o-activity-glass-emf-summary
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.74'
+          - - Na2O
+            - '0.16'
+          - - CaO
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+        note: row 2 composition
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 2
+        table: '1'
+        note: row 2
+- observation_id: seto-2010-na2o-activity-glass-emf-summary::seto_2010_table2_r1_als_1473k
+  experiment_id: 1bf0e1f582c48f16d4ec0250896f8ecf63759e753ceb3fad395c603e040de26b::seto-2010-na2o-activity-glass-emf-summary
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Thermodynamic standard state not stated in this summary; authors use the
+        Na2O-SiO2 melt activity values [2] as the reference.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent
+        components:
+        - - SiO2
+          - '0.7'
+        - - Na2O
+          - '0.3'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed field activity is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[2]'
+  admission:
+    status: rejected
+    reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+    decided_by:
+      worker: codex
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        table: '2'
+        note: row 1
+  notices: []
+  source_id: seto-2010-na2o-activity-glass-emf-summary
+  locator:
+    page: 2
+    table: '2'
+    note: row 1
+  read_from: pdf:seto-2010-na2o-activity-glass-emf-summary
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.7'
+          - - Na2O
+            - '0.3'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: row 1 composition
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 2
+        table: '2'
+        note: row 1
+- observation_id: seto-2010-na2o-activity-glass-emf-summary::seto_2010_table2_r2_als_1473k
+  experiment_id: 1bf0e1f582c48f16d4ec0250896f8ecf63759e753ceb3fad395c603e040de26b::seto-2010-na2o-activity-glass-emf-summary
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Thermodynamic standard state not stated in this summary; authors use the
+        Na2O-SiO2 melt activity values [2] as the reference.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent
+        components:
+        - - SiO2
+          - '0.65'
+        - - Na2O
+          - '0.3'
+        - - Al2O3
+          - '0.05'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed field activity is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: This study
+  admission:
+    status: rejected
+    reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+    decided_by:
+      worker: codex
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        table: '2'
+        note: row 2
+  notices: []
+  source_id: seto-2010-na2o-activity-glass-emf-summary
+  locator:
+    page: 2
+    table: '2'
+    note: row 2
+  read_from: pdf:seto-2010-na2o-activity-glass-emf-summary
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.65'
+          - - Na2O
+            - '0.3'
+          - - Al2O3
+            - '0.05'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: row 2 composition
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 2
+        table: '2'
+        note: row 2
+- observation_id: seto-2010-na2o-activity-glass-emf-summary::seto_2010_table2_r3_als_1473k
+  experiment_id: 1bf0e1f582c48f16d4ec0250896f8ecf63759e753ceb3fad395c603e040de26b::seto-2010-na2o-activity-glass-emf-summary
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1473'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Thermodynamic standard state not stated in this summary; authors use the
+        Na2O-SiO2 melt activity values [2] as the reference.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent
+        components:
+        - - SiO2
+          - '0.6'
+        - - Na2O
+          - '0.3'
+        - - Al2O3
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: printed field activity is null; absence is not a measured zero
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: This study
+  admission:
+    status: rejected
+    reason: no schema token for the printed log10(activity) and RT ln(activity) forms
+    decided_by:
+      worker: codex
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        table: '2'
+        note: row 3
+  notices: []
+  source_id: seto-2010-na2o-activity-glass-emf-summary
+  locator:
+    page: 2
+    table: '2'
+    note: row 3
+  read_from: pdf:seto-2010-na2o-activity-glass-emf-summary
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.6'
+          - - Na2O
+            - '0.3'
+          - - Al2O3
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: row 3 composition
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 2
+        table: '2'
+        note: row 3

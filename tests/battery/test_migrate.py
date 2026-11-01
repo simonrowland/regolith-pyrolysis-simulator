@@ -445,6 +445,35 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
+def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation.pop("regime")
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "fallback", extract), write=False)
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method == State.of(MethodToken.KNUDSEN_EFFUSION)
+
+    explicit_regime = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = explicit_regime["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    result = migrate(
+        _write_min_tree(tmp_path / "explicit-regime", explicit_regime), write=False
+    )
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method.is_unknown
+
+
 def _migrate_real_extract(
     tmp_path: Path,
     name: str,
@@ -1199,6 +1228,125 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
             "calculated_table1_starting_bulk_with_table2_run_FeO_NiO_CoO_mole_fractions_and_remaining_oxide_ratios"
         )
 
+    # Five rows pinned to the 300 dpi render of journal pages 23, 24, 25, 26
+    # and 27. The numbers are the printed cells.
+    rendered = (
+        {
+            "parent": "holzheid_1997_table2_page23_feo",
+            "run": "AD 10",
+            "slug": "ad-10",
+            "T_K": "1677",
+            "log_fO2": "-10.31",
+            "gamma": "1.62",
+            "melt_Fe": ("XFeO_mol_pct", "5.56"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page24_feo",
+            "run": "AD 45",
+            "slug": "ad-45",
+            "T_K": "1872",
+            "log_fO2": "-9.73",
+            "gamma": "2.02",
+            "melt_Fe": ("XFeO_mol_pct", "3.34"),
+        },
+        {
+            "parent": "holzheid_1997_table2_page25_feo",
+            "run": "BK 50 a",
+            "slug": "bk-50-a",
+            "T_K": "1578",
+            "log_fO2": "-12.54",
+            "gamma": "1.39",
+            "melt_Fe": ("XFeO_mol_pct", "0.91"),
+        },
+        {
+            "parent": "holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1",
+            "run": "V 69",
+            "slug": "v-69",
+            "T_K": "1673",
+            "log_fO2": "-9.63",
+            "gamma": "1.72",
+            "melt_Fe": ("FeO_wt_pct", "26.0"),
+            "metal_Fe": ("alloy_Fe_wt_pct", "41.9"),
+        },
+        {
+            "parent": "holzheid_1997_table3_pages27_bk_feo",
+            "run": "V 67",
+            "slug": "v-67",
+            "T_K": "1667",
+            "log_fO2": "-9.79",
+            "gamma": "3.99",
+            "melt_Fe": ("FeO_wt_pct", "0.975"),
+            "metal_Fe": ("metal_Fe_wt_pct", "6.84"),
+        },
+    )
+    source_by_id = {row["observation_id"]: row for row in activity_sources}
+    for pin in rendered:
+        source_row = next(
+            item
+            for item in source_by_id[pin["parent"]]["values"]["series"]
+            if item["run"] == pin["run"]
+            and Decimal(str(item["T_K"])) == Decimal(pin["T_K"])
+            and Decimal(str(item["gamma"])) == Decimal(pin["gamma"])
+        )
+        assert Decimal(str(source_row["log_fO2"])) == Decimal(pin["log_fO2"])
+        melt_key, melt_value = pin["melt_Fe"]
+        assert Decimal(str(source_row[melt_key])) == Decimal(melt_value)
+        if "metal_Fe" in pin:
+            metal_key, metal_value = pin["metal_Fe"]
+            assert Decimal(str(source_row[metal_key])) == Decimal(metal_value)
+        migrated_row = next(
+            observation
+            for observation in all_rows
+            if f"::{pin['parent']}::" in observation.observation_id
+            and f"row={pin['slug']}:" in observation.observation_id
+            and observation.value.point == Decimal(pin["gamma"])
+        )
+        assert migrated_row.identity.temperature_K is not None
+        assert migrated_row.identity.temperature_K.is_value
+        assert migrated_row.identity.temperature_K.value == Decimal(pin["T_K"])
+        assert migrated_row.point_conditions["fO2_log"].state.is_value
+        assert migrated_row.point_conditions["fO2_log"].state.value == Decimal(
+            pin["log_fO2"]
+        )
+
+    # Journal page 26 Table 3(b) MgO s.d. (%) column, 300 dpi render.
+    # Five cells were stored as 5; the page prints 1. The last two rows
+    # print 5 and 7 and were already stored correctly.
+    corrected_mgo_sd = (
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5", "1"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6", "5"),
+        ("holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7", "7"),
+    )
+    for parent_id, printed_sd in corrected_mgo_sd:
+        item = source_by_id[parent_id]["values"]["series"][0]
+        assert Decimal(str(item["MgO_sd_pct"])) == Decimal(printed_sd)
+
+    # Temperature and the printed absolute log fO2 reach every FeO activity row.
+    for observation in all_rows:
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        logged = observation.point_conditions["fO2_log"]
+        assert logged.state.is_value
+        assert logged.state.value < 0
+
+    stoichiometry = source_doc["source_tables"]["activity_calculation"][
+        "wustite_stoichiometry"
+    ]
+    assert stoichiometry["state"] == {"tag": "unknown", "reason": "not_published"}
+    assert "Fe0.947O" in stoichiometry["note"]
+    assert "1.94 at 1400" in stoichiometry["note"]
+    for parent_id in (
+        "holzheid_1997_table2_page23_feo",
+        "holzheid_1997_table2_page24_feo",
+        "holzheid_1997_table2_page25_feo",
+    ):
+        metal = source_by_id[parent_id]["values"]["metal_Fe_wt_pct"]
+        assert metal["state"] == {"tag": "unknown", "reason": "not_published"}
+
     # Mutating a persisted run composition must fail the three-run expected-value pin.
     mutated_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
     mutated_doc["species"]["FeO"]["observations"][0]["values"]["series"][0][
@@ -1463,6 +1611,16 @@ def test_stolyarova_1992_untyped_bulk_thermodynamics_stays_in_context(
     assert table1[0]["minus_delta_G_exp_kcal_mol"] == 8.3
     assert table1[0]["minus_delta_G_kohler"] == 8.4
     assert table1[0]["minus_delta_G_wilson"] == 7.4
+    cms = next(point for point in table1 if point["system"] == "SiO2:CaO:MgO")
+    # Printed p. 186. Third field is 25, not 0.25. Do not repair it into x.
+    assert cms["x_as_printed"] == "0.50:0.25:25"
+    assert cms["x"] is None
+    assert cms["T_K"] == 1833.0
+    assert "0.50:0.25:0.25" not in cms["note"]
+    mg = contexts["stolyarova_1992_mg_bearing_melt_activity_context"]["values"]
+    assert mg["numeric_activity_published"] is False
+    assert "0.50:0.25:25" in mg["numeric_activity_note"]
+    assert "0.50:0.25:0.25" not in mg["numeric_activity_note"]
     assert table3[0]["minus_delta_G_exp_kcal_mol"] == 8.4
     assert table4[0]["mu_Na2O_exp_kcal_mol"] == 56.0
     assert result.validation is not None
@@ -2118,6 +2276,47 @@ def test_production_migration_accepts_model_derived_raw_input_method(
         yaml.safe_load(yaml.safe_dump(to_plain(observation)))
     )
     assert reloaded.derivation == observation.derivation
+
+
+def test_shornikov_2015_extract_migrates_model_derived_provenance(
+    tmp_path: Path,
+) -> None:
+    source_id = "shornikov-2015-cai-vaporization-coefficients"
+    result = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", write=False
+    )
+    model_rows = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+        if observation.source_id == source_id
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    assert set(model_rows) == {
+        "shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04",
+        "shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04",
+        "shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04",
+        "shornikov_2015_feo_cr_prose",
+    }
+
+    for observation in model_rows.values():
+        assert observation.derivation is not None
+        raw_inputs = observation.derivation.raw_inputs
+        assert raw_inputs is not None
+        assert raw_inputs.state.is_value
+        assert raw_inputs.state.value is RawInputStatus.NOT_PRINTED
+        assert raw_inputs.locator is not None
+        method = observation.derivation.method
+        assert method is not None and method.state.is_value
+        assert method.locator is not None
+        assert observation.derivation.references
+
+    assert result.validation is not None
+    assert not any(
+        issue.path.startswith(f"observation[{source_id}::")
+        and issue.path.endswith(".derivation.raw_inputs")
+        for issue in result.validation.hard_issues
+    )
 
 
 @pytest.mark.parametrize(
@@ -3364,8 +3563,8 @@ def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -
     [
         ("pending", AdmissionStatus.ADMITTED, True),
         ("pending_validation", AdmissionStatus.ADMITTED, True),
-        ("figure_only", AdmissionStatus.PENDING, False),
-        ("model_output_not_measurement", AdmissionStatus.PENDING, False),
+        ("figure_only", AdmissionStatus.ADMITTED, False),
+        ("model_output_not_measurement", AdmissionStatus.ADMITTED, False),
         (
             "rejected_model_output_not_measurement",
             AdmissionStatus.REJECTED,
@@ -3392,6 +3591,220 @@ def test_source_admission_default_scope(
     assert any(
         notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in obs.notices
     ) is defaulted
+
+
+def _legacy_token_observation(
+    tmp_path: Path,
+    token: str,
+    *,
+    method_class: str | None | object = "KEEP",
+    locator_figure: str | None = None,
+    provenance: dict | None = None,
+    drop_regime: bool = False,
+):
+    """One migrated fixture row whose admission_status is ``token``."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    values = row["values"]
+    values.pop("series", None)
+    values["admission_status"] = token
+    if method_class is None:
+        values.pop("method_class", None)
+    elif method_class != "KEEP":
+        values["method_class"] = method_class
+    if drop_regime:
+        row.pop("regime", None)
+    if locator_figure is not None:
+        row["locator"]["figure"] = locator_figure
+    if provenance is not None:
+        values["provenance"] = provenance
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    assert len(result.observations) == 1
+    return next(iter(result.observations.values()))
+
+
+def _legacy_notice(observation, token: str):
+    matches = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+        and notice.reason == f"admission_from_legacy_token:{token}"
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def test_legacy_admission_evidence_labels_are_admitted(tmp_path: Path) -> None:
+    """Class (a): evidence labels are admitted; an existing class is kept."""
+
+    missing = _legacy_token_observation(
+        tmp_path / "figure-missing",
+        "figure_only",
+        method_class=None,
+        drop_regime=True,
+        locator_figure="7 caption",
+        provenance={"digitized_from_figure": True, "reader": "kept"},
+    )
+    assert missing.admission.status is AdmissionStatus.ADMITTED
+    assert missing.admission.reason == "admission_from_legacy_token:figure_only"
+    assert missing.admission.decided_by is None
+    assert missing.evidence.class_.is_value
+    assert missing.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    assert missing.locator is not None and missing.locator.figure == "7 caption"
+    assert missing.provenance is not None
+    assert missing.provenance["digitized_from_figure"] is True
+    assert missing.provenance["reader"] == "kept"
+    notice = _legacy_notice(missing, "figure_only")
+    assert notice.affected_quantities
+    assert not any(
+        item.kind is NoticeKind.ADMISSION_DEFAULTED for item in missing.notices
+    )
+
+    kept = _legacy_token_observation(
+        tmp_path / "figure-kept",
+        "figure_only",
+        method_class="measured_direct",
+    )
+    assert kept.admission.status is AdmissionStatus.ADMITTED
+    assert kept.admission.reason == "admission_from_legacy_token:figure_only"
+    assert kept.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert kept.evidence.original_method_class == "measured_direct"
+    _legacy_notice(kept, "figure_only")
+
+    quoted = _legacy_token_observation(
+        tmp_path / "quoted",
+        "quoted_attributed",
+        method_class="measured_direct",
+    )
+    assert quoted.admission.status is AdmissionStatus.ADMITTED
+    assert quoted.admission.reason == "admission_from_legacy_token:quoted_attributed"
+    assert quoted.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert quoted.evidence.original_method_class == "measured_direct"
+    _legacy_notice(quoted, "quoted_attributed")
+
+    model = _legacy_token_observation(
+        tmp_path / "model",
+        "model_output_not_measurement",
+        method_class="quoted_attributed",
+    )
+    assert model.admission.status is AdmissionStatus.ADMITTED
+    assert (
+        model.admission.reason
+        == "admission_from_legacy_token:model_output_not_measurement"
+    )
+    assert model.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert model.evidence.original_method_class == "quoted_attributed"
+    assert model.evidence.model is None
+    _legacy_notice(model, "model_output_not_measurement")
+
+    model_missing = _legacy_token_observation(
+        tmp_path / "model-missing",
+        "model_output_not_measurement",
+        method_class=None,
+        drop_regime=True,
+    )
+    assert model_missing.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert model_missing.evidence.model == "model_output_not_measurement"
+    assert model_missing.admission.status is AdmissionStatus.ADMITTED
+
+
+def test_legacy_admission_rejection_tokens_are_rejected(tmp_path: Path) -> None:
+    """Class (b): explicit rejection tokens stay rejected and keep their reason."""
+
+    tokens = (
+        "rejected_no_figure_reading",
+        "rejected_no_complete_figure_digitization",
+        "rejected_model_output_not_measurement",
+        "authors_rejected",
+        "authors_rejected_in_favour_of_ion_intensity_ratio_method",
+    )
+    for token in tokens:
+        observation = _legacy_token_observation(tmp_path / token, token)
+        assert observation.admission.status is AdmissionStatus.REJECTED
+        assert observation.admission.reason == f"source admission_status={token}"
+        assert not any(
+            notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+            for notice in observation.notices
+        )
+
+
+def test_legacy_admission_holds_stay_pending(tmp_path: Path) -> None:
+    """Class (c): parked rows and the named holds stay pending with their reason."""
+
+    from simulator.battery.migrate import _yield_point_admission, admission_for
+    from simulator.battery.records import Evidence
+
+    for token in ("parked", "preserved_unscored"):
+        observation = _legacy_token_observation(tmp_path / token, token)
+        assert observation.admission.status is AdmissionStatus.PENDING
+        assert observation.admission.reason == (
+            f"source admission_status={token} is not a closed v2.1 token"
+        )
+        assert not any(
+            notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+            for notice in observation.notices
+        )
+
+    parent = admission_for(
+        "figure_only",
+        superseded_by=None,
+        extraction={"worker": "pytest", "date": "2026-10-30"},
+        locator=Locator(page=12, table="1"),
+    )
+    assert parent.status is AdmissionStatus.ADMITTED
+    assert parent.reason == "admission_from_legacy_token:figure_only"
+    evidence = Evidence(
+        class_=State.of(EvidenceClass.MEASURED_DIRECT),
+        original_method_class="measured_direct",
+    )
+    locator = Locator(page=12, table="1")
+    extraction = {"worker": "pytest", "date": "2026-10-30"}
+    initial = _yield_point_admission(
+        item={"T_C_is_initial_composition": True, "test": "1"},
+        parent_values={},
+        evidence=evidence,
+        locator=locator,
+        extraction=extraction,
+        t_is_point=True,
+        parent_admission=parent,
+    )
+    assert initial.status is AdmissionStatus.PENDING
+    assert (
+        initial.reason
+        == "initial composition is not a run-temperature mass-loss measurement"
+    )
+    for test_id in ("2b", "3"):
+        disagreed = _yield_point_admission(
+            item={"test": test_id},
+            parent_values={
+                "contradiction_vs_matchett_2006_table3": {"kept": "as_printed"}
+            },
+            evidence=evidence,
+            locator=locator,
+            extraction=extraction,
+            t_is_point=True,
+            parent_admission=parent,
+        )
+        assert disagreed.status is AdmissionStatus.PENDING
+        assert "16.00/37.00" in disagreed.reason
+        assert "0.16/0.37" in disagreed.reason
+
+
+def test_unlisted_admission_token_falls_through(tmp_path: Path) -> None:
+    """An unlisted non-closed token keeps the pre-existing pending fallthrough."""
+
+    token = "qualitative_not_numeric"
+    observation = _legacy_token_observation(tmp_path / token, token)
+    assert observation.admission.status is AdmissionStatus.PENDING
+    assert observation.admission.reason == (
+        f"source admission_status={token} is not a closed v2.1 token"
+    )
+    assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
+        for notice in observation.notices
+    )
 
 
 def test_plain_pending_without_source_decision_defaults_and_adds_notice(
@@ -3973,73 +4386,169 @@ def test_validate_corpus_zero_hard_issues_on_fixture(tmp_path: Path) -> None:
 
 
 def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
-    report_path = REPO_ROOT / "data" / "battery" / "migration-report.md"
-    works_dir = REPO_ROOT / "data" / "literature" / "works"
-    obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
-    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
-    if not report_path.is_file() or not any(works_dir.glob("*.yaml")):
-        pytest.skip("migrated store not generated yet")
-    works, experiments, observations = load_migrated_store(REPO_ROOT)
-    assert works
-    assert observations
-    figure_only = observations[
+    report_path = REPO_ROOT / "data" / "battery" / "store-validation.json"
+    refresh = "run scripts/battery_validate_store.py after a scratch migrate"
+    assert report_path.is_file(), f"missing store validation record; {refresh}"
+    record = json.loads(report_path.read_text(encoding="utf-8"))
+    from simulator.battery.store_validation import _migrated_store_content_sha256
+
+    assert record.get("store_content_sha256") == _migrated_store_content_sha256(
+        REPO_ROOT
+    ), (
+        f"stale store validation record; {refresh}"
+    )
+    assert record.get("forbidden_shape_count") == 0, record
+
+
+def test_battery_validate_store_script_is_deterministic_and_detects_forbidden_shape(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import subprocess
+
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True)
+    store_path = next((root / "data" / "literature" / "extracts-v2").glob("*.yaml"))
+    store = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+    observations = store["observations"]
+    observations[0]["observation_id"] = (
         "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
+    )
+    observations[0]["admission"] = {"status": "pending", "reason": "fixture pending"}
+    observations[0]["notices"] = []
+    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
+
+    git = ["git", "-C", str(root)]
+    subprocess.run([*git, "init"], check=True, capture_output=True, text=True)
+    subprocess.run(
+        [*git, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.org", "add", "-A"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [
+            *git,
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.org",
+            "commit",
+            "-m",
+            "fixture store",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    command = [
+        sys.executable,
+        str(REPO_ROOT / "scripts" / "battery_validate_store.py"),
+        "--root",
+        str(root),
     ]
-    assert figure_only.admission.status is AdmissionStatus.PENDING
-    assert not any(
-        notice.kind is NoticeKind.ADMISSION_DEFAULTED
-        for notice in figure_only.notices
-    )
-    referenced_context_ids = set()
-    for observation in observations.values():
-        referenced_context_ids.update(
-            parent
-            for parent in observation.derived_from or ()
-            if "::context::" in parent
+
+    def run_script() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
         )
-        if observation.derivation is not None:
-            referenced_context_ids.update(
-                parent
-                for parent in observation.derivation.inputs
-                if "::context::" in parent
-            )
-    referenced_context_ids.update(
-        experiment.equipment_context_id
-        for experiment in experiments.values()
-        if experiment.equipment_context_id is not None
+
+    first = run_script()
+    assert first.returncode == 0, first.stderr
+    output_path = root / "data" / "battery" / "store-validation.json"
+    first_bytes = output_path.read_bytes()
+    assert first_bytes.endswith(b"\n")
+    first_record = json.loads(first_bytes)
+    assert set(first_record) == {
+        "store_content_sha256",
+        "hard_issue_counts_by_shape",
+        "forbidden_shape_count",
+    }
+    assert list(first_record["hard_issue_counts_by_shape"]) == sorted(
+        first_record["hard_issue_counts_by_shape"]
     )
-    context_rows = {}
-    for work_path in works_dir.glob("*.yaml"):
-        source = work_path.read_text(encoding="utf-8")
-        if not any(context_id in source for context_id in referenced_context_ids):
-            continue
-        payload = yaml.safe_load(source) or {}
-        for row in payload.get("context") or ():
-            context_id = str(row["context_id"])
-            if context_id in referenced_context_ids:
-                context_rows[context_id] = row
-    report = validate_corpus(
-        works,
-        experiments,
-        observations,
-        residuals=None,
-        context_rows=context_rows,
+    assert first_bytes == (
+        json.dumps(
+            first_record,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode("utf-8")
+    assert "HEAD sha:" in first.stdout
+    assert "wall seconds:" in first.stdout
+    assert "process CPU seconds:" in first.stdout
+
+    second = run_script()
+    assert second.returncode == 0, second.stderr
+    assert output_path.read_bytes() == first_bytes
+
+    # Generate the record from new store bytes, then commit those same bytes.
+    # The committed record must stay fresh and remain a fixed point.
+    store_path.write_bytes(store_path.read_bytes() + b"\n# committed fixture edit\n")
+    edited = run_script()
+    assert edited.returncode == 0, edited.stderr
+    committed_bytes = output_path.read_bytes()
+    assert committed_bytes != first_bytes
+    subprocess.run(
+        [*git, "add", str(store_path.relative_to(root))],
+        check=True,
+        capture_output=True,
+        text=True,
     )
-    # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
-    # hard conditional_field, not a silent pass. The same holds for a row that
-    # declares quoted_attributed but states no attribution: the canonical
-    # token now maps to its class, so the missing field is reported instead of
-    # the row falling to unknown. Invalid raw_inputs declarations and every
-    # other unlisted conditional field remain hard failures.
-    expected_conditional_fields = (
-        ".derived_from",
-        ".derivation",
-        ".attribution",
+    subprocess.run(
+        [
+            *git,
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.org",
+            "commit",
+            "-m",
+            "commit validated store content",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
     )
-    for issue in report.hard_issues:
-        assert issue.reason.value == "conditional_field", issue
-        assert issue.path.endswith(expected_conditional_fields), issue
-    assert extracts_v2.is_dir() or obs_dir.is_dir()
+    monkeypatch.setitem(globals(), "REPO_ROOT", root)
+    test_validate_corpus_zero_hard_issues_on_migrated_store()
+    committed = run_script()
+    assert committed.returncode == 0, committed.stderr
+    assert output_path.read_bytes() == committed_bytes
+
+    aliases_path = root / "data" / "literature" / "works" / "ALIASES.yaml"
+    assert aliases_path.is_file()
+    aliases_path.write_bytes(
+        aliases_path.read_bytes() + b"\n# changed without regenerating validation\n"
+    )
+    with pytest.raises(AssertionError, match="stale store validation record"):
+        test_validate_corpus_zero_hard_issues_on_migrated_store()
+    alias_refresh = run_script()
+    assert alias_refresh.returncode == 0, alias_refresh.stderr
+    test_validate_corpus_zero_hard_issues_on_migrated_store()
+
+    # A content edit without regenerating the record must make the cheap
+    # migrated-store check report stale data.
+    observations[1]["experiment_id"] = "missing-fixture-experiment"
+    store_path.write_text(yaml.safe_dump(store, sort_keys=False), encoding="utf-8")
+    with pytest.raises(AssertionError, match="stale store validation record"):
+        test_validate_corpus_zero_hard_issues_on_migrated_store()
+
+    mutated = run_script()
+    assert mutated.returncode == 1, mutated.stderr
+    mutated_record = json.loads(output_path.read_text(encoding="utf-8"))
+    assert mutated_record["forbidden_shape_count"] > 0
+    assert list(mutated_record["hard_issue_counts_by_shape"]) == sorted(
+        mutated_record["hard_issue_counts_by_shape"]
+    )
 
 
 def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None:
@@ -7040,6 +7549,11 @@ def test_g01_map_phase_refuses_heuristics() -> None:
     assert mapped.is_unknown
 
 
+def test_t1569_distin_liquid_slag_phase_is_reviewed_identity() -> None:
+    mapped, why = map_phase("liquid FeO-SiO2 slag")
+    assert mapped.is_value and mapped.value is Phase.L and why is None
+
+
 def test_t998_alkali_source_tokens_are_closed() -> None:
     from simulator.battery.migrate import PHASE_MAP, REGIME_TO_METHOD
 
@@ -8357,7 +8871,16 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
     # The independent census checks all six source cells; mismatches stay 0.
     # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
-    assert census.get("H_minus_H298") == 136
+    # Schumm (1981) adds 123 temperature rows each for cp, H-H298, delta_fH,
+    # and delta_fG, plus eight printed entropy points; mismatches stay 0.
+    assert census.get("H_minus_H298") == 259
+    assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
+        "cp": 123,
+        "H_minus_H298": 123,
+        "delta_fH": 123,
+        "delta_fG": 123,
+        "S": 8,
+    }
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
@@ -8388,7 +8911,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8200, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8700, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -11174,8 +11697,9 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
         ).encode()
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
-    # point ids move. The reference states in this payload are unchanged.
-    assert digest == "979291d9c0a3171046d7bc98ee762e85687eb2b937c1d1fa4405b9493f15bf97"
+    # point ids move. The Table 2-3 run conditions move the same :h= suffix.
+    # The reference states in this payload are unchanged.
+    assert digest == "294d6b5b3fba35da66634a64205243f9a774bf7db707dab8ef9d7b37bbfa3754"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
@@ -11291,8 +11815,24 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         and obs.identity.composition is not None
         and obs.identity.composition.is_value
     ]
-    assert len(composition_rows) == 300
-    for obs in composition_rows:
+    table_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_table2_" in obs.observation_id
+        or "stolyarova_1996_table3_" in obs.observation_id
+    ]
+    figure_composition_rows = [
+        obs
+        for obs in composition_rows
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert len(table_composition_rows) == 300
+    assert len(figure_composition_rows) == 277
+    assert len(composition_rows) == (
+        len(table_composition_rows) + len(figure_composition_rows)
+    )
+    for obs in table_composition_rows:
         assert obs.identity.temperature_K.is_value
         assert obs.identity.temperature_K.value == Decimal("1933")
         condition = obs.point_conditions["composition"]
@@ -11365,21 +11905,35 @@ def test_stolyarova_1996_printed_compositions_reach_migrated_observations(
         for obs in candidates
         if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
     ]
-    candidate_rails = Counter(
-        str(
-            rail_for_quantity(
-                obs.identity.quantity.value if obs.identity.quantity.is_value else None,
-                species_formula=obs.identity.species.formula,
+    def _rail_counter(observations):
+        return Counter(
+            str(
+                rail_for_quantity(
+                    obs.identity.quantity.value if obs.identity.quantity.is_value else None,
+                    species_formula=obs.identity.species.formula,
+                )
             )
+            for obs in observations
         )
+
+    table_candidates = [
+        obs
         for obs in candidates
-    )
-    assert candidate_rails == {
+        if "stolyarova_1996_fig2_" not in obs.observation_id
+    ]
+    figure_candidates = [
+        obs
+        for obs in candidates
+        if "stolyarova_1996_fig2_" in obs.observation_id
+        and "_digitized" in obs.observation_id
+    ]
+    assert _rail_counter(table_candidates) == {
         "None": 6,
         "SiO_evolution": 45,
         "melt_activity": 137,
         "vapour": 118,
     }
+    assert _rail_counter(figure_candidates) == {"melt_activity": 277}
 
 
 def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
@@ -15012,6 +15566,77 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert ms2.admission.status is AdmissionStatus.ADMITTED
 
 
+def _nested_temperature_estimate() -> dict:
+    return {
+        "state": {"tag": "value", "value": "926.85"},
+        "locator": {"page": 2, "table": "I"},
+        "inference": {
+            "relation": "source_temperature_estimate",
+            "inputs": ["source graph"],
+            "parameters": [],
+            "output_unit": "degC",
+        },
+    }
+
+
+def _assert_temperature_source_and_conversion(observation) -> None:
+    temperature = observation.point_conditions["temperature_K"]
+    assert temperature.state.value == Decimal("1200")
+    assert temperature.inference is not None
+    assert temperature.inference.relation == "source_temperature_estimate"
+    assert temperature.inference.inputs == ("source graph",)
+    original = dict(temperature.inference.parameters)["original"]
+    assert original.inference is not None
+    assert original.inference.relation == "celsius_to_kelvin"
+
+
+def test_nested_temperature_inference_survives_on_parent_observation(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"] = {
+        "quantity": "p_sat",
+        "pressure_atm": 1,
+        "point_conditions": {"T_C": _nested_temperature_estimate()},
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    _assert_temperature_source_and_conversion(observation)
+
+
+def test_nested_temperature_inference_survives_on_exploded_observation(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="wt_percent",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "id": "SiO2",
+                    "mass_loss_wt_pct": 1.1,
+                    "point_conditions": {"T_C": _nested_temperature_estimate()},
+                }
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["regime"] = "solar_vacuum_pyrolysis"
+    row["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    (observation,) = [
+        item for item in result.observations.values() if "::T=" in item.observation_id
+    ]
+
+    _assert_temperature_source_and_conversion(observation)
+
+
 def test_robinot_measured_oxygen_yield_splits_and_keeps_t_range(
     tmp_path: Path,
 ) -> None:
@@ -16922,17 +17547,38 @@ def test_markova_residue_default_admission_survives_printed_composition_maps(
         if observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
     ]
-    def by_id(observations):
-        return {
-            observation.observation_id: (
+    def by_series_temperature(observations):
+        # The content hash in the observation id changes when a temperature
+        # step gains point conditions. Pair the printed loss on series and
+        # temperature; that is the value the store still holds.
+        keyed = {}
+        for observation in observations:
+            series = (
+                "VI"
+                if "residual_melt_VI_lherzolite" in observation.observation_id
+                else "V"
+            )
+            temperature = observation.identity.temperature_K
+            temperature_key = (
+                temperature.value
+                if temperature is not None and temperature.is_value
+                else None
+            )
+            keyed[(series, temperature_key)] = (
                 observation.value.point,
                 observation.admission.status,
                 observation.admission.reason,
             )
-            for observation in observations
-        }
+        return keyed
+
+    stored_by_step = by_series_temperature(stored_mass_loss)
+    migrated_by_step = by_series_temperature(migrated_mass_loss)
     assert len(stored_mass_loss) == 24
-    assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
+    assert len(migrated_mass_loss) == 24
+    # A repeated series and temperature would drop a row from the map.
+    assert len(stored_by_step) == 24
+    assert len(migrated_by_step) == 24
+    assert migrated_by_step == stored_by_step
 
 def test_residue_series_oxide_columns_are_migrated_or_documented() -> None:
     residue_fields = set(

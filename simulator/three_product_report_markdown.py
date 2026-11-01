@@ -136,15 +136,67 @@ def format_three_product_markdown(
             header = '2. Stage 3 silica capture (not a product)'
         lines.append(f"## {header}")
         lines.append(f"**Class total**: {_format_kg(class_total_kg)} kg")
+        if bucket.get('status') == 'partial':
+            details = []
+            for excluded in bucket.get('excluded', ()):
+                bound = excluded.get('upper_bound_kg', 'unbounded')
+                bound_text = (
+                    f"up to {float(bound):.3f} kg (conservative upper bound)"
+                    if isinstance(bound, (int, float))
+                    else str(bound)
+                )
+                details.append(
+                    f"{excluded.get('species', 'unknown')} via "
+                    f"{excluded.get('account', 'unknown')} ({bound_text}; "
+                    f"{excluded.get('reason', 'refused quantity')})"
+                )
+            lines.append(
+                '**Availability**: PARTIAL; computed total is a lower bound. '
+                + '; '.join(details)
+            )
+        estimated_species = sorted({
+            str(item.get('species'))
+            for item in bucket.get('estimated_contributions', ())
+            if isinstance(item, Mapping) and item.get('species')
+        })
+        if estimated_species:
+            lines.append(
+                '**Estimated transport**: includes estimated transport for '
+                + ', '.join(estimated_species)
+            )
+        if bucket_key not in {'metals_plus_O2', 'pure_silica_glass'}:
+            flag = bucket.get('flag')
+            if isinstance(flag, Mapping):
+                lines.append(
+                    '- Availability flag: '
+                    f"status={flag.get('status')}; "
+                    f"authority={flag.get('authority')}; "
+                    f"reason={flag.get('reason')}"
+                )
         lines.append("")
 
         if bucket_key == 'metals_plus_O2':
             metals_kg = bucket.get('metals_kg', {}) or {}
-            o2_kg = float(bucket.get('O2_kg', 0.0))
+            raw_o2_kg = bucket.get('O2_kg', 0.0)
+            o2_kg = None if raw_o2_kg is None else float(raw_o2_kg)
+            raw_metals_total_kg = bucket.get('metals_total_kg', 0.0)
+            metals_total_kg = (
+                None
+                if raw_metals_total_kg is None
+                else float(raw_metals_total_kg)
+            )
             lines.append(
                 f"- Metals subtotal: "
-                f"{_format_kg(float(bucket.get('metals_total_kg', 0.0)))} kg"
+                f"{_format_kg(metals_total_kg)} kg"
             )
+            flag = bucket.get('flag')
+            if isinstance(flag, Mapping):
+                lines.append(
+                    '- Availability flag: '
+                    f"status={flag.get('status')}; "
+                    f"authority={flag.get('authority')}; "
+                    f"reason={flag.get('reason')}"
+                )
             lines.append(
                 "- Source-side O₂ potential subtotal "
                 f"(emitted; not recovered/captured): {_format_kg(o2_kg)} kg"
@@ -179,7 +231,8 @@ def format_three_product_markdown(
             lines.append("Per-species on Stage 3 baffles:")
             lines.append(_kg_by_species_block(stage_3))
         elif bucket_key == 'industrial_mixed_glass':
-            residual = float(bucket.get('mixed_melt_residual_kg', 0.0))
+            raw_residual = bucket.get('mixed_melt_residual_kg', 0.0)
+            residual = None if raw_residual is None else float(raw_residual)
             note = bucket.get('note', '')
             lines.append(
                 f"- Mixed melt residual: {_format_kg(residual)} kg"
@@ -188,19 +241,40 @@ def format_three_product_markdown(
                 lines.append(f"  - *{note}*")
         elif bucket_key == 'refractory_ceramic_rump':
             rump_species = bucket.get('rump_kg_by_species', {}) or {}
-            refractory_oxides_kg = float(
-                bucket.get('rump_refractory_oxides_kg', 0.0)
+            raw_refractory_oxides_kg = bucket.get(
+                'rump_refractory_oxides_kg', 0.0
             )
-            silicate_residual_kg = float(
-                bucket.get('rump_silicate_residual_kg', 0.0)
+            refractory_oxides_kg = (
+                None
+                if raw_refractory_oxides_kg is None
+                else float(raw_refractory_oxides_kg)
             )
-            unextracted_metals_kg = float(
-                bucket.get('rump_unextracted_metals_kg', 0.0)
+            raw_silicate_residual_kg = bucket.get(
+                'rump_silicate_residual_kg', 0.0
+            )
+            silicate_residual_kg = (
+                None
+                if raw_silicate_residual_kg is None
+                else float(raw_silicate_residual_kg)
+            )
+            raw_unextracted_metals_kg = bucket.get(
+                'rump_unextracted_metals_kg', 0.0
+            )
+            unextracted_metals_kg = (
+                None
+                if raw_unextracted_metals_kg is None
+                else float(raw_unextracted_metals_kg)
             )
             other_kg = float(bucket.get('rump_other_kg', 0.0))
+            raw_rump_total_kg = bucket.get('rump_total_kg', 0.0)
+            rump_total_kg = (
+                None
+                if raw_rump_total_kg is None
+                else float(raw_rump_total_kg)
+            )
             lines.append(
                 f"- Residual inventory total (not a product total): "
-                f"{_format_kg(float(bucket.get('rump_total_kg', 0.0)))} kg"
+                f"{_format_kg(rump_total_kg)} kg"
             )
             lines.append(
                 "- Refractory oxides floor (by physics): "

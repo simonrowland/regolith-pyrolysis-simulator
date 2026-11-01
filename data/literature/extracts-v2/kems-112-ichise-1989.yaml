@@ -37,9 +37,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-112-ichise-1989::ichise_1989_figs_activities_figure_only
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -92,9 +96,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
   source_id: kems-112-ichise-1989
   locator:
     published_page: 845
@@ -376,7 +384,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.094'
@@ -535,7 +543,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.319'
@@ -693,7 +701,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.153'
@@ -852,7 +860,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.244'
@@ -1011,7 +1019,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.239'
@@ -1170,7 +1178,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.255'
@@ -1328,7 +1336,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.156'
@@ -1486,7 +1494,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.152'
@@ -1645,7 +1653,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.297'
@@ -1803,7 +1811,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.054'
@@ -1962,7 +1970,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.436'
@@ -2121,7 +2129,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.606'
@@ -2280,7 +2288,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.406'
@@ -2439,7 +2447,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.404'
@@ -2598,7 +2606,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.444'
@@ -2757,7 +2765,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.727'
@@ -2916,7 +2924,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.81'
@@ -3075,7 +3083,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.775'
@@ -3234,7 +3242,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.828'
@@ -3392,7 +3400,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Ta
           - '0.048'
@@ -5779,7 +5787,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.192'
@@ -5937,7 +5945,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.242'
@@ -6095,7 +6103,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.234'
@@ -6254,7 +6262,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.32'
@@ -6412,7 +6420,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.502'
@@ -6571,7 +6579,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.394'
@@ -6730,7 +6738,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.388'
@@ -6889,7 +6897,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.596'
@@ -7048,7 +7056,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.671'
@@ -7207,7 +7215,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.76'
@@ -7366,7 +7374,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.548'
@@ -7525,7 +7533,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.856'
@@ -7684,7 +7692,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.384'
@@ -7843,7 +7851,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.37'
@@ -8001,7 +8009,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.094'
@@ -8160,7 +8168,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.298'
@@ -8318,7 +8326,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.091'
@@ -8476,7 +8484,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.144'
@@ -8634,7 +8642,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.139'
@@ -8792,7 +8800,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: printed_metals
         components:
         - - Nb
           - '0.048'

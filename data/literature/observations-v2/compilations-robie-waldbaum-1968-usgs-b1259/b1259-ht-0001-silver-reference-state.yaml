@@ -362,7 +362,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1234:col=H_minus_H298:name=silver-(reference-state):v=0a02afa7a9:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1234:col=H_minus_H298:name=silver-(reference-state):v=0a02afa7a9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -371,11 +371,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +438,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 26
-        pdf_page_index: 32
-        table: b1259-ht-0001-silver-reference-state
-        note: as_published='9.170'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json
-        record: b1259-ht-0001-silver-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -482,7 +470,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1234:col=H_minus_H298:name=silver-(reference-state):v=e89bbf2be7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1234:col=H_minus_H298:name=silver-(reference-state):v=e89bbf2be7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -491,11 +479,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -557,21 +546,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 26
-        pdf_page_index: 32
-        table: b1259-ht-0001-silver-reference-state
-        note: as_published='6.315'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json
-        record: b1259-ht-0001-silver-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -602,7 +578,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=silver-(reference-state):v=79f8b7c7eb:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=silver-(reference-state):v=79f8b7c7eb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -612,10 +588,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -722,7 +698,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=silver-(reference-state):v=86520cc629:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=silver-(reference-state):v=86520cc629
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -732,10 +708,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -842,7 +818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=silver-(reference-state):v=2abc61d0ba:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=silver-(reference-state):v=2abc61d0ba
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -852,10 +828,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -962,7 +938,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=silver-(reference-state):v=bd37d8894f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=silver-(reference-state):v=bd37d8894f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -972,10 +948,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1082,7 +1058,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=silver-(reference-state):v=c661ea332b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=silver-(reference-state):v=c661ea332b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -1092,10 +1068,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1202,7 +1178,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=silver-(reference-state):v=9437231285:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=silver-(reference-state):v=9437231285
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -1212,10 +1188,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1322,7 +1298,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=silver-(reference-state):v=df74590cba:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=silver-(reference-state):v=df74590cba
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -1332,10 +1308,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1442,7 +1418,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=silver-(reference-state):v=2baa1fab74:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=silver-(reference-state):v=2baa1fab74
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -1452,10 +1428,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2762,7 +2738,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1234:col=entropy:name=silver-(reference-state):v=8a434ed621:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1234:col=entropy:name=silver-(reference-state):v=8a434ed621
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -2771,11 +2747,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2837,21 +2814,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 26
-        pdf_page_index: 32
-        table: b1259-ht-0001-silver-reference-state
-        note: as_published='19.540'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json
-        record: b1259-ht-0001-silver-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2882,7 +2846,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1234:col=entropy:name=silver-(reference-state):v=ab33ee4734:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1234:col=entropy:name=silver-(reference-state):v=ab33ee4734
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -2891,11 +2855,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2957,21 +2922,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 26
-        pdf_page_index: 32
-        table: b1259-ht-0001-silver-reference-state
-        note: as_published='21.850'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json
-        record: b1259-ht-0001-silver-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3002,7 +2954,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1300:col=entropy:name=silver-(reference-state):v=c84d221909:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1300:col=entropy:name=silver-(reference-state):v=c84d221909
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3012,10 +2964,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3122,7 +3074,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1400:col=entropy:name=silver-(reference-state):v=d6f313f5b8:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1400:col=entropy:name=silver-(reference-state):v=d6f313f5b8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3132,10 +3084,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3242,7 +3194,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1500:col=entropy:name=silver-(reference-state):v=ea90871d3d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1500:col=entropy:name=silver-(reference-state):v=ea90871d3d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3252,10 +3204,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3362,7 +3314,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1600:col=entropy:name=silver-(reference-state):v=eadbc88ebc:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1600:col=entropy:name=silver-(reference-state):v=eadbc88ebc
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3372,10 +3324,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3482,7 +3434,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1700:col=entropy:name=silver-(reference-state):v=56facba24a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1700:col=entropy:name=silver-(reference-state):v=56facba24a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3492,10 +3444,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3602,7 +3554,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1800:col=entropy:name=silver-(reference-state):v=be39a0fe22:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1800:col=entropy:name=silver-(reference-state):v=be39a0fe22
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3612,10 +3564,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3722,7 +3674,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1900:col=entropy:name=silver-(reference-state):v=48bce4e73b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=1900:col=entropy:name=silver-(reference-state):v=48bce4e73b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3732,10 +3684,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3842,7 +3794,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=2000:col=entropy:name=silver-(reference-state):v=c45f344f3d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:S:shared:T=2000:col=entropy:name=silver-(reference-state):v=c45f344f3d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -3852,10 +3804,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5282,7 +5234,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1234:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1234:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -5291,11 +5243,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5392,7 +5345,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -5402,10 +5355,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5429,10 +5382,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5552,7 +5505,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -5562,10 +5515,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5589,10 +5542,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5712,7 +5665,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -5722,10 +5675,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5749,10 +5702,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5872,7 +5825,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -5882,10 +5835,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5909,10 +5862,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6032,7 +5985,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -6042,10 +5995,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6069,10 +6022,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6192,7 +6145,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -6202,10 +6155,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6229,10 +6182,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6352,7 +6305,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -6362,10 +6315,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6389,10 +6342,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6512,7 +6465,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -6522,10 +6475,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6549,10 +6502,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8272,7 +8225,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1234:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1234:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -8281,11 +8234,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8382,7 +8336,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -8392,10 +8346,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8419,10 +8373,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8542,7 +8496,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -8552,10 +8506,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8579,10 +8533,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8702,7 +8656,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -8712,10 +8666,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8739,10 +8693,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8862,7 +8816,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -8872,10 +8826,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8899,10 +8853,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9022,7 +8976,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -9032,10 +8986,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9059,10 +9013,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9182,7 +9136,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -9192,10 +9146,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9219,10 +9173,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9342,7 +9296,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -9352,10 +9306,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9379,10 +9333,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9502,7 +9456,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=silver-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=silver-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -9512,10 +9466,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9539,10 +9493,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11235,7 +11189,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1234:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1234:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11244,11 +11198,12 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1234 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11336,7 +11291,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11346,10 +11301,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11373,10 +11328,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11487,7 +11442,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11497,10 +11452,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11524,10 +11479,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11638,7 +11593,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11648,10 +11603,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11675,10 +11630,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11789,7 +11744,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11799,10 +11754,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11826,10 +11781,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11940,7 +11895,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -11950,10 +11905,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11977,10 +11932,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12091,7 +12046,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -12101,10 +12056,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12128,10 +12083,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12242,7 +12197,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -12252,10 +12207,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12279,10 +12234,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12393,7 +12348,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=silver-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=silver-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0001-silver-reference-state:tabulation
   identity:
     quantity:
@@ -12403,10 +12358,10 @@ observations:
       formula: Ag
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12430,10 +12385,10 @@ observations:
             formula: Ag
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0

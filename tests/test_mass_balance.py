@@ -640,7 +640,7 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 # Nightly (2026-08-02 CI tiering): cumulative mass balance campaign (~141 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(1800)
+@pytest.mark.cpu_budget(1800)
 @pytest.mark.serial
 def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal(
     monkeypatch,

@@ -16,8 +16,21 @@ source_tables:
       text: Activities of 'FeO' were obtained as the ratio of the oxygen content of the iron in equilibrium with the slag to that in equilibrium with pure 'FeO' at the same temperature.
       locator: {page: 74, section: Experimental}
       interpretation: The p. 75 Discussion identifies the measured standard state as nonstoichiometric oxide in equilibrium with liquid iron; conversion to the stoichiometric oxide is a later step.
+source_evidence:
+  liquid_iron_contact:
+    text: >-
+      In this method, liquid iron was levitated in contact with liquid 'FeO'-SiO2
+      slags and samples of slag and metal at equilibrium were withdrawn for
+      analysis.
+    locator: {page: 73}
+  atmosphere:
+    text: >-
+      Melts were equilibrated in helium or argon + helium atmospheres of the
+      same composition and flow rate as previously employed, so that the
+      temperatures of equilibration were 1785°, 1880° and 1960°C.
+    locator: {page: 74, section: Experimental}
 extraction:
-  method: Manual transcription from layout-preserving pdftotext, checked against the p. 74 page render.
+  method: Manual transcription from layout-preserving pdftotext, checked against the p. 73-74 page renders.
   date: '2026-10-16'
   worker: codex
 review_status: draft
@@ -38,6 +51,15 @@ experiments:
   - experiment_id: distin1971-1785c
     method: electromagnetic levitation slag-metal equilibration
     locator: {page: 74, table: 'Experimental results'}
+    fe_metal_saturated: &distin_fe_metal_saturated
+      state: {tag: value, value: true}
+      locator: {page: 73}
+      inferred: true
+      inference: >-
+        Inferred, not printed: the p. 73 equilibrium contact between liquid iron
+        and liquid slag, together with the p. 74 activity definition against
+        pure FeO, supports Fe-metal saturation. The paper does not name a buffer
+        or report fO2.
     conditions:
       temperature_C_as_printed:
         state: {tag: value, value: {kind: point, point: '1785'}}
@@ -48,6 +70,7 @@ experiments:
   - experiment_id: distin1971-1880c
     method: electromagnetic levitation slag-metal equilibration
     locator: {page: 74, table: 'Experimental results'}
+    fe_metal_saturated: *distin_fe_metal_saturated
     conditions:
       temperature_C_as_printed:
         state: {tag: value, value: {kind: point, point: '1880'}}
@@ -58,6 +81,7 @@ experiments:
   - experiment_id: distin1971-1960c
     method: electromagnetic levitation slag-metal equilibration
     locator: {page: 74, table: 'Experimental results'}
+    fe_metal_saturated: *distin_fe_metal_saturated
     conditions:
       temperature_C_as_printed:
         state: {tag: value, value: {kind: point, point: '1960'}}

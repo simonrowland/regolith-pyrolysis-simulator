@@ -1,0 +1,61 @@
+source_id: kems-025-markova-1983
+source:
+  citation: Markova et al. (1983), lunar material vaporization, p. 461.
+extraction:
+  method: Preserve each plotted point's printed initial-sample composition as context; measurement values were not re-extracted.
+  review_status: draft
+  printed_composition_context:
+    source: Table 1, unnumbered caption "The compositions of initial samples", p. 461.
+    quote: "Table. The compositions of initial samples"
+    code_path: simulator/battery/migrate.py::_initial_charge_only_missing_composition
+    composition_role: initial_charge_only
+    migrated_result: Identity and point composition remain unknown because per-run composition is not published; each plotted point retains its labeled initial sample map in printed_composition.
+    printed_sample_maps_wt_pct:
+      I:
+        SiO2: 42.86
+        TiO2: 0.05
+        Al2O3: 36.63
+        FeO: 0.55
+        MnO: 0.00
+        MgO: 0.11
+        CaO: 19.16
+        Na2O: 0.55
+        K2O: 0.06
+      II:
+        SiO2: 42.73
+        TiO2: 0.05
+        Al2O3: 26.72
+        FeO: 5.54
+        MnO: 0.09
+        MgO: 8.27
+        CaO: 14.31
+        Na2O: 1.26
+        K2O: 0.11
+      III:
+        SiO2: 45.40
+        TiO2: 0.32
+        Al2O3: 28.63
+        FeO: 4.25
+        MnO: 0.06
+        MgO: 4.38
+        CaO: 16.39
+        Na2O: 0.41
+        K2O: 0.06
+      IV:
+        SiO2: 44.16
+        TiO2: 0.13
+        Al2O3: 20.29
+        FeO: 8.84
+        MnO: 0.14
+        MgO: 15.58
+        CaO: 10.79
+        Na2O: 0.71
+        K2O: 0.08
+    verification:
+      migrated_p_partial_rows: 25
+      printed_compositions_matching_labeled_sample: 25
+      identity_and_point_compositions_unknown: 25
+      pinned_sample_rows:
+        - {sample: II, source_temperature_C: 1633.05, identity_temperature_K: 1906.20, locator: {published_page: 461, figure: '2'}}
+        - {sample: III, source_temperature_C: 1616.41, identity_temperature_K: 1889.56, locator: {published_page: 461, figure: '3'}}
+        - {sample: IV, source_temperature_C: 1503.96, identity_temperature_K: 1777.11, locator: {published_page: 461, figure: '4'}}

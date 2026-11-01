@@ -1,0 +1,49 @@
+source_id: mueller-2004-alkali-oxide-activity-coal-ash
+source_identity:
+  title: Structural dependence of alkali oxide activity in coal ash slags
+  venue: VII International Conference on Molten Slags, Fluxes and Salts (2004)
+  doi: null
+table_tool:
+  draft: MinerU p001-p002; tables p002-t01 and p002-t02
+  qa: 2 tables; numeric agreement 1.000 for each; no flagged table cells
+  disposition: >-
+    Table I and Table II transcribed into Slag context. Table II's structural
+    parameters are retained as printed and typed-refused because the store has
+    no closed scored structural-parameter quantity.
+manual_tables:
+  - table: 'I'
+    locator: {page: 2, published_page: 616}
+    disposition: one boiler-slag composition row, context-only
+    numeric_cells: 10
+    mapping: each printed oxide cell retained in components_as_printed, mass percent
+  - table: 'II'
+    locator: {page: 2, published_page: 616}
+    disposition: six sample rows; model compositions and both structural columns retained
+    numeric_cells: 28 printed body values (MinerU QA reports 29 numeric-column cells, including a header cell)
+    mapping:
+      composition: composition_as_printed, mass percent
+      base_acid: base_acid_as_printed, dimensionless, typed-refused structural descriptor
+      NBO_T: NBO_T_as_printed, dimensionless, typed-refused structural descriptor
+    cell_audit: >-
+      All printed numeric body cells agree in MinerU table CSV and pdftotext-layout.
+      The 200 dpi render of PDF page 2 confirms table row and column assignment, including the
+      four model-slag composition rows, two empty boiler-slag composition columns,
+      and the six values in each structural column. Negative signs on M4 and
+      Boiler slag ox. NBO/T values are present in the render.
+  - table: 'II'
+    locator: {page: 2, published_page: 616}
+    printed_rows: 6
+    note: Structural parameter definitions are printed as Equations 4 and 5 on PDF page 2.
+prose_audit:
+  - locator: {page: 1, published_page: 615, section: Experimental}
+    check: 200 dpi render confirms stated whole-setup vacuum bound <10^-3 Pa, detector-pressure equation, and pure-silver calibration sentence.
+isolated_migration:
+  observations: 4
+  hard_issues: 12
+  hard_issue_class: identity_incomplete (composition, exact total pressure, independent fO2 for each row)
+  registry_issues: 0
+  unavailable: 4
+  unavailable_reason: >-
+    Each pressure is measured_reduced by the printed detector-pressure relation;
+    raw detector signals are not printed, so the migrator's ancestry queue remains
+    even with the located raw_inputs: not_printed declaration. No parent is invented.

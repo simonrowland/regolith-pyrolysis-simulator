@@ -165,7 +165,8 @@ def test_yakovlev_1984_o2_table_is_model_derived_with_located_points():
         assert row.identity.temperature_K.is_value
         assert condition.state.value == row.identity.temperature_K.value
         assert condition.locator is not None
-        assert condition.locator.table == "Po2"
+        assert condition.locator.published_page == 946
+        assert condition.locator.pdf_page_index == 1
         assert row.point_conditions["composition"].state.is_unknown
 
 
@@ -246,7 +247,7 @@ def _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows):
             }
             assert composition["locator"]["figure"] == figure
             assert composition["locator"]["published_page"] == 946
-            assert composition["locator"]["pdf_page_index"] == 2
+            assert composition["locator"]["pdf_page_index"] == 1
             note = composition["locator"]["note"]
             assert "log10(p_torr)=" in note
             assert f"({row['read1_x_px']},{row['read1_y_px']})" in note

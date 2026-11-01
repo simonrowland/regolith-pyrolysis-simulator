@@ -57,7 +57,7 @@ class EngineInstaller:
 
         # PetThermoTools (Python API for alphaMELTS)
         try:
-            import PetThermoTools  # noqa: F401
+            import petthermotools  # noqa: F401
             status['PetThermoTools'] = True
         except ImportError:
             status['PetThermoTools'] = False

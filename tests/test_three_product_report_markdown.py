@@ -97,6 +97,12 @@ def test_metals_class_renders_per_species_breakdown():
         'metals_total_kg': 6.5,
         'O2_kg': 2.0,
         'class_total_kg': 8.5,
+        'estimated_contributions': [{
+            'species': 'SiO',
+            'account': 'process.cleaned_melt',
+            'authority': 'status_bearing',
+            'reason': 'estimated carrier row',
+        }],
     }
     report = format_three_product_markdown(classification)
     assert "**Fe**" in report
@@ -104,6 +110,51 @@ def test_metals_class_renders_per_species_breakdown():
     assert "**K**" in report
     assert "Metals subtotal" in report
     assert "Source-side O₂ potential subtotal" in report
+    assert "includes estimated transport for SiO" in report
+
+
+def test_partial_product_class_renders_excluded_refusal():
+    classification = _empty_classification()
+    classification["metals_plus_O2"].update({
+        "class_total_kg": 8.5,
+        "status": "partial",
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": "unbounded",
+        }],
+    })
+    report = format_three_product_markdown(classification)
+    assert "Availability**: PARTIAL" in report
+    assert "Si via process.cleaned_melt (unbounded" in report
+
+
+def test_partial_product_class_labels_numeric_ledger_bound_as_conservative():
+    classification = _empty_classification()
+    classification["metals_plus_O2"].update({
+        "class_total_kg": 8.5,
+        "status": "partial",
+        "excluded": [{
+            "species": "Si",
+            "account": "process.cleaned_melt",
+            "reason": "missing LJ row",
+            "upper_bound_kg": 0.5617,
+            "upper_bound_basis": "conservative_ledger_bound",
+        }],
+        "estimated_contributions": [{
+            "species": "SiO",
+            "account": "process.cleaned_melt",
+            "authority": "status_bearing",
+            "reason": "estimated carrier row",
+        }],
+    })
+    report = format_three_product_markdown(classification)
+    assert (
+        "Si via process.cleaned_melt (up to 0.562 kg "
+        "(conservative upper bound); missing LJ row)"
+    ) in report
+    assert "includes estimated transport for SiO" in report
 
 
 def test_silica_glass_class_shows_stage_3_capture():
@@ -177,6 +228,67 @@ def test_refused_silica_product_quantity_is_unavailable_not_zero():
     assert '**Class total**: unavailable kg' in silica_section
     assert 'Stage 3 capture: unavailable kg' in silica_section
     assert '**Class total**: — kg' not in silica_section
+
+
+def test_refused_metal_total_renders_flag_instead_of_numeric_partial_total():
+    classification = _empty_classification()
+    classification['metals_plus_O2'].update({
+        'metals_kg': {'Na': 1.0},
+        'metals_total_kg': None,
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'EvaporationFluxConfigurationError: Si transport missing',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Metals + O₂ potential: unavailable kg' in report
+    assert '- Metals subtotal: unavailable kg' in report
+    assert 'status=unavailable' in report
+    assert 'EvaporationFluxConfigurationError: Si transport missing' in report
+
+
+def test_refused_oxygen_partition_renders_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['metals_plus_O2'].update({
+        'metals_total_kg': None,
+        'O2_kg': None,
+        'O2_partition_kg': {'stored': None, 'total': None},
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Source-side O₂ potential subtotal (emitted; not recovered/captured): unavailable kg' in report
+
+
+def test_refused_rump_totals_render_unavailable_without_numeric_cast():
+    classification = _empty_classification()
+    classification['refractory_ceramic_rump'].update({
+        'rump_total_kg': None,
+        'rump_refractory_oxides_kg': None,
+        'rump_silicate_residual_kg': None,
+        'rump_unextracted_metals_kg': None,
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'reason': 'Si: EvaporationFluxConfigurationError',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Residual inventory total (not a product total): unavailable kg' in report
+    assert 'Refractory oxides floor (by physics): unavailable kg' in report
 
 
 def test_rump_class_shows_per_species_breakdown():

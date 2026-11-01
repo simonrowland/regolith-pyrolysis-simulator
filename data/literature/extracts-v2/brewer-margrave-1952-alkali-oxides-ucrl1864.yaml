@@ -1,0 +1,811 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
+observations:
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_approximate_high_temperature_na_pressure
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, gas_species, method_class, evidence_class,
+      pressure_range_atm_as_printed, attribution, assumption_as_printed, T_condition, quote'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Authors' discussion of their Na2O experiments; approximate high-temperature metal partial pressure.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 19
+    pdf_page_index: 18
+    section: Discussion of Na2O vaporization
+    note: Approximate high-temperature metal partial-pressure statement; absolute PDF page 19.
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  derivation:
+    relation: identity.reference_state=ideal-gas Na(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1006:row=6:h=7ac60ec11a1f
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1006'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=6
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1006'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1241:row=4:h=32f054211f0b
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1241'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=4
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1241'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1260:row=3:h=819d15c848c0
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1260'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=3
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1260'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1467:row=1:h=73ef0f153d5c
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1467'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=1
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1467'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=918:row=2:h=2eba3cba4908
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '918'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=2
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '918'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=943:row=5:h=fdbb02c94538
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '943'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=5
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '943'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'
+- observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=998:row=7:h=0cf8c2a228f7
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '998'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped mass_loss_rate field selected; source fields: row, T_K, total_weight_loss_mg, duration_s,
+      effusion_hole_area_cm2, note, value, table_row_number, table_column_number, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
+  locator:
+    page: 17
+    pdf_page_index: 16
+    table: '3'
+    note: row=7
+  read_from: pdf:brewer-margrave-1952-alkali-oxides-ucrl1864
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '998'
+          approximate: false
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '3'

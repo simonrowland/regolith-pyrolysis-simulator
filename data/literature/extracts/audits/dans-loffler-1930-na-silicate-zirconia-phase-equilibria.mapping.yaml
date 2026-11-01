@@ -1,0 +1,482 @@
+# Compare-only mapping for mineru_table_draft.py; extraction is hand-assembled from these columns.
+# Printed-column map: p9/T1 cols 3-4 are Na2O/SiO2 mol%, col 5 is separate Na2CO3 added wt%, cols 6-10 are thermal effects (7/9 phase cr; 6/8/10 phase l; col 10 corrected measured_reduced).
+# p12/T2 cols 2-4 are mixed-attribution temperature/composition context only; not emitted as observations.
+# p13/T3 cols 3-5 are Na2O/SiO2/ZrO2 mol%, col 6 separate Na2CO3 added wt%, cols 7-10 are thermal effects.
+# p18/T4 cols 3-5 are Na2O/SiO2/ZrO2 mol%, cols 6-9 thermal effects; p26/T5 cols 3-5 composition and 6-8 thermal effects.
+# p28/T6 cols 3-5 composition and col 6 observation/temperature text; p30/T7 cols 3-5 composition and 6-9 thermal effects.
+# p34 un-numbered pure summary uses col 3 melting/transition text; p34 binary and p35 summaries use col 3 temperature and cols 4-6 Na2O/SiO2/ZrO2 mol%.
+# Extract types are transition_point/transition_temperature and composition_series/equilibrium_phase_composition; melt phase is l with role melt; beta-to-alpha solid transition is cr.
+# Temperatures and melt compositions are row conditions where printed; total pressure and fO2 are unknown/not_printed. Own measurements are measured_direct except p9/T1 col 10, measured_reduced.
+# The four Table 6 no-temperature rows and Table 4 N/point 12 continuation are context. See sibling audit.md for full evidence and cell resolutions.
+source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
+tables:
+- page: 9
+  table_index: 1
+  values:
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: transition_temperature
+    phase: cr
+    unit: °C
+    evidence_class: measured_direct
+  - column: 8
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 9
+    species: Na2O
+    quantity: transition_temperature
+    phase: cr
+    unit: °C
+    evidence_class: measured_direct
+  - column: 10
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_reduced
+  render_verified: []
+- page: 12
+  table_index: 2
+  values:
+  - column: 2
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+  render_verified:
+  - row: 2
+    column: 2
+    text: 850?
+  - row: 3
+    column: 2
+    text: (800)?
+- page: 13
+  table_index: 3
+  values:
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 8
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 9
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 10
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified: []
+- page: 18
+  table_index: 5
+  values:
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 8
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 9
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified: []
+- page: 26
+  table_index: 9
+  values:
+  - column: 3
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 8
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified: []
+- page: 28
+  table_index: 10
+  values:
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified:
+  - row: 19
+    column: 3
+    text: 32,5
+  - row: 19
+    column: 4
+    text: 35,0
+  - row: 19
+    column: 5
+    text: 32,5
+  - row: 19
+    column: 6
+    text: '1446'
+  - row: 20
+    column: 3
+    text: 31,7
+  - row: 20
+    column: 4
+    text: 36,6
+  - row: 20
+    column: 5
+    text: 31,7
+  - row: 20
+    column: 6
+    text: '1446'
+- page: 30
+  table_index: 11
+  values:
+  - column: 3
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 4
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 8
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 9
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified: []
+- page: 34
+  table_index: 12
+  values:
+  - column: 3
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  render_verified:
+  - row: 2
+    column: 3
+    text: 1083° kongr.
+  - row: 3
+    column: 3
+    text: 960° → alpha-Na4SiO4
+  - row: 4
+    column: 3
+    text: 1122° kongr.
+  - row: 5
+    column: 3
+    text: ca. 1500° inkongr.
+  - row: 6
+    column: 3
+    text: 1477° inkongr.
+  - row: 7
+    column: 3
+    text: 1540° kongr.
+- page: 34
+  table_index: 13
+  values:
+  - column: 3
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 4
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  render_verified:
+  - row: 2
+    column: 3
+    text: (1000)
+  - row: 2
+    column: 4
+    text: 63,5
+  - row: 2
+    column: 5
+    text: 36,5
+- page: 35
+  table_index: 14
+  values:
+  - column: 3
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 4
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  render_verified:
+  - row: 2
+    column: 3
+    text: (998)
+  - row: 2
+    column: 4
+    text: 63,3
+  - row: 2
+    column: 5
+    text: 37,5
+  - row: 2
+    column: 6
+    text: 0,2
+- page: 35
+  table_index: 15
+  values:
+  - column: 3
+    species: Na2O
+    quantity: transition_temperature
+    phase: l
+    unit: °C
+    evidence_class: measured_direct
+  - column: 4
+    species: Na2O
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 5
+    species: SiO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  - column: 6
+    species: ZrO2
+    quantity: equilibrium_phase_composition
+    phase: l
+    unit: mol%
+    evidence_class: measured_direct
+  render_verified:
+  - row: 2
+    column: 3
+    text: (1058)
+  - row: 2
+    column: 4
+    text: (66,2)
+  - row: 2
+    column: 5
+    text: 32,5
+  - row: 2
+    column: 6
+    text: 1,2
+  - row: 3
+    column: 3
+    text: '1106'
+  - row: 3
+    column: 4
+    text: 59,7
+  - row: 3
+    column: 5
+    text: 39,0
+  - row: 3
+    column: 6
+    text: 1,2
+  - row: 4
+    column: 3
+    text: '1076'
+  - row: 4
+    column: 4
+    text: 49,1
+  - row: 4
+    column: 5
+    text: 49,1
+  - row: 4
+    column: 6
+    text: 1,7

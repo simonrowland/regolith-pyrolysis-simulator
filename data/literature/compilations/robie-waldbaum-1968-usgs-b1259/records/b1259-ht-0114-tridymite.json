@@ -14,8 +14,8 @@
   "pdf_page": 145,
   "page": 139,
   "name_as_published": "TRIDYMITE",
-  "formula_as_published": "SiO_",
-  "formula": "SiO_",
+  "formula_as_published": "SiO2",
+  "formula": "SiO2",
   "phase": "α tridymite 298.15° to 390°K. β tridymite 390° to 2000°K.",
   "gram_formula_weight": {
     "as_published": "60.085",
@@ -1979,6 +1979,14 @@
     "logKf_identity |logK+1000 dG/(RT ln10)|=10.0002 at T=1140.0"
   ],
   "corrections": [
+    {
+      "correction_id": "b1259-p145-formula_as_published",
+      "pdf_page": 145,
+      "field": "formula_as_published",
+      "layout_as_extracted": "SiO_",
+      "printed_token": "SiO2",
+      "evidence": "PDF page 145 image visibly prints 'SiO2'"
+    },
     {
       "correction_id": "b1259-p145-phase",
       "pdf_page": 145,

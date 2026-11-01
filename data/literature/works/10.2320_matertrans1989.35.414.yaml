@@ -1,0 +1,194 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/matertrans1989.35.414
+  citation: Fujisawa, Toshiharu; Fukuyama, Hiroyuki; Shimotori, Jun; Yamauchi, Chikabumi (1994). Thermodynamics of NaO0.5-CO2-SnO2
+    Slag and Estimation of Distribution Ratio of Sn between the Slag and Molten Copper. Materials Transactions, JIM 35(6),
+    414-422.
+  source_ids:
+  - fujisawa-1994-na-sn-carbonate-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:fujisawa-1994-na-sn-carbonate-thermodynamics
+      role: pdf
+      path: raw/fujisawa-1994-na-sn-carbonate-thermodynamics/fujisawa-1994-na-sn-carbonate-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: ef5dfdc0b94b015494cbab8f65c3a6d680ffdae9b686da0d0e5d1c4b60a2d238
+    - asset_id: pdftotext:fujisawa-1994-na-sn-carbonate-thermodynamics
+      role: pdftotext
+      path: text/fujisawa-1994-na-sn-carbonate-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:fujisawa-1994-na-sn-carbonate-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2320/matertrans1989.35.414
+experiments:
+- experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'distribution_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Table 2 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2320/matertrans1989.35.414
+  locator:
+    page: 5
+    published_page: 418
+    table: '2'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+- experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'distribution_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Table 3 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2320/matertrans1989.35.414
+  locator:
+    page: 6
+    published_page: 419
+    table: '3'
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+context:
+- observation_id: fujisawa94_table1_parameter_context
+  type: thermodynamic_parameter_table
+  locator:
+    page: 5
+    published_page: 418
+    table: '1'
+  units: As printed; supporting Cu-Sn-O calculation parameters, not slag activity observations.
+  values:
+    method_class: quoted_attributed
+    schema_gap: Table 1 interaction parameters and activity-coefficient functions are calculation inputs rather than a supported
+      quantity for the requested melt-activity observations.
+    rows:
+    - expression: log gamma_O^0 = (-3999/T) + 2.03
+      temperature_range_K: 1373-1673
+      references: (11)(12)
+    - expression: log gamma_Sn(l)^0 = (-2805/T) + 0.6557
+      temperature_range_K: 1373-1523
+      references: (13)
+    - expression: epsilon_O^O = (-31929/T) + 14.157
+      temperature_range_K: 1373-1673
+      references: (11)(12)
+    - expression: epsilon_Sn^Sn = 10.79
+      temperature_range_K: '1593'
+      references: (14)
+    - expression: epsilon_Sn^O = (-18575/T) + 10.1
+      temperature_range_K: 1373-1573
+      references: (15)
+  context_id: fujisawa-1994-na-sn-carbonate-thermodynamics::context::fujisawa94_table1_parameter_context
+  work_id: 10.2320/matertrans1989.35.414
+  source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+  species: SnO2

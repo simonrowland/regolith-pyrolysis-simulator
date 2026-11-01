@@ -125,9 +125,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fe_activity_fig8_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 492
@@ -180,9 +184,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig1_peak_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 489
@@ -235,9 +243,13 @@ observations:
       value: quoted_unattributed
     original_method_class: quoted_measurement
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig2_Si_O_po2_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 489
@@ -290,9 +302,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig3_ISiO_over_ISi_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -346,9 +362,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -403,9 +423,13 @@ observations:
       value: quoted_unattributed
     original_method_class: quoted_measurement
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig5_gamma_Si_comparison_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -459,9 +483,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig6_integration_curve_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -515,9 +543,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig7_gamma_Si_this_work_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 492
@@ -571,9 +603,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig8_activities_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 492
@@ -626,9 +662,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-067-yamada-1980::yamada_1980_fig9_ionization_efficiency_figure_only
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -2146,12 +2186,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si_NSi_below_0.05' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

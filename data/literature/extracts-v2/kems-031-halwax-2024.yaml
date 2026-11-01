@@ -83,9 +83,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_cao_isothermal_ca_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -186,9 +191,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_cao_isothermal_o2_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -291,9 +301,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_cao_isothermal_o_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -598,9 +613,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_mgo_isothermal_mg_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -703,9 +723,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o2_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6
@@ -808,9 +833,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-031-halwax-2024::halwax_2024_mgo_isothermal_o_pressure_figure_only
   source_id: kems-031-halwax-2024
   locator:
     page: 6

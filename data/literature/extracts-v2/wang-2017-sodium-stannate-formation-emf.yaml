@@ -1,0 +1,89 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml
+observations:
+- observation_id: wang-2017-sodium-stannate-formation-emf::wang_2017_eq12_sodium_stannate_formation_gibbs_fit
+  experiment_id: 10.1007/s12598-016-0717-4::wang-2017-sodium-stannate-formation-emf
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2SnO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [773, 1273]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_fG_slope_as_printed
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wang et al. (2017), Equation (12), as printed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: wang-2017-sodium-stannate-formation-emf
+  locator:
+    section: Results of sodium stannate’s formation free energy
+    equation: '12'
+    note: Equation image embedded in the HTML article
+  read_from: pdftotext:wang-2017-sodium-stannate-formation-emf

@@ -179,7 +179,9 @@ def _cell_material_bench(materials: tuple[CellMaterial, ...] | None) -> Bench:
 
 
 def test_predict_with_engine_does_not_select_the_engine_default() -> None:
-    source = inspect.getsource(predict_with_engine)
+    from simulator.battery.score import _predict_with_engine
+
+    source = inspect.getsource(_predict_with_engine)
     assert "PO2_ENGINE_DEFAULT" not in source
     assert "engine_default" not in source
 

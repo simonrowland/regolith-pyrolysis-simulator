@@ -193,9 +193,12 @@ PATH_VALUE_KEYS = frozenset(
         "table_provenance_root",
         "chapter_pdf",
         "corpus_asset",
+        "image_asset_as_published",  # published image filenames are relative asset paths
         "provenance_file",
         "audit_file",
         "audit_files",
+        "audit_csv",  # figure-read audit table (shornikov 2025)
+        "numeric_points",  # figure-audit csv, or the sentinels none / not_digitized
         "calibration_audit",
     }
 )

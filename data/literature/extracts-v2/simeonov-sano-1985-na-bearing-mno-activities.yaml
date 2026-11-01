@@ -1,0 +1,935 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml
+observations:
+- observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_gamma_mn_carbon_saturated_iron
+  experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: not stated in the paper for the reported gamma_Mn coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: experiment_melt_composition_not_printed
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.51'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na5-sime85
+      date: '2026-10-27'
+      evidence:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        section: III.1
+  notices: []
+  source_id: simeonov-sano-1985-na-bearing-mno-activities
+  locator:
+    page: 2
+    published_page: 1117
+    pdf_page_index: 1
+    section: III.1
+  read_from: pdf:simeonov-sano-1985-na-bearing-mno-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        section: III.1
+    gas_mix:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        section: II.1
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        section: II.1
+        note: Printed P_CO = 1 atm; exact conversion to Pa.
+    composition:
+      state:
+        tag: unknown
+        reason: experiment_melt_composition_not_printed
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        figure: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        section: III.1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 2
+              published_page: 1117
+              pdf_page_index: 1
+              section: III.1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 1117
+              pdf_page_index: 1
+              section: III.1
+        output_unit: K
+        references: []
+  derivation:
+    relation: Eq. (2), using the Fig. 2 slope and the manganese activity coefficient in copper reported by Hultgren and Desai
+    inputs: []
+    parameters:
+    - - Fig. 2 slope
+      - state:
+          tag: value
+          value: '1.07'
+        locator:
+          page: 2
+          published_page: 1117
+          pdf_page_index: 1
+          section: III.1
+    - - gamma_Mn_in_copper
+      - state:
+          tag: value
+          value: '0.544'
+        locator:
+          page: 2
+          published_page: 1117
+          pdf_page_index: 1
+          section: III.1
+          note: Quoted from Hultgren and Desai, reference 6.
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 2
+        published_page: 1117
+        pdf_page_index: 1
+        figure: '2'
+        note: The underlying paired alloy assays are plotted, not tabulated.
+    references: []
+- observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r2_lmn
+  experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '0.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na5-sime85
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=10; column_header=L_Mn; printed_cell=0.80
+  notices: []
+  source_id: simeonov-sano-1985-na-bearing-mno-activities
+  locator:
+    page: 5
+    published_page: 1120
+    pdf_page_index: 4
+    table: '1'
+    note: row_label=10; column_header=L_Mn; printed_cell=0.80
+  read_from: pdf:simeonov-sano-1985-na-bearing-mno-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=10; column_header=L_Mn; printed_cell=0.80
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=10; column_header=L_Mn; printed_cell=0.80
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=10; column_header=L_Mn; printed_cell=0.80
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+    gas_mix:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        section: V
+    composition:
+      state:
+        tag: unknown
+        reason: not_printed_per_table_row
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+  derivation:
+    relation: (MnO)/[Mn]
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: Per-row slag and metal assay values are not printed.
+    references: []
+- observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r3_lmn
+  experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '0.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na5-sime85
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=15; column_header=L_Mn; printed_cell=0.64
+  notices: []
+  source_id: simeonov-sano-1985-na-bearing-mno-activities
+  locator:
+    page: 5
+    published_page: 1120
+    pdf_page_index: 4
+    table: '1'
+    note: row_label=15; column_header=L_Mn; printed_cell=0.64
+  read_from: pdf:simeonov-sano-1985-na-bearing-mno-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=15; column_header=L_Mn; printed_cell=0.64
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=15; column_header=L_Mn; printed_cell=0.64
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=15; column_header=L_Mn; printed_cell=0.64
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+    gas_mix:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        section: V
+    composition:
+      state:
+        tag: unknown
+        reason: not_printed_per_table_row
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+  derivation:
+    relation: (MnO)/[Mn]
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: Per-row slag and metal assay values are not printed.
+    references: []
+- observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r4_lmn
+  experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '0.53'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na5-sime85
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=20; column_header=L_Mn; printed_cell=0.53
+  notices: []
+  source_id: simeonov-sano-1985-na-bearing-mno-activities
+  locator:
+    page: 5
+    published_page: 1120
+    pdf_page_index: 4
+    table: '1'
+    note: row_label=20; column_header=L_Mn; printed_cell=0.53
+  read_from: pdf:simeonov-sano-1985-na-bearing-mno-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=20; column_header=L_Mn; printed_cell=0.53
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=20; column_header=L_Mn; printed_cell=0.53
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=20; column_header=L_Mn; printed_cell=0.53
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+    gas_mix:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        section: V
+    composition:
+      state:
+        tag: unknown
+        reason: not_printed_per_table_row
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+  derivation:
+    relation: (MnO)/[Mn]
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: Per-row slag and metal assay values are not printed.
+    references: []
+- observation_id: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_t1_r5_lmn
+  experiment_id: 8286374c3cdef054a4fc43881e01e4f4dff86e65d6b0499c9d416ea87af90c2b::experiment::simeonov-sano-1985-table1-mn-distribution
+  identity:
+    quantity:
+      tag: value
+      value: distribution_ratio
+    species:
+      formula: Mn
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: wt_percent
+    per:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile distribution_ratio does not use wall
+    phase_role:
+      tag: value
+      value: slag
+    counter_phase_role:
+      tag: value
+      value: metal
+  value:
+    kind: point
+    point: '0.41'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na5-sime85
+      date: '2026-10-27'
+      evidence:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=25; column_header=L_Mn; printed_cell=0.41
+  notices: []
+  source_id: simeonov-sano-1985-na-bearing-mno-activities
+  locator:
+    page: 5
+    published_page: 1120
+    pdf_page_index: 4
+    table: '1'
+    note: row_label=25; column_header=L_Mn; printed_cell=0.41
+  read_from: pdf:simeonov-sano-1985-na-bearing-mno-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: row_label=25; column_header=L_Mn; printed_cell=0.41
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=25; column_header=L_Mn; printed_cell=0.41
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 1120
+              pdf_page_index: 4
+              table: '1'
+              note: row_label=25; column_header=L_Mn; printed_cell=0.41
+        output_unit: K
+        references: []
+    temperature_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+    gas_mix:
+      state:
+        tag: value
+        value: CO
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        section: V
+    composition:
+      state:
+        tag: unknown
+        reason: not_printed_per_table_row
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+  derivation:
+    relation: (MnO)/[Mn]
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        published_page: 1120
+        pdf_page_index: 4
+        table: '1'
+        note: Per-row slag and metal assay values are not printed.
+    references: []

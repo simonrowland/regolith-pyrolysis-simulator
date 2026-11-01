@@ -1,0 +1,3091 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml
+observations:
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1268::T=1268:h=fa61206997a8
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1268'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000006745'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1268'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1272::T=1272:h=d56b1abddff9
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1272'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000008762'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1272'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1300::T=1300:h=0d1270ec71fd
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001028'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1307::T=1307:h=0faf7ad74691
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1307'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000009898'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1307'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1325::T=1325:h=06a7aaa5d45b
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1325'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001286'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1341::T=1341:h=03a1bd09cd34
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1341'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001385'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1341'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1348::T=1348:h=4138c68dbb05
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1348'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001548'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1373::T=1373:h=c8b653e4a18e
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1373'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001931'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table2_silicate_1375::T=1375:h=d7ffb5a01a3f
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_sodium_silicate_check
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1375'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.657'
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001834'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 3
+        table: '2'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 3
+    table: '2'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1375'
+      locator:
+        page: 3
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent
+          components:
+          - - SiO2
+            - '0.657'
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        section: Experimental
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1296::T=1296:h=f0f31da891ee
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1296'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000176'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1296'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1296_lowering::T=1296:h=696013e0a7db
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1296'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000181'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1296'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1302::T=1302:h=8416fc81eb7b
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1302'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000181'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1302'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1325::T=1325:h=b8094d4cb314
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1325'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000221'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1325_lowering::T=1325:h=674cf1d464c4
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1325'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000227'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1325'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1333::T=1333:h=157d9c29f2ad
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1333'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000238'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1333'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1348::T=1348:h=d61f9d496d5a
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1348'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000269'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1348_lowering::T=1348:h=d22158452213
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1348'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000286'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1348'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1354::T=1354:h=d010e2c66b99
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1354'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000028'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1354'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1365::T=1365:h=31bc365dc170
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1365'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000000031'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1365'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1365_lowering::T=1365:h=95d722e5d67d
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1365'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000314'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1365'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []
+- observation_id: kim-2004-na2o-float-glass-emf::kim_2004_table3_glass_1370::T=1370:h=0ee09d345968
+  experiment_id: 10.1016/j.tca.2003.12.022::experiment::kim_2004_float_glass
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1370'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R)
+        + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT).
+        The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference
+        state remains unknown.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.70175'
+        - - Na2O
+          - '0.1319'
+        - - CaO
+          - '0.10046'
+        - - MgO
+          - '0.05852'
+        - - Al2O3
+          - '0.00319'
+        - - SO2
+          - '0.00242'
+        - - Fe2O3
+          - '0.00035'
+        - - Cl
+          - '0.00106'
+        - - TiO2
+          - '0.00035'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '101325'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0000000000319'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1027na3-kim04
+      date: '2026-10-27'
+      evidence:
+        page: 4
+        table: '3'
+  notices: []
+  source_id: kim-2004-na2o-float-glass-emf
+  locator:
+    page: 4
+    table: '3'
+  read_from: pdf:kim-2004-na2o-float-glass-emf
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: A pure oxygen atmosphere at 1 atm was maintained over both electrodes.
+    temperature_K:
+      state:
+        tag: value
+        value: '1370'
+      locator:
+        page: 4
+        table: '3'
+    composition:
+      state:
+        tag: unknown
+        reason: Cl in the printed composition has no typed composition component token.
+      locator:
+        page: 2
+        table: '1'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        section: Experimental
+        note: Pure oxygen at 1 atm over both electrodes.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kim-2004-na2o-float-glass-emf
+    parameters: []
+    output_unit: dimensionless activity; EMF in mV
+    references: []

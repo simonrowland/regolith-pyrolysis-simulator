@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
 )
 from simulator.scalar_boundary import finite_float
+from simulator.wall_deposit_availability import (
+    WALL_SATURATION_PRESSURE_REFUSED_CODE,
+)
 
 _EPS = 1e-12
 PRESSURE_COATING_PARETO_SPECIES = ("Na", "K", "SiO", "Fe")
@@ -35,9 +39,6 @@ WALL_STICKING_ALPHA_MISSING_CODE = (
 )
 WALL_SURFACE_GEOMETRY_PROVENANCE_CODE = (
     "wall_deposit_surface_geometry_provenance"
-)
-WALL_SATURATION_PRESSURE_REFUSED_CODE = (
-    "wall_deposit_saturation_pressure_refused"
 )
 WALL_VAPOUR_CARRIER_NON_AUTHORITATIVE_CODE = (
     "wall_deposit_vapour_carrier_non_authoritative"
@@ -1067,6 +1068,14 @@ def _plain_value(value: Any) -> Any:
         return [_plain_value(item) for item in value]
     if isinstance(value, float):
         return value if math.isfinite(value) else str(value)
+    # The JSON probe below is validation only for these native scalar values;
+    # its encoded string is discarded and the original value is returned.
+    if value is None or isinstance(value, (str, bool)):
+        return value
+    if type(value) is int and value.bit_length() < 2048:
+        # This bound stays below Python's minimum integer-to-string digit
+        # limit, so oversized integers still take the existing JSON check.
+        return value
     try:
         json.dumps(value, allow_nan=False)
     except (TypeError, ValueError):

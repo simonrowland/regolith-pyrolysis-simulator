@@ -293,6 +293,7 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Cr':  (2.880, 6000.0, 51.996),  # Estimated
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
+    'Si':  (2.910, 3036.0, 28.085),  # Svehla 1962 NASA TR R-132 Table I, p. 24
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
 }
 
@@ -357,6 +358,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'status': 'proxy',
         'source': 'estimated transition-metal vapor Lennard-Jones row',
     },
+    'Si': {
+        'status': 'sourced',
+        'source': 'Svehla 1962 NASA TR R-132 Table I, p. 24',
+    },
     'SiO': {
         'status': 'proxy',
         'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
@@ -369,7 +374,7 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     # here would falsely report proxy authority for deposition transport.
 }
 
-DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+DEFAULT_CARRIER_GAS = 'N2'  # Default carrier; CO2 for Mars feedstocks
 STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     1: 'fe_stage1',
     2: 'cr_stage2',
@@ -377,8 +382,74 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = (
-    'He/pHe, N2/pN2, Kr/pKr, Ar/pAr (legacy), O2/pO2, CO2/pCO2'
+
+
+@dataclass(frozen=True)
+class CarrierGasCatalogEntry:
+    token: str
+    aliases: tuple[str, ...]
+    label: str
+    legacy: bool
+    physical_selection_reason: str
+    alias_patterns: tuple[str, ...] = ()
+
+
+CARRIER_GAS_CATALOG = (
+    CarrierGasCatalogEntry(
+        'He', ('He', 'pHe'), 'He', False,
+        'Configured inert carrier with sourced transport properties.',
+    ),
+    CarrierGasCatalogEntry(
+        'N2', ('N2', 'pN2', 'N2Sweep', 'pN2Sweep'), 'N₂ (default)', False,
+        'Default operator carrier; unset selection preserves current N₂ behavior.',
+    ),
+    CarrierGasCatalogEntry(
+        'Kr', ('Kr', 'pKr'), 'Kr', False,
+        'Recommended inert: condenses about 30 K above LOX and drops out first.',
+    ),
+    CarrierGasCatalogEntry(
+        'Ar', ('Ar', 'pAr'), 'Ar (legacy)', True,
+        'Boiling point about 87.3 K is about 3 K from LOX, complicating cryogenic separation.',
+    ),
+    CarrierGasCatalogEntry(
+        'O2', ('O2', 'pO2', 'O2Backpressure', 'controlledO2'), 'O₂', False,
+        'Configured oxygen carrier for controlled-oxygen conditions.',
+    ),
+    CarrierGasCatalogEntry(
+        'CO2', ('CO2', 'pCO2', 'CO2Backpressure'), 'CO₂', False,
+        'Configured carbon-dioxide carrier for Mars feedstocks.',
+        alias_patterns=('{percentage}%CO2',),
+    ),
+)
+
+
+def carrier_gas_catalog_payload() -> list[dict[str, Any]]:
+    return [
+        {
+            'token': entry.token,
+            'aliases': list(entry.aliases),
+            'alias_patterns': list(entry.alias_patterns),
+            'label': entry.label,
+            'legacy': entry.legacy,
+            'physical_selection_reason': entry.physical_selection_reason,
+            'collision_diameter_m': CARRIER_GAS_PROPERTIES[
+                entry.token
+            ].collision_diameter_m,
+        }
+        for entry in CARRIER_GAS_CATALOG
+    ]
+
+
+_CARRIER_GAS_KEY_BY_ALIAS = {
+    alias.upper().replace(' ', '').replace('_', '').replace('-', ''): entry.token
+    for entry in CARRIER_GAS_CATALOG
+    for alias in entry.aliases
+}
+
+SUPPORTED_CARRIER_GAS_LABELS = ', '.join(
+    f'{entry.aliases[0]}/{entry.aliases[1]}'
+    + (' (legacy)' if entry.legacy else '')
+    for entry in CARRIER_GAS_CATALOG
 )
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
@@ -1743,26 +1814,19 @@ def _canonical_carrier_gas_key(
             'condensation carrier_gas must be non-empty when provided'
         )
     upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
-    if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
-        return 'N2'
-    if upper in {'HE', 'PHE'}:
-        return 'He'
-    if upper in {'AR', 'PAR'}:
-        return 'Ar'
-    # Kr (t-395): recommended fallback buffer replacing Ar (legacy kept).
-    if upper in {'KR', 'PKR'}:
-        return 'Kr'
-    if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
-        return 'O2'
-    if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
-        return 'CO2'
-    if upper.endswith('%CO2'):
-        try:
-            co2_percent = float(upper[:-4])
-        except ValueError:
-            co2_percent = 0.0
-        if 0.0 < co2_percent <= 100.0:
-            return 'CO2'
+    if upper in _CARRIER_GAS_KEY_BY_ALIAS:
+        return _CARRIER_GAS_KEY_BY_ALIAS[upper]
+    for entry in CARRIER_GAS_CATALOG:
+        for pattern in entry.alias_patterns:
+            prefix, suffix = pattern.split('{percentage}', maxsplit=1)
+            if upper.startswith(prefix) and upper.endswith(suffix):
+                percentage_text = upper[len(prefix):len(upper) - len(suffix)]
+                try:
+                    percentage = float(percentage_text)
+                except ValueError:
+                    percentage = 0.0
+                if 0.0 < percentage <= 100.0:
+                    return entry.token
     raise _unsupported_carrier_gas_error(carrier_gas)
 
 
@@ -5641,6 +5705,54 @@ def _alpha_record(
         record['alpha_s_domain_status'] = 'out_of_domain'
         record['output_status'] = 'status_bearing'
         record['alpha_s_authoritative_at_temperature'] = False
+        if (
+            species == 'Fe'
+            and record.get('value_ref')
+            == f'{STICKING_VALUE_REF_PREFIX}Fe.value'
+            and isinstance(spec, Mapping)
+            and spec.get('form') == 'scalar'
+            and T_K is not None
+        ):
+            # Fe uses the owner's adopted scalar form: alpha_s = 0.02, the
+            # high side of the five Costa & Jacobson Fe+ points over 1700–1800 K.
+            # The presentation supplies no alpha(T) equation, so extrapolating
+            # that adopted form means keeping its scalar value, not fitting the
+            # digitized scatter. At 1523.15 K the value remains 0.02, 176.85 K
+            # below the certified band; 0.02 is already in (0, 1], so the
+            # physical clamp is checked but not engaged.
+            raw_alpha = float(record['alpha_s'])
+            positive_floor = math.nextafter(0.0, 1.0)
+            bounded_alpha = min(1.0, max(positive_floor, raw_alpha))
+            bound_engaged = bounded_alpha != raw_alpha
+            record['alpha_s'] = bounded_alpha
+            record['alpha_s_domain_status'] = 'extrapolated'
+            record['authority_level'] = 'extrapolated'
+            record['alpha_s_physical_bound_engaged'] = bound_engaged
+            valid_band = _valid_temperature_range_K(
+                record.get('alpha_s_valid_range_K')
+            )
+            if valid_band is not None:
+                valid_low, valid_high = valid_band
+                source_fit = {
+                    'form': 'scalar',
+                    'value': raw_alpha,
+                    'source_id': 'kems-007-costa-2015',
+                    'source': record.get('source'),
+                    'source_url': record.get('source_url'),
+                }
+                record['alpha_s_extrapolation_notice'] = {
+                    'certified_band_K': valid_band,
+                    'temperature_used_K': float(T_K),
+                    'distance_below_band_K': max(0.0, valid_low - float(T_K)),
+                    'distance_above_band_K': max(0.0, float(T_K) - valid_high),
+                    'authority_level': 'extrapolated',
+                    'source_fit': source_fit,
+                    'physical_bound': {
+                        'lower_exclusive': 0.0,
+                        'upper_inclusive': 1.0,
+                    },
+                    'bound_engaged': bound_engaged,
+                }
     elif record.get('alpha_s_valid_range_K') is not None:
         record['alpha_s_domain_status'] = 'in_domain'
         record['alpha_s_authoritative_at_temperature'] = True
@@ -6136,10 +6248,11 @@ def _try_antoine_psat_pa(
 ) -> tuple[float | None, bool]:
     """Return a wall pressure or a named, fail-closed range refusal.
 
-    ``(None, True)`` means typed refusal — including the case where the
-    species has Antoine data somewhere but no segment covers ``T_K``
-    (``_antoine_psat_pa`` returns None without raising). Never invent a
-    pressure for that gap (b-127 fabricated 100 Pa).
+    ``(None, True)`` means typed refusal. The lower-level
+    ``_antoine_psat_pa`` may raise ``WallSaturationPressureRefusal`` for an
+    unusable fit or return ``None`` when an evaluator supplies no pressure;
+    this adapter normalizes both outcomes. Never invent a pressure for that
+    gap (b-127 fabricated 100 Pa).
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError

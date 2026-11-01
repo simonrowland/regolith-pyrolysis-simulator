@@ -37,7 +37,9 @@ from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
     DEFAULT_PIPE_DIAMETER_M,
+    DEFAULT_CARRIER_GAS,
     N2_COLLISION_DIAMETER_M,
+    carrier_gas_catalog_payload,
 )
 from simulator.optimize.backend_status import (
     backend_statuses_from_carrier,
@@ -109,6 +111,7 @@ from simulator.recipe_io import (
     write_recipe_patch,
 )
 from simulator.state import CondensationTrain
+from simulator.wall_deposit_availability import wall_deposit_figure_availability
 from simulator.wall_advisor import WALL_ZONE_TEMPERATURES_C
 from web.feedstock_data import (
     debug_feedstocks_enabled,
@@ -2271,9 +2274,22 @@ def _knudsen_config_payload(
         pressure_band,
         'campaigns.C2A_continuous.p_total_mbar',
     )
+    carrier_options = carrier_gas_catalog_payload()
+    default_carrier = next(
+        item for item in carrier_options
+        if item['token'] == DEFAULT_CARRIER_GAS
+    )
     return {
         'boltzmann_constant_j_k': BOLTZMANN_CONSTANT_J_K,
         'characteristic_length_m': DEFAULT_PIPE_DIAMETER_M,
+        'carrier_gas': default_carrier['token'],
+        'carrier_collision_diameter_m': default_carrier[
+            'collision_diameter_m'
+        ],
+        'carrier_gas_options': carrier_options,
+        # Deprecated N2-valued fallback. Removal owner: this payload and its
+        # JS consumer, at the next explicit Knudsen-config schema epoch after
+        # all clients read the carrier-aware fields.
         'n2_collision_diameter_m': N2_COLLISION_DIAMETER_M,
         'continuum_buffer_kn': CONTINUUM_BUFFER_KN,
         'mean_free_path_formula_id': MEAN_FREE_PATH_FORMULA_ID,
@@ -2287,10 +2303,10 @@ def _knudsen_config_payload(
             'max': pressure_high,
             'label': 'viscous-flow band',
             'warning_message': (
-                'pN2 sweep outside '
+                'Buffer pressure outside '
                 f'{_format_compact_number(pressure_low)}-'
                 f'{_format_compact_number(pressure_high)} mbar '
-                'viscous-flow band'
+                'viscous-flow band; no carrier flow rate is modeled'
             ),
         },
     }
@@ -2507,6 +2523,17 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     deposit_known = total_kg is not None
     positive_deposit = deposit_known and total_kg > 0.0
     authority = _mapping_value(result.get('wall_deposit_sticking_authority'))
+    explicit_refusal = _mapping_value(
+        result.get('wall_deposit_refusal') or result.get('coating_refusal')
+    )
+    availability = wall_deposit_figure_availability(
+        has_positive_deposit=positive_deposit,
+        authority=authority,
+        refusal=explicit_refusal,
+    )
+    refusal = availability.refusal or {}
+    if refusal.get('authority'):
+        authority = _mapping_value(refusal.get('authority'))
     authoritative = result.get('coating_authoritative')
     if authoritative is None and authority:
         authoritative = authority.get(
@@ -2532,8 +2559,13 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         if parsed_authoritative is None
         else parsed_authoritative
     )
+    if availability.status == 'refused':
+        is_authoritative = False
+        total_kg = None
+        campaigns = None
     warning_reason = str(
         result.get('coating_status_reason')
+        or refusal.get('reason')
         or authority.get('message')
         or (
             # The warning used to fire only on a POSITIVE deposit, so the
@@ -2549,7 +2581,7 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
             )
         )
     )
-    if total_kg is None and campaigns in (None, ''):
+    if total_kg is None and campaigns in (None, '') and not refusal:
         return {
             'status': 'inconclusive',
             'reason': 'coating artifact missing',
@@ -2559,11 +2591,9 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
     # authority payloads; surface it on the coating readout AND operator
     # templates (optimizer detail/table) so absence is visible — not
     # producer-only forwarding into an unread payload field.
-    refusal_count = authority.get('status_bearing_refusal_count')
+    refusal_count = refusal.get('count')
     if refusal_count is None:
-        refused_species = authority.get('wall_saturation_pressure_refused_species')
-        if isinstance(refused_species, (list, tuple)):
-            refusal_count = len(refused_species)
+        refusal_count = authority.get('status_bearing_refusal_count')
     if not is_authoritative and refusal_count is not None:
         refusal_clause = f'status-bearing refusals: {refusal_count}'
         if warning_reason:
@@ -2571,7 +2601,7 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
                 warning_reason = f'{warning_reason} ({refusal_clause})'
         else:
             warning_reason = refusal_clause
-    return {
+    readout = {
         'status': 'available' if is_authoritative else 'warning',
         'authoritative': is_authoritative,
         'output_status': str(
@@ -2586,6 +2616,9 @@ def _coating_readout(result: Mapping[str, Any]) -> dict[str, Any]:
         'segment_count': segment_count,
         'status_bearing_refusal_count': refusal_count,
     }
+    if refusal:
+        readout['refusal'] = refusal
+    return readout
 
 
 def _first_mapping(*values: Any) -> Mapping[str, Any]:
@@ -3143,7 +3176,7 @@ def _recipe_stage_sections(eval_spec: Mapping[str, Any]) -> list[dict[str, Any]]
                     _first_present(override, 'pO2_mbar', 'po2_mbar', 'pO2_Pa'),
                 ),
                 _labelled_value(
-                    'pN2 sweep',
+                    'Carrier / buffer pressure',
                     _first_present(
                         override,
                         'pN2_mbar',
@@ -3556,6 +3589,7 @@ def _recipe_runtime_overrides_from_controls(
     if not isinstance(raw, Mapping):
         raise BadRequest('controls.runtime_campaign_overrides must be an object')
     overrides: dict[str, dict[str, Any]] = {}
+    has_carrier_override = False
     for campaign, fields in raw.items():
         campaign_name = _recipe_text_value(campaign)
         if not campaign_name:
@@ -3571,6 +3605,10 @@ def _recipe_runtime_overrides_from_controls(
                 raise BadRequest(
                     f'controls.runtime_campaign_overrides.{campaign_name} field is required'
                 )
+            if field_name == 'carrier_gas':
+                clean_fields[field_name] = raw_value
+                has_carrier_override = True
+                continue
             value = _recipe_non_negative_number(
                 raw_value,
                 f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}',
@@ -3579,6 +3617,15 @@ def _recipe_runtime_overrides_from_controls(
                 clean_fields[field_name] = value
         if clean_fields:
             overrides[campaign_name] = clean_fields
+    if has_carrier_override:
+        try:
+            canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
+                overrides
+            )
+            CampaignManager.validate_runtime_campaign_overrides(canonical)
+            return canonical
+        except ValueError as exc:
+            raise BadRequest(str(exc)) from exc
     return overrides
 
 
@@ -4007,9 +4054,21 @@ def _recipe_controls_from_metadata(metadata: Mapping[str, Any]) -> dict[str, Any
                 f'invalid saved runtime_campaign_overrides: {exc}'
             ) from exc
         controls['runtime_campaign_overrides'] = copy.deepcopy(dict(overrides))
-        campaign, fields = next(iter(overrides.items()))
-        controls['lever_campaign'] = str(campaign)
-        if isinstance(fields, Mapping):
+        # Fixed C2A carrier overrides are orthogonal to the selected lever.
+        # Carrier-only entries must not become the lever when recipe YAML
+        # sorting places C2A before the campaign that owns numeric controls.
+        lever_override = next(
+            (
+                (campaign, fields)
+                for campaign, fields in overrides.items()
+                if isinstance(fields, Mapping)
+                and any(str(field) != 'carrier_gas' for field in fields)
+            ),
+            None,
+        )
+        if lever_override is not None:
+            campaign, fields = lever_override
+            controls['lever_campaign'] = str(campaign)
             field_map = {
                 'pO2_mbar': 'pO2_mbar',
                 'hold_temp_C': 'stage_temp_C',
@@ -4168,11 +4227,11 @@ def _ledger_get(resource: str, **params):
     try:
         from web.events import read_ledger_api_for_client
         return jsonify(read_ledger_api_for_client(client_id, resource, **params))
-    except LookupError as exc:
-        return _json_error(str(exc), 404)
     except KeyError as exc:
         identifier = exc.args[0] if exc.args else ''
         return _json_error(f'unknown ledger {resource}: {identifier}', 404)
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
     except (TypeError, ValueError) as exc:
         return _json_error(str(exc), 400)
 

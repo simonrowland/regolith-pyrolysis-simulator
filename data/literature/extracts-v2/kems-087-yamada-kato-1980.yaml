@@ -249,9 +249,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fe_activity_slight_negative_deviation
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 250
@@ -304,9 +308,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig10_P2_over_P_sq_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 249
@@ -355,13 +363,17 @@ observations:
       note: figure-only; scatter not digitised
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
+      tag: value
+      value: figure_only
     original_method_class: method_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig1_cell_assembly_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244
@@ -414,9 +426,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig2_P2_background_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 245
@@ -469,9 +485,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig3_ion_ratio_vs_1_over_T_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 245
@@ -524,9 +544,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig4_ion_ratio_vs_N_P_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 246
@@ -580,9 +604,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig5_integration_curve_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 246
@@ -636,9 +664,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig6_gamma_P_comparison_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 247
@@ -692,9 +724,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig7_activities_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 247
@@ -748,9 +784,13 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig8_integration_error_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 247
@@ -803,9 +843,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig9_P_plus_peak_figure_only
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 248
@@ -919,12 +963,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_1_wt_pct' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

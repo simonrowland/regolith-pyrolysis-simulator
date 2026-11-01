@@ -1,0 +1,65 @@
+source_id: seto-2010-na2o-activity-glass-emf-summary
+method: table tool unavailable: born-digital, pdftotext + image audit
+method_mapping: >-
+  The summary describes EMF measurements with a concentration cell (page 1,
+  Fig. 1 / Experimental method). All five observations carry regime emf_cell,
+  which maps to MethodToken.EMF_CELL.
+input_order:
+  - text/seto-2010-na2o-activity-glass-emf-summary/pdftotext-layout.txt
+  - page 2 PDF render, used only for the full-cell audit under controller ruling
+table_row_counts:
+  '1': {printed: 2, extracted: 2, absolute_pdf_page: 2}
+  '2': {printed: 3, extracted: 3, absolute_pdf_page: 2}
+cell_audit:
+  method: >-
+    Each numeric composition, temperature, RT ln a(Na2O), log a(Na2O), row
+    attribution and row/column assignment below was checked against the page 2
+    render at 200 dpi. Pdftotext supplied the transcription; render confirmed
+    every cell and the table layout.
+  rows:
+    - table: '1'
+      row: 1
+      absolute_pdf_page: 2
+      cells: {SiO2_mol_percent: '84', Na2O_mol_percent: '16', CaO_mol_percent: '0', temperature_K: '1473', RT_ln_a_kJ_mol: '-263.9', log10_a: '-9.36', reference: '[2]'}
+      audit: render_verified
+    - table: '1'
+      row: 2
+      absolute_pdf_page: 2
+      cells: {SiO2_mol_percent: '74', Na2O_mol_percent: '16', CaO_mol_percent: '10', temperature_K: '1473', RT_ln_a_kJ_mol: '-263.0', log10_a: '-9.33', reference: 'This study'}
+      audit: render_verified
+    - table: '2'
+      row: 1
+      absolute_pdf_page: 2
+      cells: {SiO2_mol_percent: '70', Na2O_mol_percent: '30', Al2O3_mol_percent: '0', temperature_K: '1473', RT_ln_a_kJ_mol: '-232.8', log10_a: '-8.25', reference: '[2]'}
+      audit: render_verified
+    - table: '2'
+      row: 2
+      absolute_pdf_page: 2
+      cells: {SiO2_mol_percent: '65', Na2O_mol_percent: '30', Al2O3_mol_percent: '5', temperature_K: '1473', RT_ln_a_kJ_mol: '-225.1', log10_a: '-7.98', reference: 'This study'}
+      audit: render_verified
+    - table: '2'
+      row: 3
+      absolute_pdf_page: 2
+      cells: {SiO2_mol_percent: '60', Na2O_mol_percent: '30', Al2O3_mol_percent: '10', temperature_K: '1473', RT_ln_a_kJ_mol: '-216.6', log10_a: '-7.68', reference: 'This study'}
+      audit: render_verified
+schema_gaps:
+  - >-
+    MELT_ACTIVITY has activity and activity_coefficient quantities but no token
+    for the printed base-10 log activity or RT ln activity (kJ/mol). Preserve
+    the printed values and leave these rows typed-refused.
+evidence_classification:
+  reference_rows: >-
+    Table labels [2] are quoted_attributed to reference [2]. The three “This
+    study” rows report outputs reduced from EMF plus reference [2], but this
+    summary gives neither numeric EMF inputs nor an explicit reduction relation;
+    under d-110 they are also quoted_attributed because lineage inputs cannot be
+    stored. No value is promoted to measured_reduced without those inputs.
+  identity_composition_gap: >-
+    A typed-refused activity with no numeric activity cannot enter the
+    migrator's exploded-point composition binder. The printed row composition
+    is present in observation.point_conditions, but migration leaves
+    Identity.composition unknown (no composition mapped from source); this is
+    migrator bug b-1052, which is being fixed separately. Do not work around it
+    by changing the schema or migrator in this extraction task.
+figure_read_candidates:
+  - Figure 2 shows other-source activity points and an inherited Sugawara et al. [2] curve; not digitized.

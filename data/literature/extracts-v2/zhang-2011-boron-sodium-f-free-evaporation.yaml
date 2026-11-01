@@ -1,0 +1,2647 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml
+observations:
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1300c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4896625008541885778052571789'
+        - - SiO2
+          - '0.3868796169635817330743940229'
+        - - Al2O3
+          - '0.01859517075752833571486162648'
+        - - Na2O
+          - '0.06319514659850938987447516421'
+        - - B2O3
+          - '0.04106477187474970906605105111'
+        - - TiO2
+          - '0.0006027929514422544649609557034'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1300 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 row at 1300 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4896625008541885778052571789'
+          - - SiO2
+            - '0.3868796169635817330743940229'
+          - - Al2O3
+            - '0.01859517075752833571486162648'
+          - - Na2O
+            - '0.06319514659850938987447516421'
+          - - B2O3
+            - '0.04106477187474970906605105111'
+          - - TiO2
+            - '0.0006027929514422544649609557034'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1300 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1300 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1300 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1350c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4896625008541885778052571789'
+        - - SiO2
+          - '0.3868796169635817330743940229'
+        - - Al2O3
+          - '0.01859517075752833571486162648'
+        - - Na2O
+          - '0.06319514659850938987447516421'
+        - - B2O3
+          - '0.04106477187474970906605105111'
+        - - TiO2
+          - '0.0006027929514422544649609557034'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1350 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 row at 1350 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4896625008541885778052571789'
+          - - SiO2
+            - '0.3868796169635817330743940229'
+          - - Al2O3
+            - '0.01859517075752833571486162648'
+          - - Na2O
+            - '0.06319514659850938987447516421'
+          - - B2O3
+            - '0.04106477187474970906605105111'
+          - - TiO2
+            - '0.0006027929514422544649609557034'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1350 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1350 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1350 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1400c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4896625008541885778052571789'
+        - - SiO2
+          - '0.3868796169635817330743940229'
+        - - Al2O3
+          - '0.01859517075752833571486162648'
+        - - Na2O
+          - '0.06319514659850938987447516421'
+        - - B2O3
+          - '0.04106477187474970906605105111'
+        - - TiO2
+          - '0.0006027929514422544649609557034'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1400 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 row at 1400 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4896625008541885778052571789'
+          - - SiO2
+            - '0.3868796169635817330743940229'
+          - - Al2O3
+            - '0.01859517075752833571486162648'
+          - - Na2O
+            - '0.06319514659850938987447516421'
+          - - B2O3
+            - '0.04106477187474970906605105111'
+          - - TiO2
+            - '0.0006027929514422544649609557034'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 row at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 row at 1400 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1300c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4849839777780606374105146585'
+        - - SiO2
+          - '0.3831831419170135989865434639'
+        - - Al2O3
+          - '0.01841750157652739566367563608'
+        - - Na2O
+          - '0.06259134305802047718010295032'
+        - - B2O3
+          - '0.04067241492992179327094952683'
+        - - TiO2
+          - '0.0005970335136079702170324042144'
+        - - ZrO2
+          - '0.009554587226848127271181359847'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1300 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 plus ZrO2 row at 1300 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4849839777780606374105146585'
+          - - SiO2
+            - '0.3831831419170135989865434639'
+          - - Al2O3
+            - '0.01841750157652739566367563608'
+          - - Na2O
+            - '0.06259134305802047718010295032'
+          - - B2O3
+            - '0.04067241492992179327094952683'
+          - - TiO2
+            - '0.0005970335136079702170324042144'
+          - - ZrO2
+            - '0.009554587226848127271181359847'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_ZrO2_wt_pct
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_ZrO2_g_mol
+          - state:
+              tag: value
+              value: '123.22200000000001'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1300 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1300 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1300 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1350c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4849839777780606374105146585'
+        - - SiO2
+          - '0.3831831419170135989865434639'
+        - - Al2O3
+          - '0.01841750157652739566367563608'
+        - - Na2O
+          - '0.06259134305802047718010295032'
+        - - B2O3
+          - '0.04067241492992179327094952683'
+        - - TiO2
+          - '0.0005970335136079702170324042144'
+        - - ZrO2
+          - '0.009554587226848127271181359847'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1350 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 plus ZrO2 row at 1350 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4849839777780606374105146585'
+          - - SiO2
+            - '0.3831831419170135989865434639'
+          - - Al2O3
+            - '0.01841750157652739566367563608'
+          - - Na2O
+            - '0.06259134305802047718010295032'
+          - - B2O3
+            - '0.04067241492992179327094952683'
+          - - TiO2
+            - '0.0005970335136079702170324042144'
+          - - ZrO2
+            - '0.009554587226848127271181359847'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_ZrO2_wt_pct
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_ZrO2_g_mol
+          - state:
+              tag: value
+              value: '123.22200000000001'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1350 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1350 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1350 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1400c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4849839777780606374105146585'
+        - - SiO2
+          - '0.3831831419170135989865434639'
+        - - Al2O3
+          - '0.01841750157652739566367563608'
+        - - Na2O
+          - '0.06259134305802047718010295032'
+        - - B2O3
+          - '0.04067241492992179327094952683'
+        - - TiO2
+          - '0.0005970335136079702170324042144'
+        - - ZrO2
+          - '0.009554587226848127271181359847'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1400 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-3 plus ZrO2 row at 1400 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4849839777780606374105146585'
+          - - SiO2
+            - '0.3831831419170135989865434639'
+          - - Al2O3
+            - '0.01841750157652739566367563608'
+          - - Na2O
+            - '0.06259134305802047718010295032'
+          - - B2O3
+            - '0.04067241492992179327094952683'
+          - - TiO2
+            - '0.0005970335136079702170324042144'
+          - - ZrO2
+            - '0.009554587226848127271181359847'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '46.2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '39.11'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.19'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.59'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.81'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.081'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - original_ZrO2_wt_pct
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        - - M_ZrO2_g_mol
+          - state:
+              tag: value
+              value: '123.22200000000001'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-3 plus ZrO2 row at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-3 plus ZrO2 row at 1400 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1300c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4703481082819641004180859061'
+        - - SiO2
+          - '0.3699325097019874126612620644'
+        - - Al2O3
+          - '0.01842699432709697384476787182'
+        - - Na2O
+          - '0.06354281927795792582203284391'
+        - - B2O3
+          - '0.04004937560828784664350408044'
+        - - TiO2
+          - '0.03770019280270574061034723375'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1300 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-4 row at 1300 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4703481082819641004180859061'
+          - - SiO2
+            - '0.3699325097019874126612620644'
+          - - Al2O3
+            - '0.01842699432709697384476787182'
+          - - Na2O
+            - '0.06354281927795792582203284391'
+          - - B2O3
+            - '0.04004937560828784664350408044'
+          - - TiO2
+            - '0.03770019280270574061034723375'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-4 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '43.8'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.91'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.12'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.54'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.63'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1300 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1300 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1300 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1350c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1623.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4703481082819641004180859061'
+        - - SiO2
+          - '0.3699325097019874126612620644'
+        - - Al2O3
+          - '0.01842699432709697384476787182'
+        - - Na2O
+          - '0.06354281927795792582203284391'
+        - - B2O3
+          - '0.04004937560828784664350408044'
+        - - TiO2
+          - '0.03770019280270574061034723375'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1350 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-4 row at 1350 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1350'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4703481082819641004180859061'
+          - - SiO2
+            - '0.3699325097019874126612620644'
+          - - Al2O3
+            - '0.01842699432709697384476787182'
+          - - Na2O
+            - '0.06354281927795792582203284391'
+          - - B2O3
+            - '0.04004937560828784664350408044'
+          - - TiO2
+            - '0.03770019280270574061034723375'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-4 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '43.8'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.91'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.12'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.54'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.63'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1350 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1350 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1350 C
+        output_unit: K
+        references: []
+- observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1400c_measured_flux
+  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_rate
+    species:
+      formula: slag
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4703481082819641004180859061'
+        - - SiO2
+          - '0.3699325097019874126612620644'
+        - - Al2O3
+          - '0.01842699432709697384476787182'
+        - - Na2O
+          - '0.06354281927795792582203284391'
+        - - B2O3
+          - '0.04004937560828784664350408044'
+        - - TiO2
+          - '0.03770019280270574061034723375'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmapped mass loss rate unit '10^-6 mg/(cm^2 s)'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: schema has no mass-per-area-per-time quantity token
+    decided_by:
+      worker: w1027na1-zhan11
+      date: '2026-10-27'
+      evidence:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1400 C
+  notices: []
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  locator:
+    page: 8
+    table: '6'
+    note: Measured flux; CS-4 row at 1400 C
+  read_from: pdf:zhang-2011-boron-sodium-f-free-evaporation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 8
+        table: '6'
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+    gas_flow:
+      state:
+        tag: value
+        value: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      locator:
+        page: 2
+        section: 2.2 Experimental Procedures
+        note: Absolute rate not stated; comparison on p5, section 3.3.2
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4703481082819641004180859061'
+          - - SiO2
+            - '0.3699325097019874126612620644'
+          - - Al2O3
+            - '0.01842699432709697384476787182'
+          - - Na2O
+            - '0.06354281927795792582203284391'
+          - - B2O3
+            - '0.04004937560828784664350408044'
+          - - TiO2
+            - '0.03770019280270574061034723375'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '2'
+        note: CS-4 pre-melting XRF composition
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '43.8'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.91'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.12'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '6.54'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_B2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.63'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_B2O3_g_mol
+          - state:
+              tag: value
+              value: '69.617'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 2
+              table: '2'
+              note: CS-4 pre-melting XRF composition
+        output_unit: mole_fraction
+        references: []
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 8
+        table: '6'
+        note: Measured flux; CS-4 row at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '6'
+              note: Measured flux; CS-4 row at 1400 C
+        output_unit: K
+        references: []

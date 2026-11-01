@@ -1,0 +1,2700 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
+observations:
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data::points:row=cd:h=b6bb2d9b329f
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Cd row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Cd; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data::points:row=cd:h=d0deb98cfa55
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Cd
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Cd row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Cd; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data::points:row=ge:h=d6a9bd716d16
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Ge
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wölfer et al. (2025)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Ge row; isotope data attributed to Wölfer et al. (2025).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Ge; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data::points:row=ge:h=da284c77c007
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Ge
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, value, table_row_number,
+      uncertainty_interval_permil, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Wölfer et al. (2025)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Ge row; isotope data attributed to Wölfer et al. (2025).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Ge; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data::points:row=k:h=46e427a08bb9
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nie et al. (2021)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, K row; isotope data attributed to Nie et al. (2021).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=K; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data::points:row=k:h=4f1c55873958
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nie et al. (2021)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, K row; isotope data attributed to Nie et al. (2021).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=K; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data::points:row=li:h=4c75e008ad25
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Seitz et al. (2007, 2012)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Li row; isotope data attributed to Seitz et al. (2007, 2012).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Li; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data::points:row=li:h=f5289253d7a8
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Li
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Seitz et al. (2007, 2012)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Li row; isotope data attributed to Seitz et al. (2007, 2012).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Li; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data::points:row=rb:h=03eca7eae011
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nie et al. (2021)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Rb row; isotope data attributed to Nie et al. (2021).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Rb; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data::points:row=rb:h=0e953ca61cf2
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Rb
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Nie et al. (2021)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Rb row; isotope data attributed to Nie et al. (2021).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Rb; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=chb:h=377d3f25b134
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ci_normalized_alkali_ratios'
+    species:
+      formula: Chondrule
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+  admission:
+    status: rejected
+    reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 34
+        published_page: 34
+        pdf_page_index: 33
+        table: '3'
+        note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 34
+    table: '3'
+    note: row=CHB
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cmo:h=b632702e119a
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ci_normalized_alkali_ratios'
+    species:
+      formula: Chondrule
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+  admission:
+    status: rejected
+    reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 34
+        published_page: 34
+        pdf_page_index: 33
+        table: '3'
+        note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 34
+    table: '3'
+    note: row=CMO
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cr:h=49a4fe74fc35
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ci_normalized_alkali_ratios'
+    species:
+      formula: Chondrule
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+  admission:
+    status: rejected
+    reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 34
+        published_page: 34
+        pdf_page_index: 33
+        table: '3'
+        note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 34
+    table: '3'
+    note: row=CR
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=eh:h=be714d5dbb4d
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ci_normalized_alkali_ratios'
+    species:
+      formula: Chondrule
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+  admission:
+    status: rejected
+    reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 34
+        published_page: 34
+        pdf_page_index: 33
+        table: '3'
+        note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 34
+    table: '3'
+    note: row=EH
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=oc:h=428e62c3314e
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ci_normalized_alkali_ratios'
+    species:
+      formula: Chondrule
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.
+  admission:
+    status: rejected
+    reason: No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 34
+        published_page: 34
+        pdf_page_index: 33
+        table: '3'
+        note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 34
+    table: '3'
+    note: row=OC
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=al2o3:h=380fb9f70bce
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=Al2O3
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=cao:h=f657c6d412fa
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=CaO
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=feo:h=161a85e559fe
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=FeO
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=mgo:h=8f439d9fe62b
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=MgO
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=mno:h=619e5e68f452
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=MnO
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=p2o5:h=12548f300f8b
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=P2O5
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=sio2:h=59648d4624e2
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=SiO2
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=tio2:h=79b8bae945e2
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'optical_basicity'
+    species:
+      formula: Melt_oxide
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009)
+  admission:
+    status: rejected
+    reason: No optical_basicity quantity token exists in the extraction schema.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.4
+        note: Table A.4 reports optical basicities attributed to Mathieu (2009).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.4
+    note: row=TiO2
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.48:h=cacfad5063ad
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: optical_basicity_Lambda, gamma_as_published,
+      value, table_row_number, T_C, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+  admission:
+    status: rejected
+    reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
+      can be constructed without inventing unprinted oxide proportions.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.5
+    note: row=Lambda 0.48
+  read_from: pdf:jacquet-2026-alkali-recondensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 37
+        table: A.5
+        note: row=Lambda 0.48
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.48
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.48
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: dimensionless fO2 printed; no mapped log or pressure form
+      locator:
+        page: 37
+        table: A.5
+    composition:
+      state:
+        tag: unknown
+        reason: only optical basicity Lambda printed
+      locator:
+        page: 37
+        table: A.5
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.55:h=a7f027a631de
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: optical_basicity_Lambda, gamma_as_published,
+      value, table_row_number, T_C, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+  admission:
+    status: rejected
+    reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
+      can be constructed without inventing unprinted oxide proportions.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.5
+    note: row=Lambda 0.55
+  read_from: pdf:jacquet-2026-alkali-recondensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 37
+        table: A.5
+        note: row=Lambda 0.55
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.55
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.55
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: dimensionless fO2 printed; no mapped log or pressure form
+      locator:
+        page: 37
+        table: A.5
+    composition:
+      state:
+        tag: unknown
+        reason: only optical basicity Lambda printed
+      locator:
+        page: 37
+        table: A.5
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.60:h=1ee15365bdb6
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: optical_basicity_Lambda, gamma_as_published,
+      value, table_row_number, T_C, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+  admission:
+    status: rejected
+    reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
+      can be constructed without inventing unprinted oxide proportions.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.5
+    note: row=Lambda 0.60
+  read_from: pdf:jacquet-2026-alkali-recondensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 37
+        table: A.5
+        note: row=Lambda 0.60
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.60
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.60
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: dimensionless fO2 printed; no mapped log or pressure form
+      locator:
+        page: 37
+        table: A.5
+    composition:
+      state:
+        tag: unknown
+        reason: only optical basicity Lambda printed
+      locator:
+        page: 37
+        table: A.5
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.65:h=c58e68b695c9
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: optical_basicity_Lambda, gamma_as_published,
+      value, table_row_number, T_C, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+  admission:
+    status: rejected
+    reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
+      can be constructed without inventing unprinted oxide proportions.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.5
+    note: row=Lambda 0.65
+  read_from: pdf:jacquet-2026-alkali-recondensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 37
+        table: A.5
+        note: row=Lambda 0.65
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.65
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.65
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: dimensionless fO2 printed; no mapped log or pressure form
+      locator:
+        page: 37
+        table: A.5
+    composition:
+      state:
+        tag: unknown
+        reason: only optical basicity Lambda printed
+      locator:
+        page: 37
+        table: A.5
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.72:h=be425f40dddc
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: optical_basicity_Lambda, gamma_as_published,
+      value, table_row_number, T_C, point_conditions, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).
+  admission:
+    status: rejected
+    reason: The table conditions each value by optical basicity rather than a full melt composition; no composition identity
+      can be constructed without inventing unprinted oxide proportions.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 37
+        published_page: 37
+        pdf_page_index: 36
+        table: A.5
+        note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 37
+    table: A.5
+    note: row=Lambda 0.72
+  read_from: pdf:jacquet-2026-alkali-recondensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 37
+        table: A.5
+        note: row=Lambda 0.72
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.72
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 37
+              table: A.5
+              note: row=Lambda 0.72
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: dimensionless fO2 printed; no mapped log or pressure form
+      locator:
+        page: 37
+        table: A.5
+    composition:
+      state:
+        tag: unknown
+        reason: only optical basicity Lambda printed
+      locator:
+        page: 37
+        table: A.5
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data::points:row=te:h=38f2da8655b8
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Te
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Te row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Te; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data::points:row=te:h=d4030c6014cd
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Te
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Te row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Te; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data::points:row=zn:h=71778647fd3b
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Zn row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Zn; column=delta_CI
+  read_from: pdf:jacquet-2026-alkali-recondensation
+- observation_id: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data::points:row=zn:h=f5d5b75d9dbf
+  experiment_id: 10.1016/j.icarus.2026.116970::jacquet-2026-alkali-recondensation
+  identity:
+    quantity:
+      tag: value
+      value: isotope_delta
+    species:
+      formula: Zn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: material, delta_permil, sigma_permil, value,
+      table_row_number, uncertainty, locator'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Morton et al. (2024)
+  admission:
+    status: rejected
+    reason: The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity
+      for these whole-chondrule values.
+    decided_by:
+      worker: w1027naC-jacquet-2026-alkali-recond
+      date: '2026-10-27'
+      evidence:
+        page: 27
+        published_page: 27
+        pdf_page_index: 26
+        table: '2'
+        note: Table 2, Zn row; isotope data attributed to Morton et al. (2024).
+  notices: []
+  source_id: jacquet-2026-alkali-recondensation
+  locator:
+    page: 27
+    table: '2'
+    note: row=Zn; column=delta_chd
+  read_from: pdf:jacquet-2026-alkali-recondensation

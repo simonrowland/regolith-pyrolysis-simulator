@@ -190,7 +190,7 @@ def staged_ceiling_case():
 # Nightly (2026-08-02 CI tiering): staged bakeout C2A campaign (~255 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(3600)
+@pytest.mark.cpu_budget(3600)
 def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
     staged_ceiling_case,
 ):

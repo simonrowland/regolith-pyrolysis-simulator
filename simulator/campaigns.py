@@ -136,6 +136,22 @@ class CampaignPressureSetpointRefusal(ValueError):
         )
 
 
+class CampaignSetpointMissingRefusal(ValueError):
+    """Typed refusal when a campaign is missing a required setpoint row."""
+
+    reason = 'campaign_setpoint_missing'
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        detail = self.diagnostic.get('detail')
+        super().__init__(
+            f'{self.reason}: {detail}' if detail else self.reason
+        )
+
+
 class CampaignHoldTargetRefusal(ValueError):
     """Typed refusal for a provided C6 hold target or temperature that is
     not a finite real.
@@ -548,9 +564,11 @@ class CampaignManager:
     })
     _PHASE_OVERRIDE_FIELDS = {
         CampaignPhase.C2A: frozenset({
+            'carrier_gas',
             'threshold_kg_hr',
         }),
         CampaignPhase.C2A_STAGED: frozenset({
+            'carrier_gas',
             'depletion_flux_decay_fraction',
             'hold_temp_C',
             'hold_temperature_C',
@@ -609,6 +627,21 @@ class CampaignManager:
     def _campaign_config(self, campaign: CampaignPhase) -> dict:
         cfg = self.campaigns.get(self._campaign_config_key(campaign), {})
         return cfg if isinstance(cfg, dict) else {}
+
+    def _carrier_gas_for_campaign(
+        self,
+        campaign: CampaignPhase,
+        cfg: Mapping[str, object],
+        default: str,
+    ) -> str:
+        runtime_carrier = self._campaign_overrides(campaign).get('carrier_gas')
+        configured_carrier = cfg.get('carrier_gas', default)
+        carrier = (
+            runtime_carrier
+            if runtime_carrier is not None
+            else configured_carrier
+        )
+        return _canonical_carrier_gas_key(carrier)
 
     @classmethod
     def _campaign_phases_for_override_key(
@@ -736,16 +769,36 @@ class CampaignManager:
         return fields
 
     @classmethod
-    def validate_runtime_campaign_overrides(
-            cls,
-            overrides: Mapping[str, Mapping[str, object]]) -> None:
+    def _canonicalize_runtime_carrier_overrides(
+        cls,
+        overrides: Mapping[str, Mapping[str, object]],
+    ) -> dict[str, dict[str, object]]:
         if not isinstance(overrides, Mapping):
             raise ValueError('runtime_campaign_overrides must be a mapping')
+        canonical: dict[str, dict[str, object]] = {}
         for campaign_name, fields in overrides.items():
             if not isinstance(fields, Mapping):
                 raise ValueError(
                     f'runtime_campaign_overrides[{campaign_name!r}] '
                     'must be a mapping')
+            clean_fields: dict[str, object] = {}
+            for field_name, value in fields.items():
+                field_key = str(field_name)
+                clean_fields[field_key] = (
+                    _canonical_carrier_gas_key(value)
+                    if field_key == 'carrier_gas'
+                    else value
+                )
+            canonical[str(campaign_name)] = clean_fields
+        return canonical
+
+    @classmethod
+    def validate_runtime_campaign_overrides(
+        cls,
+        overrides: Mapping[str, Mapping[str, object]],
+    ) -> None:
+        canonical = cls._canonicalize_runtime_carrier_overrides(overrides)
+        for campaign_name, fields in canonical.items():
             cls._refuse_unknown_override_fields(str(campaign_name), fields)
 
     @classmethod
@@ -771,6 +824,8 @@ class CampaignManager:
                 f'unknown runtime_campaign_overrides[{campaign_name!r}].'
                 f'{unknown[0]}; known overridable fields for '
                 f'{campaign_name}: {", ".join(known_fields)}')
+        if 'carrier_gas' in fields:
+            _canonical_carrier_gas_key(fields['carrier_gas'])
 
     def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
         merged: dict = {}
@@ -869,6 +924,22 @@ class CampaignManager:
         if value is None:
             raise ValueError(f'Missing numeric campaign setpoint: {label}')
         return self._float(value, 0.0)
+
+    def _required_campaign_config_float(
+            self,
+            campaign: CampaignPhase,
+            key: str,
+    ) -> float:
+        config = self._campaign_config(campaign)
+        label = f'{self._campaign_config_key(campaign)}.{key}'
+        value = config.get(key)
+        if value is None:
+            raise CampaignSetpointMissingRefusal({
+                'campaign': campaign.name,
+                'setpoint': label,
+                'detail': f'Missing required campaign setpoint: {label}',
+            })
+        return self._required_float(value, label)
 
     def _campaign_rate_band_midpoint(
         self,
@@ -969,15 +1040,17 @@ class CampaignManager:
             ),
         }
 
-    def _pressure_config_float(self,
-                               config: Mapping[str, object],
-                               scalar_key: str,
-                               default_key: str,
-                               default: float) -> float:
+    def _pressure_config_float(
+            self,
+            campaign: CampaignPhase,
+            scalar_key: str,
+            default_key: str,
+    ) -> float:
+        config = self._campaign_config(campaign)
         scalar_value = self._scalar_config_float(config, scalar_key)
         if scalar_value is not None:
             return scalar_value
-        return self._float(config.get(default_key), default)
+        return self._required_campaign_config_float(campaign, default_key)
 
     def _configured_max_hold_hr(self,
                                 campaign: CampaignPhase,
@@ -1429,9 +1502,9 @@ class CampaignManager:
             )
 
         default_pO2 = self._pressure_config_float(
-            cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+            CampaignPhase.C2A_STAGED, 'pO2_mbar', 'pO2_mbar_default')
         default_total = self._pressure_config_float(
-            cfg, 'p_total_mbar', 'p_total_mbar_default', 10.0)
+            CampaignPhase.C2A_STAGED, 'p_total_mbar', 'p_total_mbar_default')
         pO2_mbar, pO2_present = self._c2a_staged_stage_float(
             stage, 'pO2_mbar', default_pO2)
         p_total_mbar, p_total_present = self._c2a_staged_stage_float(
@@ -1556,9 +1629,10 @@ class CampaignManager:
             # the CONFIGURED carrier, canonically resolved (raises on an
             # unknown carrier, so a typo fails loudly instead of running
             # mislabelled). Default remains pN2 -> 'N2' (golden-neutral).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
+            melt.background_gas_species = self._carrier_gas_for_campaign(
+                CampaignPhase.C2A_STAGED,
+                cfg if isinstance(cfg, Mapping) else {},
+                'pN2',
             )
             melt.background_gas_mole_fraction = 1.0
         else:
@@ -1725,17 +1799,16 @@ class CampaignManager:
                 str(cfg.get('carrier_gas', 'Ar') or 'Ar')
             )
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
 
         elif campaign == CampaignPhase.C0B:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 9.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 9.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign in (CampaignPhase.C2A, CampaignPhase.C2A_STAGED):
             cfg = self._campaign_config(campaign)
@@ -1746,70 +1819,64 @@ class CampaignManager:
             # for a Kr carrier (double-counted buffer). Stamp the configured
             # carrier; the condensation resolver reads the same config, so
             # its answer is unchanged (golden-neutral for the pN2 default).
-            melt.background_gas_species = _canonical_carrier_gas_key(
-                str(cfg.get('carrier_gas', 'pN2') or 'pN2')
-                if isinstance(cfg, Mapping) else 'pN2'
+            melt.background_gas_species = self._carrier_gas_for_campaign(
+                campaign,
+                cfg,
+                'pN2',
             )
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 10.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.C2B:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 1.5)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.5)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 1.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 1.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.C4:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.C5:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.C6:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.CONTROLLED_O2
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.2)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.2)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.HARD_VACUUM
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 0.05)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         elif campaign == CampaignPhase.MRE_BASELINE:
-            cfg = self._campaign_config(campaign)
             melt.atmosphere = Atmosphere.O2_BACKPRESSURE
             melt.pO2_mbar = self._pressure_config_float(
-                cfg, 'pO2_mbar', 'pO2_mbar_default', 50.0)
+                campaign, 'pO2_mbar', 'pO2_mbar_default')
             melt.p_total_mbar = self._pressure_config_float(
-                cfg, 'p_total_mbar', 'p_total_mbar_default', 50.0)
+                campaign, 'p_total_mbar', 'p_total_mbar_default')
 
         # Apply runtime overrides (pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
@@ -2069,9 +2136,12 @@ class CampaignManager:
         elif campaign == CampaignPhase.C6:
             cfg = self._campaign_config(campaign)
             ovr = self._campaign_overrides(campaign)
+            default_target = self._required_campaign_config_float(
+                campaign, 'default_hold_T_C'
+            )
             target = self._float(
                 ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
-                self._float(cfg.get('default_hold_T_C'), 1400.0),
+                default_target,
             )
             ramp_raw = ovr.get('ramp_rate_C_per_hr', cfg.get('dT_dt_C_per_hr'))
             if ramp_raw is None:
@@ -2083,11 +2153,13 @@ class CampaignManager:
             return (target, ramp)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
-            cfg = self._campaign_config(campaign)
             ovr = self._campaign_overrides(campaign)
+            default_target = self._required_campaign_config_float(
+                campaign, 'default_hold_T_C'
+            )
             target = self._float(
                 ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
-                self._float(cfg.get('default_hold_T_C'), 1200.0),
+                default_target,
             )
             return (target, 10.0)
 

@@ -15,3 +15,13 @@ The notice that establishes a mode carries the same `fo2_mode` token.
 Mode-labeled residual keys include that token so records from distinct
 conditions remain separate. Residuals without a resolved or requested fO2
 mode omit the field.
+
+The `composition_binary_complement` notice records a binary composition
+derived as the complement of a printed caption mole percent. Such residuals
+remain visible in the `binary-complement-composition` flagged stratum.
+
+The `composition_oxide_from_element_mass_percent` notice records oxide mole
+fractions computed by stoichiometry from printed element mass percent, when
+those oxides account for the whole sample. The reason carries the printed
+oxide sum in wt%, read from the derivation inputs. Such residuals remain
+visible in the `oxide-from-element-mass-percent-composition` flagged stratum.

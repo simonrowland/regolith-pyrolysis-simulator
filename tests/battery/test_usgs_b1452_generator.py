@@ -734,6 +734,104 @@ def test_al2sio5_polymorphs_are_compared_identity_values() -> None:
     assert identity_equal(kyanite.identity, kyanite.identity).kind is IdentityEqualKind.EQUAL
 
 
+def test_b1452_record_owned_polymorphs_refuse_the_single_wrong_engine_phase() -> None:
+    from simulator.battery.compilation_tier import _resolve_symbol
+    from simulator.battery.enums import Engine
+
+    records = (
+        ("robie-hemingway-fisher-1978-usgs-b1452-0274", "298.15", Polymorph.ARAGONITE),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0275", "298.15", Polymorph.ARAGONITE),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0379", "298.15", Polymorph.KALIOPHILLITE_LOW),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0379-phase-02", "900", Polymorph.KALIOPHILLITE_HIGH),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0380", "298.15", Polymorph.KALIOPHILLITE_LOW),
+        ("robie-hemingway-fisher-1978-usgs-b1452-0380-phase-02", "900", Polymorph.KALIOPHILLITE_HIGH),
+    )
+    for record_id, temperature, expected in records:
+        generated = _generation(record_id)
+        observations = _observations_for(
+            generated, Quantity.S, temperature=temperature
+        )
+        assert observations
+        assert all(obs.identity.species.polymorph.value is expected for obs in observations)
+        if record_id.endswith("0379-phase-02"):
+            assert observations[0].value.point == Decimal("303.87")
+        assert all(
+            _resolve_symbol(Engine.THERMOENGINE, obs.identity)
+            == (None, "pure-phase-polymorph-unresolved")
+            for obs in observations
+        )
+
+
+def test_b1452_kaliophillite_298k_summary_is_the_printed_low_form() -> None:
+    from simulator.battery.compilation_tier import _resolve_symbol
+    from simulator.battery.enums import Engine
+
+    observations = _observations_for(
+        _generation(TABLE_298K),
+        Quantity.S,
+        temperature="298.15",
+        formula="KAlSiO4",
+        name="KALIOPHILLITE $KAlSiO_{4}$",
+    )
+    assert len(observations) == 1
+    observation = observations[0]
+    assert observation.value.point == Decimal("133.26")
+    assert observation.identity.species.polymorph.value is Polymorph.KALIOPHILLITE_LOW
+    assert _resolve_symbol(Engine.THERMOENGINE, observation.identity) == (
+        None,
+        "pure-phase-polymorph-unresolved",
+    )
+
+
+def test_b1452_anorthite_glass_uses_the_glass_phase_and_cannot_bind_anorthite() -> None:
+    from simulator.battery.compilation_tier import _resolve_symbol
+    from simulator.battery.enums import Engine
+
+    observations = _observations_for(
+        _generation("robie-hemingway-fisher-1978-usgs-b1452-0371"),
+        Quantity.S,
+        temperature="298.15",
+    )
+    assert observations
+    for observation in observations:
+        assert observation.identity.species.phase.value is Phase.GLASS
+        assert observation.identity.species.polymorph.is_not_applicable
+        assert _resolve_symbol(Engine.THERMOENGINE, observation.identity) == (
+            None,
+            "pure-phase-is-crystal-only",
+        )
+
+
+def test_b1452_nepheline_segment_below_printed_transition_keeps_nepheline_binding() -> None:
+    from simulator.battery.compilation_tier import _resolve_symbol
+    from simulator.battery.enums import Engine
+
+    observations = _observations_for(
+        _generation("robie-hemingway-fisher-1978-usgs-b1452-0391-phase-02"),
+        Quantity.S,
+        temperature="1200",
+    )
+    assert observations
+    for observation in observations:
+        assert observation.identity.species.polymorph.is_unknown
+        assert _resolve_symbol(Engine.THERMOENGINE, observation.identity) == ("Nph", "")
+
+
+def test_b1452_new_polymorph_names_are_formula_scoped() -> None:
+    from simulator.battery.polymorph_dictionary import resolve_formula_polymorph
+
+    assert resolve_formula_polymorph("CaCO3", "aragonite") is Polymorph.ARAGONITE
+    assert (
+        resolve_formula_polymorph("KAlSiO4", "low kaliophillite")
+        is Polymorph.KALIOPHILLITE_LOW
+    )
+    assert (
+        resolve_formula_polymorph("KAlSiO4", "high kaliophillite")
+        is Polymorph.KALIOPHILLITE_HIGH
+    )
+    assert resolve_formula_polymorph("CaCO3", "high kaliophillite") is None
+
+
 def test_plain_ion_tokens_keep_printed_charge() -> None:
     generated = _generation(TABLE_298K)
     iodide = _observations_for(

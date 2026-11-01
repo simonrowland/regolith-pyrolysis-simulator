@@ -1007,6 +1007,7 @@ def test_remote_error_discards_tainted_slot_before_next_call():
     worker.close()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_abort_before_pool_call_entry_prevents_expired_request_start(
     monkeypatch,
@@ -1054,6 +1055,7 @@ def test_abort_before_pool_call_entry_prevents_expired_request_start(
         results.join_thread()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_abort_during_cold_restart_before_publication_prevents_request(
     monkeypatch,
@@ -1106,6 +1108,7 @@ def test_abort_during_cold_restart_before_publication_prevents_request(
         results.join_thread()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_completed_request_abort_does_not_kill_next_assigned_request(monkeypatch):
     context = multiprocessing.get_context('spawn')
@@ -1176,6 +1179,7 @@ def test_completed_request_abort_does_not_kill_next_assigned_request(monkeypatch
         results.join_thread()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_cancelled_pending_future_is_never_executed():
     context = multiprocessing.get_context('spawn')
@@ -1212,6 +1216,7 @@ def test_cancelled_pending_future_is_never_executed():
         results.join_thread()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_pool_timeout_log_only_records_assigned_request_outside_pool_lock(
     monkeypatch,
@@ -1539,6 +1544,7 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
         os.kill(worker_pid, 0)
 
 
+@pytest.mark.cpu_budget(15)
 @pytest.mark.timeout(15)
 def test_constructor_refuses_when_worker_thread_never_reports_ready():
     """Pin: a silent worker thread must not park the constructor forever.
@@ -1719,6 +1725,7 @@ def _noop_disable_and_reap(worker):
     worker.close = close
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_constructor_preserves_typed_handshake_timeout_identity():
     """A genuine start() handshake timeout must keep that worker identity.
@@ -1764,6 +1771,7 @@ def test_constructor_preserves_typed_handshake_timeout_identity():
     assert tuple(getattr(exc, 'failed_slots', ())) == ()
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_constructor_reaps_child_when_process_start_blocks_before_publish():
     """Pin: process.start() hang before self.process is assigned must still reap.
@@ -1811,6 +1819,7 @@ def test_constructor_reaps_child_when_process_start_blocks_before_publish():
                 pass
 
 
+@pytest.mark.cpu_budget(25)
 @pytest.mark.timeout(25)
 def test_unpublished_daemon_false_spawn_does_not_block_interpreter_exit(
     tmp_path,

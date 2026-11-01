@@ -41,9 +41,9 @@ detected per evaluation, not only per build.
 That second assertion is load-bearing because the repository's own
 ``simulator.engine_local_config.setup_thermoengine_dylib_path`` PREPENDS
 the pristine staged dylib directory to ``DYLD_FALLBACK_LIBRARY_PATH``
-(``simulator/engine_local_config.py:258-262``) and is called by
+(``simulator/engine_local_config.py:1048-1050``) and is called by
 ``ThermoEngineTransport._initialize_in_process``
-(``engines/alphamelts/thermoengine.py:283``). Left alone it would let the
+(``engines/alphamelts/thermoengine.py:1113``). Left alone it would let the
 PRISTINE ``libphaseobjc`` win resolution and the screen would compute the
 unpatched model while believing it perturbed. ``evaluate-corpus`` therefore
 replaces that helper, inside this ephemeral worker process only, with a
@@ -364,13 +364,14 @@ def _patched_build_transport(prefix_lib: Path) -> Any:
     Reuses ``ThermoEngineTransport._initialize_in_process`` (the pinned
     adapter path) but substitutes the repository's dylib-path helper with a
     verify-only guard: the production helper PREPENDS the pristine staged
-    dylib directory (``simulator/engine_local_config.py:258-262``), which
+    dylib directory (``simulator/engine_local_config.py:1048-1050``), which
     would let the unpatched ``libphaseobjc`` win resolution and make the
     perturbation numerically silent. The parent has already scoped this
     process's ``DYLD_FALLBACK_LIBRARY_PATH`` to one prefix; the guard proves
     that and mutates nothing.
     """
     import engines.alphamelts.thermoengine as thermoengine_module
+    import simulator.engine_local_config as engine_local_config
     from simulator.melt_backend.alphamelts import activity_from_chem_potential
 
     def _pinned_dylib_dir() -> Path:
@@ -382,7 +383,7 @@ def _patched_build_transport(prefix_lib: Path) -> Any:
             )
         return prefix_lib
 
-    thermoengine_module.setup_thermoengine_dylib_path = _pinned_dylib_dir
+    engine_local_config.setup_thermoengine_dylib_path = _pinned_dylib_dir
     transport = thermoengine_module.ThermoEngineTransport(
         model_name=MELTS_MODEL,
         activity_converter=activity_from_chem_potential,

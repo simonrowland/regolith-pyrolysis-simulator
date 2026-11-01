@@ -1,0 +1,1438 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml
+observations:
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_carnelley_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1107.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Carnelley, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_carnelley_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=Carnelley
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1107.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=Carnelley
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '834'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Carnelley
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Carnelley
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_huttner_tammann_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1167.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hüttner and Tammann, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_huttner_tammann_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=Hüttner and Tammann
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1167.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=Hüttner and Tammann
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '894'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Hüttner and Tammann
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Hüttner and Tammann
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_huttner_tammann_na2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1126.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hüttner and Tammann, Z. anorg. Chem., 43, 215 (1905).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_huttner_tammann_na2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 25
+    published_page: 1717
+    pdf_page_index: 24
+    paragraph: sodium carbonate melting point comparison
+    section: Properties of Sodium Metasilicate
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1126.15'
+      locator:
+        page: 25
+        published_page: 1717
+        pdf_page_index: 24
+        paragraph: sodium carbonate melting point comparison
+        section: Properties of Sodium Metasilicate
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '853'
+            locator:
+              page: 25
+              published_page: 1717
+              pdf_page_index: 24
+              paragraph: sodium carbonate melting point comparison
+              section: Properties of Sodium Metasilicate
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 25
+              published_page: 1717
+              pdf_page_index: 24
+              paragraph: sodium carbonate melting point comparison
+              section: Properties of Sodium Metasilicate
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        published_page: 1717
+        pdf_page_index: 24
+        paragraph: sodium carbonate melting point comparison
+        section: Properties of Sodium Metasilicate
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_k2co3_melting_point_niggli
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1164.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_k2co3_melting_point_niggli
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: Niggli's potassium carbonate melting-point determination
+    section: Behavior of the Melts
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1164.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: Niggli's potassium carbonate melting-point determination
+        section: Behavior of the Melts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '891'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: Niggli's potassium carbonate melting-point determination
+              section: Behavior of the Melts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: Niggli's potassium carbonate melting-point determination
+              section: Behavior of the Melts
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: Niggli's potassium carbonate melting-point determination
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_k2si2o5_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1288.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '10'
+      verbatim: ±10 °C
+      confidence_level: not_stated
+      basis: Printed width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_k2si2o5_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 18
+    published_page: 1710
+    pdf_page_index: 17
+    paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1288.15'
+      locator:
+        page: 18
+        published_page: 1710
+        pdf_page_index: 17
+        paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1015'
+            locator:
+              page: 18
+              published_page: 1710
+              pdf_page_index: 17
+              paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 18
+              published_page: 1710
+              pdf_page_index: 17
+              paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 18
+        published_page: 1710
+        pdf_page_index: 17
+        paragraph: Niggli's K2Si2O5 melting-point estimate and experimental bracket
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_le_chatelier_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1158.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Le Chatelier, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_le_chatelier_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=Le Chatelier
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1158.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=Le Chatelier
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '885'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Le Chatelier
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Le Chatelier
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_quincke_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1473.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Quincke, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_quincke_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=Quincke
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=Quincke
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Quincke
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Quincke
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_ramsay_eumorfopoulos_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1159.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ramsay and Eumorfopoulos, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_ramsay_eumorfopoulos_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=Ramsay and Eumorfopoulos
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1159.15'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=Ramsay and Eumorfopoulos
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '886'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Ramsay and Eumorfopoulos
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=Ramsay and Eumorfopoulos
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_v_meyer_k2co3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2CO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1151.75'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: V. Meyer, as cited by Niggli (1913).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_v_meyer_k2co3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 17
+    published_page: 1709
+    pdf_page_index: 16
+    paragraph: comparison of potassium carbonate melting points
+    section: Behavior of the Melts
+    note: row=V. Meyer
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1151.75'
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+        note: row=V. Meyer
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '878.6'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=V. Meyer
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 17
+              published_page: 1709
+              pdf_page_index: 16
+              paragraph: comparison of potassium carbonate melting points
+              section: Behavior of the Melts
+              note: row=V. Meyer
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 17
+        published_page: 1709
+        pdf_page_index: 16
+        paragraph: comparison of potassium carbonate melting points
+        section: Behavior of the Melts
+- observation_id: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_wallace_na2sio3_melting_point
+  experiment_id: 10.1021/ja02200a004::niggli-1913-silica-alkali-carbonate-equilibria
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1291.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: R. Wallace, Z. anorg. Chem., 63, 1 (1909).
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: niggli-1913-silica-alkali-carbonate-equilibria::niggli_1913_wallace_na2sio3_melting_point
+  source_id: niggli-1913-silica-alkali-carbonate-equilibria
+  locator:
+    page: 25
+    published_page: 1717
+    pdf_page_index: 24
+    paragraph: sodium metasilicate melting point comparison
+    section: Properties of Sodium Metasilicate
+  read_from: pdf:niggli-1913-silica-alkali-carbonate-equilibria
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1291.15'
+      locator:
+        page: 25
+        published_page: 1717
+        pdf_page_index: 24
+        paragraph: sodium metasilicate melting point comparison
+        section: Properties of Sodium Metasilicate
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1018'
+            locator:
+              page: 25
+              published_page: 1717
+              pdf_page_index: 24
+              paragraph: sodium metasilicate melting point comparison
+              section: Properties of Sodium Metasilicate
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 25
+              published_page: 1717
+              pdf_page_index: 24
+              paragraph: sodium metasilicate melting point comparison
+              section: Properties of Sodium Metasilicate
+        output_unit: K
+        references: []
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        published_page: 1717
+        pdf_page_index: 24
+        paragraph: sodium metasilicate melting point comparison
+        section: Properties of Sodium Metasilicate

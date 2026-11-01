@@ -1,0 +1,896 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  citation: Yakovlev, O. I., & Shornikov, S. I. (2021). Experimental Data of Alkali Component Evaporation from Chondrule Melts.
+    Experiment in Geosciences 27(1), 25–28.
+  source_ids:
+  - yakovlev-2021-chondrule-alkali
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:yakovlev-2021-chondrule-alkali
+      role: pdf
+      path: raw/yakovlev-2021-chondrule-alkali/yakovlev-2021-chondrule-alkali.pdf
+      sha256:
+        tag: value
+        value: d766a39acd8b6ace1dec780d40eee5d4489df41b393984b0f4aa223bc0e2d063
+    - asset_id: pdftotext:yakovlev-2021-chondrule-alkali
+      role: pdftotext
+      path: text/yakovlev-2021-chondrule-alkali
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yakovlev-2021-chondrule-alkali
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965::experiment::yakovlev-shornikov-2021-vacuum-evaporation
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    total_pressure_bar:
+      state:
+        tag: unknown
+        reason: condition total_pressure_bar is not a scalar numeric value
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        paragraph: Experimental conditions
+    duration_min:
+      state:
+        tag: value
+        value: '30'
+      locator:
+        page: 3
+        published_page: 25
+        pdf_page_index: 2
+        paragraph: Experimental conditions
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    paragraph: Experimental conditions
+context:
+- observation_id: yakovlev_2021_fig1_b10_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B10; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1417.64'
+    K2O_Na2O_mass_ratio: '0.4164'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3911.75'
+      y: '5730.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b10_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b11_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B11; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1463.04'
+    K2O_Na2O_mass_ratio: '0.0947'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3993.75'
+      y: '5877.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b11_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b12_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B12; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1500.27'
+    K2O_Na2O_mass_ratio: '0.6293'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '4061'
+      y: '5633.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b12_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b13_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B13; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1599.94'
+    K2O_Na2O_mass_ratio: '0.5609'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '4241'
+      y: '5664.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b13_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b1_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B1; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1026.04'
+    K2O_Na2O_mass_ratio: '1.4871'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3204.5'
+      y: '5241.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b1_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b2_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B2; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1199.62'
+    K2O_Na2O_mass_ratio: '1.0992'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3518'
+      y: '5418.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b2_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b3_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B3; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1189.38'
+    K2O_Na2O_mass_ratio: '1.0073'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3499.5'
+      y: '5460.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b3_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b4_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B4; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1299.56'
+    K2O_Na2O_mass_ratio: '0.7212'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3698.5'
+      y: '5591.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b4_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b5_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B5; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1305.93'
+    K2O_Na2O_mass_ratio: '0.655'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3710'
+      y: '5621.75'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b5_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b6_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B6; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1299.56'
+    K2O_Na2O_mass_ratio: '0.4345'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3698.5'
+      y: '5722.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b6_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b7_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B7; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1349.67'
+    K2O_Na2O_mass_ratio: '0.5833'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3789'
+      y: '5654.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b7_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b8_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B8; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1399.92'
+    K2O_Na2O_mass_ratio: '0.5023'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3879.75'
+      y: '5691.5'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b8_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_b9_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: B9; 2 series, open symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: basalt
+    T_C: '1400.2'
+    K2O_Na2O_mass_ratio: '0.3896'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3880.25'
+      y: '5743'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_b9_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_g1_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: G1; 1 series, filled symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: granite
+    T_C: '1026.84'
+    K2O_Na2O_mass_ratio: '1.3731'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3205.94'
+      y: '5293.62'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_g1_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_g2_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: G2; 1 series, filled symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: granite
+    T_C: '1300.17'
+    K2O_Na2O_mass_ratio: '1.5283'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3699.6'
+      y: '5222.67'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_g2_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_g3_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: G3; 1 series, filled symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: granite
+    T_C: '1350.1'
+    K2O_Na2O_mass_ratio: '1.5682'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3789.78'
+      y: '5204.45'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_g3_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition
+- observation_id: yakovlev_2021_fig1_g4_context
+  type: figure_read_point
+  locator:
+    page: 3
+    published_page: 25
+    pdf_page_index: 2
+    figure: '1'
+    note: G4; 1 series, filled symbol
+  experiment: yakovlev-shornikov-2021-vacuum-evaporation
+  units: mass ratio as plotted; °C; raster pixels
+  values:
+    quantity: K2O/Na2O_mass_ratio
+    method_class: figure_only
+    evidence_class: figure_only
+    series: granite
+    T_C: '1400.26'
+    K2O_Na2O_mass_ratio: '1.5026'
+    uncertainty:
+      ratio: '0.0292'
+      temperature_C: '7.33'
+      basis: absolute_digitisation_uncertainty
+    pixel_center:
+      x: '3880.36'
+      y: '5234.43'
+    conditions:
+      pressure:
+        state:
+          tag: value
+          value: 10^-9 bar
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+      duration:
+        state:
+          tag: value
+          value: 30 min
+        locator:
+          page: 3
+          published_page: 25
+          pdf_page_index: 2
+          paragraph: Experimental conditions
+    starting_composition: unknown; not printed
+  context_id: yakovlev-2021-chondrule-alkali::context::yakovlev_2021_fig1_g4_context
+  work_id: ba8105941766db8360a676755e8551e523dfbc8d9be099d263a06ac205dd2965
+  source_id: yakovlev-2021-chondrule-alkali
+  species: residue_composition

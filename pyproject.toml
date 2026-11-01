@@ -73,7 +73,7 @@ magemin = [
 # Retain the extra name as an installer-owned build marker.
 sulfur = []
 # dev includes the pytest plugins the project-level [tool.pytest.ini_options]
-# addopts depends on (`-n auto` needs pytest-xdist; `--timeout=300` needs
+# addopts depends on (`-n auto` needs pytest-xdist; `--timeout=1800` needs
 # pytest-timeout). Without these declared, a clean checkout doing
 # `pip install -e .[dev]` would let pytest abort during argument parsing
 # before any test runs. Per autoreview 2026-05-27 finding.
@@ -92,17 +92,19 @@ pythonpath = ["."]
 # scopes default collection to `tests/`; `norecursedirs` additionally
 # blocks `_attic` if someone runs `pytest .` or `pytest _attic` directly.
 norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
-# Parallelize across cores via pytest-xdist + bound per-test runtime via
-# pytest-timeout. Without these, the full gate took ~10 min serial and
+# Parallelize across cores via pytest-xdist + bound per-test wall time via
+# pytest-timeout. The 1800 s wall guard is six times the default 300 s
+# process-CPU budget; per-test cpu_budget marks scale the wall guard the same
+# way. Without xdist and pytest-timeout, the full gate took ~10 min serial and
 # routinely exceeded the 1500s sandbox tool window of in-flight codex-acp
 # workers (which silently invoke `pytest` on top of their chunk subset).
 # `-n auto` uses all available cores; `--dist loadgroup` keeps
 # @pytest.mark.xdist_group families on one worker. The collection hook orders
 # those families by checked-in duration hints; `--no-loadscope-reorder` keeps
-# xdist's group-size heuristic from overriding that order. `--timeout=300`
-# kills any test that silently hangs past 5 min. Workers can still override
+# xdist's group-size heuristic from overriding that order. `--timeout=1800`
+# detects any test that silently hangs past 30 min. Workers can still override
 # with `-n0` for debugging serial behavior.
-addopts = "-n auto --dist loadgroup --no-loadscope-reorder --timeout=300"
+addopts = "-n auto --dist loadgroup --no-loadscope-reorder --timeout=1800"
 # Deterministic gate: `python -m pytest tests/` is the canonical default. Tests
 # marked both serial and xdist_group("serial") still run exactly once in that
 # default xdist pass, but loadgroup keeps them on one worker. The optional
@@ -119,6 +121,7 @@ markers = [
     "browser_e2e: requires the optional Playwright browser test dependency",
     "live_engine: requires a responsive optional live chemistry engine",
     "nightly: campaign-length physics; full coverage nightly; excluded from the PR tier",
+    "cpu_budget(seconds): process CPU seconds allowed per test; wall hang guard scales by six unless timeout(seconds) overrides it",
 ]
 
 # Explicit package layout. Auto-discovery works for this repo today, but

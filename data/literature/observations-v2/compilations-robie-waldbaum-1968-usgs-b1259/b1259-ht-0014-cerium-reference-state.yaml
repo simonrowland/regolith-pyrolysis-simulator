@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=cerium-(reference-state):v=2f480d1f3b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=cerium-(reference-state):v=2f480d1f3b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -15,7 +15,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -122,7 +122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1003:col=H_minus_H298:name=cerium-(reference-state):v=c06938a22d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1003:col=H_minus_H298:name=cerium-(reference-state):v=c06938a22d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -131,11 +131,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -197,21 +198,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='6.120'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -242,7 +230,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1003:col=H_minus_H298:name=cerium-(reference-state):v=dd60c4c7dd:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1003:col=H_minus_H298:name=cerium-(reference-state):v=dd60c4c7dd
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -251,11 +239,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +306,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='5.420'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -362,7 +338,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1077:col=H_minus_H298:name=cerium-(reference-state):v=38ee5dcf7a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1077:col=H_minus_H298:name=cerium-(reference-state):v=38ee5dcf7a
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -371,11 +347,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +414,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='6.790'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -482,7 +446,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1077:col=H_minus_H298:name=cerium-(reference-state):v=5bbe458ff0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1077:col=H_minus_H298:name=cerium-(reference-state):v=5bbe458ff0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -491,11 +455,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -557,21 +522,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='8.030'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -602,7 +554,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=cerium-(reference-state):v=b238d8e68f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=cerium-(reference-state):v=b238d8e68f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -612,10 +564,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -722,7 +674,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=cerium-(reference-state):v=09a72789e2:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=cerium-(reference-state):v=09a72789e2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -732,10 +684,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -842,7 +794,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=cerium-(reference-state):v=7da3acbb2d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=cerium-(reference-state):v=7da3acbb2d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -852,10 +804,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -962,7 +914,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=cerium-(reference-state):v=ae4dbce41e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=cerium-(reference-state):v=ae4dbce41e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -972,10 +924,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1082,7 +1034,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=cerium-(reference-state):v=b932258b85:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=cerium-(reference-state):v=b932258b85
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1092,10 +1044,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1202,7 +1154,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=cerium-(reference-state):v=88c4a5c103:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=cerium-(reference-state):v=88c4a5c103
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1212,10 +1164,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1322,7 +1274,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=cerium-(reference-state):v=27c1991163:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=cerium-(reference-state):v=27c1991163
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1332,10 +1284,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1442,7 +1394,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=cerium-(reference-state):v=b9c75fdbd3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=cerium-(reference-state):v=b9c75fdbd3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1452,10 +1404,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1562,7 +1514,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=cerium-(reference-state):v=49fbb31b81:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=cerium-(reference-state):v=49fbb31b81
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1572,10 +1524,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1682,7 +1634,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=cerium-(reference-state):v=3d5526bbaf:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=cerium-(reference-state):v=3d5526bbaf
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1692,10 +1644,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1802,7 +1754,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1815,7 +1767,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -1922,7 +1874,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=cerium-(reference-state):v=a791cba79a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=cerium-(reference-state):v=a791cba79a:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -1935,7 +1887,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2042,7 +1994,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=cerium-(reference-state):v=ba01281516:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=cerium-(reference-state):v=ba01281516:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2055,7 +2007,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2162,7 +2114,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=cerium-(reference-state):v=953ab55327:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=cerium-(reference-state):v=953ab55327:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2175,7 +2127,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2282,7 +2234,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=cerium-(reference-state):v=bdeb4bd5e1:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=cerium-(reference-state):v=bdeb4bd5e1:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2295,7 +2247,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2402,7 +2354,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=cerium-(reference-state):v=06497fff4c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=cerium-(reference-state):v=06497fff4c:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2415,7 +2367,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2522,7 +2474,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=cerium-(reference-state):v=8d0d0572d3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=cerium-(reference-state):v=8d0d0572d3:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2535,7 +2487,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2642,7 +2594,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1000:col=entropy:name=cerium-(reference-state):v=3702399100:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1000:col=entropy:name=cerium-(reference-state):v=3702399100:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2655,7 +2607,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2762,7 +2714,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1003:col=entropy:name=cerium-(reference-state):v=18e0f5a8b3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1003:col=entropy:name=cerium-(reference-state):v=18e0f5a8b3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2771,11 +2723,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2837,21 +2790,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='25.020'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -2882,7 +2822,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1003:col=entropy:name=cerium-(reference-state):v=da46e82b04:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1003:col=entropy:name=cerium-(reference-state):v=da46e82b04
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -2891,11 +2831,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -2957,21 +2898,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='24.320'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3002,7 +2930,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1077:col=entropy:name=cerium-(reference-state):v=2842ed5b5e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1077:col=entropy:name=cerium-(reference-state):v=2842ed5b5e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3011,11 +2939,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3077,21 +3006,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='25.660'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3122,7 +3038,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1077:col=entropy:name=cerium-(reference-state):v=6092fdeda2:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1077:col=entropy:name=cerium-(reference-state):v=6092fdeda2
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3131,11 +3047,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3197,21 +3114,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 39
-        pdf_page_index: 45
-        table: b1259-ht-0014-cerium-reference-state
-        note: as_published='26.810'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json
-        record: b1259-ht-0014-cerium-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3242,7 +3146,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1100:col=entropy:name=cerium-(reference-state):v=159712779c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1100:col=entropy:name=cerium-(reference-state):v=159712779c
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3252,10 +3156,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3362,7 +3266,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1200:col=entropy:name=cerium-(reference-state):v=d3efdc7939:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1200:col=entropy:name=cerium-(reference-state):v=d3efdc7939
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3372,10 +3276,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3482,7 +3386,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1300:col=entropy:name=cerium-(reference-state):v=44de3f45cd:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1300:col=entropy:name=cerium-(reference-state):v=44de3f45cd
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3492,10 +3396,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3602,7 +3506,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1400:col=entropy:name=cerium-(reference-state):v=2b6d2357a3:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1400:col=entropy:name=cerium-(reference-state):v=2b6d2357a3
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3612,10 +3516,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3722,7 +3626,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1500:col=entropy:name=cerium-(reference-state):v=cc8f0deaae:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1500:col=entropy:name=cerium-(reference-state):v=cc8f0deaae
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3732,10 +3636,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3842,7 +3746,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1600:col=entropy:name=cerium-(reference-state):v=21b3a35d95:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1600:col=entropy:name=cerium-(reference-state):v=21b3a35d95
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3852,10 +3756,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -3962,7 +3866,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1700:col=entropy:name=cerium-(reference-state):v=127aacb4f7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1700:col=entropy:name=cerium-(reference-state):v=127aacb4f7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -3972,10 +3876,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4082,7 +3986,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1800:col=entropy:name=cerium-(reference-state):v=e9683149d5:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1800:col=entropy:name=cerium-(reference-state):v=e9683149d5
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4092,10 +3996,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4202,7 +4106,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1900:col=entropy:name=cerium-(reference-state):v=ec38076704:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=1900:col=entropy:name=cerium-(reference-state):v=ec38076704
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4212,10 +4116,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4322,7 +4226,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=2000:col=entropy:name=cerium-(reference-state):v=4e7c86d66d:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=2000:col=entropy:name=cerium-(reference-state):v=4e7c86d66d
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4332,10 +4236,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4442,7 +4346,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=298.15:col=entropy:name=cerium-(reference-state):v=11ff716985:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=298.15:col=entropy:name=cerium-(reference-state):v=11ff716985:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4455,7 +4359,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4562,7 +4466,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=400:col=entropy:name=cerium-(reference-state):v=e285757549:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=400:col=entropy:name=cerium-(reference-state):v=e285757549:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4575,7 +4479,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4682,7 +4586,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=500:col=entropy:name=cerium-(reference-state):v=812fe7bf82:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=500:col=entropy:name=cerium-(reference-state):v=812fe7bf82:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4695,7 +4599,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4802,7 +4706,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=600:col=entropy:name=cerium-(reference-state):v=de41a90c07:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=600:col=entropy:name=cerium-(reference-state):v=de41a90c07:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4815,7 +4719,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4922,7 +4826,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=700:col=entropy:name=cerium-(reference-state):v=077ac3441e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=700:col=entropy:name=cerium-(reference-state):v=077ac3441e:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -4935,7 +4839,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5042,7 +4946,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=800:col=entropy:name=cerium-(reference-state):v=b59c954c41:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=800:col=entropy:name=cerium-(reference-state):v=b59c954c41:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5055,7 +4959,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5162,7 +5066,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=900:col=entropy:name=cerium-(reference-state):v=6fd79fc89f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:S:shared:T=900:col=entropy:name=cerium-(reference-state):v=6fd79fc89f:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5175,7 +5079,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5282,7 +5186,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5295,7 +5199,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5322,7 +5226,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5442,7 +5346,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1003:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1003:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5451,11 +5355,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5552,7 +5457,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1077:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1077:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5561,11 +5466,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5662,7 +5568,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5672,10 +5578,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5699,10 +5605,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5822,7 +5728,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5832,10 +5738,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -5859,10 +5765,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5982,7 +5888,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -5992,10 +5898,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6019,10 +5925,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6142,7 +6048,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6152,10 +6058,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6179,10 +6085,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6302,7 +6208,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6312,10 +6218,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6339,10 +6245,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6462,7 +6368,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6472,10 +6378,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6499,10 +6405,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6622,7 +6528,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6632,10 +6538,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6659,10 +6565,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6782,7 +6688,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6792,10 +6698,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6819,10 +6725,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6942,7 +6848,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -6952,10 +6858,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -6979,10 +6885,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7102,7 +7008,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7112,10 +7018,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7139,10 +7045,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7262,7 +7168,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7275,7 +7181,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7302,7 +7208,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7422,7 +7328,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7435,7 +7341,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7462,7 +7368,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7582,7 +7488,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7595,7 +7501,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7622,7 +7528,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7742,7 +7648,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7755,7 +7661,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7782,7 +7688,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7902,7 +7808,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -7915,7 +7821,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7942,7 +7848,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8062,7 +7968,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8075,7 +7981,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8102,7 +8008,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8222,7 +8128,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8235,7 +8141,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8262,7 +8168,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8382,7 +8288,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1003:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1003:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8391,11 +8297,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8492,7 +8399,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1077:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1077:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8501,11 +8408,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -8602,7 +8510,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8612,10 +8520,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8639,10 +8547,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8762,7 +8670,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8772,10 +8680,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8799,10 +8707,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8922,7 +8830,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -8932,10 +8840,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -8959,10 +8867,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9082,7 +8990,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9092,10 +9000,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9119,10 +9027,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9242,7 +9150,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9252,10 +9160,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9279,10 +9187,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9402,7 +9310,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9412,10 +9320,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9439,10 +9347,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9562,7 +9470,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9572,10 +9480,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9599,10 +9507,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9722,7 +9630,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9732,10 +9640,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9759,10 +9667,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9882,7 +9790,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -9892,10 +9800,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -9919,10 +9827,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10042,7 +9950,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10052,10 +9960,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10079,10 +9987,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10202,7 +10110,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10215,7 +10123,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10242,7 +10150,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10362,7 +10270,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10375,7 +10283,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10402,7 +10310,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10522,7 +10430,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10535,7 +10443,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10562,7 +10470,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10682,7 +10590,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10695,7 +10603,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10722,7 +10630,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10842,7 +10750,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -10855,7 +10763,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10882,7 +10790,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11002,7 +10910,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11015,7 +10923,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11042,7 +10950,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11162,7 +11070,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=cerium-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11175,7 +11083,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11202,7 +11110,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11322,7 +11230,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11335,7 +11243,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11362,7 +11270,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11473,7 +11381,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1003:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1003:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11482,11 +11390,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1003 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11574,7 +11483,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1077:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1077:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11583,11 +11492,12 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1077 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -11675,7 +11585,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11685,10 +11595,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11712,10 +11622,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11826,7 +11736,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11836,10 +11746,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -11863,10 +11773,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11977,7 +11887,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -11987,10 +11897,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12014,10 +11924,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12128,7 +12038,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12138,10 +12048,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12165,10 +12075,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12279,7 +12189,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12289,10 +12199,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12316,10 +12226,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12430,7 +12340,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12440,10 +12350,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12467,10 +12377,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12581,7 +12491,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12591,10 +12501,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12618,10 +12528,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12732,7 +12642,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12742,10 +12652,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12769,10 +12679,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12883,7 +12793,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -12893,10 +12803,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -12920,10 +12830,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13034,7 +12944,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=cerium-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13044,10 +12954,10 @@ observations:
       formula: Ce
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13071,10 +12981,10 @@ observations:
             formula: Ce
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13185,7 +13095,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13198,7 +13108,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13225,7 +13135,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13336,7 +13246,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13349,7 +13259,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13376,7 +13286,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13487,7 +13397,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13500,7 +13410,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13527,7 +13437,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13638,7 +13548,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13651,7 +13561,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13678,7 +13588,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13789,7 +13699,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13802,7 +13712,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13829,7 +13739,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13940,7 +13850,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -13953,7 +13863,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13980,7 +13890,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14091,7 +14001,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=cerium-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0014-cerium-reference-state:tabulation
   identity:
     quantity:
@@ -14104,7 +14014,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14131,7 +14041,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0

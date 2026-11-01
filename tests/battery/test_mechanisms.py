@@ -2892,6 +2892,14 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
         NoticeKind("projection")
     assert NoticeKind.OUT_OF_CERTIFIED_BAND.value == "out_of_certified_band"
     assert NoticeKind.COMPOSITION_PROJECTED.value == "composition_projected"
+    assert (
+        NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value
+        == "composition_binary_complement"
+    )
+    assert (
+        NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT.value
+        == "composition_oxide_from_element_mass_percent"
+    )
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:

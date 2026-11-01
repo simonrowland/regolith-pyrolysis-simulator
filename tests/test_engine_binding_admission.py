@@ -1074,8 +1074,13 @@ def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     assert len(notice["notices"]) == 1
     assert notice["notices"][0]["type"] == "typed_notice"
     assert notice["notices"][0]["message"] == (
-        "binding not admitted on this host (receipt missing); replay and "
-        "capture disabled; run scripts/assess_engine_bindings.py"
+        "Engine binding not admitted on this host (receipt missing); this "
+        "only disables cross-process cache replay and capture. Live "
+        "computation and its value are unaffected. To admit, run "
+        "scripts/assess_engine_bindings.py"
+    )
+    assert notice["notices"][0]["governs"] == (
+        "cross-process cache replay and capture only"
     )
 
     other_transport = BindingIdentity(
@@ -1093,6 +1098,149 @@ def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     notice = binding_admission_run_notice(sim)
     assert notice is not None
     assert len(notice["notices"]) == 2
+
+
+def test_unadmitted_binding_notice_is_cache_only_and_live_value_is_unchanged(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.backends import CachedRealConfig
+
+    candidate = _candidate()
+    missing_receipt = tmp_path / "missing-binding-admission.json"
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda *_args, **_kwargs: missing_receipt,
+    )
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_cached_real",
+        lambda _config: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
+        "cached_real_provenance",
+        lambda _config, _backend: candidate.provenance,
+    )
+
+    class SyntheticLiveEngine:
+        def __init__(self) -> None:
+            self.inputs: list[tuple[float, float]] = []
+
+        def equilibrate(self, *, temperature_C: float, pressure_bar: float) -> float:
+            self.inputs.append((temperature_C, pressure_bar))
+            return temperature_C + pressure_bar * 300.0
+
+    engine = SyntheticLiveEngine()
+    backend = CachedRealBackend(
+        config=CachedRealConfig(
+            db_path=tmp_path / "cached-real.db",
+            authorized_backend_name=SYNTHETIC_IDENTITY.engine_id,
+        ),
+        live_backend=engine,
+    )
+    assert backend._binding_admission_errors
+    sim = SimpleNamespace(backend=backend)
+
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        candidate.provenance,
+        receipt_path=missing_receipt,
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    record = notice["notices"][0]
+    assert record["kind"] == "engine_binding_not_admitted"
+    assert record["governs"] == "cross-process cache replay and capture only"
+    message = record["message"].lower()
+    assert "only disables cross-process cache replay and capture" in message
+    assert "live computation and its value are unaffected" in message
+    assert "run scripts/assess_engine_bindings.py" in message
+
+    unadmitted_value = backend.equilibrate(
+        temperature_C=1200.0,
+        pressure_bar=2.5,
+    )
+
+    receipt_path = _assess(tmp_path, candidate)
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda *_args, **_kwargs: receipt_path,
+    )
+    backend._validate_live_admission()
+    assert not backend._binding_admission_errors
+    assert live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        candidate.provenance,
+        receipt_path=receipt_path,
+    )
+    admitted_value = backend.equilibrate(
+        temperature_C=1200.0,
+        pressure_bar=2.5,
+    )
+
+    assert unadmitted_value == admitted_value
+    assert engine.inputs == [(1200.0, 2.5), (1200.0, 2.5)]
+
+
+def test_selected_binding_refusal_notice_preserves_primary_memo_scope(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    selected_identity = BindingIdentity(
+        "builtin-vapor-pressure",
+        "builtin-antoine-ellingham",
+        "builtin-vapor-pressure-r1",
+        "native",
+    )
+    provenance = {"binding_provenance_verifiable": True}
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda *_args, **_kwargs: tmp_path / "missing-binding-admission.json",
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_identities",
+        lambda *_args, **_kwargs: (selected_identity,),
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_provenance",
+        lambda *_args, **_kwargs: provenance,
+    )
+    primary_fingerprint = "a" * 64
+    sim = SimpleNamespace(
+        backend=SimpleNamespace(
+            _engine_binding_admission_fingerprint=primary_fingerprint
+        )
+    )
+
+    assert not admission._live_selected_binding_eligibility(
+        sim,
+        artifact="freeze_gate_curve",
+        provider_role=None,
+        primary_producer_evidence=primary_fingerprint,
+    )
+
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    record = notice["notices"][0]
+    assert record["governs"] == (
+        "cross-process cache replay and capture for the selected binding only"
+    )
+    message = record["message"].lower()
+    assert "selected binding only" in message
+    assert "in-process gate-curve memo reuse remains available" in message
+    assert "live computation and its value are unaffected" in message
+    assert (
+        sim.backend._engine_binding_admission_fingerprint
+        == primary_fingerprint
+    )
 
 
 def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(

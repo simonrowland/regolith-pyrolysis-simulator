@@ -1,0 +1,230 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml
+observations:
+- observation_id: itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_absolute_activity
+  experiment_id: 10.2320/matertrans1960.25.879::experiment::itoh_yokokawa_1984_concentration_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: The source specifies pure solid Na2O but not its polymorph.
+            rejection_kind: omitted
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - SiO2
+          - '0.67'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000001'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Derived half-width from rounding the printed log10 activity to one decimal place: sigma_a = a * ln(10) * 0.5
+        * 10^-1. The resulting absolute activity half-width is 1.1512925465e-10; confidence level is not stated.'
+      value: '1.1512925465e-10'
+      units: dimensionless
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Absolute log activity stated in prose immediately before Eq. (5).
+  notices: []
+  source_id: itoh-yokokawa-1984-sodium-activity-nas
+  locator:
+    page: 4
+    published_page: 882
+    equation: '5'
+    note: Absolute log activity stated in prose immediately before Eq. (5).
+  read_from: pdf:itoh-yokokawa-1984-sodium-activity-nas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Absolute log activity stated in prose immediately before Eq. (5).
+    fO2_log:
+      state:
+        tag: unknown
+        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      locator:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Absolute log activity stated in prose immediately before Eq. (5).
+  derived_from:
+  - itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_printed_log_input
+  derivation:
+    relation: a(Na2O) = 10^(log10 a(Na2O))
+    inputs:
+    - itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_printed_log_input
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+- observation_id: itoh-yokokawa-1984-sodium-activity-nas::itoh_yokokawa_1984_eq5_printed_log_input
+  experiment_id: 10.2320/matertrans1960.25.879::experiment::itoh_yokokawa_1984_concentration_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_activity_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1300'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - SiO2
+          - '0.67'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_activity_as_published'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: codex-fam28-1020
+      date: '2026-10-20'
+      evidence:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Printed log activity immediately before Eq. (5).
+  notices: []
+  source_id: itoh-yokokawa-1984-sodium-activity-nas
+  locator:
+    page: 4
+    published_page: 882
+    equation: '5'
+    note: Printed log activity immediately before Eq. (5).
+  read_from: pdf:itoh-yokokawa-1984-sodium-activity-nas
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Printed log activity immediately before Eq. (5).
+    fO2_log:
+      state:
+        tag: unknown
+        reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      locator:
+        page: 4
+        published_page: 882
+        equation: '5'
+        note: Printed log activity immediately before Eq. (5).

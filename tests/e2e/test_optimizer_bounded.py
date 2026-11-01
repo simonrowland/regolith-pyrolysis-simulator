@@ -27,6 +27,7 @@ if PLAYWRIGHT_SYNC_API is not None:
     )
 
 
+@pytest.mark.cpu_budget(200)
 @pytest.mark.timeout(200)
 def test_optimizer_page_bounded(page, evidence):
     started = time.monotonic()

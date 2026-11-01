@@ -1,0 +1,24 @@
+source_id: asai-yokokawa-maekawa-1982-na-borate-activity
+method: manual row transcription from MinerU Table 2, with page render verification
+printed_table:
+  label: '2'
+  pdf_page: 4
+  published_page: 1008
+  mineru_table_key: p004-t03
+  caption: Relative partial molar quantities of Na2O at 1173 K, referred to Na2O·2B2O3 melt
+  row_count: 32
+  columns:
+    x: Al2O3 formula amount in Na2O + n B2O3 + x Al2O3; group heading supplies n
+    relative_delta_G: Table 2 ΔG(Na2O), kJ·mol−1, stored as printed in a typed-refusal activity record
+    uncertainty: Width after ±, kJ·mol−1; Table 2 footnote states 95 per cent confidence limit
+  render_verified: true
+  render_verification: All 32 body rows and their x, ΔG and uncertainty cells checked against PDF page 4; row and column layout checked across the full table.
+extraction_decision:
+  activity: typed_refusal
+  reason: reference-melt absolute activity not printed
+  preserved_value: relative ΔG(Na2O) and its printed uncertainty; no exp(ΔG/RT) conversion
+  composition: printed formula amounts normalized to formula-unit mole fractions for identity binding; Na2O convention retained
+not_extracted:
+  - Table 1 emf rows, which are measurement inputs rather than the requested activity result
+  - Table 2 ΔH and ΔS columns, outside the requested activity quantity
+  - Values digitized from Figures 2–5

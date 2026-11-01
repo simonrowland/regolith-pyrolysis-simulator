@@ -380,6 +380,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: unknown
+      reason: temperature value is not numeric
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_onset_conditions'; refusing to pick
@@ -405,6 +408,15 @@ observations:
     figure: '1'
     section: What Is Sintering, and Why Is It a Concern?
   read_from: pdf:cooper-2007-sintering-lunar-simulant
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        pdf_page_index: 2
+        figure: '1'
+        section: What Is Sintering, and Why Is It a Concern?
 - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_grain_size_statistics
   experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   identity:

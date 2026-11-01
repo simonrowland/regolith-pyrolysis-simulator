@@ -2108,9 +2108,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-200-ueshima-1983::ueshima_1983_fig1_epma_calibration_figure_only
   source_id: kems-200-ueshima-1983
   locator:
     published_page: 559
@@ -2153,9 +2157,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-200-ueshima-1983::ueshima_1983_fig2_epma_results_figure_only
   source_id: kems-200-ueshima-1983
   locator:
     published_page: 560
@@ -2198,9 +2206,13 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:figure_only
+    origin: kems-200-ueshima-1983::ueshima_1983_fig3_phase_diagram_figure_only
   source_id: kems-200-ueshima-1983
   locator:
     published_page: 561

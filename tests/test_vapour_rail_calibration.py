@@ -504,6 +504,29 @@ def test_research_store_digest_changes_with_campaign_metadata(
         assert store.digest() != digest
 
 
+def test_research_store_digest_includes_and_orders_null_key_metadata(
+    tmp_path: Path,
+) -> None:
+    with CalibrationResearchStore(tmp_path / "empty.sqlite") as store:
+        empty_digest = store.digest()
+
+    digests = []
+    for name, values in (
+        ("forward.sqlite", ("second", "first")),
+        ("reverse.sqlite", ("first", "second")),
+    ):
+        with CalibrationResearchStore(tmp_path / name) as store:
+            store._conn.executemany(
+                "INSERT INTO meta(key, value) VALUES (?, ?)",
+                ((None, value) for value in values),
+            )
+            store._conn.commit()
+            digests.append(store.digest())
+
+    assert all(digest != empty_digest for digest in digests)
+    assert digests[0] == digests[1]
+
+
 def test_research_store_digest_changes_with_composition(tmp_path: Path):
     cell = build_calibration_cells()[0]
     observations = (censor_pressure(1.0e-6, species="SiO"),)

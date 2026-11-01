@@ -1280,7 +1280,7 @@ _RAW_STORE_DIGEST_PROJECTION: Final[dict[str, tuple[str, ...]]] = {
     ),
 }
 _RAW_STORE_DIGEST_ORDER_BY: Final[dict[str, tuple[str, ...]]] = {
-    "meta": ("key",),
+    "meta": ("key", "value"),
     "cells": ("cell_id",),
     "observations": ("cell_id", "species"),
     "boundary_stats": ("species", "boundary", "channel"),
@@ -1485,7 +1485,7 @@ class CalibrationResearchStore:
             if table == "meta":
                 parameters = tuple(_RAW_STORE_DIGEST_EXCLUDED_META_KEYS)
                 placeholders = ", ".join("?" for _ in parameters)
-                query += f" WHERE key NOT IN ({placeholders})"
+                query += f" WHERE key IS NULL OR key NOT IN ({placeholders})"
             query += " ORDER BY " + ", ".join(
                 _RAW_STORE_DIGEST_ORDER_BY[table]
             )

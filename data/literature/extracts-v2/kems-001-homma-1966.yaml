@@ -113,9 +113,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=058d7a674444
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -182,9 +186,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=b7add4fd8b46
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -251,9 +259,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=c64bb546df37
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -320,9 +332,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=d09e85ac793a
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -1809,12 +1825,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2077,9 +2092,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: alpha_Cu(theo.) 143
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_cu_olette_theoretical_quoted_deep
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -2095,12 +2114,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2238,9 +2256,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=1a1a493a8f6b
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2322,9 +2344,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=57dfdf468b4a
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2406,9 +2432,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=5a814f23f051
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2490,9 +2520,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=7a44811336bf
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2574,9 +2608,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=88e086594f53
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2658,9 +2696,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=b4fe777ebaf1
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2742,9 +2784,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=ba9f20114c39
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2826,9 +2872,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=c1828c2fcb92
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -2910,9 +2960,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=f3d2f35f7219
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -3737,12 +3791,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4002,9 +4055,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: alpha_Mn(theo.) 1095
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_mn_olette_theoretical_quoted_deep
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -4020,12 +4077,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4154,9 +4210,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=11307d7cead6
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -4223,9 +4283,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=ab99b7ebf656
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -4292,9 +4356,13 @@ observations:
       '
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=d4a905b025a1
   source_id: kems-001-homma-1966
   locator:
     page: '519'
@@ -5413,12 +5481,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5681,9 +5748,13 @@ observations:
     original_method_class: quoted_attributed
     attribution: alpha_Sn(theo.) 20
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-001-homma-1966::homma_1966_sn_olette_theoretical_quoted_deep
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5699,12 +5770,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

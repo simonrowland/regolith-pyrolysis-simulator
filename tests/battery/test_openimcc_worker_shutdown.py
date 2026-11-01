@@ -20,14 +20,15 @@ def _ignore_sigterm_and_block_on_recv(connection) -> None:
             time.sleep(3600)
 
 
+@pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20, method="signal")
 def test_sigterm_ignoring_recv_worker_is_reaped() -> None:
     """Reap a child that ignores SIGTERM and never leaves recv.
 
     Against the old closer (``terminate()`` then ``process.join()`` with
     no timeout) this test does not return. pytest-timeout's signal method
-    fires the 20s marker, which is under the 300s file budget, and the
-    ``finally`` block SIGKILLs the child so the suite itself does not hang.
+    fires the explicit 20s wall guard, and the ``finally`` block SIGKILLs
+    the child so the suite itself does not hang.
     """
     import simulator.battery.residue as residue
 

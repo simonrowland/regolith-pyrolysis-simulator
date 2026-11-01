@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util as _importlib_util
 from pathlib import Path as _Path
 import sys as _sys
+import time
 
 _BLAS_POLICY_NAME = "simulator._blas_policy"
 _blas_policy = _sys.modules.get(_BLAS_POLICY_NAME)
@@ -29,6 +30,7 @@ else:
     _blas_policy.prepare()
 
 from collections.abc import Iterator
+from dataclasses import dataclass
 
 import json
 import os
@@ -42,6 +44,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from tests._cpu_budget import cpu_budget_seconds, wall_guard_seconds
 
 from _pytest_session_safety import (
     CHILD_HANDSHAKE_TIMEOUT_SECONDS,
@@ -284,10 +288,28 @@ def runner_golden_loader(tmp_path_factory):
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    for item in items:
+        get_closest_marker = getattr(item, "get_closest_marker", None)
+        if not callable(get_closest_marker):
+            continue
+        if get_closest_marker("cpu_budget") is None:
+            continue
+        try:
+            budget_seconds = cpu_budget_seconds(item)
+        except ValueError as exc:
+            raise pytest.UsageError(f"{item.nodeid}: {exc}") from exc
+        if get_closest_marker("timeout") is not None:
+            continue
+        item.add_marker(pytest.mark.timeout(wall_guard_seconds(budget_seconds)))
+
     if PLAYWRIGHT_SYNC_API is not None:
         return
     for item in items:
-        if item.get_closest_marker("browser_e2e") is not None:
+        get_closest_marker = getattr(item, "get_closest_marker", None)
+        if (
+            callable(get_closest_marker)
+            and get_closest_marker("browser_e2e") is not None
+        ):
             item.add_marker(PLAYWRIGHT_SKIP_MARK)
 
 
@@ -307,6 +329,53 @@ _DOCS_PRIVATE_AUDIT_ROOT: Path | None = None
 _DOCS_PRIVATE_ACTIVE_TEST_NODEID: str | None = None
 _DOCS_PRIVATE_AUDIT_INSTALLED = False
 _DOCS_PRIVATE_AUDIT_SESSION_DIR: Path | None = None
+
+
+@dataclass
+class _CpuBudgetState:
+    budget_seconds: float
+    started_wall_seconds: float
+    call_cpu_seconds: float = 0.0
+    call_wall_seconds: float = 0.0
+
+
+_CPU_BUDGET_STATE: pytest.StashKey[_CpuBudgetState] = pytest.StashKey()
+
+
+def _cpu_budget_failure_message(state: _CpuBudgetState) -> str:
+    return (
+        f"CPU budget exceeded: {state.call_cpu_seconds:.3f} s of "
+        f"{state.budget_seconds:g} s (wall {state.call_wall_seconds:.3f} s)"
+    )
+
+
+def _start_cpu_budget(item: pytest.Item) -> None:
+    """Start per-test accounting; the verdict is applied after the call phase.
+
+    The call runs to completion before its CPU verdict, so runaway work is
+    bounded by pytest-timeout's wall-clock hang guard. Only the pytest worker's
+    CPU is budgeted; child and engine-pool CPU is outside the budget and bounded
+    only by the wall-clock hang guard.
+    """
+    if not callable(getattr(item, "get_closest_marker", None)):
+        return
+    budget_seconds = cpu_budget_seconds(item)
+    state = _CpuBudgetState(
+        budget_seconds=budget_seconds,
+        started_wall_seconds=time.monotonic(),
+    )
+    item.stash[_CPU_BUDGET_STATE] = state
+
+
+def _wall_guard_failure(report: pytest.TestReport) -> None:
+    if not report.failed:
+        return
+    failure = str(report.longrepr)
+    if "pytest-timeout" not in failure.lower():
+        return
+    match = re.search(r"Timeout\s*\(>([^)]*)\)", failure, flags=re.IGNORECASE)
+    guard = f" ({match.group(1)})" if match is not None else ""
+    report.longrepr = f"wall-clock hang guard exceeded{guard}"
 
 
 def _preflight_docs_private_inputs(repo_root: Path, manifest_path: Path) -> None:
@@ -511,16 +580,72 @@ def pytest_runtest_protocol(
     item: pytest.Item, nextitem: pytest.Item | None
 ) -> Iterator[object]:
     del nextitem
-    if not _DOCS_PRIVATE_AUDIT_INSTALLED:
+    _start_cpu_budget(item)
+    try:
+        if not _DOCS_PRIVATE_AUDIT_INSTALLED:
+            yield
+            return
+        global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+        previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
+        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
+        try:
+            yield
+        finally:
+            _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
+    finally:
+        stash = getattr(item, "stash", None)
+        if stash is not None and _CPU_BUDGET_STATE in stash:
+            del stash[_CPU_BUDGET_STATE]
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item: pytest.Item) -> Iterator[object]:
+    stash = getattr(item, "stash", None)
+    if stash is None or _CPU_BUDGET_STATE not in stash:
         yield
         return
-    global _DOCS_PRIVATE_ACTIVE_TEST_NODEID
-    previous_nodeid = _DOCS_PRIVATE_ACTIVE_TEST_NODEID
-    _DOCS_PRIVATE_ACTIVE_TEST_NODEID = item.nodeid
-    try:
-        yield
-    finally:
-        _DOCS_PRIVATE_ACTIVE_TEST_NODEID = previous_nodeid
+    state = stash[_CPU_BUDGET_STATE]
+    started_cpu_seconds = time.process_time()
+    started_wall_seconds = time.monotonic()
+    yield
+    ended_cpu_seconds = time.process_time()
+    state.call_cpu_seconds = max(0.0, ended_cpu_seconds - started_cpu_seconds)
+    state.call_wall_seconds = max(0.0, time.monotonic() - started_wall_seconds)
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(
+    item: pytest.Item,
+    call: pytest.CallInfo[object],
+) -> Iterator[object]:
+    del call
+    outcome = yield
+    report = outcome.get_result()
+    _wall_guard_failure(report)
+
+    stash = getattr(item, "stash", None)
+    if stash is None or _CPU_BUDGET_STATE not in stash:
+        return
+    state = stash[_CPU_BUDGET_STATE]
+    if (
+        report.when == "call"
+        and state.call_cpu_seconds > state.budget_seconds
+        and not report.failed
+    ):
+        report.outcome = "failed"
+        report.longrepr = _cpu_budget_failure_message(state)
+
+    if report.when == "teardown":
+        elapsed_wall_seconds = max(
+            0.0,
+            time.monotonic() - state.started_wall_seconds,
+        )
+        report.user_properties.extend(
+            (
+                ("cpu_seconds", f"{state.call_cpu_seconds:.6f}"),
+                ("wall_seconds", f"{elapsed_wall_seconds:.6f}"),
+            )
+        )
 
 
 @pytest.hookimpl(optionalhook=True, tryfirst=True)

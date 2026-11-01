@@ -2850,7 +2850,7 @@ def test_provider_skips_below_numerical_floor(
 # Nightly (2026-08-02 CI tiering): package consumers ×3 (~537 s junit).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(5400)
+@pytest.mark.cpu_budget(5400)
 def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
     full_builtin_provider_run,
 ):
@@ -2994,7 +2994,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_condensation(
 # Nightly: assertion-only sibling of full_builtin_provider_run (fixture co-tenant).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_c")
-@pytest.mark.timeout(5400)
+@pytest.mark.cpu_budget(5400)
 def test_split_path_end_state_matches_pre_flip_account_balances(
     full_builtin_provider_run,
 ):

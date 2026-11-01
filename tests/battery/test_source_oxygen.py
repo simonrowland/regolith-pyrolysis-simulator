@@ -6,8 +6,17 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, EvidenceClass, Phase, Quantity
-from simulator.battery.records import Species, State
+from simulator.battery.enums import (
+    BenchIdentityBasis,
+    CellMaterial,
+    Engine,
+    EvidenceClass,
+    Phase,
+    Quantity,
+)
+from simulator.battery.records import (
+    Bench, BenchIdentity, Located, Reaction, ReactionTerm, Species, State,
+)
 from simulator.battery.score import (
     ScoreContext,
     _bench_for_score,
@@ -202,8 +211,8 @@ def test_stolyarova_1996_alternative_oxygen_columns_use_mo_cell_condition(source
             key: observation for key, observation in context.observations.items()
             if observation.source_id == source_id
         }
-        # A stale committed sibling does not share observation ids: the
-        # trailing :h= hashes the extract row. The series stems must match.
+        # A stale committed sibling may have different :h= row hashes; the
+        # series stems must still match the fresh migration.
         assert {
             _series_stem(observation_id) for observation_id in fresh.observations
         } == {
@@ -495,6 +504,63 @@ def _pair_rows(o_uncertainty=None, o2_uncertainty=None):
     if o2_uncertainty is not None:
         molecular = replace(molecular, uncertainty=o2_uncertainty)
     return sample, (sample, atomic, molecular)
+
+
+def _mo_pair_atomic_oxygen(*, evidence, derived_from=()):
+    sample = _partial_pressure("mo-target", "SiO", Decimal("1"))
+    moo2 = _partial_pressure("mo-cell-moo2", "MoO2", Decimal("1"))
+    moo3 = _partial_pressure("mo-cell-moo3", "MoO3", Decimal("1"))
+    atomic = _partial_pressure("mo-cell-oxygen", "O", Decimal("1e-9"), evidence=evidence)
+    atomic = replace(
+        atomic,
+        identity=replace(
+            atomic.identity,
+            reaction=State.of(Reaction((
+                ReactionTerm(Species("MoO2", Phase.G), 1),
+                ReactionTerm(Species("MoO3", Phase.G), -1),
+                ReactionTerm(Species("O", Phase.G), 1),
+            ))),
+        ),
+        derived_from=derived_from,
+        derivation=None,
+    )
+    bench = Bench(
+        id="mo-cell-bench", work_id="synthetic-comeasured",
+        identity=BenchIdentity(
+            basis=BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="literal Mo-cell fixture",
+        ),
+        cell_materials=(Located(State.of(CellMaterial.MO), locator=atomic.locator),),
+    )
+    return sample, moo2, moo3, atomic, bench
+
+
+def test_mo_pair_model_derived_without_lineage_is_refused():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.MODEL_DERIVED)
+    assert atomic.derived_from == ()
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenFallback)
+    assert selected.reason is FallbackReason.UNTYPED_LINEAGE
+
+
+def test_mo_pair_quoted_attributed_atomic_oxygen_is_admitted():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.QUOTED_ATTRIBUTED)
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert "mo-cell-oxygen" in selected.used_observations
+
+
+def test_mo_pair_atomic_oxygen_with_derived_from_is_admitted():
+    sample, moo2, moo3, atomic, bench = _mo_pair_atomic_oxygen(evidence=EvidenceClass.MODEL_DERIVED)
+    atomic = replace(
+        atomic,
+        derived_from=("mo-cell-moo2", "mo-cell-moo3"),
+    )
+    selected = resolve_source_oxygen(sample, (sample, moo2, moo3, atomic), bench)
+    assert isinstance(selected, SourceOxygenCondition)
+    assert {
+        "mo-cell-oxygen", "mo-cell-moo2", "mo-cell-moo3",
+    } <= selected.used_observations
 
 
 def _selected_pair(o_uncertainty=None, o2_uncertainty=None):

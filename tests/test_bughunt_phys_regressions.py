@@ -23,6 +23,7 @@ from simulator.accounting.ledger import (
     KNOWN_LEDGER_ACCOUNTS,
     AtomLedger,
     LedgerTransition,
+    _clone_owned_ledger_state,
 )
 from simulator.accounting.lots import MaterialLot
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
@@ -478,6 +479,13 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
         "slotted": SlottedState({"value": 2}),
         "deque": deque([1, 2]),
     }
+    sim.setpoints = {"nested": {"value": "entry"}}
+    sim.feedstocks = {"entry": {"density": 1.0}}
+    sim.vapor_pressure_catalog_data = {"families": {"entry": [1.0]}}
+    sim.vapor_pressures = {"metals": {"entry": {"A": 1.0}}}
+    sim.materials = {"stages": {"entry": {"alpha": 0.5}}}
+    sim.lab_geometry = ("entry", 1.0)
+    sim._last_vapor_pressure_diagnostic = {"entry": {"pressure_Pa": 1.0}}
     sim.vapour_rail_catalog = owner
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
@@ -497,6 +505,16 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     }
 
     def refuse_after_mutating_every_copied_root() -> None:
+        sim.created_during_failed_hour = {"must": "be removed"}
+        sim.setpoints = {"nested": {"value": "refused"}}
+        sim.feedstocks = {"refused": {"density": 2.0}}
+        sim.vapor_pressure_catalog_data = {"families": {"refused": [2.0]}}
+        sim.vapor_pressures = {"metals": {"refused": {"A": 2.0}}}
+        sim.materials = {"stages": {"refused": {"alpha": 0.25}}}
+        sim.lab_geometry = ("refused", 2.0)
+        sim._last_vapor_pressure_diagnostic = {
+            "refused": {"pressure_Pa": 2.0}
+        }
         sim.atom_ledger._transitions.append(object())
         sim.melt.hour = 5
         sim.overhead.pressure_mbar = 99.0
@@ -523,6 +541,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
         sim.step()
 
     assert raised.value is refusal
+    assert not hasattr(sim, "created_during_failed_hour")
     restored_roots = {
         name: value
         for name, value in sim.__dict__.items()
@@ -535,6 +554,129 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     assert original_proxy["nested"][0]["value"] == 9
     assert sim.atom_ledger.__dict__ == expected_ledger.__dict__
     assert sim.vapour_rail_catalog is owner
+
+
+def _terminal_refusal_writer_sim() -> PyrolysisSimulator:
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(
+        hour=4,
+        campaign_hour=4,
+        temperature_C=700.0,
+        p_total_mbar=1.0,
+        campaign=CampaignPhase.C0,
+    )
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.atom_ledger = FakeLedger()
+    sim._build_chemistry_kernel = lambda: object()
+    return sim
+
+
+def _assert_real_writer_refusal_rollback(
+    sim: PyrolysisSimulator,
+    root_name: str,
+    writer,
+    changed,
+) -> None:
+    before = copy.deepcopy(getattr(sim, root_name))
+    refusal = EvaporationFluxRefusal("terminal", {"reason": root_name})
+
+    def write_then_refuse() -> None:
+        writer()
+        assert changed(getattr(sim, root_name))
+        raise refusal
+
+    sim._step_one_hour = write_then_refuse
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert getattr(sim, root_name) == before
+
+
+def test_terminal_refusal_restores_phase_context_writer_root() -> None:
+    sim = _terminal_refusal_writer_sim()
+    sim._last_phase_context_diagnostic = {"before": {"status": "kept"}}
+    sim._backend_composition_mol = lambda: {}
+    sim._current_melt_redox_fO2_log = lambda: -10.0
+
+    _assert_real_writer_refusal_rollback(
+        sim,
+        "_last_phase_context_diagnostic",
+        lambda: sim._record_phase_context_diagnostic("refused-hour-probe"),
+        lambda diagnostic: "refused-hour-probe" in diagnostic,
+    )
+
+
+def test_terminal_refusal_restores_bakeout_transport_writer_root() -> None:
+    sim = _terminal_refusal_writer_sim()
+    sim._last_subsolidus_bakeout = {
+        "accepted_extent_mol_by_reaction": {"reaction": {"H2O": 2.0}},
+        "committed": False,
+    }
+    sim._subsolidus_pending_release = None
+    sim._subsolidus_committed_kg_hr_by_species = {"H2O": 1.0}
+    flux = EvaporationFlux(species_kg_hr={"H2O": 2.0})
+
+    _assert_real_writer_refusal_rollback(
+        sim,
+        "_last_subsolidus_bakeout",
+        lambda: sim._scale_c0_joint_release(flux, 0.5, 2.0, 1.0),
+        lambda diagnostic: diagnostic.get("transport_cap", {}).get("scale")
+        == 0.5,
+    )
+
+
+def test_terminal_refusal_restores_freeze_gate_writer_root() -> None:
+    sim = _terminal_refusal_writer_sim()
+    sim._last_freeze_gate_diagnostic = {"before": {"source": "kept"}}
+    curve = {
+        "source": "refused-hour-probe",
+        "solidus_T_C": 500.0,
+        "liquidus_T_C": 1000.0,
+    }
+    sim._resolved_melt_redox_gate_authority = lambda *_args: curve
+    sim._interpolate_freeze_gate_curve = lambda *_args: 0.25
+
+    _assert_real_writer_refusal_rollback(
+        sim,
+        "_last_freeze_gate_diagnostic",
+        lambda: sim._freeze_gate_liquid_fraction_factor(),
+        lambda diagnostic: diagnostic.get("source") == "refused-hour-probe",
+    )
+
+
+def test_ledger_snapshot_skips_memo_probes_for_immutable_leaves() -> None:
+    class CountingMemo(dict):
+        probes = 0
+
+        def __contains__(self, key):
+            self.probes += 1
+            return super().__contains__(key)
+
+    memo = CountingMemo()
+    values = (None, False, 7, 1.5, 2j, "leaf", b"leaf")
+
+    assert [
+        _clone_owned_ledger_state(value, memo) for value in values
+    ] == list(values)
+    assert memo.probes == 0
 
 
 def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:
@@ -740,6 +882,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
 
     def complete_after_registering_providers() -> HourSnapshot:
         sim._register_freeze_gate_liquid_fraction_providers()
+        sim.created_during_successful_hour = {"committed": True}
         return HourSnapshot(hour=4)
 
     sim._step_one_hour = complete_after_registering_providers
@@ -752,6 +895,7 @@ def test_successful_hour_keeps_chemistry_registry_registrations() -> None:
             "shadows": (),
         },
     }
+    assert sim.created_during_successful_hour == {"committed": True}
 
 
 def test_shared_mappingproxy_diamond_is_copied_not_live_aliased() -> None:

@@ -14,8 +14,8 @@
   "pdf_page": 210,
   "page": 204,
   "name_as_published": "SILLIMANITE",
-  "formula_as_published": "Al Si0 5",
-  "formula": "Al Si0 5",
+  "formula_as_published": "Al2SiO5",
+  "formula": "Al2SiO5",
   "phase": "Crystals 298.15° to 1800°K.",
   "gram_formula_weight": {
     "as_published": "162.046",
@@ -1479,6 +1479,14 @@
     "logKf_identity |logK+1000 dG/(RT ln10)|=88321.7250 at T=1.0"
   ],
   "corrections": [
+    {
+      "correction_id": "b1259-p210-formula_as_published",
+      "pdf_page": 210,
+      "field": "formula_as_published",
+      "layout_as_extracted": "Al Si0 5",
+      "printed_token": "Al2SiO5",
+      "evidence": "PDF page 210 image visibly prints 'Al2SiO5'"
+    },
     {
       "correction_id": "b1259-p210-temperature-17",
       "pdf_page": 210,

@@ -133,9 +133,11 @@ def test_isolated_migration_preserves_species_temperature_conditions_and_scored_
     document = _document()
     migrator = _migrate()
     rows = list(migrator.result.observations.values())
-    assert len(rows) == 44
+    assert len(rows) == 45
     assert not migrator.result.validation.hard_issues
-    assert all(row.value.kind is ValueKind.POINT for row in rows)
+    assert sum(row.value.kind is ValueKind.POINT for row in rows) == 44
+    assert sum(row.value.kind is ValueKind.BOUND for row in rows) == 1
+    assert all(row.value.kind is not ValueKind.UNAVAILABLE for row in rows)
     assert all(row.identity.quantity.value is Quantity.VALENCE_RATIO for row in rows)
 
     first_fe_fraction = next(

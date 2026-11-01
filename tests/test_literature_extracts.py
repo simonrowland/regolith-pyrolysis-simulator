@@ -1498,6 +1498,123 @@ def test_minimal_extract_valid():
     assert errs == []
 
 
+def test_itoh_yokokawa_1984_absolute_activity_render_pins_and_migrates(
+    tmp_path: Path,
+) -> None:
+    """Eq. (5)'s printed log activity is reduced to linear activity."""
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import to_plain
+
+    name = "itoh-yokokawa-1984-sodium-activity-nas.yaml"
+    source = EXTRACTS / name
+    doc = yaml.safe_load(source.read_text(encoding="utf-8"))
+    observations = doc["species"]["Na2O"]["observations"]
+    assert len(observations) == 2
+    row = next(
+        item
+        for item in observations
+        if item["observation_id"] == "itoh_yokokawa_1984_eq5_absolute_activity"
+    )
+    printed_log = next(
+        item
+        for item in observations
+        if item["observation_id"] == "itoh_yokokawa_1984_eq5_printed_log_input"
+    )
+    assert row["values"]["log10_activity_as_published"] == "-9.0"
+    assert row["values"]["value_as_printed"] == "-9.0"
+    assert row["values"]["activity"] == "1e-9"
+    assert row["locator"]["page"] == 4
+    assert row["locator"]["published_page"] == 882
+    assert row["locator"]["equation"] == "5"
+    assert row["values"]["method_class"] == "measured_reduced"
+    assert row["values"]["evidence_class"] == "measured_reduced"
+    assert row["derivation"]["relation"] == "a(Na2O) = 10^(log10 a(Na2O))"
+    assert row["derived_from"] == ["itoh_yokokawa_1984_eq5_printed_log_input"]
+    assert printed_log["values"]["admission_status"] == "typed_refusal"
+    assert printed_log["values"]["value_as_printed"] == "-9.0"
+    assert printed_log["locator"]["page"] == 4
+    assert printed_log["locator"]["published_page"] == 882
+    assert printed_log["locator"]["equation"] == "5"
+    assert row["uncertainty"]["value"] == "1.1512925465e-10"
+    assert row["values"]["T_K"] == "1300"
+    assert row["values"]["point_conditions"]["temperature_K"]["locator"][
+        "page"
+    ] == 4
+    assert row["values"]["point_conditions"]["composition"]["state"]["value"][
+        "components"
+    ] == [["Na2O", "0.33"], ["SiO2", "0.67"]]
+    assert row["values"]["point_conditions"]["composition"]["locator"]["page"] == 3
+    assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
+    assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "cr"
+    assert row["regime"] == "emf_cell"
+    assert doc["experiments"][0]["method"] == "emf_cell"
+    assert doc["experiments"][0]["method_as_printed"]
+    assert row["values"]["admission_status"] == "admitted"
+    assert row["values"]["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
+    assert row["values"]["point_conditions"]["fO2_log"]["state"]["tag"] == "unknown"
+    assert row["values"]["point_conditions"]["total_pressure_Pa"]["locator"] == {
+        "page": 1,
+        "published_page": 879,
+        "section": "Experimental",
+    }
+    assert row["values"]["point_conditions"]["fO2_log"]["locator"] == {
+        "page": 1,
+        "published_page": 879,
+        "section": "Experimental",
+    }
+    sample = doc["fidelity_samples"][0]
+    assert not vle.check_fidelity_sample_matches(doc, sample)
+    mutated = copy.deepcopy(doc)
+    mutated["species"]["Na2O"]["observations"][0]["values"][
+        "log10_activity_as_published"
+    ] = "-9.1"
+    assert "mismatch" in " ".join(vle.check_fidelity_sample_matches(mutated, sample))
+
+    result = _migrate_real_extract(tmp_path, name, extract_doc=doc)
+    assert len(result.observations) == 2
+    migrated_rows = {
+        observation_id.rsplit("::", 1)[-1]: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+    }
+    migrated = migrated_rows["itoh_yokokawa_1984_eq5_absolute_activity"]
+    assert migrated["identity"]["quantity"]["value"] == "activity"
+    assert migrated["admission"]["status"] == "admitted"
+    assert migrated["value"]["kind"] == "point"
+    assert Decimal(str(migrated["value"]["point"])) == Decimal("1e-9")
+    assert len(result.experiments) == 1
+    assert next(iter(result.experiments.values())).method.value.value == "emf_cell"
+    assert migrated["derivation"]["relation"] == "a(Na2O) = 10^(log10 a(Na2O))"
+    parent_id = migrated["derived_from"][0].rsplit("::", 1)[-1]
+    assert parent_id == "itoh_yokokawa_1984_eq5_printed_log_input"
+    assert migrated_rows[parent_id]["admission"]["status"] == "rejected"
+    assert migrated_rows[parent_id]["value"]["kind"] == "unavailable"
+    assert migrated["uncertainty"]["verbatim"]["value"] == "1.1512925465e-10"
+    assert migrated["identity"]["temperature_K"]["value"] == "1300"
+    assert migrated["identity"]["composition"]["tag"] == "value"
+    assert dict(migrated["identity"]["composition"]["value"]["components"]) == {
+        "Na2O": "0.33",
+        "SiO2": "0.67",
+    }
+    reference_state = migrated["identity"]["reference_state"]
+    assert reference_state["tag"] == "value"
+    assert reference_state["value"]["convention"] == "raoultian_pure_endmember"
+    assert reference_state["value"]["endmember"]["formula"] == "Na2O"
+    assert migrated["identity"]["total_pressure_Pa"]["tag"] == "unknown"
+    assert migrated["identity"]["fO2_Pa"]["tag"] == "unknown"
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+    assert sum(
+        observation.admission.status.value == "admitted"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value.value == "activity"
+        for observation in result.observations.values()
+    ) == 1
+    assert sum(
+        observation.value.kind.value == "unavailable"
+        for observation in result.observations.values()
+    ) == 1
+
+
 @pytest.mark.parametrize(
     ("numerator", "denominator", "basis"),
     [
@@ -2318,12 +2435,31 @@ def test_repo_extracts_validate_green():
 
 
 def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None:
+    from simulator.battery.enums import MethodToken, Quantity
+
     path = EXTRACTS / "kems-026-markova-1984.yaml"
+    source = yaml.safe_load(path.read_text(encoding="utf-8"))
     migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(path)
     migrator.finalize()
     assert migrator.result.validation.hard_issues == ()
 
+    expected_starting_compositions = {
+        "VI_lherzolite": {
+            "SiO2": Decimal("44.02"),
+            "Al2O3": Decimal("4.56"),
+            "FeO": Decimal("8.04"),
+            "MgO": Decimal("36.44"),
+            "CaO": Decimal("6.95"),
+        },
+        "V_alumina_basalt": {
+            "SiO2": Decimal("52.32"),
+            "Al2O3": Decimal("19.13"),
+            "FeO": Decimal("9.37"),
+            "MgO": Decimal("6.25"),
+            "CaO": Decimal("12.93"),
+        },
+    }
     for panel, experiment_suffix in (
         ("VI_lherzolite", "VI"),
         ("V_alumina_basalt", "V"),
@@ -2338,6 +2474,11 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
         total_pressure = experiment.pressure_environment.total_pressure_Pa
         assert total_pressure.state.tag == "unknown"
         assert total_pressure.state.value is None
+        assert total_pressure.locator.published_page == 509
+        assert total_pressure.locator.pdf_page_index == 0
+        assert experiment.pressure_environment.sweep_gas.state.is_unknown
+        assert experiment.pressure_environment.sweep_gas.locator.published_page == 509
+        assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         assert experiment.apparatus.geometry.orifice_area_m2.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_diameter_m.state.tag == "unknown"
         assert experiment.apparatus.geometry.orifice_channel_length_m.state.tag == "unknown"
@@ -2349,9 +2490,13 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
             item
             for item in migrator.result.observations.values()
             if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+            and item.identity.quantity is not None
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         ]
-        assert rows
+        assert len(rows) == 12
         assert all(item.experiment_id == experiment.experiment_id for item in rows)
+        assert sum(item.identity.temperature_K.is_unknown for item in rows) == 1
         for item in rows:
             for axis in ("sample_mass_kg", "total_pressure_Pa"):
                 state = getattr(item.identity, axis)
@@ -2366,6 +2511,158 @@ def test_markova_1984_apparatus_inputs_migrate_from_the_printed_method() -> None
                 assert len(matches) == 1
                 assert matches[0].reason.value == "identity_incomplete"
                 assert "unknown" in matches[0].detail
+
+            conditions = item.point_conditions or {}
+            temperature = conditions["temperature_K"]
+            assert temperature.locator.published_page == 510
+            assert temperature.locator.pdf_page_index == 1
+            assert temperature.locator.table == "2"
+            start = conditions["starting_composition"]
+            assert start.state.is_value
+            assert {
+                str(oxide): Decimal(str(amount))
+                for oxide, amount in start.state.value.items()
+            } == expected_starting_compositions[panel]
+            assert start.locator.published_page == 510
+            assert start.locator.pdf_page_index == 1
+            assert start.locator.table == "2"
+
+            pressure_kind = conditions["pressure_kind"]
+            oxygen = conditions["fO2_Pa"]
+            assert pressure_kind.state.is_unknown
+            assert pressure_kind.locator.published_page == 509
+            assert pressure_kind.locator.pdf_page_index == 0
+            assert oxygen.state.is_unknown
+            assert oxygen.locator.published_page == 509
+            assert oxygen.locator.pdf_page_index == 0
+            if item.identity.temperature_K.is_value:
+                duration = conditions["duration_h"]
+                assert duration.state.value == Decimal("0.25")
+                assert duration.locator.published_page == 509
+                assert duration.locator.pdf_page_index == 0
+                assert duration.locator.section == "experimental method"
+            else:
+                assert conditions["duration_h"].state.is_unknown
+
+    table2_rows = [
+        item
+        for item in migrator.result.observations.values()
+        if "markova_1984_table2_residual_melt_" in item.observation_id
+    ]
+    assert len(table2_rows) == 134
+    assert all(item.identity.quantity.is_value for item in table2_rows)
+    assert all(not item.identity.species.phase.is_unknown for item in table2_rows)
+    assert sum(item.identity.temperature_K.is_unknown for item in table2_rows) == 2
+    experiments = {item.experiment_id: item for item in migrator.result.experiments.values()}
+    for item in table2_rows:
+        conditions = item.point_conditions or {}
+        temperature = conditions["temperature_K"]
+        assert temperature.locator.published_page == 510
+        assert temperature.locator.pdf_page_index == 1
+        assert temperature.locator.table == "2"
+        assert conditions["pressure_kind"].state.is_unknown
+        assert conditions["pressure_kind"].locator.published_page == 509
+        assert "No vacuum" in conditions["pressure_kind"].state.reason
+        assert conditions["fO2_Pa"].state.is_unknown
+        assert conditions["fO2_Pa"].locator.published_page == 509
+        assert "not an imposed condition" in conditions["fO2_Pa"].state.reason
+        assert conditions["composition"].state.is_value
+        assert conditions["composition"].locator.published_page == 510
+        assert conditions["composition"].locator.table == "2"
+        assert conditions["starting_composition"].state.is_value
+        panel = (
+            "VI_lherzolite"
+            if "VI_lherzolite" in item.observation_id
+            else "V_alumina_basalt"
+        )
+        assert {
+            str(oxide): Decimal(str(amount))
+            for oxide, amount in conditions["starting_composition"].state.value.items()
+        } == expected_starting_compositions[panel]
+        if temperature.state.is_value:
+            duration = conditions["duration_h"]
+            assert duration.state.value == Decimal("0.25")
+            assert duration.locator.published_page == 509
+            assert duration.locator.pdf_page_index == 0
+        else:
+            assert conditions["duration_h"].state.is_unknown
+        experiment = experiments[item.experiment_id]
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        assert (
+            experiment.pressure_environment.total_pressure_Pa.locator.published_page
+            == 509
+        )
+        assert (
+            "vapor total pressure as a result"
+            in experiment.pressure_environment.total_pressure_Pa.state.reason
+        )
+        assert experiment.pressure_environment.sweep_gas.state.is_unknown
+        assert item.identity.total_pressure_Pa.is_unknown
+        assert item.identity.fO2_Pa.is_unknown
+
+    expected_quantity_unknown = {
+        "kems-026-markova-1984::markova_1984_table1_initial_sample_compositions",
+        "kems-026-markova-1984::markova_1984_text_basalt_ANT_window",
+        "kems-026-markova-1984::markova_1984_fig1_ternary_residual_tracks_figure_only",
+        "kems-026-markova-1984::markova_1984_silica_partially_in_vapor_at_1500C",
+        "kems-026-markova-1984::markova_1984_Mg_completely_in_melt_at_1500C",
+        "kems-026-markova-1984::markova_1984_Fe_more_volatile_than_silica",
+        "kems-026-markova-1984::markova_1984_residual_enrichment_Ca_Ti_Al",
+    }
+    assert {
+        item.observation_id
+        for item in migrator.result.observations.values()
+        if not item.identity.quantity.is_value
+    } == expected_quantity_unknown
+    assert not any(
+        item.identity.species.phase.is_unknown
+        for item in migrator.result.observations.values()
+    )
+
+    source_panels = {
+        str(observation["observation_id"]): observation
+        for block in (source.get("species") or {}).values()
+        for observation in block.get("observations") or []
+    }
+    expected_render_values = (
+        ("VI_lherzolite", Decimal("1748.15"), Decimal("0.0146")),
+        ("VI_lherzolite", Decimal("1765.15"), Decimal("0.0416")),
+        ("V_alumina_basalt", Decimal("1913.15"), Decimal("0.1441")),
+        ("V_alumina_basalt", Decimal("2528.15"), Decimal("0.9799")),
+    )
+    for panel, temperature_k, mass_loss_fraction in expected_render_values:
+        rows = [
+            item
+            for item in migrator.result.observations.values()
+            if f"markova_1984_table2_residual_melt_{panel}" in item.observation_id
+            and item.identity.quantity is not None
+            and item.identity.quantity.is_value
+            and item.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        ]
+        row = next(
+            item
+            for item in rows
+            if item.identity.temperature_K.is_value
+            and item.identity.temperature_K.value == temperature_k
+        )
+        assert row.value.point == mass_loss_fraction
+        assert row.locator.published_page == 510
+        assert row.locator.pdf_page_index == 1
+        assert row.locator.table == "2"
+
+    raw_pressure = source_panels[
+        "markova_1984_table2_residual_melt_VI_lherzolite"
+    ]["values"]["series"][1]["point_conditions"]
+    for key in ("pressure_kind", "fO2_Pa"):
+        assert raw_pressure[key]["state"]["tag"] == "unknown"
+        assert raw_pressure[key]["locator"]["published_page"] == 509
+        assert raw_pressure[key]["locator"]["pdf_page_index"] == 0
+    for experiment in source["experiments"]:
+        pressure = experiment["pressure_environment"]["total_pressure_Pa"]
+        assert pressure["state"]["tag"] == "unknown"
+        assert "vapor total pressure as a result" in pressure["state"]["reason"]
+        assert pressure["locator"]["published_page"] == 509
+        assert pressure["locator"]["pdf_page_index"] == 0
 
 
 def test_richter_2007_table1_residues_link_to_their_runs() -> None:
@@ -5640,13 +5937,180 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     nacl = observations_named(hastie, "hastie_1981_nacl_liquid_logP_prose")
     assert nacl
     assert nacl[0].experiment_id == table2_experiment.experiment_id
-
     allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
     emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
     mo = experiment_named(allibert, "allibert-1981-mo-kems")
     assert all(item.experiment_id != mo.experiment_id for item in emf)
     assert allibert.experiments[emf[0].experiment_id].bench_id is None
 
+
+def test_shornikov_and_demaria_printed_cell_materials_reach_observations(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.score import _bench_for_score
+    from simulator.battery.source_oxygen import (
+        SourceOxygenCondition,
+        resolve_source_oxygen,
+    )
+
+    cases = (
+        (
+            "shornikov-1997-diopside-vaporization.yaml",
+            "shornikov-1997-diopside-kems",
+            "shornikov-1997-mo-kems",
+            ("Mo",),
+            "molybdenum cells",
+            174,
+            "shornikov_1997_ca_pressure_table1",
+            "orifice_to_sample_area_ratio",
+            "bound",
+            "0.0025",
+        ),
+        (
+            "kems-022-demaria-1971.yaml",
+            "demaria-1971-main-kems",
+            "demaria-1971-re-kems",
+            ("Re",),
+            "rhenium containers having a knife-edge effusion hole 2.3 mm in diameter",
+            1368,
+            "demaria_1971_al2o_psat_table4",
+            "orifice_diameter_m",
+            "point",
+            "0.0023",
+        ),
+    )
+    for (
+        filename,
+        experiment_local,
+        bench_local,
+        expected,
+        quote,
+        page,
+        obs_local,
+        geometry_field,
+        geometry_kind,
+        geometry_value,
+    ) in cases:
+        result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+        experiment = next(
+            item
+            for item in result.experiments.values()
+            if item.experiment_id.endswith(f"::experiment::{experiment_local}")
+        )
+        assert experiment.bench_id is not None
+        assert experiment.bench_id.endswith(f"::bench::{bench_local}")
+        bench = result.benches[experiment.bench_id]
+        assert bench.cell_materials is not None
+        assert tuple(item.state.value.value for item in bench.cell_materials) == expected
+        assert all(item.locator is not None for item in bench.cell_materials)
+        assert all(item.locator.published_page == page for item in bench.cell_materials)
+        assert all(quote in item.locator.paragraph for item in bench.cell_materials)
+        assert bench.geometry is not None
+        geometry = getattr(bench.geometry, geometry_field)
+        assert geometry is not None and geometry.locator is not None
+        assert geometry.locator.published_page == page
+        assert geometry.state.value.kind.value == geometry_kind
+        assert str(
+            geometry.state.value.bound_value
+            if geometry_kind == "bound"
+            else geometry.state.value.point
+        ) == geometry_value
+        observations = [
+            item
+            for item in result.observations.values()
+            if obs_local in item.observation_id.split("::")
+        ]
+        assert observations
+        assert all(item.experiment_id == experiment.experiment_id for item in observations)
+
+        if filename == "kems-022-demaria-1971.yaml":
+            atomic_oxygen = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_o_atomic_psat_table5" in item.observation_id.split("::")
+            ]
+            assert atomic_oxygen
+            assert all(item.experiment_id == experiment.experiment_id for item in atomic_oxygen)
+            conditions = [
+                (
+                    item,
+                    resolve_source_oxygen(
+                        item,
+                        result.observations.values(),
+                        _bench_for_score(experiment, result.benches),
+                    ),
+                )
+                for item in observations
+            ]
+            matched = [
+                (item, condition)
+                for item, condition in conditions
+                if isinstance(condition, SourceOxygenCondition)
+            ]
+            assert len(matched) == 10
+            assert len(conditions) - len(matched) == 4
+            assert all(
+                any(
+                    "demaria_1971_o_atomic_psat_table5" in used
+                    for used in condition.used_observations
+                )
+                for _item, condition in matched
+            )
+            pinned = next(
+                condition
+                for item, condition in matched
+                if item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2060")
+            )
+            assert pinned.observation.identity.species.formula == "O2"
+
+            al_o = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_alo_psat_table4" in item.observation_id.split("::")
+            ]
+            assert len(al_o) == 6
+            assert all(item.experiment_id == experiment.experiment_id for item in al_o)
+            al_o_conditions = [
+                (
+                    item,
+                    resolve_source_oxygen(
+                        item,
+                        result.observations.values(),
+                        _bench_for_score(experiment, result.benches),
+                    ),
+                )
+                for item in al_o
+            ]
+            assert all(
+                isinstance(condition, SourceOxygenCondition)
+                for _item, condition in al_o_conditions
+            )
+            al_o_2320 = next(
+                condition
+                for item, condition in al_o_conditions
+                if item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2320")
+            )
+            assert al_o_2320.observation.identity.species.formula == "O2"
+            assert al_o_2320.observation.value.point == Decimal("0.008780430613159444")
+            used_atomic_oxygen = next(
+                item
+                for item in atomic_oxygen
+                if item.observation_id in al_o_2320.used_observations
+                and item.identity.temperature_K.is_value
+                and item.identity.temperature_K.value == Decimal("2320")
+            )
+            assert ":row=12065" in used_atomic_oxygen.observation_id
+
+            aluminum_figure = [
+                item
+                for item in result.observations.values()
+                if "demaria_1971_al_monatomic_figure7" in item.observation_id.split("::")
+            ]
+            assert aluminum_figure
+            assert all(item.experiment_id == experiment.experiment_id for item in aluminum_figure)
 
 def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
     source_ids = (
@@ -5887,3 +6351,309 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
+
+
+def test_yakovleva_2022_table1_context_survives_migration(tmp_path):
+    """Printed starting compositions remain unscored context, pinned to Table 1."""
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "yakovleva-2022-alkali-chondrule-evaporation.yaml"
+    )
+    assert not result.observations
+    assert not result.validation.issues
+    (rows,) = result.context_by_work.values()
+    assert len(rows) == 6  # five composition columns plus figure-candidate note
+    compositions = rows[:5]
+    assert [row["locator"] for row in compositions] == [
+        {"published_page": 402, "table": "1"}
+    ] * 5
+    assert [row["values"]["sample_label"] for row in compositions] == [
+        "Composition 1 (IIAB1)",
+        "Composition 2 (IIAB2)",
+        "Composition 3 (granite)",
+        "Composition 4 (basalt)",
+        "Composition 5 (pyroxene chondrules of the Saratov chondrite)",
+    ]
+    # Exact printed cells checked on the PDF page render, published p. 402.
+    assert compositions[0]["values"]["SiO2"] == "59.9"
+    assert compositions[1]["values"]["MgO"] == "27.9"
+    assert compositions[1]["values"]["Na2O"] == "1.8"
+    assert compositions[2]["values"]["MgO"] == "0.5"
+    assert compositions[2]["values"]["FeO"] == "–"
+    assert compositions[3]["values"]["TiO2"] == "6.0"
+    assert compositions[4]["values"]["K2O"] == "0.4"
+    assert all(
+        row["values"]["table_footnote"]
+        == "Analytical results are rounded and normalized to 100 wt %."
+        for row in compositions
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "1997jonesthermo",
+            "1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation",
+            'Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997.',
+        ),
+        (
+            "ammin-73-470-oneill-1988",
+            "ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit",
+            "JANAF thermochemical tables, Chase et al. (1982), values assessed primarily from Mah et al. (1967)",
+        ),
+        (
+            "arxiv-1602-00658-fegley-rock-steam-solubility",
+            "arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation",
+            "Palme and O'Neill (2014)",
+        ),
+        (
+            "berman-1988-internally-consistent-mineral-thermodynamic-data",
+            "berman-1988-internally-consistent-mineral-thermodynamic-data::berman1988_akermanite_delta_fG::T=298.15:h=fc5697a85fa6",
+            "Berman, R. G. (1988), Thermodynamic data for minerals, Journal of Petrology, 29(2), 445-522.",
+        ),
+        (
+            "burcat-third-millennium",
+            "burcat-third-millennium::burcat_2005_table1_C_gas",
+            'Burcat, A. & Ruscic, B. (2005), "Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with Updates from Active Thermochemical Tables", ANL-05/20, TAE 960.',
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table3_bse_composition::rows:h=3547f3dd9048",
+            "Palme & O'Neill (2014)",
+        ),
+        (
+            "fegley-2016-rock-steam-solubility",
+            "fegley-2016-rock-steam-solubility::fegley_2016_table2_continental_crust_composition::rows:h=a57975b5d50a",
+            "Wedepohl (1995)",
+        ),
+        (
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii",
+            "hashimoto-nakano-2021-bubbles-to-chondrites-ii::hashimoto_2021_table1_silicate_compositions",
+            "Jarosewich (1990, table 5); Jarosewich (1990, table 2); Lodders (2003, table 1 and 3); Yanai et al. (1995); Ikeda and Takeda 1979; Kimura et al. 1979; Fujimaki et al. 1981; Nagahara 1981; Ikeda 1983; Kimura 1983; Ikeda (1983); Ikeda (1980); Hezel and Palme (2010); Ikeda (1982)",
+        ),
+        (
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+            "holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_abstract_experimental_ranges",
+            'Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical Geology 139, 21-38.',
+        ),
+        (
+            "itoh-hino-banya-1997-mg-deoxidation",
+            "itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters",
+            "Yavoiskii et al.; Nadif and Gatellier; Turkdogan; Inoue and Suito; Kulikov; Gorobetz (references 6–11)",
+        ),
+        (
+            "lpi-compendium-15013",
+            "lpi-compendium-15013::lpi_15013_table1_major_oxide_composition",
+            "Meyer, C. (2010), Lunar Sample Compendium entry 15013, Lunar and Planetary Institute/NASA.",
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity
+
+
+@pytest.mark.parametrize(
+    ("source_id", "migrated_observation_id", "printed_identity"),
+    (
+        (
+            "lpi-compendium-62231",
+            "lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446",
+            "Meyer, C. (2010), Lunar Sample Compendium: 62231 and 62241 Soils, Apollo 16 station 2.",
+        ),
+        (
+            "lpi-compendium-65701",
+            "lpi-compendium-65701::lpi_compendium_65701_chemical_composition_table::rows:h=1917b21f2ca4",
+            "Meyer, C. (2010), Lunar Sample Compendium: 65701, Lunar and Planetary Institute.",
+        ),
+        (
+            "pedley-marshall-1983-gaseous-monoxides",
+            "pedley-marshall-1983-gaseous-monoxides::pedley_marshall_1983_table_4_assessed_formation_enthalpies::rows:row=ago:h=66c3f8529598",
+            "Pedley, J. B. & Marshall, E. M. (1983). Thermochemical data for gaseous monoxides. J. Phys. Chem. Ref. Data 12, 967–1031",
+        ),
+        (
+            "robie-hemingway-wilson-1980-usgs-of-80-908",
+            "robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_ca2sio4_alpha_summary_29815_absent",
+            "Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report 80-908.",
+        ),
+        (
+            "ta-yamanaka-1997-metsoc",
+            "ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs",
+            "Rego et al. (1985), Metallurgical Transactions 16B:313-323; Chase et al. (1985), JANAF Thermochemical Tables, 3rd ed., p. 1577",
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-1",
+            "usgs-lunar-sourcebook-tab8-1::usgs_tab8_1_apollo11_mbas",
+            'Lunar Sourcebook, Chapter 8, Table A8.1, "Statistical data for concentrations of major elements" (TAB8_1R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "usgs-lunar-sourcebook-tab8-4",
+            "usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=6fb5a587202c",
+            'Lunar Sourcebook, Chapter 8, Table A8.4, "Statistical summary of the database for concentrations of frequently determined siderophile elements in mare basalts (MBAS) and in soils and regolith breccias (S&RB)" (TAB8_4R.DOC; USGS Lunar Consortium copy)',
+        ),
+        (
+            "visscher-fegley-2013-debris-disks",
+            "visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions",
+            "Palme and O'Neill 2003; O'Neill 1991; Lodders 2000; Lodders and Fegley 2011; Warren and Kallemeyn 1990; Warren et al. 1995; Mittlefehldt et al. 2002; Ringwood 1960; Vdovykin 1970; Wiik 1972; Jarosewich 1990; Klock et al. 1998",
+        ),
+    ),
+)
+def test_compilation_assessed_rows_migrate_printed_identity_second_batch(
+    source_id: str,
+    migrated_observation_id: str,
+    printed_identity: str,
+) -> None:
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrated = migrator.result.observations[migrated_observation_id]
+    assert migrated.evidence.attribution == printed_identity
+
+
+def test_celsius_temperature_from_observation_point_conditions_reaches_identity(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    name = "holzheid-lodders-2001-copper-solubility.yaml"
+    source = yaml.safe_load((EXTRACTS / name).read_text())
+    source_row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
+    )
+    source_row["values"].pop("T_C")
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_value
+    assert observation.identity.temperature_K.value == Decimal("1573.15")
+    condition = observation.point_conditions["temperature_K"]
+    assert condition.state.value == Decimal("1573.15")
+    assert condition.locator is not None
+    assert condition.locator.published_page == 1944
+    assert condition.locator.section == "3.5.1"
+
+
+def test_celsius_temperature_at_observation_level_reaches_identity(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    source = yaml.safe_load(
+        (EXTRACTS / "holzheid-lodders-2001-copper-solubility.yaml").read_text()
+    )
+    row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
+    )
+    condition = row["point_conditions"].pop("temperature_C")
+    row["T_C"] = condition["state"]["value"]
+    row["values"].pop("T_C")
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-lodders-2001-copper-solubility.yaml",
+        extract_doc=source,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_value
+    assert observation.identity.temperature_K.value == Decimal("1573.15")
+
+
+def test_ambiguous_point_condition_temperature_stays_unknown(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    source = yaml.safe_load(
+        (EXTRACTS / "holzheid-lodders-2001-copper-solubility.yaml").read_text()
+    )
+    row = next(
+        row
+        for row in source["species"]["CuO0.5"]["observations"]
+        if row["observation_id"] == "hl01_g_cuo05_fe0_s0"
+    )
+    row["values"].pop("T_C")
+    condition = row["point_conditions"]["temperature_C"]
+    condition["state"] = {
+        "tag": "unknown",
+        "reason": "printed temperature is a range",
+    }
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-lodders-2001-copper-solubility.yaml",
+        extract_doc=source,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith("::hl01_g_cuo05_fe0_s0")
+    )
+
+    assert observation.identity.temperature_K.is_unknown
+    assert observation.identity.temperature_K.reason == (
+        "printed temperature is a range"
+    )
+    assert observation.point_conditions["temperature_K"].state.is_unknown
+
+
+def test_celsius_point_conditions_reach_every_migrated_series_point(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    name = "kassis-frischat-1981-silicate-glass-vapour.yaml"
+    source = yaml.safe_load((EXTRACTS / name).read_text())
+    expected: dict[str, dict[Decimal, Decimal]] = {}
+    for block in source["species"].values():
+        for observation in block.get("observations", []):
+            observation_id = observation.get("observation_id")
+            if observation_id not in {
+                "kassis_1981_fig2_pna",
+            }:
+                continue
+            points = observation["values"]["points"]
+            expected[observation_id] = {}
+            for point in points:
+                celsius = Decimal(str(point.pop("T_C")))
+                kelvin, _trail = battery_migrate.convert_temperature_to_k(
+                    celsius, "C"
+                )
+                assert kelvin is not None
+                expected[observation_id][celsius] = kelvin
+
+    result = _migrate_real_extract(tmp_path, name, extract_doc=source)
+    for parent_id, points in expected.items():
+        migrated = [
+            row
+            for row in result.observations.values()
+            if f"::{parent_id}::" in row.observation_id
+        ]
+        assert len(migrated) == len(points)
+        for row in migrated:
+            temperature = row.identity.temperature_K
+            assert temperature.is_value
+            assert temperature.value in points.values()
+            condition = row.point_conditions["temperature_K"]
+            assert condition.state.value == temperature.value
+            assert condition.locator is not None
+            assert row.evidence.class_.value is battery_migrate.EvidenceClass.FIGURE_ONLY

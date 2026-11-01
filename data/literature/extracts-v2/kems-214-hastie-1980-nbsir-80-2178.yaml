@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-214-hastie-1980-nbsir-80-2178.yaml
 observations:
-- observation_id: kems-214-hastie-1980-nbsir-80-2178::hastie_1980_main_K1_TMS_K_pressure_1466K::T=1466.00:h=6e2f07e66c9b
+- observation_id: kems-214-hastie-1980-nbsir-80-2178::hastie_1980_main_K1_TMS_K_pressure_1466K::T=1466.00:h=99d88c8e28a7
   experiment_id: 0842c3f1218ae17103180d1348a0295658802808c2f2424a66319b348d68f122::kems-214-hastie-1980-nbsir-80-2178
   identity:
     quantity:
@@ -83,7 +83,7 @@ observations:
     affected_quantities:
     - p_partial
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: kems-214-hastie-1980-nbsir-80-2178::hastie_1980_main_K1_TMS_K_pressure_1466K::T=1466.00:h=6e2f07e66c9b
+    origin: kems-214-hastie-1980-nbsir-80-2178::hastie_1980_main_K1_TMS_K_pressure_1466K::T=1466.00:h=99d88c8e28a7
   source_id: kems-214-hastie-1980-nbsir-80-2178
   locator:
     page: 99
@@ -113,15 +113,258 @@ observations:
         published_page: 13
         pdf_page_index: 98
         note: The text says TMS N2 typically contained about 5 × 10^-5 atm O2; not a point-specific measured value.
+    starting_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.0900983637349313978850215018'
+          - - CaO
+            - '0.05161769126789820295384542852'
+          - - Cr2O3
+            - '0.006515239336255655380757680428'
+          - - Fe2O3
+            - '0.06797434841040428584820413765'
+          - - K2O
+            - '0.1580133183081766164780759547'
+          - - MgO
+            - '0.01946654264058174726476922643'
+          - - Na2O
+            - '0.00577638693900066607699276626'
+          - - SO3
+            - '0.001998111567147502256213374783'
+          - - SiO2
+            - '0.5935803983989920036048595849'
+          - - TiO2
+            - '0.004959599396611922251260344417'
+          amount_basis: mole_fraction
+      locator:
+        page: 97
+        published_page: 11
+        pdf_page_index: 96
+        section: 2.2.2
+        note: Printed initial composition for the K1 sample.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.06'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_Cr2O3_wt_pct
+          - state:
+              tag: value
+              value: '1.3'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_Cr2O3_g_mol
+          - state:
+              tag: value
+              value: '151.98919999999998'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.25'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.54'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1.03'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.47'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_SO3_wt_pct
+          - state:
+              tag: value
+              value: '0.21'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_SO3_g_mol
+          - state:
+              tag: value
+              value: '80.057'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.82'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.52'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 97
+              published_page: 11
+              pdf_page_index: 96
+              section: 2.2.2
+              note: Printed initial composition for the K1 sample.
+        output_unit: mole_fraction
+        references: []
     composition:
       state:
         tag: unknown
-        reason: K1 run-state composition at 1466 K is not reported; the initial composition is not the run-state composition.
+        reason: run-state composition at 1466 K is not reported; the source says higher-temperature vaporization data are
+          modified by changing slag composition.
       locator:
         page: 99
         published_page: 13
         pdf_page_index: 98
-        note: Section 2.2.2; typical TMS data point
+        section: 2.2.2
+        note: At higher temperatures and vaporization rates, source says data are modified by changing slag composition.
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5154,8 +5397,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5338,8 +5592,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5522,8 +5787,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5706,8 +5982,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5890,8 +6177,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6074,8 +6372,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6258,8 +6567,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6442,8 +6762,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6626,8 +6957,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6810,8 +7152,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6994,8 +7347,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -7178,8 +7542,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -7362,8 +7737,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -7546,8 +7932,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -7730,8 +8127,19 @@ observations:
       tag: unknown
       reason: source gas standard state not grounded
     reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
+      tag: value
+      value:
+        formula: MgO
+        phase:
+          tag: value
+          value: cr
+        polymorph:
+          tag: unknown
+          reason: polymorph_not_stated_in_paper
+          rejection_kind: omitted
+        charge:
+          tag: value
+          value: 0
     composition:
       tag: unknown
       reason: no composition mapped from source

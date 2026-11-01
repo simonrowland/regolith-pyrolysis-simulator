@@ -10,6 +10,9 @@ from types import MethodType, SimpleNamespace
 import pytest
 
 from simulator.condensation import _coerce_alpha_s
+from simulator.campaigns import CampaignManager, CampaignSetpointMissingRefusal
+from simulator.config import load_config_bundle
+from simulator.state import CampaignPhase
 from simulator.silent_zero import (
     CATEGORY_PROVEN_ZERO,
     CATEGORY_REFUSE,
@@ -466,15 +469,24 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
 
     from simulator.extraction import ExtractionMixin
 
+    source_row = load_config_bundle().setpoints["campaigns"]["C7"]
+    setpoints = {
+        "campaigns": {
+            "C7": {"default_hold_T_C": source_row["default_hold_T_C"]}
+        }
+    }
     sim = SimpleNamespace(
         melt=SimpleNamespace(
+            campaign=CampaignPhase.C7_CA_ALUMINOTHERMIC,
+            campaign_hour=0,
             melt_surface_area_m2=0.2,
             p_total_mbar=0.05,
             stir_state=SimpleNamespace(axial=1.0),
             stir_factor=1.0,
         ),
         vapor_pressures={"metals": {"Ca": ca_entry}},
-        setpoints={},
+        setpoints=setpoints,
+        campaign_mgr=CampaignManager(setpoints),
         _resolve_condensation_carrier_gas=lambda: "N2",
         overhead=SimpleNamespace(headspace_temperature_K=1000.0),
         overhead_model=SimpleNamespace(pipe_diameter_m=0.12),
@@ -485,8 +497,26 @@ def _c7_sim(ca_entry: dict) -> SimpleNamespace:
     sim._c7_float = ExtractionMixin._c7_float
     sim._c7_clamp = ExtractionMixin._c7_clamp
     sim._c7_bool = ExtractionMixin._c7_bool
+    sim._c7_hold_temperature_C = MethodType(
+        ExtractionMixin._c7_hold_temperature_C,
+        sim,
+    )
     sim._c7_knob_diag = MethodType(ExtractionMixin._c7_knob_diag, sim)
     return sim
+
+
+def test_c7_transport_requires_campaign_hold_setpoint() -> None:
+    from simulator.extraction import ExtractionMixin
+
+    sim = _c7_sim({})
+    sim.campaign_mgr.setpoints["campaigns"]["C7"].pop("default_hold_T_C")
+
+    with pytest.raises(CampaignSetpointMissingRefusal):
+        ExtractionMixin._c7_transport_extent_mol(
+            sim,
+            {"hold_time_h": 1.0, "p_total_mbar": 0.05},
+            ca_per_extent=1.0,
+        )
 
 
 def test_c7_ca_missing_coefficient_and_thermo_notes_bounded() -> None:

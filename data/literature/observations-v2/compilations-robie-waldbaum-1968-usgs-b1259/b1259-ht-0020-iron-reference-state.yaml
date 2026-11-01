@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
 observations:
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=iron-(reference-state):v=33d14bdc09:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1000:col=H_minus_H298:name=iron-(reference-state):v=33d14bdc09:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -15,7 +15,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -122,7 +122,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=iron-(reference-state):v=0b361fc682:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1100:col=H_minus_H298:name=iron-(reference-state):v=0b361fc682:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -135,7 +135,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -242,7 +242,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1184:col=H_minus_H298:name=iron-(reference-state):v=5bbe458ff0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1184:col=H_minus_H298:name=iron-(reference-state):v=5bbe458ff0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -251,11 +251,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -317,21 +318,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='8.030'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -362,7 +350,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1184:col=H_minus_H298:name=iron-(reference-state):v=e78713f84f:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1184:col=H_minus_H298:name=iron-(reference-state):v=e78713f84f
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -371,11 +359,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -437,21 +426,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='8.255'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -482,7 +458,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=iron-(reference-state):v=75624eabc4:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1200:col=H_minus_H298:name=iron-(reference-state):v=75624eabc4:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -495,7 +471,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -602,7 +578,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=iron-(reference-state):v=c2dd85a964:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1300:col=H_minus_H298:name=iron-(reference-state):v=c2dd85a964:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -615,7 +591,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -722,7 +698,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=iron-(reference-state):v=58f726c2f2:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1400:col=H_minus_H298:name=iron-(reference-state):v=58f726c2f2:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -735,7 +711,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -842,7 +818,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=iron-(reference-state):v=b731a99dda:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1500:col=H_minus_H298:name=iron-(reference-state):v=b731a99dda:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -855,7 +831,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -962,7 +938,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=iron-(reference-state):v=f205d32d99:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1600:col=H_minus_H298:name=iron-(reference-state):v=f205d32d99:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -975,7 +951,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -1082,7 +1058,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1665:col=H_minus_H298:name=iron-(reference-state):v=3f1d861ce7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1665:col=H_minus_H298:name=iron-(reference-state):v=3f1d861ce7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1091,11 +1067,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1157,21 +1134,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='12.600'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1202,7 +1166,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1665:col=H_minus_H298:name=iron-(reference-state):v=ba426a8417:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1665:col=H_minus_H298:name=iron-(reference-state):v=ba426a8417
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1211,11 +1175,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1277,21 +1242,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='12.340'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1322,7 +1274,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=iron-(reference-state):v=4e1e9a3f69:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1700:col=H_minus_H298:name=iron-(reference-state):v=4e1e9a3f69:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1335,7 +1287,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -1442,7 +1394,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=iron-(reference-state):v=e85b1a6bda:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1800:col=H_minus_H298:name=iron-(reference-state):v=e85b1a6bda:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1455,7 +1407,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -1562,7 +1514,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1809:col=H_minus_H298:name=iron-(reference-state):v=77594e0118:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1809:col=H_minus_H298:name=iron-(reference-state):v=77594e0118
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1571,11 +1523,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1637,21 +1590,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='14.020'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1682,7 +1622,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1809:col=H_minus_H298:name=iron-(reference-state):v=e2964558f9:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1809:col=H_minus_H298:name=iron-(reference-state):v=e2964558f9
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1691,11 +1631,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -1757,21 +1698,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='17.650'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
-          table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored;
-          printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal);
-          standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -1802,7 +1730,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=iron-(reference-state):v=31f6960348:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=1900:col=H_minus_H298:name=iron-(reference-state):v=31f6960348
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1812,10 +1740,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -1922,7 +1850,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=iron-(reference-state):v=360afd926e:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=2000:col=H_minus_H298:name=iron-(reference-state):v=360afd926e
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -1932,10 +1860,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -2042,7 +1970,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=298.15:col=H_minus_H298:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2055,7 +1983,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2162,7 +2090,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=iron-(reference-state):v=7527c99dd6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=400:col=H_minus_H298:name=iron-(reference-state):v=7527c99dd6:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2175,7 +2103,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2282,7 +2210,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=iron-(reference-state):v=758f25ce7a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=500:col=H_minus_H298:name=iron-(reference-state):v=758f25ce7a:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2295,7 +2223,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2402,7 +2330,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=iron-(reference-state):v=d145c42182:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=600:col=H_minus_H298:name=iron-(reference-state):v=d145c42182:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2415,7 +2343,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2522,7 +2450,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=iron-(reference-state):v=08e9515b06:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=700:col=H_minus_H298:name=iron-(reference-state):v=08e9515b06:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2535,7 +2463,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2642,7 +2570,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=iron-(reference-state):v=b6c106a1dd:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=800:col=H_minus_H298:name=iron-(reference-state):v=b6c106a1dd:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2655,7 +2583,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2762,7 +2690,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=iron-(reference-state):v=87bdf3fcab:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:H_minus_H298:shared:T=900:col=H_minus_H298:name=iron-(reference-state):v=87bdf3fcab:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2775,7 +2703,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -2882,7 +2810,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1000:col=entropy:name=iron-(reference-state):v=58f6ec475a:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1000:col=entropy:name=iron-(reference-state):v=58f6ec475a:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -2895,7 +2823,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -3002,7 +2930,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1100:col=entropy:name=iron-(reference-state):v=84ea92d2e0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1100:col=entropy:name=iron-(reference-state):v=84ea92d2e0:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3015,7 +2943,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -3122,7 +3050,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1184:col=entropy:name=iron-(reference-state):v=b57d4c19ed:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1184:col=entropy:name=iron-(reference-state):v=b57d4c19ed
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3131,11 +3059,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3197,21 +3126,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='17.970'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3242,7 +3158,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1184:col=entropy:name=iron-(reference-state):v=ee3cf3aec8:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1184:col=entropy:name=iron-(reference-state):v=ee3cf3aec8
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3251,11 +3167,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -3317,21 +3234,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='18.160'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -3362,7 +3266,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1200:col=entropy:name=iron-(reference-state):v=1e3a5bdb08:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1200:col=entropy:name=iron-(reference-state):v=1e3a5bdb08:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3375,7 +3279,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3482,7 +3386,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1300:col=entropy:name=iron-(reference-state):v=7a15fce023:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1300:col=entropy:name=iron-(reference-state):v=7a15fce023:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3495,7 +3399,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3602,7 +3506,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1400:col=entropy:name=iron-(reference-state):v=8a434ed621:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1400:col=entropy:name=iron-(reference-state):v=8a434ed621:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3615,7 +3519,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3722,7 +3626,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1500:col=entropy:name=iron-(reference-state):v=9830b746de:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1500:col=entropy:name=iron-(reference-state):v=9830b746de:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3735,7 +3639,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3842,7 +3746,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1600:col=entropy:name=iron-(reference-state):v=190dcba340:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1600:col=entropy:name=iron-(reference-state):v=190dcba340:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3855,7 +3759,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -3962,7 +3866,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1665:col=entropy:name=iron-(reference-state):v=c236cfefb6:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1665:col=entropy:name=iron-(reference-state):v=c236cfefb6
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -3971,11 +3875,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4037,21 +3942,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='21.200'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4082,7 +3974,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1700:col=entropy:name=iron-(reference-state):v=adc0b57292:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1700:col=entropy:name=iron-(reference-state):v=adc0b57292:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4095,7 +3987,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -4202,7 +4094,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1800:col=entropy:name=iron-(reference-state):v=6dace0d78c:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1800:col=entropy:name=iron-(reference-state):v=6dace0d78c:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4215,7 +4107,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -4322,7 +4214,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1809:col=entropy:name=iron-(reference-state):v=1aee92fedb:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1809:col=entropy:name=iron-(reference-state):v=1aee92fedb
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4331,11 +4223,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -4397,21 +4290,8 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: admitted
-    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
-    decided_by:
-      worker: source-level compilation ruling
-      date: '2026-09-30'
-      evidence:
-        published_page: 45
-        pdf_page_index: 51
-        table: b1259-ht-0020-iron-reference-state
-        note: as_published='24.030'; unit='cal deg^-1 gfw^-1' quoted from high-T table header (units_as_published on each
-          substance table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published
-          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json
-        record: b1259-ht-0020-iron-reference-state
+    status: pending
+    reason: source does not state admission_status
   notices: []
   source_id: robie-waldbaum-1968-usgs-b1259
   locator:
@@ -4442,7 +4322,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1900:col=entropy:name=iron-(reference-state):v=3a9912bbc7:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=1900:col=entropy:name=iron-(reference-state):v=3a9912bbc7
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4452,10 +4332,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4562,7 +4442,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=2000:col=entropy:name=iron-(reference-state):v=7dc34411d0:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=2000:col=entropy:name=iron-(reference-state):v=7dc34411d0
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4572,10 +4452,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -4682,7 +4562,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=298.15:col=entropy:name=iron-(reference-state):v=02eccbb9d8:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=298.15:col=entropy:name=iron-(reference-state):v=02eccbb9d8:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4695,7 +4575,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4802,7 +4682,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=400:col=entropy:name=iron-(reference-state):v=ab2335dd20:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=400:col=entropy:name=iron-(reference-state):v=ab2335dd20:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4815,7 +4695,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -4922,7 +4802,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=500:col=entropy:name=iron-(reference-state):v=21c08d84b9:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=500:col=entropy:name=iron-(reference-state):v=21c08d84b9:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -4935,7 +4815,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5042,7 +4922,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=600:col=entropy:name=iron-(reference-state):v=5fe762ab09:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=600:col=entropy:name=iron-(reference-state):v=5fe762ab09:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5055,7 +4935,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5162,7 +5042,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=700:col=entropy:name=iron-(reference-state):v=93e413de74:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=700:col=entropy:name=iron-(reference-state):v=93e413de74:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5175,7 +5055,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5282,7 +5162,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=800:col=entropy:name=iron-(reference-state):v=b5790b1879:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=800:col=entropy:name=iron-(reference-state):v=b5790b1879:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5295,7 +5175,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5402,7 +5282,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=900:col=entropy:name=iron-(reference-state):v=e03c80479b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:S:shared:T=900:col=entropy:name=iron-(reference-state):v=e03c80479b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5415,7 +5295,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5522,7 +5402,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1000:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5535,7 +5415,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5562,7 +5442,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5682,7 +5562,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1100:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5695,7 +5575,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -5722,7 +5602,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5842,7 +5722,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1184:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1184:col=delta_f_G:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5851,11 +5731,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -5952,7 +5833,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1200:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -5965,7 +5846,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -5992,7 +5873,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6112,7 +5993,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1300:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6125,7 +6006,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6152,7 +6033,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6272,7 +6153,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1400:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6285,7 +6166,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6312,7 +6193,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6432,7 +6313,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1500:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6445,7 +6326,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6472,7 +6353,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6592,7 +6473,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1600:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6605,7 +6486,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -6632,7 +6513,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -6752,7 +6633,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1665:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1665:col=delta_f_G:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6761,11 +6642,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -6862,7 +6744,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1700:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -6875,7 +6757,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -6902,7 +6784,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -7022,7 +6904,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1800:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7035,7 +6917,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -7062,7 +6944,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -7182,7 +7064,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1809:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1809:col=delta_f_G:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7191,11 +7073,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -7292,7 +7175,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=1900:col=delta_f_G:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7302,10 +7185,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7329,10 +7212,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7452,7 +7335,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=2000:col=delta_f_G:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7462,10 +7345,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -7489,10 +7372,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7612,7 +7495,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7625,7 +7508,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7652,7 +7535,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7772,7 +7655,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=400:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7785,7 +7668,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7812,7 +7695,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7932,7 +7815,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=500:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -7945,7 +7828,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -7972,7 +7855,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8092,7 +7975,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=600:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8105,7 +7988,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8132,7 +8015,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8252,7 +8135,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=700:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8265,7 +8148,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8292,7 +8175,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8412,7 +8295,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=800:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8425,7 +8308,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8452,7 +8335,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8572,7 +8455,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fG:from_the_elements:T=900:col=delta_f_G:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8585,7 +8468,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8612,7 +8495,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8732,7 +8615,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1000:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8745,7 +8628,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8772,7 +8655,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8892,7 +8775,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1100:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -8905,7 +8788,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -8932,7 +8815,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9052,7 +8935,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1184:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1184:col=delta_f_H:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9061,11 +8944,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -9162,7 +9046,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1200:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9175,7 +9059,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9202,7 +9086,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9322,7 +9206,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1300:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9335,7 +9219,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9362,7 +9246,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9482,7 +9366,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1400:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9495,7 +9379,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9522,7 +9406,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9642,7 +9526,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1500:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9655,7 +9539,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9682,7 +9566,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9802,7 +9686,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1600:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9815,7 +9699,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -9842,7 +9726,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -9962,7 +9846,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1665:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1665:col=delta_f_H:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -9971,11 +9855,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10072,7 +9957,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1700:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10085,7 +9970,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -10112,7 +9997,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -10232,7 +10117,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1800:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10245,7 +10130,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -10272,7 +10157,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -10392,7 +10277,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1809:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1809:col=delta_f_H:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10401,11 +10286,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -10502,7 +10388,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=1900:col=delta_f_H:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10512,10 +10398,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10539,10 +10425,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10662,7 +10548,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=2000:col=delta_f_H:name=iron-(reference-state):v=900e6181ee
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10672,10 +10558,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -10699,10 +10585,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10822,7 +10708,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10835,7 +10721,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -10862,7 +10748,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10982,7 +10868,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=400:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -10995,7 +10881,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11022,7 +10908,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11142,7 +11028,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=500:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11155,7 +11041,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11182,7 +11068,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11302,7 +11188,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=600:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11315,7 +11201,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11342,7 +11228,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11462,7 +11348,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=700:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11475,7 +11361,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11502,7 +11388,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11622,7 +11508,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=800:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11635,7 +11521,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11662,7 +11548,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11782,7 +11668,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:delta_fH:from_the_elements:T=900:col=delta_f_H:name=iron-(reference-state):v=900e6181ee:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11795,7 +11681,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11822,7 +11708,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -11942,7 +11828,7 @@ observations:
             in cal deg^-1 gfw^-1): kcal gfw^-1 and cal deg^-1 gfw^-1'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1000:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -11955,7 +11841,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -11982,7 +11868,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12093,7 +11979,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1100:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12106,7 +11992,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -12133,7 +12019,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12244,7 +12130,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1184:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1184:col=log_Kf:name=iron-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12253,11 +12139,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1184 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -12345,7 +12232,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1200:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12358,7 +12245,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12385,7 +12272,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12496,7 +12383,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1300:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12509,7 +12396,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12536,7 +12423,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12647,7 +12534,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1400:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12660,7 +12547,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12687,7 +12574,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12798,7 +12685,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1500:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12811,7 +12698,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12838,7 +12725,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -12949,7 +12836,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1600:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=gamma
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -12962,7 +12849,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -12989,7 +12876,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -13100,7 +12987,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1665:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1665:col=log_Kf:name=iron-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13109,11 +12996,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1665 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13201,7 +13089,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1700:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13214,7 +13102,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -13241,7 +13129,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -13352,7 +13240,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1800:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=delta
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13365,7 +13253,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: delta
       charge:
         tag: value
         value: 0
@@ -13392,7 +13280,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: delta
             charge:
               tag: value
               value: 0
@@ -13503,7 +13391,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1809:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1809:col=log_Kf:name=iron-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13512,11 +13400,12 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: value
-        value: cr
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
       polymorph:
-        tag: value
-        value: reference
+        tag: unknown
+        reason: B1259 elemental reference-state identity is unresolved at 1809 K
+        rejection_kind: omitted
       charge:
         tag: value
         value: 0
@@ -13604,7 +13493,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=1900:col=log_Kf:name=iron-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13614,10 +13503,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13641,10 +13530,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13755,7 +13644,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=2000:col=log_Kf:name=iron-(reference-state):v=725af3071b
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13765,10 +13654,10 @@ observations:
       formula: Fe
       phase:
         tag: value
-        value: cr
+        value: l
       polymorph:
-        tag: value
-        value: reference
+        tag: not_applicable
+        reason: not crystalline
       charge:
         tag: value
         value: 0
@@ -13792,10 +13681,10 @@ observations:
             formula: Fe
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13906,7 +13795,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=298.15:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -13919,7 +13808,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -13946,7 +13835,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14057,7 +13946,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=400:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14070,7 +13959,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14097,7 +13986,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14208,7 +14097,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=500:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14221,7 +14110,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14248,7 +14137,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14359,7 +14248,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=600:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14372,7 +14261,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14399,7 +14288,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14510,7 +14399,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=700:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14523,7 +14412,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14550,7 +14439,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14661,7 +14550,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=800:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14674,7 +14563,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14701,7 +14590,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -14812,7 +14701,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=reference
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:log10_Kf:from_the_elements:T=900:col=log_Kf:name=iron-(reference-state):v=725af3071b:poly=alpha
   experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0020-iron-reference-state:tabulation
   identity:
     quantity:
@@ -14825,7 +14714,7 @@ observations:
         value: cr
       polymorph:
         tag: value
-        value: reference
+        value: alpha
       charge:
         tag: value
         value: 0
@@ -14852,7 +14741,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0

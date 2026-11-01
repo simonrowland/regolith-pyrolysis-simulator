@@ -38,6 +38,13 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting.completeness import (
+    METAL_PRODUCT_SPECIES,
+    O2_PRODUCT_SPECIES,
+    PURE_SILICA_GLASS_SPECIES,
+    product_class_availability,
+    product_class_target_species,
+)
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
     AccountingQueries,
@@ -51,26 +58,6 @@ from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
     vapour_carrier_authority_status,
 )
-
-# Per CLAUDE.md § 4 + § 5: the species that map cleanly to each
-# product class. Some species can land in MORE THAN ONE class
-# depending on recipe path (e.g. Al as metal vs Al2O3 in rump if
-# C6 thermite wasn't fired); the classifier surfaces BOTH per-class
-# subtotals and the gross totals so the operator can see the
-# split honestly.
-
-METAL_PRODUCT_SPECIES: tuple[str, ...] = (
-    'Na', 'K', 'Fe', 'Mg', 'Si', 'Ti', 'Al', 'Ca',
-    'Cr', 'Mn', 'Ni', 'Co',
-)
-"""Metal alloy / ingot species per CLAUDE.md § 5 product class 1.
-``Si`` is here because the post-C6 / post-C5 Si lands as elemental
-metal at process.metal_phase. SiO (the gas-phase silicate oxide)
-maps to product class 2, NOT this list."""
-
-O2_PRODUCT_SPECIES: tuple[str, ...] = ('O2',)
-"""Terminal O₂ accumulator — part of product class 1 (the
-disproportionation by-product that motivates the whole refinery)."""
 
 CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
     'terminal.offgas',
@@ -94,12 +81,6 @@ TERMINAL_RUMP_REPORT_CLASSES: tuple[str, ...] = (
 These distinguish the by-physics refractory floor from the failure-mode
 target residue left unextracted, while keeping unclassified rump mass visible.
 """
-
-PURE_SILICA_GLASS_SPECIES: tuple[str, ...] = ('SiO', 'SiO2')
-"""Product class 2: SiO landed on Stage 3 fused-silica baffles is
-the canonical pure-silica output. SiO2 surfaces here when a
-post-condensation handler converts the captured SiO via the
-documented disproportionation route 2 SiO → SiO2(s) + Si(l)."""
 
 REFRACTORY_CERAMIC_RUMP_ELEMENTS: tuple[str, ...] = (
     'Ca', 'REE',
@@ -169,8 +150,8 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             },
             'glass': {
                 'species_kg': {species: kg, ...},
-                'class_total_kg': float,
-                'pure_silica_glass_kg': float,
+                'class_total_kg': float | None,
+                'pure_silica_glass_kg': float | None,
                 'industrial_mixed_glass_kg': float,
             },
             'industrial_mixed_glass': {
@@ -215,7 +196,6 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     train_stages = list(
         getattr(getattr(sim, 'train', None), 'stages', []) or []
     )
-
     # ----- Class 1: metals + O2 -----
     initial_inventory = getattr(getattr(sim, 'record', None), 'initial_inventory', None)
     native_metals = getattr(initial_inventory, 'metal_alloy_kg', {}) or {}
@@ -236,18 +216,31 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
 
     # ----- Class 2: pure silica glass (Stage 3 capture) -----
     stage_3_kg_by_species: dict[str, float] = {}
-    if len(train_stages) > 3:
+    stage_3_unavailable_reason: str | None = 'stage_3_missing'
+    if len(train_stages) > 3 and train_stages[3] is not None:
         stage_3 = train_stages[3]
-        collected = dict(getattr(stage_3, 'collected_kg', {}) or {})
+        collected = getattr(stage_3, 'collected_kg', None)
+        if isinstance(collected, Mapping):
+            stage_3_unavailable_reason = None
+        elif collected is None:
+            stage_3_unavailable_reason = 'stage_3_collection_missing'
+        else:
+            stage_3_unavailable_reason = 'stage_3_collection_malformed'
+    else:
+        collected = None
+    if stage_3_unavailable_reason is None:
         for species in PURE_SILICA_GLASS_SPECIES:
             kg = float(collected.get(species, 0.0))
             if kg > 0.0:
                 stage_3_kg_by_species[species] = kg
-    stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
+    stage_3_capture_kg = (
+        float(sum(stage_3_kg_by_species.values()))
+        if stage_3_unavailable_reason is None
+        else None
+    )
     saw_oxygen_hold = False
     saw_release_capture = False
     every_capture_followed_release_switch = True
-    silica_quantity_available = True
     silica_certification_flag: dict[str, Any] | None = None
     for snapshot in getattr(getattr(sim, 'record', None), 'snapshots', ()) or ():
         gas = getattr(snapshot, 'c2a_staged_gas', {}) or {}
@@ -306,23 +299,27 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'band': band,
                 'reason': str(reason),
             }
-        if authority_status != VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING:
-            silica_quantity_available = False
 
     # Product classification is derived from the executed release route;
     # evidence authority certifies that mass but never erases a prediction.
     silica_is_product = (
         saw_release_capture and every_capture_followed_release_switch
     )
-    if not silica_is_product:
+    if stage_3_unavailable_reason is not None:
+        silica_product_kg: float | None = None
+        reported_stage_3_capture_kg: float | None = None
+        silica_certification_flag = {
+            'status': 'unavailable',
+            'authority': 'unavailable',
+            'band': None,
+            'reason': stage_3_unavailable_reason,
+        }
+    elif not silica_is_product:
         silica_product_kg: float | None = 0.0
         reported_stage_3_capture_kg: float | None = stage_3_capture_kg
-    elif silica_quantity_available:
+    else:
         silica_product_kg = stage_3_capture_kg
         reported_stage_3_capture_kg = stage_3_capture_kg
-    else:
-        silica_product_kg = None
-        reported_stage_3_capture_kg = None
     reported_stage_3_species = (
         stage_3_kg_by_species if reported_stage_3_capture_kg is not None else {}
     )
@@ -344,6 +341,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     # ----- Class 4: refractory ceramic rump -----
     rump_kg_by_species: dict[str, float] = {}
     rump_method = getattr(sim, '_terminal_rump_by_species', None)
+    rump_inventory_computed = False
     if callable(rump_method):
         try:
             rump_kg_by_species = {
@@ -351,6 +349,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 for species, kg in (rump_method() or {}).items()
                 if float(kg) > 0.0
             }
+            rump_inventory_computed = bool(rump_kg_by_species)
         except (TypeError, ValueError):
             rump_kg_by_species = {}
     rump_total_kg = float(sum(rump_kg_by_species.values()))
@@ -384,6 +383,62 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         if silica_product_kg is None
         else silica_product_kg + mixed_melt_residual_kg
     )
+    has_metal_product = bool(metals_kg)
+    has_oxygen_product = (
+        any(amount > 0.0 for amount in oxygen_partition.values())
+        or 'O2' in products
+    )
+    has_silica_capture = bool(stage_3_kg_by_species)
+    has_silica_product = silica_is_product and has_silica_capture
+    has_mixed_glass_inventory = early_tap_mode and bool(mixed_melt_residual_kg)
+    computed_product_parts = {
+        'metals_plus_O2': has_metal_product or has_oxygen_product,
+        'ingots_metals': has_metal_product,
+        'oxygen': has_oxygen_product,
+        'pure_silica_glass': has_silica_capture,
+        'glass': has_silica_capture or has_mixed_glass_inventory,
+        'refractory_ceramic_rump': rump_inventory_computed,
+        'captured_volatiles': bool(captured_volatiles_kg_by_species),
+    }
+    if early_tap_mode:
+        computed_product_parts['industrial_mixed_glass'] = (
+            has_mixed_glass_inventory
+        )
+    computed_mass_by_class = {
+        'metals_plus_O2': {
+            **({'metals_total_kg': metals_total_kg} if has_metal_product else {}),
+            **({'O2_kg': o2_kg} if has_oxygen_product else {}),
+        },
+        'ingots_metals': dict(metals_kg) if has_metal_product else {},
+        'oxygen': {'O2_kg': o2_kg} if has_oxygen_product else {},
+        'pure_silica_glass': (
+            {'qualified_capture_kg': silica_product_kg}
+            if has_silica_capture else {}
+        ),
+        'glass': {
+            **(
+                {'pure_silica_glass_kg': silica_product_kg}
+                if has_silica_capture else {}
+            ),
+            **(
+                {'industrial_mixed_glass_kg': mixed_melt_residual_kg}
+                if has_mixed_glass_inventory else {}
+            ),
+        },
+        'refractory_ceramic_rump': (
+            {'refractory_oxides_kg': rump_by_class_kg['refractory_oxides']}
+            if rump_inventory_computed else {}
+        ),
+        'captured_volatiles': (
+            dict(captured_volatiles_kg_by_species)
+            if captured_volatiles_kg_by_species else {}
+        ),
+    }
+    if early_tap_mode:
+        computed_mass_by_class['industrial_mixed_glass'] = (
+            {'mixed_melt_residual_kg': mixed_melt_residual_kg}
+            if has_mixed_glass_inventory else {}
+        )
 
     # ----- Unclassified bin -----
     classified_species: set[str] = (
@@ -412,10 +467,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'stage_3_kg_by_species': reported_stage_3_species,
         'class_total_kg': silica_product_kg,
     }
-    if silica_is_product and silica_certification_flag is not None:
+    if silica_certification_flag is not None and (
+        silica_is_product or stage_3_unavailable_reason is not None
+    ):
         silica_bucket['flag'] = silica_certification_flag
 
-    return {
+    result = {
         'metals_plus_O2': {
             'metals_kg': metals_kg,
             'metals_total_kg': metals_total_kg,
@@ -476,6 +533,68 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
+    affected_buckets = [
+        ('metals_plus_O2', product_class_target_species('metals_plus_O2'),
+         ('class_total_kg', 'metals_total_kg', 'O2_kg'), ('metals_kg',)),
+        ('ingots_metals', product_class_target_species('ingots_metals'),
+         ('class_total_kg',), ('species_kg',)),
+        ('oxygen', product_class_target_species('oxygen'),
+         ('class_total_kg', 'O2_kg'), ()),
+        ('pure_silica_glass',
+         product_class_target_species('pure_silica_glass'),
+         ('class_total_kg', 'stage_3_capture_kg'), ('stage_3_kg_by_species',)),
+        ('glass', product_class_target_species(
+            'glass', early_tap_mode=early_tap_mode
+        ),
+         ('class_total_kg', 'pure_silica_glass_kg',
+          'industrial_mixed_glass_kg'), ('species_kg',)),
+        ('refractory_ceramic_rump',
+         product_class_target_species('refractory_ceramic_rump'),
+         ('class_total_kg', 'rump_total_kg', 'rump_silicate_residual_kg',
+          'rump_unextracted_metals_kg'), ('rump_kg_by_species',)),
+        ('captured_volatiles',
+         product_class_target_species('captured_volatiles'),
+         ('class_total_kg',), ('kg_by_species',)),
+    ]
+    if early_tap_mode:
+        affected_buckets.append((
+            'industrial_mixed_glass',
+            product_class_target_species('industrial_mixed_glass'),
+            ('class_total_kg',),
+            (),
+        ))
+    for name, targets, quantities, species_maps in affected_buckets:
+        bucket = result[name]
+        availability = product_class_availability(
+            sim,
+            targets,
+            computed_mass_by_class[name],
+            has_computed_part=computed_product_parts[name],
+        )
+        bucket['estimated_contributions'] = availability[
+            'estimated_contributions'
+        ]
+        if availability['status'] != 'available':
+            if availability['status'] == 'partial':
+                bucket['class_total_kg'] = availability['class_total_kg']
+            bucket['status'] = availability['status']
+            bucket['excluded'] = availability['excluded']
+            if isinstance(bucket.get('flag'), Mapping):
+                bucket['availability_flag'] = availability['flag']
+            else:
+                bucket['flag'] = availability['flag']
+            if availability['status'] == 'unavailable':
+                for key in quantities:
+                    bucket[key] = None
+                for key in species_maps:
+                    bucket[key] = {}
+    if result['oxygen']['class_total_kg'] is None:
+        for name, key in (
+            ('oxygen', 'partition_kg'),
+            ('metals_plus_O2', 'O2_partition_kg'),
+        ):
+            result[name][key] = dict.fromkeys(oxygen_partition)
+    return result
 
 
 def _terminal_ree_enrichment_extent(sim: Any) -> dict[str, Any]:
@@ -508,7 +627,16 @@ def _terminal_rump_by_class_kg(
         _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
         return values
 
-    for species, kg in rump_kg_by_species.items():
+    values = _terminal_rump_classes_from_species(rump_kg_by_species)
+    _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
+    return values
+
+
+def _terminal_rump_classes_from_species(
+    species_kg: Mapping[str, float],
+) -> dict[str, float]:
+    classes = {key: 0.0 for key in TERMINAL_RUMP_REPORT_CLASSES}
+    for species, kg in species_kg.items():
         if species in TERMINAL_RUMP_REFRACTORY_OXIDES:
             key = 'refractory_oxides'
         elif species in TERMINAL_RUMP_SILICATE_RESIDUAL:
@@ -517,9 +645,8 @@ def _terminal_rump_by_class_kg(
             key = 'unextracted_metals'
         else:
             key = 'other'
-        values[key] += float(kg)
-    _raise_if_rump_class_total_mismatches_total(values, rump_kg_by_species)
-    return values
+        classes[key] += float(kg)
+    return classes
 
 
 def _raise_if_rump_class_total_mismatches_total(
@@ -596,7 +723,7 @@ def _oxygen_partition_kg(sim: Any) -> dict[str, float]:
             values = {}
             for key, value in partition.items():
                 amount = float(value)
-                if amount > 0.0:
+                if amount >= 0.0:
                     values[str(key)] = amount
             if 'total' in values:
                 return values
@@ -611,4 +738,4 @@ def _oxygen_partition_kg(sim: Any) -> dict[str, float]:
         'vented': vented,
         'total': total,
     }
-    return {key: value for key, value in values.items() if value > 0.0}
+    return values

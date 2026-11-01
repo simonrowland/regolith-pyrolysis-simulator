@@ -694,7 +694,7 @@ species:
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
-      observation_id: ichise_1982_table4_partial_molar_1823K
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_0
       experiment: fe-mo-low-mo-in-situ
       type: activity_coefficient
       locator:
@@ -702,210 +702,1042 @@ species:
         published_page: 557
         pdf_page_index: 6
         note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
-      standard_state: Fe(l)=Fe (in alloy), Raoultian liquid Fe; Mo(s)=Mo (in alloy), Raoultian solid Mo
-      units: a and gamma dimensionless; G in kJ/g-atom as printed
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
       values:
-        quantity: activity_and_partial_molar_gibbs
-        a_Fe_method_class: measured
-        a_Mo_method_class: model_derived
-        method_class: model_derived
-        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear
-          sigma assumption). a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table
-          4 footnote.
         T_K: 1823.0
         composition_basis: x_Mo atomic fraction
         conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
           cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 1.0
+        phase_as_published: Fe liquid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_001
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.0'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_1
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.887
+        phase_as_published: Fe liquid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_002
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.1'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_2
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.774
+        phase_as_published: Fe liquid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_003
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.2'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      uncertainty:
+        as_printed:
+          pm: 0.008
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_3
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.685
+        phase_as_published: Fe liquid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_004
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.3'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_35
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.645
+        phase_as_published: Fe liquid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_005
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.35'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      uncertainty:
+        as_printed:
+          pm: 0.009
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_484
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: model_derived
+        source_field: a_Fe
+        activity: 0.645
+        phase_as_published: σ
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+        derivation:
+          relation: Linear a_Fe assumption in the sigma-phase interval (Eq. 14).
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Linear change in a_Fe was assumed for the sigma phase.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: '14'
+              table: '4'
+      point_conditions:
+        composition: &table4_006
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.484'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_5
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: model_derived
+        source_field: a_Fe
+        activity: 0.624
+        phase_as_published: σ
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+        derivation:
+          relation: Linear a_Fe assumption in the sigma-phase interval (Eq. 14).
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Linear change in a_Fe was assumed for the sigma phase.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: '14'
+              table: '4'
+      point_conditions:
+        composition: &table4_007
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.5'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_554
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: model_derived
+        source_field: a_Fe
+        activity: 0.551
+        phase_as_published: σ
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+        derivation:
+          relation: Linear a_Fe assumption in the sigma-phase interval (Eq. 14).
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Linear change in a_Fe was assumed for the sigma phase.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: '14'
+              table: '4'
+      point_conditions:
+        composition: &table4_008
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.554'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_81
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.551
+        phase_as_published: Mo solid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_009
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.81'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+      uncertainty:
+        as_printed:
+          pm: 0.008
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_0_9
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.403
+        phase_as_published: Mo solid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_010
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '0.9'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_activity_Fe_x_Mo_1_0
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: measured
+        source_field: a_Fe
+        activity: 0.0
+        phase_as_published: Mo solid solution
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear sigma assumption).
+          a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table 4 footnote.
+      point_conditions:
+        composition: &table4_011
+          state:
+            tag: value
+            value:
+              basis: printed_x_Mo_axis
+              amount_basis: mole_fraction
+              components:
+              - - Mo
+                - '1.0'
+          locator:
+            table: '4'
+            published_page: 557
+            pdf_page_index: 6
+            note: Printed x_Mo axis; no complementary Fe fraction invented.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_gammaFe_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian gamma_Fe; pure liquid Fe
+      units: dimensionless gamma_Fe; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity_coefficient
+        method_class: model_derived
+        source_field: gamma_Fe
+        model_or_data_source: Fe activity coefficients are reported with the Table 4 Fe activity curve; the liquid relation
+          is Eq. (11).
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Fe activity coefficients are reported with the Table 4 Fe activity curve; the liquid relation is
+            Eq. (11).
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Fe activity coefficients are reported with the Table 4 Fe activity curve; the liquid relation is
+                Eq. (11).
+            locator:
+              page: 5
+              published_page: 555
+              pdf_page_index: 4
+              equation: '11'
+              table: '4'
         rows:
         - x_Mo: 0.0
-          phase: Fe liquid solution
-          a_Fe: 1.0
-          gamma_Fe: 1.0
-          G_M_Fe_kJ_g_atom: 0.0
-          G_E_Fe_kJ_g_atom: 0.0
-          a_Mo: 0.0
-          gamma_Mo: 1.54
-          G_M_Mo_kJ_g_atom: -∞
-          G_E_Mo_kJ_g_atom: 6.6
-          err:
-            gamma_Mo:
-              plus: 0.26
-              minus: 0.21
-            G_E_Mo_kJ_g_atom:
-              pm: 2.3
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_001
+          activity_coefficient: 1.0
+          source_field: gamma_Fe
         - x_Mo: 0.1
-          phase: Fe liquid solution
-          a_Fe: 0.887
-          gamma_Fe: 0.986
-          G_M_Fe_kJ_g_atom: -1.82
-          G_E_Fe_kJ_g_atom: -0.22
-          a_Mo: 0.209
-          gamma_Mo: 2.09
-          G_M_Mo_kJ_g_atom: -23.7
-          G_E_Mo_kJ_g_atom: 11.2
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_002
+          activity_coefficient: 0.986
+          source_field: gamma_Fe
         - x_Mo: 0.2
-          phase: Fe liquid solution
-          a_Fe: 0.774
-          gamma_Fe: 0.967
-          G_M_Fe_kJ_g_atom: -3.89
-          G_E_Fe_kJ_g_atom: -0.51
-          a_Mo: 0.472
-          gamma_Mo: 2.36
-          G_M_Mo_kJ_g_atom: -11.37
-          G_E_Mo_kJ_g_atom: 13.02
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_003
           err:
-            a_Fe:
-              pm: 0.008
             gamma_Fe:
               pm: 0.009
-            G_M_Fe_kJ_g_atom:
-              pm: 0.15
-            G_E_Fe_kJ_g_atom:
-              pm: 0.15
-            a_Mo:
-              pm: 0.012
-            gamma_Mo:
-              pm: 0.06
-            G_M_Mo_kJ_g_atom:
-              plus: 0.4
-              minus: 0.35
-            G_E_Mo_kJ_g_atom:
-              plus: 0.4
-              minus: 0.35
+          activity_coefficient: 0.967
+          source_field: gamma_Fe
         - x_Mo: 0.3
-          phase: Fe liquid solution
-          a_Fe: 0.685
-          gamma_Fe: 0.979
-          G_M_Fe_kJ_g_atom: -5.73
-          G_E_Fe_kJ_g_atom: -0.33
-          a_Mo: 0.689
-          gamma_Mo: 2.296
-          G_M_Mo_kJ_g_atom: -5.65
-          G_E_Mo_kJ_g_atom: 12.59
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_004
+          activity_coefficient: 0.979
+          source_field: gamma_Fe
         - x_Mo: 0.35
-          phase: Fe liquid solution
-          a_Fe: 0.645
-          gamma_Fe: 0.993
-          G_M_Fe_kJ_g_atom: -6.64
-          G_E_Fe_kJ_g_atom: -0.11
-          a_Mo: 0.757
-          gamma_Mo: 2.163
-          G_M_Mo_kJ_g_atom: -4.22
-          G_E_Mo_kJ_g_atom: 11.69
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_005
           err:
-            a_Fe:
-              pm: 0.009
             gamma_Fe:
               pm: 0.013
-            G_M_Fe_kJ_g_atom:
-              plus: 0.2
-              minus: 0.22
-            G_E_Fe_kJ_g_atom:
-              plus: 0.2
-              minus: 0.22
-            a_Mo:
-              plus: 0.016
-              minus: 0.014
-            gamma_Mo:
-              plus: 0.045
-              minus: 0.041
-            G_M_Mo_kJ_g_atom:
-              plus: 0.32
-              minus: 0.28
-            G_E_Mo_kJ_g_atom:
-              plus: 0.32
-              minus: 0.28
+          activity_coefficient: 0.993
+          source_field: gamma_Fe
         - x_Mo: 0.484
-          phase: σ
-          a_Fe: 0.645
-          gamma_Fe: 1.25
-          G_M_Fe_kJ_g_atom: -6.64
-          G_E_Fe_kJ_g_atom: 3.39
-          a_Mo: 0.757
-          gamma_Mo: 1.564
-          G_M_Mo_kJ_g_atom: -4.22
-          G_E_Mo_kJ_g_atom: 6.78
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_006
+          activity_coefficient: 1.25
+          source_field: gamma_Fe
         - x_Mo: 0.5
-          phase: σ
-          a_Fe: 0.624
-          gamma_Fe: 1.247
-          G_M_Fe_kJ_g_atom: -7.16
-          G_E_Fe_kJ_g_atom: 3.35
-          a_Mo: 0.784
-          gamma_Mo: 1.568
-          G_M_Mo_kJ_g_atom: -3.69
-          G_E_Mo_kJ_g_atom: 6.82
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_007
+          activity_coefficient: 1.247
+          source_field: gamma_Fe
         - x_Mo: 0.554
-          phase: σ
-          a_Fe: 0.551
-          gamma_Fe: 1.236
-          G_M_Fe_kJ_g_atom: -9.03
-          G_E_Fe_kJ_g_atom: 3.22
-          a_Mo: 0.875
-          gamma_Mo: 1.579
-          G_M_Mo_kJ_g_atom: -2.02
-          G_E_Mo_kJ_g_atom: 6.93
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_008
+          activity_coefficient: 1.236
+          source_field: gamma_Fe
         - x_Mo: 0.81
-          phase: Mo solid solution
-          a_Fe: 0.551
-          gamma_Fe: 2.9
-          G_M_Fe_kJ_g_atom: -9.03
-          G_E_Fe_kJ_g_atom: 16.13
-          a_Mo: 0.875
-          gamma_Mo: 1.08
-          G_M_Mo_kJ_g_atom: -2.02
-          G_E_Mo_kJ_g_atom: 1.17
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_009
           err:
-            a_Fe:
-              pm: 0.008
             gamma_Fe:
               pm: 0.05
-            G_M_Fe_kJ_g_atom:
-              plus: 0.17
-              minus: 0.27
-            G_E_Fe_kJ_g_atom:
-              plus: 0.17
-              minus: 0.27
-            a_Mo:
-              plus: 0.017
-              minus: 0.014
-            gamma_Mo:
-              plus: 0.021
-              minus: 0.018
-            G_M_Mo_kJ_g_atom:
-              plus: 0.29
-              minus: 0.25
-            G_E_Mo_kJ_g_atom:
-              plus: 0.29
-              minus: 0.25
+          activity_coefficient: 2.9
+          source_field: gamma_Fe
         - x_Mo: 0.9
-          phase: Mo solid solution
-          a_Fe: 0.403
-          gamma_Fe: 4.03
-          G_M_Fe_kJ_g_atom: -13.8
-          G_E_Fe_kJ_g_atom: 21.1
-          a_Mo: 0.919
-          gamma_Mo: 1.022
-          G_M_Mo_kJ_g_atom: -1.27
-          G_E_Mo_kJ_g_atom: 0.32
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_010
+          activity_coefficient: 4.03
+          source_field: gamma_Fe
         - x_Mo: 1.0
-          phase: Mo solid solution
-          a_Fe: 0.0
-          gamma_Fe: 6.0
-          G_M_Fe_kJ_g_atom: -∞
-          G_E_Fe_kJ_g_atom: 27.3
-          a_Mo: 1.0
-          gamma_Mo: 1.0
-          G_M_Mo_kJ_g_atom: 0.0
-          G_E_Mo_kJ_g_atom: 0.0
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_011
           err:
             gamma_Fe:
               pm: 1.1
+          activity_coefficient: 6.0
+          source_field: gamma_Fe
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_GmixFe_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: gibbs_table
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian partial molar Gibbs energy of Fe; pure liquid Fe
+      units: kJ/g-atom as printed; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: partial_molar_gibbs_energy_of_mixing_Fe_as_printed
+        method_class: model_derived
+        source_field: G_M_Fe_kJ_g_atom
+        model_or_data_source: Table 4 partial molar thermodynamic values are reported with the activity curves; their
+          confidence limits are calculated from activity limits.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+            limits are calculated from activity limits.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+                limits are calculated from activity limits.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: 11-20
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          G_M_Fe_kJ_g_atom: 0.0
+          point_conditions:
+            composition: *table4_001
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          G_M_Fe_kJ_g_atom: -1.82
+          point_conditions:
+            composition: *table4_002
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          G_M_Fe_kJ_g_atom: -3.89
+          point_conditions:
+            composition: *table4_003
+          err:
+            G_M_Fe_kJ_g_atom:
+              pm: 0.15
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          G_M_Fe_kJ_g_atom: -5.73
+          point_conditions:
+            composition: *table4_004
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          G_M_Fe_kJ_g_atom: -6.64
+          point_conditions:
+            composition: *table4_005
+          err:
+            G_M_Fe_kJ_g_atom:
+              plus: 0.2
+              minus: 0.22
+        - x_Mo: 0.484
+          phase_as_published: σ
+          G_M_Fe_kJ_g_atom: -6.64
+          point_conditions:
+            composition: *table4_006
+        - x_Mo: 0.5
+          phase_as_published: σ
+          G_M_Fe_kJ_g_atom: -7.16
+          point_conditions:
+            composition: *table4_007
+        - x_Mo: 0.554
+          phase_as_published: σ
+          G_M_Fe_kJ_g_atom: -9.03
+          point_conditions:
+            composition: *table4_008
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          G_M_Fe_kJ_g_atom: -9.03
+          point_conditions:
+            composition: *table4_009
+          err:
+            G_M_Fe_kJ_g_atom:
+              plus: 0.17
+              minus: 0.27
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          G_M_Fe_kJ_g_atom: -13.8
+          point_conditions:
+            composition: *table4_010
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          G_M_Fe_kJ_g_atom: -∞
+          point_conditions:
+            composition: *table4_011
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_GexFe_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: gibbs_table
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian excess partial molar Gibbs energy of Fe; pure liquid Fe
+      units: kJ/g-atom as printed; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: excess_partial_molar_gibbs_energy_Fe_as_printed
+        method_class: model_derived
+        source_field: G_E_Fe_kJ_g_atom
+        model_or_data_source: Table 4 partial molar thermodynamic values are reported with the activity curves; their
+          confidence limits are calculated from activity limits.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+            limits are calculated from activity limits.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+                limits are calculated from activity limits.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: 11-20
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          G_E_Fe_kJ_g_atom: 0.0
+          point_conditions:
+            composition: *table4_001
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          G_E_Fe_kJ_g_atom: -0.22
+          point_conditions:
+            composition: *table4_002
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          G_E_Fe_kJ_g_atom: -0.51
+          point_conditions:
+            composition: *table4_003
+          err:
+            G_E_Fe_kJ_g_atom:
+              pm: 0.15
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          G_E_Fe_kJ_g_atom: -0.33
+          point_conditions:
+            composition: *table4_004
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          G_E_Fe_kJ_g_atom: -0.11
+          point_conditions:
+            composition: *table4_005
+          err:
+            G_E_Fe_kJ_g_atom:
+              plus: 0.2
+              minus: 0.22
+        - x_Mo: 0.484
+          phase_as_published: σ
+          G_E_Fe_kJ_g_atom: 3.39
+          point_conditions:
+            composition: *table4_006
+        - x_Mo: 0.5
+          phase_as_published: σ
+          G_E_Fe_kJ_g_atom: 3.35
+          point_conditions:
+            composition: *table4_007
+        - x_Mo: 0.554
+          phase_as_published: σ
+          G_E_Fe_kJ_g_atom: 3.22
+          point_conditions:
+            composition: *table4_008
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          G_E_Fe_kJ_g_atom: 16.13
+          point_conditions:
+            composition: *table4_009
+          err:
+            G_E_Fe_kJ_g_atom:
+              plus: 0.17
+              minus: 0.27
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          G_E_Fe_kJ_g_atom: 21.1
+          point_conditions:
+            composition: *table4_010
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          G_E_Fe_kJ_g_atom: 27.3
+          point_conditions:
+            composition: *table4_011
+          err:
             G_E_Fe_kJ_g_atom:
               pm: 2.7
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
       uncertainty:
-        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is
-          +0.26/-0.21; conclusion p.558 prints +0.32/-0.26. Both retained.
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
     - T_range_K:
       - 1665.0
       - 1873.0
@@ -1149,6 +1981,637 @@ species:
         note: figure-only; C.V.=0.032 is tabulated in the body
   Mo:
     observations:
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_aMo_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian a_Mo; pure solid Mo
+      units: dimensionless a_Mo; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity
+        method_class: model_derived
+        source_field: a_Mo
+        model_or_data_source: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem
+          equation.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem equation.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem equation.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: 16-20
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_001
+          activity: 0.0
+          source_field: a_Mo
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_002
+          activity: 0.209
+          source_field: a_Mo
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_003
+          err:
+            a_Mo:
+              pm: 0.012
+          activity: 0.472
+          source_field: a_Mo
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_004
+          activity: 0.689
+          source_field: a_Mo
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_005
+          err:
+            a_Mo:
+              plus: 0.016
+              minus: 0.014
+          activity: 0.757
+          source_field: a_Mo
+        - x_Mo: 0.484
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_006
+          activity: 0.757
+          source_field: a_Mo
+        - x_Mo: 0.5
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_007
+          activity: 0.784
+          source_field: a_Mo
+        - x_Mo: 0.554
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_008
+          activity: 0.875
+          source_field: a_Mo
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_009
+          err:
+            a_Mo:
+              plus: 0.017
+              minus: 0.014
+          activity: 0.875
+          source_field: a_Mo
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_010
+          activity: 0.919
+          source_field: a_Mo
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_011
+          activity: 1.0
+          source_field: a_Mo
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_gammaMo_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian gamma_Mo; pure solid Mo
+      units: dimensionless gamma_Mo; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: activity_coefficient
+        method_class: model_derived
+        source_field: gamma_Mo
+        model_or_data_source: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem
+          equation.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem equation.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Values for a_Mo and gamma_Mo were calculated from Eqs. (11) to (15) by the Gibbs-Duhem equation.
+            locator:
+              page: 6
+              published_page: 556
+              pdf_page_index: 5
+              equation: 16-20
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_001
+          err:
+            gamma_Mo:
+              plus: 0.26
+              minus: 0.21
+          activity_coefficient: 1.54
+          source_field: gamma_Mo
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_002
+          activity_coefficient: 2.09
+          source_field: gamma_Mo
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_003
+          err:
+            gamma_Mo:
+              pm: 0.06
+          activity_coefficient: 2.36
+          source_field: gamma_Mo
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_004
+          activity_coefficient: 2.296
+          source_field: gamma_Mo
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          point_conditions:
+            composition: *table4_005
+          err:
+            gamma_Mo:
+              plus: 0.045
+              minus: 0.041
+          activity_coefficient: 2.163
+          source_field: gamma_Mo
+        - x_Mo: 0.484
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_006
+          activity_coefficient: 1.564
+          source_field: gamma_Mo
+        - x_Mo: 0.5
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_007
+          activity_coefficient: 1.568
+          source_field: gamma_Mo
+        - x_Mo: 0.554
+          phase_as_published: σ
+          point_conditions:
+            composition: *table4_008
+          activity_coefficient: 1.579
+          source_field: gamma_Mo
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_009
+          err:
+            gamma_Mo:
+              plus: 0.021
+              minus: 0.018
+          activity_coefficient: 1.08
+          source_field: gamma_Mo
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_010
+          activity_coefficient: 1.022
+          source_field: gamma_Mo
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          point_conditions:
+            composition: *table4_011
+          activity_coefficient: 1.0
+          source_field: gamma_Mo
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_GmixMo_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: gibbs_table
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian partial molar Gibbs energy of Mo; pure solid Mo
+      units: kJ/g-atom as printed; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: partial_molar_gibbs_energy_of_mixing_Mo_as_printed
+        method_class: model_derived
+        source_field: G_M_Mo_kJ_g_atom
+        model_or_data_source: Table 4 partial molar thermodynamic values are reported with the activity curves; their
+          confidence limits are calculated from activity limits.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+            limits are calculated from activity limits.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+                limits are calculated from activity limits.
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: 16-25
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          G_M_Mo_kJ_g_atom: -∞
+          point_conditions:
+            composition: *table4_001
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          G_M_Mo_kJ_g_atom: -23.7
+          point_conditions:
+            composition: *table4_002
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          G_M_Mo_kJ_g_atom: -11.37
+          point_conditions:
+            composition: *table4_003
+          err:
+            G_M_Mo_kJ_g_atom:
+              plus: 0.4
+              minus: 0.35
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          G_M_Mo_kJ_g_atom: -5.65
+          point_conditions:
+            composition: *table4_004
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          G_M_Mo_kJ_g_atom: -4.22
+          point_conditions:
+            composition: *table4_005
+          err:
+            G_M_Mo_kJ_g_atom:
+              plus: 0.32
+              minus: 0.28
+        - x_Mo: 0.484
+          phase_as_published: σ
+          G_M_Mo_kJ_g_atom: -4.22
+          point_conditions:
+            composition: *table4_006
+        - x_Mo: 0.5
+          phase_as_published: σ
+          G_M_Mo_kJ_g_atom: -3.69
+          point_conditions:
+            composition: *table4_007
+        - x_Mo: 0.554
+          phase_as_published: σ
+          G_M_Mo_kJ_g_atom: -2.02
+          point_conditions:
+            composition: *table4_008
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          G_M_Mo_kJ_g_atom: -2.02
+          point_conditions:
+            composition: *table4_009
+          err:
+            G_M_Mo_kJ_g_atom:
+              plus: 0.29
+              minus: 0.25
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          G_M_Mo_kJ_g_atom: -1.27
+          point_conditions:
+            composition: *table4_010
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          G_M_Mo_kJ_g_atom: 0.0
+          point_conditions:
+            composition: *table4_011
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_GexMo_1823K
+      experiment: fe-mo-low-mo-in-situ
+      type: gibbs_table
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Raoultian excess partial molar Gibbs energy of Mo; pure solid Mo
+      units: kJ/g-atom as printed; x_Mo atomic fraction
+      values:
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        table_method_class_as_published: model_derived
+        quantity: excess_partial_molar_gibbs_energy_Mo_as_printed
+        method_class: model_derived
+        source_field: G_E_Mo_kJ_g_atom
+        model_or_data_source: Table 4 partial molar thermodynamic values are reported with the activity curves; their
+          confidence limits are calculated from activity limits.
+        derived_from:
+        - ichise_1982_table4_activity_Fe_x_Mo_0_0
+        - ichise_1982_table4_activity_Fe_x_Mo_0_1
+        - ichise_1982_table4_activity_Fe_x_Mo_0_2
+        - ichise_1982_table4_activity_Fe_x_Mo_0_3
+        - ichise_1982_table4_activity_Fe_x_Mo_0_35
+        - ichise_1982_table4_activity_Fe_x_Mo_0_484
+        - ichise_1982_table4_activity_Fe_x_Mo_0_5
+        - ichise_1982_table4_activity_Fe_x_Mo_0_554
+        - ichise_1982_table4_activity_Fe_x_Mo_0_81
+        - ichise_1982_table4_activity_Fe_x_Mo_0_9
+        - ichise_1982_table4_activity_Fe_x_Mo_1_0
+        derivation:
+          relation: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+            limits are calculated from activity limits.
+          inputs:
+          - ichise_1982_table4_activity_Fe_x_Mo_0_0
+          - ichise_1982_table4_activity_Fe_x_Mo_0_1
+          - ichise_1982_table4_activity_Fe_x_Mo_0_2
+          - ichise_1982_table4_activity_Fe_x_Mo_0_3
+          - ichise_1982_table4_activity_Fe_x_Mo_0_35
+          - ichise_1982_table4_activity_Fe_x_Mo_0_484
+          - ichise_1982_table4_activity_Fe_x_Mo_0_5
+          - ichise_1982_table4_activity_Fe_x_Mo_0_554
+          - ichise_1982_table4_activity_Fe_x_Mo_0_81
+          - ichise_1982_table4_activity_Fe_x_Mo_0_9
+          - ichise_1982_table4_activity_Fe_x_Mo_1_0
+          output_unit: as_published
+          method:
+            state:
+              tag: value
+              value: Table 4 partial molar thermodynamic values are reported with the activity curves; their confidence
+                limits are calculated from activity limits.
+            locator:
+              page: 7
+              published_page: 557
+              pdf_page_index: 6
+              equation: 16-25
+              table: '4'
+        rows:
+        - x_Mo: 0.0
+          phase_as_published: Fe liquid solution
+          G_E_Mo_kJ_g_atom: 6.6
+          point_conditions:
+            composition: *table4_001
+          err:
+            G_E_Mo_kJ_g_atom:
+              pm: 2.3
+        - x_Mo: 0.1
+          phase_as_published: Fe liquid solution
+          G_E_Mo_kJ_g_atom: 11.2
+          point_conditions:
+            composition: *table4_002
+        - x_Mo: 0.2
+          phase_as_published: Fe liquid solution
+          G_E_Mo_kJ_g_atom: 13.02
+          point_conditions:
+            composition: *table4_003
+          err:
+            G_E_Mo_kJ_g_atom:
+              plus: 0.4
+              minus: 0.35
+        - x_Mo: 0.3
+          phase_as_published: Fe liquid solution
+          G_E_Mo_kJ_g_atom: 12.59
+          point_conditions:
+            composition: *table4_004
+        - x_Mo: 0.35
+          phase_as_published: Fe liquid solution
+          G_E_Mo_kJ_g_atom: 11.69
+          point_conditions:
+            composition: *table4_005
+          err:
+            G_E_Mo_kJ_g_atom:
+              plus: 0.32
+              minus: 0.28
+        - x_Mo: 0.484
+          phase_as_published: σ
+          G_E_Mo_kJ_g_atom: 6.78
+          point_conditions:
+            composition: *table4_006
+        - x_Mo: 0.5
+          phase_as_published: σ
+          G_E_Mo_kJ_g_atom: 6.82
+          point_conditions:
+            composition: *table4_007
+        - x_Mo: 0.554
+          phase_as_published: σ
+          G_E_Mo_kJ_g_atom: 6.93
+          point_conditions:
+            composition: *table4_008
+        - x_Mo: 0.81
+          phase_as_published: Mo solid solution
+          G_E_Mo_kJ_g_atom: 1.17
+          point_conditions:
+            composition: *table4_009
+          err:
+            G_E_Mo_kJ_g_atom:
+              plus: 0.29
+              minus: 0.25
+        - x_Mo: 0.9
+          phase_as_published: Mo solid solution
+          G_E_Mo_kJ_g_atom: 0.32
+          point_conditions:
+            composition: *table4_010
+        - x_Mo: 1.0
+          phase_as_published: Mo solid solution
+          G_E_Mo_kJ_g_atom: 0.0
+          point_conditions:
+            composition: *table4_011
+      derived_from:
+      - ichise_1982_table4_activity_Fe_x_Mo_0_0
+      - ichise_1982_table4_activity_Fe_x_Mo_0_1
+      - ichise_1982_table4_activity_Fe_x_Mo_0_2
+      - ichise_1982_table4_activity_Fe_x_Mo_0_3
+      - ichise_1982_table4_activity_Fe_x_Mo_0_35
+      - ichise_1982_table4_activity_Fe_x_Mo_0_484
+      - ichise_1982_table4_activity_Fe_x_Mo_0_5
+      - ichise_1982_table4_activity_Fe_x_Mo_0_554
+      - ichise_1982_table4_activity_Fe_x_Mo_0_81
+      - ichise_1982_table4_activity_Fe_x_Mo_0_9
+      - ichise_1982_table4_activity_Fe_x_Mo_1_0
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21;
+          conclusion p.558 prints +0.32/-0.26. Both retained.
     - T_range_K:
       - 1823.0
       - 1823.0

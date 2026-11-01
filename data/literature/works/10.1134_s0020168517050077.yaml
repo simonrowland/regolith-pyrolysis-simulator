@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: e78a054f8155aa22b20063b4b008343f30445072
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
     files:
     - asset_id: pdf:gribchenkova-2017-al2o3-mgo
       role: pdf
@@ -35,7 +35,8 @@ experiments:
   kind: literature
   method:
     tag: unknown
-    reason: source does not state method
+    reason: regime 'Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
+      sensitivity constant.' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:

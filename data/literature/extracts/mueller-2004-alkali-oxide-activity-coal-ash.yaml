@@ -1,0 +1,294 @@
+schema_version: literature_extract.v1
+source_id: mueller-2004-alkali-oxide-activity-coal-ash
+source:
+  citation: >-
+    Mueller, M., Willenborg, W., Hilpert, K. & Singheiser, L. (2004),
+    "Structural dependence of alkali oxide activity in coal ash slags",
+    VII International Conference on Molten Slags, Fluxes and Salts, pp. 615–618.
+  year: 2004
+  doi: null
+  url: https://www.pyrometallurgy.co.za/MoltenSlags2004/615-Mueller.pdf
+extraction:
+  method: >-
+    Tables I–II transcribed from the MinerU table draft and checked against
+    pdftotext-layout and a 200 dpi render of PDF page 2. Four text-stated
+    pressure anchors are transcribed from the exact text layer and checked
+    against the 200 dpi render of PDF page 2. Figure-only series were not
+    digitized.
+  date: '2026-10-27'
+  worker: w1027na3-muel04
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[mueller_2004_na_pressure_untreated_1400c].values.points[0].p_Pa
+    value: 0.6
+    locator: {page: 2, published_page: 616, section: Results and discussion}
+  - path: species.Na.observations[mueller_2004_na_pressure_tio2_1400c].values.points[0].p_Pa
+    value: 0.42
+    locator: {page: 2, published_page: 616, section: Results and discussion}
+  - path: species.K.observations[mueller_2004_k_pressure_untreated_1400c].values.points[0].p_Pa
+    value: 0.59
+    locator: {page: 2, published_page: 616, section: Results and discussion}
+  - path: species.K.observations[mueller_2004_k_pressure_tio2_1400c].values.points[0].p_Pa
+    value: 0.375
+    locator: {page: 2, published_page: 616, section: Results and discussion}
+benches:
+  - id: mueller-2004-kems
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: Knudsen effusion mass spectrometry}
+      locator: {page: 1, published_page: 615, section: Experimental}
+    calibration:
+      state: {tag: value, value: Calibration constant determined by partial-pressure measurement with pure silver as reference}
+      locator:
+        page: 1
+        published_page: 615
+        paragraph: >-
+          The calibration constant c of the system was determined by a partial
+          pressure measurement with pure silver as reference.
+experiments:
+  - experiment_id: mueller-2004-boiler-slag-kems
+    bench_id: mueller-2004-kems
+    method: knudsen_effusion
+    locator: {page: 2, published_page: 616, table: 'I'}
+    material: boiler coal-ash slag
+    composition_as_printed:
+      basis: mass percent
+      values: {SiO2: 36.2, Al2O3: 27.0, Fe2O3: 14.4, CaO: 9.1, MgO: 2.5, Na2O: 2.1, K2O: 1.2, P2O5: 0.4, CO2: 0.154, SO3: 0.082}
+  - experiment_id: mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+    bench_id: mueller-2004-kems
+    method: knudsen_effusion
+    locator: {page: 2, published_page: 616, section: Results and discussion}
+    material: boiler coal-ash slag with 5 mass per cent TiO2 additive
+species:
+  Slag:
+    observations: []
+    context:
+      - observation_id: mueller_2004_table_i_boiler_slag_composition
+        type: composition
+        locator: {page: 2, published_page: 616, table: 'I'}
+        units: mass percent
+        values:
+          quantity: starting_material_composition
+          method_class: method_only
+          material: boiler slag
+          components_as_printed: {SiO2: 36.2, Al2O3: 27.0, Fe2O3: 14.4, CaO: 9.1, MgO: 2.5, Na2O: 2.1, K2O: 1.2, P2O5: 0.4, CO2: 0.154, SO3: 0.082}
+      - observation_id: mueller_2004_table_ii_model_slag_composition_and_structure
+        type: composition
+        locator: {page: 2, published_page: 616, table: 'II'}
+        units: mass percent for composition; dimensionless as printed for structural ratios
+        values:
+          quantity: composition_and_structural_parameters_without_closed_structure_quantity
+          method_class: method_only
+          admission_status: typed_refused_for_structural_parameters
+          schema_gap: no closed scored quantity token for base/acid or NBO/T
+          structural_parameter_definition:
+            base_acid: '(Na2O + K2O + FeO + MgO + CaO) / (SiO2 + TiO2 + Fe2O3 + Al2O3)'
+            NBO_T: '(Na2O + K2O + FeO + MgO + CaO - (Fe2O3 + Al2O3)) / (SiO2 + TiO2 + 2*(Fe2O3 + Al2O3))'
+          rows:
+            - sample: M1
+              composition_as_printed: {SiO2: 51.76, Al2O3: 28.20, CaO: 15.29, Na2O: 4.74}
+              base_acid_as_printed: 0.307
+              NBO_T_as_printed: 0.051
+            - sample: M2
+              composition_as_printed: {SiO2: 55.91, Al2O3: 19.64, CaO: 19.99, Na2O: 4.46}
+              base_acid_as_printed: 0.381
+              NBO_T_as_printed: 0.179
+            - sample: M3
+              composition_as_printed: {SiO2: 56.22, Al2O3: 24.00, CaO: 15.04, Na2O: 4.75}
+              base_acid_as_printed: 0.294
+              NBO_T_as_printed: 0.078
+            - sample: M4
+              composition_as_printed: {SiO2: 56.02, Al2O3: 29.46, CaO: 9.88, Na2O: 4.63}
+              base_acid_as_printed: 0.205
+              NBO_T_as_printed: -0.025
+            - sample: Boiler slag red.
+              composition_as_printed: not_printed
+              base_acid_as_printed: 0.543
+              NBO_T_as_printed: 0.182
+            - sample: Boiler slag ox.
+              composition_as_printed: not_printed
+              base_acid_as_printed: 0.283
+              NBO_T_as_printed: -0.064
+  Na:
+    observations:
+      - observation_id: mueller_2004_na_pressure_untreated_1400c
+        type: partial_pressure
+        experiment: mueller-2004-boiler-slag-kems
+        locator: {page: 2, published_page: 616, section: Results and discussion}
+        phase: gas
+        regime: kems_effusion
+        units: Pa
+        derivation:
+          relation: >-
+            Species partial pressures were calculated from detector signals
+            using the printed relation p_i = c I_i T/(A_i sigma_i); c was
+            calibrated by a partial-pressure measurement with pure silver.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, published_page: 615, section: Experimental}
+        values:
+          quantity: partial_pressure
+          gas_species: Na
+          method_class: measured_reduced
+          admission_status: admitted
+          composition_wt_pct: {SiO2: 36.2, Al2O3: 27.0, Fe2O3: 14.4, CaO: 9.1, MgO: 2.5, Na2O: 2.1, K2O: 1.2, P2O5: 0.4, CO2: 0.154, SO3: 0.082}
+          points:
+            - T_C: 1400
+              p_Pa: 0.6
+              point_conditions:
+                temperature:
+                  state: {tag: value, value: 1400}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
+                  locator: {page: 1, published_page: 615, section: Experimental}
+                composition:
+                  state: {tag: value, value: boiler slag; Table I composition}
+                  locator: {page: 2, published_page: 616, table: 'I'}
+      - observation_id: mueller_2004_na_pressure_tio2_1400c
+        type: partial_pressure
+        experiment: mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+        locator: {page: 2, published_page: 616, section: Results and discussion}
+        phase: gas
+        regime: kems_effusion
+        units: Pa
+        derivation:
+          relation: >-
+            Species partial pressures were calculated from detector signals
+            using the printed relation p_i = c I_i T/(A_i sigma_i); c was
+            calibrated by a partial-pressure measurement with pure silver.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, published_page: 615, section: Experimental}
+        values:
+          quantity: partial_pressure
+          gas_species: Na
+          method_class: measured_reduced
+          admission_status: admitted
+          treatment_as_printed: boiler slag with 5 mass per cent TiO2
+          points:
+            - T_C: 1400
+              p_Pa: 0.42
+              point_conditions:
+                temperature:
+                  state: {tag: value, value: 1400}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
+                  locator: {page: 1, published_page: 615, section: Experimental}
+                composition:
+                  state: {tag: value, value: boiler slag with 5 mass per cent TiO2}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+  K:
+    observations:
+      - observation_id: mueller_2004_k_pressure_untreated_1400c
+        type: partial_pressure
+        experiment: mueller-2004-boiler-slag-kems
+        locator: {page: 2, published_page: 616, section: Results and discussion}
+        phase: gas
+        regime: kems_effusion
+        units: Pa
+        derivation:
+          relation: >-
+            Species partial pressures were calculated from detector signals
+            using the printed relation p_i = c I_i T/(A_i sigma_i); c was
+            calibrated by a partial-pressure measurement with pure silver.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, published_page: 615, section: Experimental}
+        values:
+          quantity: partial_pressure
+          gas_species: K
+          method_class: measured_reduced
+          admission_status: admitted
+          composition_wt_pct: {SiO2: 36.2, Al2O3: 27.0, Fe2O3: 14.4, CaO: 9.1, MgO: 2.5, Na2O: 2.1, K2O: 1.2, P2O5: 0.4, CO2: 0.154, SO3: 0.082}
+          points:
+            - T_C: 1400
+              p_Pa: 0.59
+              point_conditions:
+                temperature:
+                  state: {tag: value, value: 1400}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
+                  locator: {page: 1, published_page: 615, section: Experimental}
+                composition:
+                  state: {tag: value, value: boiler slag; Table I composition}
+                  locator: {page: 2, published_page: 616, table: 'I'}
+      - observation_id: mueller_2004_k_pressure_tio2_1400c
+        type: partial_pressure
+        experiment: mueller-2004-boiler-slag-plus-5-mass-percent-tio2
+        locator: {page: 2, published_page: 616, section: Results and discussion}
+        phase: gas
+        regime: kems_effusion
+        units: Pa
+        derivation:
+          relation: >-
+            Species partial pressures were calculated from detector signals
+            using the printed relation p_i = c I_i T/(A_i sigma_i); c was
+            calibrated by a partial-pressure measurement with pure silver.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 1, published_page: 615, section: Experimental}
+        values:
+          quantity: partial_pressure
+          gas_species: K
+          method_class: measured_reduced
+          admission_status: admitted
+          treatment_as_printed: boiler slag with 5 mass per cent TiO2
+          points:
+            - T_C: 1400
+              p_Pa: 0.375
+              point_conditions:
+                temperature:
+                  state: {tag: value, value: 1400}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: 'The source states only an experimental setup bound: <10^-3 Pa.'
+                  locator: {page: 1, published_page: 615, section: Experimental}
+                composition:
+                  state: {tag: value, value: boiler slag with 5 mass per cent TiO2}
+                  locator: {page: 2, published_page: 616, section: Results and discussion}
+source_caveats:
+  - locator: {page: 1, published_page: 615, section: Experimental}
+    quote: 'The whole experimental set-up is kept under vacuum conditions (< 10^-3 Pa).'
+    note: >-
+      This printed setup pressure is an upper bound. It is retained as a located
+      unknown condition; the limit is not substituted as an exact total pressure.
+  - locator: {page: 2, published_page: 616, table: 'I'}
+    note: >-
+      The printed composition includes CO2, for which the migrator has no
+      composition component token. The complete ten-component map is retained
+      verbatim in context; the partial-pressure observations' composition axis
+      remains unknown rather than dropping the printed component. The additive
+      series states 5 mass per cent TiO2 but prints no complete final mixture
+      composition, so its composition axis also remains unknown.
+  - locator: {page: 1, published_page: 615, equation: '3'}
+    quote: 'Therefore, the alkali oxide activity was calculated according to Equation [3].'
+    note: >-
+      This extract has no numeric Na2O activity rows; the activity curves in
+      Figures 2, 3 and 5 are figure-only. The reference equation prints
+      Na2O(1, s), with the digit 1. Reading this as liquid/solid is an
+      interpretation; the paper does not resolve that notation. Kp is taken
+      externally from FACT. The printed pO2 = p_Na/4 relation is an activity
+      assumption, not a measured fO2.
+  - locator: {page: 2, published_page: 616, table: 'II'}
+    quote: 'NBO/T according to Equation [5]'
+    note: >-
+      Table II's structural values are derived using the printed expression
+      NBO/T = [Na2O + K2O + FeO + MgO + CaO − (Fe2O3 + Al2O3)] /
+      [SiO2 + TiO2 + 2*(Fe2O3 + Al2O3)]. Its negative values are preserved as
+      printed. No closed scored quantity exists for these structural descriptors;
+      the values are typed-refused rather than normalized or repaired.
+figure_read_candidates:
+  - {figure: '2', page: 3, quantity: Na2O activity over boiler slag series}
+  - {figure: '3', page: 3, quantity: Na partial pressure over boiler slag series}
+  - {figure: '5', page: 4, quantity: Na2O activity over model slags}

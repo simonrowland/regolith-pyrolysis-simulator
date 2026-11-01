@@ -17,7 +17,11 @@ from simulator.condensation import (
 from simulator.core import PyrolysisSimulator
 from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
-from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
+from simulator.lab_geometry import (
+    LabGeometryError,
+    parse_lab_geometry,
+    require_lab_pipe_length,
+)
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
@@ -427,6 +431,15 @@ def test_lab_surface_equivalent_diameter_poison_pairs_are_named_refusals(
         parse_lab_geometry(raw)
 
     assert excinfo.value.code == "invalid_lab_geometry_pipe_diameter"
+
+
+@pytest.mark.parametrize("length_m", [0.0, -0.01, 1.0e-12])
+def test_lab_pipe_length_poison_pairs_are_named_refusals(length_m: float) -> None:
+    with pytest.raises(LabGeometryError) as excinfo:
+        require_lab_pipe_length(length_m, "pipe_length_m")
+
+    assert excinfo.value.code == "invalid_lab_geometry_pipe_length"
+    assert "pipe_length_m" in str(excinfo.value)
 
 
 def test_zero_lab_surface_area_is_named_refusal() -> None:

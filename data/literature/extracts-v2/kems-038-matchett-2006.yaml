@@ -1639,6 +1639,14 @@ observations:
     source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
   read_from: pdftotext:kems-038-matchett-2006
   point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        page: 27
+        table: '3'
+        source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
     total_pressure_Pa:
       state:
         tag: value
@@ -1785,6 +1793,14 @@ observations:
     source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
   read_from: pdftotext:kems-038-matchett-2006
   point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: temperature value is not numeric
+      locator:
+        page: 27
+        table: '3'
+        source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
     total_pressure_Pa:
       state:
         tag: value

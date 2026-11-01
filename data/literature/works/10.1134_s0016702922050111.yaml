@@ -1,0 +1,171 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0016702922050111
+  citation: Yakovleva, O.I. and Shornikov, S.I. (2022), Effect of Acid-Base Interaction at the Evaporation of Alkaline Components
+    from Chondrule Melts, Geochemistry International 60(5):401-410.
+  source_ids:
+  - yakovleva-2022-alkali-chondrule-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:yakovleva-2022-alkali-chondrule-evaporation
+      role: pdf
+      path: raw/yakovleva-2022-alkali-chondrule-evaporation/yakovleva-2022-alkali-chondrule-evaporation.pdf
+      sha256:
+        tag: value
+        value: 62db512fea4b54ae9f70e141e8aec0a045e8c5e8a558466a7ffee48b015dffaf
+    - asset_id: pdftotext:yakovleva-2022-alkali-chondrule-evaporation
+      role: pdftotext
+      path: text/yakovleva-2022-alkali-chondrule-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:yakovleva-2022-alkali-chondrule-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1134/s0016702922050111
+experiments: []
+context:
+- observation_id: yakovleva_2022_figures_6_8_candidate_notes
+  type: method
+  locator:
+    published_page: 407-408
+    figure: 6-8
+  units: as printed
+  values:
+    quantity: figure_read_candidates_not_digitized
+    figure_6: x K2O/(K2O + Na2O), wt%; y pK/pNa, linear dimensionless; series 1 and 2 are calculated in this paper at 35 and
+      55 wt% SiO2, series 3 is quoted from Yakovlev et al. (1987), Saratov chondrules; 1200°C, no time condition; zero approximate
+      symbols in caption.
+    figure_7: x T, °C; y pK/pNa, linear dimensionless; series 1 and 2 are calculated in this paper at 35 and 55 wt% SiO2 with
+      K2O/Na2O approximately 3/4, series 3 is quoted from Yakovlev et al. (1987), Saratov chondrules; 1100–1400°C, no time
+      condition; one approximate symbol in caption.
+    figure_8: x T, °C; y log p_i, bar; series 1 Na, 2 K, 3 Fe, 4 SiO, 5 Mg are quoted from Yakovlev et al. (1987), as stated
+      in the caption; Saratov chondrule melt (Table 1 composition 5); evaporation, displayed axis 1100–1700°C, no time condition;
+      zero approximate symbols in caption.
+    note: Figure axes and series only; no values read from figures.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_figures_6_8_candidate_notes
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts
+- observation_id: yakovleva_2022_table1_composition_1
+  type: starting_composition
+  locator:
+    published_page: 402
+    table: '1'
+  units: wt%
+  values:
+    quantity: starting_bulk_composition
+    sample_label: Composition 1 (IIAB1)
+    SiO2: '59.9'
+    TiO2: –
+    Al2O3: '4.0'
+    FeO: '5.0'
+    MgO: '21.9'
+    CaO: '2.2'
+    Na2O: '3.5'
+    K2O: '3.5'
+    compilation_source: Richter et al. (2011)
+    table_footnote: Analytical results are rounded and normalized to 100 wt %.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_table1_composition_1
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts
+- observation_id: yakovleva_2022_table1_composition_2
+  type: starting_composition
+  locator:
+    published_page: 402
+    table: '1'
+  units: wt%
+  values:
+    quantity: starting_bulk_composition
+    sample_label: Composition 2 (IIAB2)
+    SiO2: '49.5'
+    TiO2: –
+    Al2O3: '4.4'
+    FeO: '12.5'
+    MgO: '27.9'
+    CaO: '3.4'
+    Na2O: '1.8'
+    K2O: '0.5'
+    compilation_source: Richter et al. (2011)
+    table_footnote: Analytical results are rounded and normalized to 100 wt %.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_table1_composition_2
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts
+- observation_id: yakovleva_2022_table1_composition_3
+  type: starting_composition
+  locator:
+    published_page: 402
+    table: '1'
+  units: wt%
+  values:
+    quantity: starting_bulk_composition
+    sample_label: Composition 3 (granite)
+    SiO2: '76.3'
+    TiO2: –
+    Al2O3: '13.2'
+    FeO: –
+    MgO: '0.5'
+    CaO: '0.7'
+    Na2O: '3.9'
+    K2O: '5.4'
+    compilation_source: Yakovlev et al. (1973), recalculated to 100 wt % without MnO, P2O5, and LOI
+    table_footnote: Analytical results are rounded and normalized to 100 wt %.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_table1_composition_3
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts
+- observation_id: yakovleva_2022_table1_composition_4
+  type: starting_composition
+  locator:
+    published_page: 402
+    table: '1'
+  units: wt%
+  values:
+    quantity: starting_bulk_composition
+    sample_label: Composition 4 (basalt)
+    SiO2: '43.9'
+    TiO2: '6.0'
+    Al2O3: '10.6'
+    FeO: '15.7'
+    MgO: '7.0'
+    CaO: '13.6'
+    Na2O: '1.3'
+    K2O: '1.9'
+    compilation_source: Yakovlev et al. (1973), recalculated to 100 wt % without MnO, P2O5, and LOI
+    table_footnote: Analytical results are rounded and normalized to 100 wt %.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_table1_composition_4
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts
+- observation_id: yakovleva_2022_table1_composition_5
+  type: starting_composition
+  locator:
+    published_page: 402
+    table: '1'
+  units: wt%
+  values:
+    quantity: starting_bulk_composition
+    sample_label: Composition 5 (pyroxene chondrules of the Saratov chondrite)
+    SiO2: '54.4'
+    TiO2: '0.1'
+    Al2O3: '3.2'
+    FeO: '13.2'
+    MgO: '25.1'
+    CaO: '2.2'
+    Na2O: '1.4'
+    K2O: '0.4'
+    compilation_source: Yakovlev et al. (1987), recalculated to 100 wt % without MnO, Cr2O3, P2O5, and NiO
+    table_footnote: Analytical results are rounded and normalized to 100 wt %.
+  context_id: yakovleva-2022-alkali-chondrule-evaporation::context::yakovleva_2022_table1_composition_5
+  work_id: 10.1134/s0016702922050111
+  source_id: yakovleva-2022-alkali-chondrule-evaporation
+  species: alkali-bearing silicate melts

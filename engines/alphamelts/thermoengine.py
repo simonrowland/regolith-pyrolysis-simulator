@@ -29,7 +29,7 @@ from typing import Any, Callable, Mapping, Optional
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.engine_local_config import (
     cache_version_for,
-    setup_thermoengine_dylib_path,
+    _load_thermoengine_phaseobjc_library,
     warn_legacy_once,
 )
 from simulator.engine_pool import (
@@ -1071,7 +1071,7 @@ class ThermoEngineTransport:
 
     def initialize(self) -> bool:
         self.close()
-        setup_thermoengine_dylib_path()
+        _load_thermoengine_phaseobjc_library()
         try:
             pickle.dumps(self._activity_converter)
         except (AttributeError, pickle.PickleError, TypeError) as exc:
@@ -1110,7 +1110,7 @@ class ThermoEngineTransport:
         self._worker.close()
 
     def _initialize_in_process(self) -> bool:
-        setup_thermoengine_dylib_path()
+        _load_thermoengine_phaseobjc_library()
         import thermoengine
         from thermoengine import chem, equilibrate, model
 

@@ -1,32 +1,31 @@
 # Battery v2.1 migration report
 
-rows in: 83452
-records out (observations): 171592
-works: 677
-experiments: 6448
-queue size: 111120
+rows in: 86723
+records out (observations): 176254
+works: 717
+experiments: 6689
+queue size: 116489
 identical-payload dedupe aliases: 342
-metadata files: 48
-index sources: 676
-hard issues: 1953
+metadata files: 50
+index sources: 715
+hard issues: 1687
 
 ## Unavailable input work census
 
-unavailable derived values without derivation: 986
+unavailable derived values without derivation: 961
 
 Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | kind | count |
 |---|---:|
-| `unavailable_missing_input:declared quantity is unknown; refusing to pick a number` | 398 |
+| `unavailable_missing_input:declared quantity is unknown; refusing to pick a number` | 330 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_knudsen_pressure_assumed_mw'; refusing to pick a number` | 117 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, subsample, run, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 61 |
 | `unavailable_missing_input:empty values` | 40 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'tabulated_equilibrium_condensation_model'; refusing to pick a number` | 27 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to pick a number` | 24 |
-| `unavailable_missing_input:no mapped activity field selected; source fields: sample_no, composition_mol, point_conditions, T_C, X_P2O5, P2O5_wt_percent, t_in_FetO, a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed` | 22 |
 | `unavailable_missing_input:sample_area_not_printed` | 21 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu` | 20 |
-| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing to pick a number` | 19 |
 | `unavailable_missing_input:declared quantity is unknown; source cells/headers report enthalpy, not delta_fG; refusing to pick a number` | 12 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, admission_status, caption, axes_as_printed, temperature_as_printed, note` | 11 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K, gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K, composition_mol` | 11 |
@@ -37,21 +36,16 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'apparent_enthalpy_entropy_of_degassing'; refusing to pick a number` | 9 |
 | `unavailable_missing_input:declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing to pick a number` | 8 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient'; refusing to pick a number` | 7 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: gas_species, A_bar, B_bar, C_bar, D_bar` | 7 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vaporisation_enthalpy_per_mole_gas_unresolved_reaction'; refusing to pick a number` | 7 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'sample_provenance_and_characterization'; refusing to pick a number` | 6 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'vant_hoff_log_IT_slope'; refusing to pick a number` | 6 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: gas_species, P_1000K_bar, P_1500K_bar, P_2000K_bar` | 6 |
 | `unavailable_missing_input:no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published, locator, printed_quote` | 6 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'raoultian_activity_coefficient_infinite_dilution'; refusing to pick a number` | 5 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: T_K, without_atm_as_printed, without_atm, with_atm_as_printed, with_atm, enhancement_pct` | 5 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, MnO_mol_percent, composition_basis, composition_mol, point_conditions` | 5 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'clausius_clapeyron_averaged_log10_P_kPa'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_K_at_1273_K_Pa, a_K2O_at_1273_K` | 4 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 4 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, CaO_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, MgO_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, SiO2_mol_percent, composition_basis, composition_mol, point_conditions` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'published_second_law_fit'; refusing to pick a number` | 3 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'reduced_partition_function_ratio_prefactor'; refusing to pick a number` | 3 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'thermodynamic_functions'; refusing to pick a number` | 3 |
@@ -73,7 +67,6 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, N, intercept_forced_through_origin` | 2 |
 | `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: logfO2, alpha_66Zn_64Zn, uncertainty, N, intercept_delta66Zn_per_mil, intercept_2SD_per_mil` | 2 |
 | `unavailable_missing_input:no mapped log10_Kf field selected; source fields: quantity, method_class, model, generator, equilibrium, expression_as_printed, intercept, inverse_temperature_coefficient_K, standard_state` | 2 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, P2O5_mol_percent, FetO_mol_percent, CaO_mol_percent, SiO2_mol_percent, composition_basis, composition_mol, point_conditions` | 2 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1068, 1285] is a temperature domain, not the observable` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1100, 1450] is a temperature domain, not the observable` | 1 |
 | `unavailable_missing_input:declared quantity is unknown; no observable selected; T_range_K [1150, 1450] is a temperature domain, not the observable` | 1 |
@@ -189,20 +182,12 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, composition, ln_gamma_NaO05, ln_gamma_KO05, gamma_KO05_over_gamma_NaO05, model_comparison` | 1 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, generator, evidence_class, illite, SRM_621, model_comparison` | 1 |
 | `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model, note, selected_rows` | 1 |
-| `unavailable_missing_input:no mapped activity_coefficient field selected; source fields: quantity, method_class, model_or_data_source, gamma_1370C, gamma_1370C_as_printed, gamma_1380C, gamma_1380C_as_printed, gamma_1390C, gamma_1390C_as_printed` | 1 |
 | `unavailable_missing_input:no mapped cp field selected; source fields: method_class, generator, quantity, fit_segments` | 1 |
 | `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, model_generator, alpha_assumption, surface_area_assumption, alpha_pe_obtained_by, alpha_bound_as_printed, equilibrium_pressure_source, reaction_as_printed, numerical_alpha_values_printed, numerical_activity_coefficients_printed, numerical_equilibrium_pressures_printed` | 1 |
 | `unavailable_missing_input:no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element, D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta65Cu_per_mil_calc, alpha_surface_assumed, alpha_bulk_calc` | 1 |
-| `unavailable_missing_input:no mapped evaporation_rate field selected; source fields: quantity, method_class, generator, gas_species, evaporation_coefficient_symbol, variables, note` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_CaO, uncertainty_95pct, T_K` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MgO, uncertainty_95pct, T_K` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_MnO, uncertainty_95pct, T_K` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, epsilon_P2O5_SiO2, uncertainty_95pct, T_K, authors_note` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, T_C_as_printed, T_K, gamma0_P2O5_1370C, gamma0_source, epsilon_P2O5_CaO, epsilon_P2O5_CaO_as_printed, epsilon_P2O5_MgO, epsilon_P2O5_MgO_as_printed, epsilon_P2O5_MnO, epsilon_P2O5_MnO_as_printed, epsilon_P2O5_SiO2, epsilon_P2O5_SiO2_as_printed, eq10_as_printed, fit_excluded` | 1 |
+| `unavailable_missing_input:no mapped evaporation_rate field selected; source fields: system_class, quantity, method_class, generator, gas_species, evaporation_coefficient_symbol, variables, note` | 1 |
 | `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, T_K, epsilon_Mo_Mo, epsilon_Mo_Mo_as_printed, epsilon_Mo_Mo2, epsilon_Mo_Mo2_as_printed, e_Mo_Mo, e_Mo_Mo_as_printed, e_Mo_Mo2, e_Mo_Mo2_as_printed` | 1 |
-| `unavailable_missing_input:no mapped interaction_parameter field selected; source fields: quantity, method_class, model_or_data_source, epsilon_P_Si, epsilon_P_Si_as_printed, T_C_as_printed, T_K, authors_comment` | 1 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: quantity, method_class, generator, gas_species, source_form_as_printed, reference_temperature_K, rows, table_transcription` | 1 |
-| `unavailable_missing_input:no mapped p_partial field selected; source fields: sample_no, T_C, T_K, P_P2_x1e8_atm_as_printed, P_P2_atm, P_PO_x1e7_atm_as_printed, P_PO_atm, P_PO2_x1e8_atm_as_printed, P_PO2_atm, pressure_conversion, composition_omitted_reason, point_conditions` | 1 |
+| `unavailable_missing_input:no mapped p_partial field selected; source fields: system_class, quantity, method_class, generator, gas_species, source_form_as_printed, reference_temperature_K, rows, table_transcription` | 1 |
 | `unavailable_missing_input:no mapped p_sat field selected; source fields: method_class, generator, quantity, pressure_expression, concentration_expression, P_boil_Pa, T_boil_K, DeltaH_options_J_per_mol, DeltaH_used_J_per_mol, reference_pressure_as_printed, DeltaH_from_reference_point_J_per_mol, reference_point_semantics, R_gas_J_per_mol_K` | 1 |
 | `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, coalescence_lower_limit_K, upper_limit_semantics, semantics` | 1 |
 | `unavailable_missing_input:no mapped transition_temperature field selected; source fields: method_class, generator, quantity, melting_temperature_as_printed, semantics, disagreement` | 1 |
@@ -211,29 +196,29 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 675 (mismatch) |
-| doi_works | 56 | 366 (mismatch) |
-| no_doi_works | 91 | 311 (mismatch) |
-| admission_statuses | 374 | 27840 (mismatch) |
+| citations | 147 | 714 (mismatch) |
+| doi_works | 56 | 386 (mismatch) |
+| no_doi_works | 91 | 331 (mismatch) |
+| admission_statuses | 374 | 28820 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
-| series | 60 | 1271 (mismatch) |
-| gibbs_reference_pressures | 1617 | 1876 (mismatch) |
+| series | 60 | 1323 (mismatch) |
+| gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
-| gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 20470 (mismatch) |
-| equipment_payloads | 670 | 930 (mismatch) |
-| absent_admissions | 3511 | 13416 (mismatch) |
-| absent_classes | 2174 | 2095 (mismatch) |
-| range_only_T | 3125 | 2787 (mismatch) |
-| system_like_phases | 1065 | 3779 (mismatch) |
-| missing_phases | 237 | 1340 (mismatch) |
+| gibbs_reference_101325 | 594 | 635 (mismatch) |
+| formulas | 1625 | 21064 (mismatch) |
+| equipment_payloads | 670 | 950 (mismatch) |
+| absent_admissions | 3511 | 14777 (mismatch) |
+| absent_classes | 2174 | 2127 (mismatch) |
+| range_only_T | 3125 | 2796 (mismatch) |
+| system_like_phases | 1065 | 3811 (mismatch) |
+| missing_phases | 237 | 1357 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
 
 | source method_class | count |
 |---|---:|
-| `absent` | 432 |
+| `absent` | 464 |
 | `method_only` | 34 |
 | `third_law_kems` | 10 |
 | `derived_from_kems_equilibrium_constants` | 8 |
@@ -259,7 +244,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 104
+degradations: 108
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
@@ -270,6 +255,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `TiO2` | 18 |
 | `MgO·2TiO2` | 15 |
 | `MgO·SiO2` | 15 |
+| `hexagonal` | 4 |
 | `enstatite` | 2 |
 
 ## Per source
@@ -7171,6 +7157,869 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/burcat/records/BU-3445.json` | 1 | 1 | 1 |
 | `data/literature/compilations/burcat/records/BU-3446.json` | 1 | 1 | 1 |
 | `data/literature/compilations/burcat/source/sidecar.yaml` | 0 | 0 | 0 |
+| `data/literature/compilations/fastchem-v3-1-3/manifest.yaml` | 0 | 0 | 0 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0001.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0002.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0003.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0004.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0005.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0006.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0007.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0008.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0009.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0010.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0011.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0012.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0013.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0014.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0015.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0016.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0017.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0018.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0019.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0020.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0021.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0022.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0023.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0024.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0025.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0026.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0027.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0028.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0029.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0030.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0031.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0032.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0033.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0034.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0035.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0036.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0037.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0038.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0039.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0040.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0041.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0042.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0043.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0044.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0045.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0046.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0047.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0048.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0049.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0050.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0051.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0052.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0053.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0054.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0055.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0056.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0057.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0058.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0059.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0060.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0061.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0062.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0063.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0064.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0065.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0066.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0067.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0068.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0069.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0070.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0071.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0072.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0073.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0074.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0075.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0076.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0077.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0078.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0079.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0080.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0081.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0082.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0083.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0084.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0085.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0086.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0087.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0088.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0089.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0090.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0091.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0092.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0093.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0094.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0095.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0096.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0097.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0098.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0099.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0100.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0101.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0102.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0103.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0104.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0105.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0106.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0107.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0108.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0109.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0110.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0111.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0112.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0113.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0114.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0115.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0116.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0117.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0118.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0119.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0120.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0121.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0122.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0123.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0124.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0125.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0126.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0127.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0128.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0129.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0130.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0131.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0132.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0133.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0134.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0135.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0136.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0137.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0138.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0139.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0140.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0141.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0142.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0143.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0144.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0145.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0146.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0147.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0148.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0149.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0150.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0151.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0152.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0153.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0154.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0155.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0156.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0157.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0158.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0159.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0160.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0161.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0162.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0163.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0164.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0165.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0166.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0167.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0168.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0169.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0170.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0171.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0172.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0173.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0174.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0175.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0176.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0177.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0178.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0179.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0180.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0181.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0182.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0183.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0184.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0185.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-C-0186.json` | 1 | 1 | 3 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0001.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0002.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0003.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0004.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0005.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0006.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0007.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0008.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0009.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0010.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0011.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0012.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0013.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0014.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0015.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0016.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0017.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0018.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0019.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0020.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0021.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0022.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0023.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0024.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0025.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0026.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0027.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0028.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0029.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0030.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0031.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0032.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0033.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0034.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0035.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0036.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0037.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0038.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0039.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0040.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0041.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0042.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0043.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0044.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0045.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0046.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0047.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0048.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0049.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0050.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0051.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0052.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0053.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0054.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0055.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0056.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0057.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0058.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0059.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0060.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0061.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0062.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0063.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0064.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0065.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0066.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0067.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0068.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0069.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0070.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0071.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0072.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0073.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0074.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0075.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0076.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0077.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0078.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0079.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0080.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0081.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0082.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0083.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0084.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0085.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0086.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0087.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0088.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0089.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0090.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0091.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0092.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0093.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0094.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0095.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0096.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0097.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0098.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0099.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0100.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0101.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0102.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0103.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0104.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0105.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0106.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0107.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0108.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0109.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0110.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0111.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0112.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0113.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0114.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0115.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0116.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0117.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0118.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0119.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0120.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0121.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0122.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0123.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0124.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0125.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0126.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0127.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0128.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0129.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0130.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0131.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0132.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0133.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0134.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0135.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0136.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0137.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0138.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0139.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0140.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0141.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0142.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0143.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0144.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0145.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0146.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0147.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0148.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0149.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0150.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0151.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0152.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0153.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0154.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0155.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0156.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0157.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0158.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0159.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0160.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0161.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0162.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0163.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0164.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0165.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0166.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0167.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0168.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0169.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0170.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0171.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0172.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0173.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0174.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0175.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0176.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0177.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0178.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0179.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0180.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0181.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0182.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0183.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0184.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0185.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0186.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0187.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0188.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0189.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0190.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0191.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0192.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0193.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0194.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0195.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0196.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0197.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0198.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0199.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0200.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0201.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0202.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0203.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0204.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0205.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0206.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0207.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0208.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0209.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0210.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0211.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0212.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0213.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0214.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0215.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0216.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0217.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0218.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0219.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0220.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0221.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0222.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0223.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0224.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0225.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0226.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0227.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0228.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0229.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0230.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0231.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0232.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0233.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0234.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0235.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0236.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0237.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0238.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0239.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0240.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0241.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0242.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0243.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0244.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0245.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0246.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0247.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0248.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0249.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0250.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0251.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0252.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0253.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0254.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0255.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0256.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0257.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0258.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0259.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0260.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0261.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0262.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0263.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0264.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0265.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0266.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0267.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0268.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0269.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0270.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0271.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0272.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0273.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0274.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0275.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0276.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0277.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0278.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0279.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0280.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0281.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0282.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0283.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0284.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0285.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0286.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0287.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0288.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0289.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0290.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0291.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0292.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0293.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0294.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0295.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0296.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0297.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0298.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0299.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0300.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0301.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0302.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0303.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0304.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0305.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0306.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0307.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0308.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0309.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0310.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0311.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0312.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0313.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0314.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0315.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0316.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0317.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0318.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0319.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0320.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0321.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0322.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0323.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0324.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0325.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0326.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0327.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0328.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0329.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0330.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0331.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0332.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0333.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0334.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0335.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0336.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0337.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0338.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0339.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0340.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0341.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0342.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0343.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0344.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0345.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0346.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0347.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0348.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0349.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0350.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0351.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0352.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0353.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0354.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0355.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0356.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0357.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0358.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0359.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0360.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0361.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0362.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0363.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0364.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0365.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0366.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0367.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0368.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0369.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0370.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0371.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0372.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0373.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0374.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0375.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0376.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0377.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0378.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0379.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0380.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0381.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0382.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0383.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0384.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0385.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0386.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0387.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0388.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0389.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0390.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0391.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0392.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0393.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0394.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0395.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0396.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0397.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0398.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0399.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0400.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0401.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0402.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0403.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0404.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0405.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0406.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0407.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0408.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0409.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0410.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0411.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0412.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0413.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0414.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0415.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0416.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0417.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0418.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0419.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0420.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0421.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0422.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0423.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0424.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0425.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0426.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0427.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0428.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0429.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0430.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0431.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0432.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0433.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0434.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0435.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0436.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0437.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0438.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0439.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0440.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0441.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0442.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0443.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0444.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0445.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0446.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0447.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0448.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0449.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0450.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0451.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0452.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0453.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0454.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0455.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0456.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0457.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0458.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0459.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0460.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0461.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0462.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0463.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0464.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0465.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0466.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0467.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0468.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0469.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0470.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0471.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0472.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0473.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0474.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0475.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0476.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0477.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0478.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0479.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0480.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0481.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0482.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0483.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0484.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0485.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0486.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0487.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0488.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0489.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0490.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0491.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0492.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0493.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0494.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-G-0495.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0001.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0002.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0003.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0004.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0005.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0006.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0007.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0008.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0009.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0010.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0011.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0012.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0013.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0014.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0015.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0016.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0017.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0018.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0019.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0020.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0021.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0022.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0023.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0024.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0025.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0026.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0027.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0028.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0029.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0030.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0031.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0032.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0033.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0034.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0035.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0036.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0037.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0038.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0039.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0040.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0041.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0042.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0043.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0044.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0045.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0046.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0047.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0048.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0049.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0050.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0051.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0052.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0053.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0054.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0055.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0056.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0057.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0058.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0059.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0060.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0061.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0062.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0063.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0064.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0065.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0066.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0067.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0068.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0069.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0070.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0071.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0072.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0073.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0074.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0075.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0076.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0077.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0078.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0079.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0080.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0081.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0082.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0083.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0084.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0085.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0086.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0087.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0088.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0089.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0090.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0091.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0092.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0093.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0094.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0095.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0096.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0097.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0098.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0099.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0100.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0101.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0102.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0103.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0104.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0105.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0106.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0107.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0108.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0109.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0110.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0111.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0112.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0113.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0114.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0115.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0116.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0117.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0118.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0119.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0120.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0121.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0122.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0123.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0124.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0125.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0126.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0127.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0128.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0129.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0130.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0131.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0132.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0133.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0134.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0135.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0136.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0137.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0138.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0139.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0140.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0141.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0142.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0143.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0144.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0145.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0146.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0147.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0148.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0149.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0150.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0151.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0152.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0153.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0154.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0155.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0156.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0157.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0158.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0159.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0160.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0161.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0162.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0163.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0164.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0165.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0166.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0167.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0168.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0169.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0170.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0171.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0172.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0173.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0174.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0175.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0176.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0177.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0178.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0179.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/records/FC-X-0180.json` | 1 | 1 | 2 |
+| `data/literature/compilations/fastchem-v3-1-3/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-al2sio5-reference.json` | 1 | 152 | 0 |
 | `data/literature/compilations/hemingway-haas-robinson-1982-usgs-b1544/records/usgs-b1544-alooh-reference.json` | 1 | 35 | 0 |
@@ -17523,8 +18372,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0298-tephroite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0299-willemite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0300-zircon.json` | 1 | 1 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0301-wollastonite.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0302-pseudowollastonite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0301-wollastonite.json` | 1 | 4 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0302-pseudowollastonite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0303-ca-al-pyroxene.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0304-diopside.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0305-spodumene.json` | 1 | 1 | 0 |
@@ -17533,7 +18382,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0308-jadeite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0309-tremolite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0310-anorthite.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json` | 1 | 4 | 4 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0312-leonhardite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0313-microcline.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0314-high-sanidine.json` | 1 | 0 | 0 |
@@ -17557,59 +18406,59 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0332-fluor-phlogopite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0333-talc.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0334-chrysotile.json` | 1 | 1 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json` | 1 | 97 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0002-aluminum-reference-state.json` | 1 | 91 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json` | 1 | 95 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0004-gold-reference-state.json` | 1 | 97 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0001-silver-reference-state.json` | 1 | 97 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0002-aluminum-reference-state.json` | 1 | 91 | 8 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0003-arsenic-reference-state.json` | 1 | 95 | 69 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0004-gold-reference-state.json` | 1 | 97 | 10 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0005-boron-reference-state.json` | 1 | 73 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json` | 1 | 109 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0006-barium-reference-state.json` | 1 | 109 | 30 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0007-p38.json` | 1 | 97 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0008-bismuth-reference-state.json` | 1 | 102 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0009-bromine-reference-state.json` | 1 | 97 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0008-bismuth-reference-state.json` | 1 | 102 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0009-bromine-reference-state.json` | 1 | 97 | 10 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0010-carbon-reference-state.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0011-diamond.json` | 1 | 50 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0012-calcium-reference-state.json` | 1 | 111 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0013-cadmium-reference-state.json` | 1 | 103 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json` | 1 | 103 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0012-calcium-reference-state.json` | 1 | 111 | 28 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0013-cadmium-reference-state.json` | 1 | 103 | 18 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0014-cerium-reference-state.json` | 1 | 103 | 20 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0015-chlorine-reference-state.json` | 1 | 90 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0016-co.json` | 1 | 103 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0017-chromium-reference-state.json` | 1 | 40 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0018-copper-reference-state.json` | 1 | 96 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0019-fluorine-reference-state.json` | 1 | 85 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json` | 1 | 109 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0021-hydrogen-reference-state.json` | 1 | 87 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0018-copper-reference-state.json` | 1 | 96 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0019-fluorine-reference-state.json` | 1 | 85 | 16 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0020-iron-reference-state.json` | 1 | 109 | 28 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0021-hydrogen-reference-state.json` | 1 | 87 | 4 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0022-hafnium-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0023-mercury-reference-state.json` | 1 | 96 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json` | 1 | 102 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0025-potassium-reference-state.json` | 1 | 104 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0023-mercury-reference-state.json` | 1 | 96 | 8 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0024-iodine-reference-state.json` | 1 | 102 | 19 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0025-potassium-reference-state.json` | 1 | 104 | 18 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0026-lithium-reference-sta-te.json` | 1 | 101 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json` | 1 | 103 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json` | 1 | 109 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0027-magnesium-reference-state.json` | 1 | 103 | 18 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0028-manganese-reference-state.json` | 1 | 109 | 30 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0029-molybdenum-ireference-state.json` | 1 | 39 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0030-nitrogen-reference-state.json` | 1 | 87 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0031-sodium-reference-state.json` | 1 | 104 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0030-nitrogen-reference-state.json` | 1 | 87 | 3 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0031-sodium-reference-state.json` | 1 | 104 | 18 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0032-niobium-reference-state.json` | 1 | 88 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json` | 1 | 102 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0033-nickel-reference-state.json` | 1 | 102 | 15 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0034-oxygen-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0035-phosphorus-reference-state.json` | 1 | 95 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0036-lead-reference-state.json` | 1 | 103 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0035-phosphorus-reference-state.json` | 1 | 95 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0036-lead-reference-state.json` | 1 | 103 | 20 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0037-platinum-reference-state.json` | 1 | 89 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json` | 1 | 77 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0038-sulfur-reference-state.json` | 1 | 77 | 64 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0039-diatomic-sulfur-ideal-gas.json` | 1 | 88 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0040-octa-atomic-sulfur.json` | 1 | 87 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json` | 1 | 104 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0042-selenium-reference-state.json` | 1 | 100 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0043-silicon-reference-state.json` | 1 | 65 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0044-tin-reference-state.json` | 1 | 97 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0045-strontium-reference-state.json` | 1 | 109 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json` | 1 | 103 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0047-thorium-reference-state.json` | 1 | 103 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json` | 1 | 103 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json` | 1 | 110 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0041-antimony-reference-state.json` | 1 | 104 | 25 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0042-selenium-reference-state.json` | 1 | 100 | 72 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0043-silicon-reference-state.json` | 1 | 65 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0044-tin-reference-state.json` | 1 | 97 | 10 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0045-strontium-reference-state.json` | 1 | 109 | 33 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0046-tellurium-reference-state.json` | 1 | 103 | 59 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0047-thorium-reference-state.json` | 1 | 103 | 19 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0048-titanium-reference-state.json` | 1 | 103 | 19 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json` | 1 | 110 | 29 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0050-vanadium-reference-state.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0051-tungsten-reference-state.json` | 1 | 90 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0052-zinc-reference-state.json` | 1 | 102 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json` | 1 | 95 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0052-zinc-reference-state.json` | 1 | 102 | 24 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0053-zirconium-reference-state.json` | 1 | 95 | 10 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0054-ammonia-ideal-gas.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0055-methane-ideal-gas.json` | 1 | 70 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0056-cenentite.json` | 1 | 25 | 0 |
@@ -18177,17 +19026,18 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/sgte-unary/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/extracts/1997jonesthermo.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` | 8 | 9 | 33 |
+| `data/literature/extracts/abdeyazdan-2026-na-sn-si-phase-thermodynamics.yaml` | 452 | 452 | 452 |
 | `data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml` | 2 | 13 | 2 |
 | `data/literature/extracts/abdul-2023-clinker-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/abdullah-2013-redox-acid-base-soda-lime-silicate-thesis.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml` | 20 | 47 | 91 |
+| `data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml` | 20 | 42 | 86 |
 | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 64 |
 | `data/literature/extracts/albertsson-2013-cr-slag-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/alexander-2001-maps.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ames-walsh-white-1967.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/ammin-73-470-oneill-1988.yaml` | 9 | 9 | 43 |
 | `data/literature/extracts/ammin-75-781-hemingway-1990.yaml` | 12 | 12 | 48 |
-| `data/literature/extracts/ammin-76-904.yaml` | 10 | 38 | 63 |
+| `data/literature/extracts/ammin-76-904.yaml` | 10 | 38 | 59 |
 | `data/literature/extracts/anand-2024-sioc-carbothermal-stability.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/archakov-1999-titania-slag-evaporation.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/arias-2025-polyhedron-oxide-heat-capacity.yaml` | 0 | 0 | 1 |
@@ -18196,6 +19046,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/arxiv-1602-00658-fegley-rock-steam-solubility.yaml` | 5 | 5 | 28 |
 | `data/literature/extracts/arxiv-1902-05005.yaml` | 2 | 41 | 58 |
 | `data/literature/extracts/arxiv-2509-sio-flame-nucleation.yaml` | 11 | 11 | 57 |
+| `data/literature/extracts/asai-yokokawa-maekawa-1982-na-borate-activity.yaml` | 32 | 32 | 128 |
 | `data/literature/extracts/avarmaa-2022-cr-don-smelting.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/babaian-2024-fe-mg-si-air-equilibria.yaml` | 165 | 165 | 165 |
 | `data/literature/extracts/babaian-2026-fe-mg-si-reassessment.yaml` | 213 | 213 | 213 |
@@ -18205,12 +19056,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/baldwin-2001-metal-oxide-mitigation-sodium.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/banya-2004-sulphide-capacity-cao-al2o3.yaml` | 2 | 2 | 1 |
+| `data/literature/extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml` | 207 | 138 | 207 |
+| `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 |
 | `data/literature/extracts/basu-2008-feo-steelmaking.yaml` | 216 | 216 | 0 |
 | `data/literature/extracts/beckett-2002-silicate-melt-activities.yaml` | 14 | 14 | 84 |
-| `data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml` | 5 | 5 | 6 |
-| `data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml` | 4 | 4 | 4 |
+| `data/literature/extracts/beerkens-2003-sulfate-decomposition-na2o-activity.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/bencze-yazhenskikh-2016-table-s1-k.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/bencze-yazhenskikh-2016.yaml` | 4 | 70 | 210 |
@@ -18218,7 +19071,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 2 | 2 |
 | `data/literature/extracts/berman-1988-internally-consistent-mineral-thermodynamic-data.yaml` | 219 | 219 | 0 |
 | `data/literature/extracts/berry-2003-in-situ-cr-xanes-furnace.yaml` | 1 | 1 | 1 |
-| `data/literature/extracts/berry-2006-chromium-composition.yaml` | 32 | 96 | 39 |
+| `data/literature/extracts/berry-2006-chromium-composition.yaml` | 32 | 89 | 39 |
 | `data/literature/extracts/berry-2018-morb-iron-redox.yaml` | 10 | 58 | 27 |
 | `data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml` | 145 | 145 | 155 |
 | `data/literature/extracts/beyer-1980-potassium-metasilicate-disilicate-ri8410.yaml` | 75 | 628 | 77 |
@@ -18239,6 +19092,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/boulliung-2025-mercury-volatile-metals-magmatic.yaml` | 9 | 9 | 36 |
 | `data/literature/extracts/boulliung-wood-2022-so2-solubility-silicate-melts.yaml` | 3 | 3 | 14 |
 | `data/literature/extracts/boulliung-wood-2023-sulfur-solubility.yaml` | 2 | 2 | 0 |
+| `data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml` | 2 | 8 | 12 |
 | `data/literature/extracts/brillo-2025-al-ti-thermophysical.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/britt-2019-asteroid-simulants.yaml` | 9 | 9 | 35 |
 | `data/literature/extracts/burcat-third-millennium.yaml` | 42 | 42 | 42 |
@@ -18253,7 +19107,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 33 |
 | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 |
 | `data/literature/extracts/cheng-2021-fe-ca-si-o-phase-equilibria.yaml` | 990 | 990 | 1983 |
-| `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 35 | 35 | 42 |
+| `data/literature/extracts/cho-suito-1994-cas-slag-activities.yaml` | 48 | 48 | 53 |
 | `data/literature/extracts/colson-colson-1995-chromium-dimer-lpsc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-floden-1998-lpsc-co-nickel-activity.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/colson-keedy-1990-lpsc-redox-relationships.yaml` | 0 | 0 | 1 |
@@ -18263,9 +19117,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/costa-2015-yb-silicate-silica-activity.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/costa-2016-lpsc-forsterite-olivine-vaporization.yaml` | 8 | 8 | 8 |
 | `data/literature/extracts/costa-2025-ree-cmas-glass-melt-thermochemistry.yaml` | 28 | 28 | 0 |
-| `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 3 |
-| `data/literature/extracts/cottrell-2009-iron-xanes.yaml` | 4 | 41 | 7 |
+| `data/literature/extracts/costa-jacobson-2015.yaml` | 1 | 1 | 2 |
+| `data/literature/extracts/cottrell-2009-iron-xanes.yaml` | 4 | 41 | 15 |
 | `data/literature/extracts/dachs-geiger-2006-pyrope-grossular.yaml` | 23 | 23 | 29 |
+| `data/literature/extracts/dans-loffler-1930-na-silicate-zirconia-phase-equilibria.yaml` | 167 | 167 | 167 |
 | `data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml` | 92 | 92 | 92 |
 | `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 12 |
@@ -18276,7 +19131,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` | 3 | 3 | 9 |
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
 | `data/literature/extracts/di-donato-granati-2000.yaml` | 95 | 95 | 95 |
-| `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 48 |
+| `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
@@ -18288,7 +19143,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/farber-1972-al2o3-suboxides.yaml` | 7 | 21 | 0 |
 | `data/literature/extracts/farmer-oneill-2023-mgo-zno-miscibility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fdm879.yaml` | 6 | 8 | 26 |
-| `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 75 | 179 |
+| `data/literature/extracts/fegley-2016-rock-steam-solubility.yaml` | 5 | 104 | 76 |
 | `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 109 | 164 |
 | `data/literature/extracts/feng-2025-fe-si-ca-v-ti-phase-diagrams.yaml` | 204 | 204 | 0 |
 | `data/literature/extracts/ferguson-2004-iron-vapor-pressure.yaml` | 1 | 45 | 1 |
@@ -18302,6 +19157,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml` | 20 | 20 | 43 |
 | `data/literature/extracts/fuyuki-2007-sio-recombination.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/gaillard-2003-hydrogen-iron-redox-rate.yaml` | 52 | 52 | 65 |
 | `data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml` | 32 | 260 | 232 |
@@ -18318,7 +19174,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml` | 3 | 3 | 6 |
 | `data/literature/extracts/gribchenkova-2017-al2o3-mgo.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml` | 1 | 8 | 1 |
-| `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 9 |
+| `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/hamuyuni-2016-copper-oxide-solubility-thesis-summary.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml` | 98 | 400 | 18 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 30 |
@@ -18339,15 +19195,16 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/itoh-1989-zno-solid-zinc-silicate.yaml` | 67 | 67 | 67 |
 | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` | 3 | 39 | 52 |
 | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` | 2 | 2 | 2 |
-| `data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/itoh-yokokawa-1984-sodium-activity-nas.yaml` | 2 | 2 | 3 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml` | 1 | 32 | 1 |
 | `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 64 | 70 |
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/jackson-2005-ferrous-glass-multispectroscopy.yaml` | 6 | 6 | 0 |
+| `data/literature/extracts/jacquet-2026-alkali-recondensation.yaml` | 10 | 32 | 55 |
 | `data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml` | 3 | 7 | 4 |
 | `data/literature/extracts/jakobsson-tangstad-2015-ca-mg-activities.yaml` | 68 | 68 | 0 |
-| `data/literature/extracts/janaf-4th.yaml` | 51 | 51 | 224 |
+| `data/literature/extracts/janaf-4th.yaml` | 51 | 98 | 219 |
 | `data/literature/extracts/janz-1979-nsrds61-part2-molten-salt-properties.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml` | 3 | 38 | 6 |
 | `data/literature/extracts/jeon-2025-metal-slag-refractory-thesis.yaml` | 330 | 0 | 330 |
@@ -18355,7 +19212,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/jeon-lindberg-2025-mgo-refractory-slag-interface.yaml` | 203 | 0 | 203 |
 | `data/literature/extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml` | 50 | 50 | 100 |
 | `data/literature/extracts/jin-2022-cl-cr-sulfur-glass-solubility.yaml` | 13 | 198 | 13 |
-| `data/literature/extracts/johnston-1965-sodium-disilicate-redox.yaml` | 54 | 148 | 216 |
+| `data/literature/extracts/johnston-1965-sodium-disilicate-redox.yaml` | 54 | 148 | 223 |
 | `data/literature/extracts/jsc-a16-special-samples.yaml` | 3 | 18 | 27 |
 | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` | 12 | 16 | 52 |
 | `data/literature/extracts/jugo-2010-sulfur-xanes.yaml` | 2 | 8 | 4 |
@@ -18364,18 +19221,19 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml` | 4 | 16 | 10 |
 | `data/literature/extracts/kawashima-1984-soda-flux-chemical-sensors.yaml` | 3 | 12 | 2 |
 | `data/literature/extracts/kayahara-1981-liquid-cu-o.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml` | 55 | 507 | 141 |
 | `data/literature/extracts/kemori-1980-oxygen-liquid-copper.yaml` | 31 | 51 | 46 |
-| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 72 | 210 |
-| `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 72 |
-| `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 59 |
+| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 72 | 204 |
+| `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 60 |
+| `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 46 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 15 | 37 |
 | `data/literature/extracts/kems-007-costa-2015.yaml` | 17 | 113 | 10 |
-| `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 333 |
-| `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 8 |
-| `data/literature/extracts/kems-010-richter-2007.yaml` | 197 | 350 | 252 |
-| `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 86 |
-| `data/literature/extracts/kems-012-sossi-2019.yaml` | 183 | 617 | 161 |
+| `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 324 |
+| `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 7 |
+| `data/literature/extracts/kems-010-richter-2007.yaml` | 197 | 350 | 250 |
+| `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 84 |
+| `data/literature/extracts/kems-012-sossi-2019.yaml` | 183 | 643 | 146 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 37 |
 | `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 152 | 666 | 101 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 0 | 0 | 1 |
@@ -18384,14 +19242,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 42 | 112 | 318 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 16 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 129 |
-| `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 119 |
+| `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 45 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 102 | 108 | 292 |
-| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
-| `data/literature/extracts/kems-026-markova-1984.yaml` | 9 | 141 | 17 |
+| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 46 |
+| `data/literature/extracts/kems-026-markova-1984.yaml` | 9 | 141 | 15 |
 | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 114 |
-| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 27 | 98 | 60 |
-| `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 17 | 122 | 35 |
+| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 27 | 98 | 37 |
+| `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 17 | 122 | 20 |
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 28 | 30 | 110 |
 | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 13 | 28 |
 | `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 25 |
@@ -18403,47 +19261,47 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-040-stolyarova-2015.yaml` | 2 | 2 | 7 |
 | `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 77 | 90 | 248 |
 | `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 0 |
-| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 62 |
+| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 60 |
 | `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 57 | 154 |
 | `data/literature/extracts/kems-046-van-limpt-2007.yaml` | 12 | 24 | 84 |
-| `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 14 | 33 |
+| `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 14 | 27 |
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 18 | 18 | 107 |
-| `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 60 |
+| `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 58 |
 | `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 10 |
 | `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 56 |
-| `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 17 | 144 | 22 |
+| `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 17 | 144 | 15 |
 | `data/literature/extracts/kems-055-kambayashi-1983.yaml` | 50 | 50 | 10 |
-| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 145 | 275 |
-| `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 256 |
+| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 149 | 82 |
+| `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 67 |
 | `data/literature/extracts/kems-066-ichise-1977.yaml` | 45 | 49 | 235 |
-| `data/literature/extracts/kems-067-yamada-1980.yaml` | 18 | 48 | 87 |
-| `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 52 | 103 |
-| `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 19 | 53 |
+| `data/literature/extracts/kems-067-yamada-1980.yaml` | 18 | 48 | 86 |
+| `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 32 | 105 |
+| `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 19 | 52 |
 | `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 25 | 68 |
-| `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 40 | 153 |
-| `data/literature/extracts/kems-095-ueda-1986.yaml` | 38 | 46 | 171 |
-| `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 24 | 92 |
+| `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 40 | 149 |
+| `data/literature/extracts/kems-095-ueda-1986.yaml` | 38 | 46 | 160 |
+| `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 24 | 82 |
 | `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 142 | 248 |
-| `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 35 | 52 |
-| `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 64 | 100 |
+| `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 35 | 33 |
+| `data/literature/extracts/kems-111-ichise-1982.yaml` | 33 | 141 | 130 |
 | `data/literature/extracts/kems-112-ichise-1989.yaml` | 49 | 87 | 77 |
-| `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 116 |
+| `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 92 |
 | `data/literature/extracts/kems-116-nunoue-1987.yaml` | 12 | 40 | 45 |
 | `data/literature/extracts/kems-118-yamamoto-1983.yaml` | 11 | 50 | 79 |
 | `data/literature/extracts/kems-119-furukawa-1975.yaml` | 21 | 38 | 99 |
 | `data/literature/extracts/kems-120-ueshima-1984.yaml` | 8 | 30 | 72 |
 | `data/literature/extracts/kems-127-qi-1989.yaml` | 11 | 26 | 71 |
 | `data/literature/extracts/kems-132-nakajima-2016.yaml` | 11 | 23 | 87 |
-| `data/literature/extracts/kems-133-costa-2017.yaml` | 21 | 21 | 91 |
+| `data/literature/extracts/kems-133-costa-2017.yaml` | 21 | 21 | 87 |
 | `data/literature/extracts/kems-137-bischof-2023.yaml` | 20 | 164 | 462 |
-| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 36 | 126 |
+| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 36 | 117 |
 | `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 35 | 59 |
 | `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 148 | 441 |
 | `data/literature/extracts/kems-169-nakazawa-1976.yaml` | 5 | 5 | 21 |
 | `data/literature/extracts/kems-184-behrens-1979.yaml` | 33 | 49 | 189 |
-| `data/literature/extracts/kems-188-nanjo-1976.yaml` | 6 | 12 | 30 |
+| `data/literature/extracts/kems-188-nanjo-1976.yaml` | 6 | 12 | 22 |
 | `data/literature/extracts/kems-189-bischof-2021.yaml` | 16 | 16 | 50 |
-| `data/literature/extracts/kems-190-wu-1993.yaml` | 16 | 63 | 211 |
+| `data/literature/extracts/kems-190-wu-1993.yaml` | 16 | 63 | 205 |
 | `data/literature/extracts/kems-198-ichise-ueshima-1989.yaml` | 14 | 23 | 75 |
 | `data/literature/extracts/kems-200-ueshima-1983.yaml` | 21 | 32 | 107 |
 | `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 27 | 65 |
@@ -18451,12 +19309,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-213-schneider-1980-nbsir-80-2139.yaml` | 15 | 15 | 16 |
 | `data/literature/extracts/kems-214-hastie-1980-nbsir-80-2178.yaml` | 4 | 43 | 0 |
 | `data/literature/extracts/kems-218-schneider-1981-nbsir-81-2306.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 283 |
+| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 140 | 235 |
 | `data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml` | 25 | 25 | 0 |
 | `data/literature/extracts/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility.yaml` | 80 | 80 | 0 |
 | `data/literature/extracts/kido-2004-mn-cr-high-temperature-glass-spectra.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/kim-2004-na2o-float-glass-emf.yaml` | 21 | 21 | 42 |
 | `data/literature/extracts/kim-2014-carbon-fe-v-mo-ni.yaml` | 233 | 233 | 0 |
 | `data/literature/extracts/kim-2018-sulfur-fe-v-mo-ni.yaml` | 208 | 208 | 9 |
 | `data/literature/extracts/kirschen-1998-silicate-miscibility-thesis.yaml` | 21 | 21 | 0 |
@@ -18465,21 +19324,26 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml` | 14 | 827 | 22 |
 | `data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml` | 25 | 25 | 64 |
 | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
+| `data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kramer-1991-glass-basicity-gas-solubility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/krawczynski-grove-2012-high-ti-lunar-melts.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 3 | 127 | 134 |
 | `data/literature/extracts/kress-carmichael-1991-iron-redox-calibration.yaml` | 881 | 881 | 884 |
 | `data/literature/extracts/kroger-fingas-1935-alkali-silicate-equilibria.yaml` | 17 | 194 | 25 |
+| `data/literature/extracts/kroger-janetzko-kreitlow-1958-glass-formation-heat.yaml` | 35 | 35 | 105 |
+| `data/literature/extracts/kroger-kreitlow-1956-soda-lime-silicate-calorimetry.yaml` | 36 | 36 | 102 |
 | `data/literature/extracts/kropf-2009-alkalis-chondrules-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kume-2000-cao-activities.yaml` | 375 | 375 | 687 |
+| `data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml` | 21 | 21 | 56 |
+| `data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml` | 8 | 8 | 1 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 84 |
 | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` | 6 | 6 | 27 |
 | `data/literature/extracts/le-losq-2023-alkali-aluminosilicate-glasses.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lead-25-wetzel-2012a.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/lebrun-2013-magma-ocean-atmosphere.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/lee-bruckner-1984-cr-mn-glass-redox.yaml` | 5 | 35 | 6 |
-| `data/literature/extracts/lee-bruckner-1986-borate-redox-series.yaml` | 14 | 52 | 14 |
-| `data/literature/extracts/leister-1999-fe-v-redox-2000c.yaml` | 5 | 44 | 10 |
+| `data/literature/extracts/lee-bruckner-1984-cr-mn-glass-redox.yaml` | 5 | 35 | 40 |
+| `data/literature/extracts/lee-bruckner-1986-borate-redox-series.yaml` | 14 | 52 | 36 |
+| `data/literature/extracts/leister-1999-fe-v-redox-2000c.yaml` | 5 | 45 | 9 |
 | `data/literature/extracts/leister-1999-v-sodium-silicate-high-temperature.yaml` | 7 | 32 | 0 |
 | `data/literature/extracts/leister-ehrt-2000-polyvalent-redox.yaml` | 3 | 14 | 3 |
 | `data/literature/extracts/leuthold-2023-basalt-partition-fo2.yaml` | 2 | 2 | 0 |
@@ -18491,6 +19355,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lh87-mgo-g.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-pbo-g.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/lh87-sno-g.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml` | 324 | 370 | 644 |
 | `data/literature/extracts/li-kato-kobayashi-2021-cr-solubility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/liu-2023-chromium-oxide-activity.yaml` | 38 | 72 | 39 |
 | `data/literature/extracts/liu-2024-cao-al2o3-vox-phase.yaml` | 72 | 72 | 5 |
@@ -18516,6 +19381,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/lunarsurface-2020-5029.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/majzlan-2021-magnesium-silicate-glass-cp.yaml` | 23 | 23 | 28 |
 | `data/literature/extracts/mamiya-2000-sio-disproportionation.yaml` | 2 | 2 | 0 |
+| `data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml` | 13 | 13 | 26 |
 | `data/literature/extracts/mathieu-2009-sodium-solubility-thesis.yaml` | 421 | 421 | 209 |
 | `data/literature/extracts/matousek-1998-silicate-vaporization-reactions.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/matsumaru-1999-plasma-arc-silicate-evaporation.yaml` | 1 | 1 | 1 |
@@ -18541,7 +19407,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/morris-2006-gusev-mossbauer.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/morris-2006-meridiani-mossbauer.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/muan-1959-manganese-silica-air.yaml` | 57 | 57 | 7 |
-| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 105 |
+| `data/literature/extracts/mueller-2004-alkali-oxide-activity-coal-ash.yaml` | 4 | 4 | 0 |
+| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 81 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 |
 | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` | 0 | 0 | 1 |
@@ -18555,9 +19422,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/nasa-cea-thermo.yaml` | 1615 | 1615 | 1692 |
 | `data/literature/extracts/nasa-tm-2024-simulant-guide.yaml` | 11 | 113 | 146 |
 | `data/literature/extracts/nazarov-2015-dhofar-silicides.yaml` | 8 | 34 | 2 |
+| `data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml` | 51 | 51 | 14 |
 | `data/literature/extracts/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.yaml` | 45 | 45 | 25 |
 | `data/literature/extracts/neubert-2025-vanadium-slag-evaporation.yaml` | 148 | 148 | 148 |
 | `data/literature/extracts/neuman-2026-levitation-k-isotopes.yaml` | 80 | 2307 | 80 |
+| `data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml` | 10 | 10 | 10 |
 | `data/literature/extracts/nist-srd69-p4.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/nist-webbook.yaml` | 46 | 46 | 181 |
 | `data/literature/extracts/no27-fegley-cameron-1987-epsl.yaml` | 8 | 97 | 112 |
@@ -18565,7 +19434,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ntrs-19650014783.yaml` | 8 | 52 | 27 |
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 36 |
-| `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 11 | 20 | 36 |
+| `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 140 | 140 | 17 |
 | `data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml` | 19 | 19 | 19 |
 | `data/literature/extracts/oishi-1986-cu2o-cao-activities.yaml` | 48 | 0 | 48 |
 | `data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml` | 13 | 13 | 53 |
@@ -18575,6 +19444,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ottonello-2000-polymeric-cao-feo-silica.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/ozawa-2012-forsterite-vacuum-evaporation.yaml` | 5 | 134 | 42 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 16 |
+| `data/literature/extracts/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.yaml` | 46 | 46 | 160 |
 | `data/literature/extracts/panda-2019-ten-oxide-thermodynamics.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml` | 14 | 14 | 0 |
 | `data/literature/extracts/park-min-2004-carbide-capacity-fluoride-soda-slags.yaml` | 111 | 111 | 0 |
@@ -18593,8 +19463,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/pending-pages-wo3-polymer-vp.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/pending-re2o7-second-series.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/pending-teo2-vp.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/pickrell-1994-gaseous-alkali-corrosion.yaml` | 24 | 66 | 114 |
+| `data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml` | 290 | 290 | 643 |
 | `data/literature/extracts/qi-1987-fe-c-v-interaction.yaml` | 71 | 71 | 19 |
 | `data/literature/extracts/raberg-2007-salt-stability-na2s-thermochemistry-thesis.yaml` | 4 | 4 | 10 |
+| `data/literature/extracts/ramteke-2026-alkali-vapor-corrosion-spinels.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 7 |
 | `data/literature/extracts/rb86-capobianco-navrotsky-1982.yaml` | 3 | 3 | 3 |
 | `data/literature/extracts/rb86-neuvonen-1952.yaml` | 0 | 0 | 1 |
@@ -18613,18 +19486,18 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ref-032-zr.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-052-k-o-gas.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-052-na-o-gas.yaml` | 1 | 1 | 5 |
-| `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` | 85 | 85 | 0 |
 | `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 51 |
 | `data/literature/extracts/renggli-2022-te-evaporation.yaml` | 1 | 36 | 1 |
 | `data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/richter-et-al-2007.yaml` | 2 | 2 | 8 |
+| `data/literature/extracts/richter-et-al-2007.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml` | 7 | 7 | 28 |
 | `data/literature/extracts/robinot-2025-promes-review.yaml` | 29 | 39 | 136 |
 | `data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml` | 4 | 4 | 8 |
 | `data/literature/extracts/rusiecka-2026-chlorine-data.yaml` | 1911 | 1911 | 3822 |
 | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` | 11 | 13 | 46 |
-| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1001 | 90 |
+| `data/literature/extracts/rys-2007-alkali-oxide-thermodynamics.yaml` | 56 | 1001 | 62 |
 | `data/literature/extracts/rzehak-2021-ti-isotope-redox-lunar-melts.yaml` | 3 | 18 | 0 |
 | `data/literature/extracts/sack-2021-melilite-thermochemistry.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sack-ghiorso-2017-fassaite-thermodynamics.yaml` | 0 | 0 | 1 |
@@ -18647,16 +19520,18 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/schreiber-1986-oxygen-diffusion-redox.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/schreiber-1996-fe-mn-cr-redox-interactions.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/schreiber-haskin-1976-plsc7-chromium-in-basalts.yaml` | 8 | 8 | 0 |
+| `data/literature/extracts/schumm-1981-alkali-aluminosilicate-thermochemical-tables.yaml` | 52 | 500 | 52 |
 | `data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml` | 1 | 10 | 2 |
 | `data/literature/extracts/semkow-haskin-1984-redox-diopsidic-melt.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1991-solar-heating-jbis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sesko-2022-tum-thesis.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/seto-2010-na2o-activity-glass-emf-summary.yaml` | 5 | 5 | 10 |
 | `data/literature/extracts/sf04-magma-companion-workbook.yaml` | 7 | 56 | 77 |
 | `data/literature/extracts/shaw-2023-vacuum-thermal-sublimation-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shi-2024-cr-activity-slag-polymerisation.yaml` | 36 | 36 | 0 |
-| `data/literature/extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml` | 23 | 92 | 110 |
+| `data/literature/extracts/shilov-1998-sno-zno-p2o5-vaporization.yaml` | 23 | 92 | 97 |
 | `data/literature/extracts/shilov-2025-sro-al2o3-sio2-kems-supplement.yaml` | 42 | 42 | 0 |
 | `data/literature/extracts/shilov-2026-sro-la2o3-kems.yaml` | 9 | 29 | 9 |
 | `data/literature/extracts/shimaoka-nakamura-1989-nipr2-252.yaml` | 12 | 12 | 24 |
@@ -18699,11 +19574,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2014-sodium-silicate-model.yaml` | 17 | 17 | 34 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics-metsoc.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics.yaml` | 27 | 27 | 42 |
-| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 114 |
+| `data/literature/extracts/shornikov-2015-cai-vaporization-coefficients.yaml` | 53 | 53 | 110 |
 | `data/literature/extracts/shornikov-2015-complex-oxide-vapor.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-ca-al-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/shornikov-2016-cao-mgo-silicate.yaml` | 50 | 85 | 68 |
-| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 20 |
+| `data/literature/extracts/shornikov-2017-cai-mgo-sio-fugacity.yaml` | 4 | 4 | 12 |
 | `data/literature/extracts/shornikov-2017-spinel-evaporation.yaml` | 25 | 144 | 25 |
 | `data/literature/extracts/shornikov-2017-spinel-thermodynamics.yaml` | 18 | 30 | 13 |
 | `data/literature/extracts/shornikov-2018-cai-complex-gas-species.yaml` | 0 | 0 | 1 |
@@ -18734,7 +19609,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2024-iron-phosphate-melts.yaml` | 17 | 17 | 51 |
 | `data/literature/extracts/shornikov-2024-sodium-phosphate-melts.yaml` | 13 | 13 | 43 |
 | `data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml` | 19 | 19 | 59 |
-| `data/literature/extracts/shornikov-2025-ca-al-inclusion-kems.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/shornikov-2025-ca-al-inclusion-kems.yaml` | 8 | 95 | 8 |
 | `data/literature/extracts/shornikov-2025-ca-al-inclusion-thermodynamics.yaml` | 29 | 29 | 58 |
 | `data/literature/extracts/shornikov-2025-calcium-oxide-evaporation.yaml` | 14 | 210 | 14 |
 | `data/literature/extracts/shornikov-2025-lithium-phosphate-melts.yaml` | 2 | 2 | 8 |
@@ -18744,11 +19619,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/shornikov-2026-hatrurite-evaporation.yaml` | 10 | 134 | 2 |
 | `data/literature/extracts/shornikov-2026-wollastonite-kems.yaml` | 194 | 277 | 86 |
 | `data/literature/extracts/shornikova-2019-perovskite-thermodynamics.yaml` | 119 | 119 | 155 |
+| `data/literature/extracts/shtenberg-2020-alkaline-oxide-thermodynamic-regression.yaml` | 46 | 46 | 46 |
 | `data/literature/extracts/shugurov-2024-gaseous-cerates-si.yaml` | 6 | 126 | 6 |
 | `data/literature/extracts/shugurov-2026-ceo2-tio2-kems.yaml` | 50 | 50 | 150 |
 | `data/literature/extracts/shults-1994-mullite-evaporation.yaml` | 45 | 45 | 53 |
 | `data/literature/extracts/shults-1995-calcium-aluminate-thermodynamics.yaml` | 1 | 1 | 2 |
-| `data/literature/extracts/shyrokykh-2021-vanadium-vaporization.yaml` | 2 | 2 | 2 |
+| `data/literature/extracts/shyrokykh-2021-vanadium-vaporization.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml` | 5 | 5 | 6 |
 | `data/literature/extracts/sineva-2023-ni-sn-zn-slag-copper.yaml` | 696 | 696 | 696 |
 | `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 67 | 346 |
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 155 |
@@ -18762,12 +19639,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 9 | 29 | 85 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 30 |
-| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 6 |
+| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 88 | 589 | 87 |
 | `data/literature/extracts/stolyarova-2021-ti-al-kems-ru.yaml` | 205 | 205 | 26 |
 | `data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml` | 190 | 1037 | 6 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
+| `data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml` | 48 | 48 | 0 |
 | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
 | `data/literature/extracts/sugie-2021-sioc-mixed-bond-calorimetry.yaml` | 4 | 4 | 4 |
@@ -18783,9 +19661,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ta-mendybaev-2002-lpsc.yaml` | 6 | 6 | 26 |
 | `data/literature/extracts/ta-mendybaev-2020-lpsc.yaml` | 3 | 3 | 11 |
 | `data/literature/extracts/ta-shirai-2000-lpsc.yaml` | 19 | 46 | 92 |
-| `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` | 5 | 5 | 22 |
+| `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` | 5 | 5 | 21 |
 | `data/literature/extracts/tachibana-2002-enstatite-evaporation-kinetics.yaml` | 6 | 54 | 6 |
-| `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 24 |
+| `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 23 |
 | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 13 | 13 | 26 |
 | `data/literature/extracts/taniguchi-1997-feo-cas.yaml` | 141 | 141 | 282 |
 | `data/literature/extracts/terashima-2026-sro-slag-activity-preprint.yaml` | 119 | 119 | 37 |
@@ -18798,8 +19676,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/tranell-2002-titanium-valence.yaml` | 57 | 57 | 0 |
 | `data/literature/extracts/ts1985.yaml` | 16 | 19 | 36 |
 | `data/literature/extracts/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml` | 18 | 18 | 18 |
+| `data/literature/extracts/tsukihashi-1985-na-silicate-mn-p-nitrogen.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/tsukihashi-1985-v-nb-sb-soda-silicate-distribution.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/tsukihashi-1988-na2o-v-nb-mn-ti-partition.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/tsukihashi-sano-1997-alkali-fluoride-slag-activities.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/tyurnina-2023-sro-al2o3-sio2-vaporization.yaml` | 60 | 60 | 79 |
 | `data/literature/extracts/tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml` | 91 | 181 | 3 |
 | `data/literature/extracts/ueshima-1982-fe-mo-thermal.yaml` | 4 | 61 | 5 |
@@ -18809,24 +19689,27 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/van-der-waal-2023-volatile-loss-isotope-fractionation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/van-ende-2008-mn-cr-slag-steel.yaml` | 189 | 189 | 0 |
 | `data/literature/extracts/van-kooten-2020-lunar-outgassing.yaml` | 3 | 15 | 24 |
-| `data/literature/extracts/van-limpt-2006-sodium-evaporation.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/van-limpt-2006-sodium-evaporation.yaml` | 4 | 9 | 14 |
 | `data/literature/extracts/vanbuchem-2023-lavatmos.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vanbuchem-2025-lavatmos2.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/vanlimpt-2011-boron-evaporation-part1.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vickerfalt-2020-mgo-v2o3.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/vickerfalt-2024-al-si-v-phase-diagram.yaml` | 39 | 39 | 0 |
 | `data/literature/extracts/vickerfalt-2024-autogenous-slag-thesis.yaml` | 150 | 150 | 0 |
 | `data/literature/extracts/vienna-2004-sulfur-loading-law-glass.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 13 | 13 | 43 |
+| `data/literature/extracts/visscher-fegley-2013-debris-disks.yaml` | 12 | 12 | 40 |
 | `data/literature/extracts/volovetskii-2012-iron-redox.yaml` | 3 | 30 | 3 |
 | `data/literature/extracts/volovetsky-2010-granitoid-iron-redox.yaml` | 22 | 22 | 0 |
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
 | `data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml` | 38 | 538 | 0 |
 | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` | 516 | 516 | 516 |
-| `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
-| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 65 |
+| `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 59 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
+| `data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 66 |
-| `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml` | 7 | 7 | 13 |
 | `data/literature/extracts/woermann-1969-mg-fe-ti-oxides.yaml` | 17 | 17 | 3 |
 | `data/literature/extracts/wright-okamura-1977-makaopuhi-cooling.yaml` | 40 | 40 | 40 |
 | `data/literature/extracts/xiao-2002-chromium-oxide-activities.yaml` | 261 | 261 | 0 |
@@ -18834,8 +19717,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/xiao-reuter-holappa-2000-chromium-slag-oxidation-review.yaml` | 84 | 84 | 0 |
 | `data/literature/extracts/xu-2026-excess-oxygen-magma.yaml` | 1462 | 1462 | 1462 |
 | `data/literature/extracts/yakovlev-2017-cai-acidity.yaml` | 97 | 166 | 20 |
+| `data/literature/extracts/yakovlev-2021-chondrule-alkali.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yakovlev-2024-cai-vaporization.yaml` | 11 | 167 | 11 |
+| `data/literature/extracts/yakovleva-2022-alkali-chondrule-evaporation.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 33 |
+| `data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml` | 1 | 1 | 0 |
 | `data/literature/extracts/yan-2009-cr-ti-nb-v-slag-thermodynamics-review.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.yaml` | 230 | 230 | 250 |
 | `data/literature/extracts/yang-teng-seetharaman-2012-vanadium-evaporation.yaml` | 3 | 3 | 3 |
@@ -18847,6 +19733,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/zaitsev-1999-na2o-sio2-pccp.yaml` | 11 | 116 | 8 |
 | `data/literature/extracts/zaitsev-2000-ms2000-045.yaml` | 4 | 32 | 0 |
 | `data/literature/extracts/zaitsev-2000-sodium-silicate-thermodynamics.yaml` | 7 | 110 | 4 |
+| `data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml` | 9 | 9 | 18 |
+| `data/literature/extracts/zhang-2021-acsesc-si.yaml` | 25 | 25 | 39 |
 | `data/literature/extracts/zhang-2024-alkali-evaporation-ti-thesis.yaml` | 23 | 257 | 23 |
 | `data/literature/extracts/zhinkina-2024-ce-gd-kems-poster.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/zigo-1987-gehlenite-fusion.yaml` | 13 | 37 | 64 |
@@ -18860,16 +19748,15 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 1953
+hard issues: 1687
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1444 |
-| `conditional_field:derivation` | 259 |
-| `conditional_field:inputs` | 238 |
-| `conditional_field:raw_inputs` | 8 |
+| `conditional_field:derived_from` | 1203 |
+| `conditional_field:derivation` | 251 |
+| `conditional_field:inputs` | 229 |
 | `invalid_source:initial_composition` | 4 |
 
 ## Hard issues (first 50)
@@ -18927,8 +19814,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 287215
+advisory issues: 293128
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 287215 |
+| `identity_incomplete` | 293128 |

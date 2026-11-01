@@ -14,8 +14,8 @@
   "pdf_page": 143,
   "page": 137,
   "name_as_published": "QUARTZ",
-  "formula_as_published": "Si0 2",
-  "formula": "Si0 2",
+  "formula_as_published": "SiO2",
+  "formula": "SiO2",
   "phase": "*==**== a quartz 298.15° to 848°K. |3 quartz 848° to 2000°K, 0 quartz is metastable above 1140°K.",
   "gram_formula_weight": {
     "as_published": "60.085",
@@ -1886,6 +1886,14 @@
     "gef_identity |gef-(S-1000H/T)|=0.2000 at T=298.15"
   ],
   "corrections": [
+    {
+      "correction_id": "b1259-p143-formula_as_published",
+      "pdf_page": 143,
+      "field": "formula_as_published",
+      "layout_as_extracted": "Si0 2",
+      "printed_token": "SiO2",
+      "evidence": "PDF page 143 image visibly prints 'SiO2'"
+    },
     {
       "correction_id": "b1259-p143-temperature-05",
       "pdf_page": 143,

@@ -398,6 +398,11 @@
       .filter((key) => isRecord(metadata) && own(metadata, key))
       .map((key) => detailRow(humanize(key), treeValue(metadata[key], key)))
       .join("");
+    const engineBindingAdmissionNotice = isRecord(metadata)
+      && own(metadata, "engine_binding_admission_notice")
+      ? `<article><h3>Engine binding admission notice</h3>` +
+        `${treeValue(metadata.engine_binding_admission_notice, "engine_binding_admission_notice")}</article>`
+      : "";
 
     const artifactNotice = artifactMalformed
       ? `<div class="pending"><strong>Pending</strong><p>Artifact is malformed; expected an object.</p></div>`
@@ -420,7 +425,7 @@
       `<article><h3>Artifact engine identity</h3>${identityDetail(identity)}</article>` +
       `<article class="sec-p9-engine-chain"><h3>${ENGINES_USED_TITLE}</h3>` +
       `<p class="sec-p9-note">Provider registry projection and operator request echo as emitted — not an invocation or execution trace. Does not establish real-backend activity.</p>` +
-      `${enginesUsedValue(metadata)}</article></div></details></section>`;
+      `${enginesUsedValue(metadata)}</article>${engineBindingAdmissionNotice}</div></details></section>`;
   }
 
   (root.ReportPanels = root.ReportPanels || []).push({ id: "sec-p9-provenance", render });

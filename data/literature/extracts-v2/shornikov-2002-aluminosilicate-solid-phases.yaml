@@ -76,9 +76,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_replica::T=1724.7:h=027d6d705772
   source_id: shornikov-2002-aluminosilicate-solid-phases
   locator:
     page: 2
@@ -253,9 +258,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_viii::T=1725.5:h=d180b94f00ce
   source_id: shornikov-2002-aluminosilicate-solid-phases
   locator:
     page: 2
@@ -439,9 +449,14 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:figure_only
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities:
+    - p_partial
+    reason: admission_from_legacy_token:figure_only
+    origin: shornikov-2002-aluminosilicate-solid-phases::shornikov_2002_fig2a_sio_viii::T=1743.2:h=e7f0f09bbd57
   source_id: shornikov-2002-aluminosilicate-solid-phases
   locator:
     page: 2

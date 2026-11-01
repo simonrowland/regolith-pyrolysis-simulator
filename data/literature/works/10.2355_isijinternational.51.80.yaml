@@ -1,0 +1,451 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.51.80
+  citation: Zhang, Zuo Tai; Sridhar, Seetharaman; Cho, Jung Wook (2011). An Investigation of the Evaporation of B2O3 and Na2O
+    in F-Free Mold Slags. ISIJ International 51(1), 80–87.
+  source_ids:
+  - zhang-2011-boron-sodium-f-free-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:zhang-2011-boron-sodium-f-free-evaporation
+      role: pdf
+      path: raw/zhang-2011-boron-sodium-f-free-evaporation/zhang-2011-boron-sodium-f-free-evaporation.pdf
+      sha256:
+        tag: value
+        value: 40aa1a814231e218f114499eeadc1b3c99fc8690a6a897efa0cb8df4031b3a92
+    - asset_id: pdftotext:zhang-2011-boron-sodium-f-free-evaporation
+      role: pdftotext
+      path: text/zhang-2011-boron-sodium-f-free-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:zhang-2011-boron-sodium-f-free-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.51.80
+experiments:
+- experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '46.2'
+          SiO2: '39.11'
+          Al2O3: '3.19'
+          Na2O: '6.59'
+          B2O3: '4.81'
+          TiO2: '0.081'
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 XRF composition; section 3.1 identifies analysis as pre-melting
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.51.80
+  locator:
+    page: 2
+    section: 2.2 Experimental Procedures
+- experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '46.2'
+          SiO2: '39.11'
+          Al2O3: '3.19'
+          Na2O: '6.59'
+          B2O3: '4.81'
+          TiO2: '0.081'
+          ZrO2: '2'
+      locator:
+        page: 2
+        table: '2'
+        note: CS-3 base XRF composition plus the stated 2 wt% ZrO2 addition; not reanalysed
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.51.80
+  locator:
+    page: 2
+    section: 2.2 Experimental Procedures
+- experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  kind: literature
+  method:
+    tag: value
+    value: tga
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '43.8'
+          SiO2: '36.91'
+          Al2O3: '3.12'
+          Na2O: '6.54'
+          B2O3: '4.63'
+          TiO2: '5'
+      locator:
+        page: 2
+        table: '2'
+        note: CS-4 XRF composition; section 3.1 identifies analysis as pre-melting
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.51.80
+  locator:
+    page: 2
+    section: 2.2 Experimental Procedures
+context:
+- observation_id: zhang_2011_analyzed_slag_compositions_table2
+  type: composition
+  locator:
+    page: 2
+    table: '2'
+    note: XRF analyses of pre-melted slags per section 3.1
+  units: mass%
+  values:
+    quantity: printed_slag_compositions
+    table_2_basis: caption says post-measured slag; section 3.1 says pre-melting XRF analysis
+    table_2_rows:
+    - slag_id: CS-1
+      composition_wt_pct:
+        CaO: '36.92'
+        SiO2: '48.22'
+        Al2O3: '2.93'
+        Na2O: '6.7'
+        B2O3: '5.13'
+        TiO2: '0.092'
+    - slag_id: CS-2
+      composition_wt_pct:
+        CaO: '41.98'
+        SiO2: '42.9'
+        Al2O3: '3.1'
+        Na2O: '6.71'
+        B2O3: '5.22'
+        TiO2: '0.081'
+    - slag_id: CS-3
+      composition_wt_pct:
+        CaO: '46.2'
+        SiO2: '39.11'
+        Al2O3: '3.19'
+        Na2O: '6.59'
+        B2O3: '4.81'
+        TiO2: '0.081'
+    - slag_id: CS-4
+      composition_wt_pct:
+        CaO: '43.8'
+        SiO2: '36.91'
+        Al2O3: '3.12'
+        Na2O: '6.54'
+        B2O3: '4.63'
+        TiO2: '5'
+    - slag_id: CS-5
+      composition_wt_pct:
+        CaO: '38.29'
+        SiO2: '39.18'
+        Al2O3: '3.21'
+        Na2O: '6.61'
+        B2O3: '5.08'
+        TiO2: '5.55'
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_analyzed_slag_compositions_table2
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_apparent_activation_energy_figure9
+  type: model_comparison
+  locator:
+    page: 4
+    figure: '9'
+  units: kJ/mol
+  values:
+    quantity: apparent_activation_energy_comparison
+    evidence_class: quoted_attributed
+    statement: Calculated apparent activation energy for the evaporation mechanism(s) of CS-3 is larger than for CS-3 with
+      ZrO2 and CS-4 with TiO2.
+    figure_read_candidate: numerical activation energies are shown only in Figure 9 and were not digitised
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_apparent_activation_energy_figure9
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_calculation_tables_3_to_5
+  type: thermodynamic_example
+  locator:
+    page: 7
+    table: '3'
+    note: Calculation inputs and model estimates; cells checked against render
+  units: as printed per field
+  values:
+    quantity: evaporation_transport_model_context
+    table_3:
+      columns:
+      - Ar
+      - NaBO2_g
+      - B2O3_g
+      rows:
+      - property: epsilon_over_k_K
+        values:
+        - '122.4'
+        - '2378.88'
+        - '1388.16'
+      - property: sigma_A
+        values:
+        - '3.432'
+        - '3.65'
+        - '4.23'
+      - property: molecular_weight_g_per_mol
+        values:
+        - '39.948'
+        - '65.8'
+        - '69.62'
+      - property: molecular_volume_cm3_per_mol
+        values:
+        - '75.2'
+        - '26.7'
+        - '41.69'
+    table_4:
+      unit: 10^-4 m2/s
+      temperatures_C:
+      - 1300
+      - 1350
+      - 1400
+      rows:
+      - species: NaBO2_g
+        values:
+        - '1.93'
+        - '2.05'
+        - '2.16'
+      - species: B2O3_g
+        values:
+        - '1.75'
+        - '1.85'
+        - '1.94'
+    table_5:
+      unit: Pa
+      temperatures_C:
+      - 1300
+      - 1350
+      - 1400
+      source_basis: estimated from ternary Na2O–B2O3–SiO2 slag system; assumed applicable to these slags because their Na2O
+        and B2O3 contents are similar
+      rows:
+      - species: NaBO2_g
+        values:
+        - 2298
+        - 4417
+        - 8164
+      - species: B2O3_g
+        values:
+        - '1.46'
+        - '4.69'
+        - '14.06'
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_calculation_tables_3_to_5
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_designed_slag_compositions_table1
+  type: composition
+  locator:
+    page: 2
+    table: '1'
+    note: Designed composition; each oxide row across CS-1 to CS-5
+  units: mass%
+  values:
+    quantity: printed_slag_compositions
+    table_1_basis: design composition before melting
+    table_1_rows:
+    - slag_id: CS-1
+      composition_wt_pct:
+        CaO: 39
+        SiO2: 47
+        Al2O3: 3
+        Na2O: 6
+        B2O3: 5
+        TiO2: 0
+    - slag_id: CS-2
+      composition_wt_pct:
+        CaO: 44
+        SiO2: 42
+        Al2O3: 3
+        Na2O: 6
+        B2O3: 5
+        TiO2: 0
+    - slag_id: CS-3
+      composition_wt_pct:
+        CaO: '47.8'
+        SiO2: '38.2'
+        Al2O3: 3
+        Na2O: 6
+        B2O3: 5
+        TiO2: 0
+    - slag_id: CS-4
+      composition_wt_pct:
+        CaO: '44.6'
+        SiO2: '35.4'
+        Al2O3: 3
+        Na2O: 6
+        B2O3: 5
+        TiO2: 6
+    - slag_id: CS-5
+      composition_wt_pct:
+        CaO: 41
+        SiO2: 39
+        Al2O3: 3
+        Na2O: 6
+        B2O3: 5
+        TiO2: 6
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_designed_slag_compositions_table1
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_geometry_and_run_conditions
+  type: apparatus
+  locator:
+    page: 2
+    section: 2.2 Experimental Procedures
+    figure: '1'
+  units: as printed
+  values:
+    quantity: thermogravimetric_run_setup
+    furnace: SETARAM TGA 92
+    crucible: platinum; sample suspended by platinum wire in even-temperature zone
+    sample_charge_geometry: liquid slag surface to crucible end distance is L in the model; no numerical L or crucible dimensions
+      are stated
+    xrf_analysis_aliquot_mass_g: 50
+    premelt_schedule: dried 4 h at 200 C; heated to 1400 C at 5 C/min
+    test_atmosphere: argon
+    reaction_tube_evacuation_min: 5
+    test_gas_flow: fixed flow above starvation rate; authors state it was five times the flow expected to be rate-controlling
+      (p5); absolute flow not stated
+    test_heating_rate_K_per_min: 50
+    hold_time_min: 120
+    tga_detection_limit_ug: 1
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_geometry_and_run_conditions
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_mass_flux_schema_gap
+  type: method
+  locator:
+    page: 8
+    table: '6'
+  units: as printed
+  values:
+    quantity: schema_gap
+    printed_quantity: mass per area per time
+    printed_unit: mg/(cm^2 s)
+    reason: no quantity token stores an areal mass flux per unit time; rate_series mass_loss_rate is typed-refused and preserves
+      the published value and unit
+    figure_only_candidates:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_mass_flux_schema_gap
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag
+- observation_id: zhang_2011_table6_estimated_gas_film_flux
+  type: method
+  locator:
+    page: 8
+    table: '6'
+    note: Estimated gas-film mass flux column
+  units: 10^-3 mg/(cm^2 s)
+  values:
+    quantity: estimated_gas_film_flux
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    temperatures_C:
+    - 1300
+    - 1350
+    - 1400
+    values_as_printed:
+    - '1.12'
+    - '2.21'
+    - '4.18'
+    attribution: Authors calculated with equations (5), (6), and (12); vapor pressures are estimated from a ternary Na2O-B2O3-SiO2
+      system.
+    measured_rows_in_table: 3
+    measured_compositions_in_table:
+    - CS-3
+    - CS-3 plus 2 wt% ZrO2
+    - CS-4
+  context_id: zhang-2011-boron-sodium-f-free-evaporation::context::zhang_2011_table6_estimated_gas_film_flux
+  work_id: 10.2355/isijinternational.51.80
+  source_id: zhang-2011-boron-sodium-f-free-evaporation
+  species: slag

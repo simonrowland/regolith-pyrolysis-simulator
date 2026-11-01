@@ -913,7 +913,7 @@ def test_process_pool_matches_serial_deterministic_view(tmp_path: Path) -> None:
     ).encode("utf-8")
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.cpu_budget(15)
 def test_spinel_feedstock_pool_warm_path_returns_with_subprocess_route(
     tmp_path: Path,
 ) -> None:
@@ -1144,6 +1144,7 @@ def test_pool_records_thermal_admission_refusals_and_continues(
     assert results[3].feasible is True
 
 
+@pytest.mark.cpu_budget(10)
 @pytest.mark.timeout(10)
 def test_process_pool_timeout_records_failure_and_continues(
     monkeypatch: pytest.MonkeyPatch,
@@ -1363,6 +1364,7 @@ def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
     assert {1111, 2222}.issubset(set(captured_extra_pids[0]))
 
 
+@pytest.mark.cpu_budget(50)
 @pytest.mark.timeout(50)
 def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
     monkeypatch: pytest.MonkeyPatch,
@@ -1393,6 +1395,7 @@ def test_pool_unavailable_serial_fallback_timeout_records_and_continues(
     assert not (tmp_path / "pool" / "eval-000000" / "artifact.txt").exists()
 
 
+@pytest.mark.cpu_budget(10)
 @pytest.mark.timeout(10)
 def test_process_pool_timeout_kills_worker_process_group(
     tmp_path: Path,
@@ -1421,6 +1424,7 @@ def test_process_pool_timeout_kills_worker_process_group(
 
 @pytest.mark.serial  # red under -n auto trains 11-12, green -n0 serial rerun 2026-08-02, timeout/subprocess-timing class
 @pytest.mark.xdist_group("serial")
+@pytest.mark.cpu_budget(120)
 @pytest.mark.timeout(120)
 def test_process_pool_timeout_reaps_normal_subprocess_child(
     tmp_path: Path,
@@ -1480,6 +1484,7 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
         os.kill(child_pid, 0)
 
 
+@pytest.mark.cpu_budget(10)
 @pytest.mark.timeout(10)
 def test_pool_process_termination_kills_child_process_group(tmp_path: Path) -> None:
     survivor = tmp_path / "pool-grandchild-survived.txt"
@@ -1655,6 +1660,7 @@ def test_descendant_snapshot_merges_tracked_and_discovered_pids(
     assert found == (202, 303)
 
 
+@pytest.mark.cpu_budget(10)
 @pytest.mark.timeout(10)
 def test_cleanup_deadline_expiry_reclaims_tracked_straggler_and_worker(
     monkeypatch: pytest.MonkeyPatch,

@@ -188,7 +188,7 @@ def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
 # the PR tier does not re-run the fixture for a 0 s consumer.
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(7200)
+@pytest.mark.cpu_budget(7200)
 def test_pyrolysis_track_c5_reduces_feo_without_additives(
     full_pyrolysis_track_result,
 ):
@@ -443,7 +443,7 @@ def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
 # the chains balanced rather than stacking onto the fullrun_b critical path.
 # Nightly (2026-08-02 CI tiering): distinct-input full track (~36 s junit).
 @pytest.mark.nightly
-@pytest.mark.timeout(1020)
+@pytest.mark.cpu_budget(1020)
 @pytest.mark.xdist_group("magemin_fullrun_d")
 def test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours():
     result = _run_pyrolysis_track(mre_target_species="FeO")
@@ -589,7 +589,7 @@ def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
 # Nightly: assertion-only sibling of the retained full track (fixture co-tenant).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(7200)
+@pytest.mark.cpu_budget(7200)
 def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
     full_pyrolysis_track_result,
 ):
@@ -608,7 +608,7 @@ def test_pc_extract_fe_target_has_fe_product_after_full_pyrolysis_track(
 # Nightly: assertion-only sibling of the retained full track (fixture co-tenant).
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_b")
-@pytest.mark.timeout(7200)
+@pytest.mark.cpu_budget(7200)
 def test_pc_extract_al_remains_infeasible_at_1p6v_c5_cap(
     full_pyrolysis_track_result,
 ):

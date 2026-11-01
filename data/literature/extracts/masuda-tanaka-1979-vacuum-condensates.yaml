@@ -1,0 +1,1882 @@
+schema_version: literature_extract.v1
+source_id: masuda-tanaka-1979-vacuum-condensates
+source:
+  citation: Masuda, A. and Tanaka, T. (1979). Experimental Studies on Behaviors of Major and Minor Lithophile Elements
+    in Vaporization Under Evacuated Condition. Meteoritics, 14(1), 13–28.
+  doi: 10.1111/j.1945-5100.1979.tb00475.x
+  year: 1979
+  corpus_asset: raw/masuda-tanaka-1979-vacuum-condensates/masuda-tanaka-1979-vacuum-condensates.pdf
+extraction:
+  method: MinerU machine-text table transcription; both printed table pages checked cell by cell against page renders.
+    The pdftotext layer contains only ADS watermarks.
+  date: '2026-10-27'
+  worker: w1027naC-masuda-tanaka-1979-vacuum
+review_status: draft
+fidelity_samples:
+- species: SiO2
+  observable: context_no_token
+  observation_id: masuda_tanaka_1979_table1_full_cell_audit
+  field: render_pins
+  value:
+    IU-1 condensate La ppm: '13.2'
+    9-26-5 residue Ce ppm: '115'
+    JB-1 K2O percent: '1.44'
+  locator: &id002
+    page: 5
+    pdf_page_index: 4
+    published_page: 17
+    table: '1'
+- species: SiO2
+  observable: context_no_token
+  observation_id: masuda_tanaka_1979_table2_enrichment_factors_typed_refusal
+  field: render_pins
+  value:
+    Ce, 6-16-3: '0.587'
+    K, 9-26-4: '1.38'
+    Rb, 9-26-5: '0.014'
+  locator: &id003
+    page: 6
+    pdf_page_index: 5
+    published_page: 18
+    table: '2'
+experiments:
+- experiment_id: jb1_electron_bombardment_vaporization
+  bench_id: electron_bombardment_system
+  method: electron_bombardment_vaporization
+  locator: &id001
+    page: 3
+    pdf_page_index: 2
+    published_page: 15
+    section: Experimental
+  sample:
+    form:
+      state:
+        tag: value
+        value: JB-1 reference basaltic rock powder
+      locator: *id001
+    mass_kg:
+      state:
+        tag: unknown
+        reason: no_per_run_charge_mass_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 15
+        section: Experimental
+        note: The sample was usually approximately 100 mg; no charge mass is assigned to each run.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: table1_starting_reference_is_incomplete_for_bulk_composition
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: JB-1 row gives trace elements and selected major oxides only; the complete starting composition is
+          not printed here.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: during_vaporization_pressure_not_measured
+      locator: &id004
+        page: 2
+        pdf_page_index: 1
+        published_page: 14
+        section: Experimental
+        note: The bell jar was evacuated to (2–5) × 10^-5 Torr prior to vaporization; pressure rose by orders of
+          magnitude during vaporization and was not measured above the crucible or collector.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure_during_vaporization_not_measured
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: electron bombardment of a Ta crucible using a W filament
+      locator: *id001
+    temperature_range_C:
+      state:
+        tag: value
+        value:
+        - '1800'
+        - '2000'
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 15
+        section: Experimental
+        note: Optical pyrometer crucible temperature range as printed; local and instantaneous sample temperatures
+          may be higher or lower.
+    sample_mass_as_printed:
+      state:
+        tag: value
+        value: approximately 100 mg
+      locator: *id001
+    usual_evaporation_duration_as_printed:
+      state:
+        tag: value
+        value: about five minutes
+      locator: *id001
+    interrupted_run_duration:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 15
+        section: Experimental
+        note: The 9-26-4/9-26-5 interrupted experiment has no printed interruption time.
+    heating_filament_temperature_C:
+      state:
+        tag: value
+        value:
+        - '2100'
+        - '2300'
+      locator: &id005
+        page: 2
+        pdf_page_index: 1
+        published_page: 14
+        section: Experimental
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    locator: *id001
+benches:
+- id: electron_bombardment_system
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: electron bombardment vaporization system in an evacuated bell jar
+    locator: *id001
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: tantalum crucible, 8 mm outer diameter
+    locator: *id005
+  heating_method:
+    state:
+      tag: value
+      value: tungsten filament electron bombardment
+    locator: *id001
+  temperature_measurement:
+    optical_pyrometer:
+      state:
+        tag: value
+        value: optical pyrometer indicated 1800–2000 °C crucible temperature
+      locator: *id001
+  detector:
+    state:
+      tag: value
+      value: optical pyrometer; electron emission current
+    locator: *id001
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: masuda_tanaka_1979_table1_full_cell_audit
+      type: context_no_token
+      locator: *id002
+      attribution: 'present work; analytical methods: stable isotope dilution for REE, Rb, Sr and Ba; atomic absorption
+        spectrometry for other elements'
+      units: ppm for trace elements; % for major oxides, as printed
+      values:
+        quantity: Table 1 complete cell transcript; condensate compositions typed-refused
+        method_class: measured_direct
+        candidate_tokens:
+        - condensate_composition
+        reason: 'The seven Table 1 condensates have non-closed analyses: trace elements in ppm and selected major
+          oxides in percent, with unreported components and mixed analytical bases. The existing condensate_composition
+          quantity requires a component mole-fraction vector; these printed values cannot be converted into that
+          vector without inventing missing composition. The 9-26-5 residue trace-element cells are represented separately
+          by residue observations below; this complete table grid is retained here as the cell-audit transcript.'
+        row_count_as_printed: 22
+        column_order_as_printed:
+        - row label
+        - 6-16-3 condensate
+        - IU-1 condensate
+        - IU-4 condensate
+        - 9-26-1 condensate
+        - 9-26-3 condensate
+        - 9-26-2 condensate
+        - 9-26-4 condensate
+        - 9-26-5 residue
+        - JB-1 starting reference
+        rows_as_published:
+        - row: 2
+          analyte_or_measure: La
+          values_as_published:
+            6-16-3 condensate: '-'
+            IU-1 condensate: '13.2'
+            IU-4 condensate: '7.15'
+            9-26-1 condensate: '1.50'
+            9-26-3 condensate: '1.70'
+            9-26-2 condensate: '0.32'
+            9-26-4 condensate: '2.16'
+            9-26-5 residue: '69.0'
+            JB-1 starting reference: '37.0'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 1: La'
+        - row: 3
+          analyte_or_measure: Ce
+          values_as_published:
+            6-16-3 condensate: '39.6'
+            IU-1 condensate: '12.9'
+            IU-4 condensate: '4.35'
+            9-26-1 condensate: '1.80'
+            9-26-3 condensate: '3.12'
+            9-26-2 condensate: '0.623'
+            9-26-4 condensate: '3.39'
+            9-26-5 residue: '115'
+            JB-1 starting reference: '67.5'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 2: Ce'
+        - row: 4
+          analyte_or_measure: Nd
+          values_as_published:
+            6-16-3 condensate: '-'
+            IU-1 condensate: '4.17'
+            IU-4 condensate: '0.94'
+            9-26-1 condensate: '0.367'
+            9-26-3 condensate: '0.855'
+            9-26-2 condensate: '0.040'
+            9-26-4 condensate: '0.784'
+            9-26-5 residue: '45.9'
+            JB-1 starting reference: '26.8'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 3: Nd'
+        - row: 5
+          analyte_or_measure: Sm
+          values_as_published:
+            6-16-3 condensate: '3.33'
+            IU-1 condensate: '0.954'
+            IU-4 condensate: '0.28'
+            9-26-1 condensate: '0.0927'
+            9-26-3 condensate: '0.182'
+            9-26-2 condensate: '0.0116'
+            9-26-4 condensate: '0.200'
+            9-26-5 residue: '8.67'
+            JB-1 starting reference: '5.13'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 4: Sm'
+        - row: 6
+          analyte_or_measure: Eu
+          values_as_published:
+            6-16-3 condensate: '1.56'
+            IU-1 condensate: '0.670'
+            IU-4 condensate: '0.52'
+            9-26-1 condensate: '0.129'
+            9-26-3 condensate: '0.136'
+            9-26-2 condensate: '0.0057'
+            9-26-4 condensate: '0.242'
+            9-26-5 residue: '2.57'
+            JB-1 starting reference: '1.55'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 5: Eu'
+        - row: 7
+          analyte_or_measure: Gd
+          values_as_published:
+            6-16-3 condensate: '2.25'
+            IU-1 condensate: '0.670'
+            IU-4 condensate: '0.175'
+            9-26-1 condensate: '0.0428'
+            9-26-3 condensate: '0.129'
+            9-26-2 condensate: '0.0120'
+            9-26-4 condensate: '0.133'
+            9-26-5 residue: '8.04'
+            JB-1 starting reference: '4.82'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 6: Gd'
+        - row: 8
+          analyte_or_measure: Dy
+          values_as_published:
+            6-16-3 condensate: '1.74'
+            IU-1 condensate: '0.544'
+            IU-4 condensate: '-'
+            9-26-1 condensate: '0.0448'
+            9-26-3 condensate: '0.113'
+            9-26-2 condensate: '0.0079'
+            9-26-4 condensate: '0.103'
+            9-26-5 residue: '7.17'
+            JB-1 starting reference: '4.19'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 7: Dy'
+        - row: 9
+          analyte_or_measure: Er
+          values_as_published:
+            6-16-3 condensate: '1.09'
+            IU-1 condensate: '0.39'
+            IU-4 condensate: '0.067'
+            9-26-1 condensate: '0.0196'
+            9-26-3 condensate: '0.055'
+            9-26-2 condensate: '0.0053'
+            9-26-4 condensate: '0.045'
+            9-26-5 residue: '4.05'
+            JB-1 starting reference: '2.28'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 8: Er'
+        - row: 10
+          analyte_or_measure: Yb
+          values_as_published:
+            6-16-3 condensate: '2.15'
+            IU-1 condensate: '1.09'
+            IU-4 condensate: '-'
+            9-26-1 condensate: '0.235'
+            9-26-3 condensate: '0.243'
+            9-26-2 condensate: '0.0162'
+            9-26-4 condensate: '0.481'
+            9-26-5 residue: '3.45'
+            JB-1 starting reference: '2.14'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 9: Yb'
+        - row: 11
+          analyte_or_measure: Lu
+          values_as_published:
+            6-16-3 condensate: '0.142'
+            IU-1 condensate: '0.073'
+            IU-4 condensate: '0.044'
+            9-26-1 condensate: '0.084'
+            9-26-3 condensate: '0.0105'
+            9-26-2 condensate: '0.0036'
+            9-26-4 condensate: '0.0112'
+            9-26-5 residue: '0.594'
+            JB-1 starting reference: '0.308'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 10: Lu'
+        - row: 12
+          analyte_or_measure: Ba
+          values_as_published:
+            6-16-3 condensate: '399'
+            IU-1 condensate: '170'
+            IU-4 condensate: '29.4'
+            9-26-1 condensate: '58.0'
+            9-26-3 condensate: '34.1'
+            9-26-2 condensate: '67.3'
+            9-26-4 condensate: '110.4'
+            9-26-5 residue: '1110'
+            JB-1 starting reference: '511'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 11: Ba'
+        - row: 13
+          analyte_or_measure: Rb
+          values_as_published:
+            6-16-3 condensate: '-'
+            IU-1 condensate: '-'
+            IU-4 condensate: '-'
+            9-26-1 condensate: '91.8'
+            9-26-3 condensate: '94.0'
+            9-26-2 condensate: '123'
+            9-26-4 condensate: '186'
+            9-26-5 residue: '0.57'
+            JB-1 starting reference: '41.2'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 12: Rb'
+        - row: 14
+          analyte_or_measure: Sr
+          values_as_published:
+            6-16-3 condensate: '-'
+            IU-1 condensate: '-'
+            IU-4 condensate: '-'
+            9-26-1 condensate: '49.5'
+            9-26-3 condensate: '59.7'
+            9-26-2 condensate: '1.7'
+            9-26-4 condensate: '90.0'
+            9-26-5 residue: '951'
+            JB-1 starting reference: '435.2'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 13: Sr'
+        - row: 15
+          analyte_or_measure: ' $Al_2O_3$ '
+          values_as_published:
+            6-16-3 condensate: '13.2'
+            IU-1 condensate: '9.35'
+            IU-4 condensate: '3.38'
+            9-26-1 condensate: '6.28'
+            9-26-3 condensate: '4.29'
+            9-26-2 condensate: '0.26'
+            9-26-4 condensate: '7.25'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '14.53'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 14:  $Al_2O_3$ '
+        - row: 16
+          analyte_or_measure: FeO
+          values_as_published:
+            6-16-3 condensate: '8.61'
+            IU-1 condensate: '8.94'
+            IU-4 condensate: '8.93'
+            9-26-1 condensate: '8.07'
+            9-26-3 condensate: '8.18'
+            9-26-2 condensate: '7.38'
+            9-26-4 condensate: '6.91'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '8.06'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 15: FeO'
+        - row: 17
+          analyte_or_measure: CaO
+          values_as_published:
+            6-16-3 condensate: '5.43'
+            IU-1 condensate: '5.10'
+            IU-4 condensate: '1.18'
+            9-26-1 condensate: '1.46'
+            9-26-3 condensate: '1.31'
+            9-26-2 condensate: '0.03'
+            9-26-4 condensate: '2.63'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '9.24'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 16: CaO'
+        - row: 18
+          analyte_or_measure: MgO
+          values_as_published:
+            6-16-3 condensate: '7.18'
+            IU-1 condensate: '9.03'
+            IU-4 condensate: '8.84'
+            9-26-1 condensate: '7.22'
+            9-26-3 condensate: '8.45'
+            9-26-2 condensate: '6.34'
+            9-26-4 condensate: '6.55'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '7.74'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 17: MgO'
+        - row: 19
+          analyte_or_measure: MnO
+          values_as_published:
+            6-16-3 condensate: '-'
+            IU-1 condensate: '0.14'
+            IU-4 condensate: '0.16'
+            9-26-1 condensate: '0.19'
+            9-26-3 condensate: '0.20'
+            9-26-2 condensate: '0.22'
+            9-26-4 condensate: '0.14'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '0.15'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 18: MnO'
+        - row: 20
+          analyte_or_measure: ' $Na_2O$ '
+          values_as_published:
+            6-16-3 condensate: '1.51'
+            IU-1 condensate: '2.96'
+            IU-4 condensate: '4.64'
+            9-26-1 condensate: '3.78'
+            9-26-3 condensate: '4.93'
+            9-26-2 condensate: '5.80'
+            9-26-4 condensate: '3.94'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '2.80'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 19:  $Na_2O$ '
+        - row: 21
+          analyte_or_measure: ' $K_2O$ '
+          values_as_published:
+            6-16-3 condensate: '1.23'
+            IU-1 condensate: '1.51'
+            IU-4 condensate: '1.98'
+            9-26-1 condensate: '1.99'
+            9-26-3 condensate: '2.15'
+            9-26-2 condensate: '2.22'
+            9-26-4 condensate: '1.99'
+            9-26-5 residue: '-'
+            JB-1 starting reference: '1.44'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 20:  $K_2O$ '
+        - row: 22
+          analyte_or_measure: Sample analyzed (mg)
+          values_as_published:
+            6-16-3 condensate: '3.03'
+            IU-1 condensate: '1.64'
+            IU-4 condensate: '2.28'
+            9-26-1 condensate: '11.48'
+            9-26-3 condensate: '28.93'
+            9-26-2 condensate: '17.95'
+            9-26-4 condensate: '9.87'
+            9-26-5 residue: '10.2'
+            JB-1 starting reference: ''
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 21: Sample analyzed (mg)'
+        - row: 23
+          analyte_or_measure: Distance from source (cm)
+          values_as_published:
+            6-16-3 condensate: '1.5'
+            IU-1 condensate: '4.5'
+            IU-4 condensate: '7.0'
+            9-26-1 condensate: '7.8'
+            9-26-3 condensate: '11.9'
+            9-26-2 condensate: '15'
+            9-26-4 condensate: '6.4'
+            9-26-5 residue: '6.4'
+            JB-1 starting reference: ''
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: 'Printed body row 22: Distance from source (cm)'
+        render_pins:
+          IU-1 condensate La ppm: '13.2'
+          9-26-5 residue Ce ppm: '115'
+          JB-1 K2O percent: '1.44'
+        ta_free_basis: Table 1 values are on a Ta-free basis because tantalum contamination from the crucible was
+          sometimes found in the products.
+        reference_row_attribution: JB-1 major elements, Rb and Sr after Ando et al. (1974); REE and Ba after Tanaka
+          (1975).
+        interrupted_run_pair: 9-26-4 condensate and 9-26-5 residue are the paired interrupted evaporation products.
+    - observation_id: masuda_tanaka_1979_table2_enrichment_factors_typed_refusal
+      type: context_no_token
+      locator: *id003
+      attribution: Masuda and Tanaka (1979), author-calculated enrichment factors relative to the JB-1 starting
+        reference in Table 1.
+      units: dimensionless enrichment factor, as printed
+      values:
+        quantity: enrichment factors relative to starting material
+        method_class: quoted_attributed
+        candidate_tokens:
+        - distribution_ratio
+        - condensate_composition
+        reason: Table 2 reports author-calculated relative enrichment factors, not a phase distribution coefficient
+          or a measured composition vector. Table 1/starting-reference inputs cannot be stored as compatible observation
+          records, and the paper gives no defining equation; retain as quoted attributed values without fabricating
+          derivation lineage.
+        row_count_as_printed: 21
+        column_order_as_printed:
+        - row label
+        - 6-16-3
+        - IU-1
+        - IU-4
+        - 9-26-1
+        - 9-26-3
+        - 9-26-2
+        - 9-26-4
+        - 9-26-5
+        rows_as_published:
+        - row: 2
+          analyte_or_measure: La
+          values_as_published:
+            6-16-3: '-'
+            IU-1: '0.357'
+            IU-4: '0.193'
+            9-26-1: '0.0405'
+            9-26-3: '0.0459'
+            9-26-2: '0.0086'
+            9-26-4: '0.0583'
+            9-26-5: '1.86'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 1: La'
+        - row: 3
+          analyte_or_measure: Ce
+          values_as_published:
+            6-16-3: '0.587'
+            IU-1: '0.190'
+            IU-4: '0.064'
+            9-26-1: '0.0267'
+            9-26-3: '0.0462'
+            9-26-2: '0.0092'
+            9-26-4: '0.0503'
+            9-26-5: '1.71'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 2: Ce'
+        - row: 4
+          analyte_or_measure: Nd
+          values_as_published:
+            6-16-3: '-'
+            IU-1: '0.155'
+            IU-4: '0.035'
+            9-26-1: '0.0137'
+            9-26-3: '0.0319'
+            9-26-2: '0.00148'
+            9-26-4: '0.0292'
+            9-26-5: '1.71'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 3: Nd'
+        - row: 5
+          analyte_or_measure: Sm
+          values_as_published:
+            6-16-3: '0.648'
+            IU-1: '0.186'
+            IU-4: '0.054'
+            9-26-1: '0.0181'
+            9-26-3: '0.0354'
+            9-26-2: '0.00226'
+            9-26-4: '0.0390'
+            9-26-5: '1.69'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 4: Sm'
+        - row: 6
+          analyte_or_measure: Eu
+          values_as_published:
+            6-16-3: '1.01'
+            IU-1: '0.432'
+            IU-4: '0.34'
+            9-26-1: '0.0831'
+            9-26-3: '0.0875'
+            9-26-2: '0.00370'
+            9-26-4: '0.156'
+            9-26-5: '1.65'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 5: Eu'
+        - row: 7
+          analyte_or_measure: Gd
+          values_as_published:
+            6-16-3: '0.466'
+            IU-1: '0.139'
+            IU-4: '0.036'
+            9-26-1: '0.00888'
+            9-26-3: '0.0268'
+            9-26-2: '0.00248'
+            9-26-4: '0.0275'
+            9-26-5: '1.67'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 6: Gd'
+        - row: 8
+          analyte_or_measure: Dy
+          values_as_published:
+            6-16-3: '0.416'
+            IU-1: '0.130'
+            IU-4: '-'
+            9-26-1: '0.0107'
+            9-26-3: '0.0270'
+            9-26-2: '0.00187'
+            9-26-4: '0.0265'
+            9-26-5: '1.71'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 7: Dy'
+        - row: 9
+          analyte_or_measure: Er
+          values_as_published:
+            6-16-3: '0.477'
+            IU-1: '0.171'
+            IU-4: '0.029'
+            9-26-1: '0.00857'
+            9-26-3: '0.0243'
+            9-26-2: '0.0023'
+            9-26-4: '0.0197'
+            9-26-5: '1.78'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 8: Er'
+        - row: 10
+          analyte_or_measure: Yb
+          values_as_published:
+            6-16-3: '1.00'
+            IU-1: '0.51'
+            IU-4: '-'
+            9-26-1: '0.110'
+            9-26-3: '0.114'
+            9-26-2: '0.0076'
+            9-26-4: '0.225'
+            9-26-5: '1.61'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 9: Yb'
+        - row: 11
+          analyte_or_measure: Lu
+          values_as_published:
+            6-16-3: '0.463'
+            IU-1: '0.237'
+            IU-4: '0.142'
+            9-26-1: '0.0274'
+            9-26-3: '0.034'
+            9-26-2: '0.0073'
+            9-26-4: '0.0362'
+            9-26-5: '1.93'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 10: Lu'
+        - row: 12
+          analyte_or_measure: Average for REE*
+          values_as_published:
+            6-16-3: '0.510'
+            IU-1: '0.196'
+            IU-4: '0.079'
+            9-26-1: '0.0193'
+            9-26-3: '0.0339'
+            9-26-2: '0.0045'
+            9-26-4: '0.0358'
+            9-26-5: ''
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 11: Average for REE*'
+        - row: 13
+          analyte_or_measure: Ba
+          values_as_published:
+            6-16-3: '0.781'
+            IU-1: '0.333'
+            IU-4: '0.058'
+            9-26-1: '0.113'
+            9-26-3: '0.0668'
+            9-26-2: '0.132'
+            9-26-4: '0.216'
+            9-26-5: '2.18'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 12: Ba'
+        - row: 14
+          analyte_or_measure: Rb
+          values_as_published:
+            6-16-3: '-'
+            IU-1: '-'
+            IU-4: '-'
+            9-26-1: '2.24'
+            9-26-3: '2.29'
+            9-26-2: '3.00'
+            9-26-4: '4.54'
+            9-26-5: '0.014'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 13: Rb'
+        - row: 15
+          analyte_or_measure: Sr
+          values_as_published:
+            6-16-3: '-'
+            IU-1: '-'
+            IU-4: '-'
+            9-26-1: '0.091'
+            9-26-3: '0.133'
+            9-26-2: '0.0038'
+            9-26-4: '0.201'
+            9-26-5: '2.19'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 14: Sr'
+        - row: 16
+          analyte_or_measure: Al
+          values_as_published:
+            6-16-3: '0.911'
+            IU-1: '0.643'
+            IU-4: '0.233'
+            9-26-1: '0.432'
+            9-26-3: '0.295'
+            9-26-2: '0.0179'
+            9-26-4: '0.499'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 15: Al'
+        - row: 17
+          analyte_or_measure: Fe
+          values_as_published:
+            6-16-3: '1.07'
+            IU-1: '1.11'
+            IU-4: '1.11'
+            9-26-1: '1.00'
+            9-26-3: '1.01'
+            9-26-2: '0.916'
+            9-26-4: '0.857'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 16: Fe'
+        - row: 18
+          analyte_or_measure: Ca
+          values_as_published:
+            6-16-3: '0.587'
+            IU-1: '0.552'
+            IU-4: '0.12'
+            9-26-1: '0.158'
+            9-26-3: '0.142'
+            9-26-2: '0.0032'
+            9-26-4: '0.285'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 17: Ca'
+        - row: 19
+          analyte_or_measure: Mg
+          values_as_published:
+            6-16-3: '0.928'
+            IU-1: '1.17'
+            IU-4: '1.14'
+            9-26-1: '0.933'
+            9-26-3: '1.09'
+            9-26-2: '0.819'
+            9-26-4: '0.846'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 18: Mg'
+        - row: 20
+          analyte_or_measure: Mn
+          values_as_published:
+            6-16-3: '-'
+            IU-1: '0.91'
+            IU-4: '1.08'
+            9-26-1: '1.27'
+            9-26-3: '1.33'
+            9-26-2: '1.47'
+            9-26-4: '0.93'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 19: Mn'
+        - row: 21
+          analyte_or_measure: Na
+          values_as_published:
+            6-16-3: '0.538'
+            IU-1: '1.06'
+            IU-4: '1.66'
+            9-26-1: '1.35'
+            9-26-3: '1.76'
+            9-26-2: '2.07'
+            9-26-4: '1.41'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 20: Na'
+        - row: 22
+          analyte_or_measure: K
+          values_as_published:
+            6-16-3: '0.851'
+            IU-1: '1.05'
+            IU-4: '1.37'
+            9-26-1: '1.38'
+            9-26-3: '1.49'
+            9-26-2: '1.54'
+            9-26-4: '1.38'
+            9-26-5: '-'
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 18
+            table: '2'
+            note: 'Printed body row 21: K'
+        render_pins:
+          Ce, 6-16-3: '0.587'
+          K, 9-26-4: '1.38'
+          Rb, 9-26-5: '0.014'
+        average_REE_footnote: Except Eu and Yb.
+  Ce:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_ce
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Ce row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Ce
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '115'
+          residue_ppm: '115'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 3
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 2, 9-26-5 residue column, Ce.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  La:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_la
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, La row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: La
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '69.0'
+          residue_ppm: '69.0'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 2
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 1, 9-26-5 residue column, La.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Nd:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_nd
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Nd row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Nd
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '45.9'
+          residue_ppm: '45.9'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 4
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 3, 9-26-5 residue column, Nd.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Sm:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_sm
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Sm row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Sm
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '8.67'
+          residue_ppm: '8.67'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 5
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 4, 9-26-5 residue column, Sm.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Eu:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_eu
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Eu row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Eu
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '2.57'
+          residue_ppm: '2.57'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 6
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 5, 9-26-5 residue column, Eu.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Gd:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_gd
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Gd row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Gd
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '8.04'
+          residue_ppm: '8.04'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 7
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 6, 9-26-5 residue column, Gd.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Dy:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_dy
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Dy row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Dy
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '7.17'
+          residue_ppm: '7.17'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 8
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 7, 9-26-5 residue column, Dy.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Er:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_er
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Er row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Er
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '4.05'
+          residue_ppm: '4.05'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 9
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 8, 9-26-5 residue column, Er.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Yb:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_yb
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Yb row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Yb
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '3.45'
+          residue_ppm: '3.45'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 10
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 9, 9-26-5 residue column, Yb.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Lu:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_lu
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Lu row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Lu
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '0.594'
+          residue_ppm: '0.594'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 11
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 10, 9-26-5 residue column, Lu.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Ba:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_ba
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Ba row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Ba
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '1110'
+          residue_ppm: '1110'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 12
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 11, 9-26-5 residue column, Ba.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Rb:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_rb
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Rb row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Rb
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '0.57'
+          residue_ppm: '0.57'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 13
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 12, 9-26-5 residue column, Rb.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.
+  Sr:
+    observations:
+    - observation_id: masuda_tanaka_1979_residue_sr
+      experiment: jb1_electron_bombardment_vaporization
+      type: composition_series
+      class_tag: measured
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 17
+        table: '1'
+        note: 9-26-5 residue, Sr row; interrupted evaporation.
+      units: ppm
+      regime: vacuum_chamber_pyrolysis
+      phase: post-run residue; phase not stated
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analyte: Sr
+        sample_form: material remaining in Ta crucible after interrupted vaporization
+        basis_as_published: Ta-free analytical basis; element concentration in ppm
+        points:
+        - value: '951'
+          residue_ppm: '951'
+          sample_id: 9-26-5
+          phase: null
+          table_row_number: 14
+          table_phase_column: 9
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 17
+            table: '1'
+            note: Table 1 body row 13, 9-26-5 residue column, Sr.
+          point_conditions:
+            T_C:
+              state:
+                tag: unknown
+                reason: source reports only an experiment-level crucible range; actual sample temperature varied
+                  locally and was not measured per run
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: during_vaporization_pressure_not_measured
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: not_published
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: complete_starting_composition_not_published
+              locator: *id002
+            exposure:
+              state:
+                tag: unknown
+                reason: interruption_time_not_published
+              locator: *id001
+            sample_mass_kg:
+              state:
+                tag: unknown
+                reason: per_run_initial_charge_mass_not_published
+              locator: *id001
+        uncertainty_as_published: No numerical analytical uncertainty stated.

@@ -63,6 +63,125 @@ def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
     assert bucket["class_total_kg"] == 0.0
 
 
+def test_product_story_keeps_partial_flag_with_numeric_total():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={},
+        classification={
+            "ingots_metals": {
+                "status": "partial",
+                "excluded": excluded,
+                "estimated_contributions": estimated_contributions,
+                "flag": {"status": "partial", "reason": "missing LJ row"},
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {"Fe": 1.0},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+    assert story["metal_ingots"]["class_total_kg"] == 1.0
+    assert story["metal_ingots"]["status"] == "partial"
+    assert story["metal_ingots"]["excluded"] == excluded
+    assert story["metal_ingots"]["estimated_contributions"] == (
+        estimated_contributions
+    )
+
+
+def test_product_story_keeps_estimates_for_available_class():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "extrapolated",
+        "reason": "estimated carrier row",
+    }]
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species={},
+        classification={
+            "ingots_metals": {
+                "status": "available",
+                "estimated_contributions": estimated_contributions,
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {"Fe": 1.0},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+
+    assert story["metal_ingots"]["class_total_kg"] == 1.0
+    assert story["metal_ingots"]["estimated_contributions"] == (
+        estimated_contributions
+    )
+
+
+def test_product_story_rump_composition_keeps_partial_flag_and_exclusion():
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    rump_species = {"Al2O3": 542.0, "SiO2": 457.0}
+    story = web_events._product_story_payload(
+        sim,
+        terminal_rump_by_species=rump_species,
+        classification={
+            "refractory_ceramic_rump": {
+                "status": "partial",
+                "availability_flag": {
+                    "status": "partial",
+                    "reason": "missing LJ row",
+                },
+                "excluded": excluded,
+                "rump_silicate_residual_kg": 457.0,
+            }
+        },
+        account_kg={},
+        extracted_projection={
+            "metal_ingots": {},
+            "glass": {},
+            "captured_volatiles": {},
+            "off_spec_condensate": {},
+            "oxygen": {"O2": 0.0},
+            "oxygen_partition": {"stored": 0.0, "vented": 0.0},
+        },
+    )
+
+    assert story["refractory_ceramic"]["class_total_kg"] == 542.0
+    assert story["refractory_ceramic"]["status"] == "partial"
+    assert story["refractory_ceramic"]["excluded"] == excluded
+    assert story["terminal_residue"]["silicate_residual_kg"] == 457.0
+    assert story["terminal_residue"]["status"] == "partial"
+    assert story["terminal_residue"]["excluded"] == excluded
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
@@ -1305,7 +1424,9 @@ const elements = Object.fromEntries([
     'lever-stage-temp', 'lever-stage-duration', 'lever-stage-ramp',
     'c4-max-temp', 'feedstock-select', 'batch-mass', 'engine-select',
     'furnace-material', 'add-na', 'add-k', 'add-mg', 'add-ca', 'add-c',
+    'carrier-gas',
 ].map(id => [id, {id, value: '', dataset: {}}]));
+elements['carrier-gas'].value = 'N2';
 const leverFields = {
     'lever-po2-mbar': 'pO2_mbar',
     'lever-pn2-mbar': 'p_total_mbar',
@@ -1329,25 +1450,37 @@ const context = {
 vm.createContext(context);
 vm.runInContext([
     functionSource('selectedLeverCampaign'),
+    functionSource('selectedCarrierGas'),
     functionSource('buildRuntimeCampaignOverrides'),
     functionSource('setRadioValue'),
     functionSource('applyLoadedRecipeControls'),
     functionSource('applyLoadedRecipeStartIdentity'),
+    functionSource('updateCarrierGasDisplayConfig'),
     'let loadedRecipePatch = null;',
     'let loadedRecipeCostParameters = null;',
     'let loadedRecipeCostRecipeName = null;',
 ].join('\n'), context);
 vm.runInContext(`
+document.getElementById('carrier-gas').value = 'N2';
 applyLoadedRecipeControls({
     lever_campaign: 'C4', pO2_mbar: 0.12, p_total_mbar: 0.12,
-    stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22
+    stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22,
+    runtime_campaign_overrides: {C2A: {carrier_gas: 'Kr'}}
 });
+const carrierAfterLoad = document.getElementById('carrier-gas').value;
 loadedRecipePatch = {campaigns: {C4: {temp_range_C: [1600, 1660]}}};
 loadedRecipeCostParameters = {schema_version: 'optimize-costs-v1', parameters: {}};
 loadedRecipeCostRecipeName = 'tab-local-prices';
 const payload = {};
 applyLoadedRecipeStartIdentity(payload);
-console.log(JSON.stringify(payload));
+const changedPayload = {};
+document.getElementById('carrier-gas').value = 'N2';
+applyLoadedRecipeStartIdentity(changedPayload);
+console.log(JSON.stringify({
+    carrierAfterLoad,
+    payload,
+    changedPayload,
+}));
 `, context);
 """
     completed = subprocess.run(
@@ -1358,7 +1491,9 @@ console.log(JSON.stringify(payload));
         check=False,
     )
     assert completed.returncode == 0, completed.stderr
-    assert json.loads(completed.stdout) == {
+    result = json.loads(completed.stdout)
+    assert result["carrierAfterLoad"] == "Kr"
+    assert result["payload"] == {
         "setpoints_patch": {"campaigns": {"C4": {"temp_range_C": [1600, 1660]}}},
         "cost_parameters": {
             "schema_version": "optimize-costs-v1",
@@ -1372,9 +1507,29 @@ console.log(JSON.stringify(payload));
                 "hold_temp_C": 1600,
                 "max_hours": 7.5,
                 "ramp_rate": 22,
-            }
+            },
+            "C2A": {"carrier_gas": "Kr"},
+            "C2A_staged": {"carrier_gas": "Kr"},
         },
     }
+    assert result["changedPayload"]["setpoints_patch"] == result["payload"][
+        "setpoints_patch"
+    ]
+    assert result["changedPayload"]["cost_parameters"] == result["payload"][
+        "cost_parameters"
+    ]
+    assert result["changedPayload"]["cost_parameters_recipe_name"] == (
+        result["payload"]["cost_parameters_recipe_name"]
+    )
+    assert result["changedPayload"]["runtime_campaign_overrides"]["C2A"][
+        "carrier_gas"
+    ] == "N2"
+    assert result["changedPayload"]["runtime_campaign_overrides"][
+        "C2A_staged"
+    ]["carrier_gas"] == "N2"
+    assert result["changedPayload"]["runtime_campaign_overrides"]["C4"] == (
+        result["payload"]["runtime_campaign_overrides"]["C4"]
+    )
 
 
 def test_recipe_cost_intent_is_tab_local_replaceable_and_clearable() -> None:
@@ -1941,6 +2096,39 @@ def test_c4_disclosure_option_lists_are_server_sourced_byte_identical():
         '<option value="4">Low (4&times;)</option>',
         '<option value="1">Off (1&times;)</option>',
     ]
+
+
+def test_c2a_product_targets_are_flagged_in_api_and_disclosure():
+    app = app_module.create_app()
+    client = app.test_client()
+
+    response = client.get("/api/setpoints")
+    assert response.status_code == 200
+    products = response.get_json()["campaigns"]["C2A_continuous"]["products"]
+    expected_masses = {
+        "Fe": [85, 130],
+        "SiO2_glass": [100, 160],
+        "O2": [48, 70],
+    }
+    for product, mass_kg in expected_masses.items():
+        assert products[product]["mass_kg"] == mass_kg
+        assert products[product]["target_status"] == "unverified_design_target"
+        assert products[product]["decision"] == "d-310"
+        assert products[product]["reason"]
+
+    response = client.get("/partials/disclosure/C2A_continuous")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert html.count("UNVERIFIED DESIGN TARGET (d-310)") == len(expected_masses)
+    assert html.count("Run ledger reports engine-predicted yields.") == len(
+        expected_masses
+    )
+    assert html.count("not verified against frozen-hour engine yields") == len(
+        expected_masses
+    )
+    assert "conflicts with oxygen implied by glass chemistry." in html
+    for mass_kg in expected_masses.values():
+        assert f"{mass_kg} kg" in html
 
 
 def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
@@ -2650,13 +2838,28 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
         state, _ = _current_simulation_state(new_sids.pop())
         assert state is not None
         sim = state["session"].simulator
-        assert sim.campaign_mgr.furnace_max_T_C == pytest.approx(1200)
+        from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+        assert sim.campaign_mgr.furnace_max_T_C == FURNACE_MAX_T_BOUNDS_C[0]
         assert state["recipe_inputs"]["furnace_material_id"] == "fused_silica"
-        assert state["recipe_inputs"]["furnace_max_T_C"] == pytest.approx(1200)
+        assert (
+            state["recipe_inputs"]["furnace_max_T_C"]
+            == FURNACE_MAX_T_BOUNDS_C[0]
+        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_fused_silica_clamp_regression_uses_exact_material_floor():
+    import inspect
+
+    source = inspect.getsource(
+        test_web_start_event_applies_furnace_material_after_recipe_patch
+    )
+    assert "pytest.approx(1200)" not in source
+    assert source.count("== FURNACE_MAX_T_BOUNDS_C[0]") == 2
 
 
 @pytest.mark.parametrize(
@@ -3047,6 +3250,87 @@ def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatc
         assert statuses[-1]["status"] == "error"
         assert "pressure validation failed" in statuses[-1]["message"]
         assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_socket_campaign_carrier_adjust_operates_and_unknown_is_non_mutating(
+    monkeypatch,
+):
+    from simulator.runner import _carrier_pressure_observables
+    from simulator.state import CampaignPhase
+
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        sid = (set(_simulations) - before).pop()
+        state, _ = _current_simulation_state(sid)
+        sim = state["session"].simulator
+        sim.start_campaign(CampaignPhase.C2A)
+
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C2A",
+                "field": "carrier_gas",
+                "value": "pKr",
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "parameter_adjusted"
+        assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+        assert sim.melt.background_gas_species == "Kr"
+
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C2A",
+                "field": "carrier_gas",
+                "value": "pXenon",
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "error"
+        assert "supported carrier gases:" in statuses[-1]["message"]
+        assert sim.campaign_mgr.overrides["C2A"]["carrier_gas"] == "Kr"
+        assert sim.melt.background_gas_species == "Kr"
+
+        result = state["session"].advance()
+        hourly = result.per_hour_summary
+        assert result.snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+        assert result.snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+        assert hourly["carrier_identity"] == "Kr"
+        assert hourly["p_carrier_bar"] > 0.0
+        assert _carrier_pressure_observables(sim, result.snapshot)[
+            "carrier_identity"
+        ] == "Kr"
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -4424,6 +4708,84 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert "residual_inventory_kg" in payload
 
 
+def test_completion_payload_marks_missing_metal_product_story_unavailable(
+    monkeypatch,
+):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    flag = {
+        "status": "unavailable",
+        "authority": "unavailable",
+        "reason": "EvaporationFluxConfigurationError: Si transport missing",
+    }
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "metals_plus_O2": {
+                "metals_kg": {},
+                "metals_total_kg": None,
+                "O2_kg": None,
+                "O2_partition_kg": {"stored": None, "vented": None},
+                "class_total_kg": None,
+                "flag": flag,
+            },
+            "ingots_metals": {
+                "species_kg": {},
+                "class_total_kg": None,
+                "flag": flag,
+            },
+            "oxygen": {
+                "O2_kg": None,
+                "partition_kg": {"stored": None, "vented": None},
+                "class_total_kg": None,
+                "flag": flag,
+            },
+            "pure_silica_glass": {
+                "stage_3_capture_kg": 0.0,
+                "stage_3_kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "glass": {
+                "species_kg": {},
+                "class_total_kg": 0.0,
+                "pure_silica_glass_kg": 0.0,
+                "industrial_mixed_glass_kg": 0.0,
+            },
+            "industrial_mixed_glass": {
+                "mixed_melt_residual_kg": 0.0,
+                "class_total_kg": 0.0,
+            },
+            "captured_volatiles": {
+                "kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "process_inventory_spent_reductant": {
+                "kg_by_species": {},
+                "class_total_kg": 0.0,
+            },
+            "refractory_ceramic_rump": {
+                "rump_kg_by_species": {},
+                "rump_total_kg": 0.0,
+                "rump_refractory_oxides_kg": 0.0,
+                "rump_silicate_residual_kg": 0.0,
+                "rump_unextracted_metals_kg": 0.0,
+                "rump_other_kg": 0.0,
+                "class_total_kg": 0.0,
+            },
+            "unclassified": {
+                "kg_by_species": {},
+                "total_kg": 0.0,
+            }
+        },
+    )
+
+    payload = _completion_payload(sim)
+
+    assert payload["product_story"]["metal_ingots"]["class_total_kg"] is None
+    assert payload["product_story"]["metal_ingots"]["flag"] == flag
+    assert payload["product_story_status"] == "unavailable"
+
+
 def test_live_completion_payload_propagates_composition_projected_notice(
     monkeypatch,
 ):
@@ -4512,20 +4874,30 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
         lambda: dict(terminal_rump),
     )
     monkeypatch.setattr(
+        sim,
+        "_terminal_rump_by_class",
+        lambda: {
+            "refractory_oxides": 70.0,
+            "silicate_residual": 30.0,
+            "unextracted_metals": 0.0,
+            "other": 0.0,
+        },
+    )
+    monkeypatch.setattr(
         web_events,
         "_product_story_payload",
-        lambda _sim, *, terminal_rump_by_species: {
+        lambda _sim, **_kwargs: {
             "refractory_ceramic": {
                 "species_kg": {
                     species: round(mass, 2)
-                    for species, mass in sorted(terminal_rump_by_species.items())
+                    for species, mass in sorted(terminal_rump.items())
                     if species in TERMINAL_RUMP_REFRACTORY_OXIDES
                 }
             },
             "terminal_residue": {
                 "species_kg": {
                     species: round(mass, 2)
-                    for species, mass in sorted(terminal_rump_by_species.items())
+                    for species, mass in sorted(terminal_rump.items())
                     if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
                 }
             },
@@ -4556,6 +4928,60 @@ def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
         payload["ceramic_rump_panel"]["match"]["ceramic_id"]
         == "calcium_aluminate_refractory"
     )
+
+
+def test_completion_rump_outputs_inherit_partial_exclusions(monkeypatch):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    terminal_rump = {
+        "CaO": 25.0,
+        "Al2O3": 35.0,
+        "SiO2": 30.0,
+        "MgO": 8.0,
+        "TiO2": 2.0,
+    }
+    excluded = [{
+        "species": "Si",
+        "account": "process.cleaned_melt",
+        "reason": "missing LJ row",
+        "upper_bound_kg": "unbounded",
+    }]
+    estimated_contributions = [{
+        "species": "SiO",
+        "account": "process.cleaned_melt",
+        "authority": "status_bearing",
+        "reason": "estimated carrier row",
+    }]
+    monkeypatch.setattr(
+        sim, "_terminal_rump_by_species", lambda: dict(terminal_rump)
+    )
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "refractory_ceramic_rump": {
+                "status": "partial",
+                "class_total_kg": 60.0,
+                "availability_flag": {"status": "partial"},
+                "excluded": excluded,
+                "estimated_contributions": estimated_contributions,
+                "rump_silicate_residual_kg": 30.0,
+            }
+        },
+    )
+
+    payload = _completion_payload(sim)
+
+    for bucket in (
+        payload["product_story"]["refractory_ceramic"],
+        payload["product_story"]["terminal_residue"],
+    ):
+        assert bucket["status"] == "partial"
+        assert bucket["excluded"] == excluded
+    ceramic_panel = payload["ceramic_rump_panel"]
+    assert ceramic_panel["product_class_status"] == "partial"
+    assert ceramic_panel["availability_flag"]["status"] == "partial"
+    assert ceramic_panel["excluded"] == excluded
+    assert ceramic_panel["estimated_contributions"] == estimated_contributions
 
 
 def test_web_payloads_preserve_full_precision_mass_balance_error(
@@ -4602,9 +5028,10 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
 
 
 @pytest.mark.parametrize("pressure_mbar", [0.0004, 0.0])
-def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
+def test_tick_payload_preserves_pressure_values(pressure_mbar):
     sim, snapshot = _sim_with_mass_balance_snapshot(0.0)
     snapshot.overhead.pressure_mbar = pressure_mbar
+    sim.melt.p_total_mbar = pressure_mbar
 
     payload = _tick_payload(
         sim=sim,
@@ -4613,12 +5040,19 @@ def test_tick_payload_preserves_overhead_pressure_value(pressure_mbar):
         backend_status="internal-analytical",
         backend_authoritative=False,
     )
-    serialized = json.loads(json.dumps({"pressure_mbar": payload["pressure_mbar"]}))
+    serialized = json.loads(json.dumps({
+        "pressure_mbar": payload["pressure_mbar"],
+        "p_total_mbar": payload["p_total_mbar"],
+    }))
 
     assert type(payload["pressure_mbar"]) is float
     assert payload["pressure_mbar"] == pressure_mbar
     assert type(serialized["pressure_mbar"]) is float
     assert serialized["pressure_mbar"] == pressure_mbar
+    assert type(payload["p_total_mbar"]) is float
+    assert payload["p_total_mbar"] == pressure_mbar
+    assert type(serialized["p_total_mbar"]) is float
+    assert serialized["p_total_mbar"] == pressure_mbar
 
 
 def test_tick_payload_exposes_non_authoritative_backend_domain_gate():
@@ -5951,6 +6385,8 @@ def _socket_single_run_payload(target_or_recipe, **overrides):
 def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
     monkeypatch,
 ):
+    from simulator.state import CampaignPhase
+
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     client = _identified_socket_client(app)
@@ -5965,6 +6401,9 @@ def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
                 speed=0,
                 track="pyrolysis",
                 additives={"C": 100.0},
+                runtime_campaign_overrides={
+                    "C2A": {"carrier_gas": "pKr"},
+                },
             ),
         )
         events = client.get_received()
@@ -5976,6 +6415,15 @@ def test_socket_single_run_envelope_honours_nested_feedstock_and_overrides(
         sim = states[0]["session"].simulator
         assert sim.record.feedstock_key == "mars_basalt"
         assert sim.record.batch_mass_kg == pytest.approx(321.0)
+        assert states[0]["session"]._config.runtime_campaign_overrides[
+            "C2A"
+        ]["carrier_gas"] == "Kr"
+        sim.start_campaign(CampaignPhase.C2A)
+        result = states[0]["session"].advance()
+        assert result.snapshot.overhead.composition.get("Kr", 0.0) > 0.0
+        assert result.snapshot.overhead.composition.get("N2", 0.0) == pytest.approx(0.0)
+        assert result.per_hour_summary["carrier_identity"] == "Kr"
+        assert result.per_hour_summary["p_carrier_bar"] > 0.0
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -6021,6 +6469,35 @@ def test_socket_single_run_envelope_refuses_absent_or_ambiguous_feedstock(
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_socket_start_unknown_carrier_refuses_before_run_creation(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            _socket_single_run_payload(
+                "mars_basalt",
+                runtime_campaign_overrides={
+                    "C2A": {"carrier_gas": "pXenon"},
+                },
+            ),
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses[-1]["status"] == "error"
+        assert "supported carrier gases:" in statuses[-1]["message"]
+        assert set(_simulations) == before
+    finally:
+        client.disconnect()
 
 
 def test_refusal_message_explains_without_replacing_the_machine_reason():

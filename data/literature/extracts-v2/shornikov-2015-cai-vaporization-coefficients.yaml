@@ -216,17 +216,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 3
         published_page: 1082
         pdf_page_index: 2
         table: '1'
-        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells;
-          the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient
-          in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The
-          melting temperature in another column is not used.; row_label=1283–1473; column_header=αvap
-    references: []
+        note: Table 1 row 1283–1473; numeric inputs for the starred calculation are not printed.
+    method:
+      state:
+        tag: value
+        value: Calculated in the course of this research
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        equation: footnote *
+        note: The table footnote identifies the method; no row-specific equation is printed.
+    references:
+    - Knyazeva and Vasil'ev, 1972
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -304,18 +313,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 3
         published_page: 1082
         pdf_page_index: 2
         table: '1'
-        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells;
-          the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient
-          in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored
-          as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.;
-          row_label=1617–1728; column_header=αvap
-    references: []
+        note: Table 1 row 1617–1728; numeric inputs for the starred calculation are not printed.
+    method:
+      state:
+        tag: value
+        value: Calculated in the course of this research
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        equation: footnote *
+        note: The table footnote identifies the method; no row-specific equation is printed.
+    references:
+    - Claasen and Veenemans, 1933
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -1341,18 +1358,26 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 3
         published_page: 1082
         pdf_page_index: 2
         table: '2'
-        note: 600 dpi render matches this MinerU αvap cell. No digit was edited. MinerU had tagged data rows as header cells;
-          the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the MgO coefficient
-          in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored
-          as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.;
-          row_label=2273–2573; column_header=αvap
-    references: []
+        note: Table 2 row 2273–2573; numeric inputs for the starred calculation are not printed.
+    method:
+      state:
+        tag: value
+        value: Calculated in the course of this research
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        equation: footnote *
+        note: The table footnote identifies the method; no row-specific equation is printed.
+    references:
+    - Lukin and Poluboyarinov, 1964
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:
@@ -5061,15 +5086,28 @@ observations:
     raw_inputs:
       state:
         tag: value
-        value: printed_unresolved
+        value: not_printed
       locator:
         page: 4
         published_page: 1083
         pdf_page_index: 3
         paragraph: Crystalline Fe oxide
-        note: The sentence starts at the bottom of published p. 1082 and the value is printed on published p. 1083. 600 dpi
-          render of PDF p. 4. This is not the Table 5 cell, which prints 1.00 ± 0.30.
-    references: []
+        note: The evaluation paragraph cites the experimental and thermochemical sources but prints no numeric inputs.
+    method:
+      state:
+        tag: value
+        value: αvap (FeO, cr) = 1.00 ± 0.20 on the basis of experimental data (Darken and Gurry, 1946) and calculations conducted
+          in the course of this study using thermochemical information from (Glushko et al., 1978–1982).
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        paragraph: Crystalline Fe oxide
+        equation: unnumbered evaluation paragraph
+        note: The evaluation paragraph identifies the method; no row-specific equation is printed.
+    references:
+    - Darken and Gurry, 1946
+    - Glushko et al., 1978–1982
 - observation_id: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_feo_liq_prose
   experiment_id: 10.1134/s0016702915100055::shornikov-2015-cai-vaporization-coefficients
   identity:

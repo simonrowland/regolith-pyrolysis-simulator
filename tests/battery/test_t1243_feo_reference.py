@@ -9,10 +9,12 @@ write the battery store.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import replace
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -25,8 +27,8 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     Quantity,
-    ReferenceStateConvention,
     RefusalReason,
+    ReferenceStateConvention,
     ResidualStatus,
 )
 from simulator.battery.generators.janaf import (
@@ -52,11 +54,13 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     EnginePrediction,
     Execution,
+    FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
     FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
     compile_residual,
     flagged_strata,
     fusion_comparison_reference,
+    predict_with_engine,
     score_store,
     temperature_of,
 )
@@ -405,6 +409,17 @@ def _context(result) -> ScoreContext:
     )
 
 
+def _test_oxide_inventory(composition) -> dict[str, float]:
+    from simulator.accounting.formulas import parse_formula
+
+    inventory: dict[str, float] = {}
+    for oxide, amount in composition.components:
+        formula = parse_formula(oxide, species=oxide)
+        for element, atom_moles in formula.atom_moles(float(amount)).items():
+            inventory[element] = inventory.get(element, 0.0) + atom_moles
+    return inventory
+
+
 def _predict(engine, observation, **_kwargs):
     identity = observation.identity
     return EnginePrediction(
@@ -429,8 +444,9 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     # identity.fO2_Pa as 1e5 Pa times 10 to that power. Those 57 rows now
     # match the stub's copied identity, so they carry a dex residual. Table 2
     # prints no per-row gamma uncertainty, so the decision rule stays missing.
-    # Composition and species phase stay unknown on the other rows, and none
-    # of the refusals is the reference state.
+    # Composition remains unknown on 15 rows; Distin's phase now maps to liquid,
+    # leaving its missing independent fO2 as the refusal. Neither refusal is the
+    # reference state.
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
@@ -509,9 +525,266 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     assert ad10_scored == 1
     assert refusal_fields == {
         ("composition",): 15,
-        ("species.phase",): 24,
+        ("fO2_Pa",): 24,
     }
     assert extrapolated == 32
+
+
+def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) -> None:
+    """Pin d-305: without the typed Fe condition, every Distin row refuses.
+
+    Table I prints FeO, Fe2O3, SiO2 and the oxygen-in-metal activity ratio,
+    not fO2. A fixed fO2 or dropping Fe2O3 would be an unruled derivation;
+    t-1571 supplies the Fe-metal-saturated closed-solve route.
+    """
+    context = _context(migration)
+    context = replace(
+        context,
+        experiments={
+            experiment_id: replace(
+                experiment, fO2_control=None, fe_metal_saturated=None
+            )
+            for experiment_id, experiment in context.experiments.items()
+        },
+    )
+    rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
+    assert len(rows) == 24
+    expected = {
+        Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
+        Engine.OPENIMCC: RefusalReason.IDENTITY_INCOMPLETE,
+        Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
+        Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
+        Engine.THERMOENGINE: RefusalReason.UNSUPPORTED,
+        Engine.VAPOROCK: RefusalReason.UNSUPPORTED,
+    }
+    for observation in rows:
+        for engine, reason in expected.items():
+            residual, _candidate = compile_residual(
+                observation,
+                engine,
+                context=context,
+                comparison_ids={observation.observation_id},
+            )
+            assert residual.status is ResidualStatus.REFUSED
+            assert residual.refusal is not None
+            assert residual.refusal.reason is reason
+            if engine is Engine.INTERNAL_ANALYTICAL:
+                assert (
+                    residual.refusal.detail["reason"]
+                    == "distin_activity_requires_joint_fe_metal_solve"
+                )
+            elif engine is Engine.OPENIMCC:
+                assert (
+                    residual.refusal.detail["reason"]
+                    == "distin_fe_metal_saturation_not_established"
+                )
+
+
+def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
+    """An inferred typed source condition enables the d-305 closed solve."""
+    rows = tuple(row for row in _feo_rows(migration) if row.source_id == _DISTIN)
+    assert len(rows) == 24
+    assert all(
+        row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.L
+        for row in rows
+    )
+    context = _context(migration)
+    for experiment_id in {row.experiment_id for row in rows}:
+        experiment = context.experiments[experiment_id]
+        condition = experiment.fe_metal_saturated
+        assert condition is not None
+        assert condition.state.is_value and condition.state.value is True
+        assert condition.locator is not None and condition.locator.page == 73
+        assert condition.inference is not None
+        assert condition.inference.relation == "extract_inference"
+
+    residuals = []
+    for observation in rows:
+        residual, _candidate = compile_residual(
+            observation,
+            Engine.OPENIMCC,
+            context=context,
+            comparison_ids={observation.observation_id},
+        )
+        residuals.append(residual)
+        assert residual.status is ResidualStatus.NO_BAND
+        assert residual.numeric is not None
+        conversion = next(
+            notice
+            for notice in residual.notices
+            if notice.reason.startswith("reference_converted_via_iron_saturation;")
+        )
+        assert conversion.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        assert "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source)" in conversion.reason
+        assert "factor=" in conversion.reason
+        assert "log10_shift=" in conversion.reason and " dex;" in conversion.reason
+        if observation.observation_id.endswith("distin1971_t1_1880_1_4"):
+            assert observation.value.point == Decimal("0.952")
+            assert "factor=0.9861" in conversion.reason
+            assert "log10_shift=-0.0061 dex" in conversion.reason
+        for engine, reason in {
+            Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
+            Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
+            Engine.MAGEMIN: RefusalReason.UNSUPPORTED,
+            Engine.THERMOENGINE: RefusalReason.UNSUPPORTED,
+            Engine.VAPOROCK: RefusalReason.UNSUPPORTED,
+        }.items():
+            refusal, _candidate = compile_residual(
+                observation,
+                engine,
+                context=context,
+                comparison_ids={observation.observation_id},
+            )
+            assert refusal.status is ResidualStatus.REFUSED
+            assert refusal.refusal is not None
+            assert refusal.refusal.reason is reason
+    assert len(residuals) == 24
+
+
+def test_distin_printed_facts_and_inferred_fe_saturation_are_separate(migration) -> None:
+    extract = load_yaml(
+        ROOT / "data/literature/extracts" / f"{_DISTIN}.yaml"
+    )
+    assert isinstance(extract, dict)
+    assert extract["source_evidence"]["liquid_iron_contact"] == {
+        "text": (
+            "In this method, liquid iron was levitated in contact with liquid "
+            "'FeO'-SiO2 slags and samples of slag and metal at equilibrium were "
+            "withdrawn for analysis."
+        ),
+        "locator": {"page": 73},
+    }
+    assert extract["source_evidence"]["atmosphere"]["text"] == (
+        "Melts were equilibrated in helium or argon + helium atmospheres of the "
+        "same composition and flow rate as previously employed, so that the "
+        "temperatures of equilibration were 1785°, 1880° and 1960°C."
+    )
+    assert extract["source_evidence"]["atmosphere"]["locator"] == {
+        "page": 74,
+        "section": "Experimental",
+    }
+    assert extract["source_tables"]["experimental_results"]["standard_state"][
+        "text"
+    ] == (
+        "Activities of 'FeO' were obtained as the ratio of the oxygen content "
+        "of the iron in equilibrium with the slag to that in equilibrium with "
+        "pure 'FeO' at the same temperature."
+    )
+    assert extract["source_tables"]["experimental_results"]["standard_state"][
+        "locator"
+    ] == {"page": 74, "section": "Experimental"}
+
+    result = migration
+    observation = next(
+        row
+        for row in _feo_rows(result)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    experiment = result.experiments[observation.experiment_id]
+    condition = getattr(experiment, "fe_metal_saturated", None)
+    assert condition is not None
+    assert condition.state.is_value and condition.state.value is True
+    assert condition.locator is not None and condition.locator.page == 73
+    assert condition.inference is not None
+    assert condition.inference.relation == "extract_inference"
+    assert "not printed" in " ".join(condition.inference.inputs).casefold()
+
+
+def test_distin_scorer_sends_one_mole_excess_fe_on_closed_route(
+    migration, monkeypatch
+) -> None:
+    redox = pytest.importorskip("openimcc.redox")
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    context = _context(migration)
+    calls = []
+    original_evaluate_redox = redox.evaluate_redox
+
+    def capture_redox_call(inventory, temperature_K, mode):
+        calls.append((dict(inventory), temperature_K, mode))
+        return original_evaluate_redox(inventory, temperature_K, mode)
+
+    monkeypatch.setattr(redox, "evaluate_redox", capture_redox_call)
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert len(calls) == 1
+    closed_inventory, _temperature_K, mode = calls[0]
+    composition_state = observation.identity.composition
+    assert composition_state is not None and composition_state.is_value
+    expected_inventory = _test_oxide_inventory(composition_state.value)
+    expected_inventory["Fe"] = expected_inventory.get("Fe", 0.0) + 1.0
+    assert mode == "closed"
+    assert closed_inventory == pytest.approx(expected_inventory, abs=1e-12)
+
+
+def test_distin_closed_solver_refuses_off_fe_metal_segment(migration, monkeypatch) -> None:
+    redox = pytest.importorskip("openimcc.redox")
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    experiment = migration.experiments[observation.experiment_id]
+    monkeypatch.setattr(
+        redox,
+        "evaluate_redox",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            metal_buffered=False, flags=("not_on_fe_metal_segment",)
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["reason"] == "openimcc_fe_metal_saturation_inactive"
+
+
+def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> None:
+    """Engine-level +0.5/+1/+2 invariance; the scorer route pins fixed +1 mol."""
+    redox = pytest.importorskip("openimcc.redox")
+    from simulator.melt_backend.openimcc_bridge import imported_openimcc_commit
+
+    assert imported_openimcc_commit() == "66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    observation = next(
+        row
+        for row in _feo_rows(migration)
+        if row.source_id == _DISTIN
+        and row.observation_id.endswith("distin1971_t1_1880_1_4")
+    )
+    identity = observation.identity
+    assert identity.composition is not None and identity.composition.is_value
+    inventory = _test_oxide_inventory(identity.composition.value)
+
+    activities = []
+    for excess_fe_mol in (0.5, 1.0, 2.0):
+        closed_inventory = dict(inventory)
+        closed_inventory["Fe"] = closed_inventory.get("Fe", 0.0) + excess_fe_mol
+        result = redox.evaluate_redox(
+            closed_inventory, float(temperature_of(identity)), "closed"
+        )
+        assert result.metal_buffered is True
+        activity = float(result.parent_activity["FeO"])
+        assert math.isfinite(activity) and activity > 0.0
+        activities.append(activity)
+
+    assert max(activities) - min(activities) <= 1e-10
 
 
 def _fingerprint(residual) -> tuple:

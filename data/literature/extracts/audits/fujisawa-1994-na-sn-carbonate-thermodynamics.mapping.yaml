@@ -1,0 +1,38 @@
+source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
+source_read_order:
+  - MinerU table HTML and markdown
+  - Tesseract 300 dpi OCR text
+  - PDF renders only where the OCR reads conflicted or required visual row/column confirmation
+tables:
+  - table_key: p005-t01
+    printed_locator: {page: 5, table: '1'}
+    printed_rows: 5
+    mapping: Table 1 rows are Cu-Sn-O calculation parameters, not NaO0.5 or SnO2 slag activity observations; retained as context.
+    cell_audit: All five parameter rows and the three columns checked against the page 5 render. MinerU and Tesseract are independent OCR reads; the rendered row/column assignments agree.
+  - table_key: p005-t02
+    printed_locator: {page: 5, table: '2'}
+    printed_rows: 8
+    mapping: 'Columns: PCO2, PO2, copper [%Sn], slag (%Cu), log aSnO2, group average log aSnO2, log aNaO0.5, reaction ΔG(16). The primary activity rows are per-run SnO2 activity; group summaries are kept attached to the group rows.'
+    cell_audit: All 8 rows and numeric cells checked against the page 5 render. MinerU read the minus sign in -160.5; Tesseract OCR omitted it. Render verified the printed value is -160.5 kJ.
+    render_verified:
+      - {row: 7, column: 8, value: '-160.5', reason: Tesseract OCR omitted the minus sign; render confirms minus.}
+    schema_gap: Log10 activities have no schema value form in this base; retain the printed logarithms and type the activity records refused. No exponentiation or duplicate linear-activity values were added.
+  - table_key: p006-t03
+    printed_locator: {page: 6, table: '3'}
+    printed_rows: 9
+    mapping: 'Columns: PCO2, PO2, copper [%Sn], slag (%Sn), slag (%Cu), log LSn, log aSnO2, XSnO2. Stored nine homogeneous-melt SnO2 activity rows with the printed Sn concentration and mole fraction.'
+    cell_audit: All 9 rows and numeric cells checked against the page 6 render, including scientific notation and empty (%Cu) cells. Row and column assignment confirmed against the rendered table.
+    schema_gap: Log10 activity form has no schema token; each row is retained as typed_refusal. No total pressure or complete run-wise slag composition is printed.
+composition_binding:
+  table_2: The eight saturated-slag distribution rows do not print a complete row-wise melt composition or N; composition remains unknown.
+  table_3: The homogeneous melt is ternary NaO0.5-CO2-SnO2 (Eq. 24). Table 3 prints XSnO2, while N=nNa/(nNa+nSn) excludes CO2; retain the printed XSnO2 token and leave full melt composition unknown. Do not close NaO0.5 as 1-XSnO2.
+activity_reduction:
+  table_2: Authors calculate log aSnO2 by equations (12)-(15) from measured Sn distribution and oxygen pressure in molten copper. The table stores those inputs as row fields, but not as separate input observations with lineage IDs, so the logarithmic activities are quoted_attributed under d-110 and remain typed-refused. The NaO0.5 activities are group summaries reduced by the EMF method; the table has no EMF measurements to store as input observations, so they are also quoted_attributed and typed-refused.
+  table_3: Authors calculate log aSnO2 by the same distribution-equilibrium method; input quantities are stored as row fields, not independent input observations, so the logarithmic activities are quoted_attributed under d-110 and remain typed-refused.
+reference_states: SnO2 is printed as SnO2(s) and is typed as pure solid SnO2(s) in the migrator's standard_state path. For NaO0.5, the printed reference is the NaO0.5-SiO2-FeO1.5 melt and Eq. (5) gives log a*_NaO0.5 = -(4770.9/T)+0.0715 over 1223-1473 K. The migrator reference remains unknown; no pure-endmember convention is added.
+oxygen_identity: The tables print oxygen partial pressure PO2. The extract stores that raw quantity as oxygen_partial_pressure_Pa and does not add an fO2_Pa source field. The current migrator also exposes a printed oxygen partial pressure on its fO2_Pa point-condition path; activity identities remain refused, so their fO2_Pa identity axis is unknown and no comparison candidates are generated. Absolute oxygen fugacity is not separately printed.
+printed_relations: NaO0.5 activity is determined by the EMF method using the printed relations (1)-(5). SnO2 activities are reduced from Sn distribution equilibrium using equations (12)-(15); the reaction relation for ΔG(16) is preserved as printed in the row context.
+printed_conditions: The Chapter IV distribution method specifies a CO2-CO-Ar gas mixture for the Table 2 and Table 3 experiments; flow and total pressure are not stated there. The distinct Chapter III Na2SnO3 solubility procedure reports CO2-O2 (or CO)-Ar and 100 Nml/min with parenthetical 5 x 10^-6 Nm3/s; retain that inconsistent pair as solubility-procedure context only. Temperature is 1523 K in both activity-table captions, with row-wise CO2 and O2 partial pressures. Table 3 prints XSnO2, [%Sn] in copper, [%Sn] and [%Cu] in slag; full ternary melt composition is unknown. Table 2 does not print complete per-run composition or N.
+figures_deferred: Figures 1-12 contain plotted measured or derived points and are not digitized. Figure 1 includes NaO0.5 activity versus log PCO2; figures 6-8 include SnO2 and NaO0.5 activity curves; figures 9-12 include distribution-ratio estimates and data points.
+lineage_note: The source states it was originally published in Japanese in 1993; that translation is the same experiment family, not an independent dataset.
+table_tool_note: The seat copy of tools/mineru_table_draft.py provides convert and compare commands only; it has no emit subcommand. The loss-preserving draft CSVs were used for transcription and this mapping records each column assignment.

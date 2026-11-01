@@ -84,6 +84,150 @@ def test_nonfinite_activity_pressure_stays_required() -> None:
     assert "total_pressure_Pa" in profile_for(identity).required
 
 
+def test_standalone_activity_prediction_closes_its_engine_handle(monkeypatch) -> None:
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+    import simulator.battery.score as score_module
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    from simulator.battery.enums import AmountBasis, EvidenceClass
+    from simulator.battery.records import Composition
+    from tests.battery import factories as F
+    from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell
+
+    experiment = F.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = F.observation(
+        "standalone-activity-handle",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    close_calls: list[int] = []
+
+    class FakeBackend:
+        def close(self) -> None:
+            close_calls.append(1)
+
+    opened: list[EngineHandle] = []
+
+    def open_fake_engine(name: str) -> EngineHandle:
+        handle = EngineHandle(
+            name=name,
+            backend=FakeBackend(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+        opened.append(handle)
+        return handle
+
+    monkeypatch.setattr(binary_pot_battery, "open_battery_engine", open_fake_engine)
+    monkeypatch.setattr(
+        score_module,
+        "_activity_request_or_contract_refusal",
+        lambda *_args, **_kwargs: (
+            SimpleNamespace(
+                payload={
+                    "composition_mol": {"SiO2": 0.5, "Al2O3": 0.5},
+                }
+            ),
+            None,
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda _handle, pot, **kwargs: EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.THERMOENGINE.value,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"SiO2_Liq": 0.9},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        observation,
+        experiment=experiment,
+    )
+
+    assert prediction.value is not None
+    assert len(opened) == 1
+    assert close_calls == [1]
+
+
+def test_predict_with_engine_forwards_intrinsic_fo2_mode_to_activity_contract(
+    monkeypatch,
+) -> None:
+    from simulator.battery.enums import Engine, Fo2Mode
+    from simulator.battery.generators import bench as bench_module
+    from simulator.battery.score import predict_with_engine
+
+    experiment = f.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = f.observation(
+        "activity-intrinsic-fo2-mode",
+        experiment.experiment_id,
+        f.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+    )
+    seen_modes: list[Fo2Mode] = []
+
+    def activity_request_for_engine(
+        _experiment, _observation, _engine, *, fo2_mode
+    ):
+        seen_modes.append(fo2_mode)
+        return None
+
+    monkeypatch.setattr(
+        bench_module, "activity_request_for_engine", activity_request_for_engine
+    )
+
+    for handles in ({}, None):
+        prediction = predict_with_engine(
+            Engine.THERMOENGINE,
+            observation,
+            experiment=experiment,
+            handles=handles,
+            fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+        )
+        assert prediction.refusal_reason is not None
+
+    assert seen_modes == [Fo2Mode.ENGINE_INTRINSIC, Fo2Mode.ENGINE_INTRINSIC]
+
+
 def _reference_state(
     formula: str = "Na2O",
     basis: str = "oxide",
@@ -1188,6 +1332,50 @@ def test_feo_parent_row_is_ready_only_for_imcc_when_oxygen_is_printed(basis):
         assert item.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
     for engine in _MELTS_ACTIVITY:
         _assert_melts_parent_oxide_refused(results[engine], "FeO")
+
+
+def test_oneill_feo_activity_coefficient_refusal_is_typed_per_engine():
+    from simulator.battery.enums import Engine, ExecutionState, RefusalReason
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("CaO", "0.2395"),
+            ("MgO", "0.1465"),
+            ("Al2O3", "0.0874"),
+            ("SiO2", "0.4973"),
+            ("FeO", "0.0293"),
+        ),
+        oxygen=Decimal("-12.61"),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="FeO",
+        basis="FeO",
+    )
+
+    alpha = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+    assert alpha.value is None
+    assert alpha.execution.state is ExecutionState.NOT_PROBED
+    assert alpha.refusal_reason is RefusalReason.UNSUPPORTED
+    assert alpha.refusal_detail["reason"] == "reference_state_mismatch"
+    assert alpha.refusal_detail["engine_convention"].startswith(
+        "typed-refusal:melts_endmember_not_parent_oxide:FeO:"
+    )
+    assert "pure-FeO liquid standard state the model does not define" in (
+        alpha.refusal_detail["engine_convention"]
+    )
+
+    magemin = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment, isolated=False,
+    )
+    assert magemin.value is None
+    assert magemin.execution.state is ExecutionState.NOT_PROBED
+    assert magemin.refusal_reason is RefusalReason.UNSUPPORTED
+    assert magemin.refusal_detail["reason"] == "reference_state_mismatch"
+    assert magemin.refusal_detail["engine_convention"] == (
+        "typed-refusal:magemin_no_native_activity:FeO"
+    )
 
 
 def test_single_cation_formula_with_oxide_token_is_not_scored_as_parent_oxide(monkeypatch):

@@ -114,6 +114,14 @@ def test_isolated_migration_types_printed_pressures_and_conditions() -> None:
         assert temperature.state.value == Decimal("1673.15")
         assert temperature.locator is not None
         assert temperature.locator.pdf_page_index == row.locator.pdf_page_index
+        starting = row.point_conditions["starting_composition"]
+        assert starting.state.is_value
+        assert starting.state.value == "San Carlos olivine Fo90"
+        assert starting.locator is not None
+        assert starting.locator.published_page == "5-2"
+        assert starting.locator.note == (
+            "One large, gem quality single crystal of green San Carlos olivine (Fo90)"
+        )
         experiment = result.experiments[row.experiment_id]
         chamber_pressure = experiment.pressure_environment.total_pressure_Pa
         assert chamber_pressure.state.is_value

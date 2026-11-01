@@ -1,0 +1,568 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s10973-024-13659-7
+  citation: Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and thermodynamic analysis
+    of liquid-liquid immiscibility in the system SiO2-Na2O-MoO3. Journal of Thermal Analysis and Calorimetry, 150, 7199-7206.
+  source_ids:
+  - sugawara-2024-na-silicate-molybdate-miscibility
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 2d8a9fb2703c55c4c72b7b75e284b289172e1874
+    files:
+    - asset_id: pdf:sugawara-2024-na-silicate-molybdate-miscibility
+      role: pdf
+      path: raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf
+      sha256:
+        tag: value
+        value: 196ffb5b0cc0f95232106dfa7397b4666f5cf9d5d38c408087eebee0a9e1453b
+    - asset_id: pdftotext:sugawara-2024-na-silicate-molybdate-miscibility
+      role: pdftotext
+      path: text/sugawara-2024-na-silicate-molybdate-miscibility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:sugawara-2024-na-silicate-molybdate-miscibility
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s10973-024-13659-7
+experiments:
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s50_15_1000c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S50-15; temperature_C=1000
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s50_15_1200c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S50-15; temperature_C=1200
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s55_15_1000c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S55-15; temperature_C=1000
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s55_15_1200c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S55-15; temperature_C=1200
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s62_15_1000c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S62-15; temperature_C=1000
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s62_15_1200c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S62-15; temperature_C=1200
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s70_15_1000c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S70-15; temperature_C=1000
+- experiment_id: 10.1007/s10973-024-13659-7::experiment::sugawara_2024_s70_15_1200c
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s10973-024-13659-7
+  locator:
+    page: 4
+    published_page: '7202'
+    table: '2'
+    note: sample=S70-15; temperature_C=1200
+context:
+- observation_id: sugawara_2024_phase_equilibrium_experiment_conditions
+  type: laboratory_conditions
+  units: as printed
+  locator:
+    page: 2
+    section: Experimental
+    published_page: '7200'
+  values:
+    quantity: experimental_temperature_duration_and_quench_method
+    temperature_conditions_C_as_printed:
+    - '1200'
+    - '1000'
+    heating_rate_C_per_hour_as_printed: '200'
+    hold_duration_hours_as_printed: '24'
+    quench_as_printed: The platinum crucible was taken out and rapidly cooled by immersing the bottom of crucible in water.
+    total_pressure: not stated
+    fO2: not stated
+  context_id: sugawara-2024-na-silicate-molybdate-miscibility::context::sugawara_2024_phase_equilibrium_experiment_conditions
+  work_id: 10.1007/s10973-024-13659-7
+  source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  species: SiO2
+- observation_id: sugawara_2024_table1_experimental_compositions_and_run_products
+  type: composition
+  units: mol% as printed
+  locator:
+    page: 2
+    table: '1'
+    published_page: '7200'
+    note: All 11 printed sample rows; row and column assignments checked against the page render.
+  values:
+    quantity: experimental_charge_composition_and_run_products
+    system_as_printed: SiO2-Na2O-MoO3
+    column_headers_as_printed:
+    - Sample
+    - SiO2
+    - Na2O
+    - MoO3
+    - 1200 °C run products
+    - 1000 °C run products
+    - 1200 °C glass appearance
+    - 1000 °C glass appearance
+    rows_as_printed:
+    - - S50-13
+      - '43.50'
+      - '43.50'
+      - '13.00'
+      - SL
+      - n.d
+      - White
+      - ''
+    - - S35-15
+      - '29.75'
+      - '55.25'
+      - '15.00'
+      - SL
+      - SL
+      - White
+      - White
+    - - S40-15
+      - '34.00'
+      - '51.00'
+      - '15.00'
+      - SL
+      - SL + NS
+      - White
+      - White
+    - - S45-15
+      - '38.25'
+      - '46.75'
+      - '15.00'
+      - SL
+      - SL + ML + NS
+      - White
+      - White
+    - - S50-15
+      - '42.50'
+      - '42.50'
+      - '15.00'
+      - SL + ML
+      - SL + ML
+      - White
+      - Pale white
+    - - S55-15
+      - '46.75'
+      - '38.25'
+      - '15.00'
+      - SL + ML
+      - SL + ML
+      - Pale white
+      - Transparent
+    - - S62-15
+      - '52.70'
+      - '32.30'
+      - '15.00'
+      - SL + ML
+      - SL + ML
+      - White
+      - Transparent
+    - - S70-15
+      - '59.50'
+      - '25.50'
+      - '15.00'
+      - SL + ML + Qtz
+      - SL + ML + Qtz
+      - White
+      - Transparent
+    - - S30-25
+      - '22.50'
+      - '52.50'
+      - '25.00'
+      - SL
+      - SL
+      - White
+      - White
+    - - S40-25
+      - '30.00'
+      - '45.00'
+      - '25.00'
+      - SL + ML
+      - SL + ML
+      - White
+      - White
+    - - S50-25
+      - '37.50'
+      - '37.50'
+      - '25.00'
+      - SL + ML
+      - SL + ML
+      - White
+      - Transparent
+    printed_row_count: 11
+    source_method: MinerU table block and pdftotext; row/column layout verified by page render.
+  context_id: sugawara-2024-na-silicate-molybdate-miscibility::context::sugawara_2024_table1_experimental_compositions_and_run_products
+  work_id: 10.1007/s10973-024-13659-7
+  source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  species: SiO2
+- observation_id: sugawara_2024_table2_phase_proportions_and_quenched_compositions
+  type: composition
+  units: mass% and mol% as printed
+  locator:
+    page: 4
+    table: '2'
+    published_page: '7202'
+    note: All 8 printed sample-temperature rows; all numeric columns checked against the page render.
+  values:
+    quantity: phase_proportions_and_Na2O_loss_as_printed
+    system_as_printed: SiO2-Na2O-MoO3
+    column_headers_as_printed:
+    - Sample
+    - Temperature/°C
+    - SL mass%
+    - ML mass%
+    - Qtz mass%
+    - Na2O loss mass%
+    rows_as_printed:
+    - - S50-15
+      - '1200'
+      - '72.9'
+      - '26.5'
+      - ''
+      - '0.6'
+    - - S55-15
+      - '1200'
+      - '65.1'
+      - '33.5'
+      - ''
+      - '1.3'
+    - - S62-15
+      - '1200'
+      - '62.7'
+      - '37.3'
+      - ''
+      - '0.0'
+    - - S70-15
+      - '1200'
+      - '54.6'
+      - '38.8'
+      - '6.6'
+      - '0.0'
+    - - S50-15
+      - '1000'
+      - '61.7'
+      - '36.3'
+      - ''
+      - '2.0'
+    - - S55-15
+      - '1000'
+      - '59.6'
+      - '38.3'
+      - ''
+      - '2.1'
+    - - S62-15
+      - '1000'
+      - '59.2'
+      - '40.8'
+      - ''
+      - '0.0'
+    - - S70-15
+      - '1000'
+      - '38.4'
+      - '41.9'
+      - '19.7'
+      - '0.0'
+    printed_row_count: 8
+    method_class: measured_reduced
+    analysis_as_printed: SL of S50 and S55 analyzed by XRF; other phase analyses by EPMA.
+    quench_as_printed: Sample rapidly cooled by immersing the bottom of the platinum crucible in water.
+    tie_line_quench_note: The separate statement about Mo-rich microspheres in whitish glass concerns cooling precipitates
+      and is not assigned as alteration of these macroscopic SL/ML tie-line analyses.
+    composition_observations: 48 measured mol% cells are emitted separately by oxide, phase, sample, and temperature.
+    phase_proportions_note: The printed mass proportions and Na2O loss are retained here; Table 2 composition cells are represented
+      by the phase-composition observations.
+    source_method: MinerU table block and pdftotext; multi-number composition cells and all row/column assignments verified
+      against the page render.
+  context_id: sugawara-2024-na-silicate-molybdate-miscibility::context::sugawara_2024_table2_phase_proportions_and_quenched_compositions
+  work_id: 10.1007/s10973-024-13659-7
+  source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  species: SiO2
+- observation_id: sugawara_2024_table4_calphad_interaction_parameters
+  type: thermodynamic_example
+  units: as printed in table header
+  locator:
+    page: 6
+    table: '4'
+    published_page: '7204'
+    note: All six parameter rows checked against the page render.
+  values:
+    quantity: CALPHAD_Redlich_Kister_liquid_interaction_parameters
+    system_as_printed: SiO2-Na2O-MoO3
+    column_headers_as_printed:
+    - i-j
+    - k=0
+    - k=1
+    - k=2
+    rows_as_printed:
+    - - Mo2O6-Na2MoO4
+      - -161,000+72 T
+      - 10,000
+      - '0'
+    - - Si2O4-Mo2O6
+      - 70,000
+      - '0'
+      - '0'
+    - - Si2O4-Na2MoO4
+      - 55,000
+      - '0'
+      - '0'
+    - - Na2Si2O5-Na2MoO4
+      - 44,000
+      - '-5000'
+      - '0'
+    - - Na4Si2O6-Na2MoO4
+      - 12,000
+      - '0'
+      - 10,000
+    - - Na8Si2O8-Na2MoO4
+      - '0'
+      - '0'
+      - '0'
+    printed_row_count: 6
+    method_class: model_derived
+    model_as_printed: associate species model with Redlich–Kister polynomial
+    input_statement_as_printed: CALPHAD analysis used the phase-equilibrium relationship obtained in this study (Fig. 4) and
+      previously reported thermodynamic data.
+    lineage_note: The phase relationship in Fig. 4 is not digitized as measurements in this extract, so these fitted parameters
+      are retained as context and not emitted as model_derived observation rows.
+  context_id: sugawara-2024-na-silicate-molybdate-miscibility::context::sugawara_2024_table4_calphad_interaction_parameters
+  work_id: 10.1007/s10973-024-13659-7
+  source_id: sugawara-2024-na-silicate-molybdate-miscibility
+  species: SiO2

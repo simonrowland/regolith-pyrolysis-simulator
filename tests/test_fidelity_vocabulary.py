@@ -765,6 +765,27 @@ def test_canonical_emission_combines_backend_status_and_runtime_flag() -> None:
     assert payload["label_source"] == "backend_alias:alphamelts"
 
 
+@pytest.mark.parametrize(
+    ("backend_status", "expected_certification"),
+    (
+        ("ok", True),
+        ("out_of_domain", False),
+        ("not_converged", False),
+        ("refused", False),
+    ),
+)
+def test_canonical_emission_certification_requires_ok_runtime_status(
+    backend_status: str,
+    expected_certification: bool,
+) -> None:
+    payload = canonicalize_fidelity_emission(
+        backend_name="alphamelts",
+        backend_status=backend_status,
+    )
+
+    assert payload["certification_allowed"] is expected_certification
+
+
 def test_canonical_emission_preserves_explicit_denied_evidence_over_backend_inference() -> None:
     payload = canonicalize_fidelity_emission(
         backend_name="alphamelts",

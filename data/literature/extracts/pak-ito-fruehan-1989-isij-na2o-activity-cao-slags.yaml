@@ -1,0 +1,2305 @@
+schema_version: literature_extract.v1
+source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
+source:
+  citation: Pak J.J., Ito K., and Fruehan R.J. (1989). Activities of Na2O in CaO-based
+    Slags Used for Dephosphorization of Steel. ISIJ International 29(4):318–323.
+  year: 1989
+  provenance_path: raw/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags/pak-ito-fruehan-1989-isij-na2o-activity-cao-slags.pdf
+extraction:
+  method: Table 1 transcribed from MinerU HTML and pdftotext-layout; all numeric table
+    cells independently checked against the page render because the MinerU table QA
+    reported 47 numeric mismatches and one comma/dot flag. The 22 activity values
+    are reduced from the printed -log a_Na2O cells under the controller ruling. Figure
+    values were not digitized.
+  date: '2026-10-27'
+  worker: codex-resume-91483-1793146160
+review_status: draft
+fidelity_samples:
+- species: Na2O
+  observation_id: pak_1989_table1_row_01_a0_1400
+  field: value_as_printed
+  value: '3.241'
+  locator: &id001
+    page: 3
+    published_page: 320
+    pdf_page_index: 2
+    table: '1'
+- species: Na2O
+  observation_id: pak_1989_table1_row_09_a1_1400
+  field: value_as_printed
+  value: '2.458'
+  locator: *id001
+- species: Na2O
+  observation_id: pak_1989_table1_row_22_d4_1400
+  field: value_as_printed
+  value: '7.648'
+  locator: *id001
+species:
+  Na2O:
+    observations:
+    - observation_id: pak_1989_table1_row_01_a0_1400
+      type: activity_coefficient
+      locator: &id002
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id002
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '60'
+              - - SiO2
+                - '40'
+          locator: *id002
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_01_a0_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 0.0005741164622073274
+        value_as_printed: '3.241'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: A0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '-437'
+        composition_mol_percent_as_published:
+          Na2O: '60'
+          CaO: null
+          SiO2: '40'
+        composition_mole_fraction:
+          Na2O: '0.6'
+          SiO2: '0.4'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '3.241'
+            locator: &id003
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_01_a0_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_01_a0_1400_printed_log_input
+      type: gibbs_table
+      locator: *id003
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '3.241'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_02_a0_1500
+      type: activity_coefficient
+      locator: &id004
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1500'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *id004
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '60'
+              - - SiO2
+                - '40'
+          locator: *id004
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_02_a0_1500_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 0.0010889300933334333
+        value_as_printed: '2.963'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: A0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '-450'
+        composition_mol_percent_as_published:
+          Na2O: '60'
+          CaO: null
+          SiO2: '40'
+        composition_mole_fraction:
+          Na2O: '0.6'
+          SiO2: '0.4'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '2.963'
+            locator: &id005
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1773.15'
+      derived_from:
+      - pak_1989_table1_row_02_a0_1500_printed_log_input
+    - observation_id: pak_1989_table1_row_02_a0_1500_printed_log_input
+      type: gibbs_table
+      locator: *id005
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '2.963'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_03_b0_1400
+      type: activity_coefficient
+      locator: &id006
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '50'
+              - - SiO2
+                - '50'
+          locator: *id006
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_03_b0_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 1.6943378004473287e-05
+        value_as_printed: '4.771'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: B0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '-183'
+        composition_mol_percent_as_published:
+          Na2O: '50'
+          CaO: null
+          SiO2: '50'
+        composition_mole_fraction:
+          Na2O: '0.5'
+          SiO2: '0.5'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '4.771'
+            locator: &id007
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_03_b0_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_03_b0_1400_printed_log_input
+      type: gibbs_table
+      locator: *id007
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '4.771'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_04_b0_1500
+      type: activity_coefficient
+      locator: &id008
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1500'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *id008
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '50'
+              - - SiO2
+                - '50'
+          locator: *id008
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_04_b0_1500_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 3.515604405282983e-05
+        value_as_printed: '4.454'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: B0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '-188'
+        composition_mol_percent_as_published:
+          Na2O: '50'
+          CaO: null
+          SiO2: '50'
+        composition_mole_fraction:
+          Na2O: '0.5'
+          SiO2: '0.5'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '4.454'
+            locator: &id009
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1773.15'
+      derived_from:
+      - pak_1989_table1_row_04_b0_1500_printed_log_input
+    - observation_id: pak_1989_table1_row_04_b0_1500_printed_log_input
+      type: gibbs_table
+      locator: *id009
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '4.454'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_05_c0_1400
+      type: activity_coefficient
+      locator: &id010
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id010
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '33.3'
+              - - SiO2
+                - '66.7'
+          locator: *id010
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_05_c0_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 3.2508729738543403e-07
+        value_as_printed: '6.488'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '102'
+        composition_mol_percent_as_published:
+          Na2O: '33.3'
+          CaO: null
+          SiO2: '66.7'
+        composition_mole_fraction:
+          Na2O: '0.333'
+          SiO2: '0.667'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.488'
+            locator: &id011
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_05_c0_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_05_c0_1400_printed_log_input
+      type: gibbs_table
+      locator: *id011
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.488'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_06_c0_1500
+      type: activity_coefficient
+      locator: &id012
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1500'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '33.3'
+              - - SiO2
+                - '66.7'
+          locator: *id012
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_06_c0_1500_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 6.65273156201742e-07
+        value_as_printed: '6.177'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '115'
+        composition_mol_percent_as_published:
+          Na2O: '33.3'
+          CaO: null
+          SiO2: '66.7'
+        composition_mole_fraction:
+          Na2O: '0.333'
+          SiO2: '0.667'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.177'
+            locator: &id013
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1773.15'
+      derived_from:
+      - pak_1989_table1_row_06_c0_1500_printed_log_input
+    - observation_id: pak_1989_table1_row_06_c0_1500_printed_log_input
+      type: gibbs_table
+      locator: *id013
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.177'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_07_d0_1400
+      type: activity_coefficient
+      locator: &id014
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '20'
+              - - SiO2
+                - '80'
+          locator: *id014
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_07_d0_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 1.6443717232149325e-08
+        value_as_printed: '7.784'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '317'
+        composition_mol_percent_as_published:
+          Na2O: '20'
+          CaO: null
+          SiO2: '80'
+        composition_mole_fraction:
+          Na2O: '0.2'
+          SiO2: '0.8'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '7.784'
+            locator: &id015
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_07_d0_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_07_d0_1400_printed_log_input
+      type: gibbs_table
+      locator: *id015
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '7.784'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_08_d0_1500
+      type: activity_coefficient
+      locator: &id016
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1500'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '20'
+              - - SiO2
+                - '80'
+          locator: *id016
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_08_d0_1500_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 2.9648313895243454e-08
+        value_as_printed: '7.528'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D0
+        reference_as_published: 40N·60S*
+        EMF_mV_as_published: '353'
+        composition_mol_percent_as_published:
+          Na2O: '20'
+          CaO: null
+          SiO2: '80'
+        composition_mole_fraction:
+          Na2O: '0.2'
+          SiO2: '0.8'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '7.528'
+            locator: &id017
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1773.15'
+      derived_from:
+      - pak_1989_table1_row_08_d0_1500_printed_log_input
+    - observation_id: pak_1989_table1_row_08_d0_1500_printed_log_input
+      type: gibbs_table
+      locator: *id017
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '7.528'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_09_a1_1400
+      type: activity_coefficient
+      locator: &id018
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '52.03'
+              - - CaO
+                - '13.29'
+              - - SiO2
+                - '34.68'
+          locator: *id018
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_09_a1_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 0.0034833731503601164
+        value_as_printed: '2.458'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: A1
+        reference_as_published: 60N·40S
+        EMF_mV_as_published: '-130'
+        composition_mol_percent_as_published:
+          Na2O: '52.03'
+          CaO: '13.29'
+          SiO2: '34.68'
+        composition_mole_fraction:
+          Na2O: '0.5203'
+          CaO: '0.1329'
+          SiO2: '0.3468'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '2.458'
+            locator: &id019
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_09_a1_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_09_a1_1400_printed_log_input
+      type: gibbs_table
+      locator: *id019
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '2.458'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_10_a2_1400
+      type: activity_coefficient
+      locator: &id020
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '54.79'
+              - - CaO
+                - '8.68'
+              - - SiO2
+                - '36.53'
+          locator: *id020
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_10_a2_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 0.0022961486481123633
+        value_as_printed: '2.639'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: A2
+        reference_as_published: 60N·40S
+        EMF_mV_as_published: '-100'
+        composition_mol_percent_as_published:
+          Na2O: '54.79'
+          CaO: '8.68'
+          SiO2: '36.53'
+        composition_mole_fraction:
+          Na2O: '0.5479'
+          CaO: '0.0868'
+          SiO2: '0.3653'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '2.639'
+            locator: &id021
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_10_a2_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_10_a2_1400_printed_log_input
+      type: gibbs_table
+      locator: *id021
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '2.639'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_11_b1_1400
+      type: activity_coefficient
+      locator: &id022
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '39.30'
+              - - CaO
+                - '21.40'
+              - - SiO2
+                - '39.30'
+          locator: *id022
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_11_b1_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 0.00018197008586099826
+        value_as_printed: '3.740'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: B1
+        reference_as_published: 50N·50S
+        EMF_mV_as_published: '-171'
+        composition_mol_percent_as_published:
+          Na2O: '39.30'
+          CaO: '21.40'
+          SiO2: '39.30'
+        composition_mole_fraction:
+          Na2O: '0.393'
+          CaO: '0.214'
+          SiO2: '0.393'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '3.740'
+            locator: &id023
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_11_b1_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_11_b1_1400_printed_log_input
+      type: gibbs_table
+      locator: *id023
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '3.740'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_12_b2_1400
+      type: activity_coefficient
+      locator: &id024
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '41.94'
+              - - CaO
+                - '16.12'
+              - - SiO2
+                - '41.94'
+          locator: *id024
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_12_b2_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 8.472274141405963e-05
+        value_as_printed: '4.072'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: B2
+        reference_as_published: 50N·50S
+        EMF_mV_as_published: '-116'
+        composition_mol_percent_as_published:
+          Na2O: '41.94'
+          CaO: '16.12'
+          SiO2: '41.94'
+        composition_mole_fraction:
+          Na2O: '0.4194'
+          CaO: '0.1612'
+          SiO2: '0.4194'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '4.072'
+            locator: &id025
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_12_b2_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_12_b2_1400_printed_log_input
+      type: gibbs_table
+      locator: *id025
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '4.072'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_13_b3_1400
+      type: activity_coefficient
+      locator: &id026
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '44.60'
+              - - CaO
+                - '10.80'
+              - - SiO2
+                - '44.60'
+          locator: *id026
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_13_b3_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 4.0644332916521274e-05
+        value_as_printed: '4.391'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: B3
+        reference_as_published: 50N·50S
+        EMF_mV_as_published: '-63'
+        composition_mol_percent_as_published:
+          Na2O: '44.60'
+          CaO: '10.80'
+          SiO2: '44.60'
+        composition_mole_fraction:
+          Na2O: '0.446'
+          CaO: '0.108'
+          SiO2: '0.446'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '4.391'
+            locator: &id027
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_13_b3_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_13_b3_1400_printed_log_input
+      type: gibbs_table
+      locator: *id027
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '4.391'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_14_c1_1400
+      type: activity_coefficient
+      locator: &id028
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id028
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '22.76'
+              - - CaO
+                - '31.71'
+              - - SiO2
+                - '45.53'
+          locator: *id028
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_14_c1_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 2.1428906011200605e-06
+        value_as_printed: '5.669'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C1
+        reference_as_published: 33N·67S
+        EMF_mV_as_published: '-136'
+        composition_mol_percent_as_published:
+          Na2O: '22.76'
+          CaO: '31.71'
+          SiO2: '45.53'
+        composition_mole_fraction:
+          Na2O: '0.2276'
+          CaO: '0.3171'
+          SiO2: '0.4553'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '5.669'
+            locator: &id029
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_14_c1_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_14_c1_1400_printed_log_input
+      type: gibbs_table
+      locator: *id029
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '5.669'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_15_c2_1400
+      type: activity_coefficient
+      locator: &id030
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id030
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '24.49'
+              - - CaO
+                - '26.53'
+              - - SiO2
+                - '48.98'
+          locator: *id030
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_15_c2_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 1.2647363474711523e-06
+        value_as_printed: '5.898'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C2
+        reference_as_published: 33N·67S
+        EMF_mV_as_published: '-98'
+        composition_mol_percent_as_published:
+          Na2O: '24.49'
+          CaO: '26.53'
+          SiO2: '48.98'
+        composition_mole_fraction:
+          Na2O: '0.2449'
+          CaO: '0.2653'
+          SiO2: '0.4898'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '5.898'
+            locator: &id031
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_15_c2_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_15_c2_1400_printed_log_input
+      type: gibbs_table
+      locator: *id031
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '5.898'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_16_c3_1400
+      type: activity_coefficient
+      locator: &id032
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id032
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '26.58'
+              - - CaO
+                - '20.26'
+              - - SiO2
+                - '53.16'
+          locator: *id032
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_16_c3_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 7.585775750291836e-07
+        value_as_printed: '6.120'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C3
+        reference_as_published: 33N·67S
+        EMF_mV_as_published: '-61'
+        composition_mol_percent_as_published:
+          Na2O: '26.58'
+          CaO: '20.26'
+          SiO2: '53.16'
+        composition_mole_fraction:
+          Na2O: '0.2658'
+          CaO: '0.2026'
+          SiO2: '0.5316'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.120'
+            locator: &id033
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_16_c3_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_16_c3_1400_printed_log_input
+      type: gibbs_table
+      locator: *id033
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.120'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_17_c4_1400
+      type: activity_coefficient
+      locator: &id034
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id034
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '28.69'
+              - - CaO
+                - '13.93'
+              - - SiO2
+                - '57.38'
+          locator: *id034
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_17_c4_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 4.78630092322638e-07
+        value_as_printed: '6.320'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C4
+        reference_as_published: 33N·67S
+        EMF_mV_as_published: '-28'
+        composition_mol_percent_as_published:
+          Na2O: '28.69'
+          CaO: '13.93'
+          SiO2: '57.38'
+        composition_mole_fraction:
+          Na2O: '0.2869'
+          CaO: '0.1393'
+          SiO2: '0.5738'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.320'
+            locator: &id035
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_17_c4_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_17_c4_1400_printed_log_input
+      type: gibbs_table
+      locator: *id035
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.320'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_18_c5_1400
+      type: activity_coefficient
+      locator: &id036
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id036
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '30.96'
+              - - CaO
+                - '7.11'
+              - - SiO2
+                - '61.93'
+          locator: *id036
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_18_c5_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 3.8370724549227845e-07
+        value_as_printed: '6.416'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: C5
+        reference_as_published: 33N·67S
+        EMF_mV_as_published: '-12'
+        composition_mol_percent_as_published:
+          Na2O: '30.96'
+          CaO: '7.11'
+          SiO2: '61.93'
+        composition_mole_fraction:
+          Na2O: '0.3096'
+          CaO: '0.0711'
+          SiO2: '0.6193'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.416'
+            locator: &id037
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_18_c5_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_18_c5_1400_printed_log_input
+      type: gibbs_table
+      locator: *id037
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.416'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_19_d1_1400
+      type: activity_coefficient
+      locator: &id038
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id038
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '11.63'
+              - - CaO
+                - '41.83'
+              - - SiO2
+                - '46.54'
+          locator: *id038
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_19_d1_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 1.6557699634695294e-07
+        value_as_printed: '6.781'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D1
+        reference_as_published: 20N·80S
+        EMF_mV_as_published: '-167'
+        composition_mol_percent_as_published:
+          Na2O: '11.63'
+          CaO: '41.83'
+          SiO2: '46.54'
+        composition_mole_fraction:
+          Na2O: '0.1163'
+          CaO: '0.4183'
+          SiO2: '0.4654'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '6.781'
+            locator: &id039
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_19_d1_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_19_d1_1400_printed_log_input
+      type: gibbs_table
+      locator: *id039
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '6.781'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_20_d2_1400
+      type: activity_coefficient
+      locator: &id040
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id040
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '13.93'
+              - - CaO
+                - '30.38'
+              - - SiO2
+                - '55.70'
+          locator: *id040
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_20_d2_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 5.9292532457999936e-08
+        value_as_printed: '7.227'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D2
+        reference_as_published: 20N·80S
+        EMF_mV_as_published: '-93'
+        composition_mol_percent_as_published:
+          Na2O: '13.93'
+          CaO: '30.38'
+          SiO2: '55.70'
+        composition_mole_fraction:
+          Na2O: '0.1393'
+          CaO: '0.3038'
+          SiO2: '0.557'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '7.227'
+            locator: &id041
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_20_d2_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_20_d2_1400_printed_log_input
+      type: gibbs_table
+      locator: *id041
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '7.227'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_21_d3_1400
+      type: activity_coefficient
+      locator: &id042
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id042
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '15.30'
+              - - CaO
+                - '23.72'
+              - - SiO2
+                - '60.98'
+          locator: *id042
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_21_d3_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 3.58921934645005e-08
+        value_as_printed: '7.445'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D3
+        reference_as_published: 20N·80S
+        EMF_mV_as_published: '-56'
+        composition_mol_percent_as_published:
+          Na2O: '15.30'
+          CaO: '23.72'
+          SiO2: '60.98'
+        composition_mole_fraction:
+          Na2O: '0.153'
+          CaO: '0.2372'
+          SiO2: '0.6098'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '7.445'
+            locator: &id043
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_21_d3_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_21_d3_1400_printed_log_input
+      type: gibbs_table
+      locator: *id043
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '7.445'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_row_22_d4_1400
+      type: activity_coefficient
+      locator: &id044
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed composition
+          columns: Na2O, CaO, SiO2; printed temperature column'
+      T_C: '1400'
+      phase: liquid slag
+      standard_state: Na2O activity as reported relative to the reference melt shown
+        in Table 1; the 40 mol% Na2O–60 mol% SiO2 reference marked * is anchored to
+        Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity; sample composition in mol%
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id044
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '16.76'
+              - - CaO
+                - '16.20'
+              - - SiO2
+                - '67.04'
+          locator: *id044
+      derivation:
+        relation: a_Na2O = 10^(-(-log a_Na2O))
+        inputs:
+        - pak_1989_table1_row_22_d4_1400_printed_log_input
+        output_unit: dimensionless activity
+        printed_precision:
+          decimal_places: 3
+          half_last_digit_in_negative_log: '0.0005'
+          relative_activity_uncertainty: 0.001151292546497023
+          note: ln(10) × 0.5 × 10^-3; confidence level not stated.
+      uncertainty:
+        relative: 0.001151292546497023
+        note: Propagated from rounding of the printed -log a_Na2O cell (3 decimal
+          places); confidence level not stated.
+        decimal_places_in_printed_negative_log: 3
+        confidence_level: not_stated
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        activity: 2.2490546058357827e-08
+        value_as_printed: '7.648'
+        printed_header_as_published: '-log a_Na2O'
+        sample_as_published: D4
+        reference_as_published: 20N·80S
+        EMF_mV_as_published: '-23'
+        composition_mol_percent_as_published:
+          Na2O: '16.76'
+          CaO: '16.20'
+          SiO2: '67.04'
+        composition_mole_fraction:
+          Na2O: '0.1676'
+          CaO: '0.162'
+          SiO2: '0.6704'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+        raw_inputs:
+          negative_log_activity:
+            state:
+              tag: value
+              value: '7.648'
+            locator: &id045
+              page: 3
+              published_page: 320
+              pdf_page_index: 2
+              table: '1'
+              note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed
+                composition columns: Na2O, CaO, SiO2; printed temperature column;
+                printed -log a_Na2O cell retained as a typed-refused log-form input'
+      T_K: '1673.15'
+      derived_from:
+      - pak_1989_table1_row_22_d4_1400_printed_log_input
+    - observation_id: pak_1989_table1_row_22_d4_1400_printed_log_input
+      type: gibbs_table
+      locator: *id045
+      phase: liquid slag
+      units: printed -log activity value; no closed log-activity quantity token
+      values:
+        quantity: negative_log10_activity_as_published
+        method_class: measured_direct
+        value_as_published: '7.648'
+        printed_header_as_published: '-log a_Na2O'
+        printed_form: neg_log10
+        schema_gap: No schema token for the printed negative-log activity form; this
+          input row remains typed-refused.
+    - observation_id: pak_1989_table1_yamaguchi_reference_1400
+      type: activity_coefficient
+      locator: &id046
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et
+          al. (ref. 4)
+      T_C: '1400'
+      phase: Na2O-SiO2 reference melt
+      standard_state: Na2O activity for the 40 mol% Na2O–60 mol% SiO2 melt, as calibrated
+        by Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1400'
+          locator: *id046
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '40'
+              - - SiO2
+                - '60'
+          locator: *id046
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        admission_status: admitted
+        activity: 1.3365955165464433e-06
+        value_as_printed: log a_Na2O = -5.874
+        attribution: Yamaguchi et al. (ref. 4), as quoted in the Table 1 footnote.
+        composition_mole_fraction:
+          Na2O: '0.4'
+          SiO2: '0.6'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+      T_K: '1673.15'
+    - observation_id: pak_1989_table1_yamaguchi_reference_1500
+      type: activity_coefficient
+      locator: &id047
+        page: 3
+        published_page: 320
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et
+          al. (ref. 4)
+      T_C: '1500'
+      phase: Na2O-SiO2 reference melt
+      standard_state: Na2O activity for the 40 mol% Na2O–60 mol% SiO2 melt, as calibrated
+        by Yamaguchi et al. (ref. 4). The source does not name a pure-component standard
+        state.
+      units: dimensionless activity
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1500'
+          locator: *id047
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mol_percent
+              amount_basis: mole_percent
+              components:
+              - - Na2O
+                - '40'
+              - - SiO2
+                - '60'
+          locator: *id047
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        admission_status: admitted
+        activity: 3.013006024186122e-06
+        value_as_printed: log a_Na2O = -5.521
+        attribution: Yamaguchi et al. (ref. 4), as quoted in the Table 1 footnote.
+        composition_mole_fraction:
+          Na2O: '0.4'
+          SiO2: '0.6'
+        composition_mol_basis: printed_mol_percent converted to mole_fraction by /100
+      T_K: '1773.15'

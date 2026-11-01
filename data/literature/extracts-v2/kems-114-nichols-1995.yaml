@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -68,12 +67,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -115,12 +113,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -171,12 +168,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -227,12 +223,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -285,12 +280,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -314,9 +308,13 @@ observations:
     attribution: Mg slope = 2.76(1)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-114-nichols-1995::nichols_1995_fig1_mg_slope_second_law_quoted
   source_id: kems-114-nichols-1995
   locator:
     page: 2
@@ -333,12 +331,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -386,12 +383,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -440,12 +436,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -498,12 +493,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -527,9 +521,13 @@ observations:
     attribution: SiO2 slope = -2.7(8)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-114-nichols-1995::nichols_1995_fig1_sio2_slope_second_law_quoted
   source_id: kems-114-nichols-1995
   locator:
     page: 2
@@ -546,12 +544,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -599,12 +596,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -653,12 +649,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -711,12 +706,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -740,9 +734,13 @@ observations:
     attribution: SiO slope = -2.13(4)
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
-  notices: []
+    status: admitted
+    reason: admission_from_legacy_token:model_output_not_measurement
+  notices:
+  - kind: admission_from_legacy_token
+    affected_quantities: []
+    reason: admission_from_legacy_token:model_output_not_measurement
+    origin: kems-114-nichols-1995::nichols_1995_fig1_sio_slope_second_law_quoted
   source_id: kems-114-nichols-1995
   locator:
     page: 2
@@ -880,12 +878,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -940,12 +937,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1094,12 +1090,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1149,12 +1144,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1196,12 +1190,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1251,12 +1244,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1298,12 +1290,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1353,12 +1344,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1401,12 +1391,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1458,12 +1447,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo90_forsterite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

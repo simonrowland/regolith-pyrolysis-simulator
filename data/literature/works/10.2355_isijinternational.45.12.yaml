@@ -1,0 +1,185 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.45.12
+  citation: Li, Guangqiang; Hamano, Tasuku; Tsukihashi, Fumitaka (2005). “The Effect of Na2O and Al2O3 on Dephosphorization
+    of Molten Steel by High Basicity MgO Saturated CaO–FeOx–SiO2 Slag.” ISIJ International 45(1):12–18.
+  source_ids:
+  - li-2005-na-al-phosphate-fe-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 499a0fd386c3dd006f98398a85ae897c53586288
+    files:
+    - asset_id: pdf:li-2005-na-al-phosphate-fe-activities
+      role: pdf
+      path: raw/li-2005-na-al-phosphate-fe-activities/li-2005-na-al-phosphate-fe-activities.pdf
+      sha256:
+        tag: value
+        value: 282b3c45059d21a2ba081d1d873e80fddda77264beb6e777a79ac5d355e12f00
+    - asset_id: pdftotext:li-2005-na-al-phosphate-fe-activities
+      role: pdftotext
+      path: text/li-2005-na-al-phosphate-fe-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:li-2005-na-al-phosphate-fe-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.45.12
+experiments:
+- experiment_id: 10.2355/isijinternational.45.12::experiment::li_2005_table_1_equilibration
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'chemical_equilibration_slag_metal' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 3
+        published_page: 14
+        table: '1'
+        note: Table 1 caption prints 1823 K
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '0.000064'
+      locator:
+        page: 3
+        published_page: 14
+        table: '1'
+        note: Table 1 caption prints pO2 = 6.40e-5 Pa
+    gas_ratio_as_published:
+      state:
+        tag: unknown
+        reason: condition gas_ratio_as_published is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.45.12
+  locator:
+    page: 3
+    published_page: 14
+    table: '1'
+    note: Table 1 conditions and experimental results
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2/CO = 1/10; oxygen partial pressure calculated by reaction (1)
+      locator:
+        page: 2
+        published_page: 13
+        section: Experimental
+        note: CO2/CO = 1/10; oxygen partial pressure calculated by reaction (1).
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000064'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 14
+        table: '1'
+        note: Table caption prints oxygen partial pressure; row=1-1
+- experiment_id: 10.2355/isijinternational.45.12::experiment::li_2005_table_2_equilibration
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'chemical_equilibration_slag_metal' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 3
+        published_page: 14
+        table: '2'
+        note: Table 2 caption prints 1873 K
+    oxygen_partial_pressure:
+      state:
+        tag: value
+        value: '0.0000532'
+      locator:
+        page: 3
+        published_page: 14
+        table: '2'
+        note: Table 2 caption prints pO2 = 5.32e-5 Pa
+    gas_ratio_as_published:
+      state:
+        tag: unknown
+        reason: condition gas_ratio_as_published is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.45.12
+  locator:
+    page: 3
+    published_page: 14
+    table: '2'
+    note: Table 2 conditions and experimental results
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO2/CO = 1/18; oxygen partial pressure calculated by reaction (1)
+      locator:
+        page: 2
+        published_page: 13
+        section: Experimental
+        note: CO2/CO = 1/18; oxygen partial pressure calculated by reaction (1).
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000532'
+          approximate: false
+      locator:
+        page: 3
+        published_page: 14
+        table: '2'
+        note: Table caption prints oxygen partial pressure; row=2-1

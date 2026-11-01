@@ -1,0 +1,5260 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml
+observations:
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: K2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '102.0896'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O2 c; column=S° at 298.15 K; table_row_number=16; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O2 c; column=S° at 298.15 K; table_row_number=16; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: K2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-425.0944'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O2 c; column=ΔfG° at 298.15 K; table_row_number=16; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O2 c; column=ΔfG° at 298.15 K; table_row_number=16; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-494.1304'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O2 c; column=ΔfH° at 298.15 K; table_row_number=16; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O2 c; column=ΔfH° at 298.15 K; table_row_number=16; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_g_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-158.992'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O2_g_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O2 g; column=ΔfH° at 298.15 K; table_row_number=17; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O2 g; column=ΔfH° at 298.15 K; table_row_number=17; table_column_number=6
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-361.4976'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O c; column=ΔfH° at 298.15 K; table_row_number=14; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O c; column=ΔfH° at 298.15 K; table_row_number=14; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O_g_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: K2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-62.76'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2O_g_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=K2O g; column=ΔfH° at 298.15 K; table_row_number=15; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=K2O g; column=ΔfH° at 298.15 K; table_row_number=15; table_column_number=6
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2Si2O5_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '160.70744'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2Si2O5_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2Si2O5 c; column=C°p at 298.15 K; table_row_number=24; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2Si2O5 c; column=C°p at 298.15 K; table_row_number=24; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2Si2O5_c_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2Si2O5 c; column=H°298−H°0; table_row_number=24; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2Si2O5 c; column=H°298−H°0; table_row_number=24; table_column_number=8
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2Si2O5_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '190.5812'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2Si2O5_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2Si2O5 c; column=S° at 298.15 K; table_row_number=24; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2Si2O5 c; column=S° at 298.15 K; table_row_number=24; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2SiO3_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '118.4072'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2SiO3_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2SiO3 c; column=C°p at 298.15 K; table_row_number=23; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2SiO3 c; column=C°p at 298.15 K; table_row_number=23; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2SiO3_c_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2SiO3 c; column=H°298−H°0; table_row_number=23; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2SiO3 c; column=H°298−H°0; table_row_number=23; table_column_number=8
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2SiO3_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: K2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '146.0216'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_K2SiO3_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 88
+    pdf_page_index: 87
+    table: '100'
+    note: row=K2SiO3 c; column=S° at 298.15 K; table_row_number=23; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 88
+        pdf_page_index: 87
+        table: '100'
+        note: row=K2SiO3 c; column=S° at 298.15 K; table_row_number=23; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: KO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '77.52952'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=KO2 c; column=C°p at 298.15 K; table_row_number=12; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=KO2 c; column=C°p at 298.15 K; table_row_number=12; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: KO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '116.7336'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=KO2 c; column=S° at 298.15 K; table_row_number=12; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=KO2 c; column=S° at 298.15 K; table_row_number=12; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: KO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-239.45032'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=KO2 c; column=ΔfG° at 298.15 K; table_row_number=12; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=KO2 c; column=ΔfG° at 298.15 K; table_row_number=12; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: KO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-284.9304'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table100_KO2_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 72
+    pdf_page_index: 71
+    table: '100'
+    note: row=KO2 c; column=ΔfH° at 298.15 K; table_row_number=12; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 72
+        pdf_page_index: 71
+        table: '100'
+        note: row=KO2 c; column=ΔfH° at 298.15 K; table_row_number=12; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '89.24472'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O2 c; column=C°p at 298.15 K; table_row_number=39; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O2 c; column=C°p at 298.15 K; table_row_number=39; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: Na2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O2 c; column=H°298−H°0; table_row_number=39; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O2 c; column=H°298−H°0; table_row_number=39; table_column_number=8
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '94.9768'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O2 c; column=S° at 298.15 K; table_row_number=39; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O2 c; column=S° at 298.15 K; table_row_number=39; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-447.688'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O2 c; column=ΔfG° at 298.15 K; table_row_number=39; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O2 c; column=ΔfG° at 298.15 K; table_row_number=39; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-510.8664'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O2_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O2 c; column=ΔfH° at 298.15 K; table_row_number=39; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O2 c; column=ΔfH° at 298.15 K; table_row_number=39; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '69.11968'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O c; column=C°p at 298.15 K; table_row_number=37; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O c; column=C°p at 298.15 K; table_row_number=37; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O c; column=H°298−H°0; table_row_number=37; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O c; column=H°298−H°0; table_row_number=37; table_column_number=8
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '75.06096'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O c; column=S° at 298.15 K; table_row_number=37; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O c; column=S° at 298.15 K; table_row_number=37; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-375.47216'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O c; column=ΔfG° at 298.15 K; table_row_number=37; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O c; column=ΔfG° at 298.15 K; table_row_number=37; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-414.216'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O c; column=ΔfH° at 298.15 K; table_row_number=37; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O c; column=ΔfH° at 298.15 K; table_row_number=37; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '55.2288'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O g; column=C°p at 298.15 K; table_row_number=38; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O g; column=C°p at 298.15 K; table_row_number=38; table_column_number=10
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O g; column=H°298−H°0; table_row_number=38; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O g; column=H°298−H°0; table_row_number=38; table_column_number=8
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '261.0816'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O g; column=S° at 298.15 K; table_row_number=38; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O g; column=S° at 298.15 K; table_row_number=38; table_column_number=9
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-52.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O g; column=ΔfG° at 298.15 K; table_row_number=38; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O g; column=ΔfG° at 298.15 K; table_row_number=38; table_column_number=7
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-35.564'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2O_g_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=Na2O g; column=ΔfH° at 298.15 K; table_row_number=38; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=Na2O g; column=ΔfH° at 298.15 K; table_row_number=38; table_column_number=6
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c2_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2465.29648'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c2_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 c2; column=ΔfH° at 298.15 K; table_row_number=36; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 c2; column=ΔfH° at 298.15 K; table_row_number=36; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c3_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: The printed word 'unstable' is not a Polymorph member.
+        rejection_kind: unrecognised
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2457.17952'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c3_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 c3; column=ΔfH° at 298.15 K; table_row_number=38; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 c3; column=ΔfH° at 298.15 K; table_row_number=38; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: beta
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '164.05464'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 c; column=S° at 298.15 K; table_row_number=34; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 c; column=S° at 298.15 K; table_row_number=34; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: beta
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-2322.12'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 c; column=ΔfG° at 298.15 K; table_row_number=34; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 c; column=ΔfG° at 298.15 K; table_row_number=34; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: beta
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2467.7232'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 c; column=ΔfH° at 298.15 K; table_row_number=34; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 c; column=ΔfH° at 298.15 K; table_row_number=34; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_gl_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2445.79904'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2Si2O5_gl_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2Si2O5 gl; column=ΔfH° at 298.15 K; table_row_number=39; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2Si2O5 gl; column=ΔfH° at 298.15 K; table_row_number=39; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: Table 99 prints gl; it gives no quench statement for this assessed value.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '113.84664'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2SiO3 c; column=S° at 298.15 K; table_row_number=29; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2SiO3 c; column=S° at 298.15 K; table_row_number=29; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-1461.01096'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2SiO3 c; column=ΔfG° at 298.15 K; table_row_number=29; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2SiO3 c; column=ΔfG° at 298.15 K; table_row_number=29; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1554.89992'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2SiO3 c; column=ΔfH° at 298.15 K; table_row_number=29; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2SiO3 c; column=ΔfH° at 298.15 K; table_row_number=29; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_gl_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1540.1304'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na2SiO3_gl_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na2SiO3 gl; column=ΔfH° at 298.15 K; table_row_number=30; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na2SiO3 gl; column=ΔfH° at 298.15 K; table_row_number=30; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: Table 99 prints gl; it gives no quench statement for this assessed value.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na4SiO4_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '195.64384'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na4SiO4_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na4SiO4 c; column=S° at 298.15 K; table_row_number=40; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na4SiO4 c; column=S° at 298.15 K; table_row_number=40; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na6Si2O7_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3631.712'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_Na6Si2O7_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 61
+    pdf_page_index: 60
+    table: '99'
+    note: row=Na6Si2O7 c; column=ΔfH° at 298.15 K; table_row_number=41; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 61
+        pdf_page_index: 60
+        table: '99'
+        note: row=Na6Si2O7 c; column=ΔfH° at 298.15 K; table_row_number=41; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '72.13216'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 c; column=C°p at 298.15 K; table_row_number=35; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 c; column=C°p at 298.15 K; table_row_number=35; table_column_number=10
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 c; column=H°298−H°0; table_row_number=35; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 c; column=H°298−H°0; table_row_number=35; table_column_number=8
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '115.8968'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 c; column=S° at 298.15 K; table_row_number=35; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 c; column=S° at 298.15 K; table_row_number=35; table_column_number=9
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_delta_fG
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-218.4048'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_delta_fG
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 c; column=ΔfG° at 298.15 K; table_row_number=35; table_column_number=7
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 c; column=ΔfG° at 298.15 K; table_row_number=35; table_column_number=7
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_delta_fH
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-260.2448'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_c_delta_fH
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 c; column=ΔfH° at 298.15 K; table_row_number=35; table_column_number=6
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 c; column=ΔfH° at 298.15 K; table_row_number=35; table_column_number=6
+    standard_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Conventions Regarding Pure Substances
+        note: The condensed-phase standard state is under one atmosphere; the footnote equates one standard atmosphere to
+          101325 pascal.
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_g_Cp
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '44.7688'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_g_Cp
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 g; column=C°p at 298.15 K; table_row_number=36; table_column_number=10
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 g; column=C°p at 298.15 K; table_row_number=36; table_column_number=10
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_g_H298_minus_H0
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'enthalpy_298K_minus_0K_as_printed'
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_298K_minus_0K_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 g; column=H°298−H°0; table_row_number=36; table_column_number=8
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 g; column=H°298−H°0; table_row_number=36; table_column_number=8
+- observation_id: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_g_S
+  experiment_id: 38325e5aeb4a498e3569ddb7f76706ee794f9fc9747ef851678553c49d9e866b::nbs-1981-tn270-8-alkali-thermochemistry
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: NaO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '266.5208'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+    attribution: National Bureau of Standards — Technical Note 270-8
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nbs-1981-tn270-8-alkali-thermochemistry::nbs81_table99_NaO2_g_S
+  source_id: nbs-1981-tn270-8-alkali-thermochemistry
+  locator:
+    page: 41
+    pdf_page_index: 40
+    table: '99'
+    note: row=NaO2 g; column=S° at 298.15 K; table_row_number=36; table_column_number=9
+  read_from: pdf:nbs-1981-tn270-8-alkali-thermochemistry
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 41
+        pdf_page_index: 40
+        table: '99'
+        note: row=NaO2 g; column=S° at 298.15 K; table_row_number=36; table_column_number=9

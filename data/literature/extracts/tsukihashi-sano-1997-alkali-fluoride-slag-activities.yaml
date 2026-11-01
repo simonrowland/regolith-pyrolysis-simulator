@@ -1,0 +1,97 @@
+schema_version: literature_extract.v1
+source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
+source:
+  citation: Tsukihashi F. and Sano N. (1997). Thermodynamics of Na2O and K2O in the Molten CaO-CaF2-SiO2 System. Molten Slags, Fluxes and Salts '97 Conference, 729-734.
+  doi: null
+  year: 1997
+  version: conference proceedings original
+extraction:
+  method: >-
+    Transcribed from MinerU machine text and pdftotext-layout. MinerU reports
+    no printed tables; its tables inside figure details were excluded. The
+    printed Eq. 12 fit is recorded; no figure coordinates were digitized.
+    Full-cell audit: abstract equation values 18,600, ±1,100, 7.53, ±0.08
+    agree between MinerU and pdftotext; Eq. 12 values 18,600, ±1,100, 7.23,
+    ±0.08 agree between both machine reads. Render checks on PDF pages 1 and
+    4 confirm the abstract/Eq. 12 intercepts respectively. Eq. 12 used
+    because it agrees with the conclusion; the abstract conflict is retained
+    below. The abstract's separate 0.4 mass% K2O versus conclusion's 0.4
+    mass% Na2O conflict concerns the phosphorus-partition result and is out of
+    scope here. The fitted coefficients are quoted_attributed because per-run
+    inputs are not available as printed numeric rows. No K2O activity rows:
+    K2O occurs in phosphorus-partition figures, whose coordinates are outside
+    this extraction. Useful figure candidates are Fig. 6 (temperature fit
+    context), Fig. 7 (Na2O activity versus composition), and Fig. 8 (equal
+    activity comparison); none is digitized here.
+  date: '2026-10-27'
+  worker: w1027na3-tsuk97
+review_status: draft
+fidelity_samples:
+  - species: Na2O
+    observation_id: tsukihashi_sano_1997_eq12_na2o_gamma_fit
+    field: fit
+    value: {form_as_published: 'log gamma_Na2O = -A/T + B', slope_numerator_as_published: '18,600', slope_uncertainty_as_published: '1,100', intercept_as_published: '7.23', intercept_uncertainty_as_published: '0.08', abstract_intercept_conflict_as_published: '7.53', uncertainty_notice: 'confidence level not stated'}
+    locator: {page: 4, published_page: 732, equation: '12'}
+species:
+  Na2O:
+    observations:
+      - observation_id: tsukihashi_sano_1997_eq12_na2o_gamma_fit
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 732
+          equation: '12'
+          note: 'Abstract p. 729 prints intercept 7.53; Eq. 12 and conclusion print 7.23; Eq. 12 used per controller ruling.'
+        T_range_K: [1423, 1623]
+        phase: l
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase: {tag: value, value: l}
+                polymorph: {tag: not_applicable, reason: liquid_endmember}
+              component_basis: Na2O
+          inferred: false
+          note: 'Activity coefficient relative to pure liquid Na2O; logarithm base 10 as printed.'
+          locator: {page: 2, published_page: 730, equation: '3'}
+        regime: CO2-CO chemical equilibration with Pb-Na alloy
+        units: dimensionless coefficients; T in K as printed
+        point_conditions:
+          composition:
+            state: {tag: unknown, reason: 'flux system and 4 mass% Na2O are stated, but complete per-temperature composition is not tabulated'}
+            locator: {page: 4, published_page: 732, figure: '6'}
+          atmosphere:
+            state: {tag: value, value: 'CO2-CO gas; P_CO2/P_CO varied from 0.01 to 10'}
+            locator: {page: 3, published_page: 731, section: '3.2'}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not stated for this experiment}
+            locator: {page: 2, published_page: 730, section: '2.2'}
+          fO2_Pa:
+            state: {tag: unknown, reason: CO2/CO gas ratio is reported but absolute fO2 is not stated for this experiment}
+            locator: {page: 4, published_page: 732, section: '3.2'}
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: authors' fitted temperature dependence of measured Na2O activity coefficient
+          quantity: activity_coefficient_temperature_fit
+          component: Na2O
+          temperature_basis: K
+          A_printed: '7.23'
+          B_printed: '−18,600'
+          notes_printed: '1423–1623 K; CaO-4 mass% Na2O-CaF2-SiO2 flux doubly saturated with CaO and 3CaO·SiO2; standard state pure Na2O(l); paper labels slope numerator A and intercept B in the form, while schema A_printed is the intercept and B_printed is the signed slope; abstract prints intercept 7.53 while Eq. 12 and conclusion print 7.23; Eq. 12 used'
+          fit:
+            form_as_published: 'log gamma_Na2O = -A/T + B'
+            slope_numerator_as_published: '18,600'
+            slope_uncertainty_as_published: '1,100'
+            intercept_as_published: '7.23'
+            intercept_uncertainty_as_published: '0.08'
+            abstract_intercept_conflict_as_published: '7.53'
+            uncertainty_notice: confidence level not stated
+          composition_as_published: 'CaO-4 mass% Na2O-CaF2-SiO2 flux doubly saturated with CaO and 3CaO·SiO2; full per-temperature oxide ratios not tabulated'
+          composition_locator: {page: 4, published_page: 732, figure: '6'}
+          gas_ratio_as_published: 'P_CO2/P_CO varied from 0.01 to 10 to control sodium content of Pb-Na alloy'
+          equilibration_method_as_published: '20 g Pb-Na alloy equilibrated with 13 g flux in a CaO crucible in CO2-CO gas; samples quenched in argon flow'
+          equilibration_method_locator: {page: 2, published_page: 730, section: '2.2'}

@@ -774,12 +774,54 @@ species:
           fidelity_first_temperature_C: 1495
           fidelity_quote: '1 495 | Exp. 41 | Calc. 40.5'
           rows:
-            - {temperature_C_as_published: 1495, Fe2SiO4_wt_pct_as_published: 41, locator: {published_page: 33, table: '3', row: '1495'}, printed_quote: '1 495 | 41 | 40.5'}
-            - {temperature_C_as_published: 1465, Fe2SiO4_wt_pct_as_published: 45, locator: {published_page: 33, table: '3', row: '1465'}, printed_quote: '1 465 | 45 | 45'}
-            - {temperature_C_as_published: 1440, Fe2SiO4_wt_pct_as_published: 47.5, locator: {published_page: 33, table: '3', row: '1440'}, printed_quote: '1 440 | 47.5 | 49'}
-            - {temperature_C_as_published: 1410, Fe2SiO4_wt_pct_as_published: 54, locator: {published_page: 33, table: '3', row: '1410'}, printed_quote: '1 410 | 54 | 54'}
-            - {temperature_C_as_published: 1318, Fe2SiO4_wt_pct_as_published: 70, locator: {published_page: 33, table: '3', row: '1318'}, printed_quote: '1 318 | 70 | 71.5'}
-            - {temperature_C_as_published: 1276, Fe2SiO4_wt_pct_as_published: 80, locator: {published_page: 33, table: '3', row: '1276'}, printed_quote: '1 276 | 80 | 81'}
+            - T_C: 1495
+              Fe2SiO4_wt_pct_as_published: 41
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '41'}
+                  locator: {published_page: 33, table: '3', row: '1495'}
+              locator: {published_page: 33, table: '3', row: '1495'}
+              printed_quote: '1 495 | 41 | 40.5'
+            - T_C: 1465
+              Fe2SiO4_wt_pct_as_published: 45
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '45'}
+                  locator: {published_page: 33, table: '3', row: '1465'}
+              locator: {published_page: 33, table: '3', row: '1465'}
+              printed_quote: '1 465 | 45 | 45'
+            - T_C: 1440
+              Fe2SiO4_wt_pct_as_published: 47.5
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '47.5'}
+                  locator: {published_page: 33, table: '3', row: '1440'}
+              locator: {published_page: 33, table: '3', row: '1440'}
+              printed_quote: '1 440 | 47.5 | 49'
+            - T_C: 1410
+              Fe2SiO4_wt_pct_as_published: 54
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '54'}
+                  locator: {published_page: 33, table: '3', row: '1410'}
+              locator: {published_page: 33, table: '3', row: '1410'}
+              printed_quote: '1 410 | 54 | 54'
+            - T_C: 1318
+              Fe2SiO4_wt_pct_as_published: 70
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '70'}
+                  locator: {published_page: 33, table: '3', row: '1318'}
+              locator: {published_page: 33, table: '3', row: '1318'}
+              printed_quote: '1 318 | 70 | 71.5'
+            - T_C: 1276
+              Fe2SiO4_wt_pct_as_published: 80
+              point_conditions:
+                Fe2SiO4_wt_pct:
+                  state: {tag: value, value: '80'}
+                  locator: {published_page: 33, table: '3', row: '1276'}
+              locator: {published_page: 33, table: '3', row: '1276'}
+              printed_quote: '1 276 | 80 | 81'
         uncertainty:
           note: No numeric uncertainty is printed for the reported Table 3 points.
       - observation_id: wu_1993_table3_calculated_solidus_points

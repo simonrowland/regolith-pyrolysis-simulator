@@ -3,7 +3,7 @@
 The full suite must never drift back to multi-hour wall-clock. Three
 structural invariants enforce that:
 
-1. Every test with a timeout ceiling above the 300 s global default MUST
+1. Every test with a process CPU budget above the 300 s global default MUST
    carry exactly one recognized serialized-chain ``xdist_group`` mark —
    ``magemin_fullrun_<x>`` for heavy native tests, or ``serial`` for the
    socket/pool-contended web pair — so heavy tests run inside a
@@ -33,8 +33,10 @@ from pathlib import Path
 
 import pytest
 
+from tests._cpu_budget import DEFAULT_CPU_BUDGET_SECONDS, cpu_budget_seconds
 
-GLOBAL_TIMEOUT_CEILING_S = 300.0
+
+GLOBAL_CPU_BUDGET_CEILING_S = DEFAULT_CPU_BUDGET_SECONDS
 
 # "serial" is the web/socket serialized chain — duration-hinted and scheduled
 # by --dist loadgroup exactly like the magemin chains, so it satisfies the
@@ -165,13 +167,10 @@ def _item_key(item) -> tuple[str, str]:
     return (rel, name)
 
 
-def _timeout_s(item) -> float | None:
-    mark = item.get_closest_marker("timeout")
-    if mark is None or not mark.args:
-        return None
+def _cpu_budget_s(item) -> float | None:
     try:
-        return float(mark.args[0])
-    except (TypeError, ValueError):
+        return cpu_budget_seconds(item)
+    except ValueError:
         return None
 
 
@@ -199,20 +198,20 @@ def _suite_shape_violations(
                 f"{item.nodeid}: multiple xdist_group marks {groups} — "
                 "xdist UNIONS them into a fused scope (keep exactly one)"
             )
-        ceiling = _timeout_s(item)
-        if ceiling is None or ceiling <= GLOBAL_TIMEOUT_CEILING_S:
+        ceiling = _cpu_budget_s(item)
+        if ceiling is None or ceiling <= GLOBAL_CPU_BUDGET_CEILING_S:
             continue
         heavy_groups = [g for g in groups if HEAVY_GROUP_PATTERN.match(g)]
         if len(heavy_groups) != 1:
             violations.append(
-                f"{item.nodeid}: timeout {ceiling:g}s > "
-                f"{GLOBAL_TIMEOUT_CEILING_S:g}s without exactly one "
+                f"{item.nodeid}: CPU budget {ceiling:g}s > "
+                f"{GLOBAL_CPU_BUDGET_CEILING_S:g}s without exactly one "
                 f"recognized serialized-chain group "
                 f"(magemin_fullrun_<x> or serial; got {groups})"
             )
         if _item_key(item) not in roster:
             violations.append(
-                f"{item.nodeid}: timeout {ceiling:g}s but not in the "
+                f"{item.nodeid}: CPU budget {ceiling:g}s but not in the "
                 "shrink-only heavy roster — reduce its cost or demote a "
                 "roster entry (see module docstring)"
             )

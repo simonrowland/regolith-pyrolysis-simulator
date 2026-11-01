@@ -15,12 +15,8 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
-import shutil
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +26,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.compilation_harvest_io import (  # noqa: E402
+    copy_if_needed,
+    sha256_bytes,
+    write_json,
+)
 from simulator.reference_data.nasa_glenn import (  # noqa: E402
     COMPILATION_ROLE,
     COMPILATION_SOURCE,
@@ -64,10 +65,6 @@ def cli() -> argparse.Namespace:
     )
     parser.add_argument("--extract", type=Path, default=EXTRACT_PATH)
     return parser.parse_args()
-
-
-def sha256_bytes(payload: bytes) -> str:
-    return hashlib.sha256(payload).hexdigest()
 
 
 def resolve_thermo(args_thermo: Path | None, output_root: Path) -> Path:
@@ -120,14 +117,6 @@ def records_missing_from_extract(
                 }
             )
     return missing
-
-
-def write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, indent=2, sort_keys=False, ensure_ascii=True) + "\n",
-        encoding="utf-8",
-    )
 
 
 def build_manifest(
@@ -240,8 +229,7 @@ def main() -> int:
 
     thermo_src = resolve_thermo(args.thermo, output_root)
     dest_thermo = source_dir / "thermo.inp"
-    if thermo_src.resolve() != dest_thermo.resolve():
-        shutil.copyfile(thermo_src, dest_thermo)
+    copy_if_needed(thermo_src, dest_thermo)
     payload = dest_thermo.read_bytes()
     digest = sha256_bytes(payload)
     parsed = parse_thermo_inp(

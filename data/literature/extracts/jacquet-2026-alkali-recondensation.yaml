@@ -1,0 +1,287 @@
+schema_version: literature_extract.v1
+source_id: jacquet-2026-alkali-recondensation
+source:
+  citation: 'Jacquet, E., Marrocchi, Y., and Charnoz, S. (2026), Alkali recondensation into chondrules, Icarus 449:116970.'
+  doi: 10.1016/j.icarus.2026.116970
+  url: https://doi.org/10.1016/j.icarus.2026.116970
+  year: 2026
+extraction:
+  method: 'Machine-text transcription from corpus MinerU tables and pdftotext; locator and layout verification on rendered pages 27, 34, and 37.'
+  date: '2026-10-27'
+  worker: w1027naC-jacquet-2026-alkali-recond
+  provenance_path: corpus/raw/jacquet-2026-alkali-recondensation/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.K.observations[jacquet_2026_k_table2_quoted_isotope_data].values.points[1].delta_permil
+  value: '-0.33'
+  locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'K row, chondrule delta 41/39 K cell; rendered table.'}
+- path: species.K.observations[jacquet_2026_k_table2_quoted_isotope_data].values.points[1].sigma_permil
+  value: '0.12'
+  locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'K row, printed ± uncertainty; rendered table.'}
+- path: species.Na.observations[jacquet_2026_table_a5_na_activity_coefficient].values.points[2].gamma_as_published
+  value: '1.5e-4'
+  locator: {page: 37, published_page: 37, pdf_page_index: 36, table: A.5, note: 'Lambda 0.60 row; rendered table.'}
+species:
+  Melt_oxide:
+    observations:
+    - observation_id: jacquet_2026_table_a4_optical_basicity
+      type: rate_series
+      locator: {page: 37, published_page: 37, pdf_page_index: 36, table: A.4, note: 'Table A.4 reports optical basicities attributed to Mathieu (2009).'}
+      units: dimensionless
+      values:
+        quantity: optical_basicity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Mathieu (2009)
+        admission_status: typed_refusal
+        refusal_reason: 'No optical_basicity quantity token exists in the extraction schema.'
+        schema_gap: optical_basicity
+        points:
+        - {oxide: MgO, optical_basicity_as_published: '0.78', value: '0.78', table_row_number: 2, locator: {page: 37, table: A.4, row: MgO}}
+        - {oxide: Al2O3, optical_basicity_as_published: '0.6', value: '0.6', table_row_number: 2, locator: {page: 37, table: A.4, row: Al2O3}}
+        - {oxide: SiO2, optical_basicity_as_published: '0.48', value: '0.48', table_row_number: 2, locator: {page: 37, table: A.4, row: SiO2}}
+        - {oxide: P2O5, optical_basicity_as_published: '0.4', value: '0.4', table_row_number: 2, locator: {page: 37, table: A.4, row: P2O5}}
+        - {oxide: CaO, optical_basicity_as_published: '1', value: '1', table_row_number: 2, locator: {page: 37, table: A.4, row: CaO}}
+        - {oxide: TiO2, optical_basicity_as_published: '0.61', value: '0.61', table_row_number: 2, locator: {page: 37, table: A.4, row: TiO2}}
+        - {oxide: MnO, optical_basicity_as_published: '1', value: '1', table_row_number: 2, locator: {page: 37, table: A.4, row: MnO}}
+        - {oxide: FeO, optical_basicity_as_published: '1', value: '1', table_row_number: 2, locator: {page: 37, table: A.4, row: FeO}}
+  Chondrule:
+    observations:
+    - observation_id: jacquet_2026_table3_ci_normalized_alkali_averages
+      type: rate_series
+      locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', note: 'Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.'}
+      units: ratio as CI-normalized
+      values:
+        quantity: ci_normalized_alkali_ratios
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.'
+        admission_status: typed_refusal
+        refusal_reason: 'No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.'
+        schema_gap: ci_normalized_alkali_ratios
+        uncertainty: one standard error of the mean as printed; confidence level not stated.
+        points:
+        - {group: EH, Na_Al_mean: '1.0', Na_Al_SE: '0.1', K_Al_mean: '1.1', K_Al_SE: '0.2', n: 56, value: '1.0', table_row_number: 2, locator: {page: 34, table: '3', row: EH}}
+        - {group: OC, Na_Al_mean: '0.30', Na_Al_SE: '0.02', K_Al_mean: '0.23', K_Al_SE: '0.02', n: 171, value: '0.30', table_row_number: 3, locator: {page: 34, table: '3', row: OC}}
+        - {group: CMO, Na_Al_mean: '0.19', Na_Al_SE: '0.02', K_Al_mean: '0.19', K_Al_SE: '0.02', n: 75, value: '0.19', table_row_number: 4, locator: {page: 34, table: '3', row: CMO}}
+        - {group: CR, Na_Al_mean: '0.13', Na_Al_SE: '0.02', K_Al_mean: '0.26', K_Al_SE: '0.09', n: 58, value: '0.13', table_row_number: 5, locator: {page: 34, table: '3', row: CR}}
+        - {group: CHB, Na_Al_mean: '0.16', Na_Al_SE: '0.02', K_Al_mean: '0.09', K_Al_SE: '0.02', n: 39, value: '0.16', table_row_number: 6, locator: {page: 34, table: '3', row: CHB}}
+  Li:
+    observations:
+    - observation_id: jacquet_2026_li_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Li row; isotope data attributed to Seitz et al. (2007, 2012).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Seitz et al. (2007, 2012)'
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 7Li/6Li
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '3.6', sigma_permil: '0.7', value: '3.6', table_row_number: 2, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Li, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-0.3', sigma_permil: '0.8', value: '-0.3', table_row_number: 2, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Li, column: delta_chd}}
+        isotope_masses: {i: 7, j: 6}
+        chd_over_CI_as_published: '0.29'
+        MDF_as_published: '-0.02 ± 0.01'
+  K:
+    observations:
+    - observation_id: jacquet_2026_k_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, K row; isotope data attributed to Nie et al. (2021).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Nie et al. (2021)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 41K/39K
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '-0.07', sigma_permil: '0.03', value: '-0.07', table_row_number: 3, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: K, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-0.33', sigma_permil: '0.12', value: '-0.33', table_row_number: 3, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: K, column: delta_chd}}
+        isotope_masses: {i: 41, j: 39}
+        chd_over_CI_as_published: '0.48'
+        MDF_as_published: '-0.005 ± 0.002'
+  Rb:
+    observations:
+    - observation_id: jacquet_2026_rb_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Rb row; isotope data attributed to Nie et al. (2021).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Nie et al. (2021)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 87Rb/85Rb
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '0.17', sigma_permil: '0.02', value: '0.17', table_row_number: 4, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Rb, column: delta_CI}}
+        - {material: chondrules, delta_permil: '0.04', sigma_permil: '0.05', value: '0.04', table_row_number: 4, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Rb, column: delta_chd}}
+        isotope_masses: {i: 87, j: 85}
+        chd_over_CI_as_published: '0.43'
+        MDF_as_published: '-0.006 ± 0.002'
+  Ge:
+    observations:
+    - observation_id: jacquet_2026_ge_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Ge row; isotope data attributed to Wölfer et al. (2025).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Wölfer et al. (2025)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 74Ge/70Ge
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '1.00', sigma_permil: '0.04', value: '1.00', table_row_number: 5, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Ge, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-2.62', value: '-2.62', table_row_number: 5, uncertainty_interval_permil: ['-1.13', '0.87'], uncertainty: 'asymmetrical 2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Ge, column: delta_chd}}
+        isotope_masses: {i: 74, j: 70}
+        chd_over_CI_as_published: '0.25'
+        MDF_as_published: '-0.06 ± 0.02'
+  Te:
+    observations:
+    - observation_id: jacquet_2026_te_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Te row; isotope data attributed to Morton et al. (2024).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Morton et al. (2024)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 130Te/125Te
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '0.86', sigma_permil: '0.19', value: '0.86', table_row_number: 6, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Te, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-0.47', sigma_permil: '0.30', value: '-0.47', table_row_number: 6, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Te, column: delta_chd}}
+        isotope_masses: {i: 130, j: 125}
+        chd_over_CI_as_published: '0.15'
+        MDF_as_published: '-0.03 ± 0.01'
+  Zn:
+    observations:
+    - observation_id: jacquet_2026_zn_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Zn row; isotope data attributed to Morton et al. (2024).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Morton et al. (2024)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 66Zn/64Zn
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '0.45', sigma_permil: '0.10', value: '0.45', table_row_number: 7, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Zn, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-0.10', sigma_permil: '0.03', value: '-0.10', table_row_number: 7, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Zn, column: delta_chd}}
+        isotope_masses: {i: 66, j: 64}
+        chd_over_CI_as_published: '0.11'
+        MDF_as_published: '-0.018 ± 0.003'
+  Cd:
+    observations:
+    - observation_id: jacquet_2026_cd_table2_quoted_isotope_data
+      type: rate_series
+      locator: {page: 27, published_page: 27, pdf_page_index: 26, table: '2', note: 'Table 2, Cd row; isotope data attributed to Morton et al. (2024).'}
+      units: permil
+      values:
+        quantity: isotope_delta
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: Morton et al. (2024)
+        admission_status: typed_refusal
+        refusal_reason: 'The isotope delta record is preserved as source-attributed data; this extract has no compatible evaporation identity for these whole-chondrule values.'
+        isotope_ratio: 114Cd/110Cd
+        reference_standard: CI composition (as stated in Table 2 caption)
+        points:
+        - {material: CI, delta_permil: '0.38', sigma_permil: '0.17', value: '0.38', table_row_number: 8, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Cd, column: delta_CI}}
+        - {material: chondrules, delta_permil: '-0.19', sigma_permil: '0.27', value: '-0.19', table_row_number: 8, uncertainty: '2 sigma; confidence level not stated', locator: {page: 27, table: '2', row: Cd, column: delta_chd}}
+        isotope_masses: {i: 114, j: 110}
+        chd_over_CI_as_published: '0.11'
+        MDF_as_published: '-0.02 ± 0.01'
+  Na:
+    observations:
+    - observation_id: jacquet_2026_table_a5_na_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 37, published_page: 37, pdf_page_index: 36, table: A.5, note: 'Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.'}
+      T_C: 1400
+      phase: melt
+      units: dimensionless
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        attribution: 'Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).'
+        admission_status: typed_refusal
+        refusal_reason: 'The table conditions each value by optical basicity rather than a full melt composition; no composition identity can be constructed without inventing unprinted oxide proportions.'
+        component: NaO0.5
+        temperature_C_as_published: 1400
+        oxygen_buffer: NNO
+        fO2_as_published: '2.11e-6'
+        schema_gap: 'Source gives a dimensionless fO2 ratio, not log fO2 or fO2_Pa; retain the printed ratio and do not convert it to an unprinted log or pressure.'
+        points:
+        - optical_basicity_Lambda: '0.48'
+          gamma_as_published: '3.8e-5'
+          value: '3.8e-5'
+          table_row_number: 2
+          T_C: 1400
+          point_conditions:
+            fO2_Pa: {state: {tag: unknown, reason: 'dimensionless fO2 printed; no mapped log or pressure form'}, locator: {page: 37, table: A.5}}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
+            composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
+          locator: {page: 37, table: A.5, row: Lambda 0.48}
+        - optical_basicity_Lambda: '0.55'
+          gamma_as_published: '8e-5'
+          value: '8e-5'
+          table_row_number: 2
+          T_C: 1400
+          point_conditions:
+            fO2_Pa: {state: {tag: unknown, reason: 'dimensionless fO2 printed; no mapped log or pressure form'}, locator: {page: 37, table: A.5}}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
+            composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
+          locator: {page: 37, table: A.5, row: Lambda 0.55}
+        - optical_basicity_Lambda: '0.60'
+          gamma_as_published: '1.5e-4'
+          value: '1.5e-4'
+          table_row_number: 2
+          T_C: 1400
+          point_conditions:
+            fO2_Pa: {state: {tag: unknown, reason: 'dimensionless fO2 printed; no mapped log or pressure form'}, locator: {page: 37, table: A.5}}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
+            composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
+          locator: {page: 37, table: A.5, row: Lambda 0.60}
+        - optical_basicity_Lambda: '0.65'
+          gamma_as_published: '2e-3'
+          value: '2e-3'
+          table_row_number: 2
+          T_C: 1400
+          point_conditions:
+            fO2_Pa: {state: {tag: unknown, reason: 'dimensionless fO2 printed; no mapped log or pressure form'}, locator: {page: 37, table: A.5}}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
+            composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
+          locator: {page: 37, table: A.5, row: Lambda 0.65}
+        - optical_basicity_Lambda: '0.72'
+          gamma_as_published: '2e-2'
+          value: '2e-2'
+          table_row_number: 2
+          T_C: 1400
+          point_conditions:
+            fO2_Pa: {state: {tag: unknown, reason: 'dimensionless fO2 printed; no mapped log or pressure form'}, locator: {page: 37, table: A.5}}
+            total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
+            composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
+          locator: {page: 37, table: A.5, row: Lambda 0.72}

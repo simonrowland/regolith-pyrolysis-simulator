@@ -76,6 +76,11 @@ ions and condensed phases included). See `nasa-glenn/README.md`.
 (ions, condensed phases, and comment-only CAS notes included). See
 `burcat/README.md`.
 
+`fastchem-v3-1-3/` is the FastChem v3.1.3 mass-action ln K fit compilation
+(495 standard gas records, 180 extended-only gas ions, 186 condensates).
+Printed coefficients only; not a closed scored quantity. See
+`fastchem-v3-1-3/README.md`.
+
 | Compilation | Local status |
 |---|---|
 | [Robie & Hemingway 1995, USGS Bulletin 2131](robie-hemingway-1995-usgs-b2131/) | Whole-bulletin numeric-table census (1,277 records); native OCR records. Pass 2 transcribed the 111 pass-1 OCR/layout gaps from MinerU tables plus page images. Public domain; reference input only, never in the measured tier (emitted as refused compilation-tier records). |

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
 observations:
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=298.15:col=entropy:v=f07a9c73ad
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=298.15:col=entropy:v=f07a9c73ad:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -14,10 +14,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -79,8 +77,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='133.26'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -100,7 +109,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=400:col=entropy:v=838f28df5c
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=400:col=entropy:v=838f28df5c:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -112,10 +121,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -177,8 +184,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='170.98'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -198,7 +216,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=500:col=entropy:v=fe8c6577fe
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=500:col=entropy:v=fe8c6577fe:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -210,10 +228,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -275,8 +291,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='203.04'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -296,7 +323,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=600:col=entropy:v=16cd7eb728
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=600:col=entropy:v=16cd7eb728:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -308,10 +335,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -373,8 +398,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='231.47'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -394,7 +430,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=700:col=entropy:v=4fa0e70325
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=700:col=entropy:v=4fa0e70325:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -406,10 +442,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -471,8 +505,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='257.15'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -492,7 +537,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=800:col=entropy:v=a7a5d054fa
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=800:col=entropy:v=a7a5d054fa:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -504,10 +549,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -569,8 +612,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='280.67'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -590,7 +644,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=810:col=entropy:v=d17436445a
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:S:shared:T=810:col=entropy:v=d17436445a:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -602,10 +656,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -667,8 +719,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='286.45'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -688,7 +751,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=298.15:col=heat_capacity:v=f8894361a4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=298.15:col=heat_capacity:v=f8894361a4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -700,10 +763,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -765,8 +826,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='119.79'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -786,7 +858,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=400:col=heat_capacity:v=6cd38d5f75
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=400:col=heat_capacity:v=6cd38d5f75:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -798,10 +870,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -863,8 +933,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='137.02'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -884,7 +965,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=500:col=heat_capacity:v=0e1a9279fb
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=500:col=heat_capacity:v=0e1a9279fb:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -896,10 +977,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -961,8 +1040,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='150.34'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -982,7 +1072,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=600:col=heat_capacity:v=d1933d47d4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=600:col=heat_capacity:v=d1933d47d4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -994,10 +1084,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1059,8 +1147,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='161.62'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1080,7 +1179,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=700:col=heat_capacity:v=8b5feb7100
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=700:col=heat_capacity:v=8b5feb7100:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1092,10 +1191,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1157,8 +1254,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='171.62'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1178,7 +1286,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=800:col=heat_capacity:v=b4009e3523
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=800:col=heat_capacity:v=b4009e3523:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1190,10 +1298,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1255,8 +1361,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='180.75'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1276,7 +1393,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=810:col=heat_capacity:v=fe4147b68e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:cp:shared:T=810:col=heat_capacity:v=fe4147b68e:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1288,10 +1405,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1353,8 +1468,19 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 406
+        pdf_page_index: 412
+        table: robie-hemingway-fisher-1978-usgs-b1452-0380
+        note: as_published='181.63'; unit='J/mol·K' quoted from PDF page 36 (printed p. 30) unit row; captured units_as_published
+          ignored; standard_pressure=1 bar from title (298.15 K and 1 bar (10^5 pascals) pressure)
+        source_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0380.json
+        record: robie-hemingway-fisher-1978-usgs-b1452-0380
   notices: []
   source_id: robie-hemingway-fisher-1978-usgs-b1452
   locator:
@@ -1374,7 +1500,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=298.15:col=formation_gibbs_energy:v=59470a536d
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=298.15:col=formation_gibbs_energy:v=59470a536d:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1386,10 +1512,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1415,10 +1539,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1577,7 +1699,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=400:col=formation_gibbs_energy:v=389277cebc
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=400:col=formation_gibbs_energy:v=389277cebc:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1589,10 +1711,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1618,10 +1738,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1780,7 +1898,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=500:col=formation_gibbs_energy:v=9520d7ce5f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=500:col=formation_gibbs_energy:v=9520d7ce5f:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1792,10 +1910,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -1821,10 +1937,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -1983,7 +2097,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=600:col=formation_gibbs_energy:v=bfe593c0e2
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=600:col=formation_gibbs_energy:v=bfe593c0e2:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -1995,10 +2109,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2024,10 +2136,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2186,7 +2296,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=700:col=formation_gibbs_energy:v=6749f5cb55
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=700:col=formation_gibbs_energy:v=6749f5cb55:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -2198,10 +2308,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2227,10 +2335,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2389,7 +2495,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=800:col=formation_gibbs_energy:v=360f9fa0d7
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=800:col=formation_gibbs_energy:v=360f9fa0d7:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -2401,10 +2507,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2430,10 +2534,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2592,7 +2694,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=810:col=formation_gibbs_energy:v=a99b0f066d
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fG:from_the_oxides:T=810:col=formation_gibbs_energy:v=a99b0f066d:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -2604,10 +2706,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2633,10 +2733,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2795,7 +2893,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=298.15:col=formation_enthalpy:v=f1a000fbd6
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=298.15:col=formation_enthalpy:v=f1a000fbd6:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -2807,10 +2905,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -2836,10 +2932,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -2998,7 +3092,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=400:col=formation_enthalpy:v=11d9360983
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=400:col=formation_enthalpy:v=11d9360983:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -3010,10 +3104,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -3039,10 +3131,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -3201,7 +3291,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=500:col=formation_enthalpy:v=596e42d368
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=500:col=formation_enthalpy:v=596e42d368:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -3213,10 +3303,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -3242,10 +3330,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -3404,7 +3490,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=600:col=formation_enthalpy:v=1ebf98209f
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=600:col=formation_enthalpy:v=1ebf98209f:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -3416,10 +3502,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -3445,10 +3529,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -3607,7 +3689,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=700:col=formation_enthalpy:v=1604263f64
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=700:col=formation_enthalpy:v=1604263f64:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -3619,10 +3701,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -3648,10 +3728,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -3810,7 +3888,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=800:col=formation_enthalpy:v=b2c8f82444
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=800:col=formation_enthalpy:v=b2c8f82444:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -3822,10 +3900,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -3851,10 +3927,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4013,7 +4087,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=810:col=formation_enthalpy:v=55a85f2d66
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:delta_fH:from_the_oxides:T=810:col=formation_enthalpy:v=55a85f2d66:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -4025,10 +4099,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -4054,10 +4126,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4216,7 +4286,7 @@ observations:
           note: 'PDF page 36 (printed p. 30) unit row: J/mol·K and kJ/mol'
     output_unit: kJ_per_declared_mol_basis
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=298.15:col=log_kf:v=c62c903d0e
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=298.15:col=log_kf:v=c62c903d0e:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -4228,10 +4298,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -4257,10 +4325,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4411,7 +4477,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=400:col=log_kf:v=570aeb3402
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=400:col=log_kf:v=570aeb3402:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -4423,10 +4489,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -4452,10 +4516,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4606,7 +4668,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=500:col=log_kf:v=0c4dfa58f0
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=500:col=log_kf:v=0c4dfa58f0:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -4618,10 +4680,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -4647,10 +4707,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4801,7 +4859,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=600:col=log_kf:v=0a1778508d
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=600:col=log_kf:v=0a1778508d:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -4813,10 +4871,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -4842,10 +4898,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -4996,7 +5050,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=700:col=log_kf:v=68cd01c3e4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=700:col=log_kf:v=68cd01c3e4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -5008,10 +5062,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -5037,10 +5089,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -5191,7 +5241,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=800:col=log_kf:v=7b921305a8
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=800:col=log_kf:v=7b921305a8:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -5203,10 +5253,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -5232,10 +5280,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
@@ -5386,7 +5432,7 @@ observations:
     parameters: []
     output_unit: dimensionless
     references: []
-- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=810:col=log_kf:v=00f6ca7cc4
+- observation_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:log10_Kf:from_the_oxides:T=810:col=log_kf:v=00f6ca7cc4:poly=kaliophillite_low
   experiment_id: robie-hemingway-fisher-1978-usgs-b1452:robie-hemingway-fisher-1978-usgs-b1452-0380:tabulation
   identity:
     quantity:
@@ -5398,10 +5444,8 @@ observations:
         tag: value
         value: cr
       polymorph:
-        tag: unknown
-        reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800 K.'
-          is not a closed Polymorph token
-        rejection_kind: omitted
+        tag: value
+        value: kaliophillite_low
       charge:
         tag: value
         value: 0
@@ -5427,10 +5471,8 @@ observations:
               tag: value
               value: cr
             polymorph:
-              tag: unknown
-              reason: name_as_published 'Low kaliophillite 298.15 to 810 K.                Big~   kaliophillite 810 to 1800
-                K.' is not a closed Polymorph token
-              rejection_kind: omitted
+              tag: value
+              value: kaliophillite_low
             charge:
               tag: value
               value: 0
