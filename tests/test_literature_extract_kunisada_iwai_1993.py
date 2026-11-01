@@ -167,29 +167,43 @@ def test_isolated_migration_preserves_observations_conditions_and_locators() -> 
         for context_rows in migrator.result.context_by_work.values()
         for row in context_rows
     }
-    assert contexts[TABLE_ID]["locator"]["page"] == 2
     assert contexts[TABLE_ID]["locator"]["table"] == "1"
-    assert contexts["kunisada_iwai_1993_experimental_conditions"]["locator"][
-        "page"
-    ] == 1
-    assert contexts["kunisada_iwai_1993_capacity_definition_and_gas_potentials"][
-        "locator"
-    ]["page"] == 2
-    assert contexts["kunisada_iwai_1993_capacity_correlations_abstract"][
-        "locator"
-    ]["page"] == 1
-    assert contexts["kunisada_iwai_1993_capacity_correlation_binary"][
-        "locator"
-    ]["page"] == 3
-    assert contexts["kunisada_iwai_1993_capacity_correlation_modified_basicity"][
-        "locator"
-    ]["page"] == 4
-    assert contexts["kunisada_iwai_1993_capacity_correlation_optical_basicity"][
-        "locator"
-    ]["page"] == 5
+    expected_context_pages = {
+        TABLE_ID: (2, 1, 44),
+        "kunisada_iwai_1993_experimental_conditions": (1, 0, 43),
+        "kunisada_iwai_1993_capacity_definition_and_gas_potentials": (2, 1, 44),
+        "kunisada_iwai_1993_capacity_correlations_abstract": (1, 0, 43),
+        "kunisada_iwai_1993_capacity_correlation_binary": (2, 1, 44),
+        "kunisada_iwai_1993_capacity_modified_basicity_definition": (3, 2, 45),
+        "kunisada_iwai_1993_capacity_correlation_modified_basicity": (4, 3, 46),
+        "kunisada_iwai_1993_capacity_correlation_optical_basicity": (5, 4, 47),
+        "kunisada_iwai_1993_optical_basicity_values": (5, 4, 47),
+    }
+    for observation_id, (page, pdf_page_index, published_page) in (
+        expected_context_pages.items()
+    ):
+        locator = contexts[observation_id]["locator"]
+        assert locator["page"] == page
+        assert locator["pdf_page_index"] == pdf_page_index
+        assert locator["published_page"] == published_page
+
+    expected_figure_pages = {
+        **{f"kunisada_iwai_1993_figure_{n}": (3, 2, 45) for n in range(1, 5)},
+        **{f"kunisada_iwai_1993_figure_{n}": (4, 3, 46) for n in range(5, 7)},
+    }
+    for observation_id, (page, pdf_page_index, published_page) in (
+        expected_figure_pages.items()
+    ):
+        locator = contexts[observation_id]["locator"]
+        assert locator["page"] == page
+        assert locator["pdf_page_index"] == pdf_page_index
+        assert locator["published_page"] == published_page
     assert contexts["kunisada_iwai_1993_capacity_correlation_binary"]["values"][
         "equation_as_printed"
     ] == "log C_S = 4.64 B - 6.88 at 1500 °C"
+    assert contexts["kunisada_iwai_1993_capacity_modified_basicity_definition"][
+        "values"
+    ]["equation_as_printed"] == "B' = {(Na2O) + m(MO)}/{(SiO2) + m'(MO')}"
     assert contexts["kunisada_iwai_1993_capacity_correlation_optical_basicity"][
         "values"
     ]["equation_as_printed"] == "log C_S = 27.0 Λ_th - 21.2 at 1500 °C"

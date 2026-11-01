@@ -4920,9 +4920,9 @@ species:
     - observation_id: kunisada_iwai_1993_capacity_correlation_binary
       type: table_context
       locator:
-        page: 3
-        pdf_page_index: 2
-        published_page: 45
+        page: 2
+        pdf_page_index: 1
+        published_page: 44
         section: 3.1. Na2O-SiO2 slags
         equation: '4'
       units: log C_S; B in mole ratio
@@ -4933,6 +4933,21 @@ species:
         equation_as_printed: log C_S = 4.64 B - 6.88 at 1500 °C
         definition_as_printed: B = (Na2O)/(SiO2), mole ratio
         standard_deviation_as_printed: 0.37 for log C_S
+    - observation_id: kunisada_iwai_1993_capacity_modified_basicity_definition
+      type: table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 45
+        section: 3.2. Effects of CaO, MnO, MgO and Al2O3
+        equation: '5'
+      units: B' in mole ratio
+      values:
+        quantity: sulfide-capacity basicity definition
+        method_class: author_derived
+        attribution: K. Kunisada and H. Iwai, present work.
+        equation_as_printed: B' = {(Na2O) + m(MO)}/{(SiO2) + m'(MO')}
+        definition_as_printed: (MO) = (CaO), (MnO), (MgO); (MO') = (Al2O3), in mole fraction
     - observation_id: kunisada_iwai_1993_capacity_correlation_modified_basicity
       type: table_context
       locator:
@@ -4940,14 +4955,13 @@ species:
         pdf_page_index: 3
         published_page: 46
         section: 3.2. Effects of CaO, MnO, MgO and Al2O3
-        equation: '5-6'
+        equation: '6'
       units: log C_S; B' in mole ratio
       values:
         quantity: sulfide_capacity
         method_class: author_derived
         attribution: K. Kunisada and H. Iwai, present work.
         rows_as_printed:
-        - equation: B' = {(Na2O) + m(MO)}/{(SiO2) + m'(MO')}, mole ratio
         - parameters: m = 0.7 for CaO; 0.4 for MnO; 0.3 for MgO; m' = 0.5 for Al2O3
         - equation: log C_S = 4.64 B' - 6.88 at 1500 °C
     - observation_id: kunisada_iwai_1993_capacity_correlation_optical_basicity
