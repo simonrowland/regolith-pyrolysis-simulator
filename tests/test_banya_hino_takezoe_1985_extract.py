@@ -85,6 +85,8 @@ def _assert_table_render_pins(document: dict) -> None:
         assert values["Fe2O3_wt_percent_as_printed"] == fe2o3
         assert values["Na2O_wt_percent_as_printed"] == na2o
         assert values["Fe3_over_Fe2_as_printed"] == ratio
+        assert values["value"] == ratio
+        assert values["Fe3_over_Fe2_as_printed"] == values["value"]
         assert row["locator"]["page"] == 2
         assert row["locator"]["table"] == "1"
 
@@ -101,8 +103,12 @@ def _assert_table_render_pins(document: dict) -> None:
         assert values["SiO2_wt_percent_as_printed"] == sio2
         assert values["Na2O_wt_percent_as_printed"] == na2o
         assert values["Fe3_over_Fe2_as_printed"] == ratio
+        assert values["value"] == ratio
+        assert values["Fe3_over_Fe2_as_printed"] == values["value"]
         assert activity_values["P_H2O_over_PH2_as_printed"] == gas_ratio
         assert activity_values["a_FetO_as_printed"] == a_feto
+        assert activity_values["activity"] == a_feto
+        assert activity_values["a_FetO_as_printed"] == activity_values["activity"]
         assert redox["locator"]["page"] == activity["locator"]["page"] == 2
         assert redox["locator"]["table"] == activity["locator"]["table"] == "2"
 
@@ -119,6 +125,20 @@ def test_all_printed_rows_match_render_pins_and_fidelity_samples() -> None:
     ] = "0.088"
     with pytest.raises(AssertionError):
         _assert_table_render_pins(mutated)
+
+    mutated_ratio = deepcopy(document)
+    mutated_ratio["species"]["Fe"]["observations"][0]["values"]["value"] = "9.999"
+    with pytest.raises(AssertionError):
+        _assert_table_render_pins(mutated_ratio)
+
+    mutated_activity = deepcopy(document)
+    mutated_activity["species"]["Fe_tO"]["observations"][0]["values"][
+        "activity"
+    ] = "0.999"
+    with pytest.raises(AssertionError):
+        _assert_table_render_pins(mutated_activity)
+
+    _assert_table_render_pins(document)
 
     table3 = next(
         row
