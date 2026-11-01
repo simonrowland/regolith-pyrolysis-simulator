@@ -1742,7 +1742,7 @@ def _point_condition_from_plain(
             return _composition_located_from_plain(payload)
         if key == "printed_composition":
             return located_value(
-                _printed_map_payload(payload),
+                _printed_map_payload(payload, numeric_values_as="decimal"),
                 _locator_from_plain(payload.get("locator")),
             )
     if not isinstance(payload, Mapping) or "state" not in payload:
@@ -1773,7 +1773,13 @@ def _point_condition_from_plain(
     if isinstance(value, Mapping):
         return _located_from_plain(
             payload,
-            _printed_map_payload if key == "printed_composition" else _as_printed_map,
+            (
+                lambda raw: _printed_map_payload(
+                    raw, numeric_values_as="decimal"
+                )
+                if key == "printed_composition"
+                else _as_printed_map(raw)
+            ),
         )
     return _located_from_plain(payload, as_decimal)
 
@@ -2639,11 +2645,16 @@ def _sample_from_plain(
             lambda value: _mass_percent_printed_from_plain(value)
             or (
                 located_value(
-                    _printed_map_payload(value),
+                    _printed_map_payload(value, numeric_values_as="source"),
                     _locator_from_plain(value.get("locator")),
                 )
                 if isinstance(value, Mapping) and "state" not in value
-                else _located_from_plain(value, _printed_map_payload)
+                else _located_from_plain(
+                    value,
+                    lambda raw: _printed_map_payload(
+                        raw, numeric_values_as="source"
+                    ),
+                )
             ),
         )
     initial_located = (
@@ -5654,13 +5665,14 @@ def _printed_map_payload(
     for key, value in wt.items():
         if str(key) == "locator":
             continue
-        if not isinstance(value, str):
+        if numeric_values_as == "decimal":
             kind, amount = _classify_composition_cell(value)
             if kind == "number" and amount is not None:
-                if numeric_values_as == "decimal":
-                    value = amount
-                elif numeric_values_as == "string":
-                    value = _dec_str(amount)
+                value = amount
+        elif numeric_values_as == "string" and not isinstance(value, str):
+            kind, amount = _classify_composition_cell(value)
+            if kind == "number" and amount is not None:
+                value = _dec_str(amount)
         printed[str(key)] = value
     return printed
 
