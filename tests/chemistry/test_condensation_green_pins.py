@@ -48,11 +48,44 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     if runner_output is not None:
         serialized = json.dumps(runner_output, sort_keys=True)
         (tmp_path / f"{name}-runner.json").write_text(serialized)
-        # runner_sha256 hashes the whole runner result, including engine
-        # capability metadata that depends on the host's engine configuration,
-        # so the committed digests are the studio-3 gate box's values (the
-        # route measurements above are host-independent and match exactly).
-        actual["runner_sha256"] = hashlib.sha256(serialized.encode()).hexdigest()
+        run_metadata = runner_output["run_metadata"]
+        assert isinstance(run_metadata, dict)
+        engines_used = run_metadata["engines_used"]
+        assert isinstance(engines_used, dict)
+        assert {"active", "requested", "registry"} <= engines_used.keys()
+        active = engines_used["active"]
+        registry = engines_used["registry"]
+        assert isinstance(active, dict)
+        assert isinstance(registry, dict)
+        authoritative = {}
+        for intent, slots in registry.items():
+            assert isinstance(intent, str) and intent
+            assert isinstance(slots, dict)
+            assert {"authoritative", "fallback", "shadows"} <= slots.keys()
+            assert isinstance(slots["shadows"], list)
+            for provider in (
+                slots["authoritative"],
+                slots["fallback"],
+                *slots["shadows"],
+            ):
+                if provider is not None:
+                    assert isinstance(provider, str) and provider
+                    assert provider == provider.strip()
+                    assert provider[0].isalnum()
+                    assert all(
+                        char.isalnum() or char in "._:-" for char in provider
+                    )
+            if slots["authoritative"] is not None:
+                authoritative[intent] = slots["authoritative"]
+        assert active == authoritative
+        assert active
+        # Assert the emitted provider maps above, but keep their host-specific
+        # registrations out of this digest; every other result field remains.
+        digest_payload = _runner_digest_payload(runner_output)
+        digest_serialized = json.dumps(digest_payload, sort_keys=True)
+        actual["runner_sha256"] = hashlib.sha256(
+            digest_serialized.encode()
+        ).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
     expected = json.loads(PINS.read_text())[name]
     for species in SPECIES:
@@ -66,6 +99,20 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
             )
     if runner_output is not None:
         assert actual["runner_sha256"] == expected["runner_sha256"]
+
+
+def _runner_digest_payload(runner_output):
+    # active and registry are projections of capability registrations, which
+    # vary with each host's engine configuration; requested and all other
+    # metadata remain in the hash so unrelated result changes still fail it.
+    payload = dict(runner_output)
+    metadata = dict(payload["run_metadata"])
+    engines_used = dict(metadata["engines_used"])
+    del engines_used["active"]
+    del engines_used["registry"]
+    metadata["engines_used"] = engines_used
+    payload["run_metadata"] = metadata
+    return payload
 
 
 @pytest.mark.nightly
