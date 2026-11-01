@@ -402,21 +402,22 @@ def _run_eval_batch(
             expired = [
                 key for key, start in started.items() if key in pending and now - start >= timeout_s
             ]
-            if expired:
-                # Recheck after observing the deadline. A worker can finish while
-                # the parent is being rescheduled; its own elapsed time decides
-                # whether that completion met the per-evaluation limit.
+            if timed_out or expired:
+                # Stop and join before the final drain. Completed results are
+                # classified by their worker elapsed time; pending tasks without
+                # a completion message are the timeout cases.
+                _join_or_stop_workers(workers)
                 timed_out = drain_result_queue() or timed_out
                 expired = [key for key in expired if key in pending]
-            if timed_out or expired:
                 for key in expired:
-                    task = pending.pop(key)
+                    task = pending.pop(key, None)
+                    if task is None:
+                        continue
                     started.pop(key, None)
                     outcomes[key] = (
                         None,
                         _drop(task.index, task.tier, task.candidate_id, "timeout", "per-eval timeout"),
                     )
-                _terminate_workers(workers)
                 for key, task in list(pending.items()):
                     outcomes[key] = (
                         None,
@@ -842,12 +843,6 @@ def _start_method() -> str:
     if "spawn" in methods:
         return "spawn"
     return methods[0]
-
-
-def _terminate_workers(workers: Sequence[Any]) -> None:
-    for worker in workers:
-        if worker.is_alive():
-            worker.terminate()
 
 
 def _join_or_stop_workers(workers: Sequence[Any]) -> None:
