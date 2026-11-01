@@ -4130,14 +4130,24 @@ def _printed_composition_map(payload: object) -> Mapping[str, Any] | None:
         return None
     components = payload.get("components")
     if isinstance(components, Mapping):
-        return components
+        return {
+            str(key): value
+            for key, value in components.items()
+            if key not in _WALK_SKIP_KEYS and key != "locator"
+        }
     if isinstance(components, (list, tuple)):
         return {
             str(pair[0]): pair[1]
             for pair in components
             if isinstance(pair, (list, tuple)) and len(pair) == 2
+            and str(pair[0]) not in _WALK_SKIP_KEYS
+            and str(pair[0]) != "locator"
         }
-    return payload
+    return {
+        str(key): value
+        for key, value in payload.items()
+        if key not in _WALK_SKIP_KEYS and key != "locator"
+    }
 
 
 def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None:
@@ -4321,7 +4331,7 @@ def _source_printed_composition_values(
     printed: dict[str, Any] = {}
     for key, value in source_map.items():
         name = str(key)
-        normalized_name, has_mass_suffix = _mass_percent_component_key(name)
+        normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
         if not (
             normalized_name in declared_names
             or (
@@ -4332,10 +4342,7 @@ def _source_printed_composition_values(
             or normalized_name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
-        printed_name, _ = _mass_percent_component_stem(name)
-        if not has_mass_suffix or _volatile_closure_component(name) is not None:
-            printed_name = name
-        printed[printed_name] = value
+        printed[name] = value
 
     scopes: list[Mapping[str, Any]] = []
     if isinstance(closure_context, Mapping):
@@ -4774,6 +4781,8 @@ def _wt_percent_conversion_or_refusal(
             if component_map is None:
                 continue
             for raw_name, raw_amount in component_map.items():
+                if str(raw_name) in _WALK_SKIP_KEYS or str(raw_name) == "locator":
+                    continue
                 name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
                 kind, _amount = _classify_composition_cell(raw_amount)
                 if (
@@ -4782,10 +4791,32 @@ def _wt_percent_conversion_or_refusal(
                 ):
                     continue
                 if kind == "malformed":
-                    raise ValueError(
-                        "malformed printed component amount for "
-                        f"{raw_name!r}: {raw_amount!r}"
+                    volatile_alias = _volatile_closure_component(
+                        str(raw_name)
                     )
+                    resolved_ditto = False
+                    if (
+                        volatile_alias is not None
+                        and str(raw_name).casefold().endswith("_as_printed")
+                    ):
+                        for resolved_name, resolved_amount in component_map.items():
+                            resolved_alias = _volatile_closure_component(
+                                str(resolved_name)
+                            )
+                            if (
+                                resolved_alias is not None
+                                and resolved_alias[0] == volatile_alias[0]
+                                and resolved_alias[1] < volatile_alias[1]
+                                and _classify_composition_cell(resolved_amount)[0]
+                                == "number"
+                            ):
+                                resolved_ditto = True
+                                break
+                    if not resolved_ditto:
+                        raise ValueError(
+                            "malformed printed component amount for "
+                            f"{raw_name!r}: {raw_amount!r}"
+                        )
                 if _volatile_closure_component(name) is not None:
                     continue
 
@@ -5321,14 +5352,43 @@ def _declared_wt_composition_point_map(values: object, units: object) -> bool:
         if isinstance(rows, list) and any(
             isinstance(row, Mapping)
             and sum(
-                _classify_composition_cell(value)[0] == "number"
-                for value in row.values()
+                _is_printed_chemical_component_name(str(name))
+                and _classify_composition_cell(value)[0] == "number"
+                for name, value in row.items()
             )
             >= 2
             for row in rows
         ):
             return True
     return False
+
+
+def _composition_axis_is_required(
+    quantity: Quantity | None, subtype: object = None
+) -> bool:
+    if quantity is None:
+        return False
+    if quantity in {Quantity.ENTHALPY_OF_FUSION, Quantity.TRANSITION_TEMPERATURE}:
+        # These profiles can require a mixture composition, which is only
+        # known after parsing the printed components.
+        return True
+    subtype_state = (
+        subtype
+        if isinstance(subtype, State)
+        else State.of(subtype)
+        if isinstance(subtype, str)
+        else None
+    )
+    try:
+        return "composition" in profile_for(
+            Identity(quantity=quantity, species=None, subtype=subtype_state)
+        ).required
+    except IdentityRefusal:
+        # Identity validates this quantity's separate valence basis before
+        # producing its profile; both valence quantities require composition.
+        if quantity is Quantity.VALENCE_RATIO:
+            return True
+        raise
 
 
 def _catalogue_composition_located_from_values(
@@ -18832,10 +18892,39 @@ class Migrator:
             if experiment_log_f_o2 is not None
             else None
         )
-        row_oxide_map = _oxide_map_from_mapping(values, closure_context=values)
-        projected_oxide_map = row_oxide_map or (
-            sample_composition[0]
-            if isinstance(sample_composition, tuple)
+        obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
+        quantity, q_reason = map_quantity(
+            obs_type, values, units=obs.get("units"), row=obs
+        )
+        q_token = quantity.value if quantity.is_value else None
+        composition_axis_required = _composition_axis_is_required(
+            q_token,
+            values.get("basis")
+            if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            else values.get("subtype"),
+        )
+        if (
+            not composition_axis_required
+            and q_token is None
+            and values.get("quantity") == "chemical_composition"
+            and _named_printed_composition_map(values) is not None
+        ):
+            # This explicit source quantity is outside the closed v2 enum, but
+            # its named oxide map still declares the composition identity axis.
+            composition_axis_required = True
+        row_oxide_map = (
+            _oxide_map_from_mapping(values, closure_context=values)
+            if composition_axis_required
+            else None
+        )
+        projected_oxide_map = (
+            row_oxide_map
+            or (
+                sample_composition[0]
+                if isinstance(sample_composition, tuple)
+                else None
+            )
+            if composition_axis_required
             else None
         )
         projected_closure_context = (
@@ -18909,10 +18998,6 @@ class Migrator:
             obs.get("locator"), fallback=f"extract:{source_id}:{obs_id}"
         )
         assert locator is not None
-        obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
-        quantity, q_reason = map_quantity(
-            obs_type, values, units=obs.get("units"), row=obs
-        )
         if q_reason:
             self.result.add_queue(
                 work.work_id,
@@ -18922,7 +19007,6 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        q_token = quantity.value if quantity.is_value else None
         observation_provenance = _provenance_from_extract(
             obs, values, provenance, quantity=q_token
         )
@@ -19130,12 +19214,16 @@ class Migrator:
                     suffix_formula, phase, polymorph=species_polymorph
                 )
         composition_refusal: list[str] = []
-        initial_oxide_map = _initial_oxide_map_from_values(
-            values,
-            refusal_reason=composition_refusal,
-            declared_map=_declared_wt_composition_point_map(
-                values, obs.get("units")
-            ),
+        initial_oxide_map = (
+            _initial_oxide_map_from_values(
+                values,
+                refusal_reason=composition_refusal,
+                declared_map=_declared_wt_composition_point_map(
+                    values, obs.get("units")
+                ),
+            )
+            if composition_axis_required
+            else None
         )
         total_iron_notice = _total_iron_reported_as_feo_notice(
             projected_oxide_map, q_token, obs_id
@@ -19162,8 +19250,12 @@ class Migrator:
             composition_role, composition_role_error = _declared_composition_role(
                 obs.get("equipment")
             )
-        composition_located = _composition_located_from_values(
-            values, locator, role_refusal=composition_role_refusal
+        composition_located = (
+            _composition_located_from_values(
+                values, locator, role_refusal=composition_role_refusal
+            )
+            if composition_axis_required
+            else None
         )
         source_composition = values.get("composition")
         if source_composition is None:
@@ -19180,7 +19272,8 @@ class Migrator:
         )
         source_composition_located = (
             _composition_located_from_plain(source_composition)
-            if isinstance(source_composition_state, Mapping)
+            if composition_axis_required
+            and isinstance(source_composition_state, Mapping)
             and source_composition_state.get("tag") == StateTag.UNKNOWN.value
             else None
         )
@@ -19193,23 +19286,32 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        catalogue_composition = _catalogue_composition_located_from_values(values, locator)
+        catalogue_composition = (
+            _catalogue_composition_located_from_values(values, locator)
+            if composition_axis_required
+            else None
+        )
         malformed_composition_amount: str | None = None
-        try:
-            initial_composition, omitted_components = (
-                _mole_fraction_composition_from_values(values)
-            )
-        except ValueError as exc:
-            detail, composition_key = _mole_fraction_composition_error(exc, values)
-            initial_composition, omitted_components = None, ()
-            malformed_composition_amount = detail
-            self.result.registry_issues.append(
-                ValidationIssue(
-                    path=f"observations.{obs_id}.values.{composition_key}",
-                    reason=RefusalReason.INVALID_SOURCE,
-                    detail=detail,
+        if composition_axis_required:
+            try:
+                initial_composition, omitted_components = (
+                    _mole_fraction_composition_from_values(values)
                 )
-            )
+            except ValueError as exc:
+                detail, composition_key = _mole_fraction_composition_error(
+                    exc, values
+                )
+                initial_composition, omitted_components = None, ()
+                malformed_composition_amount = detail
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{obs_id}.values.{composition_key}",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=detail,
+                    )
+                )
+        else:
+            initial_composition, omitted_components = None, ()
         if omitted_components:
             self.result.add_queue(
                 work.work_id,
@@ -19786,7 +19888,7 @@ class Migrator:
                     sample_composition[2]
                 ),
             )
-        elif composition_refusal or q_token in _BULK_PROPERTY_QUANTITIES:
+        elif composition_refusal:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(composition_refusal)
             )
@@ -21194,11 +21296,15 @@ class Migrator:
             # Same declared-map rule as the parent probe. Without it a
             # composition_wt_pct on a non-composition quantity is invisible,
             # the maps compare unequal, and the stamped proxy is cleared.
-            rowless_initial_map = _initial_oxide_map_from_values(
-                rowless_values,
-                declared_map=_declared_wt_composition_point_map(
-                    rowless_values, obs.get("units")
-                ),
+            rowless_initial_map = (
+                _initial_oxide_map_from_values(
+                    rowless_values,
+                    declared_map=_declared_wt_composition_point_map(
+                        rowless_values, obs.get("units")
+                    ),
+                )
+                if composition_axis_required
+                else None
             )
             has_non_yield_points = any(
                 name in {"points", "tests"} for name, _items in row_point_containers
@@ -21926,6 +22032,9 @@ class Migrator:
             if isinstance(quantity, State) and quantity.is_value
             else (quantity if isinstance(quantity, Quantity) else None)
         )
+        point_composition_axis_required = _composition_axis_is_required(
+            q_token, ident_kwargs.get("subtype")
+        )
         coord = None
         val = None
         trail = "identity"
@@ -21969,7 +22078,9 @@ class Migrator:
                     for key in raw_item
                 )
             )
-            if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            if not point_composition_axis_required:
+                point_oxide_map = None
+            elif q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 point_oxide_map = (
                     dict(source_point_oxide_map)
                     if source_point_oxide_map is not None
@@ -22001,6 +22112,7 @@ class Migrator:
                 )
             if (
                 q_for_species is Quantity.MASS_LOSS_FRACTION
+                and point_composition_axis_required
                 and point_oxide_map is None
             ):
                 point_oxide_map = _initial_oxide_map_from_values(parent_values)
@@ -22131,8 +22243,12 @@ class Migrator:
                         ),
                     )
                 )
-            point_catalogue = _catalogue_composition_located_from_values(
-                raw_item, point_locator
+            point_catalogue = (
+                _catalogue_composition_located_from_values(
+                    raw_item, point_locator
+                )
+                if point_composition_axis_required
+                else None
             )
             if point_catalogue is not None:
                 point_oxide_map = None
@@ -22359,10 +22475,14 @@ class Migrator:
             )
         elif ident_kwargs.get("composition") is None:
             composition_refusal: list[str] = []
-            initial_map = _initial_oxide_map_from_values(
-                parent_values,
-                refusal_reason=composition_refusal,
-                declared_map=point_map_declared,
+            initial_map = (
+                _initial_oxide_map_from_values(
+                    parent_values,
+                    refusal_reason=composition_refusal,
+                    declared_map=point_map_declared,
+                )
+                if point_composition_axis_required
+                else None
             )
             if initial_map:
                 ident_kwargs["composition"] = _wt_percent_conversion_state(
@@ -22372,7 +22492,7 @@ class Migrator:
                         parent_values
                     ),
                 )
-            elif composition_refusal or q_token_point in _BULK_PROPERTY_QUANTITIES:
+            elif composition_refusal:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason(composition_refusal)
                 )
@@ -22760,22 +22880,34 @@ class Migrator:
                     and "starting_composition" not in (point_conditions or {})
                 ):
                     starting = run_experiment.sample.printed_composition
-                    starting_values = {
-                        name: (
-                            format(amount, "f")
-                            if kind == "number"
-                            and amount is not None
-                            and not isinstance(raw_amount, str)
-                            else raw_amount
+                    starting_map = _printed_composition_map(
+                        starting.state.value
+                    )
+                    if starting_map is None:
+                        starting_composition = Located(
+                            State.unknown(
+                                "printed starting composition is not a component map"
+                            ),
+                            locator=starting.locator,
                         )
-                        for name, raw_amount in starting.state.value.items()
-                        for kind, amount in (_classify_composition_cell(raw_amount),)
-                    }
+                    else:
+                        starting_values = {
+                            name: (
+                                format(amount, "f")
+                                if kind == "number"
+                                and amount is not None
+                                and not isinstance(raw_amount, str)
+                                else raw_amount
+                            )
+                            for name, raw_amount in starting_map.items()
+                            for kind, amount in (_classify_composition_cell(raw_amount),)
+                        }
+                        starting_composition = located_value(
+                            starting_values, starting.locator
+                        )
                     point_conditions = {
                         **(point_conditions or {}),
-                        "starting_composition": located_value(
-                            starting_values, starting.locator
-                        ),
+                        "starting_composition": starting_composition,
                     }
                 pressure_environment = run_experiment.pressure_environment
                 total_pressure = pressure_environment.total_pressure_Pa
