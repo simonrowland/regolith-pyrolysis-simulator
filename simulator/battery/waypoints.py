@@ -10,6 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _initial_oxide_map_from_values,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
@@ -477,6 +478,17 @@ def charge_moles_by_species(
         and printed.state.is_value
     ):
         raw = _printed_composition_map(printed.state.value)
+        if isinstance(raw, Mapping):
+            # A preserved print map may be wider than its usable oxide subset.
+            # Validate the complete declared map before routing any partial
+            # mass-derived charge, using migrate's shared b-704 policy.
+            if _initial_oxide_map_from_values(
+                raw,
+                declared_map=True,
+                declared_component_map=raw,
+                closure_context=raw,
+            ) is None:
+                raw = None
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():

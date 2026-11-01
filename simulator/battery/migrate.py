@@ -1526,6 +1526,14 @@ def _mass_percent_printed_from_plain(
     )
     raw_components_are_unique = len(raw_components) == len(items)
 
+    if (
+        isinstance(body, Mapping)
+        and str(body.get("basis") or "").casefold() == "as printed"
+    ):
+        # This source envelope is intentionally typed provenance, not a plain
+        # oxide map. Keep it intact even when its cells are numeric.
+        return _located_from_plain(payload, lambda value: value)
+
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
         if isinstance(body, Mapping):
@@ -1543,14 +1551,9 @@ def _mass_percent_printed_from_plain(
                         for _name, amount in items
                     )
                 ):
-                    locator = (
-                        _locator_from_plain(payload.get("locator"))
-                        if isinstance(payload, Mapping)
-                        else None
-                    )
-                    return located_value(
-                        raw_components, locator
-                    )
+                    # Keep the declared typed envelope and every source cell,
+                    # including blanks and malformed tokens, as provenance.
+                    return _located_from_plain(payload, lambda value: value)
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
@@ -1559,6 +1562,8 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
+    # Keep printed key spellings, while matching the legacy printed-value
+    # representation for numeric cells.
     return located_value(_printed_map_payload(raw_components), locator)
 
 
@@ -3490,16 +3495,15 @@ class MigrationResult:
             loc_plain = dict(locator)
         else:
             loc_plain = {}
-        self.queue.append(
-            QueueEntry(
-                work_id=work_id,
-                locator=loc_plain,
-                axes=list(axes),
-                why=why,
-                source=source,
-                observation_id=observation_id,
-            )
+        entry = QueueEntry(
+            work_id=work_id,
+            locator=loc_plain,
+            axes=list(axes),
+            why=why,
+            source=source,
+            observation_id=observation_id,
         )
+        self.queue.append(entry)
 
 
 # ---------------------------------------------------------------------------
@@ -4154,7 +4158,7 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
         if printed is not None:
             source_map.update(printed)
     direct = _printed_composition_map(payload)
-    if direct is not None:
+    if not source_map and direct is not None:
         for name, value in direct.items():
             token = str(name).strip()
             if (
@@ -4267,11 +4271,18 @@ def _unrecognized_printed_chemical_components(
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+        volatile = _volatile_closure_component(name)
         # A declared map may retain trace analyses in ppm beside its wt% oxides.
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or name.casefold().endswith(("_ppm", " ppm"))
-            or _volatile_closure_component(name) is not None
+            or (
+                volatile is not None
+                and (
+                    volatile[0] in {"H2O", "CO2", "LOI"}
+                    or name not in declared_names
+                )
+            )
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
             or _is_composition_condition_key(name)
@@ -5606,7 +5617,15 @@ def _mole_fraction_composition_from_values(
 
 
 def _printed_map_payload(wt: Mapping[str, Any]) -> dict[str, Any]:
-    return {str(key): value for key, value in wt.items()}
+    printed: dict[str, Any] = {}
+    for key, value in wt.items():
+        kind, amount = _classify_composition_cell(value)
+        printed[str(key)] = (
+            _dec_str(amount)
+            if kind == "number" and amount is not None
+            else value
+        )
+    return printed
 
 
 def wt_pct_to_mole_fraction_derivation(
@@ -20439,7 +20458,11 @@ class Migrator:
                 row_sample.printed_composition,
                 state=(
                     State.of(
-                        _runtime_printed_composition_values(row_printed_values)
+                        (
+                            _runtime_printed_composition_values(row_printed_values)
+                            if source_id == "lpi-lunar-soils"
+                            else _printed_map_payload(row_printed_values)
+                        )
                     )
                     if row_printed_locator is not None
                     else State.unknown(
@@ -23339,7 +23362,11 @@ class Migrator:
                 point_conditions = {
                     **(point_conditions or {}),
                     "printed_composition": located_value(
-                        _runtime_printed_composition_values(child_printed_map),
+                        (
+                            _runtime_printed_composition_values(child_printed_map)
+                            if source_id == "lpi-lunar-soils"
+                            else _printed_map_payload(child_printed_map)
+                        ),
                         point_locator,
                     ),
                 }
@@ -23415,7 +23442,15 @@ class Migrator:
                             "components": raw_composition,
                         }
                     )
-                    if converted_composition.state.is_value:
+                    if (
+                        converted_composition.state.is_value
+                        or (
+                            identity.composition is not None
+                            and identity.composition.is_unknown
+                            and identity.composition.reason
+                            == "no composition mapped from source"
+                        )
+                    ):
                         identity = replace(
                             identity, composition=converted_composition.state
                         )
@@ -25471,6 +25506,13 @@ class Migrator:
                     exp = self.result.experiments.get(obs.experiment_id)
                     if exp is not None and exp.work_id in works:
                         entry.work_id = exp.work_id
+        # Parent-row queue entries can resolve to the same exploded child as a
+        # child-local entry. Deduplicate only after observation ids are final.
+        unique_entries: list[QueueEntry] = []
+        for entry in self.result.queue:
+            if entry not in unique_entries:
+                unique_entries.append(entry)
+        self.result.queue[:] = unique_entries
 
     def _close_conditional_method_classes(self) -> None:
         for observation_id, observation in self.result.observations.items():
