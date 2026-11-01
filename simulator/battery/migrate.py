@@ -1477,6 +1477,51 @@ def _mass_percent_printed_from_plain(
 ) -> Located[Mapping[str, Any]] | None:
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
+        body: object = payload
+        if isinstance(payload, Mapping) and "state" in payload:
+            state = payload.get("state")
+            body = (
+                state.get("value")
+                if isinstance(state, Mapping)
+                and str(state.get("tag") or "value") == "value"
+                else None
+            )
+        if isinstance(body, Mapping):
+            basis = body.get("amount_basis")
+            if isinstance(basis, AmountBasis):
+                basis = basis.value
+            components = body.get("components")
+            items = (
+                tuple(components.items())
+                if isinstance(components, Mapping)
+                else tuple(components)
+                if isinstance(components, (list, tuple))
+                else ()
+            )
+            if (
+                str(basis or "") == AmountBasis.MASS_PERCENT.value
+                and items
+                and all(
+                    isinstance(item, (list, tuple)) and len(item) == 2
+                    for item in items
+                )
+            ):
+                raw_components = {str(name): amount for name, amount in items}
+                if (
+                    len(raw_components) == len(items)
+                    and any(
+                        _classify_composition_cell(amount)[0] != "number"
+                        for _name, amount in items
+                    )
+                ):
+                    locator = (
+                        _locator_from_plain(payload.get("locator"))
+                        if isinstance(payload, Mapping)
+                        else None
+                    )
+                    return located_value(
+                        _printed_map_payload(raw_components), locator
+                    )
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
@@ -4677,18 +4722,19 @@ def _wt_percent_conversion_or_refusal(
                 continue
             for raw_name, raw_amount in component_map.items():
                 name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+                kind, _amount = _classify_composition_cell(raw_amount)
                 if (
                     name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
                     or _is_composition_condition_key(name)
-                    or _volatile_closure_component(name) is not None
                 ):
                     continue
-                kind, _amount = _classify_composition_cell(raw_amount)
                 if kind == "malformed":
                     raise ValueError(
                         "malformed printed component amount for "
                         f"{raw_name!r}: {raw_amount!r}"
                     )
+                if _volatile_closure_component(name) is not None:
+                    continue
 
         dropped = _unrecognized_printed_chemical_components(
             wt,
