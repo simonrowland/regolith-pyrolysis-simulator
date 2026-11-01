@@ -923,20 +923,34 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
     # t-1217: full first-wall capture leaves no separate high-supersaturation source class.
-    assert notice["source_classes"] == [
-        "fail_closed_no_direct_sticking_coefficient",
-        "solid_film_growth_proxy_not_evaporation_evidence",
-    ]
+    fused_silica_alpha = condensation_module.MATERIALS_DATA[
+        "fused_silica_alpha_s_by_species"
+    ]["SiO"]
+    assert fused_silica_alpha["source_class"] in notice["source_classes"]
+    assert "solid_film_growth_proxy_not_evaporation_evidence" in (
+        notice["source_classes"]
+    )
+    assert "fail_closed_no_direct_sticking_coefficient" not in (
+        notice["source_classes"]
+    )
     assert notice["species"] == ["SiO"]
     assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
         0.022481955557451427
     )
-    assert (
-        notice["alpha_s_provenance_by_species"]["SiO"]["stage_2_to_stage_3"][
-            "alpha_s"
-        ]
-        == pytest.approx(0.0)
+    fused_silica_record = notice["alpha_s_provenance_by_species"]["SiO"][
+        "stage_2_to_stage_3"
+    ]
+    expected_proxy = condensation_module._sidecar_alpha_record(
+        "SiO",
+        T_K=fused_silica_record["alpha_s_temperature_K"],
     )
+    assert fused_silica_record["alpha_s"] == expected_proxy["alpha_s"]
+    assert fused_silica_record["source_class"] == fused_silica_alpha[
+        "source_class"
+    ]
+    assert fused_silica_record["uncertainty_flag"] == fused_silica_alpha[
+        "uncertainty_flag"
+    ]
     # Reported alphas are the wall-path values; the capture-budget path reads
     # the same literature sidecar defaults and must not be conflated with
     # material-specific wall overrides.

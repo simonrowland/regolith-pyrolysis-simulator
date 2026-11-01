@@ -5406,7 +5406,14 @@ def _alpha_record(
     if segment is not None:
         record['segment'] = str(segment.name)
     if isinstance(entry, Mapping):
-        for key in ('source', 'source_class', 'status', 'output_status', 'basis'):
+        for key in (
+            'source',
+            'source_class',
+            'status',
+            'output_status',
+            'uncertainty_flag',
+            'basis',
+        ):
             value = entry.get(key)
             if value not in (None, ''):
                 record[key] = value

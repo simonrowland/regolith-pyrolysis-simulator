@@ -39,15 +39,16 @@ default_liner_alpha_s_by_species: &default_liner_alpha_s_by_species
   Mn: *alpha_Mn
   Cr: *alpha_Cr
 
-fused_silica_liner_alpha_s_by_species: &fused_silica_liner_alpha_s_by_species
+fused_silica_alpha_s_by_species: &fused_silica_alpha_s_by_species
   <<: *default_liner_alpha_s_by_species
   SiO:
-    value: 0.0
-    status: uncharacterized
-    source_class: fail_closed_no_direct_sticking_coefficient
-    source: data/wall_materials.yaml::materials.fused_silica.stickiness.SiO
+    value_ref: data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value
+    status: UNCERTIFIED
+    source_class: fused_silica_sio_wetzel_gail_growth_proxy
+    source: "Wetzel & Gail 2013 solid-SiO particle-growth coefficient used as a proxy for fused-silica SiO sticking."
     output_status: status_bearing
-    basis: "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7."
+    uncertainty_flag: "uncertified_wetzel_gail_solid_sio_growth_proxy; no direct SiO-on-fused-silica sticking measurement (seekq sio-sticking-on-silica)"
+    basis: "The Wetzel & Gail 2013 solid-SiO particle-growth coefficient remains an uncertified proxy; it is not a measured fused-silica sticking coefficient."
 
 stages:
   0:
@@ -73,7 +74,7 @@ stages:
     liner_material: fused_silica_baffles
     temp_range_C: [900, 1200]
     max_service_T_C: 1200
-    alpha_s_by_species: *default_alpha_s_by_species
+    alpha_s_by_species: *fused_silica_alpha_s_by_species
   4:
     structural_material: refractory_shell
     liner_material: alkali_mg_cyclone_liner
@@ -115,7 +116,7 @@ liner_materials:
     alpha_s_by_species: *default_liner_alpha_s_by_species
   fused_silica_baffles:
     max_service_T_C: 1200
-    alpha_s_by_species: *fused_silica_liner_alpha_s_by_species
+    alpha_s_by_species: *fused_silica_alpha_s_by_species
   alkali_mg_cyclone_liner:
     max_service_T_C: 700
     alpha_s_by_species: *default_liner_alpha_s_by_species

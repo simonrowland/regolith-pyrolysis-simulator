@@ -252,7 +252,18 @@ def _materials_with_liner_alpha(
     return materials
 
 
-def test_fused_silica_sio_stage_and_liner_baseline() -> None:
+def test_fused_silica_sio_stage_and_liner_share_uncertified_proxy() -> None:
+    materials = condensation_module.MATERIALS_DATA
+    owner_map = materials["fused_silica_alpha_s_by_species"]
+    owner_entry = owner_map["SiO"]
+    assert materials["stages"][3]["alpha_s_by_species"] == owner_map
+    assert (
+        materials["liner_materials"]["fused_silica_baffles"][
+            "alpha_s_by_species"
+        ]
+        == owner_map
+    )
+
     stage = next(
         stage
         for stage in CondensationTrain.create_default().stages
@@ -271,6 +282,10 @@ def test_fused_silica_sio_stage_and_liner_baseline() -> None:
 
     assert stage_record["alpha_s"] == sidecar_record["alpha_s"]
     assert stage_record["value_ref"] == sidecar_record["value_ref"]
+    assert stage_record["source_class"] == owner_entry["source_class"]
+    assert stage_record["citation_status"] == "UNCERTIFIED"
+    assert stage_record["output_status"] == "status_bearing"
+    assert stage_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
 
     liner_record = condensation_module._wall_alpha_record(
         "SiO",
@@ -281,10 +296,20 @@ def test_fused_silica_sio_stage_and_liner_baseline() -> None:
         ),
         T_K=temperature_K,
     )
-    assert liner_record["alpha_s"] == 0.0
-    assert liner_record["source_class"] == (
-        "fail_closed_no_direct_sticking_coefficient"
-    )
+    assert liner_record["alpha_s"] == stage_record["alpha_s"]
+    assert liner_record["source_class"] == owner_entry["source_class"]
+    assert liner_record["citation_status"] == "UNCERTIFIED"
+    assert liner_record["output_status"] == "status_bearing"
+    assert liner_record["uncertainty_flag"] == owner_entry["uncertainty_flag"]
+
+    route, _ = _route_wall_deposit_authority("SiO", wall_temperature_C=1700.0)
+    route_provenance = route.sticking_alpha_provenance_notice[
+        "alpha_s_provenance_by_species"
+    ]["SiO"]
+    for surface in ("stage_3", "stage_2_to_stage_3"):
+        assert route_provenance[surface]["uncertainty_flag"] == (
+            owner_entry["uncertainty_flag"]
+        )
 
 
 @pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
