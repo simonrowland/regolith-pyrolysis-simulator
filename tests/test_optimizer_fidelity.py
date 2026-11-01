@@ -13,6 +13,7 @@ import pytest
 
 import simulator.backends as backend_module
 import simulator.optimize.fidelity as fidelity_module
+import simulator.optimize.pool as pool_module
 import simulator.optimize.worker_runtime as worker_runtime_module
 from simulator.optimize.doe import (
     DEPENDENCY_FREE_LHC_SAMPLER,
@@ -516,16 +517,20 @@ def test_fidelity_warm_runtime_spec_keeps_benign_feedstock_inprocess() -> None:
 def test_fidelity_subprocess_routing_uses_shared_backend_predicate() -> None:
     fidelity_source = Path(fidelity_module.__file__).read_text()
     task_route_source = inspect.getsource(
-        fidelity_module._task_stage0_subprocess_required
+        pool_module._task_stage0_subprocess_required
     )
     init_route_source = inspect.getsource(fidelity_module._initialize_fidelity_worker)
 
     assert (
-        fidelity_module.requires_stage0_subprocess
+        fidelity_module._task_stage0_subprocess_required
+        is pool_module._task_stage0_subprocess_required
+    )
+    assert (
+        pool_module.requires_stage0_subprocess
         is backend_module.requires_stage0_subprocess
     )
     assert "requires_stage0_subprocess" in task_route_source
-    assert "requires_stage0_subprocess" in init_route_source
+    assert "_task_stage0_subprocess_required" in init_route_source
     assert "STAGE0_SUBPROCESS_FEEDSTOCK_IDS" not in fidelity_source
     assert "is_spinel_rich_stage0_subprocess_feedstock" not in fidelity_source
 
