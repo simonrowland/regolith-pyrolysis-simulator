@@ -805,11 +805,12 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. The production runner captures 0.0004975624607245658 kg by
-    # row 7; the following row transfers it to reagent, so live product returns
-    # to zero while cumulative condensate remains and recycled mass records it.
+    # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
+    # this production row total; the next row transfers it to reagent, so live
+    # product returns to zero while cumulative condensate and recycled mass
+    # retain the capture.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975624607245658, rel=1e-12, abs=1e-15
+        0.0004975311735864234, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (

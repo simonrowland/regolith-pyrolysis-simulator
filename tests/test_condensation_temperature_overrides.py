@@ -41,6 +41,14 @@ from simulator.condensation import (
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
+def _constant_deposition_flux(*args, diagnostic_out=None, **kwargs):
+    """Keep the mocked saturation diagnostic paired with the mocked flux."""
+    if diagnostic_out is not None:
+        diagnostic_out["wall_saturation_pressure_pa"] = 1.0
+        diagnostic_out["wall_saturation_pressure_refused"] = False
+    return 2.0
+
+
 @pytest.fixture(autouse=True)
 def _restore_condensation_temps():
     """Snapshot the module-level dict before each test and restore
@@ -742,7 +750,7 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        _constant_deposition_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
@@ -762,9 +770,13 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
             inlet_partial_pressure_pa=100.0,
         )
 
-    # t-1217: P_sat/p_in=0.01 leaves f_eq=0.99 excess inventory for the integrated kinetics.
-    assert efficiency(0.25) == pytest.approx(0.048758364372035276)
-    assert efficiency(1.0) == pytest.approx(0.181092363070676)
+    # P_sat/p_in = 1 Pa/100 Pa = 0.01, so the dimensionless equilibrium
+    # excess is 1 - 0.01 = 0.99. The 900-1200 C band has 33 centers; the
+    # inclusive 1050 C cutoff makes 17/33 strips eligible. These area-response
+    # pins are from that integrated path with the fixed test flux; eta tends
+    # to zero as configured area tends to zero.
+    assert efficiency(0.25) == pytest.approx(0.025425385812662002)
+    assert efficiency(1.0) == pytest.approx(0.09785031217279809)
 
 
 def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
@@ -783,7 +795,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        _constant_deposition_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
