@@ -8,7 +8,7 @@ import pytest
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import AmountBasis
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
-from simulator.battery.records import Composition, Derivation, Located, Sample, State
+from simulator.battery.records import Composition, Derivation, Located, Sample, State, Value
 from simulator.battery.migrate import (
     load_yaml, _sample_from_plain, _wt_percent_conversion_state,
 )
@@ -71,23 +71,73 @@ def test_partial_printed_composition_does_not_reach_engine_point():
     )
 
 
-def test_payload_scale_invariance():
+def test_printed_wt_percent_outside_closure_refuses_even_with_derived_initial_composition():
     experiment, bench, observation = case()
     source = load_yaml(Path(__file__).resolve().parents[2] /
                        "data/literature/extracts/ta-badro-2021.yaml")
     sample = _sample_from_plain(source["experiments"][0]["sample"])
     assert not sample.mass_kg.state.is_value
     weights = source["laboratory_parameters"]["starting_composition"]["composition_wt_pct"]
-    payloads = []
-    for scale in (1, 10):
-        scaled = replace(experiment, sample=replace(sample,
-            printed_composition=replace(sample.printed_composition,
-                state=State.of({species: D(weight) * scale for species, weight in weights.items()}))))
-        payloads.append([r.payload for r in engine_point_requests(
-            collect_consumer_inputs(scaled, bench, observation))])
-    assert all(payload is not None for payload in payloads[0])
-    assert payloads[0] == payloads[1]
-    assert sum(payloads[0][0]["composition_mol"].values()) == pytest.approx(1)
+    scale_one = replace(experiment, sample=replace(sample,
+        printed_composition=replace(sample.printed_composition,
+            state=State.of({species: D(weight) for species, weight in weights.items()}))))
+    scale_ten_map = {species: D(weight) * 10 for species, weight in weights.items()}
+    scale_ten = replace(experiment, sample=replace(sample,
+        printed_composition=replace(sample.printed_composition,
+            state=State.of(scale_ten_map))))
+    closure = _wt_percent_conversion_state(
+        scale_ten_map,
+        closure_context=scale_ten_map,
+        declared_component_map=scale_ten_map,
+    )
+    assert closure.is_unknown
+    assert "sum=1000 wt% is above 102 wt%" in closure.reason
+
+    valid_requests = engine_point_requests(
+        collect_consumer_inputs(scale_one, bench, observation)
+    )
+    assert all(request.payload is not None for request in valid_requests)
+    assert sum(valid_requests[0].payload["composition_mol"].values()) == pytest.approx(1)
+
+    invalid_inputs = collect_consumer_inputs(scale_ten, bench, observation)
+    waypoint = invalid_inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert waypoint.absence.missing == ("experiment.sample.printed_composition",)
+    invalid_requests = engine_point_requests(invalid_inputs)
+    assert invalid_requests
+    assert all(request.payload is None for request in invalid_requests)
+    assert all(any(
+        gap.waypoint == "normalized_composition"
+        and gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        for gap in request.readiness.gaps
+    ) for request in invalid_requests)
+
+
+def test_mass_inventory_scale_preserves_engine_composition():
+    experiment, bench, observation = case()
+    compositions = []
+    charges = []
+    for mass_kg in (D("0.001"), D("0.010")):
+        sample = Sample(
+            mass_kg=f.located(Value.point_of(mass_kg)),
+            initial_composition=f.located(Composition(
+                "mix", (("MgO", D("0.25")), ("SiO2", D("0.75"))),
+                AmountBasis.MOLE_FRACTION,
+            )),
+        )
+        inputs = collect_consumer_inputs(
+            replace(experiment, sample=sample), bench, observation
+        )
+        requests = engine_point_requests(inputs)
+        assert all(request.payload is not None for request in requests)
+        compositions.append([request.payload["composition_mol"] for request in requests])
+        charges.append({
+            species: waypoint.selected.value.point
+            for species, waypoint in inputs.charges.items()
+        })
+    assert compositions[0] == compositions[1]
+    assert charges[1] == {species: amount * 10 for species, amount in charges[0].items()}
 
 
 def test_printed_inventory_precedes_wt_derivation():

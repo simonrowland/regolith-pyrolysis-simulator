@@ -953,7 +953,19 @@ def normalized_composition(
                         declared_component_map=mass_percent_map,
                     )
                     if closure_refusal is not None:
-                        raw = None
+                        # A rejected printed mass analysis cannot fall through
+                        # to a lower-ranked composition route and bypass its
+                        # closure refusal.
+                        return WaypointResult(
+                            "normalized_composition",
+                            None,
+                            (),
+                            WaypointAbsence(
+                                "normalized_composition",
+                                GapReason.UNSUPPORTED_PRINT_FORM,
+                                (path,),
+                            ),
+                        )
                 if raw is not None:
                     try:
                         engine_oxides = _engine_printed_oxides(raw)
