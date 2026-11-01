@@ -1,0 +1,1894 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.26.121
+  citation: Kunisada, K. & Iwai, H. (1986). Dephosphorization of Liquid Iron by Na2O-SiO2 Slag. Transactions of the Iron and
+    Steel Institute of Japan 26(2), 121-127.
+  source_ids:
+  - kunisada-1986-na-silicate-dephosphorization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: d2cfb582f0a2173d99c23c79d7257b56ed252063
+    files:
+    - asset_id: pdf:kunisada-1986-na-silicate-dephosphorization
+      role: pdf
+      path: raw/kunisada-1986-na-silicate-dephosphorization/kunisada-1986-na-silicate-dephosphorization.pdf
+      sha256:
+        tag: value
+        value: 1240ff2154d201671ea18b25adb9ba8322267c37be72d939f2e9deaa9acaac60
+    - asset_id: pdftotext:kunisada-1986-na-silicate-dephosphorization
+      role: pdftotext
+      path: text/kunisada-1986-na-silicate-dephosphorization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kunisada-1986-na-silicate-dephosphorization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational1966.26.121
+experiments:
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '18.5'
+          SiO2: '39.0'
+          T.Fe: '13.6'
+          MgO: '22.0'
+          P2O5: '1.01'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row A-2 (table row 3).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=A-2; table_row_number=3
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '16.0'
+          SiO2: '39.2'
+          T.Fe: '14.2'
+          MgO: '23.6'
+          P2O5: '0.83'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row A-2 (table row 4).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=A-2; table_row_number=4
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '17.9'
+          SiO2: '37.2'
+          T.Fe: '13.4'
+          MgO: '24.5'
+          P2O5: '0.72'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row A-2 (table row 5).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=A-2; table_row_number=5
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '16.9'
+          SiO2: '33.9'
+          T.Fe: '20.6'
+          MgO: '19.1'
+          P2O5: '1.16'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row A-3 (table row 6).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=A-3; table_row_number=6
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '13.2'
+          SiO2: '29.1'
+          T.Fe: '28.3'
+          MgO: '16.5'
+          P2O5: '1.23'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row A-4 (table row 7).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=A-4; table_row_number=7
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '23.5'
+          SiO2: '36.9'
+          T.Fe: '14.7'
+          MgO: '17.6'
+          P2O5: '1.25'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row B-2 (table row 8).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=B-2; table_row_number=8
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '21.3'
+          SiO2: '37.1'
+          T.Fe: '14.8'
+          MgO: '19.6'
+          P2O5: '1.14'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row B-2 (table row 9).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=B-2; table_row_number=9
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '20.9'
+          SiO2: '35.9'
+          T.Fe: '15.2'
+          MgO: '20.6'
+          P2O5: '1.14'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row B-2 (table row 10).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=B-2; table_row_number=10
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '18.4'
+          SiO2: '32.2'
+          T.Fe: '21.4'
+          MgO: '16.1'
+          P2O5: '1.36'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row B-3 (table row 11).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=B-3; table_row_number=11
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '17.0'
+          SiO2: '27.8'
+          T.Fe: '28.7'
+          MgO: '13.5'
+          P2O5: '1.45'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row B-4 (table row 12).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=B-4; table_row_number=12
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '36.3'
+          SiO2: '40.0'
+          T.Fe: '0.8'
+          MgO: '15.1'
+          P2O5: '0.43'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-0 (table row 13).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-0; table_row_number=13
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '31.3'
+          SiO2: '35.9'
+          T.Fe: '11.0'
+          MgO: '13.0'
+          P2O5: '1.38'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-1 (table row 14).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-1; table_row_number=14
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '30.7'
+          SiO2: '37.0'
+          T.Fe: '9.2'
+          MgO: '15.7'
+          P2O5: '1.38'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-1 (table row 15).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-1; table_row_number=15
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '26.5'
+          SiO2: '35.5'
+          T.Fe: '13.3'
+          MgO: '17.1'
+          P2O5: '1.30'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-1 (table row 16).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-1; table_row_number=16
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '27.6'
+          SiO2: '31.5'
+          T.Fe: '15.8'
+          MgO: '12.9'
+          P2O5: '1.79'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-2 (table row 17).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-2; table_row_number=17
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '22.7'
+          SiO2: '31.4'
+          T.Fe: '20.0'
+          MgO: '14.9'
+          P2O5: '0.47'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-2 (table row 18).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-2; table_row_number=18
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '25.1'
+          SiO2: '32.3'
+          T.Fe: '18.0'
+          MgO: '13.8'
+          P2O5: '1.77'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-2 (table row 19).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-2; table_row_number=19
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '28.2'
+          SiO2: '31.5'
+          T.Fe: '14.0'
+          MgO: '13.1'
+          P2O5: '3.11'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-2 (table row 20).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-2; table_row_number=20
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '23.8'
+          SiO2: '30.8'
+          T.Fe: '18.2'
+          MgO: '15.8'
+          P2O5: '1.49'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-2 (table row 21).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-2; table_row_number=21
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '23.5'
+          SiO2: '28.5'
+          T.Fe: '24.1'
+          MgO: '9.2'
+          P2O5: '1.39'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-3 (table row 22).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-3; table_row_number=22
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '21.8'
+          SiO2: '27.3'
+          T.Fe: '24.2'
+          MgO: '12.9'
+          P2O5: '1.54'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-3 (table row 23).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-3; table_row_number=23
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '20.1'
+          SiO2: '27.7'
+          T.Fe: '25.9'
+          MgO: '13.1'
+          P2O5: '1.24'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-3 (table row 24).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-3; table_row_number=24
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '19.8'
+          SiO2: '23.4'
+          T.Fe: '31.4'
+          MgO: '14.5'
+          P2O5: '1.18'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row C-4 (table row 25).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=C-4; table_row_number=25
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '25.4'
+          SiO2: '26.5'
+          T.Fe: '22.5'
+          MgO: '9.6'
+          P2O5: '2.72'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row D-1 (table row 26).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=D-1; table_row_number=26
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '25.9'
+          SiO2: '20.8'
+          T.Fe: '30.4'
+          MgO: '4.9'
+          P2O5: '2.44'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row D-2 (table row 27).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=D-2; table_row_number=27
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '24.3'
+          SiO2: '21.0'
+          T.Fe: '29.7'
+          MgO: '7.1'
+          P2O5: '1.70'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row D-2 (table row 28).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=D-2; table_row_number=28
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '21.7'
+          SiO2: '20.9'
+          T.Fe: '32.2'
+          MgO: '7.6'
+          P2O5: '1.79'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(I)
+        note: Printed composition for Table 1(I) row D-2 (table row 29).
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(I)
+    note: Table 1(I) end-of-run assay row; the T.Fe component remains elemental iron as printed.; row_label=D-2; table_row_number=29
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '40.9'
+          SiO2: '39.5'
+          T.Fe: '2.3'
+          MgO: '17.5'
+          P2O5: '1.95'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(II)
+        note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(II)
+    note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.; row_label=E; table_row_number=1
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '38.8'
+          SiO2: '38.5'
+          T.Fe: '6.5'
+          MgO: '18.5'
+          P2O5: '2.84'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(II)
+        note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(II)
+    note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.; row_label=F; table_row_number=2
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '32.3'
+          SiO2: '32.2'
+          T.Fe: '13.9'
+          MgO: '23.2'
+          P2O5: '3.90'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(II)
+        note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(II)
+    note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.; row_label=G; table_row_number=3
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '29.7'
+          SiO2: '29.9'
+          T.Fe: '18.0'
+          MgO: '22.3'
+          P2O5: '4.80'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(II)
+        note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(II)
+    note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.; row_label=H; table_row_number=4
+- experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
+  kind: literature
+  method:
+    tag: value
+    value: static_equilibrium
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '23.8'
+          SiO2: '29.4'
+          T.Fe: '22.4'
+          MgO: '14.5'
+          P2O5: '4.94'
+      locator:
+        page: 2
+        published_page: 122
+        pdf_page_index: 1
+        table: 1(II)
+        note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    table: 1(II)
+    note: Final slag composition from the Table 1(II) row, columns Na2O, SiO2, T.Fe, MgO, and P2O5.; row_label=I; table_row_number=5
+- experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational1966.26.121
+  locator:
+    page: 5
+    published_page: 125
+    pdf_page_index: 4
+    section: III.2 Effect of Na2CO3 in Flux
+context:
+- observation_id: kunisada_1986_equation_6
+  type: thermodynamic_equation
+  locator:
+    page: 7
+    published_page: 127
+    pdf_page_index: 6
+    section: III. Results and Discussion — 3. Dephosphorization Equilibrium
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    equation_number_as_printed: (6)
+    equation_as_printed: 2P + 5(FeO) = (P2O5) + 5Fe
+    use_as_printed: phosphorus dephosphorization equilibrium relation; context only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_equation_6
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_equation_7
+  type: thermodynamic_equation
+  locator:
+    page: 7
+    published_page: 127
+    pdf_page_index: 6
+    section: III. Results and Discussion — 3. Dephosphorization Equilibrium
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    equation_number_as_printed: (7)
+    equation_as_printed: k_P = (%P2O5)/([%P]^2 · (%FeO)^5)
+    use_as_printed: phosphorus dephosphorization equilibrium relation; context only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_equation_7
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_equation_8
+  type: thermodynamic_equation
+  locator:
+    page: 7
+    published_page: 127
+    pdf_page_index: 6
+    section: III. Results and Discussion — 3. Dephosphorization Equilibrium
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    equation_number_as_printed: (8)
+    equation_as_printed: log k_P = 8.67 log(%Na2O) - 14.55 (1600 °C)
+    temperature_dependence_as_printed: The temperature dependence of log k_P was not clear at this time as shown in the figure.
+    total_iron_basis_as_printed: where, (%Fe_tO) calculated from the total iron content in the slag was used instead of (%FeO).
+    use_as_printed: phosphorus dephosphorization equilibrium relation; context only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_equation_8
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_experimental_methods
+  type: experimental_methods
+  locator:
+    page: 1
+    published_page: 121
+    pdf_page_index: 0
+    section: II. Experimental Method
+  units: context only; as printed
+  values:
+    method_class: method_only
+    system_as_printed: dephosphorization of liquid iron with Na2O-SiO2 flux containing Fe2O3 or Na2CO3
+    alloy_mass_and_composition_as_printed: about 250 g Fe-0.1%P alloy
+    flux_mass_as_printed: 30 g
+    crucible_as_printed: recrystallized magnesia (MgO), 40 mm I.D., 60 mm H
+    furnace_and_tube_as_printed: Tammann furnace with an alumina reaction tube
+    atmosphere_as_printed: argon dehydrated by P2O5 and deoxidized through Mg chips heated at 500 °C
+    temperature_measurement_as_printed: Pt-6%Rh/Pt-30%Rh thermocouple by immersion; controlled with another thermocouple under
+      the crucible
+    sampling_as_printed: liquid iron sampled by suction at predetermined times; slag sampled at the end of the run
+    phosphorus_analysis_as_printed: Mo-blue colorimetry
+    oxygen_analysis_as_printed: inert gas fusion-thermal conductivity method
+    carbon_analysis_as_printed: infrared absorption spectrometry
+    slag_analysis_as_printed: fluorescent X-ray and JIS-standard analyses
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_experimental_methods
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_01_caption
+  type: figure_caption
+  locator:
+    page: 2
+    published_page: 122
+    pdf_page_index: 1
+    figure: '1'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Composition of the flux used in this experiment.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_01_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_02_caption
+  type: figure_caption
+  locator:
+    page: 3
+    published_page: 123
+    pdf_page_index: 2
+    figure: '2'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Changes in the phosphorus and oxygen contents in the liquid iron during the run in the case of Fe2O3
+      addition to Flux C.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_02_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_03_caption
+  type: figure_caption
+  locator:
+    page: 3
+    published_page: 123
+    pdf_page_index: 2
+    figure: '3'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Relation between Lp and (%T.Fe).
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_03_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_04_caption
+  type: figure_caption
+  locator:
+    page: 3
+    published_page: 123
+    pdf_page_index: 2
+    figure: '4'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Effect of slag basicity on the dephosphorization in the case of 20 wt% Fe2O3 addition.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_04_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_05_caption
+  type: figure_caption
+  locator:
+    page: 4
+    published_page: 124
+    pdf_page_index: 3
+    figure: '5'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Relation between Lp and slag basicity.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_05_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_06_caption
+  type: figure_caption
+  locator:
+    page: 4
+    published_page: 124
+    pdf_page_index: 3
+    figure: '6'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Effect of temperature on the degree of dephosphorization.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_06_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_07_caption
+  type: figure_caption
+  locator:
+    page: 5
+    published_page: 125
+    pdf_page_index: 4
+    figure: '7'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Change in the phosphorus content in the liquid iron during the run in the case of Na2CO3 addition
+      to Na2O-SiO2.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_07_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_08_caption
+  type: figure_caption
+  locator:
+    page: 5
+    published_page: 125
+    pdf_page_index: 4
+    figure: '8'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Effect of the Na2CO3 content added to Na2O-SiO2 on the degree of dephosphorization.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_08_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_09_caption
+  type: figure_caption
+  locator:
+    page: 5
+    published_page: 125
+    pdf_page_index: 4
+    figure: '9'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Relation between the Na2CO3 content in the flux and the carbon content in the liquid iron.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_09_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_10_caption
+  type: figure_caption
+  locator:
+    page: 6
+    published_page: 126
+    pdf_page_index: 5
+    figure: '10'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Relations between the content of Na2CO3 or Fe2O3 added to Na2O-SiO2 and the oxygen content in the
+      liquid iron.
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_10_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
+- observation_id: kunisada_1986_figure_11_caption
+  type: figure_caption
+  locator:
+    page: 7
+    published_page: 127
+    pdf_page_index: 6
+    figure: '11'
+  units: caption as printed; no plotted values digitized
+  values:
+    method_class: context_only
+    caption_as_printed: Relations between log kP and log (%Na2O) or log (%CaO).
+    digitization: not digitized; caption inventory only
+  context_id: kunisada-1986-na-silicate-dephosphorization::context::kunisada_1986_figure_11_caption
+  work_id: 10.2355/isijinternational1966.26.121
+  source_id: kunisada-1986-na-silicate-dephosphorization
+  species: P
