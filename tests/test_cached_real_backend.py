@@ -61,8 +61,10 @@ from tests.binding_admission_fixtures import (
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
     "484c612688d6d253983173947fe59d9b7e47d135587177f1abc8d35dbf5298ee"
 )
+# Studio-2 canonical bucket after the replay key began including submitted
+# composition. Persisted cached-real buckets with the old digest intentionally miss.
 _DEFAULT_MELTS_PROVIDER_KEY_HASH = (
-    "0435dada46c55b064f6593edae3fbbac9c556e00ea56807944400dccbc3bc30a"
+    "361c676f6a25564abd3d12e8495162257ac23e772210aa4ebeb76de26750044f"
 )
 
 
