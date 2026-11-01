@@ -5626,9 +5626,11 @@ def _mole_fraction_composition_from_values(
     )
 
 
-def _printed_map_payload(wt: Mapping[str, Any]) -> dict[str, Any]:
-    """Copy a printed map without changing the source YAML scalar types."""
+def _printed_map_payload(wt: object) -> object:
+    """Copy a printed map, preserving scalar values and source YAML types."""
 
+    if not isinstance(wt, Mapping):
+        return wt
     components = wt.get("components")
     if isinstance(components, Mapping):
         wt = components
@@ -6200,6 +6202,7 @@ def _owner_initial_from_printed(
             locator=locator,
         )
     refusal_reason: list[str] = []
+    wt: dict[str, Decimal] | None = None
     pairs = _mass_percent_pairs(raw)
     if pairs is None and isinstance(raw, Mapping):
         pairs = _mass_percent_pairs(
@@ -6218,12 +6221,15 @@ def _owner_initial_from_printed(
         else:
             wt = dict(pairs)
     else:
-        wt = _initial_oxide_map_from_values(
-            raw,
-            refusal_reason=refusal_reason,
-            declared_map=True,
-            declared_component_map=raw,
-        )
+        if isinstance(raw, Mapping):
+            wt = _initial_oxide_map_from_values(
+                raw,
+                refusal_reason=refusal_reason,
+                declared_map=True,
+                declared_component_map=raw,
+            )
+        else:
+            refusal_reason.append("printed composition is not a component map")
     if wt:
         source_map = _source_printed_composition_values(wt, closure_context)
         if source_map:
