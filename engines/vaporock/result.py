@@ -15,7 +15,9 @@ Schema:
   map for diagnostics, benchmarks, and cross-engine analysis only.
 * ``activities`` -- ``species -> activity`` map (matches the
   Builtin-side ``a_oxide`` proxy; left empty for VapoRock which has
-  no per-oxide activity surface).
+  no activity map on the default path).
+* ``oxide_activity`` -- optional ``parent oxide -> activity`` values from
+  VapoRock's liquid chemical potentials, with their standard state.
 * ``pO2_bar`` -- commanded oxygen partial pressure echoed back for
   trace.
 * ``mode`` -- which VapoRock entry point produced the result
@@ -35,7 +37,8 @@ writer-purity invariant test enforces this at the AST level.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
+from types import MappingProxyType
 from typing import Any, Dict, Mapping, Tuple
 
 from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
@@ -65,6 +68,8 @@ class VapoRockDiagnostics:
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
     backend_warnings: Tuple[str, ...] = ()
+    oxide_activity: Mapping[str, float] | None = None
+    oxide_activity_standard_state: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, 'melt_model_id', str(self.melt_model_id))
@@ -117,6 +122,23 @@ class VapoRockDiagnostics:
                 ).items()
             },
         )
+        if self.oxide_activity is not None:
+            object.__setattr__(
+                self,
+                'oxide_activity',
+                MappingProxyType(
+                    {
+                        str(k): float(v)
+                        for k, v in dict(self.oxide_activity).items()
+                    }
+                ),
+            )
+        if self.oxide_activity_standard_state is not None:
+            object.__setattr__(
+                self,
+                'oxide_activity_standard_state',
+                str(self.oxide_activity_standard_state),
+            )
         object.__setattr__(self, 'pO2_bar', float(self.pO2_bar))
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
@@ -130,7 +152,21 @@ class VapoRockDiagnostics:
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for ``IntentResult.diagnostic``."""
 
-        diagnostic = asdict(self)
+        if self.oxide_activity is None:
+            diagnostic = asdict(self)
+            diagnostic.pop('oxide_activity')
+            diagnostic.pop('oxide_activity_standard_state')
+        else:
+            serializable = replace(
+                self,
+                oxide_activity=None,
+                oxide_activity_standard_state=None,
+            )
+            diagnostic = asdict(serializable)
+            diagnostic['oxide_activity'] = dict(self.oxide_activity)
+            diagnostic['oxide_activity_standard_state'] = (
+                self.oxide_activity_standard_state
+            )
         diagnostic["instrument_status"] = (
             "non_authoritative"
             if self.melt_extrap_status == "in_calibration"

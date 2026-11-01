@@ -453,6 +453,23 @@ class VapoRockProvider(ChemistryProvider):
                 raw_vapor,
             ) or {}
         )
+        backend_diagnostics = dict(
+            getattr(equilibrium, 'diagnostics', None) or {}
+        )
+        oxide_activity_standard_state = backend_diagnostics.get(
+            'oxide_activity_standard_state'
+        )
+        raw_oxide_activity = dict(
+            backend_diagnostics.get('oxide_activity') or {}
+        )
+        oxide_activity = {
+            str(oxide): float(activity)
+            for oxide, activity in raw_oxide_activity.items()
+            if is_finite(activity) and float(activity) > 0.0
+        }
+        if not oxide_activity or not oxide_activity_standard_state:
+            oxide_activity = {}
+            oxide_activity_standard_state = None
         vaporock_full_speciation_Pa: dict[str, float] = {}
         rejected_pressure_count = 0
         for species, value in raw_full_speciation.items():
@@ -524,7 +541,9 @@ class VapoRockProvider(ChemistryProvider):
             **envelope_fields,
             vapor_pressures_Pa=vapor_pressures_Pa,
             vaporock_full_speciation_Pa=vaporock_full_speciation_Pa,
-            activities={},  # VapoRock has no per-oxide activity surface
+            activities={},  # Legacy species-activity field remains unused.
+            oxide_activity=oxide_activity or None,
+            oxide_activity_standard_state=oxide_activity_standard_state,
             pO2_bar=pO2_bar,
             mode=mode,
             engine_version=engine_version,
