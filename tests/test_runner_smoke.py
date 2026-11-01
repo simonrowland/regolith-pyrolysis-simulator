@@ -2019,10 +2019,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     )
     assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
     if scenario["name"] == "mars_basalt_C2A_12h":
-        # Pre-t-423 default-N2 hourly envelope. This uses the existing runner
-        # scenario/generator path and excludes run metadata; the rows contain
-        # no run IDs or timestamps. Keep this byte pin separate from fixture
-        # semantics so a default-path drift cannot be accepted by reblessing.
+        # Pin the merged d-137 envelope while keeping t-423's default carrier
+        # covered. d-137 adds wall-deposit authority metadata to each row.
         canonical_hours = json.dumps(
             actual["per_hour_summary"],
             sort_keys=True,
@@ -2037,7 +2035,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         ).encode("utf-8")
         assert canonical_hours == expected_hours
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "744fee078070a611770a4e86d34c47235d11006b0e8fe072cf759eb827bf9ebd"
+            "e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386"
         )
 
 
