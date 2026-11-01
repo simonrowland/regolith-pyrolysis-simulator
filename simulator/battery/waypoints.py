@@ -926,8 +926,11 @@ def normalized_composition(
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
+        notice_inference = located.inference
+        notice_locator = located.locator
         refused_components: tuple[str, ...] = ()
         as_moles = False
+        mass_percent_conversion: Composition | None = None
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
             if isinstance(components, Mapping):
@@ -1029,7 +1032,7 @@ def normalized_composition(
                                 "printed_composition": raw,
                                 **row_volatiles,
                             }
-                    _, closure_refusal = _wt_percent_conversion_or_refusal(
+                    converted, closure_refusal = _wt_percent_conversion_or_refusal(
                         closure_wt,
                         closure_context=closure_context,
                         declared_component_map=mass_percent_map,
@@ -1041,6 +1044,7 @@ def normalized_composition(
                         refused_components = tuple(sorted(duplicate_names))
                         raw = None
                     else:
+                        mass_percent_conversion = converted
                         raw = engine_map
                 if raw is not None:
                     try:
@@ -1059,6 +1063,28 @@ def normalized_composition(
                                 printed_path = path
                         else:
                             raw = _printed_composition_map(raw)
+                    if raw is not None and mass_percent_conversion is not None:
+                        raw = mass_percent_conversion.as_map()
+                        as_moles = True
+                        candidate = (
+                            point.get("composition")
+                            if key in point
+                            else experiment.sample.initial_composition
+                        )
+                        if (
+                            isinstance(candidate, Located)
+                            and candidate.state.is_value
+                            and isinstance(candidate.state.value, Composition)
+                            and candidate.inference is not None
+                            and candidate.inference.relation == "wt_pct_to_mole_fraction"
+                            and candidate.state.value.as_map()
+                            == mass_percent_conversion.as_map()
+                        ):
+                            # The printed map supplies the b-704 closure check;
+                            # reuse its matching typed derivation for the green
+                            # conversion arithmetic and calculation notice.
+                            notice_inference = candidate.inference
+                            notice_locator = candidate.locator
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
@@ -1097,8 +1123,8 @@ def normalized_composition(
             # n_i/sum(n_j) is dimensionless and invariant under n -> k*n, k>0.
             # A one-mole reference charge preserves ratios at specified T/P/fO2.
             notice = None
-            if located.inference is not None:
-                locator = located.locator
+            if notice_inference is not None:
+                locator = notice_locator
                 locator_text = str(locator) if locator is not None else "source locator unavailable"
                 origins = {
                     "wt_pct_to_mole_fraction":
@@ -1108,7 +1134,7 @@ def normalized_composition(
                     "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
                         "measured composition",
                 }
-                relation = located.inference.relation
+                relation = notice_inference.relation
                 origin = origins.get(relation)
                 if origin is None:
                     # Plante-style source note: X is printed and Y is its
@@ -1141,7 +1167,7 @@ def normalized_composition(
                 notice = (
                     f"calculated from {origin}; "
                     f"relation={relation}; "
-                    f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
+                    f"inputs={' | '.join(notice_inference.inputs)}; locator={locator_text}"
                 )
             if basis_notice:
                 notice = f"{notice}; {basis_notice}" if notice else basis_notice
