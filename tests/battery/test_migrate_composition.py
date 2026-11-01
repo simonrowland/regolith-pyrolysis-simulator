@@ -4691,9 +4691,9 @@ def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
     printed = point.point_conditions["printed_composition"]
     assert printed.state.is_value
     assert printed.state.value == {
-        "SiO2": Decimal("49.85"),
-        "MgO": Decimal("49.85"),
-        "XxO": Decimal("0.3"),
+        "SiO2": "49.85",
+        "MgO": "49.85",
+        "XxO": "0.3",
     }
     projected = [
         notice

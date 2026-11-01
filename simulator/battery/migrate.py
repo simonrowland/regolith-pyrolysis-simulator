@@ -20479,6 +20479,7 @@ class Migrator:
             row_printed_values = row_sample.printed_composition.state.value
             row_printed_fingerprint = _printed_fingerprint(row_printed_values)
             row_printed_locator = row_sample.printed_composition.locator
+            row_named_printed_values = None
             for source_values, source_fallback in (
                 (values, locator),
                 (obs.get("equipment"), None),
@@ -20495,13 +20496,26 @@ class Migrator:
                         row_printed_locator = _composition_source_locator(
                             source_values, fallback=source_fallback
                         )
+                    named_values = _named_printed_composition_map(source_values)
+                    if (
+                        named_values is not None
+                        and _printed_fingerprint(named_values)
+                        == row_printed_fingerprint
+                    ):
+                        row_named_printed_values = named_values
                     break
             if row_printed_fingerprint is not None:
-                row_printed_values = dict(row_printed_fingerprint)
+                row_printed_values = dict(
+                    row_named_printed_values or row_printed_fingerprint
+                )
             row_printed_composition = replace(
                 row_sample.printed_composition,
                 state=(
-                    State.of(_printed_map_payload(row_printed_values))
+                    State.of(
+                        _printed_map_payload(
+                            row_printed_values, numeric_values_as="source"
+                        )
+                    )
                     if row_printed_locator is not None
                     else State.unknown(
                         "printed composition has no source locator"
