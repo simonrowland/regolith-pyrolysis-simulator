@@ -10,6 +10,7 @@ import yaml
 
 from simulator.battery.migrate import to_plain
 from simulator.battery.enums import EvidenceClass, ValueKind
+from simulator.battery.generators.bench import activity_request_for_engine
 from tests.battery.factories import migrate_one_extract
 
 
@@ -169,22 +170,174 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
         assert row["locator"]["printed_cell"] == printed
         assert row["values"]["note"] == "The first numeric cell prints ×10^-3 as the column multiplier; apply it to every row."
 
-    expected_sio2_activity = {
-        "inoue_suito_1982_sio2_activity_callow_xsio2_050": (".13", "Callow", ".50"),
-        "inoue_suito_1982_sio2_activity_callow_xsio2_067": (".6", "Callow", ".67"),
-        "inoue_suito_1982_sio2_activity_charles_xsio2_050": (".009", "Charles", ".50"),
-        "inoue_suito_1982_sio2_activity_charles_xsio2_067": (".38", "Charles", ".67"),
+    callow_citation = "29) R.J. Callow: Trans. Faraday Soc., 46 (1950), 663."
+    charles_citation = "30) R. J. Charles: J. Amer. Ceram. Soc., 50 (1967), 631."
+    sanders_citation = "22) D. M. Sanders and W. K. Haller: J. Amer. Ceram. Soc., 60 (1977), 138."
+    not_printed = {"state": "unknown", "reason": "not_printed"}
+    derived_compositions = {
+        "Na2O·2SiO2": {
+            "components": {
+                "Na2O": "0.3333333333333333333333333333",
+                "SiO2": "0.6666666666666666666666666667",
+            },
+            "derivation": "identity-derived: Na2O·2SiO2 formula-unit ratio 1:2; x(Na2O)=1/3 and x(SiO2)=2/3.",
+        },
+        "xSiO2 = 0.5": {
+            "components": {"Na2O": "0.5", "SiO2": "0.5"},
+            "derivation": "identity-derived binary complement: x(Na2O)=1-x(SiO2) from printed x(SiO2)=0.5.",
+        },
+        "xSiO2 = 0.67": {
+            "components": {"Na2O": "0.33", "SiO2": "0.67"},
+            "derivation": "identity-derived binary complement: x(Na2O)=1-x(SiO2) from printed x(SiO2)=0.67.",
+        },
     }
-    for observation_id, (activity, attribution, x_sio2) in expected_sio2_activity.items():
+    derived_basis = "identity_derived_binary_mole_fraction"
+    haller_standard_state = {
+        "state": "value",
+        "value": "relative to the liquid standard state for Na2O·2SiO2 glass melt",
+    }
+    expected_quote_rows = {
+        "inoue_suito_1982_na2o_activity_haller_1250": {
+            "species": "Na2O", "activity": "6.56e-8", "composition": "Na2O·2SiO2",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": haller_standard_state,
+            "citation": sanders_citation, "attribution": "Sanders and Haller", "page": "2",
+            "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_na2o_activity_haller_1350": {
+            "species": "Na2O", "activity": "1.98e-7", "composition": "Na2O·2SiO2",
+            "temperature": "1 350 °C", "T_C": "1350", "standard_state": haller_standard_state,
+            "citation": sanders_citation, "attribution": "Sanders and Haller", "page": "2",
+            "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_na2o_activity_callow_xsio2_050": {
+            "species": "Na2O", "activity": "1.1e-7", "composition": "xSiO2 = 0.5",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": callow_citation, "attribution": "Inoue and Suito calculation from Callow silica activity",
+            "page": "3", "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_na2o_activity_callow_xsio2_067": {
+            "species": "Na2O", "activity": "6.6e-9", "composition": "xSiO2 = 0.67",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": callow_citation, "attribution": "Inoue and Suito calculation from Callow silica activity",
+            "page": "3", "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_na2o_activity_charles_xsio2_050": {
+            "species": "Na2O", "activity": "1.6e-6", "composition": "xSiO2 = 0.5",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": charles_citation, "attribution": "Inoue and Suito calculation from Charles silica activity",
+            "page": "3", "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_na2o_activity_charles_xsio2_067": {
+            "species": "Na2O", "activity": "1.7e-8", "composition": "xSiO2 = 0.67",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": charles_citation, "attribution": "Inoue and Suito calculation from Charles silica activity",
+            "page": "3", "composition_page": "3", "column": "Na2O activity",
+        },
+        "inoue_suito_1982_sio2_activity_callow_xsio2_050": {
+            "species": "SiO2", "activity": ".13", "composition": "xSiO2 = 0.5",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": callow_citation, "attribution": "Callow", "page": "3",
+            "composition_page": "3", "column": "SiO2(l) activity",
+        },
+        "inoue_suito_1982_sio2_activity_callow_xsio2_067": {
+            "species": "SiO2", "activity": ".6", "composition": "xSiO2 = 0.67",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": callow_citation, "attribution": "Callow", "page": "3",
+            "composition_page": "3", "column": "SiO2(l) activity",
+        },
+        "inoue_suito_1982_sio2_activity_charles_xsio2_050": {
+            "species": "SiO2", "activity": ".009", "composition": "xSiO2 = 0.5",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": charles_citation, "attribution": "Charles", "page": "3",
+            "composition_page": "3", "column": "SiO2(l) activity",
+        },
+        "inoue_suito_1982_sio2_activity_charles_xsio2_067": {
+            "species": "SiO2", "activity": ".38", "composition": "xSiO2 = 0.67",
+            "temperature": "1 250 °C", "T_C": "1250", "standard_state": not_printed,
+            "citation": charles_citation, "attribution": "Charles", "page": "3",
+            "composition_page": "3", "column": "SiO2(l) activity",
+        },
+    }
+    mapping_quote_rows = {
+        row["observation_id"]: row
+        for row in mapping["quoted_activity_provenance"]["observations"]
+    }
+    assert set(mapping_quote_rows) == set(expected_quote_rows)
+    activity_audit_rows = {
+        (row["column"], row["printed_cell"]): row
+        for row in audit_rows
+        if row["column"] in {"Na2O activity", "SiO2(l) activity"}
+    }
+    assert len(activity_audit_rows) == 10
+    for observation_id, expected in expected_quote_rows.items():
         row = source_rows[observation_id]
-        assert row["values"]["activity"] == activity
+        assert row["values"]["activity"] == expected["activity"]
+        assert row["locator"]["printed_cell"] == expected["activity"]
+        assert str(row["locator"]["page"]) == expected["page"]
         assert row["values"]["method_class"] == "quoted_attributed"
-        assert row["values"]["attribution"] == attribution
-        assert row["values"]["T_C"] == "1250"
-        composition = row["point_conditions"]["composition"]["state"]["value"]
-        assert dict(composition["components"])["SiO2"] == x_sio2
-        assert row["locator"]["page"] == 3
-        assert audit_cells[("3", "", f"xSiO2={x_sio2}; {attribution}", "SiO2(l) activity")] == activity
+        assert row["values"]["attribution"] == expected["attribution"]
+        assert row["values"]["T_C"] == expected["T_C"]
+        assert row["values"]["melt_composition_as_printed"] == expected["composition"]
+        composition_map = derived_compositions[expected["composition"]]
+        assert row["values"]["composition_mol"] == composition_map["components"]
+        assert row["values"]["composition_mol_basis"] == derived_basis
+        assert row["values"]["composition_derivation"] == composition_map["derivation"]
+        assert row["values"]["temperature_as_printed"] == expected["temperature"]
+        assert row["values"]["standard_state_as_printed"] == expected["standard_state"]
+        assert row["values"]["reference_list_entry_as_printed"] == expected["citation"]
+        assert row["standard_state"] == (
+            "liquid Na2O"
+            if expected["standard_state"]["state"] == "value"
+            else "not printed"
+        )
+        composition = row["point_conditions"]["composition"]
+        composition_value = composition["state"]["value"]
+        assert composition_value["basis"] == derived_basis
+        assert composition_value["amount_basis"] == "mole_fraction"
+        assert dict(composition_value["components"]) == composition_map["components"]
+        assert composition["locator"]["page"] == int(expected["composition_page"])
+        if expected["composition_page"] != expected["page"]:
+            assert composition["locator"]["printed_cell"] == expected["composition"]
+        else:
+            assert composition["locator"]["printed_cell"] == expected["activity"]
+        assert composition["inference"]["relation"] == derived_basis
+        inference_inputs = " ".join(composition["inference"]["inputs"]).casefold()
+        if expected["composition"] == "Na2O·2SiO2":
+            assert "1:2" in inference_inputs
+            assert "xna2o=1/3" in inference_inputs
+            assert "xsio2=2/3" in inference_inputs
+        else:
+            assert "1-xsio2" in inference_inputs
+            assert expected["composition"].casefold() in inference_inputs
+        if expected["composition_page"] != expected["page"]:
+            assert composition["locator"]["paragraph"] == "Na2O activity calculation"
+            assert composition["locator"]["printed_cell"] == expected["composition"]
+        printed_temperature = row["values"]["point_conditions"]["temperature_C"]
+        assert printed_temperature["state"]["value"] == expected["T_C"]
+        assert printed_temperature["locator"]["page"] == int(expected["page"])
+        mapped = mapping_quote_rows[observation_id]
+        assert mapped["activity_species"] == expected["species"]
+        assert mapped["page"] == int(expected["page"])
+        assert mapped["value_as_printed"] == expected["activity"]
+        assert mapped["melt_composition_as_printed"] == expected["composition"]
+        assert mapped["temperature_as_printed"] == expected["temperature"]
+        assert mapped["standard_state_as_printed"] == expected["standard_state"]
+        assert mapped["reference_list_entry_as_printed"] == expected["citation"]
+        if expected["composition_page"] != expected["page"]:
+            assert mapped["melt_composition_locator"] == {
+                "page": int(expected["composition_page"]),
+                "paragraph": "Na2O activity calculation",
+                "printed_cell": expected["composition"],
+            }
+        audited = activity_audit_rows[(expected["column"], expected["activity"])]
+        assert audited["pdf_page"] == expected["page"]
+        assert expected["citation"].split(" ", 1)[1] in audited["confirmation"]
+        if expected["standard_state"]["state"] == "value":
+            assert expected["standard_state"]["value"] in audited["confirmation"]
+        else:
+            assert "standard state not printed" in audited["confirmation"]
+        if expected["composition_page"] != expected["page"]:
+            assert f"melt composition at PDF p. {expected['composition_page']}: {expected['composition']}" in audited["confirmation"]
     rate_audit = [row for row in audit_rows if row["column"] == "ΔNa/(Na_init·t)"]
     assert len(rate_audit) == 23
     assert all("inherits ×10^-3 column multiplier" in row["confirmation"] for row in rate_audit)
@@ -234,10 +387,48 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
         table = "3" if sample_id in table3_final_s else "1"
         migrated = by_id[f"inoue_suito_1982_t{table}_sample_{sample_id}_slag_S_slag_total_sulfur_wt"]
         assert migrated.value.point == Decimal(expected)
-    for observation_id, (activity, _attribution, _x_sio2) in expected_sio2_activity.items():
+    for observation_id, expected in expected_quote_rows.items():
         migrated = by_id[observation_id]
-        assert migrated.value.point == Decimal(activity)
+        assert migrated.value.point == Decimal(expected["activity"])
         assert migrated.evidence.class_.value == "quoted_attributed"
+        plain = to_plain(migrated)
+        assert plain["identity"]["temperature_K"]["value"] == str(
+            Decimal(expected["T_C"]) + Decimal("273.15")
+        )
+        reference_state = plain["identity"]["reference_state"]
+        if expected["standard_state"]["state"] == "value":
+            assert reference_state["tag"] == "value"
+            assert reference_state["value"]["convention"] == "raoultian_pure_endmember"
+            assert reference_state["value"]["endmember"]["formula"] == "Na2O"
+            assert reference_state["value"]["endmember"]["phase"] == {"tag": "value", "value": "l"}
+        else:
+            assert reference_state["tag"] == "unknown"
+        composition = plain["point_conditions"]["composition"]
+        composition_value = composition["state"]["value"]
+        composition_map = derived_compositions[expected["composition"]]
+        assert composition_value["basis"] == derived_basis
+        assert composition_value["amount_basis"] == "mole_fraction"
+        assert dict(composition_value["components"]) == composition_map["components"]
+        assert composition["locator"]["page"] == int(expected["composition_page"])
+        request = activity_request_for_engine(
+            result.experiments[migrated.experiment_id], migrated, "openimcc"
+        )
+        readiness = to_plain(request.readiness)
+        assert not any(gap["waypoint"] == "normalized_composition" for gap in readiness["gaps"])
+        if expected["standard_state"]["state"] == "value":
+            assert readiness["status"] == "ready"
+            assert request.payload["composition_mol"] == {
+                name: float(value) for name, value in composition_map["components"].items()
+            }
+        else:
+            assert readiness["status"] == "not_applicable"
+            assert readiness["gaps"] == [
+                {
+                    "waypoint": "reference_state",
+                    "reason": "missing_evidence",
+                    "missing": ["identity.reference_state"],
+                }
+            ]
     table1 = by_id["inoue_suito_1982_t1_sample_15_metal_S_metal_s_wt"]
     table2 = next(row for key, row in by_id.items() if key.startswith("inoue_suito_1982_t2_sample_98_metal_Si_observed"))
     table3 = next(row for key, row in by_id.items() if key.startswith("inoue_suito_1982_t3_sample_102_metal_S_metal_s_wt"))
