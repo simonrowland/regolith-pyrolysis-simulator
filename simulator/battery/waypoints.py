@@ -1098,7 +1098,15 @@ def normalized_composition(
                         else:
                             raw = _printed_composition_map(raw)
                     if raw is not None and mass_percent_conversion is not None:
-                        raw = mass_percent_conversion.as_map()
+                        # Closure includes every printed mass; the engine map
+                        # keeps only the species accepted by _engine_printed_oxides.
+                        engine_oxide_species = set(raw)
+                        converted_map = mass_percent_conversion.as_map()
+                        raw = {
+                            species: amount
+                            for species, amount in converted_map.items()
+                            if species in engine_oxide_species
+                        }
                         as_moles = True
                         candidate = (
                             point.get("composition")
