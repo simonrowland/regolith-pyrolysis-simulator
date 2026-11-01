@@ -1976,6 +1976,31 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
+def test_typed_mass_percent_initial_preserves_blank_printed_component() -> None:
+    initial = {
+        "locator": {"table": "3"},
+        "state": {
+            "tag": "value",
+            "value": {
+                "basis": "printed_oxides",
+                "amount_basis": "mass_percent",
+                "components": [["SiO2", None], ["MgO", "100"]],
+            },
+        },
+    }
+
+    printed = migrate_module._mass_percent_printed_from_plain(initial)
+    sample = _sample_from_plain({"initial_composition": initial})
+
+    assert printed is not None
+    assert printed.state.is_value
+    assert printed.state.value == {"SiO2": None, "MgO": "100"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == printed.state.value
+
+
 @pytest.mark.parametrize(
     ("amount_basis", "components_parser"),
     (
@@ -3223,6 +3248,29 @@ def test_b704_hydrous_mass_percent_closes_only_with_row_printed_water(
     assert refusal == [
         "mass-percent composition is a partial analysis: kept sum=94.90 wt% is below 95 wt%"
     ]
+
+
+@pytest.mark.parametrize(
+    ("water", "converts"),
+    (("abc", False), (None, True), ("n/a", True)),
+)
+def test_b704_volatile_cells_are_classified_before_closure(
+    water: object,
+    converts: bool,
+) -> None:
+    declared = {"SiO2": "50", "MgO": "50", "H2O": water}
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context={"composition_wt_pct": declared},
+        declared_component_map=declared,
+    )
+
+    assert (converted is not None) is converts
+    if converts:
+        assert refusal is None
+    else:
+        assert refusal is not None
+        assert "malformed printed component amount for 'H2O'" in refusal
 
 
 def test_b704_hydrous_datum_state_completes_full_migration(tmp_path: Path) -> None:
