@@ -112,7 +112,25 @@ def _runner_digest_payload(runner_output):
     del engines_used["registry"]
     metadata["engines_used"] = engines_used
     payload["run_metadata"] = metadata
-    return payload
+    # engine_version strings carry the local engine binary's build digest
+    # (e.g. MAGEMin 1.9.6 built separately on the laptop and on studio-3), so
+    # they are host provenance, not results. A laptop-vs-studio-3 field diff of
+    # the full runner result found them to be the only remaining difference.
+    return _without_engine_versions(payload)
+
+
+def _without_engine_versions(value):
+    if isinstance(value, dict):
+        stripped = {}
+        for key, item in value.items():
+            if key == "engine_version":
+                assert isinstance(item, str) and item.strip()
+                continue
+            stripped[key] = _without_engine_versions(item)
+        return stripped
+    if isinstance(value, list):
+        return [_without_engine_versions(item) for item in value]
+    return value
 
 
 @pytest.mark.nightly
