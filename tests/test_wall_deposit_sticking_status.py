@@ -252,6 +252,41 @@ def _materials_with_liner_alpha(
     return materials
 
 
+def test_fused_silica_sio_stage_and_liner_baseline() -> None:
+    stage = next(
+        stage
+        for stage in CondensationTrain.create_default().stages
+        if stage.stage_number == 3
+    )
+    temperature_K = condensation_module._stage_midpoint_temperature_K(stage)
+    stage_record = condensation_module._stage_alpha_record(
+        stage,
+        "SiO",
+        T_K=temperature_K,
+    )
+    sidecar_record = condensation_module._sidecar_alpha_record(
+        "SiO",
+        T_K=temperature_K,
+    )
+
+    assert stage_record["alpha_s"] == sidecar_record["alpha_s"]
+    assert stage_record["value_ref"] == sidecar_record["value_ref"]
+
+    liner_record = condensation_module._wall_alpha_record(
+        "SiO",
+        segment=SimpleNamespace(
+            name="stage_2_to_stage_3",
+            liner_material="fused_silica_baffles",
+            wall_temperature_C=stage.temp_range_C[0],
+        ),
+        T_K=temperature_K,
+    )
+    assert liner_record["alpha_s"] == 0.0
+    assert liner_record["source_class"] == (
+        "fail_closed_no_direct_sticking_coefficient"
+    )
+
+
 @pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
 @pytest.mark.parametrize("entrypoint", ["stage", "wall"])
 @pytest.mark.parametrize(
