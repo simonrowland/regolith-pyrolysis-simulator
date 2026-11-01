@@ -2646,7 +2646,7 @@ def test_valid_major_map_is_unchanged_through_every_reader(
             name: Decimal(value) for name, value in printed_map.items()
         }
     else:
-        assert components == expected
+        assert dict(components) == dict(expected)
 
 
 def test_malformed_minor_component_is_not_treated_as_missing_major() -> None:
