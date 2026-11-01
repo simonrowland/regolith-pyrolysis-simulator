@@ -756,12 +756,33 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def _classify_composition_cell(value: object) -> tuple[str, Decimal | None]:
+    """Classify one printed composition cell without raising."""
+
+    if value is None:
+        return "blank", None
+    if isinstance(value, bool):
+        return "malformed", None
+    if isinstance(value, str):
+        value = value.strip()
+        if not value or value.casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS:
+            return "blank", None
+    try:
+        amount = as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError):
+        return "malformed", None
+    if not amount.is_finite():
+        return "malformed", None
+    return "number", amount
+
+
 def _printed_composition_amount(value: object) -> Decimal | None:
     """Read a printed central composition amount, dropping its stated ± value."""
 
     if isinstance(value, str):
         value = re.split(r"\s*(?:±|\+/-)\s*", value, maxsplit=1)[0].strip()
-    return _as_dec_or_none(value)
+    _kind, amount = _classify_composition_cell(value)
+    return amount
 
 
 def _canonical_printed_oxide_name(name: str) -> str:
@@ -771,10 +792,29 @@ def _canonical_printed_oxide_name(name: str) -> str:
     return "FeOT" if token in {"FeO_T", "FeO*"} else token
 
 
-def _mass_percent_component_key(name: str) -> str:
-    """Strip the mass-percent column suffix before oxide alias handling."""
+def _mass_percent_component_key(name: str) -> tuple[str, bool]:
+    """Normalize a printed wt% key using the parser's oxide alias resolver."""
 
-    return str(name).strip().removesuffix("_wt_pct")
+    token = str(name).strip()
+    if token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+        return token, False
+    if _is_composition_condition_key(token):
+        return token, False
+    suffix = next(
+        (
+            suffix
+            for suffix in ("_wt_percent", "_wt_pct", "_wt%", " wt%")
+            if token.casefold().endswith(suffix.casefold())
+        ),
+        None,
+    )
+    if suffix is not None:
+        token = token[: -len(suffix)].strip()
+    token = _canonical_printed_oxide_name(token)
+    equivalent = _kume_formula_unit_oxide(token)
+    if equivalent is not None:
+        token = equivalent[0]
+    return token, suffix is not None
 
 
 def parse_declared_amount(value: object) -> Decimal:
@@ -1324,9 +1364,11 @@ def _percent_pairs(
         if not isinstance(item, (list, tuple)) or len(item) != 2:
             return None
         name = str(item[0])
-        amount = _as_dec_or_none(item[1])
-        if amount is None:
+        kind, amount = _classify_composition_cell(item[1])
+        if kind != "number" or amount is None:
             return None
+        if amount_basis is AmountBasis.MASS_PERCENT:
+            name, _has_mass_suffix = _mass_percent_component_key(name)
         result.append((name, amount))
     return result or None
 
@@ -3918,7 +3960,7 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
     }
 )
 _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
-    {"-", "–", "—", "n.d.", "nd", "bdl", "--"}
+    {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
 # b-704's 2026-10-04 sweep found a natural gap between 92.35 and 96.86 wt%;
 # near-complete assays from 98 through 102 were ordinary, so accept kept mass
@@ -3962,7 +4004,12 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
 
 
 def _volatile_closure_component(name: str) -> tuple[str, int] | None:
-    return _VOLATILE_CLOSURE_COMPONENTS.get(str(name).strip().casefold())
+    token = str(name).strip()
+    alias = _VOLATILE_CLOSURE_COMPONENTS.get(token.casefold())
+    if alias is not None:
+        return alias
+    normalized, _has_mass_suffix = _mass_percent_component_key(token)
+    return _VOLATILE_CLOSURE_COMPONENTS.get(normalized.casefold())
 
 
 def _is_closure_only_volatile(name: str) -> bool:
@@ -3983,7 +4030,8 @@ def _printed_mass_percent_number(value: object) -> Decimal | None:
         if set(value) == {"value"}:
             return _printed_mass_percent_number(value["value"])
         return None
-    return _as_dec_or_none(value)
+    _kind, amount = _classify_composition_cell(value)
+    return amount
 
 
 def _printed_composition_map(payload: object) -> Mapping[str, Any] | None:
@@ -4087,7 +4135,9 @@ def _declared_printed_composition_map(payload: object) -> Mapping[str, Any] | No
 
 
 def _is_printed_chemical_component_name(name: str) -> bool:
-    token = _canonical_printed_oxide_name(name.strip())
+    if _volatile_closure_component(name) is not None:
+        return True
+    token, _has_mass_suffix = _mass_percent_component_key(name)
     if _is_composition_condition_key(token) or is_sample_code_formula(token):
         return False
     if (
@@ -4109,7 +4159,7 @@ def _unrecognized_printed_chemical_components(
 ) -> dict[str, Decimal]:
     declared_names = (
         {
-            _canonical_printed_oxide_name(str(name).strip())
+            _mass_percent_component_key(str(name))[0]
             for name in declared_component_map
         }
         if declared_component_map is not None
@@ -4122,7 +4172,7 @@ def _unrecognized_printed_chemical_components(
     }
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
-        name = _canonical_printed_oxide_name(str(raw_name).strip())
+        name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or _volatile_closure_component(name) is not None
@@ -4167,9 +4217,7 @@ def _wt_percent_derivation_source_note(
     )
     if trace_note is not None:
         notes.append(trace_note)
-    if any(
-        _canonical_printed_oxide_name(name.strip()) == "FeOT" for name in wt
-    ):
+    if any(_mass_percent_component_key(name)[0] == "FeOT" for name in wt):
         notes.append(_FEOT_COMPOSITION_DERIVATION_NOTE)
     return "; ".join(notes) or None
 
@@ -4180,7 +4228,7 @@ def _source_printed_composition_values(
     source_map = _printed_composition_source_map(closure_context)
     declared_map = _declared_printed_composition_map(closure_context)
     declared_names = (
-        {str(name) for name in declared_map}
+        {_mass_percent_component_key(str(name))[0] for name in declared_map}
         if declared_map is not None
         else set()
     )
@@ -4189,23 +4237,21 @@ def _source_printed_composition_values(
     printed: dict[str, Any] = {}
     for key, value in source_map.items():
         name = str(key)
+        normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
         if not (
-            name in declared_names
+            normalized_name in declared_names
             or (
-                not _is_composition_condition_key(name)
-                and not is_sample_code_formula(name)
-                and _is_printed_chemical_component_name(name)
+                not _is_composition_condition_key(normalized_name)
+                and not is_sample_code_formula(normalized_name)
+                and _is_printed_chemical_component_name(normalized_name)
             )
-            or name.strip().casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            or normalized_name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
-        amount = _printed_mass_percent_number(value)
-        if amount is not None:
+        kind, amount = _classify_composition_cell(value)
+        if kind == "number" and amount is not None:
             printed[name] = value
-        elif value is None or value == "" or (
-            isinstance(value, str)
-            and value.strip().casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS
-        ):
+        else:
             printed[name] = value
 
     scopes: list[Mapping[str, Any]] = []
@@ -4357,6 +4403,11 @@ def _printed_volatile_mass_percent(*payloads: object) -> dict[str, Decimal]:
         for name, raw_amount in scope.items():
             alias = _volatile_closure_component(str(name))
             if alias is None:
+                normalized_name, _has_mass_suffix = _mass_percent_component_key(
+                    str(name)
+                )
+                alias = _volatile_closure_component(normalized_name)
+            if alias is None:
                 continue
             component, priority = alias
             amount = _printed_mass_percent_number(raw_amount)
@@ -4369,17 +4420,29 @@ def _printed_volatile_mass_percent(*payloads: object) -> dict[str, Decimal]:
 
 
 def _oxide_mass_percent_components(
-    wt: Mapping[str, Decimal],
+    wt: Mapping[str, Any],
 ) -> dict[str, Decimal]:
-    names = {_canonical_printed_oxide_name(str(name).strip()) for name in wt}
+    names = {_mass_percent_component_key(str(name))[0] for name in wt}
     if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
         overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
         raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
 
     components: dict[str, Decimal] = {}
     for raw_name, amount in wt.items():
-        name = _canonical_printed_oxide_name(str(raw_name).strip())
+        name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
+        kind, numeric_amount = _classify_composition_cell(amount)
+        if kind == "blank":
+            continue
+        if numeric_amount is None:
+            if (
+                _COMPOSITION_COMPONENTS.get(name) is not None
+                or _kume_formula_unit_oxide(name) is not None
+            ):
+                raise ValueError(
+                    f"malformed printed oxide amount for {name!r}: {amount!r}"
+                )
             continue
         component = _COMPOSITION_COMPONENTS.get(name)
         if component is not None:
@@ -4391,14 +4454,14 @@ def _oxide_mass_percent_components(
             if equivalent is None:
                 continue
             oxide, _factor = equivalent
-        components[oxide] = components.get(oxide, Decimal("0")) + as_decimal(amount)
+        components[oxide] = components.get(oxide, Decimal("0")) + numeric_amount
     return components
 
 
 def _residue_component_subtype(field_name: str) -> str | None:
     if field_name == "residue_ppm":
         return "element_ppm_by_mass"
-    if field_name.endswith("_wt_pct"):
+    if _mass_percent_component_key(field_name)[1]:
         return "oxide_wt_percent"
     return None
 
@@ -4500,15 +4563,16 @@ def _missing_major_oxide_names(
         )
     if declared_component_map is not None:
         candidates.append(declared_component_map)
-    names.extend(
-        str(name)
-        for candidate in candidates
-        for name, amount in candidate.items()
-        if _printed_composition_amount(amount) is None
-    )
     missing: list[str] = []
+    for candidate in candidates:
+        for raw_name, raw_amount in candidate.items():
+            name = str(raw_name)
+            kind, _amount = _classify_composition_cell(raw_amount)
+            if kind == "number":
+                continue
+            names.append(name)
     for name in names:
-        token = _canonical_printed_oxide_name(_mass_percent_component_key(name))
+        token, _has_mass_suffix = _mass_percent_component_key(name)
         major = "FeO" if token == "FeOT" else token
         if major in _MAJOR_OXIDE_COMPONENT_KEYS and major not in missing:
             missing.append(major)
@@ -4579,6 +4643,49 @@ def _wt_percent_conversion_or_refusal(
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> tuple[Composition | None, str | None]:
     try:
+        missing_major = tuple(
+            dict.fromkeys(
+                (
+                    *_missing_major_oxide_names(wt, declared_component_map),
+                    *_missing_major_oxide_names(
+                        closure_context, declared_component_map
+                    ),
+                )
+            )
+        )
+        if missing_major:
+            raise ValueError("missing major oxides: " + ", ".join(missing_major))
+
+        declared_maps = [declared_component_map]
+        declared_from_context = _declared_printed_composition_map(closure_context)
+        if (
+            declared_from_context is not None
+            and declared_from_context is not declared_component_map
+        ):
+            declared_maps.append(declared_from_context)
+        source_map = _printed_composition_source_map(closure_context)
+        if source_map is not None and all(
+            source_map is not item for item in declared_maps
+        ):
+            declared_maps.append(source_map)
+        for component_map in declared_maps:
+            if component_map is None:
+                continue
+            for raw_name, raw_amount in component_map.items():
+                name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+                if (
+                    name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+                    or _is_composition_condition_key(name)
+                    or _volatile_closure_component(name) is not None
+                ):
+                    continue
+                kind, _amount = _classify_composition_cell(raw_amount)
+                if kind == "malformed":
+                    raise ValueError(
+                        "malformed printed component amount for "
+                        f"{raw_name!r}: {raw_amount!r}"
+                    )
+
         dropped = _unrecognized_printed_chemical_components(
             wt,
             closure_context,
@@ -4586,7 +4693,9 @@ def _wt_percent_conversion_or_refusal(
         )
         dropped_mass = sum(dropped.values(), Decimal("0"))
         if any(not amount.is_finite() or amount < 0 for amount in dropped.values()):
-            raise ValueError("unsupported printed component has a negative or non-finite amount")
+            raise ValueError(
+                "unsupported printed component has a negative or non-finite amount"
+            )
         if dropped_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
             details = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
@@ -4601,11 +4710,6 @@ def _wt_percent_conversion_or_refusal(
         closure_wt = {**oxide_wt, **volatile_wt}
 
         errors: list[str] = []
-        missing_major = _missing_major_oxide_names(
-            closure_context, declared_component_map
-        )
-        if missing_major:
-            errors.append("missing major oxides: " + ", ".join(missing_major))
         closure_error = _percent_composition_closure_error(closure_wt, "mass")
         if closure_error is not None:
             errors.append(closure_error)
@@ -4692,7 +4796,13 @@ def _total_iron_reported_as_feo_notice(
     quantity: Quantity | None,
     origin: str,
 ) -> Notice | None:
-    if wt is None or "FeOT" not in wt or quantity is None:
+    if (
+        wt is None
+        or not any(
+            _mass_percent_component_key(str(name))[0] == "FeOT" for name in wt
+        )
+        or quantity is None
+    ):
         return None
     return Notice(
         kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
@@ -4800,16 +4910,16 @@ def _oxide_map_from_mapping(
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
-                    token = _canonical_printed_oxide_name(str(name))
+                    token, _has_mass_suffix = _mass_percent_component_key(str(name))
                     if (
                         _is_composition_condition_key(token)
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
                         or _is_closure_only_volatile(token)
                     ):
                         continue
-                    amount = _as_dec_or_none(value)
-                    if amount is None:
-                        return None
+                    kind, amount = _classify_composition_cell(value)
+                    if kind != "number" or amount is None:
+                        continue
                     equivalent = _kume_formula_unit_oxide(token)
                     if equivalent is None:
                         continue
@@ -4842,18 +4952,14 @@ def _oxide_map_from_mapping(
             if got:
                 original = dict(got)
                 for name, value in nested.items():
-                    token = _canonical_printed_oxide_name(str(name))
+                    token, _has_mass_suffix = _mass_percent_component_key(str(name))
                     if (
                         _is_composition_condition_key(token)
                         or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
                         or _is_closure_only_volatile(token)
                     ):
                         continue
-                    amount = (
-                        _printed_composition_amount(value)
-                        if key == "oxide_wt_percent"
-                        else _as_dec_or_none(value)
-                    )
+                    amount = _printed_composition_amount(value)
                     if amount is not None and token not in got:
                         equivalent = _kume_formula_unit_oxide(token)
                         if equivalent is not None:
@@ -4874,9 +4980,9 @@ def _oxide_map_from_mapping(
         return None
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
-        name = str(key).strip()
-        amount = _as_dec_or_none(value)
-        if amount is None:
+        name, _has_mass_suffix = _mass_percent_component_key(str(key))
+        kind, amount = _classify_composition_cell(value)
+        if kind != "number" or amount is None:
             continue
         # Point records share the flat map with these condition fields.
         if (
@@ -4885,7 +4991,7 @@ def _oxide_map_from_mapping(
             or _is_closure_only_volatile(name)
         ):
             continue
-        token = _canonical_printed_oxide_name(name)
+        token = name
         equivalent = _kume_formula_unit_oxide(token)
         if equivalent is None:
             continue
@@ -4995,11 +5101,12 @@ def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
     fields, _invalid = _residue_component_field_sets(obj)
-    components = {
-        _mass_percent_component_key(field): amount
-        for field in fields
-        if (amount := _as_dec_or_none(obj.get(field))) is not None
-    }
+    components: dict[str, Decimal] = {}
+    for field in fields:
+        name, _has_mass_suffix = _mass_percent_component_key(field)
+        kind, amount = _classify_composition_cell(obj.get(field))
+        if kind == "number" and amount is not None:
+            components[name] = amount
     return components if len(components) >= 2 else None
 
 
@@ -5317,14 +5424,13 @@ def _mole_fraction_composition_from_values(
 
 
 def _printed_map_payload(wt: Mapping[str, Any]) -> dict[str, Any]:
-    return {
-        str(key): (
-            value
-            if value is None or value == "" or isinstance(value, (str, Mapping))
-            else _dec_str(as_decimal(value))
+    payload: dict[str, Any] = {}
+    for key, value in wt.items():
+        kind, amount = _classify_composition_cell(value)
+        payload[str(key)] = (
+            _dec_str(amount) if kind == "number" and amount is not None else value
         )
-        for key, value in wt.items()
-    }
+    return payload
 
 
 def wt_pct_to_mole_fraction_derivation(
@@ -5789,13 +5895,17 @@ def _apply_equilibrium_starting_bulk(
         printed is not None
         and printed.state.is_value
         and isinstance(printed.state.value, Mapping)
-        and any(str(key) == "FeOT" for key in printed.state.value)
+        and any(
+            _mass_percent_component_key(str(key))[0] == "FeOT"
+            for key in printed.state.value
+        )
     ):
-        weights = {
-            str(key): amount
-            for key, raw in printed.state.value.items()
-            if (amount := _as_dec_or_none(raw)) is not None
-        }
+        weights: dict[str, Decimal] = {}
+        for key, raw in printed.state.value.items():
+            name, _has_mass_suffix = _mass_percent_component_key(str(key))
+            kind, amount = _classify_composition_cell(raw)
+            if kind == "number" and amount is not None:
+                weights[name] = amount
         iron = _total_iron_reported_as_feo_notice(
             weights,
             Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
@@ -10953,7 +11063,10 @@ def _residue_component_field_sets(
     ordered_fields = (*_RESIDUE_COMPONENT_SLOT_FIELDS, *payload)
     seen: set[str] = set()
     for field in ordered_fields:
-        if not isinstance(field, str) or not field.endswith("_wt_pct"):
+        if not isinstance(field, str):
+            continue
+        oxide, has_mass_suffix = _mass_percent_component_key(field)
+        if not has_mass_suffix:
             continue
         if field not in payload:
             continue
@@ -10962,18 +11075,18 @@ def _residue_component_field_sets(
         seen.add(field)
         if (
             field in _PRINTED_COMPOSITION_MAP_KEYS
-            or _is_composition_condition_key(field)
+            or _is_composition_condition_key(oxide)
             or field.startswith("pin_")
         ):
             continue
-        oxide = field.removesuffix("_wt_pct")
-        try:
-            formula = resolve_species_formula(oxide)
-        except ValueError:
-            invalid.append(field)
-            continue
-        if "O" not in formula.elements:
-            continue
+        if _kume_formula_unit_oxide(oxide) is None:
+            try:
+                formula = resolve_species_formula(oxide)
+            except ValueError:
+                invalid.append(field)
+                continue
+            if "O" not in formula.elements:
+                continue
         valid.append(field)
     return tuple(valid), tuple(invalid)
 
@@ -14178,10 +14291,9 @@ PrintedFingerprint = tuple[tuple[str, str | None], ...]
 def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     """Identity of a printed composition map (b-718: the one owner).
 
-    Numeric components and printed missing-cell markers, keys sorted, decimals
-    normalised by _dec_str, so ``{"Al2O3": "26.0"}`` and ``{"Al2O3": 26}``
-    agree. ``locator``/skip keys and other non-numeric cells are ignored. A
-    ``{"components": {...}}`` wrapper is unwrapped.
+    Numeric components and non-numeric printed cells are retained, keys sorted,
+    and decimals normalised by _dec_str. A ``{"components": {...}}`` wrapper
+    is unwrapped.
     """
 
     if isinstance(raw, Mapping) and isinstance(raw.get("components"), Mapping):
@@ -14192,19 +14304,15 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     for key, value in raw.items():
         if key in _WALK_SKIP_KEYS or key == "locator":
             continue
-        number = _as_dec_or_none(value)
-        if number is None:
-            if value is None:
-                pairs.append((str(key), None))
-            elif value == "":
-                pairs.append((str(key), ""))
-            elif (
-                isinstance(value, str)
-                and value.strip().casefold() in _PRINTED_COMPOSITION_MISSING_MARKERS
-            ):
-                pairs.append((str(key), value))
-        else:
-            pairs.append((str(key), _dec_str(number)))
+        kind, number = _classify_composition_cell(value)
+        pairs.append(
+            (
+                str(key),
+                _dec_str(number)
+                if kind == "number" and number is not None
+                else None if value is None else str(value),
+            )
+        )
     return tuple(sorted(pairs)) or None
 
 
@@ -14215,11 +14323,12 @@ def _runtime_printed_composition_values(
 
     return {
         str(name): (
-            value
-            if value is None or value == "" or isinstance(value, (str, Mapping))
-            else as_decimal(value)
+            amount
+            if kind == "number" and amount is not None and not isinstance(value, str)
+            else value
         )
         for name, value in wt.items()
+        for kind, amount in (_classify_composition_cell(value),)
     }
 
 
@@ -20331,11 +20440,17 @@ class Migrator:
                     **(values if isinstance(values, Mapping) else {}),
                     "printed_composition": printed.state.value,
                 }
-                components = tuple(
-                    (str(formula), amount)
-                    for formula, raw_amount in printed.state.value.items()
-                    if (amount := _as_dec_or_none(raw_amount)) is not None
-                )
+                phase_components: dict[str, Decimal] = {}
+                for raw_formula, raw_amount in printed.state.value.items():
+                    formula, _has_mass_suffix = _mass_percent_component_key(
+                        str(raw_formula)
+                    )
+                    kind, amount = _classify_composition_cell(raw_amount)
+                    if kind == "number" and amount is not None:
+                        phase_components[formula] = (
+                            phase_components.get(formula, Decimal("0")) + amount
+                        )
+                components = tuple(phase_components.items())
                 current_composition = ident_kwargs.get("composition")
                 if components and "composition" not in (point_conditions or {}) and not (
                     isinstance(current_composition, State)
@@ -22482,15 +22597,14 @@ class Migrator:
                             and printed.state.is_value
                             and isinstance(printed.state.value, Mapping)
                         ):
-                            components = {
-                                str(formula): _as_dec_or_none(amount)
-                                for formula, amount in printed.state.value.items()
-                            }
-                            components = {
-                                formula: amount
-                                for formula, amount in components.items()
-                                if amount is not None
-                            }
+                            components: dict[str, Decimal] = {}
+                            for formula, raw_amount in printed.state.value.items():
+                                normalized_formula, _has_mass_suffix = (
+                                    _mass_percent_component_key(str(formula))
+                                )
+                                kind, amount = _classify_composition_cell(raw_amount)
+                                if kind == "number" and amount is not None:
+                                    components[normalized_formula] = amount
                             composition = _mass_percent_composition_state(
                                 components,
                                 basis="printed_oxides",
