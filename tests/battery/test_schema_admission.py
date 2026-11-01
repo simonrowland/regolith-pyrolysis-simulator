@@ -491,7 +491,20 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     assert bool(charge_moles_by_species(experiment, None).by_species) == valid
     assert sample.printed_composition.state.is_value
     if not valid:
-        assert sample.initial_composition.state.is_unknown
+        if components == [["SiO2", "60"], ["Cl", "40"]]:
+            # b-704 closure counts printed Cl toward the mass total. Its
+            # oxide projection survives round-trip, while engine and charge
+            # consumers still refuse the unsupported Cl-bearing print.
+            assert sample.initial_composition.state.is_value
+            assert (
+                sample.initial_composition.state.value.amount_basis
+                is AmountBasis.MOLE_FRACTION
+            )
+            assert sample.initial_composition.state.value.components == (
+                ("SiO2", Decimal("1")),
+            )
+        else:
+            assert sample.initial_composition.state.is_unknown
     elif sample.initial_composition.state.is_value:
         from simulator.battery.score import composition_wt_pct
 

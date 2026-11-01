@@ -446,6 +446,7 @@ def charge_moles_by_species(
         AmountBasis.MASS_PERCENT.value,
     )
     printed_route_usable = False
+    printed_charge_route_usable = False
     numeric_printed: dict[str, Decimal] = {}
     if mass is not None and isinstance(printed_raw, Mapping):
         malformed = False
@@ -459,13 +460,21 @@ def charge_moles_by_species(
         if not malformed and numeric_printed:
             if not printed_is_mass_percent:
                 printed_route_usable = True
+                printed_charge_route_usable = True
             else:
                 _converted, refusal = _wt_percent_conversion_or_refusal(
                     numeric_printed,
                     closure_context=printed_raw,
                     declared_component_map=printed_raw,
                 )
-                if refusal is None:
+                if refusal is not None:
+                    # A large unsupported label refuses the mixture, while
+                    # the printed masses of its recognized species remain
+                    # usable as individual charge waypoints.
+                    printed_charge_route_usable = (
+                        "contains unsupported component(s) above" in refusal
+                    )
+                else:
                     engine_printed = {
                         name: value
                         for name, value in printed_raw.items()
@@ -479,6 +488,7 @@ def charge_moles_by_species(
                         pass
                     else:
                         printed_route_usable = True
+                        printed_charge_route_usable = True
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
@@ -536,7 +546,7 @@ def charge_moles_by_species(
         mass is not None
         and printed is not None
         and printed.state.is_value
-        and printed_route_usable
+        and printed_charge_route_usable
     ):
         for species, wt_pct in numeric_printed.items():
             molar_mass = _molar_mass_kg_mol(species)

@@ -728,7 +728,10 @@ def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None
         source_id = row.observation_id.rsplit("::", 1)[-1]
         source_row = source_table3[source_id]
         source_values = source_row["values"]["composition_wt_pct"]
-        assert dict(printed.state.value) == source_values
+        assert dict(printed.state.value) == {
+            oxide: format(Decimal(str(value)).normalize(), "f")
+            for oxide, value in source_values.items()
+        }
         # Table 3 declares datum_state (published p.1813): the measured slag
         # composition at the datum, on the point and not the starting charge.
         # Green already expected a point composition here. This test restores

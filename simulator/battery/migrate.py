@@ -5808,7 +5808,13 @@ def _located_printed_and_initial(
     ):
         return None, None
     printed_map = _source_printed_composition_values(wt, closure_context)
-    printed = located_value(_printed_map_payload(printed_map), locator)
+    # This conversion path also supplies the map used for identity matching;
+    # canonicalize numeric spellings as the green reader did. Raw source
+    # provenance is copied by _printed_map_payload at the direct readers.
+    printed = located_value(
+        _printed_identity_map(printed_map) or _printed_map_payload(printed_map),
+        locator,
+    )
     state = _wt_percent_conversion_state(
         wt,
         closure_context=closure_context or wt,
@@ -14532,16 +14538,39 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
     return tuple(sorted(pairs)) or None
 
 
+def _printed_identity_map(raw: object) -> dict[str, str | None] | None:
+    """Return the normalized map used to compare printed composition identities."""
+
+    fingerprint = _printed_fingerprint(raw)
+    return dict(fingerprint) if fingerprint is not None else None
+
+
+def _runtime_printed_composition_values(
+    wt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep numeric LPI row values as Decimal in point-condition payloads."""
+
+    return {
+        str(name): (
+            amount
+            if kind == "number" and amount is not None and not isinstance(value, str)
+            else value
+        )
+        for name, value in wt.items()
+        for kind, amount in (_classify_composition_cell(value),)
+    }
+
+
 def _printed_composition_candidates(
     roots: Iterable[object],
     vocabulary: tuple[VocabEntry, ...],
     *,
     fallback_locator: Locator | None = None,
-) -> list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]]:
+) -> list[tuple[PrintedFingerprint, Locator, str]]:
     """Every vocabulary-named printed map under ``roots`` that has a locator."""
 
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]] = []
+    found: list[tuple[PrintedFingerprint, Locator, str]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -14560,7 +14589,7 @@ def _printed_composition_candidates(
                         and value_loc is not None
                         and isinstance(raw_value, Mapping)
                     ):
-                        found.append((fingerprint, value_loc, name, raw_value))
+                        found.append((fingerprint, value_loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -14597,10 +14626,10 @@ def _printed_composition_from_roots(
         preferred_fps = {item[0] for item in preferred}
         if len(preferred_fps) != 1:
             return None
-        fingerprint, loc, _name, raw_map = preferred[0]
+        fingerprint, loc, _name = preferred[0]
     else:
-        fingerprint, loc, _name, raw_map = found[0]
-    return located_value(_printed_map_payload(raw_map), loc)
+        fingerprint, loc, _name = found[0]
+    return located_value(dict(fingerprint), loc)
 
 
 def _is_printed_initial_charge(
@@ -14652,7 +14681,7 @@ def _printed_map_is_typed_initial(
         return True
     return any(
         fingerprint == target and name == "starting_glass_wt_pct"
-        for fingerprint, _located, name, _raw_map
+        for fingerprint, _located, name
         in _printed_composition_candidates(
             _lab_roots(equipment, values), vocabulary, fallback_locator=locator
         )
@@ -14706,7 +14735,7 @@ def _printed_map_is_observation_level(
     own_roots = _lab_roots(equipment, own_values)
     if any(
         fingerprint == target
-        for fingerprint, _loc, _name, _raw_map
+        for fingerprint, _loc, _name
         in _printed_composition_candidates(
             own_roots, vocabulary, fallback_locator=locator
         )
@@ -20463,7 +20492,12 @@ class Migrator:
                 row_sample.printed_composition,
                 state=(
                     State.of(
-                        _printed_map_payload(row_printed_values)
+                        (
+                            _runtime_printed_composition_values(row_printed_values)
+                            if source_id == "lpi-lunar-soils"
+                            else _printed_identity_map(row_printed_values)
+                            or _printed_map_payload(row_printed_values)
+                        )
                     )
                     if row_printed_locator is not None
                     else State.unknown(
@@ -23363,7 +23397,12 @@ class Migrator:
                 point_conditions = {
                     **(point_conditions or {}),
                     "printed_composition": located_value(
-                        _printed_map_payload(child_printed_map),
+                        (
+                            _runtime_printed_composition_values(child_printed_map)
+                            if source_id == "lpi-lunar-soils"
+                            else _printed_identity_map(child_printed_map)
+                            or _printed_map_payload(child_printed_map)
+                        ),
                         point_locator,
                     ),
                 }
