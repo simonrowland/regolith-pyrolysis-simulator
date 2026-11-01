@@ -47,6 +47,30 @@ def test_massless_wt_percent_derivation():
     assert all(r.payload is not None for r in engine_point_requests(inputs))
 
 
+def test_partial_printed_composition_does_not_reach_engine_point():
+    experiment, bench, observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            printed_composition=f.located({"SiO2": D("45"), "MgO": D("45")}),
+            initial_composition=Located(State.unknown("not reported")),
+        ),
+    )
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+
+    waypoint = inputs.waypoints["normalized_composition"]
+    assert waypoint.selected is None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    requests = engine_point_requests(inputs)
+    assert requests
+    assert all(request.payload is None for request in requests)
+    assert all(
+        any(gap.waypoint == "normalized_composition" for gap in request.readiness.gaps)
+        for request in requests
+    )
+
+
 def test_payload_scale_invariance():
     experiment, bench, observation = case()
     source = load_yaml(Path(__file__).resolve().parents[2] /

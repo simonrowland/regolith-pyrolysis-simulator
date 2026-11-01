@@ -927,22 +927,50 @@ def normalized_composition(
                 # Unknown basis, mol_inventory, or components with no basis.
                 raw = None
             else:
-                try:
-                    engine_oxides = _engine_printed_oxides(raw)
-                except _EnginePrintRefused as exc:
-                    refused_components = exc.components
-                    raw = None
-                else:
-                    if engine_oxides is not None:
-                        raw, basis_exempt, basis_notice, feot_amount = engine_oxides
-                        if feot_amount is not None:
-                            basis_inference = _feot_derivation(feot_amount, located.locator)
-                        if printed_species is None:
-                            pairs = _printed_component_pairs(located.state.value)
-                            printed_species = {name for name, _value in pairs} if pairs else set()
-                            printed_path = path
+                mass_percent_map: Mapping[str, object] | None = None
+                if basis == AmountBasis.MASS_PERCENT.value:
+                    pairs = _typed_component_pairs(raw)
+                    if (
+                        pairs is not None
+                        and len({name for name, _value in pairs}) == len(pairs)
+                    ):
+                        mass_percent_map = dict(pairs)
+                elif basis is None and isinstance(raw, Mapping):
+                    mass_percent_map = raw
+                if mass_percent_map is not None:
+                    # The shared b-704 owner decides whether the printed mass
+                    # map closes before this waypoint can emit engine ratios.
+                    # Classify cells first so malformed/non-finite source values
+                    # remain in the declared map for typed refusal.
+                    closure_wt: dict[str, Decimal] = {}
+                    for species, printed_amount in mass_percent_map.items():
+                        kind, amount = _classify_composition_cell(printed_amount)
+                        if kind == "number" and amount is not None:
+                            closure_wt[str(species)] = amount
+                    _, closure_refusal = _wt_percent_conversion_or_refusal(
+                        closure_wt,
+                        closure_context=raw,
+                        declared_component_map=mass_percent_map,
+                    )
+                    if closure_refusal is not None:
+                        raw = None
+                if raw is not None:
+                    try:
+                        engine_oxides = _engine_printed_oxides(raw)
+                    except _EnginePrintRefused as exc:
+                        refused_components = exc.components
+                        raw = None
                     else:
-                        raw = _printed_composition_map(raw)
+                        if engine_oxides is not None:
+                            raw, basis_exempt, basis_notice, feot_amount = engine_oxides
+                            if feot_amount is not None:
+                                basis_inference = _feot_derivation(feot_amount, located.locator)
+                            if printed_species is None:
+                                pairs = _printed_component_pairs(located.state.value)
+                                printed_species = {name for name, _value in pairs} if pairs else set()
+                                printed_path = path
+                        else:
+                            raw = _printed_composition_map(raw)
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
