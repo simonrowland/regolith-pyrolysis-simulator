@@ -2001,6 +2001,41 @@ def test_typed_mass_percent_initial_preserves_blank_printed_component() -> None:
     assert sample.printed_composition.state.value == printed.state.value
 
 
+def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() -> None:
+    composition = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "50"], ["MgO", "50"], ["H2O", None]],
+    }
+    serialized = {"tag": "value", "value": composition}
+
+    located = migrate_module._composition_located_from_plain(serialized)
+    identity = migrate_module._identity_from_plain(
+        {
+            "quantity": {"tag": "value", "value": "activity"},
+            "composition": serialized,
+        }
+    )
+
+    assert located.state.is_value
+    assert set(dict(located.state.value.components)) == {"SiO2", "MgO"}
+    assert identity.composition is not None and identity.composition.is_value
+    assert set(dict(identity.composition.value.components)) == {"SiO2", "MgO"}
+
+
+def test_typed_mass_percent_printed_map_keeps_uncertainty_text_verbatim() -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [["SiO2", "100.0 ± 2.0"], ["MgO", None]],
+    }
+
+    printed = migrate_module._mass_percent_printed_from_plain(payload)
+
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value == {"SiO2": "100.0 ± 2.0", "MgO": None}
+
+
 @pytest.mark.parametrize(
     ("amount_basis", "components_parser"),
     (
@@ -2724,6 +2759,67 @@ def test_composition_cell_classifier_matches_printed_amount_reader(
         assert amount is None
     else:
         assert (kind, amount) == ("number", expected)
+
+
+def test_composition_cell_classifier_matches_green_numeric_reader_union() -> None:
+    cases = (
+        ("decimal string", "5.00", Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
+        ("decimal object", Decimal("5.00"), Decimal("5.00"), Decimal("5.00"), Decimal("5.00")),
+        ("integer", 5, Decimal("5"), Decimal("5"), Decimal("5")),
+        ("exponent", "5e0", Decimal("5"), Decimal("5"), Decimal("5")),
+        ("unicode uncertainty", "5.00 ± 0.1", None, Decimal("5.00"), None),
+        ("ascii uncertainty", "5.00+/-0.1", None, Decimal("5.00"), None),
+        (
+            "state wrapper",
+            {"state": {"tag": "value", "value": "5.00"}},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        (
+            "implicit value state wrapper",
+            {"state": {"value": "5.00"}},
+            None,
+            None,
+            Decimal("5.00"),
+        ),
+        ("bare value wrapper", {"value": "5.00"}, None, None, None),
+        ("sigma uncertainty", "5.00 (1σ)", None, None, None),
+        ("range", "5.00–6.00", None, None, None),
+        ("bound", ">5.00", None, None, None),
+        ("structured range", {"range": ["5.00", "6.00"]}, None, None, None),
+    )
+
+    for label, raw, strict_amount, printed_amount, located_amount in cases:
+        assert migrate_module._as_dec_or_none(raw) == strict_amount, label
+        assert migrate_module._printed_composition_amount(raw) == printed_amount, label
+        try:
+            located = migrate_module._point_condition_from_plain(
+                raw, key="H2O_EMPA"
+            )
+        except (TypeError, ValueError, ArithmeticError):
+            located_amount_read = None
+        else:
+            located_amount_read = (
+                located.state.value
+                if located.state.is_value
+                and isinstance(located.state.value, Decimal)
+                else None
+            )
+        assert located_amount_read == located_amount, label
+
+        kind, amount = migrate_module._classify_composition_cell(raw)
+        expected = next(
+            (
+                amount
+                for amount in (strict_amount, printed_amount, located_amount)
+                if amount is not None
+            ),
+            None,
+        )
+        assert (kind, amount) == (
+            ("number", expected) if expected is not None else ("malformed", None)
+        ), label
 
 
 def test_uncertainty_cells_count_as_a_declared_wt_composition_point() -> None:
