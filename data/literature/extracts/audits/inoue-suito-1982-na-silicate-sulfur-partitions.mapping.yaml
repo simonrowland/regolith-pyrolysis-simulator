@@ -8,14 +8,14 @@ tables:
     phase: l
     units: wt%
     method_class: measured_direct
-    notes: Page 5 used studio MinerU OCR as machine read 1; every numeric cell reconciled to page render and pdftotext. Page 6 continuation checked against MinerU, pdftotext, and render. The printed rate column is schema-gap context; it is not re-scaled.
+    notes: Page 5 used studio MinerU OCR as machine read 1; every numeric cell reconciled to page render and pdftotext. Page 6 continuation checked against MinerU, pdftotext, and render. The first numeric rate cell prints ×10^-3 as the column multiplier; every rate value applies it.
   - printed_table: '2'
     page: 6
     printed_rows: 7
     scope: observed metal silicon and Charles/Callow calculated comparisons
     phase: l
     method_class: measured_direct / quoted_attributed
-    notes: Trace cells remain the printed token tr.; not zero.
+    notes: Trace cells remain the printed token tr.; not zero. Seven printed Na2O/SiO2 ratios retain p. 6 row and cell locators.
   - printed_table: '3'
     page: 7
     printed_rows: 6
@@ -23,6 +23,7 @@ tables:
     phase: l
     units: wt%
     method_class: measured_direct
+    notes: The first numeric rate cell prints ×10^-3 as the column multiplier; every rate value applies it.
   - printed_table: '4'
     page: 8
     printed_rows: 4
@@ -31,4 +32,37 @@ tables:
     method_class: quoted_attributed
 figures:
   digitised: false
-  candidates: [2, 3, 4, 5]
+  captions:
+    - figure: 1
+      page: 2
+      caption: "The emf's referred to various reference melts of the Na2O-SiO2 and the Na2O-P2O5 systems at 1250 C."
+    - figure: 2
+      page: 3
+      caption: "Logarithms of activities of Na2O in the Na2O-SiO2 and the Na2O-P2O5 systems at 1250 and 1350 C."
+    - figure: 3
+      page: 3
+      caption: "Logarithms of sodium vapor pressure calculated from the reduction of Na2O by carbon at PCO=1 atm in the Na2O-SiO2 and the Na2O-P2O5 systems at 1250 and 1350 C."
+    - figure: 4
+      page: 4
+      caption: "Logarithms of the sulfur partition (S)/[S] plotted against the Na2O/SiO2 molar ratio."
+    - figure: 5
+      page: 4
+      caption: "Comparison of the present sulfur partition (S)/[S] in the Na2O-SiO2 slag-iron melt system with that from the work of Korber and Oelsen."
+    - figure: 6
+      page: 6
+      caption: "Comparison of the present sulfur partition (S)/[S] in the Na2O-SiO2 slag-iron melt system with that obtained from the gas-slag equilibrium studies at 1250 and 1350 C."
+    - figure: 7
+      page: 6
+      caption: "Sulfide capacities of the Na2O-SiO2, the CaO-SiO2, and the CaO-CaF2 systems."
+    - figure: 8
+      page: 6
+      caption: "Logarithms of the sulfur partition (S)/[S] at 1250 C, PCO=1 atm in the 3Na2O·2SiO2-3CaO·2SiO2 pseudo-binary slag-iron melt and the Na2O·SiO2-CaO·SiO2 pseudo-binary slag-iron melt systems."
+    - figure: 9
+      page: 7
+      caption: "Sulfur as FeS against the total sulfur in the Na2O-SiO2 slag-iron melt system at 1250 and 1350 C."
+    - figure: 10
+      page: 8
+      caption: "Variation of sulfur and phosphorus in metal with time in the experiment of the sodium vapor refining."
+    - figure: 11
+      page: 8
+      caption: "Comparison of the present sulfur partition (S)/[S] with that of the practical operations."

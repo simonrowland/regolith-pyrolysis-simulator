@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import re
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
@@ -24,7 +26,179 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
         )
     )
     assert [table["printed_rows"] for table in mapping["tables"]] == [20, 7, 6, 4]
-    assert len(doc["species"]["S"]["observations"]) >= 40
+
+    table1_initial_s = {
+        "15": ".290", "16": ".003", "20": ".294", "19": ".003", "24": ".574",
+        "22": ".010", "29": ".994", "28": ".003", "98": ".994", "99": ".574",
+        "100": ".574", "101": ".994", "151": ".003", "152": ".003", "105": ".574",
+        "106": ".574", "107": ".574", "108": ".994", "153": ".003", "154": ".003",
+    }
+    table1_final_s = {
+        "15": ".0013", "16": ".0012", "20": ".0029", "19": ".0024", "24": ".0346",
+        "22": ".0080", "29": ".511", "28": ".0386", "98": ".359", "99": ".0421",
+        "100": ".0121", "101": ".0034", "151": ".0194", "152": ".0113", "105": ".164",
+        "106": ".0299", "107": ".0095", "108": ".0032", "153": ".0196", "154": ".0093",
+    }
+    table3_initial_s = {
+        "102": ".574", "103": ".574", "104": ".574", "155": ".994", "156": ".994", "157": ".994",
+    }
+    table3_final_s = {
+        "102": ".0151", "103": ".0294", "104": ".0489", "155": ".0046", "156": ".0074", "157": ".0096",
+    }
+    contexts = {row["observation_id"]: row for row in doc["species"]["Na2O"]["context"]}
+    table1_start = contexts["inoue_suito_1982_table1_starting_compositions"]["values"]["table_transcription"]
+    table3_start = contexts["inoue_suito_1982_table3_starting_compositions"]["values"]["table_transcription"]
+    assert {row["sample_id"]: row["metal_S"] for row in table1_start} == table1_initial_s
+    assert {row["sample_id"]: row["metal_S"] for row in table3_start} == table3_initial_s
+
+    source_rows = {
+        row["observation_id"]: row
+        for species in doc["species"].values()
+        for row in species.get("observations", [])
+    }
+    table1_final_rows = {
+        sample_id: source_rows[f"inoue_suito_1982_t1_sample_{sample_id}_metal_S_metal_s_wt"]
+        for sample_id in table1_final_s
+    }
+    table3_final_rows = {
+        sample_id: source_rows[f"inoue_suito_1982_t3_sample_{sample_id}_metal_S_metal_s_wt"]
+        for sample_id in table3_final_s
+    }
+    assert {sample_id: row["values"]["value"] for sample_id, row in table1_final_rows.items()} == table1_final_s
+    assert {sample_id: row["values"]["value"] for sample_id, row in table3_final_rows.items()} == table3_final_s
+    assert all(row["values"]["phase_label"] == "metal" for row in (*table1_final_rows.values(), *table3_final_rows.values()))
+    with (ROOT / "data/literature/extracts/audits/inoue-suito-1982-na-silicate-sulfur-partitions.audit.csv").open(
+        newline="", encoding="utf-8"
+    ) as stream:
+        audit_rows = list(csv.DictReader(stream))
+    assert {
+        row["row"]: row["printed_cell"]
+        for row in audit_rows
+        if row["pdf_page"] == "5" and row["printed_table"] == "1"
+        and row["column"] == "metal S, wt%" and row["row"] in {"151", "152"}
+    } == {"151": ".0194", "152": ".0113"}
+
+    final_total_s = {
+        **{
+            "15": ".909", "16": ".845", "20": ".847", "19": ".761", "24": "1.19", "22": ".588",
+            "29": "1.08", "28": ".308",
+            "98": "2.35", "99": "2.03", "100": "2.12", "101": "3.84", "151": ".314", "152": ".496",
+            "105": "1.55", "106": "1.97", "107": "1.85", "108": "3.85", "153": ".369", "154": ".521",
+        },
+        "102": "2.04", "103": "2.19", "104": "2.82", "155": "3.68", "156": "3.70", "157": "3.41",
+    }
+    total_s_rows = {
+        row["values"]["sample_id"]: row
+        for row in doc["species"]["S"]["observations"]
+        if row["observation_id"].endswith("_slag_S_slag_total_sulfur_wt")
+    }
+    assert {sample_id: row["values"]["value"] for sample_id, row in total_s_rows.items()} == final_total_s
+    audit_cells = {
+        (row["pdf_page"], row["printed_table"], row["row"], row["column"]): row["printed_cell"]
+        for row in audit_rows
+    }
+    for sample_id, value in final_total_s.items():
+        page, table = ("7", "3") if sample_id in table3_final_s else ("5", "1")
+        assert audit_cells[(page, table, sample_id, "slag total sulfur, wt%")] == value
+
+    expected_ratios = {
+        "98": ".32", "99": ".58", "100": ".90", "101": "1.23", "151": ".36", "105": ".31", "106": ".56",
+    }
+    table2_rows = [
+        row for species in doc["species"].values() for row in species.get("observations", [])
+        if row["observation_id"].startswith("inoue_suito_1982_t2_sample_")
+    ]
+    assert len(table2_rows) == 19
+    assert {
+        (row["values"]["sample_id"], row["values"]["composition_ratio_Na2O_to_SiO2_as_published"])
+        for row in table2_rows
+    } == set(expected_ratios.items())
+    assert all(
+        row["values"]["composition_ratio_locator"]
+        == {
+            "page": 6,
+            "table": "2",
+            "row_label": row["values"]["sample_id"],
+            "column_header": "Na2O/SiO2 (mole ratio)",
+            "printed_cell": row["values"]["composition_ratio_Na2O_to_SiO2_as_published"],
+        }
+        for row in table2_rows
+    )
+    assert {
+        (sample_id, audit_cells[("6", "2", sample_id, "Na2O/SiO2 (mole ratio)")])
+        for sample_id in expected_ratios
+    } == set(expected_ratios.items())
+
+    absent_components = {
+        **{sample_id: "Al2O3" for sample_id in ("15", "16", "20", "19", "24", "22", "29", "28")},
+        **{sample_id: "MgO" for sample_id in ("99", "100", "101", "151", "152", "105", "106", "107", "108", "153", "154")},
+    }
+    assert len(absent_components) == 19
+    for sample_id, component in absent_components.items():
+        composition = source_rows[
+            f"inoue_suito_1982_t1_sample_{sample_id}_normalized_sodium_loss_rate"
+        ]["point_conditions"]["composition"]["state"]["value"]
+        assert component not in {name for name, _amount in composition["components"]}
+
+    expected_rates = {
+        ("1", "15"): ("2.73e-3", "2.73×10^-3"), ("1", "16"): ("0.00118", "1.18"),
+        ("1", "20"): ("0.00234", "2.34"), ("1", "19"): ("0.00198", "1.98"),
+        ("1", "24"): ("0.00056", ".56"), ("1", "22"): ("0.00054", ".54"),
+        ("1", "29"): ("0.00026", ".26"), ("1", "28"): ("0.00017", ".17"),
+        ("1", "99"): ("0.00123", "1.23"), ("1", "100"): ("0.00159", "1.59"),
+        ("1", "101"): ("0.00601", "6.01"), ("1", "151"): ("0.00055", ".55"),
+        ("1", "152"): ("0.00018", ".18"), ("1", "105"): ("0.00163", "1.63"),
+        ("1", "106"): ("0.00273", "2.73"), ("1", "107"): ("0.00511", "5.11"),
+        ("1", "108"): ("0.0117", "11.7"), ("1", "153"): ("0.00099", ".99"),
+        ("1", "154"): ("0.00058", ".58"), ("3", "102"): ("1.52e-3", "1.52×10^-3"),
+        ("3", "155"): ("0.00428", "4.28"), ("3", "156"): ("0.00246", "2.46"),
+        ("3", "157"): ("0.00238", "2.38"),
+    }
+    rate_rows = {
+        (match[1], match[2]): row
+        for row in source_rows.values()
+        if (match := re.match(
+            r"inoue_suito_1982_t([13])_sample_(\d+)_normalized_sodium_loss_rate$", row["observation_id"]
+        ))
+    }
+    assert set(rate_rows) == set(expected_rates)
+    for key, (normalized, printed) in expected_rates.items():
+        row = rate_rows[key]
+        assert Decimal(row["values"]["value"]) == Decimal(normalized)
+        assert row["values"]["value_as_published"] == printed
+        assert row["locator"]["printed_cell"] == printed
+        assert row["values"]["note"] == "The first numeric cell prints ×10^-3 as the column multiplier; apply it to every row."
+
+    expected_sio2_activity = {
+        "inoue_suito_1982_sio2_activity_callow_xsio2_050": (".13", "Callow", ".50"),
+        "inoue_suito_1982_sio2_activity_callow_xsio2_067": (".6", "Callow", ".67"),
+        "inoue_suito_1982_sio2_activity_charles_xsio2_050": (".009", "Charles", ".50"),
+        "inoue_suito_1982_sio2_activity_charles_xsio2_067": (".38", "Charles", ".67"),
+    }
+    for observation_id, (activity, attribution, x_sio2) in expected_sio2_activity.items():
+        row = source_rows[observation_id]
+        assert row["values"]["activity"] == activity
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert row["values"]["attribution"] == attribution
+        assert row["values"]["T_C"] == "1250"
+        composition = row["point_conditions"]["composition"]["state"]["value"]
+        assert dict(composition["components"])["SiO2"] == x_sio2
+        assert row["locator"]["page"] == 3
+        assert audit_cells[("3", "", f"xSiO2={x_sio2}; {attribution}", "SiO2(l) activity")] == activity
+    rate_audit = [row for row in audit_rows if row["column"] == "ΔNa/(Na_init·t)"]
+    assert len(rate_audit) == 23
+    assert all("inherits ×10^-3 column multiplier" in row["confirmation"] for row in rate_audit)
+
+    captions = mapping["figures"]["captions"]
+    assert [caption["figure"] for caption in captions] == list(range(1, 12))
+    assert [caption["page"] for caption in captions] == [2, 3, 3, 4, 4, 6, 6, 6, 7, 8, 8]
+    assert "activities of Na2O" in captions[1]["caption"]
+    assert "Sulfide capacities" in captions[6]["caption"]
+    audit_md = (ROOT / "data/literature/extracts/audits/inoue-suito-1982-na-silicate-sulfur-partitions.audit.md").read_text(
+        encoding="utf-8"
+    )
+    assert "Fig. 2 gives sulfur distribution ratios" not in audit_md
+    assert "Fig. 5 gives sulfide capacity" not in audit_md
 
     migrator = migrate_one_extract(
         ROOT,
@@ -34,10 +208,29 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
     )
     migrator.finalize()
     result = migrator.result
-    assert len(result.observations) == 251
+    assert len(result.observations) == 267
     assert not result.validation.hard_issues
 
     by_id = {row.observation_id.split("::", 1)[-1]: row for row in result.observations.values()}
+    assert sum(row.value.kind is ValueKind.POINT for row in result.observations.values()) == 240
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 27
+    assert set(by_id) == set(source_rows)
+    for row in result.observations.values():
+        plain = to_plain(row)
+        assert plain["identity"]["temperature_K"]["tag"] == "value"
+        assert plain["point_conditions"]
+        assert any("state" in condition and "locator" in condition for condition in plain["point_conditions"].values())
+    for sample_id, expected in {"151": ".0194", "152": ".0113"}.items():
+        migrated = by_id[f"inoue_suito_1982_t1_sample_{sample_id}_metal_S_metal_s_wt"]
+        assert migrated.value.point == Decimal(expected)
+    for sample_id, expected in final_total_s.items():
+        table = "3" if sample_id in table3_final_s else "1"
+        migrated = by_id[f"inoue_suito_1982_t{table}_sample_{sample_id}_slag_S_slag_total_sulfur_wt"]
+        assert migrated.value.point == Decimal(expected)
+    for observation_id, (activity, _attribution, _x_sio2) in expected_sio2_activity.items():
+        migrated = by_id[observation_id]
+        assert migrated.value.point == Decimal(activity)
+        assert migrated.evidence.class_.value == "quoted_attributed"
     table1 = by_id["inoue_suito_1982_t1_sample_15_metal_S_metal_s_wt"]
     table2 = next(row for key, row in by_id.items() if key.startswith("inoue_suito_1982_t2_sample_98_metal_Si_observed"))
     table3 = next(row for key, row in by_id.items() if key.startswith("inoue_suito_1982_t3_sample_102_metal_S_metal_s_wt"))
@@ -155,6 +348,30 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
     )
     assert identity["total_pressure_Pa"]["tag"] == "unknown"
     assert identity["fO2_Pa"]["tag"] == "unknown"
+    final_composition_rows = {}
+    for observation_id, source_row in source_rows.items():
+        if not observation_id.startswith(("inoue_suito_1982_t1_sample_", "inoue_suito_1982_t2_sample_")):
+            continue
+        composition = (source_row.get("point_conditions") or {}).get("composition") or {}
+        state = composition.get("state") or {}
+        value = state.get("value") or {}
+        if state.get("tag") == "value" and value.get("amount_basis") == "mass_percent":
+            final_composition_rows[observation_id] = composition
+    assert len(final_composition_rows) == 185
+    for observation_id, composition in final_composition_rows.items():
+        sample_id = re.search(r"_t[12]_sample_(\d+)_", observation_id).group(1)
+        locator = composition["locator"]
+        assert locator["page"] == 6
+        assert locator["table"] == "1"
+        assert locator["row_label"] == sample_id
+        source_components = composition["state"]["value"]["components"]
+        assert all(Decimal(amount) != 0 for _, amount in source_components)
+        migrated_conditions = to_plain(by_id[observation_id])["point_conditions"]
+        migrated_composition = migrated_conditions["composition"]
+        assert migrated_composition["locator"]["page"] == 6
+        assert migrated_composition["locator"]["table"] == "1"
+        migrated_components = to_plain(by_id[observation_id])["identity"]["composition"]["value"]["components"]
+        assert all(Decimal(amount) != 0 for _, amount in migrated_components)
     for row in (table1, table2, table3):
         axes = to_plain(row)["identity"]
         assert axes["temperature_K"]["tag"] == "value"
