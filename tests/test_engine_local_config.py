@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator import engine_local_config
 from simulator.engine_local_config import (
     EngineIdentity,
     EngineLocalConfig,
@@ -109,7 +110,7 @@ def test_config_absent_legacy_fallback_emits_warning(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr("simulator.engine_local_config._LEGACY_WARNED", set())
+    monkeypatch.setattr(engine_local_config, "_LEGACY_WARNED", set())
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "simulator.engine_local_config.config_path",

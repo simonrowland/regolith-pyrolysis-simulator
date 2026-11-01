@@ -13674,6 +13674,7 @@ def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
         return corrupted
 
     monkeypatch.setattr(janaf, "load_table_document", corrupt_o037_hash)
+    monkeypatch.setattr("simulator.reference_data.janaf.load_table_document", corrupt_o037_hash)
     janaf._fusion_table_points.cache_clear()
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 
@@ -14605,6 +14606,7 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
         return incomplete
 
     monkeypatch.setattr(janaf, "load_table_document", missing_alumina_row)
+    monkeypatch.setattr("simulator.reference_data.janaf.load_table_document", missing_alumina_row)
     janaf._fusion_table_points.cache_clear()
     janaf._fusion_missing_gibbs_temperatures.cache_clear()
 
@@ -14659,7 +14661,11 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
     monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
 
     with pytest.raises(ValueError, match="1700"):
         janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
@@ -14680,7 +14686,11 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_table_points", without_silica_1700)
     monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr("simulator.reference_data.janaf._fusion_missing_gibbs_temperatures", lambda _table_id: ())
     experiment = F.kems_experiment()
     reference = F.observation(
         "silica-activity-across-missing-janaf-node",
@@ -15534,7 +15544,9 @@ def test_magemin_composition_gate_is_a_typed_out_of_domain_refusal(
         bench_module,
         "activity_request_for_engine",
         lambda *_args, **_kwargs: SimpleNamespace(
-            payload={"composition_mol": {"SiO2": Decimal("0.1"), "MgO": Decimal("0.9")}}
+            # Positive SiO2 beyond the calibration window is extrapolated
+            # with a notice; zero silica remains a typed domain refusal.
+            payload={"composition_mol": {"SiO2": Decimal("0"), "MgO": Decimal("1")}}
         ),
     )
 
@@ -15622,7 +15634,7 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     ):
         raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
 
-    monkeypatch.setattr(janaf, "_janaf_fusion_energy_for_pair", no_unique_crossing)
+    monkeypatch.setattr("simulator.reference_data.janaf._janaf_fusion_energy_for_pair", no_unique_crossing)
     identity = _with_activity_reference_polymorph(identity, "lime")
     reference = replace(reference, identity=identity)
     result = fusion_comparison_reference(reference)

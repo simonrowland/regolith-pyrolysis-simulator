@@ -81,8 +81,10 @@ def test_nio_mre_rung_is_phase_correct_graph_authority() -> None:
     assert liquid_reference is not None
     assert solid_reference.authority == "ellingham_graph"
     assert liquid_reference.authority == "ellingham_graph"
-    assert solid_reference.authoritative is True
-    assert liquid_reference.authoritative is True
+    assert solid_reference.authoritative is False
+    assert "unresolved_standard_state" in solid_reference.status
+    assert liquid_reference.authoritative is False
+    assert "unresolved_standard_state" in liquid_reference.status
     assert "Ni(s)" in (solid_reference.ellingham_phase_basis or "")
     assert "Ni(l)" in (liquid_reference.ellingham_phase_basis or "")
     assert liquid_reference.voltage == pytest.approx(0.386419, abs=1e-6)
@@ -915,8 +917,8 @@ def test_molar_mass_ledger_derives_from_canonical_atomic_weight_table() -> None:
 @pytest.mark.parametrize(
     ("reductant", "target", "expected_c", "abs_tol_c"),
     [
-        # NIST-JANAF high-T oxide refit: Na2O/FeO crossover cited by Mandate.
-        ("Na", "Fe", 1181.5, 1.0),
+        # JANAF Na-013 liquid rows, regrounded in b-959, cross Fe-020 near 1184 C.
+        ("Na", "Fe", 1184.0, 1.0),
         # NIST-JANAF high-T oxide refit: K2O/FeO crossover cited by Mandate.
         ("K", "Fe", 836.25, 1.0),
     ],

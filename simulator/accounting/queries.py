@@ -112,6 +112,12 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
     "TiO2",
     "Cr2O3",
     "REE_oxides",
+    "Y2O3",
+    "Sc2O3",
+    "ZrO2",
+    "HfO2",
+    "ThO2",
+    "UO2",
 }) | REE_OXIDE_SPECIES
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})
@@ -645,10 +651,12 @@ class AccountingQueries:
         initial_total_kg = sum(initial.values())
         terminal_total_kg = sum(terminal.values())
         initial_ree_kg = sum(
-            float(initial.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(initial.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         terminal_ree_kg = sum(
-            float(terminal.get(species, 0.0)) for species in REE_OXIDE_SPECIES
+            float(terminal.get(species, 0.0))
+            for species in sorted(REE_OXIDE_SPECIES, key=str)
         )
         initial_wt_pct = (
             initial_ree_kg / initial_total_kg * 100.0
@@ -757,10 +765,17 @@ class AccountingQueries:
             for row in rows:
                 _add_stage0_foulant_partition_row(groups, row)
 
-        return _finalize_stage0_foulant_partition_groups(
+        result = _finalize_stage0_foulant_partition_groups(
             groups,
             expected_source_debit_kg,
         )
+        allocation_diagnostics = [
+            dict(diagnostic) for diagnostic in diagnostics
+            if diagnostic.get("reaction_family") == "sulfate_carbon_allocation"
+        ]
+        if allocation_diagnostics:
+            result["other_mineral_contaminant"]["diagnostics"] = allocation_diagnostics
+        return result
 
     def stage0_foulant_hourly_by_group(
         self,

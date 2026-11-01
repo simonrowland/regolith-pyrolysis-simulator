@@ -1,7 +1,7 @@
 """Canonical Ellingham thermodynamic table (single source of truth).
 
-Data leaf. The only ``simulator`` import is ``physical_constants``, which
-imports nothing else, so this module can still be imported at module level
+Data leaf. Imports physical constants and the JANAF source-data loader,
+without importing the battery or an engine, so it can be imported at module level
 by both the builtin vapor provider (:mod:`engines.builtin.vapor_pressure`)
 and the legacy equilibrium fallback
 (:class:`simulator.equilibrium.EquilibriumMixin`) WITHOUT closing an import
@@ -16,7 +16,9 @@ Tuple per species: ``(dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)``
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 from simulator.physical_constants import GAS_CONSTANT
@@ -142,28 +144,154 @@ _LEGACY_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
 # only dG/dT kinks at the phase transition. Mg is the documented exception:
 # its source-fit join remains at 1366 K while runtime phase ownership switches
 # at the NIST-backed 1363.15 K physical boundary above.
+@lru_cache(maxsize=1)
+def _na2o_janaf_liquid_source_data() -> tuple[
+    tuple[tuple[float, float], ...], float, float, float
+]:
+    """Load Na2O(l) Gibbs rows and its JANAF alpha/liquid fusion data."""
+
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    liquid_document = load_table_document(TABLES_DIR / "Na-013.yaml")["table"]
+    alpha_document = load_table_document(TABLES_DIR / "Na-014.yaml")["table"]
+
+    def numeric_cell(row: Mapping[str, Any], field: str) -> float:
+        cell = row.get(field)
+        if not isinstance(cell, Mapping) or cell.get("value") is None:
+            raise ValueError(f"JANAF Na2O row is missing {field}")
+        return float(cell["value"])
+
+    def row_at(
+        table: Mapping[str, Any], temperature_K: float
+    ) -> Mapping[str, Any]:
+        for row in table.get("values", ()):
+            if not isinstance(row, Mapping):
+                continue
+            temperature = row.get("temperature")
+            if (
+                isinstance(temperature, Mapping)
+                and temperature.get("value") is not None
+                and float(temperature["value"]) == temperature_K
+            ):
+                return row
+        raise ValueError(
+            f"JANAF {table.get('table_id')} has no {temperature_K:g} K row"
+        )
+
+    def alpha_liquid_transition(
+        table: Mapping[str, Any],
+    ) -> tuple[float, float]:
+        matches: list[tuple[float, float]] = []
+        for ambiguity in table.get("parse_ambiguities", ()):
+            if not isinstance(ambiguity, Mapping):
+                continue
+            fields = str(ambiguity.get("raw_line", "")).split("\t")
+            if len(fields) == 6 and fields[-1].strip() == "ALPHA <--> LIQUID":
+                matches.append((float(fields[0]), float(fields[4])))
+        if len(matches) != 1:
+            raise ValueError(
+                f"JANAF {table.get('table_id')} needs one alpha/liquid row"
+            )
+        return matches[0]
+
+    liquid_points = tuple(
+        sorted(
+            (
+                numeric_cell(row, "temperature"),
+                numeric_cell(row, "formation_gibbs_energy"),
+            )
+            for row in liquid_document.get("values", ())
+            if isinstance(row, Mapping)
+            and isinstance(row.get("temperature"), Mapping)
+            and row["temperature"].get("value") is not None
+            and isinstance(row.get("formation_gibbs_energy"), Mapping)
+            and row["formation_gibbs_energy"].get("value") is not None
+        )
+    )
+    liquid_tm, liquid_h_increment_tm = alpha_liquid_transition(liquid_document)
+    alpha_tm, alpha_h_increment_tm = alpha_liquid_transition(alpha_document)
+    if liquid_tm != alpha_tm:
+        raise ValueError("JANAF Na2O tables disagree on the alpha/liquid Tm")
+
+    liquid_1400 = row_at(liquid_document, 1400.0)
+    alpha_1400 = row_at(alpha_document, 1400.0)
+    # Premise: fusion enthalpy is H_liquid(Tm)-H_alpha(Tm). Algebra: start
+    # with the JANAF formation-enthalpy difference at 1400 K, then add the
+    # difference of the printed H-H(Tr) increments from 1400 K to Tm; the
+    # elemental reference increments cancel. Units are kJ/mol Na2O.
+    delta_h_fus_kJ_per_mol_na2o = (
+        numeric_cell(liquid_1400, "formation_enthalpy")
+        - numeric_cell(alpha_1400, "formation_enthalpy")
+        + liquid_h_increment_tm
+        - numeric_cell(liquid_1400, "enthalpy_increment")
+        - alpha_h_increment_tm
+        + numeric_cell(alpha_1400, "enthalpy_increment")
+    )
+    if delta_h_fus_kJ_per_mol_na2o <= 0.0:
+        raise ValueError("JANAF Na2O fusion enthalpy must be positive")
+    return (
+        liquid_points,
+        liquid_tm,
+        delta_h_fus_kJ_per_mol_na2o,
+        numeric_cell(row_at(alpha_document, 1300.0), "formation_gibbs_energy"),
+    )
+
+
+def _na2o_janaf_fit_segments() -> tuple[EllinghamFitSegment, ...]:
+    liquid_points, tm, fusion_h, alpha_1300 = _na2o_janaf_liquid_source_data()
+    # Chase 1998 JANAF Na-013: ΔfG(1400)=-192.041, ΔfG(1500)=-167.596
+    # kJ/mol Na2O. Use the complete printed liquid band through 3000 K. Each secant
+    # is G=H-T*S with S=(G_left-G_right)/(T_right-T_left), H=G_left+T_left*S.
+    # Two Na2O form per O2, so multiply source G and fusion H by two:
+    # H [kJ/mol O2], S [kJ/(K mol O2)]. Sanity: G(1500)=-335.192 exactly.
+    rows = tuple(
+        (t, 2.0 * g) for t, g in liquid_points if t >= 1400.0
+    )
+    liquid_segments = []
+    for (left, g_left), (right, g_right) in zip(rows, rows[1:]):
+        entropy = (g_left - g_right) / (right - left)
+        enthalpy = g_left + left * entropy
+        liquid_segments.append(
+            EllinghamFitSegment(
+                enthalpy, entropy, 4, 2, (max(left, tm), right),
+                "4 Na(g) + O2 -> 2 Na2O(l); JANAF liquid row interpolation",
+                "Chase 1998 NIST-JANAF Na-013; confidence: primary-refit",
+            )
+        )
+    liquid = liquid_segments[0]
+    # Coexistence requires G_l(Tm)=G_alpha(Tm). With JANAF fusion enthalpy
+    # h=47.696 kJ/mol Na2O (derived by the source loader), ΔS_fus=h/Tm.
+    # Therefore H_alpha=H_liquid-2h and S_alpha=S_liquid-2h/Tm. This fixes
+    # both the value and the slope jump without shifting any liquid row.
+    # At Tm=1405.2 K both G=-381.539720 kJ/mol O2; H_l-H_alpha=95.392.
+    # The resulting alpha G(1400)=-384.435002 differs from JANAF Na-014's
+    # printed -384.436 by 0.000998 kJ/mol O2. Join that endpoint to Na-014's
+    # 1300 K G=-220.358 kJ/mol Na2O, preserving continuity at 1400 K.
+    # Limiting case: h->0 removes the phase slope jump; at Tm ΔG_fus=0.
+    alpha_h = liquid.dH_f_kJ_per_mol_O2 - 2.0 * fusion_h
+    alpha_s = liquid.dS_f_kJ_per_mol_K_per_mol_O2 - 2.0 * fusion_h / tm
+    alpha_1400 = alpha_h - 1400.0 * alpha_s
+    low_s = (2.0 * alpha_1300 - alpha_1400) / (1400.0 - 1300.0)
+    return (
+        EllinghamFitSegment(
+            2.0 * alpha_1300 + 1300.0 * low_s, low_s, 4, 2,
+            (1243.15, 1400.0),
+            "4 Na(g) + O2 -> 2 Na2O(alpha); JANAF 1300 K to fusion join",
+            "Chase 1998 NIST-JANAF Na-014/Na-013; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            alpha_h, alpha_s, 4, 2, (1400.0, tm),
+            "4 Na(g) + O2 -> 2 Na2O(alpha); JANAF fusion-constrained tangent",
+            "Chase 1998 NIST-JANAF Na-014/Na-013; confidence: primary-refit",
+        ),
+        *liquid_segments,
+    )
+
+
 ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     **_LEGACY_SEGMENTS,
-    # Na premise: Chase 1998 JANAF Na-014 rows 1100-2600 K, split at Na
-    # boil 1156.1 K and Na2O beta->alpha 1243.15 K, alpha->liquid 1405.2 K.
-    # Fit: dH/dS are least-squares for each row span below; max residual
-    # 0.442 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2.
-    # Sanity at the 2200 K shared breakpoint, where ellingham_segment_for_temperature
-    # selects the next segment (2200, 2600) with dH=-985.0724, dS=-0.444394:
-    #   dG = dH - T*dS = -985.0724 - 2200*(-0.444394) = -7.4056 kJ/mol O2
-    # which is the public ellingham_delta_g_kj_per_mol_o2("Na", 2200) value.
-    # JANAF Na-014 (Na2O cr,l) 2200 K fG° = -3.886 kJ/mol Na2O; the table
-    # reaction at this T is 4 Na(g)+O2 -> 2 Na2O(l), so grid dG/mol O2 =
-    # 2 * fG° = -7.772 kJ/mol O2. Residual = -7.4056 - (-7.772) = +0.366
-    # kJ/mol O2, inside the 0.442 kJ max-residual headline.
-    # The (1800, 2200) segment at its excluded upper edge is
-    # -1020.2496 - 2200*(-0.460416) = -7.3344 kJ/mol O2; that is not the
-    # public 2200 K value. Boil kink: above Tb
-    # the metal standard state is gas; gaseous metal is a higher-energy
-    # reactant, so oxide-formation dG becomes less negative above T_b and
-    # the slope changes instead of false-flattening the Na line. The
-    # 1100-1156.1 K segment is constrained to the post-boil shared endpoint
-    # dG(1156.1 K) = -524.382071 kJ/mol O2.
+    # Na below the alpha band retains the established metal/oxide rails.
+    # Alpha/liquid segments share the JANAF source and coexistence owner above.
     "Na": (
         EllinghamFitSegment(
             -731.077284147,
@@ -183,42 +311,7 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             "4 Na(g) + O2 -> 2 Na2O(beta); source-row tangent at 1200 K",
             "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
         ),
-        EllinghamFitSegment(
-            -1172.356,
-            -0.562800,
-            4,
-            2,
-            (1243.15, 1405.2),
-            "4 Na(g) + O2 -> 2 Na2O(alpha); rows 1300-1400 K",
-            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
-        ),
-        EllinghamFitSegment(
-            -1051.1212,
-            -0.477468,
-            4,
-            2,
-            (1405.2, 1800.0),
-            "4 Na(g) + O2 -> 2 Na2O(l); rows 1500-1800 K",
-            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
-        ),
-        EllinghamFitSegment(
-            -1020.2496,
-            -0.460416,
-            4,
-            2,
-            (1800.0, 2200.0),
-            "4 Na(g) + O2 -> 2 Na2O(l); rows 1800-2200 K",
-            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
-        ),
-        EllinghamFitSegment(
-            -985.0724,
-            -0.444394,
-            4,
-            2,
-            (2200.0, 2600.0),
-            "4 Na(g) + O2 -> 2 Na2O(l); rows 2200-2600 K",
-            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
-        ),
+        *_na2o_janaf_fit_segments(),
     ),
     # K premise: this worktree already has K, so keep it non-breaking but
     # fail-closed at the JANAF K-012 solid-only table limit of 2000 K.
@@ -901,6 +994,90 @@ _MG_GAS_FIT_SEGMENTS = tuple(
 )
 
 
+def _na_activity_reference_standard_delta_g_kj_per_mol_o2(
+    temperature_K: float,
+) -> float:
+    """Resolve the Na standard Gibbs energy on the liquid NaO0.5 activity basis."""
+
+    T_K = _finite_temperature_K(temperature_K)
+    active = ellingham_segment_for_temperature("Na", T_K)
+    if "Na2O(l)" in active.phase_basis:
+        # The canonical Na liquid segments now interpolate JANAF and coexist
+        # with alpha at Tm. Outside their band the existing Ellingham owner
+        # extends the terminal segment and callers carry its authority notice.
+        return active.delta_g_kJ_per_mol_O2(T_K)
+
+    liquid_points, melting_temperature_K, delta_h_fus_kJ_per_mol_na2o, _ = (
+        _na2o_janaf_liquid_source_data()
+    )
+
+    def interpolate(
+        points: tuple[tuple[float, float], ...], target_K: float
+    ) -> float:
+        for (left_K, left_value), (right_K, right_value) in zip(
+            points, points[1:]
+        ):
+            if left_K <= target_K <= right_K:
+                fraction = (target_K - left_K) / (right_K - left_K)
+                return left_value + fraction * (right_value - left_value)
+        raise ValueError(
+            f"JANAF Na2O(l) does not cover {target_K:g} K"
+        )
+
+    submelt_points = tuple(
+        point for point in liquid_points if point[0] < melting_temperature_K
+    )
+    if (
+        submelt_points
+        and submelt_points[0][0] <= T_K <= submelt_points[-1][0]
+    ):
+        # Premise: the activity reference is pure-liquid NaO0.5. For
+        # 4 Na + O2 -> 2 Na2O(l) = 4 NaO0.5(l), algebra gives
+        # ΔG°/mol O2 = 2*ΔfG°(Na2O(l)). JANAF values are kJ/mol Na2O, so
+        # multiplying by 2 gives the required kJ/mol O2.
+        return 2.0 * interpolate(submelt_points, T_K)
+
+    segments = ellingham_fit_segments("Na")
+    # The below-table conversion uses the nearest, lowest-T alpha segment.
+    # Near Tm the active fusion-constrained alpha segment is used directly.
+    alpha_gas = next(
+        segment
+        for segment in segments
+        if "Na(g)" in segment.phase_basis
+        and "Na2O(alpha)" in segment.phase_basis
+    )
+    if "Na2O(alpha)" in active.phase_basis:
+        alpha_on_active_metal_rail = active.delta_g_kJ_per_mol_O2(T_K)
+    else:
+        beta_gas = next(
+            segment
+            for segment in segments
+            if "Na(g)" in segment.phase_basis
+            and "Na2O(beta)" in segment.phase_basis
+        )
+        alpha_on_active_metal_rail = (
+            active.delta_g_kJ_per_mol_O2(T_K)
+            + alpha_gas.delta_g_kJ_per_mol_O2(T_K)
+            - beta_gas.delta_g_kJ_per_mol_O2(T_K)
+        )
+
+    # Premise: below the liquid table's coverage, the activity still uses
+    # pure-liquid NaO0.5 while the Ellingham rail uses Na2O(alpha) or beta.
+    # Algebra per mol Na2O: ΔG°_liq = ΔG°_alpha + ΔH_fus(1-T/Tm); two Na2O
+    # form per mol O2, so multiply the correction by 2. On a beta rail,
+    # (ΔG_alpha-ΔG_beta) on the common Na(g) rail converts oxide phase while
+    # preserving the active Na(g) or Na(l) reactant state.
+    # Units: both dG and ΔH_fus are kJ/mol Na2O before ×2, yielding kJ/mol O2.
+    # As T approaches the JANAF Tm=1405.2 K from below, the correction tends
+    # to 2*47.696*(1-1405.2/1405.2)=0.000 kJ/mol O2; the alpha rail is
+    # -381.53972 kJ/mol O2 there, equal to the first liquid segment. The
+    # same fusion tangent joins the 1400 K tabulated liquid row continuously.
+    return alpha_on_active_metal_rail + 2.0 * (
+        delta_h_fus_kJ_per_mol_na2o
+        * (1.0 - T_K / melting_temperature_K)
+    )
+
+
 def ellingham_fit_segments(species: str) -> tuple[EllinghamFitSegment, ...]:
     return ELLINGHAM_FIT_SEGMENTS[str(species)]
 
@@ -1073,8 +1250,14 @@ _ELLINGHAM_PHASE_INTERVALS: dict[str, tuple[_EllinghamPhaseInterval, ...]] = {
     "Na2O": (
         _phase_interval("Na2O", 0.0, 1023.150, "JANAF Na-014 gamma <--> beta 1023.150 K"),
         _phase_interval("Na2O", 1023.150, 1243.150, "JANAF Na-014 beta <--> alpha 1243.150 K"),
-        _phase_interval("Na2O", 1243.150, 1405.200, "JANAF Na-014 alpha <--> liquid 1405.200 K"),
-        _phase_interval("Na2O", 1405.200, None, "JANAF Na-014 liquid; table has no further transition"),
+        _phase_interval(
+            "Na2O", 1243.150, _na2o_janaf_liquid_source_data()[1],
+            "JANAF Na-014 alpha <--> liquid 1405.200 K",
+        ),
+        _phase_interval(
+            "Na2O", _na2o_janaf_liquid_source_data()[1], None,
+            "JANAF Na-014 liquid; table has no further transition",
+        ),
     ),
     "Ni": (
         _phase_interval("Ni", 0.0, 631.0, "JANAF Ni-001 magnetic transition 631 K"),

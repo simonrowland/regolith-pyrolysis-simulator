@@ -220,6 +220,28 @@ def classify_projected_bulk(
     )
 
 
+def _projected_liquidus_refusal_reason(notice: Mapping[str, Any]) -> str | None:
+    """Apply d-297 to validated per-component fractions at both consumers."""
+    # Fractions are kg/kg of the original bulk. Using source_sum=1 makes
+    # classify_projected_bulk normalize them to wt% (100 * kg/kg); no
+    # renormalization against the retained bulk. 0.01 kg/kg is exactly 1 wt%.
+    classification = classify_projected_bulk(
+        {
+            row['component']: row['mass_fraction']
+            for row in notice['dropped_components']
+        },
+        source_sum_wt_pct=1.0,
+    )
+    if classification.within_threshold:
+        return None
+    return (
+        f'composition_projected_{classification.verdict}: '
+        f'components={dict(classification.dropped_component_wt_pct)}; '
+        f'total={classification.dropped_total_wt_pct:g} wt%; '
+        f'max={classification.threshold_wt_pct:g} wt%'
+    )
+
+
 def projected_component_moles_per_kg(
     dropped_component_wt_pct: Mapping[str, float],
     *,

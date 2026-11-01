@@ -107,9 +107,9 @@ ELECTROLYSIS_STEP) -- :meth:`ChemistryKernel.commit_batch` engages
 atom-balance validation at dispatch time AND again at commit time.
 
 Account declaration: ``process.cleaned_melt`` (debit oxides being
-reduced + credit K2O / MgO / regenerated Al2O3 coproducts),
-``process.spent_reductant_residue`` (credit melt-resident Na2O from the
-spent Na shuttle), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
+reduced + credit K2O / Na2O / MgO / regenerated Al2O3 coproducts),
+``process.spent_reductant_residue`` (read existing melt-resident residue
+for composition), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
 + debit Al on back-reduction), ``process.reagent_inventory`` (debit
 K/Na/Mg consumed), and ``terminal.drain_tap_material`` (credit net C6
 Al product).
@@ -140,6 +140,7 @@ from engines.builtin.vapor_pressure import (
     _ELLINGHAM_THERMO,
 )
 from simulator.chemistry.ellingham_thermo import (
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
@@ -150,7 +151,6 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
-    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
@@ -232,9 +232,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     name = "builtin-metallothermic-step"
 
     # Accounts the legacy _shuttle_inject_K / _shuttle_inject_Na /
-    # _step_thermite collectively touch on debit or credit side.  Na
-    # spent-reductant oxide is melt-resident, but provenance-isolated
-    # from feedstock/recovered reagent accounting.
+    # _step_thermite collectively touch, including existing residue read
+    # for melt composition. New dissolved coproducts share cleaned_melt.
     DECLARED_ACCOUNTS = frozenset({
         "process.cleaned_melt",
         "process.metal_phase",
@@ -923,8 +922,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if not debits["process.cleaned_melt"]:
             del debits["process.cleaned_melt"]
 
+        # Na2O dissolves in the melt: credit the same account evaporation
+        # debits, as for K2O. Isolating it as spent residue strands the Na
+        # after native Na2O is exhausted; material origin is ledger-tracked
+        # independently of this physical destination.
         credits: dict[str, dict[str, float]] = {
-            SPENT_REDUCTANT_RESIDUE_ACCOUNT: {
+            "process.cleaned_melt": {
                 "Na2O": total_Na2O_added_mol
             },
             "process.metal_phase": {},
@@ -991,8 +994,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "Cr": Cr_produced_kg,
                 "Ti": Ti_produced_kg,
             },
-            "spent_reductant_residue_account": SPENT_REDUCTANT_RESIDUE_ACCOUNT,
-            "spent_reductant_residue_kg": {
+            "cleaned_melt_account": "process.cleaned_melt",
+            "cleaned_melt_kg": {
                 "Na2O": Na2O_added_kg,
             },
             "na2o_melt_kg_for_solubility_cap": Na2O_current_kg,
@@ -1839,7 +1842,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         """Return the oxide-stability crossover temperature in Celsius.
 
         V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 836.25 C, Na/Fe = 1181.5 C. Above a pair's crossover, the
+        K/Fe = 836.25 C, Na/Fe about 1183.67 C (b-959 liquid JANAF rows).
+        Above a pair's crossover, the
         reagent oxide is less stable than the target oxide, so reduction is
         thermodynamically disfavored; current recipe gates remain handled
         outside this helper. Returns None when the algebraic root falls
@@ -1919,7 +1923,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # strongly negative, so C3 may accept Cr2O3 while refusing TiO2.
         # FeO likewise keeps the raw Na/Fe crossover executable: the
         # NaO0.5 activity diagnostic must not turn a standard-state-negative
-        # dispatch above 1181.5 C into an accepted reduction.
+        # dispatch above the Na/Fe crossover into an accepted reduction.
         if "FeO" in margin:
             margin["FeO"] = min(
                 margin["FeO"],

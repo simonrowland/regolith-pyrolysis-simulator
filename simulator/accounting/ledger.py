@@ -324,6 +324,7 @@ class AtomLedger:
         # projections at the simulator boundary.
         self._balances: dict[str, dict[str, float]] = {}
         self._movement_scale_kg: dict[str, dict[str, float]] = {}
+        self.last_physical_mol_projection: dict[str, Any] = {}
         self._policies: dict[str, AccountPolicy] = {}
         self._transitions: list[LedgerTransition] = []
         self._terminal_debit_authorized_transition_ids: set[int] = set()
@@ -332,7 +333,7 @@ class AtomLedger:
         self._unresolved_origin_atom_moles: dict[str, dict[str, float]] = {}
         self._origin_attribution_methods: dict[str, dict[str, str]] = {}
         self._external_origin_atom_moles: dict[str, dict[str, float]] = {
-            origin: {} for origin in MATERIAL_ORIGINS
+            origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
         }
         self._gross_account_flows: dict[str, dict[str, Any]] = {
             direction: {
@@ -868,7 +869,7 @@ class AtomLedger:
             account = str(lot.account)
             physical_atoms = lot.atom_moles_for(self.registry)
             origin_allocation: dict[str, dict[str, float]] = {
-                origin: {} for origin in MATERIAL_ORIGINS
+                origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
             }
             unresolved_allocation: dict[str, float] = {}
             methods: dict[str, str] = {}
@@ -977,7 +978,7 @@ class AtomLedger:
                                 f"debit={amount:.12g}, "
                                 f"available={available:.12g} mol-atoms"
                             ) from exc
-                        for origin in MATERIAL_ORIGINS:
+                        for origin in sorted(MATERIAL_ORIGINS, key=str):
                             origin_amount = float(pool_withdrawal.get(origin, 0.0))
                             if origin_amount > 0.0:
                                 origin_allocation[origin][element] = origin_amount
@@ -999,7 +1000,7 @@ class AtomLedger:
 
                 methods[element] = str(method)
                 debit_methods[element].add(str(method))
-                for origin in MATERIAL_ORIGINS:
+                for origin in sorted(MATERIAL_ORIGINS, key=str):
                     debited = max(
                         0.0,
                         float(origin_allocation[origin].get(element, 0.0)),
@@ -1109,7 +1110,7 @@ class AtomLedger:
         for lot, physical_atoms in zip(transition.credits, credit_atoms):
             account = str(lot.account)
             allocation: dict[str, dict[str, float]] = {
-                origin: {} for origin in MATERIAL_ORIGINS
+                origin: {} for origin in sorted(MATERIAL_ORIGINS, key=str)
             }
             unresolved_allocation: dict[str, float] = {}
             methods: dict[str, str] = {}
@@ -1117,7 +1118,7 @@ class AtomLedger:
                 element = str(element)
                 total_credit = float(total_credit_atoms.get(element, 0.0))
                 fraction = float(amount) / total_credit if total_credit > 0.0 else 0.0
-                for origin in MATERIAL_ORIGINS:
+                for origin in sorted(MATERIAL_ORIGINS, key=str):
                     origin_amount = float(
                         debit_origin_totals[origin].get(element, 0.0)
                     ) * fraction
@@ -1376,6 +1377,39 @@ class AtomLedger:
         if account is not None:
             return dict(self._balances.get(str(account), {}))
         return _copy_balances(self._balances)
+
+    def physical_mol_by_account(self, account: str) -> dict[str, float]:
+        """Return physical supply, preserving signed balances for closure."""
+        name = str(account)
+        projected: dict[str, float] = {}
+        roundoff: dict[str, dict[str, float]] = {}
+        diagnostic = {'account': name, 'roundoff_projected_mol': roundoff}
+        self.last_physical_mol_projection = diagnostic
+        for species, value in self.mol_by_account(name).items():
+            # Use the same account/species roundoff scale accepted by
+            # _validate_account_policies, not a gate epsilon:
+            # tol[kg] / M[kg/mol] = tol[mol]. Canonical balances are untouched,
+            # so projection cannot change the batch mass/atom closure.
+            # Its absolute floor covers zero-scale subtraction noise; the
+            # movement-relative term follows accumulated conversion scale.
+            # Both signs within tol are nonphysical; zero stays zero,
+            # v > tol is bit-identical, and v < -tol must still refuse.
+            molar_mass = resolve_species_formula(
+                species, self.registry).molar_mass_kg_per_mol()
+            tolerance = self._projection_tolerance_kg(name, species) / molar_mass
+            if value < -tolerance:
+                raise AccountingError(
+                    'negative physical supply from account: '
+                    f'account={name!r} species={species!r} mol={value:.12g}')
+            if abs(value) <= tolerance:
+                projected[species] = 0.0
+                if value != 0.0:
+                    roundoff[species] = {
+                        'signed_mol': value, 'physical_mol': 0.0,
+                        'tolerance_mol': tolerance}
+            else:
+                projected[species] = value
+        return projected
 
     def total_kg_by_account(self, account: str | None = None) -> dict[str, float] | float:
         if account is not None:

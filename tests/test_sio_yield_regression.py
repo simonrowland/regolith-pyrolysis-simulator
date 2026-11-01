@@ -694,6 +694,8 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     assert "pure_component_antoine" not in sio_data
 
     model = CondensationModel(CondensationTrain.create_default())
+    # d-268: this isolated SiO window opens the otherwise diverted cartridge.
+    model.train.collection_route["stage3_route"] = "through"
     route = model.route(
         synthetic_sio_stage_authority.flux(),
         MeltState(),
@@ -715,6 +717,8 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
 
 def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     model = CondensationModel(CondensationTrain.create_default())
+    # Routing and carrier authority are independent: expose the SiO collector.
+    model.train.collection_route["stage3_route"] = "through"
     route = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
         MeltState(),
@@ -911,11 +915,13 @@ def test_cold_liner_routes_sio_to_wall_deposit_bucket():
     assert destinations == pytest.approx(1.0)
 
 
-def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
+@pytest.mark.parametrize("stage3_route", ["through", "divert"])
+def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate(stage3_route):
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    model.train.collection_route["stage3_route"] = stage3_route
     # This direct-route pin isolates the free-molecular wall budget and
     # sticking-alpha notice from production's provisional condenser geometry.
     model.configure_operating_conditions(
@@ -946,38 +952,48 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    # t-1217: full first-wall capture leaves no separate high-supersaturation source class.
     fused_silica_alpha = condensation_module.MATERIALS_DATA[
         "fused_silica_alpha_s_by_species"
     ]["SiO"]
-    assert fused_silica_alpha["source_class"] in notice["source_classes"]
-    assert "solid_film_growth_proxy_not_evaporation_evidence" in (
-        notice["source_classes"]
-    )
-    assert "fail_closed_no_direct_sticking_coefficient" not in (
-        notice["source_classes"]
-    )
     assert notice["species"] == ["SiO"]
-    assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
-        0.022481955557451427
-    )
-    fused_silica_record = notice["alpha_s_provenance_by_species"]["SiO"][
-        "stage_2_to_stage_3"
-    ]
-    expected_proxy = condensation_module._sidecar_alpha_record(
-        "SiO",
-        T_K=fused_silica_record["alpha_s_temperature_K"],
-    )
-    assert fused_silica_record["alpha_s"] == expected_proxy["alpha_s"]
-    assert fused_silica_record["source_class"] == fused_silica_alpha[
-        "source_class"
-    ]
-    assert fused_silica_record["uncertainty_flag"] == fused_silica_alpha[
-        "uncertainty_flag"
-    ]
-    # Reported alphas are the wall-path values; the capture-budget path reads
-    # the same literature sidecar defaults and must not be conflated with
-    # material-specific wall overrides.
+    provenance = notice["alpha_s_provenance_by_species"]["SiO"]
+    if stage3_route == "through":
+        # b-1101 supplies one flagged fused-silica proxy for this route.
+        assert fused_silica_alpha["source_class"] in notice["source_classes"]
+        assert "solid_film_growth_proxy_not_evaporation_evidence" in (
+            notice["source_classes"]
+        )
+        assert "fail_closed_no_direct_sticking_coefficient" not in (
+            notice["source_classes"]
+        )
+        fused_silica_record = notice["alpha_s_provenance_by_species"]["SiO"][
+            "stage_2_to_stage_3"
+        ]
+        expected_proxy = condensation_module._sidecar_alpha_record(
+            "SiO",
+            T_K=fused_silica_record["alpha_s_temperature_K"],
+        )
+        assert fused_silica_record["alpha_s"] == expected_proxy["alpha_s"]
+        assert fused_silica_record["source_class"] == fused_silica_alpha[
+            "source_class"
+        ]
+        assert fused_silica_record["uncertainty_flag"] == fused_silica_alpha[
+            "uncertainty_flag"
+        ]
+        assert notice["alpha_s_by_species"]["SiO"] == pytest.approx(
+            expected_proxy["alpha_s"]
+        )
+    else:
+        # d-268 isolates the silica and exposes the maintained-hot refractory
+        # bypass; its in-domain Wetzel/Gail proxy replaces the silica refusal.
+        assert "stage_2_to_stage_3" not in provenance
+        bypass = provenance["stage_2_to_stage_4_bypass"]
+        assert bypass["liner_material"] == "hot_wall_refractory_liner"
+        assert bypass["alpha_s_temperature_K"] == pytest.approx(1773.15)
+        assert bypass["alpha_s"] == pytest.approx(0.06507929431606507)
+        assert bypass["source_class"] == "solid_film_growth_proxy_not_evaporation_evidence"
+    # The historical capture-budget source key remains in the notice for
+    # artifact compatibility; current deposited mass follows the causal route.
     assert notice["alpha_s_source"] == "_wall_alpha_s"
     assert (
         notice["capture_budget_alpha_s_source"]

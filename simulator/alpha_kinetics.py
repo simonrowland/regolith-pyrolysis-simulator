@@ -14,6 +14,7 @@ class AlphaSpecError(ValueError):
 
 
 ANALYTICAL_UPPER_BOUND_ALPHA_STATUS = "analytical_upper_bound"
+PROXY_BRIDGE_ALPHA_STATUS = "proxy/bridge"
 ALPHA_AUTHORITY_STATUS_FIELD = "alpha_authority_status"
 
 

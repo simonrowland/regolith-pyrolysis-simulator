@@ -1278,6 +1278,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
     ) -> IntentResult:
         from engines.builtin.foulant_disposition import (
             FoulantRegistry,
+            _MissingFoulantThermochemistry,
             chi_decomp,
             load_foulant_registry,
         )
@@ -1303,7 +1304,10 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 )
             registry = load_foulant_registry(path)
 
-        extent = chi_decomp(carrier, t_c, p_o2_bar, 0.0, registry)
+        try:
+            extent = chi_decomp(carrier, t_c, p_o2_bar, 0.0, registry)
+        except _MissingFoulantThermochemistry as exc:
+            return self._out_of_domain(str(exc), control_audit=control_audit)
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",

@@ -7,10 +7,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from simulator.alpha_kinetics import (
-    ALPHA_AUTHORITY_STATUS_FIELD,
-    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
-)
+from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
 from simulator.scalar_boundary import finite_float
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSED_CODE,
@@ -1639,7 +1636,6 @@ def pressure_coating_pareto_diagnostic(
     alpha_authority_status_by_species = {
         str(species): str(status)
         for species, status in raw_alpha_authority_status_by_species.items()
-        if status == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
     }
     knudsen_diagnostic = dict(
         getattr(condensation_model, "last_knudsen_regime_diagnostic", {}) or {}
@@ -1842,8 +1838,7 @@ def pressure_coating_pareto_diagnostic(
                 {
                     ALPHA_AUTHORITY_STATUS_FIELD: alpha_authority_status,
                 }
-                if alpha_authority_status
-                == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+                if alpha_authority_status is not None
                 else {}
             ),
             "transport_length_m": flux_kwargs["pipe_diameter_m"],

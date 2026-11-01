@@ -265,15 +265,20 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
     shadow = payload["per_hour_summary"][0][
         "wall_deposition_rate_shadow_candidate"
     ]["by_segment_species"]
-    records_by_species: dict[str, list[dict]] = {}
-    for segment in shadow.values():
+    from simulator.config import load_config_bundle
+    from simulator.condensation_routing import STAGE3_BYPASS_SEGMENT_NAME
+
+    bypass_C = load_config_bundle().setpoints["condensation_train"]["stage3_bypass"][
+        "wall_temperature_C"]
+    records_by_species: dict[str, list[tuple[str, dict]]] = {}
+    for segment_name, segment in shadow.items():
         for species, record in segment.items():
-            records_by_species.setdefault(species, []).append(record)
+            records_by_species.setdefault(species, []).append((segment_name, record))
 
     for species in ("Na", "K"):
         records = records_by_species.get(species)
         assert records, f"no shadow wall-deposition record for {species}"
-        for record in records:
+        for segment_name, record in records:
             p_i_pa = float(record["species_partial_pressure_pa"])
             p_total_pa = float(record["total_pressure_pa"])
             p_sat_pa = float(record["wall_saturation_pressure_pa"])
@@ -290,7 +295,8 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
             # the commanded band.
             assert p_total_pa == pytest.approx(TOTAL_PRESSURE_PA, rel=1e-6)
             assert wall_K == pytest.approx(
-                wall_temperature_C + CELSIUS_TO_KELVIN,
+                (bypass_C if segment_name == STAGE3_BYPASS_SEGMENT_NAME
+                 else wall_temperature_C) + CELSIUS_TO_KELVIN,
                 rel=1e-9,
             )
 

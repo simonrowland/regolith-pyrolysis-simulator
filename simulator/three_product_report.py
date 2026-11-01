@@ -51,6 +51,7 @@ from simulator.account_ids import (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     TERMINAL_DRAIN_TAP_ACCOUNT,
 )
+from simulator.alpha_kinetics import PROXY_BRIDGE_ALPHA_STATUS
 from simulator.accounting.completeness import (
     METAL_PRODUCT_SPECIES,
     O2_PRODUCT_SPECIES,
@@ -356,6 +357,53 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     captured_volatiles_total_kg = float(
         sum(captured_volatiles_kg_by_species.values())
     )
+    train_crO_kg = _ledger_species_kg(
+        sim, (CONDENSATION_TRAIN_ACCOUNT,)
+    ).get('CrO', 0.0)
+    captured_volatiles_flag: dict[str, Any] | None = None
+    alpha_authority = getattr(
+        sim, '_alpha_authority_status_by_species_engaged', {}
+    ) or {}
+    if (
+        train_crO_kg > 0.0
+        and alpha_authority.get('CrO') == PROXY_BRIDGE_ALPHA_STATUS
+    ):
+        vapor_pressures = getattr(sim, 'vapor_pressures', {}) or {}
+        oxide_vapors = vapor_pressures.get('oxide_vapors', {}) or {}
+        cro_data = oxide_vapors.get('CrO', {}) or {}
+        alpha_spec = cro_data.get('evaporation_alpha', {}) or {}
+        alpha_spec = alpha_spec if isinstance(alpha_spec, Mapping) else {}
+        flux_diagnostic = getattr(
+            sim, '_last_evaporation_flux_diagnostic', {}
+        ) or {}
+        alpha_used = flux_diagnostic.get('alpha_used_by_species', {}) or {}
+        alpha_value = alpha_used.get('CrO', alpha_spec.get('value'))
+        alpha_text = (
+            f'{float(alpha_value):.15g}'
+            if isinstance(alpha_value, (int, float))
+            else 'unknown'
+        )
+        tier = alpha_spec.get('tier', 'unknown')
+        rail_catalog = getattr(sim, 'vapour_rail_catalog', None)
+        compiled_cro = (
+            rail_catalog.species.get('CrO')
+            if rail_catalog is not None
+            else None
+        )
+        routing = compiled_cro.fiat_routing.raw if compiled_cro is not None else {}
+        routing_note = routing.get('routing_note') or (
+            'Routing note unavailable; capture remains uncertified.'
+        )
+        captured_volatiles_flag = {
+            'status': 'flagged prediction',
+            'authority': PROXY_BRIDGE_ALPHA_STATUS,
+            'reason': (
+                f'{train_crO_kg:.15g} kg CrO is in '
+                f'{CONDENSATION_TRAIN_ACCOUNT}; it used tier-{tier} '
+                f'evaporation alpha {alpha_text}. Capture is uncertified: '
+                f'{routing_note}'
+            ),
+        }
 
     # ----- Process inventory: spent reductant residue -----
     spent_reductant_kg_by_species = _spent_reductant_residue_kg(sim)
@@ -411,7 +459,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         any(amount > 0.0 for amount in oxygen_partition.values())
         or 'O2' in products
     )
-    has_silica_capture = bool(stage_3_kg_by_species)
+    has_silica_capture = stage_3_unavailable_reason is None
     has_silica_product = silica_is_product and has_silica_capture
     has_mixed_glass_inventory = early_tap_mode and bool(mixed_melt_residual_kg)
     computed_product_parts = {
@@ -699,6 +747,19 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             ('metals_plus_O2', 'O2_partition_kg'),
         ):
             result[name][key] = dict.fromkeys(oxygen_partition)
+    if captured_volatiles_flag is not None:
+        bucket = result['captured_volatiles']
+        existing_flag = bucket.get('flag')
+        if isinstance(existing_flag, Mapping):
+            merged_flag = dict(existing_flag)
+            existing_reason = str(merged_flag.get('reason') or '')
+            proxy_reason = captured_volatiles_flag['reason']
+            merged_flag['reason'] = '; '.join(
+                reason for reason in (existing_reason, proxy_reason) if reason
+            )
+            bucket['flag'] = merged_flag
+        else:
+            bucket['flag'] = captured_volatiles_flag
     return result
 
 

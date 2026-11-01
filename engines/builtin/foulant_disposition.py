@@ -32,6 +32,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_VAPOR_PRESSURES_PATH = _REPO_ROOT / "data" / "vapor_pressures.yaml"
 
 
+class _MissingFoulantThermochemistry(KeyError):
+    """A referenced dG row is unavailable, rather than invalid input."""
+
+
 @dataclass(frozen=True)
 class EscapeSplit:
     escaped_frac: float
@@ -437,7 +441,7 @@ def chi_decomp(
     dg_key = str(dG_pointer).split(".", 1)[-1]
     dg_row = registry.foulant_dG.get(dg_key)
     if dg_row is None:
-        raise KeyError(f"dG row {dg_key!r} missing from registry")
+        raise _MissingFoulantThermochemistry(f"dG row {dg_key!r} missing from registry")
 
     dg_points = _parse_dg_points(dg_row)
     query_temperature_K = float(T_C) + 273.15

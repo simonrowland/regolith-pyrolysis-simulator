@@ -724,6 +724,7 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
         shuttle_cycle=0,
         mre_voltage_V=0.0,
         mre_current_A=0.0,
+        mre_decomposition_voltage_status_by_oxide={},
         condensation_totals={},
         evap_flux=SimpleNamespace(species_kg_hr={}),
         wall_deposit_by_segment_species_delta={},
@@ -1043,6 +1044,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "evap_plane_selectivity",
     "mre_uncertified_yield",
     "mre_ellingham_ladder_diagnostic",
+    "mre_decomposition_voltage_status_by_oxide",
     "fe_redox_split",
     "stage_3_capture",
     "redox_source_breakdown",
@@ -2271,6 +2273,35 @@ def test_runner_cli_entry_point_writes_output_file(tmp_path):
     payload = json.loads(output.read_text())
     assert payload["status"] == "ok"
     assert payload["run_metadata"]["hours_completed"] == 2
+
+
+def test_runner_cli_reports_known_refusal_on_stderr(tmp_path):
+    output = tmp_path / "refused.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=1",
+            '--runtime-campaign-overrides={"C0":{"o2_bubbler_kg_per_hr":-1}}',
+            f"--output={output}",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(output.read_text())
+    assert payload["status"] == "refused"
+    # Engines and libraries may also write to stderr; the runner's own line is last.
+    assert result.stderr.splitlines()[-1] == (
+        f"refused: {payload['error_message'] or payload['reason']}"
+    )
 
 
 def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):

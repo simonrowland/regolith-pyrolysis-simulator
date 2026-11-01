@@ -35,10 +35,9 @@ def declared_domain_transition(
 ) -> DomainTransition:
     """Resolve one generic OOD transition from compiled metadata and bounds.
 
-    Rows without an explicit disposition retain the catalog's normal
-    status-bearing continuation. Rows declaring ``typed_refusal`` refuse before
-    any evaluator is called, so a caller cannot widen a source polynomial's
-    domain by reaching an outer continuation path.
+    Calibration misses retain the catalog-owned continuation, including legacy
+    rows declaring ``typed_refusal``. Missing/invalid evaluator inputs still
+    refuse at their owning boundary.
     """
 
     raw = getattr(getattr(compiled_species, "code_metadata", None), "raw", {})
@@ -55,21 +54,20 @@ def declared_domain_transition(
         return DomainTransition(False, None)
 
     temperature = float(temperature_K)
-    if not math.isfinite(temperature):
-        raise DomainPolicyError("temperature_K must be finite")
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise DomainPolicyError("temperature_K must be finite and positive")
     low, high = compiled_species.valid_temperature_K
     outside = temperature < float(low) or temperature > float(high)
     if not outside:
         return DomainTransition(outside, disposition)
 
     detail = (
-        f"temperature {temperature} K is outside declared evaluator domain "
-        f"[{float(low)}, {float(high)}] K; conservative continuation is not "
-        "admitted for this row"
+        f"reason={REFUSAL_OUTSIDE_DECLARED_DOMAIN}; authority_level=extrapolated; "
+        f"certified_band=[{float(low)}, {float(high)}] K; "
+        f"temperature_K={temperature}; using evaluator continuation"
     )
     return DomainTransition(
         outside_declared_domain=True,
-        disposition=disposition,
-        refusal_code=REFUSAL_OUTSIDE_DECLARED_DOMAIN,
+        disposition="out_of_range_conservative_continuation",
         detail=detail,
     )

@@ -9,7 +9,11 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any, NamedTuple
 
-from simulator.alpha_kinetics import parse_alpha_contract
+from simulator.alpha_kinetics import (
+    ALPHA_AUTHORITY_STATUS_FIELD,
+    PROXY_BRIDGE_ALPHA_STATUS,
+    parse_alpha_contract,
+)
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
@@ -76,6 +80,184 @@ PRE_RG_EFFECTIVE_PRESSURE_CHEAP_ZERO_BELOW_C = 1050.0
 _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS = frozenset({
     'PO', 'PO2', 'P2', 'P4', 'P4O6', 'P4O10',
 })
+
+
+def _evaporation_stoich(species: str, sp_data: dict, registry):
+    parent_oxide = sp_data.get('parent_oxide', '')
+    if not parent_oxide:
+        raise AccountingError(
+            f"vapor species {species!r} requires parent_oxide "
+            "metadata before ledger routing"
+        )
+
+    has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
+    has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
+    if has_oxide or has_o2:
+        missing = []
+        if not has_oxide:
+            missing.append('stoich_oxide_per_vapor')
+        if not has_o2:
+            missing.append('stoich_O2_per_vapor')
+        if missing:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                f"missing explicit stoich metadata: {', '.join(missing)}"
+            )
+        oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
+        O2_per_product = float(sp_data['stoich_O2_per_vapor'])
+        if oxide_per_product <= 0.0:
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "requires positive stoich_oxide_per_vapor"
+            )
+        if not math.isclose(
+            oxide_per_product,
+            1.0 + O2_per_product,
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise AccountingError(
+                f"vapor species {species!r} from {parent_oxide!r} "
+                "stoich metadata must conserve mass: "
+                "stoich_oxide_per_vapor must equal "
+                "1 + stoich_O2_per_vapor"
+            )
+        _validate_evaporation_stoich_atoms(
+            parent_oxide,
+            species,
+            oxide_per_product,
+            O2_per_product, registry,
+        )
+        return {
+            'parent_oxide': parent_oxide,
+            'oxide_per_product_kg': oxide_per_product,
+            'O2_per_product_kg': O2_per_product,
+            'oxygen_destination': sp_data.get('oxygen_destination'),
+        }
+
+    implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
+    if species != implied:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} requires "
+            "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
+            f"STOICH_RATIOS fallback only applies to elemental "
+            f"{implied!r}"
+        )
+    fallback = STOICH_RATIOS.get(parent_oxide)
+    if not fallback or fallback[0] <= 0:
+        raise AccountingError(
+            f"vapor species {species!r} from {parent_oxide!r} has no "
+            "valid elemental stoich fallback"
+        )
+    kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
+    oxide_per_product = 1.0 / kg_product_per_kg_oxide
+    O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
+    if not math.isclose(
+        oxide_per_product,
+        1.0 + O2_per_product,
+        rel_tol=1e-6,
+        abs_tol=1e-9,
+    ):
+        raise AccountingError(
+            f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
+        )
+    _validate_evaporation_stoich_atoms(
+        parent_oxide,
+        species,
+        oxide_per_product,
+        O2_per_product, registry,
+    )
+    return {
+        'parent_oxide': parent_oxide,
+        'oxide_per_product_kg': oxide_per_product,
+        'O2_per_product_kg': O2_per_product,
+        'oxygen_destination': sp_data.get('oxygen_destination'),
+    }
+
+
+def _validate_evaporation_stoich_atoms(
+    parent_oxide: str,
+    product_species: str,
+    oxide_per_product_kg: float,
+    O2_per_product_kg: float,
+    registry,
+) -> None:
+    debit_atoms = _atom_moles_for_kg(
+        parent_oxide, oxide_per_product_kg, registry)
+    credit_atoms = defaultdict(float)
+    product_atoms = _atom_moles_for_kg(product_species, 1.0, registry)
+    for element, moles in product_atoms.items():
+        credit_atoms[element] += moles
+    if O2_per_product_kg >= 0.0:
+        oxygen_atoms = _atom_moles_for_kg('O2', O2_per_product_kg, registry)
+        for element, moles in oxygen_atoms.items():
+            credit_atoms[element] += moles
+    else:
+        oxygen_atoms = _atom_moles_for_kg('O2', abs(O2_per_product_kg), registry)
+        for element, moles in oxygen_atoms.items():
+            debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
+
+    for element in set(debit_atoms) | set(credit_atoms):
+        debit = debit_atoms.get(element, 0.0)
+        credit = credit_atoms.get(element, 0.0)
+        if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
+            raise AccountingError(
+                f"vapor species {product_species!r} from "
+                f"{parent_oxide!r} stoich metadata does not conserve "
+                f"{element} atoms"
+            )
+
+
+def _atom_moles_for_kg(species: str, kg: float, registry) -> dict:
+    if kg <= 0.0:
+        return {}
+    formula = resolve_species_formula(
+        species, registry)
+    species_moles = float(kg) / formula.molar_mass_kg_per_mol()
+    return formula.atom_moles(species_moles)
+
+
+def _project_evaporation_overhead_source_mol_hr(
+    rates_kg_hr: Mapping[str, float],
+    stoich_by_species: Mapping[str, Mapping[str, Any]],
+    registry: Mapping[str, Any],
+) -> dict[str, float]:
+    source_mol_hr: dict[str, float] = {}
+    o2_molar_mass = resolve_species_formula(
+        'O2', registry
+    ).molar_mass_kg_per_mol()
+    for species, raw_rate in rates_kg_hr.items():
+        rate_kg_hr = max(0.0, float(raw_rate))
+        if rate_kg_hr <= 0.0:
+            continue
+        formula = resolve_species_formula(
+            species, registry
+        )
+        source_mol_hr[species] = (
+            source_mol_hr.get(species, 0.0)
+            + rate_kg_hr / formula.molar_mass_kg_per_mol()
+        )
+        stoich = dict(stoich_by_species.get(species) or {})
+        o2_kg_hr = rate_kg_hr * float(
+            stoich.get('O2_per_product_kg') or 0.0
+        )
+        oxygen_destination = str(
+            stoich.get('oxygen_destination') or ''
+        )
+        vapor_oxygen_atoms = float(
+            formula.elements.get('O', 0.0) or 0.0
+        )
+        if (
+            o2_kg_hr < 0.0
+            or (oxygen_destination != 'reservoir.fo2_buffer'
+                and (vapor_oxygen_atoms > 0.0
+                     or oxygen_destination == 'process.overhead_gas'))
+        ):
+            source_mol_hr['O2'] = (
+                source_mol_hr.get('O2', 0.0)
+                + o2_kg_hr / o2_molar_mass
+            )
+    return source_mol_hr
 
 
 class EvaporationFluxRefusal(ProviderUnavailableError):
@@ -541,18 +723,7 @@ def _assert_runtime_alpha_source_not_vaporock(
 
 
 def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, Any]:
-    """Load executable alpha specs, preserving dormant pressure-only carriers.
-
-    b-314: a row tagged ``broad_proxy_not_intrinsic`` (tier-2 proxy inherited
-    from another measurement family) is not an intrinsic melt alpha. It stays
-    in this map — the pressure-gating path
-    (``_legacy_evaporation_shadow_pressure_map``) and class diagnostics consume
-    it — but as a provenance-carrying mapping marked with
-    ``alpha_proxy_tag``, never a bare number indistinguishable from a
-    measured coefficient. The provider-facing measured view
-    (``_measured_alpha_control_view``) strips these rows so the SC-67
-    unmeasured-alpha refusal fires instead of a proxy satisfying the gate.
-    """
+    """Load alpha specs, retaining tagged proxy provenance and dormant zeros."""
 
     from simulator.evaporation_classes import (
         BROAD_PROXY_NOT_INTRINSIC_TAG,
@@ -585,6 +756,8 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
                     else {"form": "scalar", "value": value}
                 )
                 payload["alpha_proxy_tag"] = BROAD_PROXY_NOT_INTRINSIC_TAG
+                payload[ALPHA_AUTHORITY_STATUS_FIELD] = PROXY_BRIDGE_ALPHA_STATUS
+                payload["authority_reason"] = BROAD_PROXY_NOT_INTRINSIC_TAG
                 if alpha_data.get("tier") is not None:
                     payload["alpha_proxy_tier"] = alpha_data.get("tier")
                 if alpha_data.get("source"):
@@ -593,34 +766,6 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
                 continue
             alpha_by_species[species] = value
     return alpha_by_species
-
-
-def _measured_alpha_control_view(
-    alpha_by_species: Mapping[str, Any],
-) -> dict[str, Any]:
-    """Provider-facing alpha map with tier-2 broad-proxy rows removed (b-314).
-
-    A row carrying ``alpha_proxy_tag == broad_proxy_not_intrinsic`` is proxy
-    evidence, not a measured intrinsic melt alpha; it must not satisfy the
-    provider's presence-based measured-alpha test
-    (``engines.builtin.evaporation_flux._alpha_is_unmeasured``). Removing it
-    here lets the SC-67 ``missing_alpha`` refusal (or the explicitly gated
-    ``allow_unmeasured_alpha_fallback`` prototype path) fire instead of the
-    proxy driving flux as if it were a measurement. The full loader map —
-    proxy rows included, tag-carrying — remains the pressure-gating and
-    diagnostic view.
-    """
-
-    from simulator.evaporation_classes import BROAD_PROXY_NOT_INTRINSIC_TAG
-
-    return {
-        str(species): spec
-        for species, spec in alpha_by_species.items()
-        if not (
-            isinstance(spec, Mapping)
-            and spec.get("alpha_proxy_tag") == BROAD_PROXY_NOT_INTRINSIC_TAG
-        )
-    }
 
 
 def _load_hkl_upper_bound_transport_species(
@@ -650,17 +795,16 @@ def _legacy_evaporation_shadow_pressure_map(
     *,
     read_context: str | None = None,
 ) -> dict[str, float]:
-    """Independent pre-RG shadow projection after the legacy alpha gate."""
+    """Keep finite backend pressures, including carriers with unknown alpha.
 
-    alpha_by_species = _load_evaporation_alpha_by_species(vapor_pressure_data)
-    return {
-        species_id: pressure_pa
-        for species_id, pressure_pa in finite_live_pressure_map(
-            live_pressures_Pa,
-            read_context=read_context,
-        ).items()
-        if species_id in alpha_by_species
-    }
+    Alpha authority belongs to the flux provider: a missing coefficient must
+    reach its explicitly flagged HKL upper-bound path.
+    """
+
+    return finite_live_pressure_map(
+        live_pressures_Pa,
+        read_context=read_context,
+    )
 
 
 def _evaporation_legacy_shadow_pressure_map(
@@ -1368,14 +1512,7 @@ class EvaporationMixin:
         if str(kernel_result.status) != 'ok' and not transport_only_unavailable:
             reason = str(diagnostic.get('reason') or '').strip()
             # A primary refusal wins; secondary records remain diagnostic context.
-            if 'missing_alpha' in diagnostic and not reason:
-                missing = ', '.join(sorted(diagnostic['missing_alpha']))
-                reason = (
-                    "missing evaporation_alpha for sampled species: "
-                    f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                    "for alpha=1.0 prototype fallback"
-                )
-            elif 'missing_transport_parameters' in diagnostic and not reason:
+            if 'missing_transport_parameters' in diagnostic and not reason:
                 missing = ', '.join(
                     sorted(diagnostic['missing_transport_parameters'])
                 )
@@ -1966,6 +2103,17 @@ class EvaporationMixin:
                 'per-component mass fraction'
             )
             return None
+        from simulator.composition_projection import (
+            _projected_liquidus_refusal_reason,
+        )
+
+        refusal = _projected_liquidus_refusal_reason(notice)
+        if refusal is not None:
+            reasons.append(f'{source} {refusal}')
+            self._stash_invalid_projected_liquidus_notice(
+                {**notice, 'reason': refusal},
+            )
+            return None
         projected_source = f'{source}:composition_projected'
         curve = None
         inconsistent = False
@@ -2207,6 +2355,7 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
+            'realized_provider': curve.get('gate_provider_step_down', {}).get('realized_provider'),
             'curve': copy.deepcopy(curve),
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
@@ -2219,6 +2368,13 @@ class EvaporationMixin:
     ) -> dict[str, Any] | None:
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
+            return None
+        realized_provider = previous.get('realized_provider')
+        if realized_provider and realized_provider not in {
+            attempt['provider'] for attempt in failure['provider_diagnostic'].get(
+                'gate_provider_step_down', {},
+            ).get('failed_providers', ())
+        }:
             return None
         composition = self.melt.composition_wt_pct()
         previous_composition = previous['composition_wt_pct']
@@ -2820,6 +2976,8 @@ class EvaporationMixin:
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
         timeout_reason = None
+        step_down = None
+        failed_providers = []
         for attempt in range(2):
             try:
                 result = self._dispatch_only(
@@ -2847,6 +3005,9 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
+            if diagnostic.get('gate_provider_step_down'):
+                step_down = diagnostic['gate_provider_step_down']
+                failed_providers.extend(step_down['failed_providers'])
             timeout_reason = gate_curve_provider_timeout_reason(diagnostic)
             if timeout_reason is None or attempt == 1:
                 break
@@ -2854,8 +3015,39 @@ class EvaporationMixin:
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
+        if step_down:
+            # Retry recovery changes the curve provider, not the work already attempted.
+            diagnostic['gate_provider_step_down'] = {
+                **step_down,
+                'failed_providers': failed_providers,
+                'realized_provider': fallback_provider if status == 'ok' else None,
+            }
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
+        notices = {}
+        if fallback_provider == 'alphamelts-diagnostic':
+            # Step 3 supplies measured-bracket validation. Until then this
+            # diagnostic prediction must not earn the primary MAGEMin
+            # binding's cache admission through the shared fallback slot.
+            notices['calibration_status'] = 'pending_validation'
+        if diagnostic.get('gate_provider_step_down'):
+            notices['gate_provider_step_down'] = diagnostic['gate_provider_step_down']
+        backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+        if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
+            for attempt in diagnostic.get('gate_provider_step_down', {}).get('failed_providers', ()):
+                details = attempt['diagnostic'].get('backend_diagnostics') or {}
+                if 'condensed_phase_reference_pressure_bar' in details:
+                    backend_diagnostic = details
+        if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
+            notices['alphamelts_reference_pressure'] = {
+                key: backend_diagnostic[key] for key in (
+                    'physical_overhead_pressure_bar', 'condensed_phase_reference_pressure_bar',
+                )
+            }
+            for key in ('solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
+                        'commissioning_notice', 'authority', 'certified_band'):
+                if key in backend_diagnostic:
+                    notices['alphamelts_reference_pressure'][key] = backend_diagnostic[key]
         status_outcome = gate_curve_provider_outcome_for_status(
             status,
             diagnostic,
@@ -2886,6 +3078,15 @@ class EvaporationMixin:
                     timeout_reason=timeout_reason,
                 )
                 if held is not None:
+                    if 'gate_provider_step_down' in notices:
+                        held['gate_provider_step_down'] = notices['gate_provider_step_down']
+                    if 'gate_provider_step_down' in held:
+                        held['gate_provider_step_down'] = {
+                            **held['gate_provider_step_down'],
+                            'prediction': 'held_last_good_curve',
+                            'realized_provider': (self._freeze_gate_last_good_curve or {}).get('realized_provider')
+                            or self._liquid_fraction_provider,
+                        }
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         held,
                         timeout_reason=timeout_reason,
@@ -2909,6 +3110,11 @@ class EvaporationMixin:
                             'not a fresh solve or a melting measurement'
                         ),
                     }
+                    curve.update(notices)
+                    if 'gate_provider_step_down' in curve:
+                        curve['gate_provider_step_down'] = {
+                            **curve['gate_provider_step_down'], 'prediction': 'kress91_floor',
+                        }
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         curve,
                         timeout_reason=timeout_reason,
@@ -2929,7 +3135,30 @@ class EvaporationMixin:
                 repair_notices=repair_notices,
             )
             if projected is not None:
+                projected.update(notices)
                 return self._remember_freeze_gate_provider_curve(projected)
+            invalid_notice = getattr(
+                self, '_invalid_projected_liquidus_notice', None,
+            )
+            if isinstance(invalid_notice, Mapping) and str(
+                invalid_notice.get('reason')
+            ).startswith('composition_projected_over_threshold:'):
+                held = self._hold_freeze_gate_provider_curve({
+                    'provider': self._liquid_fraction_provider,
+                    'status': status,
+                    'outcome': status_outcome,
+                    'provider_diagnostic': {
+                        **diagnostic,
+                        'backend_status_reason': invalid_notice['reason'],
+                    },
+                })
+                if held is not None:
+                    held['composition_projected_notice'] = (
+                        self._invalid_projection_bounds_notice(
+                            invalid_notice, bounds_source=str(held['source']),
+                        )
+                    )
+                    return held
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(
                     'composition_projected' in reason for reason in reasons
@@ -2960,6 +3189,7 @@ class EvaporationMixin:
                     },
                     'warnings': warnings,
                 }
+                curve.update(notices)
                 return curve
             reasons.append(
                 'gate liquid fraction unavailable: '
@@ -2977,6 +3207,7 @@ class EvaporationMixin:
                 reasons=reasons,
             )
             if curve is not None:
+                curve.update(notices)
                 record_gate_curve_provider_outcome(
                     self,
                     GateCurveProviderOutcome.PRODUCED,
@@ -2992,6 +3223,7 @@ class EvaporationMixin:
             reasons=reasons,
         )
         if curve is not None:
+            curve.update(notices)
             record_gate_curve_provider_outcome(
                 self,
                 GateCurveProviderOutcome.PRODUCED,
@@ -3358,25 +3590,31 @@ class EvaporationMixin:
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
             # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
-            # cleaned_melt + spent_reductant_residue define the projection.
-            ledger_oxide_kg = (
-                float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            # cleaned_melt + spent_reductant_residue define the projection,
+            # while evaporation debits cleaned_melt only.
+            cleaned_oxide_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
+            projected_ledger_oxide_kg = (
+                cleaned_oxide_kg
                 + float(spent_reductant_residue_kg.get(parent_oxide, 0.0))
             )
             projection_oxide_kg = float(self.melt.composition_kg.get(
                 parent_oxide, 0.0))
-            scale_kg = max(abs(ledger_oxide_kg), abs(projection_oxide_kg), 1.0)
+            scale_kg = max(
+                abs(projected_ledger_oxide_kg), abs(projection_oxide_kg), 1.0
+            )
             divergence_pct = (
-                abs(ledger_oxide_kg - projection_oxide_kg) / scale_kg * 100.0
+                abs(projected_ledger_oxide_kg - projection_oxide_kg)
+                / scale_kg
+                * 100.0
             )
             if divergence_pct > projection_parity_tolerance_pct:
                 raise AccountingError(
                     "cleaned_melt projection stale for parent oxide "
-                    f"{parent_oxide!r}: atom_ledger={ledger_oxide_kg:.17g} kg "
+                    f"{parent_oxide!r}: atom_ledger={projected_ledger_oxide_kg:.17g} kg "
                     f"melt_projection={projection_oxide_kg:.17g} kg "
                     f"divergence_pct={divergence_pct:.17g}"
                 )
-            available_oxide_kg[species] = ledger_oxide_kg
+            available_oxide_kg[species] = cleaned_oxide_kg
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
@@ -3764,17 +4002,12 @@ class EvaporationMixin:
             'evaporation_series_resistance': dict(
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
-            'alpha': _measured_alpha_control_view(
-                _load_evaporation_alpha_by_species(self.vapor_pressures)
-            ),
+            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
             'hkl_upper_bound_transport_species': (
                 _load_hkl_upper_bound_transport_species(self.vapor_pressures)
-            ),
-            'allow_unmeasured_alpha_fallback': kernel_config.get(
-                'allow_unmeasured_alpha_fallback', False
             ),
             'campaign_name': str(
                 getattr(
@@ -3797,10 +4030,6 @@ class EvaporationMixin:
                 controls['vapour_batch_flux_shadow_outcome'] = (
                     vapour_batch_flux_overlay['shadow_outcome']
                 )
-        if 'unmeasured_alpha_fallback_species' in kernel_config:
-            controls['unmeasured_alpha_fallback_species'] = tuple(
-                kernel_config['unmeasured_alpha_fallback_species'] or ()
-            )
         return controls, molar_masses_kg_mol
 
     def _project_evaporation_overhead_source_mol_hr(
@@ -3808,52 +4037,18 @@ class EvaporationMixin:
         rates_kg_hr: Mapping[str, float],
         stoich_by_species: Mapping[str, Mapping[str, Any]],
     ) -> dict[str, float]:
-        source_mol_hr: dict[str, float] = {}
-        o2_molar_mass = resolve_species_formula(
-            'O2', self.species_formula_registry
-        ).molar_mass_kg_per_mol()
+        resolved_stoich = dict(stoich_by_species)
         for species, raw_rate in rates_kg_hr.items():
-            rate_kg_hr = max(0.0, float(raw_rate))
-            if rate_kg_hr <= 0.0:
+            if float(raw_rate) <= 0.0 or resolved_stoich.get(species):
                 continue
-            formula = resolve_species_formula(
-                species, self.species_formula_registry
+            sp_data = dict(
+                (self.vapor_pressures.get('metals', {}) or {}).get(species, {})
+                or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(species, {})
             )
-            source_mol_hr[species] = (
-                source_mol_hr.get(species, 0.0)
-                + rate_kg_hr / formula.molar_mass_kg_per_mol()
-            )
-            stoich = dict(stoich_by_species.get(species) or {})
-            if not stoich:
-                sp_data = dict(
-                    (self.vapor_pressures.get('metals', {}) or {}).get(
-                        species, {}
-                    )
-                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
-                        species, {}
-                    )
-                )
-                if sp_data:
-                    stoich = dict(self._evaporation_stoich(species, sp_data))
-            o2_kg_hr = rate_kg_hr * float(
-                stoich.get('O2_per_product_kg') or 0.0
-            )
-            oxygen_destination = str(
-                stoich.get('oxygen_destination') or ''
-            )
-            vapor_oxygen_atoms = float(
-                formula.elements.get('O', 0.0) or 0.0
-            )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
-                source_mol_hr['O2'] = (
-                    source_mol_hr.get('O2', 0.0)
-                    + o2_kg_hr / o2_molar_mass
-                )
-        return source_mol_hr
+            if sp_data:
+                resolved_stoich[species] = self._evaporation_stoich(species, sp_data)
+        return _project_evaporation_overhead_source_mol_hr(
+            rates_kg_hr, resolved_stoich, self.species_formula_registry)
 
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
@@ -4160,11 +4355,32 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        canonical_species_order = species_order
+        if any(reaction.get('uptake_mol', 0.0) > 0.0 for reaction in
+               route_result.stage3_reactive_alkali_by_species.values()):
+            # Commit actual gas-side oxygen sources before reactions debit
+            # them. Allocation was computed from the complete parcel above;
+            # this only satisfies the ledger's per-transition no-overdraft
+            # invariant, including sources outside the default SiO-first order.
+            stoich_by_species = {
+                sp: self._evaporation_stoich(sp, (
+                    self.vapor_pressures.get('metals', {}).get(sp)
+                    or self.vapor_pressures.get('oxide_vapors', {}).get(sp) or {}))
+                for sp in species_order
+            }
+            source_species = {
+                sp for sp in species_order
+                if _project_evaporation_overhead_source_mol_hr(
+                    {sp: evap_flux.species_kg_hr[sp]}, stoich_by_species,
+                    self.species_formula_registry).get('O2', 0.0) > 0.0
+            }
+            species_order = tuple(sorted(species_order, key=lambda sp: sp not in source_species))
         residual_species_kg_hr = {
             species: max(0.0, float(rate_kg_hr) * phase_scalar)
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
         committed_species_kg_hr: dict[str, float] = {}
+        evaporation_transitions = {}
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
@@ -4179,9 +4395,11 @@ class EvaporationMixin:
                 route_result,
                 species,
                 rate_kg_hr,
+                apply_evaporative_redox_source_terms=False,
             )
             if route_outcome.get('evaporation_transition') is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
+                evaporation_transitions[species] = route_outcome['evaporation_transition']
             overhead_after_kg = float(
                 self.atom_ledger.kg_by_account('process.overhead_gas').get(
                     species, 0.0,
@@ -4198,6 +4416,22 @@ class EvaporationMixin:
             residual_species_kg_hr[species] = max(
                 0.0, overhead_after_kg - overhead_before_kg,
             )
+
+        # Premise: the finite-capacity redox clamp is sequential and nonlinear;
+        # ledger order can change when its bound is reached. Algebra: in general
+        # clamp(clamp(B + s1) + s2) != clamp(clamp(B + s2) + s1) when opposing
+        # carrier sources straddle a bound. Unit check: B and each s are mol O2
+        # equivalent. Limiting case: with one committed carrier this is the old
+        # single-transition result; with none, there is no redox update.
+        # Ledger commits may be reordered to prevent Stage-3 overdrafts, so
+        # apply each transition once after the loop in canonical carrier order.
+        for species in canonical_species_order:
+            transition = evaporation_transitions.get(species)
+            if transition is not None:
+                self._apply_evaporative_redox_source_terms(
+                    transition,
+                    exchange_direction='redox_source:evaporative_loss',
+                )
 
         self._apply_organic_tar_wall_deposit()
         self._sync_oxygen_kg_counters()
@@ -4507,11 +4741,17 @@ class EvaporationMixin:
                     getattr(route_result, 'condensation_authority_by_species', {})
                     .get(species, {})
                 ),
+                **({'stage3_reactive_alkali': dict(
+                    route_result.stage3_reactive_alkali_by_species[species])}
+                   if species in route_result.stage3_reactive_alkali_by_species else {}),
             },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
+                **({'stage3_reactive_alkali': dict(
+                    route_result.stage3_reactive_alkali_by_species[species])}
+                   if species in route_result.stage3_reactive_alkali_by_species else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
@@ -4522,7 +4762,7 @@ class EvaporationMixin:
                     segment.wall_deposit_account: (
                         float(segment.wall_temperature_C) + 273.15
                     )
-                    for segment in self.condensation_model.pipe_segments
+                    for segment in self.condensation_model.active_pipe_segments
                     if segment.name not in self.condensation_model.wall_temperature_input_refusals
                 },
                 'wall_alkali_binding_diagnostic_state_by_account': dict(
@@ -4539,6 +4779,9 @@ class EvaporationMixin:
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
+        reaction = dict(diagnostic.get('stage3_reactive_alkali') or {})
+        if reaction:
+            route_result.stage3_reactive_alkali_by_species[species] = reaction
         self._record_wall_deposit_delta(species, diagnostic)
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
@@ -4672,6 +4915,10 @@ class EvaporationMixin:
             if isinstance(state, Mapping)
         }
 
+    def _mark_overhead_na_origin_pool(self) -> None:
+        """Declare headspace sodium origins well-mixed for partial withdrawals."""
+        self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
+
     def _credit_evaporation_transition(
         self,
         species: str,
@@ -4779,6 +5026,9 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
+        # The well-mixed headspace makes Na origins indistinguishable;
+        # the ledger attributes partial gas withdrawals pro rata.
+        self._mark_overhead_na_origin_pool()
         if apply_evaporative_redox_source_terms:
             self._apply_evaporative_redox_source_terms(
                 transition,
@@ -4886,136 +5136,10 @@ class EvaporationMixin:
         return converted
 
     def _evaporation_stoich(self, species: str, sp_data: dict):
-        parent_oxide = sp_data.get('parent_oxide', '')
-        if not parent_oxide:
-            raise AccountingError(
-                f"vapor species {species!r} requires parent_oxide "
-                "metadata before ledger routing"
-            )
-
-        has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
-        has_o2 = sp_data.get('stoich_O2_per_vapor') is not None
-        if has_oxide or has_o2:
-            missing = []
-            if not has_oxide:
-                missing.append('stoich_oxide_per_vapor')
-            if not has_o2:
-                missing.append('stoich_O2_per_vapor')
-            if missing:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    f"missing explicit stoich metadata: {', '.join(missing)}"
-                )
-            oxide_per_product = float(sp_data['stoich_oxide_per_vapor'])
-            O2_per_product = float(sp_data['stoich_O2_per_vapor'])
-            if oxide_per_product <= 0.0:
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "requires positive stoich_oxide_per_vapor"
-                )
-            if not math.isclose(
-                oxide_per_product,
-                1.0 + O2_per_product,
-                rel_tol=1e-6,
-                abs_tol=1e-9,
-            ):
-                raise AccountingError(
-                    f"vapor species {species!r} from {parent_oxide!r} "
-                    "stoich metadata must conserve mass: "
-                    "stoich_oxide_per_vapor must equal "
-                    "1 + stoich_O2_per_vapor"
-                )
-            self._validate_evaporation_stoich_atoms(
-                parent_oxide,
-                species,
-                oxide_per_product,
-                O2_per_product,
-            )
-            return {
-                'parent_oxide': parent_oxide,
-                'oxide_per_product_kg': oxide_per_product,
-                'O2_per_product_kg': O2_per_product,
-                'oxygen_destination': sp_data.get('oxygen_destination'),
-            }
-
-        implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
-        if species != implied:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} requires "
-                "explicit stoich_oxide_per_vapor and stoich_O2_per_vapor; "
-                f"STOICH_RATIOS fallback only applies to elemental "
-                f"{implied!r}"
-            )
-        fallback = STOICH_RATIOS.get(parent_oxide)
-        if not fallback or fallback[0] <= 0:
-            raise AccountingError(
-                f"vapor species {species!r} from {parent_oxide!r} has no "
-                "valid elemental stoich fallback"
-            )
-        kg_product_per_kg_oxide, kg_O2_per_kg_oxide = fallback
-        oxide_per_product = 1.0 / kg_product_per_kg_oxide
-        O2_per_product = kg_O2_per_kg_oxide / kg_product_per_kg_oxide
-        if not math.isclose(
-            oxide_per_product,
-            1.0 + O2_per_product,
-            rel_tol=1e-6,
-            abs_tol=1e-9,
-        ):
-            raise AccountingError(
-                f"STOICH_RATIOS[{parent_oxide!r}] does not conserve mass"
-            )
-        self._validate_evaporation_stoich_atoms(
-            parent_oxide,
-            species,
-            oxide_per_product,
-            O2_per_product,
-        )
-        return {
-            'parent_oxide': parent_oxide,
-            'oxide_per_product_kg': oxide_per_product,
-            'O2_per_product_kg': O2_per_product,
-            'oxygen_destination': sp_data.get('oxygen_destination'),
-        }
-
-    def _validate_evaporation_stoich_atoms(
-        self,
-        parent_oxide: str,
-        product_species: str,
-        oxide_per_product_kg: float,
-        O2_per_product_kg: float,
-    ) -> None:
-        debit_atoms = self._atom_moles_for_kg(
-            parent_oxide, oxide_per_product_kg)
-        credit_atoms = defaultdict(float)
-        product_atoms = self._atom_moles_for_kg(product_species, 1.0)
-        for element, moles in product_atoms.items():
-            credit_atoms[element] += moles
-        if O2_per_product_kg >= 0.0:
-            oxygen_atoms = self._atom_moles_for_kg('O2', O2_per_product_kg)
-            for element, moles in oxygen_atoms.items():
-                credit_atoms[element] += moles
-        else:
-            oxygen_atoms = self._atom_moles_for_kg('O2', abs(O2_per_product_kg))
-            for element, moles in oxygen_atoms.items():
-                debit_atoms[element] = debit_atoms.get(element, 0.0) + moles
-
-        for element in set(debit_atoms) | set(credit_atoms):
-            debit = debit_atoms.get(element, 0.0)
-            credit = credit_atoms.get(element, 0.0)
-            if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
-                raise AccountingError(
-                    f"vapor species {product_species!r} from "
-                    f"{parent_oxide!r} stoich metadata does not conserve "
-                    f"{element} atoms"
-                )
+        return _evaporation_stoich(species, sp_data, self.species_formula_registry)
 
     def _atom_moles_for_kg(self, species: str, kg: float) -> dict:
-        if kg <= 0.0:
-            return {}
-        formula = resolve_species_formula(
-            species, self.species_formula_registry)
-        species_moles = float(kg) / formula.molar_mass_kg_per_mol()
-        return formula.atom_moles(species_moles)
+        return _atom_moles_for_kg(species, kg, self.species_formula_registry)
 
     def _project_condensed_stage_collection(
         self, route_result, species: str, credited_condensed_kg: float,
@@ -5029,6 +5153,12 @@ class EvaporationMixin:
         if intended_condensed_kg <= 1e-12:
             return
         scale = credited_condensed_kg / intended_condensed_kg
+        reaction = route_result.stage3_reactive_alkali_by_species.get(species, {})
+        reactive_vapor_kg = float(reaction.get('committed_vapor_kg', 0.0))
+        if reaction.get('uptake_mol', 0.0) > 0.0:
+            ordinary_intended_kg = intended_condensed_kg - route_result.condensed_by_stage_species.get(3, {}).get(species, 0.0)
+            scale = ((credited_condensed_kg - reactive_vapor_kg) / ordinary_intended_kg
+                     if ordinary_intended_kg > 1e-12 else 0.0)
         product_scale = {
             product: kg / credited_condensed_kg
             for product, kg in product_kg_by_species.items()
@@ -5040,7 +5170,11 @@ class EvaporationMixin:
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
-            if projected_kg <= 1e-12:
+            stage_products = (dict(reaction.get('committed_products_kg', {}))
+                              if stage_number == 3 and reaction.get('uptake_mol', 0.0) > 0.0
+                              else {product: projected_kg * fraction
+                                    for product, fraction in product_scale.items()})
+            if not any(kg > 1e-12 for kg in stage_products.values()):
                 continue
             stage_idx = collection_stage_index(
                 self.train, int(stage_number), species,
@@ -5054,8 +5188,7 @@ class EvaporationMixin:
                 .get(species, 0.0)
                 > 0.0
             )
-            for product, product_fraction in product_scale.items():
-                stage_product_kg = projected_kg * product_fraction
+            for product, stage_product_kg in stage_products.items():
                 if stage_product_kg <= 1e-12:
                     continue
                 delta_key = (int(stage.stage_number), product)

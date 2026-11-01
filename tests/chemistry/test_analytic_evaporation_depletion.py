@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 
 import pytest
 
 import simulator.chemistry.phase_context as phase_context_module
+from simulator.reduced_real_determinism import _authoritative_melt_fO2_log
+from simulator.engine_binding_admission import write_gate_curve_memo_record
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
@@ -22,6 +25,132 @@ def _flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
     flux = EvaporationFlux(species_kg_hr=dict(species_kg_hr))
     flux.update_totals()
     return flux
+
+
+@pytest.mark.parametrize("initial_fO2_log", [-2.1, -20.0])
+def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+    initial_fO2_log,
+):
+    results = []
+    for mode in ("single_canonical_reference", "canonical", "producer_first"):
+        sim = _build_sim(
+            "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data,
+            setpoints_data,
+        )
+        sim.melt.temperature_C = 1900.0
+        sim.melt.p_total_mbar = 10.0
+        monkeypatch.setattr(
+            sim, "_freeze_gate_curve_record",
+            lambda: write_gate_curve_memo_record(sim, {
+                "source": "test", "solidus_T_C": 1000.0,
+                "liquidus_T_C": 1700.0,
+                "path": ((1000.0, 0.0), (1700.0, 1.0)),
+            }, provider_outcome="produced"),
+        )
+        sim._refresh_oxygen_reservoir_without_exchange(
+            melt_intrinsic_fO2_log=initial_fO2_log,
+            reference_T_K=2173.15,
+        )
+        # A fixed tangent isolates batch integration from the capacity model.
+        # TiO releases gas O2 (negative source); Fe/Mg leave oxide oxygen in
+        # the buffer (positive sources). The first case crosses the ceiling.
+        monkeypatch.setattr(
+            sim, "_melt_redox_source_capacity_mol_per_ln_fO2",
+            lambda **kwargs: 1.0,
+        )
+        flux = _flux({"TiO": 0.01, "Fe": 1.0, "Mg": 0.01})
+        sim._configure_condensation_operating_conditions(flux)
+        route = sim.condensation_model.route
+
+        canonical_order = ("Mg", "Fe", "TiO")
+
+        def stage3_route(*args, **kwargs):
+            result = route(*args, **kwargs)
+            assert result.wall_route_species_order == canonical_order
+            if mode == "producer_first":
+                return replace(
+                    result,
+                    stage3_reactive_alkali_by_species={
+                        "Na": {"uptake_mol": 1.0},
+                    },
+                )
+            return result
+
+        committed = {}
+        applied = []
+        reader_values = []
+        dispatch = sim._dispatch_only
+        route_species = sim._route_evaporated_species_to_condensation
+        apply_redox = sim._apply_evaporative_redox_source_terms
+
+        def record_dispatch(*args, **kwargs):
+            # This is the same reader used by PT-0 quantized_controls.
+            reader_values.append(_authoritative_melt_fO2_log(sim))
+            return dispatch(*args, **kwargs)
+
+        def record_route(result, species, rate, **kwargs):
+            outcome = route_species(result, species, rate, **kwargs)
+            if outcome.get("evaporation_transition") is not None:
+                committed[species] = outcome["evaporation_transition"]
+            return outcome
+
+        def record_apply(transition, **kwargs):
+            applied.append(transition)
+            return apply_redox(transition, **kwargs)
+
+        monkeypatch.setattr(sim, "_dispatch_only", record_dispatch)
+        monkeypatch.setattr(sim, "_route_evaporated_species_to_condensation", record_route)
+        monkeypatch.setattr(sim, "_apply_evaporative_redox_source_terms", record_apply)
+        monkeypatch.setattr(sim.condensation_model, "route", stage3_route)
+        if mode == "single_canonical_reference":
+            # Independent orchestration: bypass the batch method under test,
+            # commit the fixed allocation, then invoke the unchanged clamp
+            # owner exactly once per carrier in canonical order.
+            result = stage3_route(flux, sim.melt)
+            for species in canonical_order:
+                record_route(
+                    result, species, flux.species_kg_hr[species],
+                    apply_evaporative_redox_source_terms=False,
+                )
+            for species in canonical_order:
+                record_apply(
+                    committed[species],
+                    exchange_direction="redox_source:evaporative_loss",
+                )
+        else:
+            sim._route_to_condensation(flux)
+            assert set(sim._ledger_committed_evap_flux_this_tick.species_kg_hr) == set(flux.species_kg_hr)
+        assert tuple(committed) == (
+            ("TiO", "Mg", "Fe") if mode == "producer_first" else canonical_order
+        )
+        assert sim._redox_source_terms_this_hr["redox_source:evaporative_oxygen_loss"] < 0.0
+        assert sim._redox_source_terms_this_hr["redox_source:evaporative_metal_loss"] > 0.0
+        results.append((
+            sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
+            sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0),
+            sim.atom_ledger.mol_by_account(),
+            committed, applied, reader_values,
+        ))
+
+    reference, canonical, producer_first = results
+    for result in (canonical, producer_first):
+        assert result[0] == pytest.approx(reference[0], rel=1e-14, abs=1e-14)
+        assert result[1] == pytest.approx(reference[1], rel=1e-14, abs=1e-14)
+        assert result[2].keys() == reference[2].keys()
+        for account in reference[2]:
+            assert result[2][account] == pytest.approx(
+                reference[2][account], rel=1e-14, abs=1e-14,
+            )
+    for _, _, _, committed, applied, reader_values in results:
+        assert len(applied) == len(committed) == 3
+        for transition in committed.values():
+            assert sum(item is transition for item in applied) == 1
+        assert [id(item) for item in applied] == [
+            id(committed[species]) for species in canonical_order
+        ]
+        assert len(reader_values) == 6  # evaporation + condensation per carrier
+        assert reader_values == [initial_fO2_log] * len(reader_values)
 
 
 def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(

@@ -34,6 +34,7 @@ import math
 import multiprocessing
 import os
 import re
+import selectors
 import signal
 import struct
 import subprocess
@@ -41,7 +42,7 @@ import tempfile
 import time
 import traceback
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
@@ -100,6 +101,10 @@ from simulator.environment import (
 from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.liquidus import (
+    DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+    EquilibriumCrystallizationPathResult,
+    LiquidFractionPathPoint,
+    _equilibrium_path_from_cooling,
     LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
@@ -112,6 +117,7 @@ from simulator.physical_constants import (
     PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -540,6 +546,7 @@ def _run_alphamelts_subprocess(
     text: bool = True,
     timeout: float,
     env: Mapping[str, str] | None = None,
+    interact=None,
 ) -> subprocess.CompletedProcess:
     if not capture_output:
         raise ValueError('AlphaMELTS subprocess requires captured output')
@@ -560,10 +567,13 @@ def _run_alphamelts_subprocess(
     timeout_error: subprocess.TimeoutExpired | None = None
     try:
         try:
-            stdout, stderr = process.communicate(
-                input=input,
-                timeout=execution_timeout_s,
-            )
+            if interact is None:
+                stdout, stderr = process.communicate(
+                    input=input,
+                    timeout=execution_timeout_s,
+                )
+            else:
+                stdout, stderr = interact(process, time.monotonic() + execution_timeout_s)
         except subprocess.TimeoutExpired as exc:
             try:
                 group_killed = _kill_alphamelts_process_group(process)
@@ -2101,6 +2111,211 @@ class _MELTSBackendSupport(MeltBackend):
             samples=result.samples,
             iterations=result.iterations,
             diagnostics=diagnostics_out,
+        )
+
+    def _parse_gate_cooling_row(
+        self, system_output, phase_output, *, temperature_C, pressure_bar, fO2_log,
+    ) -> LiquidFractionPathPoint:
+        lines = [line.split() for line in system_output.splitlines() if line.strip()]
+        header_index = next((i for i, row in enumerate(lines) if row[0] == 'index'), None)
+        if header_index is None:
+            raise ValueError('cooling path lacks system header')
+        headers = lines[header_index]
+        values = lines[-1]
+        if len(values) != len(headers) or values[0] == 'index':
+            raise ValueError('cooling path has no completed system row')
+        row = dict(zip(headers, values))
+        for field in ('Temperature', 'Pressure', 'mass', 'F', 'H', 'S', 'fO2(absolute)'):
+            if not math.isfinite(float(row[field])):
+                raise ValueError(f'cooling path non-finite {field}')
+        # Native tables print T/P to 0.01 and log10 fO2 to 0.001.
+        if (abs(float(row['Temperature']) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C
+                or abs(float(row['Pressure']) - pressure_bar) > .01
+                or not math.isclose(float(row['fO2(absolute)']), fO2_log, rel_tol=0,
+                                    abs_tol=ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10)):
+            raise ValueError('cooling path did not apply requested T/P/fO2')
+        phase_lines = phase_output.splitlines()
+        indices = [i for i, line in enumerate(phase_lines) if line.startswith('index ')]
+        if not indices:
+            raise ValueError('cooling path lacks phase row')
+        phase_block = '\n'.join(phase_lines[indices[-1]:])
+        phase_header = phase_lines[indices[-1]].split()
+        if (phase_header[1] != row['index']
+                or abs(float(phase_header[5]) - temperature_C) > ALPHAMELTS_SYSTEM_TABLE_T_TOLERANCE_C):
+            raise ValueError('cooling path system/phase rows disagree')
+        phases = self._parse_phase_main_output(phase_block)
+        instances = phases['phase_instances']
+        for phase in instances:
+            if not all(math.isfinite(float(phase[key])) for key in (
+                'enthalpy_J', 'entropy_J_K', 'solver_basis_mass_kg',
+            )) or phase['solver_basis_mass_kg'] < 0:
+                raise ValueError('cooling path invalid phase thermodynamics')
+        masses = {name: data['reference_mass_kg']
+                  for name, data in phases['phase_thermo'].items()}
+        total_mass = sum(masses.values())
+        fraction = float(row['F'])
+        try:
+            self._resolve_ok_liquid_fraction(
+                liquid_fraction=fraction, phase_masses_kg=masses,
+            )
+        except LiquidFractionInvalidError as exc:
+            raise ValueError('cooling path liquid fraction disagrees with phases') from exc
+        if (not 0 <= fraction <= 1
+                or abs(total_mass * 1000 - float(row['mass'])) > .001
+                or (melt_regime(liquid_fraction=fraction, epsilon=0) is MeltRegime.FROZEN
+                    and any(p['phase'] == 'liquid' for p in instances))):
+            raise ValueError('cooling path liquid fraction disagrees with phases')
+        return LiquidFractionPathPoint(
+            temperature_C, fraction, phases['phase_compositions'].get('liquid', {}),
+        )
+
+    def gate_cooling_path(
+        self, *, pressure_bar, fO2_log, composition_mol_by_account,
+        species_formula_registry, redox_state=None,
+    ) -> EquilibriumCrystallizationPathResult:
+        """Batch cooling with carried native state, stopping at liquid disappearance."""
+        if self._mode != 'subprocess':
+            return EquilibriumCrystallizationPathResult(status='unavailable')
+        fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
+        if redox_state is not None and redox_state.kind != 'absolute':
+            return EquilibriumCrystallizationPathResult(
+                status='unavailable', diagnostics={'reason': 'redox_state_not_expressible'},
+            )
+        if pressure_bar < ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED, f'{pressure_bar:g} bar',
+            )
+        start_T_C, stop_T_C, step_C = 2200, 400, 10
+        comp = self._composition_for_liquidus_finder(
+            composition_kg=None, composition_mol=None,
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_formula_registry,
+            pressure_bar=pressure_bar, fO2_log=fO2_log, min_T_C=stop_T_C,
+        )
+        if isinstance(comp, LiquidusSolidusResult):
+            return EquilibriumCrystallizationPathResult(
+                status=comp.status, warnings=comp.warnings, diagnostics=comp.diagnostics,
+            )
+        _, calc_mode = resolve_alphamelts_subprocess_model(self._model)
+        if os.environ.get('ALPHAMELTS_CALC_MODE', calc_mode) != calc_mode:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_CALC_MODE_MISMATCH, 'ambient calculation mode mismatch',
+            )
+        points = []
+        path_warnings = []
+        diagnostics = self._apply_engine_commissioning(
+            comp, temperature_C=start_T_C, pressure_bar=pressure_bar,
+            fO2_log=fO2_log, warnings=path_warnings,
+        ) or {}
+        # The existing aggregate ceiling is retained; each menu step also
+        # uses the existing subprocess timeout, clamped to the residual.
+        timeout_s = _validated_timeout_s(self._timeout_s)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            self._write_melts_file(root / 'input.melts', comp, start_T_C, pressure_bar,
+                                   fO2_path='Absolute', fO2_offset=fO2_log)
+            with (root / 'input.melts').open('a') as stream:
+                stream.write(f'Final Temperature: {stop_T_C}\nIncrement Temperature: {-step_C}\n'
+                             f'Final Pressure: {pressure_bar}\nIncrement Pressure: 0\n')
+            env = os.environ.copy()
+            env.update(ALPHAMELTS_CALC_MODE=calc_mode, ALPHAMELTS_RUN_MODE='isobaric',
+                       ALPHAMELTS_DELTAT=str(-step_C), ALPHAMELTS_MINT=str(stop_T_C),
+                       ALPHAMELTS_MAXT=str(start_T_C), ALPHAMELTS_CELSIUS_OUTPUT='true')
+
+            def interact(process, deadline):
+                outputs = {'stdout': '', 'stderr': ''}
+                with selectors.DefaultSelector() as selector:
+                    selector.register(process.stdout, selectors.EVENT_READ, 'stdout')
+                    selector.register(process.stderr, selectors.EVENT_READ, 'stderr')
+
+                    def menu(command=None):
+                        if command is not None:
+                            process.stdin.write(command)
+                            process.stdin.flush()
+                        chunk = ''
+                        step_deadline = min(deadline, time.monotonic() + timeout_s)
+                        while 'Your choice:' not in chunk:
+                            remaining = step_deadline - time.monotonic()
+                            if remaining <= 0:
+                                raise subprocess.TimeoutExpired(process.args, timeout_s)
+                            for key, _ in selector.select(remaining):
+                                data = os.read(key.fileobj.fileno(), 65536).decode(errors='replace')
+                                if not data:
+                                    raise ValueError('cooling process ended before completed row')
+                                outputs[key.data] += data
+                                if key.data == 'stdout':
+                                    chunk += data
+                        return chunk
+
+                    menu()
+                    menu('1\ninput.melts\n')
+                    completed_rows = 0
+                    for temperature in range(start_T_C, stop_T_C - 1, -step_C):
+                        # A continuation's first row repeats the current
+                        # equilibrium; two native rows advance exactly 10 C.
+                        output = menu('4\n1\n1\n' if not points else '4\n0\n2\n')
+                        if ('Successful return from alphamelts' not in output
+                                or self._subprocess_failure_reason(output)):
+                            raise ValueError('incomplete cooling path: native convergence failure')
+                        system_lines = (root / 'System_main_tbl.txt').read_text().splitlines()
+                        header = next((line for line in system_lines if line.startswith('index ')), None)
+                        if header is None:
+                            raise ValueError('cooling path lacks completed system output')
+                        rows = [line for line in system_lines if line.split() and line.split()[0].isdigit()]
+                        if len(rows) - completed_rows != (2 if points else 1):
+                            raise ValueError('cooling path missing completed rows')
+                        completed_rows = len(rows)
+                        # A resumed path writes the carried row again before
+                        # advancing. Check BOTH completed rows, including H/S.
+                        new_rows = rows[-(2 if points else 1):]
+                        phase_blocks = re.split(r'(?m)(?=^index )',
+                                                (root / 'Phase_main_tbl.txt').read_text())
+                        blocks = {block.split()[1]: block for block in phase_blocks
+                                  if block.startswith('index ')}
+                        for index, row in enumerate(new_rows):
+                            expected_T = points[-1].temperature_C if points and index == 0 else temperature
+                            point = self._parse_gate_cooling_row(
+                                header + '\n' + row, blocks[row.split()[0]],
+                                temperature_C=expected_T, pressure_bar=pressure_bar, fO2_log=fO2_log,
+                            )
+                        if not points and melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is not MeltRegime.MOLTEN:
+                            raise ValueError('cooling start is not superliquidus')
+                        points.append(point)
+                        if melt_regime(liquid_fraction=point.liquid_fraction, epsilon=0) is MeltRegime.FROZEN:
+                            break
+                    process.stdin.write('x\n')
+                    process.stdin.flush()
+                    stdout, stderr = process.communicate(timeout=max(.001, deadline-time.monotonic()))
+                    return outputs['stdout'] + stdout, outputs['stderr'] + stderr
+
+            try:
+                result = _run_alphamelts_subprocess(
+                    [str(self._binary_path or self._engine_path), '1'], cwd=tmpdir,
+                    input='', env=env, timeout=DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
+                    interact=interact,
+                )
+                if (result.returncode != 0 or not points
+                        or melt_regime(liquid_fraction=points[-1].liquid_fraction, epsilon=0) is not MeltRegime.FROZEN):
+                    raise ValueError('incomplete cooling path: no checked solidus')
+            except (ValueError, OSError, IndexError, KeyError, subprocess.TimeoutExpired) as exc:
+                return EquilibriumCrystallizationPathResult(
+                    status='not_converged', warnings=(*path_warnings, str(exc)),
+                    diagnostics={**diagnostics,
+                                 'reason': ('timeout' if isinstance(exc, subprocess.TimeoutExpired)
+                                            else 'incomplete_cooling_path'),
+                                 'last_completed_temperature_C': points[-1].temperature_C if points else None,
+                                 'completed_rows': len(points)},
+                )
+        bounds = _equilibrium_path_from_cooling(tuple(points), step_C=step_C)
+        if bounds.status != 'ok':
+            return bounds
+        diagnostics.update(bounds.diagnostics)
+        if 'accepted, but non-optimal' in result.stdout:
+            diagnostics['numerical_path_warning'] = 'accepted, but non-optimal equilibria'
+        return replace(
+            bounds, diagnostics=diagnostics,
+            warnings=(*path_warnings, *((diagnostics['numerical_path_warning'],)
+                                      if 'numerical_path_warning' in diagnostics else ())),
         )
 
     def _unapplied_absolute_fo2_result(

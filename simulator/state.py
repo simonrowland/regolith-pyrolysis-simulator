@@ -20,6 +20,7 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     K_TRAP_SUB_ORDER,
     NA_COLLECTOR_STAGE_KEY,
+    STAGE3_BYPASS_SEGMENT_NAME,
     target_species_for_stage_key,
     target_species_for_stage_number,
 )
@@ -722,7 +723,7 @@ class CondensationStage:
 PIPE_SEGMENT_NAMES = tuple(
     f'stage_{stage_number}_to_stage_{stage_number + 1}'
     for stage_number in range(7)
-)
+) + (STAGE3_BYPASS_SEGMENT_NAME,)
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX = 'process.wall_deposit_segment_'
 PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS = tuple(
     f'{PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX}{name}'
@@ -846,6 +847,16 @@ class CondensationTrain:
     after devolatilisation.
     """
     stages: List[CondensationStage] = field(default_factory=list)
+
+    # Ideal isolation of both ends of the fused-silica cartridge.
+    collection_route: dict[str, Any] = field(
+        default_factory=lambda: {"stage3_route": "divert"})
+
+    @property
+    def active_stages(self) -> List[CondensationStage]:
+        return [stage for stage in self.stages
+                if stage.stage_number != 3
+                or self.collection_route["stage3_route"] == "through"]
 
     # Volatiles train (sealed after C0/C0b)
     volatiles_collected_kg: Dict[str, float] = field(default_factory=dict)
@@ -1114,6 +1125,7 @@ class HourSnapshot:
     mre_declared_rung_V: float = 0.0
     mre_current_A: float = 0.0  # Effective Faradaic current, never nominal dispatch
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
+    mre_decomposition_voltage_status_by_oxide: Dict[str, str] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
     metal_phase_stratification: Dict[str, Any] = field(default_factory=dict)

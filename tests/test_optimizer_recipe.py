@@ -368,6 +368,7 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
             {
                 "campaigns": {
                     "C5": {
+                        **yaml.safe_load(SETPOINTS_PATH.read_text())["campaigns"]["C5"],
                         "allow_mre_voltage_cap_upper_bound_V": high,
                     }
                 },
@@ -599,10 +600,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
     assert unpinned is schema
-    assert len(paths) == 65
+    # c3: four per-substage route controls extend the 65-dimensional search.
+    assert len(paths) == 69
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
+        == "9b36f69e58eeb0f8662c2b6ab62c537d8ca0dda65a1b1927b2afb33006216b0d"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -1744,6 +1746,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # difference between two moving numbers, written down as a constant, goes
     # stale every time either moves. It is now evaluated, not pinned. Recomputed
     # 2026-09-29 for C2 loader-scalar pressure coupling.
+    # c3 route controls and engineering provenance move the schema bounds digest.
     assert (
         first.recipe_id()
                 == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"

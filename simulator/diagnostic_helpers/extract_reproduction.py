@@ -4349,7 +4349,7 @@ def _evaluate_ordering(
         metrics: dict[str, float] = {}
         refusals: dict[str, str] = {}
         needed = {s for pair in engine_pairs for s in pair}
-        for species in needed:
+        for species in sorted(needed, key=str):
             value, refusal, _rt = _engine_species_rank_metric(
                 species, T_K, diagnostic_pO2, vp, melt_recipe
             )

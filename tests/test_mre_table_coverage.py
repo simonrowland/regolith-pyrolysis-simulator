@@ -123,18 +123,8 @@ def test_static_fallback_table_excludes_ferric_full_reduction_rung() -> None:
 def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
     assert set(MRE_DECOMP_VOLTAGE_PROVENANCE) == set(DECOMP_VOLTAGES)
 
-    graph_promoted = {
-        "NiO",
-        "Na2O",
-        "K2O",
-        "FeO",
-        "Cr2O3",
-        "SiO2",
-        "TiO2",
-        "Al2O3",
-        "MgO",
-        "CaO",
-    }
+    graph_promoted = {"Na2O", "FeO", "SiO2"}
+    graph_diagnostic = {"NiO", "K2O", "Cr2O3", "TiO2", "Al2O3", "MgO", "CaO", "MnO"}
     for oxide, voltage in DECOMP_VOLTAGES.items():
         row = MRE_DECOMP_VOLTAGE_PROVENANCE[oxide]
         n_e = ELECTRONS_PER_OXIDE[oxide]
@@ -155,13 +145,13 @@ def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
             assert row["standard_voltage_status"] == "ok"
             assert row["delta_g_relation"] == "DeltaG_dissoc = -E*4F"
         else:
-            if oxide == "MnO":
+            if oxide in graph_diagnostic:
                 assert row["standard_voltage_authority"] == "ellingham_graph"
                 assert row["standard_voltage_authoritative"] is False
                 assert row["status"] == "diagnostic_ellingham_graph"
-                assert row["standard_voltage_status"] == (
-                    "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
-                )
+                assert "out_of_domain:" in row["standard_voltage_status"]
+                assert "authority_level=" in row["standard_voltage_status"]
+                assert "certified_band_K=" in row["standard_voltage_status"]
                 assert row["delta_g_relation"] == "DeltaG_dissoc = -E*4F"
             else:
                 assert row["standard_voltage_V"] == pytest.approx(voltage)
@@ -181,11 +171,11 @@ def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
         "NiO": 0.386419,
         "FeO": 0.804340,
         "MnO": 1.254731,
-        "Cr2O3": 1.118868,
+        "Cr2O3": 1.059135,
         "SiO2": 1.491058,
-        "TiO2": 1.575521,
+        "TiO2": 1.555530,
         "MgO": 1.792604,
-        "Al2O3": 1.857324,
+        "Al2O3": 1.824432,
         "CaO": 2.208316,
     }
 
@@ -202,9 +192,10 @@ def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
         if oxide == "MnO":
             assert rung["voltage_authority"] == "ellingham_graph"
             assert rung["voltage_authoritative"] is False
-            assert rung["voltage_status"] == (
+            assert rung["voltage_status"].startswith(
                 "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
             )
+            assert "unresolved_standard_state" in rung["voltage_status"]
         else:
             assert rung["voltage_authority"] == "ellingham_graph"
 

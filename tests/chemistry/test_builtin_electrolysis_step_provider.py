@@ -1288,7 +1288,7 @@ def test_kress91_diagnostic_is_golden_neutral_for_provider_transition(
     assert "FeO" in direct_low.transition.credits["process.cleaned_melt"]
 
 
-def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
+def test_mre_current_partition_predicts_uncertified_multi_oxide_yield(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -1326,11 +1326,11 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
     )
     diagnostic = dict(result.diagnostic or {})
 
-    assert result.status == "refused"
-    assert result.transition is None
-    assert not {
-        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
-    }.intersection(diagnostic)
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert all(abs(net) < 1e-9 for net in result.transition.atom_balance_proof.values())
+    assert diagnostic["O2_produced_mol"] > 0
+    assert diagnostic["energy_kWh"] == pytest.approx(2.0)
     assert diagnostic["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
     assert diagnostic["mre_optional_banner"] == MRE_OPTIONAL_BANNER
     assert diagnostic["certification_evidence_class"] == MRE_CERTIFICATION_EVIDENCE_CLASS
@@ -1341,8 +1341,12 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
     assert diagnostic["current_partition_certified"] is False
     assert diagnostic["yield_certification"] == "uncertified_current_partition"
     assert "heuristic" in diagnostic["current_partition_source"]
-    assert diagnostic["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    assert set(diagnostic["reducible_oxide_targets"]) == {
+    assert "reason_refused" not in diagnostic
+    notice = diagnostic["notices"][0]
+    assert notice["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {"oxide_to_metal_target_count": (0, 1)}
+    assert set(notice["reducible_oxide_targets"]) == {
         "Cr2O3",
         "FeO",
         "MnO",
@@ -1369,13 +1373,13 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
         T_C=1600.0,
         pO2_bar=1e-6,
     )
-    assert not {
-        "oxides_reduced_mol", "metals_produced_mol", "O2_produced_mol", "energy_kWh",
-    }.intersection(legacy)
+    assert set(legacy["oxides_reduced_mol"]) == set(diagnostic["oxides_reduced_mol"])
+    assert all(value > 0 for value in legacy["oxides_reduced_mol"].values())
+    assert legacy["energy_kWh"] == pytest.approx(diagnostic["energy_kWh"])
     assert legacy["mre_north_star_posture"] == MRE_NORTH_STAR_POSTURE
     assert legacy["certification_allowed"] is False
     assert legacy["certification_denylist_reason"] == MRE_CERTIFICATION_DENYLIST_REASON
-    assert legacy["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+    assert legacy["notices"] == diagnostic["notices"]
 
 
 def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(

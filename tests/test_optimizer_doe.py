@@ -50,7 +50,8 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [59, 65] * 4
+    # c3 adds the four per-substage Stage-3 route controls to both subspaces.
+    assert [len(item.patch.values) for item in batch] == [63, 69] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]

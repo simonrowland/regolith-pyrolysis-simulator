@@ -56,9 +56,9 @@ from engines.builtin.metallothermic_step import (
 )
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
-    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
 )
 from simulator.chemistry.ellingham_thermo import (
+    _na_activity_reference_standard_delta_g_kj_per_mol_o2,
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_delta_g_kj_per_mol_o2,
@@ -245,7 +245,8 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
     limited = authority["extrapolated_beyond_fit_range_K"]["Na/TiO2"][
         "limited_species"
     ]
-    assert set(limited) == {"Na", "Ti"}
+    # Na-013 now grounds Na through 3000 K; Ti still ends at 2600 K.
+    assert set(limited) == {"Ti"}
 
 
 def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
@@ -271,7 +272,7 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
     # one-sided limit without a finite-offset probe.
     alpha_na2o_segment = next(
         segment
-        for segment in ellingham_fit_segments("Na")
+        for segment in reversed(ellingham_fit_segments("Na"))
         if "Na2O(alpha)" in segment.phase_basis
     )
     melting_temperature_K = 1405.2
@@ -292,19 +293,18 @@ def test_na_metallothermic_standard_gibbs_matches_liquid_activity_reference():
         abs=1e-3,
     )
 
-    # Keep the existing green-path discontinuity explicit until physics ticket
-    # b-959 reconciles the liquid fit at/above Tm with the JANAF alpha limit.
+    # b-959: JANAF alpha and liquid standard potentials coexist at Tm.
     liquid_delta_g_at_tm = ellingham_delta_g_kj_per_mol_o2(
         "Na",
         melting_temperature_K,
     )
     assert liquid_delta_g_at_tm - alpha_delta_g_at_tm == pytest.approx(
-        1.3262736,
+        0.0,
         abs=1e-6,
     )
 
 
-def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
+def test_na_standard_state_at_and_above_melting_uses_janaf_ellingham_owner():
     melting_temperature_C = 1405.2 - CELSIUS_TO_KELVIN_OFFSET
     for temperature_C in (
         melting_temperature_C,
@@ -325,11 +325,11 @@ def test_na_standard_state_at_and_above_melting_keeps_ellingham_path():
         )
         if temperature_C == 1150.0:
             assert diagnostic["standard_deltaG"]["Na2O"] == pytest.approx(
-                -371.612616
+                -372.763965
             )
 
 
-def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
+def test_na_feo_margin_at_1181_5_c_reflects_janaf_liquid_reground():
     _priority, diagnostic = (
         BuiltinMetallothermicStepProvider._na_thermo_priority(
             ("FeO",),
@@ -338,7 +338,7 @@ def test_na_feo_crossover_margin_at_1181_5_c_keeps_green_value():
         )
     )
     assert diagnostic["margin"]["FeO"] == pytest.approx(
-        -0.001828,
+        0.7894134,
         abs=1e-6,
     )
 
@@ -699,12 +699,12 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 
 def test_reduction_margin_kj_per_mol_o2_uses_ellingham_difference():
     # Margin under the JANAF-4th multiphase Ellingham re-ground:
-    # Na/FeO @ 1150 C = +11.1 kJ/mol O2.
+    # Na-013 liquid rows put Na/FeO @ 1150 C at +12.24 kJ/mol O2.
     provider = BuiltinMetallothermicStepProvider()
 
     margin = provider._reduction_margin_kj_per_mol_o2("Na", "FeO", 1150.0)
 
-    assert margin == pytest.approx(11.1, abs=0.1)
+    assert margin == pytest.approx(12.24, abs=0.1)
 
 
 def test_crossover_temperature_C_reports_physical_roots_only():
@@ -728,7 +728,7 @@ def test_crossover_temperature_C_has_single_runtime_helper():
     assert source.count("def _crossover_temperature_C(") == 1
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "Na", "Fe"
-    ) == pytest.approx(1181.5, abs=0.5)
+    ) == pytest.approx(1184.0, abs=0.5)
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "K", "Fe"
     ) == pytest.approx(836.25, abs=0.5)
@@ -1339,14 +1339,21 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         additives_kg={"Na": 30.0},
     )
     _prepare_stranded_staged_na_hold(sim)
+    crossover_C = BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "Na", "Fe"
+    )
+    assert crossover_C is not None
+    # Keep this synthetic window subdegree as the source-grounded root moves.
+    first_liquid_C = crossover_C - 0.3
+    liquidus_C = crossover_C - 0.1
     curve = {
         "source": "test:reviewer-subdegree-na-fe-window",
         "solidus_T_C": 1100.0,
-        "liquidus_T_C": 1181.4,
+        "liquidus_T_C": liquidus_C,
         "path": (
             (1100.0, 0.0),
-            (1181.2, 0.0),
-            (1181.4, 0.1),
+            (first_liquid_C, 0.0),
+            (liquidus_C, 0.1),
         ),
     }
     monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
@@ -1359,14 +1366,14 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         "solved boundaries plus curve sample knots"
     )
     assert diagnostic["first_positive_liquid_temperature_C"] == pytest.approx(
-        1181.2,
+        first_liquid_C,
         abs=diagnostic["boundary_tolerance_C"],
     )
     assert diagnostic["joint_window_T_min_exclusive_C"] == (
         diagnostic["first_positive_liquid_temperature_C"]
     )
     assert any(
-        row["temperature_C"] == pytest.approx(1181.4)
+        row["temperature_C"] == pytest.approx(liquidus_C)
         and row["status"] == "ok"
         for row in diagnostic["rows"]
     )
@@ -1374,7 +1381,7 @@ def test_staged_na_fe_hold_solves_subdegree_joint_window(
         diagnostic,
         configured_temperature_C=1250.0,
     )
-    assert 1181.2 < selected["temperature_C"] < 1181.5
+    assert first_liquid_C < selected["temperature_C"] < crossover_C
     assert selected["liquid_fraction"] > 0.0
 
 
@@ -1836,7 +1843,7 @@ def test_empty_na_targets_dispatch_reduces_nothing_not_default_set(
     assert result.transition is None
 
 
-def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(
+def test_c3_na_shuttle_returns_na2o_to_cleaned_melt(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -1853,11 +1860,78 @@ def test_c3_na_shuttle_returns_na2o_to_spent_reductant_residue(
 
     assert result.status == "ok"
     assert result.transition is not None
-    assert result.transition.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] > 0.0
+    assert result.transition.credits["process.cleaned_melt"]["Na2O"] > 0.0
+    assert SPENT_REDUCTANT_RESIDUE_ACCOUNT not in result.transition.credits
+    assert result.diagnostic["cleaned_melt_account"] == "process.cleaned_melt"
     assert "Na2O" not in result.transition.credits.get(
         "process.reagent_inventory", {}
     )
-    assert "Na2O" not in result.transition.credits.get("process.cleaned_melt", {})
+
+
+def test_c3_na_shuttle_bakes_out_reaction_product_after_native_na2o(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data,
+        setpoints_data, additives_kg={"Na": 12.0},
+    )
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.record.path = "A_staged"
+    sim.melt.temperature_C = 1150.0
+    ledger = sim.atom_ledger
+    native_na2o_kg = ledger.kg_by_account("process.cleaned_melt")["Na2O"]
+    initial_na_mol = sum(
+        ledger.atom_moles_by_account(account).get("Na", 0.0)
+        for account in ledger.mol_by_account()
+    )
+    reagent_na_before = ledger.mol_by_account("process.reagent_inventory")["Na"]
+
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+
+    assert ledger.origin_attribution_methods_by_account()["process.cleaned_melt"]["Na"] == "pool_ratio"
+    na_dosed_mol = reagent_na_before - ledger.mol_by_account(
+        "process.reagent_inventory"
+    )["Na"]
+    assert na_dosed_mol > 0.0
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 0.2
+    sp_data = sim.vapor_pressures["metals"]["Na"]
+    stoich = sim._evaporation_stoich("Na", sp_data)
+    native_na_kg = native_na2o_kg / stoich["oxide_per_product_kg"]
+    _, native_transition = sim._credit_evaporation_transition(
+        "Na", native_na_kg, 0.0, sp_data, return_transition=True,
+    )
+    assert native_transition is not None
+
+    # Independent atom balance: 2 Na + FeO -> Na2O + Fe, then
+    # Na2O -> 2 Na(g) + 1/2 O2. Every dosed Na atom must be recoverable.
+    na_kg = na_dosed_mol * MOLAR_MASS["Na"] / 1000.0
+    o2_before = ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+    captured_before = ledger.mol_by_account("process.condensation_train")["Na"]
+    _, transition = sim._credit_evaporation_transition(
+        "Na", na_kg, 0.0, sp_data, return_transition=True,
+    )
+
+    assert transition is not None
+    transition.validate_conservation(sim.species_formula_registry)
+    assert ledger.mol_by_account("process.condensation_train")["Na"] == pytest.approx(
+        captured_before + na_dosed_mol
+    )
+    assert ledger.mol_by_account("reservoir.fo2_buffer")["O2"] - o2_before == pytest.approx(
+        na_dosed_mol / 4.0
+    )
+    assert ledger.mol_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(0.0, abs=1e-10)
+    assert ledger.mol_by_account(SPENT_REDUCTANT_RESIDUE_ACCOUNT).get(
+        "Na2O", 0.0
+    ) == 0.0
+    assert sum(
+        ledger.atom_moles_by_account(account).get("Na", 0.0)
+        for account in ledger.mol_by_account()
+    ) == pytest.approx(initial_na_mol)
+    ledger.assert_balanced()
 
 
 def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(

@@ -640,7 +640,7 @@ class ExtractionMixin:
         if not union_species:
             return {}
         drift: Dict[str, float] = {}
-        for species in union_species:
+        for species in sorted(union_species, key=str):
             total_projected_kg = self._condensed_species_projected_kg(species)
             tracked_metal_kg = metal_projection_by_species.get(species, 0.0)
             projected_train_kg = max(
@@ -669,7 +669,7 @@ class ExtractionMixin:
                 for key in metal_projection_by_route
                 if key[0] == species
             }
-            for key in route_keys:
+            for key in sorted(route_keys, key=lambda item: (item[0], item[1])):
                 raw_ledger_kg = self._stage_routed_metal_ledger_kg.get(
                     key, 0.0
                 )
@@ -1002,7 +1002,7 @@ class ExtractionMixin:
         a sorted list of ``{voltage, species, min_hold_hours}`` dicts,
         or an empty list if YAML is missing / malformed / empty after
         filtering. The caller falls back to
-        ``_MRE_VOLTAGE_LADDER_FALLBACK`` on empty.
+        ``mre_ladder.build_mre_voltage_sequence`` on empty.
 
         Parsing is conservative — any individual unparseable entry is
         skipped rather than crashing the whole sequence. Defensive
@@ -1020,22 +1020,6 @@ class ExtractionMixin:
         return mre_ladder.coerce_mre_decomposition_voltage(value)
 
     # 0.5.4.1 B5 (CW1 historical-audit closure, 2026-05-28):
-    # canonical FALLBACK ladder used by ``_build_mre_voltage_sequence``
-    # when ``setpoints['mre_voltage_sequence']['sequence']`` is missing
-    # or unparseable. Pre-B5 this list was inline and the YAML
-    # ``data/setpoints.yaml § mre_voltage_sequence.sequence`` block
-    # documented the same data but was never read — operators
-    # tweaking the YAML saw zero effect. B5 wires the YAML through,
-    # so this alias is now the canonical runtime fallback, NOT an
-    # independent golden or ground-truth data source.
-    _MRE_VOLTAGE_LADDER_FALLBACK = mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK
-
-    # Default ``min_hold_hours`` per species used when YAML doesn't
-    # carry an explicit value. Sourced from the same fallback ladder
-    # above (so YAML-without-hours behaves identically to the fallback
-    # for those species). For species the YAML adds but the fallback
-    # doesn't cover (e.g., Na2O / K2O in the published YAML), the
-    # default below applies.
     _MRE_DEFAULT_MIN_HOLD_HOURS = mre_ladder.MRE_DEFAULT_MIN_HOLD_HOURS
 
     def _build_mre_voltage_sequence(self) -> list:
@@ -1047,7 +1031,7 @@ class ExtractionMixin:
 
         - If the YAML block is present and at least one entry parses
           cleanly, return the YAML-derived ladder.
-        - Otherwise fall back to ``_MRE_VOLTAGE_LADDER_FALLBACK``.
+        - Otherwise fall back to ``mre_ladder.build_mre_voltage_sequence``.
 
         YAML schema (per ``data/setpoints.yaml § mre_voltage_sequence
         .sequence``): each entry has ``species`` (single string),
@@ -1365,6 +1349,8 @@ class ExtractionMixin:
                     species, {}
                 )
             )
+            if species == 'Na':
+                self._mark_overhead_na_origin_pool()
             credited_condensed_kg = self._dispatch_condensation_route(
                 species,
                 condensed_kg,
@@ -1436,6 +1422,8 @@ class ExtractionMixin:
         from simulator.mre_reproduction import PlantMREIntervalControl
 
         mre_diagnostic_state_before_step = {
+            'voltage_status_by_oxide': dict(
+                getattr(self, '_mre_decomposition_voltage_status_by_oxide', {}) or {}),
             'uncertified_yield': dict(
                 getattr(self, '_mre_uncertified_yield', {}) or {}),
             'ellingham_ladder_diagnostic': dict(
@@ -1453,6 +1441,7 @@ class ExtractionMixin:
                 None,
             ),
         }
+        self._mre_decomposition_voltage_status_by_oxide = {}
         self._mre_uncertified_yield = {}
         self._mre_ellingham_ladder_diagnostic = {}
         if (
@@ -1484,6 +1473,8 @@ class ExtractionMixin:
                 self.melt, 'mre_c5_ladder_complete', False),
             'melt_declared_rung_V': getattr(
                 self.melt, 'mre_declared_rung_V', 0.0),
+            'voltage_status_by_oxide': dict(
+                mre_diagnostic_state_before_step['voltage_status_by_oxide']),
             'uncertified_yield': dict(
                 mre_diagnostic_state_before_step['uncertified_yield']),
             'ellingham_ladder_diagnostic': dict(
@@ -1795,6 +1786,8 @@ class ExtractionMixin:
                 control.diagnostic_state_before_dispatch)
         else:
             mre_diagnostic_state_before_step = {
+                'voltage_status_by_oxide': dict(
+                    getattr(self, '_mre_decomposition_voltage_status_by_oxide', {}) or {}),
                 'uncertified_yield': dict(
                     getattr(self, '_mre_uncertified_yield', {}) or {}),
                 'ellingham_ladder_diagnostic': dict(
@@ -1812,6 +1805,7 @@ class ExtractionMixin:
                     None,
                 ),
             }
+            self._mre_decomposition_voltage_status_by_oxide = {}
             self._mre_uncertified_yield = {}
             self._mre_ellingham_ladder_diagnostic = {}
 
@@ -1888,6 +1882,9 @@ class ExtractionMixin:
             fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._mre_decomposition_voltage_status_by_oxide = dict(
+            diagnostic.get('mre_decomposition_voltage_status_by_oxide') or {}
+        )
         self._mre_effective_voltage_margin_V_by_oxide = dict(
             diagnostic.get('mre_effective_voltage_margin_V_by_oxide') or {}
         )
@@ -1909,8 +1906,11 @@ class ExtractionMixin:
 
         produced_metals = set(result.get('metals_produced_kg', {}) or {})
         produced_metals.update(result.get('metals_produced_mol', {}) or {})
-        produced_gases = set(result.get('gas_products_produced_kg', {}) or {})
-        produced_gases.update(result.get('gas_products_produced_mol', {}) or {})
+        produced_gases = sorted(
+            set(result.get('gas_products_produced_kg', {}) or {})
+            | set(result.get('gas_products_produced_mol', {}) or {}),
+            key=str,
+        )
         metal_before_kg = {
             metal: self._ledger_account_species_kg(
                 'process.metal_phase', metal)
@@ -1974,6 +1974,8 @@ class ExtractionMixin:
                 if is_plant
                 else mre_diagnostic_state_before_step
             )
+            self._mre_decomposition_voltage_status_by_oxide = dict(
+                restore_state['voltage_status_by_oxide'])
             self._mre_uncertified_yield = dict(
                 restore_state['uncertified_yield'])
             self._mre_ellingham_ladder_diagnostic = dict(
@@ -2022,7 +2024,7 @@ class ExtractionMixin:
         # destinations stay in process.metal_phase; only true condenser
         # destinations receive a stage UI projection.
         mre_metal_deltas_kg: Dict[str, float] = {}
-        for metal in produced_metals:
+        for metal in sorted(produced_metals, key=str):
             delta_kg = (
                 self._ledger_account_species_kg(
                     'process.metal_phase', metal)
@@ -2844,7 +2846,7 @@ class ExtractionMixin:
         Stoichiometry (TiO₂ reaction):
             91.95 g Na + 79.87 g TiO₂ → 123.96 g Na₂O + 47.87 g Ti
             1 kg Na → 0.869 kg TiO₂ reduced
-                    → 1.348 kg melt-resident spent-residue Na₂O
+                    → 1.348 kg dissolved Na₂O in the cleaned melt
                     → 0.521 kg Ti produced
 
         Na₂O solubility limit: 8-12 wt% in the silicate melt.
@@ -2911,6 +2913,9 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        # As for K and Mg, dissolved feedstock/reagent Na is well mixed;
+        # partial bakeout withdrawals retain their live origin proportions.
+        self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('Na',))
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,

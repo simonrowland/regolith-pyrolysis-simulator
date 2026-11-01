@@ -66,6 +66,7 @@ from simulator.campaigns import (
     CampaignPressureSetpointRefusal,
     CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
+    parse_campaign_override_value,
 )
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
@@ -2867,6 +2868,9 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
+    voltage_status = snapshot.mre_decomposition_voltage_status_by_oxide
+    if voltage_status:
+        summary["mre_decomposition_voltage_status_by_oxide"] = dict(voltage_status)
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {
@@ -5613,20 +5617,20 @@ def _parse_runtime_campaign_overrides_json(
     raw_json: str | None,
     *,
     flag_name: str,
-) -> dict[str, dict[str, float]] | None:
+) -> dict[str, dict[str, Any]] | None:
     if raw_json is None:
         return None
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise RunnerError(f"{flag_name} must decode to an object")
-    parsed: dict[str, dict[str, float]] = {}
+    parsed: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise RunnerError(
                 f"{flag_name}[{campaign!r}] must decode to an object"
             )
         parsed[str(campaign)] = {
-            str(field): float(value)
+            str(field): parse_campaign_override_value(str(field), value)
             for field, value in fields.items()
         }
     return parsed
@@ -6500,7 +6504,12 @@ def main(argv: Optional[list[str]] = None) -> int:
             )
             f.write("\n")
 
-    return 0 if result["status"] not in {"failed", "refused"} else 1
+    exit_code = 0 if result["status"] not in {"failed", "refused"} else 1
+    if exit_code:
+        message = str(result.get("error_message") or result.get("reason") or "")
+        message = " ".join(message.splitlines())
+        print(f"{result['status']}: {message}", file=sys.stderr)
+    return exit_code
 
 
 def build_sio_yield_arg_parser() -> argparse.ArgumentParser:

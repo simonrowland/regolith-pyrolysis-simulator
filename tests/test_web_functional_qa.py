@@ -436,7 +436,8 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Regression: WEBQA-001 — terminal UI hid the feedstock-to-product story.
 # Found by /qa on 2026-07-19
 # Report: docs-private/research/2026-07-19-webqa/report.md
-# Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
+# Nightly campaign-length path: car 1 used 352 s CPU vs green at about 298 s;
+# C2A rose from 103 to 158 s after c3's Stage-3 admission and rerouting.
 @pytest.mark.nightly
 def test_headless_full_run_ledgers_and_product_story_web(
     headless_full_run_product_story,
@@ -590,20 +591,9 @@ def test_headless_full_run_ledgers_and_product_story_web(
         float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
         for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # Stage 4 now captures Na/Mg at 250 C and K at 40 C. That changes per-hour
-    # alkali capture and the later pressure-limited reduction trajectory: the
-    # independent runner and web paths both move Cr2O3 from 3.3280300206015765
-    # to 3.3283236817361845 kg, while Cr-equivalent terminal offgas moves from
-    # 9.216286830238766e-06 to 0.1824367962875407 kg and extracted Cr falls
-    # from 0.18 to 0 kg. The Cr2O3 delta is 0.000293661134608 kg; dividing by
-    # the old residual gives 8.8239e-5 (dimensionless); kg cancel in that
-    # ratio. In the limiting case of
-    # unchanged alkali capture, the late reduction trajectory and delta return
-    # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
-    # d-137 rounds 5-7 (per-strip piecewise capture solution) move this by
-    # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
-    # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
-    # solver's per-call differences at <=1.1e-7 kg.
+    # d-137's Stage-4 split and per-strip Stage-2 capture interact with
+    # car1's flagged CrO proxy; the product pins below are regenerated from
+    # the merged production inventory.
     assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
     assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
@@ -614,11 +604,31 @@ def test_headless_full_run_ledgers_and_product_story_web(
         cr_ingot_kg, abs=0.005
     )
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
-        0.0, abs=0.005
+        round(cro_offgas_kg, 2), abs=0.005
     )
-    # Inventory closure: ceramic Cr + ingot Cr + terminal offgas Cr-eq closes
-    # the ~2.46 kg lunar Cr feed (AtomLedger total 2.459769).
-    assert cr_in_rump_kg + cr_ingot_kg + cr_offgas_eq_kg == pytest.approx(
+    # Inventory closure follows AtomLedger streams: rump Cr + train Cr + Cr
+    # in captured CrO3 + terminal offgas. One Cr per CrO3 gives kg CrO3 *
+    # M(Cr)/M(CrO3) = kg Cr; the molar-mass ratio is dimensionless and tends
+    # to 1 as the oxygen mass tends to zero.
+    train_kg = sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT)
+    train_cro_kg = float(train_kg.get("CrO", 0.0) or 0.0)
+    assert train_cro_kg == pytest.approx(2.44855547, rel=1e-8)
+    assert story["off_spec_condensate"]["species_kg"].get("CrO", 0.0) == (
+        pytest.approx(round(train_cro_kg, 2), abs=0.005)
+    )
+    capture_flag = story["off_spec_condensate"]["flag"]
+    assert capture_flag["status"] == "flagged prediction"
+    assert capture_flag["authority"] == "proxy/bridge"
+    assert "tier-2 evaporation alpha 0.9" in capture_flag["reason"]
+    assert "cannot certify capture" in capture_flag["reason"]
+    # CrO contains one Cr per molecule: kg Cr = kg CrO × M(Cr)/M(CrO).
+    # The molar-mass ratio is dimensionless, and approaches 1 as oxygen mass
+    # tends to zero.
+    train_cr_eq_kg = float(train_kg.get("Cr", 0.0) or 0.0) + float(
+        train_kg.get("CrO3", 0.0) or 0.0
+    ) * (_CR_MW / _CRO3_MW)
+    train_cr_eq_kg += train_cro_kg * (_CR_MW / _CRO_MW)
+    assert cr_in_rump_kg + train_cr_eq_kg + cr_offgas_eq_kg == pytest.approx(
         2.46, abs=0.02
     )
     assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (

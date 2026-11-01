@@ -1038,14 +1038,6 @@ TERMINAL_RUMP_ACCOUNTS = (
     'process.cleaned_melt',
     'terminal.slag',
 )
-TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
-    'CaO',
-    'MgO',
-    'Al2O3',
-    'TiO2',
-    'Cr2O3',
-    'REE_oxides',
-})
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({'SiO2'})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({'Fe', 'Ni', 'Co', 'Mn'})
 # TERMINAL_RUMP_CLASS_TOLERANCE_PCT: single source is simulator/accounting/queries.py
@@ -1558,6 +1550,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_current_A = 0.0
         self._mre_effective_current_A = 0.0
         self._mre_energy_this_hr = 0.0
+        self._mre_decomposition_voltage_status_by_oxide: Dict[str, str] = {}
         self._mre_uncertified_yield: Dict[str, Any] = {}
         self._mre_ellingham_ladder_diagnostic: Dict[str, Any] = {}
         self._mre_effective_voltage_margin_V_by_oxide: Dict[str, float] = {}
@@ -1573,6 +1566,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- Campaign manager ---
         from simulator.campaigns import CampaignManager
         self.campaign_mgr = CampaignManager(setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
 
         # --- Subsystem models (lazy imports to avoid circular deps) ---
         self._condensation_model = None
@@ -1611,6 +1605,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @property
     def condensation_model(self):
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is None:
             from simulator.condensation import CondensationModel
             # 0.5.4.1 review-cluster-C (P2 #1, 2026-05-28):
@@ -1636,6 +1631,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._condensation_model.configure_lab_geometry(
                     self.lab_geometry
                 )
+        # Include all retained vapor, including parcels absent from fresh flux.
+        self._condensation_model.retained_vapor_mol = dict(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas'))
+        self._condensation_model.retained_supply_projection = copy.deepcopy(
+            self.atom_ledger.last_physical_mol_projection)
         return self._condensation_model
 
     @property
@@ -1798,8 +1798,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Reset condensation train
         self.train = CondensationTrain.create_default(self.setpoints)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         if self._condensation_model is not None:
             self._condensation_model.train = self.train
+            self._condensation_model.last_stage3_route_diagnostic = {}
+            self._condensation_model.cold_spot_history[:] = [
+                item for item in self._condensation_model.cold_spot_history
+                if 'stage3_route' not in item]
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
@@ -2517,12 +2522,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             return
         from engines.magemin import MAGEMinShadowProvider
+        from engines.alphamelts import AlphaMELTSProvider
+        from simulator.chemistry.kernel.config import LIQUID_FRACTION_PROVIDER_ORDER
 
-        provider = MAGEMinShadowProvider()
-        self._chem_registry.register_idempotent(
-            provider,
-            [ChemistryIntent.GATE_LIQUID_FRACTION],
-            fallback=True,
+        providers = {
+            'magemin': MAGEMinShadowProvider(),
+            'alphamelts': AlphaMELTSProvider(),
+        }
+        self._chem_registry.register_gate_provider_order(
+            providers[name] for name in LIQUID_FRACTION_PROVIDER_ORDER[self._liquid_fraction_provider]
         )
 
     def _resolve_liquid_fraction_provider(self) -> None:
@@ -3627,7 +3635,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_overhead_o2_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                     OXYGEN_SPECIES,
                     0.0,
                 )
@@ -4388,13 +4396,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         residual_o2_mol = max(0.0, float(head_o2_mol))
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
-            holdup_mol = {
-                species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
-                    'process.overhead_gas'
-                ).items()
-                if max(0.0, float(mol)) > 0.0
-            }
+            holdup_mol = self._overhead_holdup_mol()
             total_mol = sum(holdup_mol.values())
             total_kg = 0.0
             holdup_kg: Dict[str, float] = {}
@@ -4476,7 +4478,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> OxygenReservoirState:
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5724,7 +5726,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'got {reference_T_K!r}'
                 )
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5796,7 +5798,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6846,7 +6848,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -7005,7 +7007,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.physical_mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -10661,6 +10663,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'{carbon_kg_remaining:.6g} kg remains'
             )
 
+        claimed_kg = self._stage0_bakeout_reserved_carbon_kg + math.fsum(
+            amounts.get('C', 0.0)
+            for spec in specs
+            for account, amounts, _origin in spec['debits']
+            if account == 'process.reagent_inventory'
+        )
+        if claimed_kg > min(required_kg, available_kg) + 1e-12:
+            raise AccountingError('Stage 0 carbon claims exceed the admitted C budget')
         self._stage0_carbon_cleanup_specs = specs
 
     @staticmethod
@@ -10772,12 +10782,95 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if species not in BAKEOUT_SULFATE_HOSTS:
             return False, carbon_mol_remaining
-        carbon_mol = float(extent_mol) * float(c_per_mol)
+        carbon_mol = min(
+            max(0.0, carbon_mol_remaining),
+            max(0.0, float(extent_mol) * float(c_per_mol)),
+        )
         self._stage0_bakeout_reserved_carbon_kg = (
             float(getattr(self, '_stage0_bakeout_reserved_carbon_kg', 0.0))
             + carbon_mol * float(molar_c_kg)
         )
         return True, carbon_mol_remaining - carbon_mol
+
+    def _stage0_sulfate_carbon_order(
+        self, hosts: Mapping[str, float], *, to_sulfide: bool,
+    ) -> list[str]:
+        from engines.builtin.foulant_disposition import _dg_source_confidence, _parse_dg_points
+        from simulator.chemistry.organics_pyrolysis import carbon_delta_g_co_kj_per_mol_o2
+
+        temperature_K = float(self.inventory.stage0_temp_range_C[1]) + 273.15
+        registry = self._load_foulant_registry_cached()
+        scores: dict[str, float] = {}
+        rows: dict[str, str] = {}
+        sources: dict[str, dict[str, Any]] = {}
+        flags = ['sulfate_carbon_standard_state_gas_activities']
+        for host in sorted(hosts):
+            entry = registry.carriers.get(host)
+            pointer = entry.thermo.get('dG_row') if entry else None
+            row = registry.foulant_dG.get(str(pointer).split('.')[-1])
+            if to_sulfide or not row:
+                flags.append('sulfate_carbon_missing_dG_canonical_order')
+                continue
+            try:
+                points = sorted(_parse_dg_points(row))
+            except (KeyError, ValueError, TypeError):
+                flags.append('sulfate_carbon_missing_dG_canonical_order')
+                continue
+            rows[host] = str(pointer)
+            extrapolated = _dg_source_confidence(
+                'partly_grounded', temperature_K, points,
+            ) == 'out_of_domain'
+            sources[host] = {
+                'source': row.get('source'),
+                'source_band_K': [points[0][0], points[-1][0]],
+                'authority_level': 'extrapolated' if extrapolated else 'bridge',
+            }
+            if extrapolated:
+                flags.append('sulfate_carbon_dG_extrapolated')
+            lower, upper = points[0], points[1]
+            for lower, upper in zip(points, points[1:]):
+                if temperature_K <= upper[0]:
+                    break
+            thermal_dg = lower[1] + (
+                (temperature_K - lower[0]) * (upper[1] - lower[1])
+                / (upper[0] - lower[0])
+            )
+            # Hess composition, using foulant_dG.{CaSO4,FeSO4,MgSO4}_thermal_decomp:
+            # Ca: CaSO4 -> CaO + SO2 + 1/2 O2; Fe: 2 FeSO4 -> Fe2O3
+            # + 2 SO2 + 1/2 O2. Add C + 1/2 O2 -> CO to either row.
+            # The carbon resolver is per mol O2 (2 C), hence divide by 2;
+            # divide the composed reaction by nu_C=1, NOT by host moles (Fe=2).
+            # Mg's row produces SO3: first add SO3 -> SO2 + 1/2 O2.
+            # REF-012 NIST WebBook gas Hf/S (Chase 1998, CAS 7446-11-9,
+            # 7446-09-5, 7782-44-7): dH=-296.84-(-395.77)=98.93 kJ/mol;
+            # dS=(248.21+205.15/2-256.77)/1000=0.094015 kJ/(mol K).
+            # This uses the registry's tier-2 dH-T*dS approximation (no Cp).
+            # Units: kJ/mol reaction / (mol C/mol reaction) = kJ/mol C.
+            # At 1323.15 K: Fe=-35-228.796763=-263.796763 kJ/mol C;
+            # Ca=85.75-228.796763=-143.046763. A zero carbon budget gives
+            # zero extent regardless of rank. No Stage-0 gas partial pressures
+            # are declared here: use unit gas activities and flag that premise.
+            if host == 'MgSO4':
+                thermal_dg += 98.93 - temperature_K * 0.094015
+            scores[host] = (
+                thermal_dg + carbon_delta_g_co_kj_per_mol_o2(temperature_K) / 2.0
+            ) / STAGE0_CATION_SULFATE_OXIDE_STOICH[host]['C']
+        if len(scores) != len(hosts):
+            order = sorted(hosts)
+        else:
+            order = sorted(hosts, key=lambda host: (scores[host], host))
+            if len(set(scores.values())) != len(scores):
+                flags.append('sulfate_carbon_tied_dG_canonical_order')
+        self._stage0_foulant_diagnostics.append({
+            'reaction_family': 'sulfate_carbon_allocation',
+            'temperature_K': temperature_K,
+            'dG_kJ_per_mol_C': scores,
+            'dG_rows': rows,
+            'dG_sources': sources,
+            'host_order': order,
+            'notice_flags': sorted(set(flags)),
+        })
+        return order
 
     def _apply_stage0_cation_sulfate_carbon_reactions(
         self,
@@ -10794,7 +10887,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cleanup.get('cation_sulfate_product', 'oxide')
         ).lower()
         to_sulfide = product_mode == 'sulfide'
-        cation_feed = dict(self.inventory.cation_sulfate_feed_kg)
+        cation_feed = {
+            species: kg for species, kg in self.inventory.cation_sulfate_feed_kg.items()
+            if kg > 1e-12
+        }
         if not cation_feed:
             return carbon_mol_remaining
 
@@ -10807,7 +10903,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ).molar_mass_kg_per_mol()
             for species in molar_species
         }
-        for species, feed_kg in list(cation_feed.items()):
+        host_order = (
+            self._stage0_sulfate_carbon_order(cation_feed, to_sulfide=to_sulfide)
+            if len(cation_feed) > 1 else sorted(cation_feed)
+        )
+        for species in host_order:
+            feed_kg = cation_feed[species]
             if feed_kg <= 1e-12:
                 continue
             feed_formula = resolve_species_formula(
@@ -10815,89 +10916,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
             if feed_mol <= 1e-12:
                 continue
-            if to_sulfide:
-                sulfide_species = STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS.get(
-                    species)
-                stoich = STAGE0_CATION_SULFATE_SULFIDE_STOICH.get(species)
-                if sulfide_species is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate sulfide product for '
-                        f'{species!r}'
-                    )
-                if stoich is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate sulfide stoich for '
-                        f'{species!r}'
-                    )
-                feed_coeff = stoich['feed']
-                c_per_mol = stoich['C'] / feed_coeff
-                co_per_mol = stoich['CO'] / feed_coeff
-                sulfide_per_mol = stoich['sulfide'] / feed_coeff
-                extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
-                if extent_mol <= 1e-12:
-                    continue
-                reserved, carbon_mol_remaining = (
-                    self._reserve_stage0_bakeout_sulfate_carbon(
-                        species,
-                        extent_mol,
-                        c_per_mol,
-                        molar['C'],
-                        carbon_mol_remaining,
-                    )
+            products = (
+                STAGE0_CATION_SULFATE_SULFIDE_PRODUCTS if to_sulfide
+                else STAGE0_CATION_SULFATE_OXIDE_PRODUCTS
+            )
+            stoich_table = (
+                STAGE0_CATION_SULFATE_SULFIDE_STOICH if to_sulfide
+                else STAGE0_CATION_SULFATE_OXIDE_STOICH
+            )
+            product_species = products.get(species)
+            stoich = stoich_table.get(species)
+            mode = 'sulfide' if to_sulfide else 'oxide'
+            if product_species is None:
+                raise AccountingError(
+                    f'unsupported cation-sulfate {mode} product for {species!r}'
                 )
-                if reserved:
-                    continue
-                c_consumed_kg = extent_mol * c_per_mol * molar['C']
-                products_kg = {'CO': co_per_mol * extent_mol * molar['CO']}
-                sulfide_products_kg = {
-                    sulfide_species: (
-                        sulfide_per_mol * extent_mol * molar[sulfide_species]
-                    ),
-                }
+            if stoich is None:
+                raise AccountingError(
+                    f'unsupported cation-sulfate {mode} stoich for {species!r}'
+                )
+            feed_coeff = stoich['feed']
+            c_per_mol = stoich['C'] / feed_coeff
+            co_per_mol = stoich['CO'] / feed_coeff
+            extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
+            if extent_mol <= 1e-12:
+                continue
+            reserved, carbon_mol_remaining = (
+                self._reserve_stage0_bakeout_sulfate_carbon(
+                    species, extent_mol, c_per_mol, molar['C'],
+                    carbon_mol_remaining,
+                )
+            )
+            if reserved:
+                continue
+            c_consumed_kg = extent_mol * c_per_mol * molar['C']
+            products_kg = {'CO': co_per_mol * extent_mol * molar['CO']}
+            product_kg = {
+                product_species: stoich[mode] / feed_coeff * extent_mol * molar[product_species],
+            }
+            if to_sulfide:
+                sulfide_products_kg = product_kg
                 oxide_products_kg: Dict[str, float] = {}
             else:
-                oxide_species = STAGE0_CATION_SULFATE_OXIDE_PRODUCTS.get(
-                    species)
-                stoich = STAGE0_CATION_SULFATE_OXIDE_STOICH.get(species)
-                if oxide_species is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate oxide product for '
-                        f'{species!r}'
-                    )
-                if stoich is None:
-                    raise AccountingError(
-                        f'unsupported cation-sulfate oxide stoich for '
-                        f'{species!r}'
-                    )
-                feed_coeff = stoich['feed']
-                c_per_mol = stoich['C'] / feed_coeff
-                so2_per_mol = stoich['SO2'] / feed_coeff
-                co_per_mol = stoich['CO'] / feed_coeff
-                oxide_per_mol = stoich['oxide'] / feed_coeff
-                extent_mol = min(carbon_mol_remaining / c_per_mol, feed_mol)
-                if extent_mol <= 1e-12:
-                    continue
-                reserved, carbon_mol_remaining = (
-                    self._reserve_stage0_bakeout_sulfate_carbon(
-                        species,
-                        extent_mol,
-                        c_per_mol,
-                        molar['C'],
-                        carbon_mol_remaining,
-                    )
-                )
-                if reserved:
-                    continue
-                c_consumed_kg = extent_mol * c_per_mol * molar['C']
                 products_kg = {
-                    'SO2': so2_per_mol * extent_mol * molar['SO2'],
-                    'CO': co_per_mol * extent_mol * molar['CO'],
+                    'SO2': stoich['SO2'] / feed_coeff * extent_mol * molar['SO2'],
+                    **products_kg,
                 }
-                oxide_products_kg = {
-                    oxide_species: (
-                        oxide_per_mol * extent_mol * molar[oxide_species]
-                    ),
-                }
+                oxide_products_kg = product_kg
                 sulfide_products_kg = {}
 
             consumed_kg = extent_mol * feed_formula.molar_mass_kg_per_mol()
@@ -11098,7 +11163,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         raw, processed_components).values()),
             )
             melt = self._melt_from_anhydrous_silicate(
-                feedstock, mass_kg, cleaned_mass_kg=cleaned_mass_kg)
+                feedstock, mass_kg, raw=raw, cleaned_mass_kg=cleaned_mass_kg)
         else:
             melt = self._melt_from_raw_inventory(raw)
             processed_components = set()
@@ -12131,6 +12196,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
         batch_mass_kg: float,
         *,
+        raw: Mapping[str, float],
         cleaned_mass_kg: Optional[float] = None,
     ) -> Dict[str, float]:
         stage0 = feedstock.get('anhydrous_silicate_after_degassing') or {}
@@ -12140,8 +12206,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if cleaned_mass_kg is None
             else cleaned_mass_kg
         )
-        melt = cls._component_masses_from_wt_pct(comp, cleaned_mass)
-        normalize_component_masses_kg(melt, cleaned_mass)
+        retained = {
+            oxide: float(raw.get(oxide, 0.0))
+            for oxide in ('Na2O', 'K2O')
+            if oxide in raw or oxide in feedstock.get('composition_wt_pct', {})
+        }
+        # This projection has no alkali-removal reaction: the normalized bulk
+        # owns declared Na2O/K2O, and the dry surrogate describes the remainder.
+        # For cleaned mass M and retained alkali A [kg], m_i=(M-A)*w_i/sum(w).
+        # Thus sum(m_i)+A=M [kg]; A=0 recovers the original projection.
+        # Sanity: data/feedstocks.yaml, comet_nucleus bulk row, gives
+        # 1000 kg * 0.32/100 = 3.2 kg Na2O, independent of the dry surrogate.
+        projected_mass = cleaned_mass - sum(retained.values())
+        comp = {oxide: value for oxide, value in comp.items() if oxide not in retained}
+        melt = cls._component_masses_from_wt_pct(comp, projected_mass)
+        normalize_component_masses_kg(melt, projected_mass)
+        melt.update(retained)
         return {
             oxide: float(melt.get(oxide, 0.0))
             for oxide in OXIDE_SPECIES
@@ -13251,6 +13331,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
+        self.campaign_mgr.apply_collection_route(self.melt, self.train)
         self.melt.validate_melt_pressures()
         self._configure_overhead_headspace(
             campaign,
@@ -13297,6 +13378,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_hold_hours = 0
             self._mre_effective_current_A = 0.0
             self._mre_rung_ever_effective = False
+            self._mre_decomposition_voltage_status_by_oxide = {}
             self._mre_effective_voltage_margin_V_by_oxide = {}
             self._mre_effective_voltage_margin_temperature_C = None
             self.melt.mre_low_current_hours = 0
@@ -15480,7 +15562,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(type(exc), 'terminal_refusal', False)
             )
             if terminal_refusal:
-                wall_refusals = self.condensation_model.last_sticking_alpha_provenance_notice.get(
+                wall_refusals = getattr(
+                    self._condensation_model, 'last_sticking_alpha_provenance_notice', {},
+                ).get(
                     'wall_saturation_pressure_refusals_by_species'
                 )
                 _materialize_refusal_snapshot_history(terminal_refusal_state)
@@ -15491,7 +15575,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 # Roll back quantities, but retain the reason the wall channel refused.
                 if wall_refusals:
-                    self.condensation_model.last_sticking_alpha_provenance_notice[
+                    model = self._condensation_model
+                    if model is None:
+                        model = self.condensation_model
+                    model.last_sticking_alpha_provenance_notice[
                         'wall_saturation_pressure_refusals_by_species'
                     ] = wall_refusals
             elif committed_transition_count:
@@ -15629,6 +15716,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_current_A = 0.0
             self._mre_effective_current_A = 0.0
             self._mre_metals_this_hr = {}
+            self._mre_decomposition_voltage_status_by_oxide = {}
             self._mre_ellingham_ladder_diagnostic = {}
             self._mre_energy_this_hr = 0.0
             self._mre_anode_O2_kg_this_hr = 0.0
@@ -16774,6 +16862,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self.melt, 'mre_declared_rung_V', 0.0)
             ),
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
+            mre_decomposition_voltage_status_by_oxide=dict(
+                self._mre_decomposition_voltage_status_by_oxide
+            ),
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
             mre_ellingham_ladder_diagnostic=dict(
                 self._mre_ellingham_ladder_diagnostic

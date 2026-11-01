@@ -1460,7 +1460,7 @@ def coverage_table(
         if record.element is not None:
             by_formula[formula_from_tdb_symbol(record.element.symbol)].append(record)
     table: dict[str, dict[str, Any]] = {}
-    for element in elements:
+    for element in sorted(elements, key=str):
         matches = by_formula.get(element, [])
         # de-duplicate by record_id
         unique = {record.record_id: record for record in matches}

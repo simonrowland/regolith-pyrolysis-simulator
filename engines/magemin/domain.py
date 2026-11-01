@@ -104,14 +104,14 @@ class MAGEMinDomainGate:
         -------
         ``(valid, warnings)`` — ``valid`` is ``True`` iff the composition
         passes every check; ``warnings`` is the list of human-readable
-        reasons (empty when ``valid`` is True).
+        reasons and calibration notices.
 
         Checks
         ------
         1. Composition mapping is non-empty.
         2. No forbidden species (native metals, halides, sulfides,
            perchlorates, carbonates, nitrates, elemental S).
-        3. SiO2 ∈ [30, 80] wt%.
+        3. Positive SiO2; calibration notice outside [30, 80] wt%.
         4. Sum of major oxides > 95 wt% (i.e. trace species must not
            dominate).
         5. All species in the input map are in the 14-oxide MELTS basis.
@@ -181,11 +181,13 @@ class MAGEMinDomainGate:
         # Check 3: SiO2 in [30, 80] wt%.
         sio2 = normalized.get('SiO2', 0.0)
         if sio2 < _SIO2_MIN_WT_PCT or sio2 > _SIO2_MAX_WT_PCT:
-            reason = reason or OutOfDomainReason.SILICATE_WINDOW
+            if sio2 <= 0.0:
+                reason = reason or OutOfDomainReason.SILICATE_WINDOW
             warnings.append(
                 f'MAGEMinDomainGate: SiO2 = {sio2:.2f} wt% outside MELTS '
                 f'calibration range [{_SIO2_MIN_WT_PCT}, '
-                f'{_SIO2_MAX_WT_PCT}] wt%.'
+                f'{_SIO2_MAX_WT_PCT}] wt%; reason=silicate_window; '
+                'authority=extrapolated; certified_band=SiO2 [30, 80] wt%.'
             )
 
         # Check 4: major oxides total > 95 wt%.
@@ -201,9 +203,7 @@ class MAGEMinDomainGate:
                 'composition is dominated by non-oxide species.'
             )
 
-        if warnings and reason is None:
-            reason = OutOfDomainReason.MAJOR_SUM
-        return (not warnings), warnings, reason_value(reason)
+        return reason is None, warnings, reason_value(reason)
 
     @staticmethod
     def oxide_basis() -> Tuple[str, ...]:

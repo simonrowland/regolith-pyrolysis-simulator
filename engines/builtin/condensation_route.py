@@ -236,10 +236,49 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         wall_fraction = self._wall_deposit_fraction(controls)
         wall_deposit_kg = condensed_kg * wall_fraction
         baffle_condensed_kg = max(0.0, condensed_kg - wall_deposit_kg)
+        reaction = dict(controls.get('stage3_reactive_alkali') or {})
+        reactive_mol = float(reaction.get('uptake_mol', 0.0))
+        oxygen_mol = float(reaction.get('oxygen_debit_mol', 0.0))
+        oxide_mol = float(reaction.get('oxide_product_mol', 0.0))
+        oxide = reaction.get('oxide_species')
+        if reactive_mol > 0.0:
+            if (species not in ('Na', 'K') or oxide not in ('Na2O', 'K2O')
+                    or reactive_mol * vapor_molar_mass > baffle_condensed_kg + 1e-12
+                    or oxygen_mol > float(request.account_view.accounts.get(
+                        'process.overhead_gas', {}).get('O2', 0.0))):
+                return IntentResult(
+                    intent=ChemistryIntent.CONDENSATION_ROUTE, status='refused',
+                    control_audit=control_audit,
+                    diagnostic={'reason': 'invalid_or_unavailable_reactive_alkali_supply'})
+            if min(reactive_mol * vapor_molar_mass,
+                   oxygen_mol * resolve_species_formula('O2', registry).molar_mass_kg_per_mol(),
+                   oxide_mol * resolve_species_formula(oxide, registry).molar_mass_kg_per_mol()
+                   ) <= EMPTY_KG_TOLERANCE:
+                # Keep the entire coupled reaction in overhead; ordinary
+                # downstream condensate must still commit. MaterialLot would
+                # otherwise floor only its O2 debit and break oxygen closure.
+                deferred_kg = reactive_mol * vapor_molar_mass
+                current_condensed_kg -= deferred_kg
+                baffle_condensed_kg = max(0.0, baffle_condensed_kg - deferred_kg)
+                reactive_mol = oxygen_mol = oxide_mol = 0.0
+                reaction['materialization_status'] = 'reactive_parcel_retained_below_numerical_floor'
+                if current_condensed_kg <= EMPTY_KG_TOLERANCE:
+                    return IntentResult(
+                        intent=ChemistryIntent.CONDENSATION_ROUTE, status='ok',
+                        control_audit=control_audit,
+                        diagnostic={'credited_condensed_kg': 0.0,
+                                    'reason_skipped': 'coupled reactive parcel below numerical floor'})
         condensed_product_mol = self._condensed_product_mol(
             species, baffle_condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
+        if reactive_mol > 0.0:
+            ordinary_mol = max(0.0, condensed_product_mol.get(species, 0.0) - reactive_mol)
+            if ordinary_mol > 0.0:
+                condensed_product_mol[species] = ordinary_mol
+            else:
+                condensed_product_mol.pop(species, None)
+            condensed_product_mol[oxide] = condensed_product_mol.get(oxide, 0.0) + oxide_mol
         wall_deposit_mol = self._wall_deposit_mol(
             species, wall_deposit_kg, registry, resolve_species_formula,
         )
@@ -448,6 +487,8 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             debits[self.RETAINED_HOLDUP_ACCOUNT] = {
                 species: prior_holdup_mol
             }
+        if reactive_mol > 0.0:
+            debits['process.overhead_gas']['O2'] = oxygen_mol
         for account, species_mol in wall_plan[
             "substrate_debit_mol_by_account"
         ].items():
@@ -502,6 +543,14 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "credited_condensed_kg": float(baffle_condensed_kg),
+                **({'stage3_reactive_alkali': {
+                    **reaction,
+                    'committed_vapor_kg': reactive_mol * vapor_molar_mass,
+                    'committed_products_kg': {
+                        oxide: oxide_mol * resolve_species_formula(
+                            oxide, registry).molar_mass_kg_per_mol()
+                    } if reactive_mol > 0.0 else {},
+                }} if reaction else {}),
                 "credited_wall_deposit_kg": float(credited_wall_deposit_kg),
                 "numerical_floor_baffle_to_wall_kg": float(
                     sum(folded_baffle_kg_by_wall_account.values())

@@ -9,7 +9,7 @@ is not read by the production flux path; behavior-changing adoption is a
 separate gated landing. The one wired exception is the b-314 flux-admission
 predicate :func:`is_broad_proxy_not_intrinsic_row`, which
 ``simulator.evaporation._load_evaporation_alpha_by_species`` consults so a
-tier-2 broad-proxy row cannot satisfy the measured-alpha requirement (SC-67).
+tier-2 broad-proxy row executes with its proxy authority preserved.
 
 Design authority:
 ``docs-private/research/2026-08-09-evap-class-model/design.md``.
@@ -630,15 +630,9 @@ def grounding_evidence(class_id: str) -> tuple[EvidenceRow, ...]:
 # Given (species, current production alpha source metadata) return whether that
 # source is class-comparable for the production silicate-melt carrier.
 #
-# b-314: the structured ``broad_proxy_not_intrinsic`` tag IS wired into flux
-# admission — ``simulator.evaporation._load_evaporation_alpha_by_species``
-# consults :func:`is_broad_proxy_not_intrinsic_row` and emits tagged rows as
-# provenance-carrying mappings (``alpha_proxy_tag``), and the provider-facing
-# ``simulator.evaporation._measured_alpha_control_view`` strips them so a
-# tier-2 proxy cannot satisfy the measured-alpha requirement (the SC-67
-# unmeasured-alpha refusal fires instead). The richer
-# :func:`gate_production_alpha_source` instrument (free-text refinement,
-# system-class fences) is still NOT wired into flux.
+# Tagged broad proxies remain executable with proxy/bridge authority. The loader
+# preserves provenance; the flux provider evaluates and flags the prediction.
+# gate_production_alpha_source remains a separate class-comparability diagnostic.
 
 BROAD_PROXY_NOT_INTRINSIC_TAG: Final[str] = "broad_proxy_not_intrinsic"
 
@@ -647,7 +641,7 @@ def is_broad_proxy_not_intrinsic_row(alpha_data: Any) -> bool:
     """True when an ``evaporation_alpha`` contract row is tagged as a tier-2
     broad proxy — inherited from another measurement family, not an intrinsic
     melt coefficient. Such a row is proxy evidence, never a measurement, and
-    must not satisfy the flux path's measured-alpha requirement."""
+    executes only as a flagged proxy/bridge prediction."""
 
     if not isinstance(alpha_data, Mapping):
         return False

@@ -169,4 +169,4 @@ def test_na2o_solubility_cap_uses_post_reaction_melt_denominator(
     assert result.transition is not None
     diagnostic = result.diagnostic
     assert diagnostic["na2o_post_reaction_wt_pct"] <= 10.0 + 1e-12
-    assert diagnostic["spent_reductant_residue_kg"]["Na2O"] < 0.5
+    assert diagnostic["cleaned_melt_kg"]["Na2O"] < 0.5

@@ -1310,12 +1310,6 @@ def refusal_closure(
                     REFUSAL_MISSING_CHANNEL_CONTRACT,
                     str(exc),
                 )
-            if domain_transition.refuses:
-                return _make_refusal(
-                    rule,
-                    domain_transition.refusal_code or REFUSAL_MISSING_CHANNEL_CONTRACT,
-                    domain_transition.detail or "declared evaluator domain refused",
-                )
             evaluator_activity_exponent = float(
                 getattr(compiled.evaluator, "activity_exponent", 0.0) or 0.0
             )
@@ -1494,6 +1488,8 @@ def refusal_closure(
                     ),
                     "status": getattr(evaluation, "status", None),
                 }
+                if domain_transition.detail:
+                    evaluation_extra["domain_notice"] = domain_transition.detail
                 provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
                 )

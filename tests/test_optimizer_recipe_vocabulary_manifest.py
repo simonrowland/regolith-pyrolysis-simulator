@@ -26,12 +26,11 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     digest = payload.pop("payload_digest")
     # d-137's Stage-4 split changes the stage_4_to_stage_5 wall-knob ceiling
     # from 700 C to the 250 C Na/Mg collector. The generated vocabulary records
-    # that one bound change; the conditional subspace dimensions/digests stay
-    # unchanged.
+    # that bound change alongside car1's Stage-3 route controls.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "f853466595b53df629694a03646189a0aa328596dc3c6af275f1ba9ed5ca82a9"
+        "2d83dd325798ac7d83982f0f3104a486e741e91b75dbf40b45de859a54df13ea"
     )
-    assert digest == "a1a6038ca3f4f5f9f425b4dbbe66fb8349c5fd6f05d4dbf463e6428e940b345e"
+    assert digest == "2913cc10acba28ffd0a630d11755edb6ada7190c79ff68f6f07dd883b4fa0278"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (
@@ -46,4 +45,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [63, 69]
