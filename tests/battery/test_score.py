@@ -8936,6 +8936,36 @@ def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
     assert headline_with_notice is headline_without_notice
 
 
+def test_shilov_ceramic_row_state_gets_nonblocking_domain_notice() -> None:
+    """Shilov's extract records the solid ceramic state on its Sr rows."""
+
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=None, characterization=None),
+    )
+    reference = replace(
+        reference,
+        observation_id="shilov_2026_table2_sr_sample1",
+        source_id="shilov-2026-sro-la2o3-kems",
+        provenance={"measured_condensed_form": "solid ceramic sample"},
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+
+
 @pytest.mark.parametrize(
     "measured_phase",
     (
@@ -8953,6 +8983,38 @@ def test_recorded_liquid_measurement_phase_overrides_solid_sample_description(
 ) -> None:
     experiment, reference = _vapour_over_sample_form("crystalline K2Si2O5")
     reference = replace(reference, provenance=measured_phase)
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+def test_recorded_liquid_row_state_overrides_solid_characterization() -> None:
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            form=None,
+            characterization=F.located("solid"),
+        ),
+    )
+    reference = replace(
+        reference,
+        provenance={
+            "measured_condensed_form": {
+                "state": "liquid_melt",
+                "basis": "explicit_author",
+            }
+        },
+    )
 
     residual, calls = _score_sample_phase_vapour(
         reference, experiment, Engine.INTERNAL_ANALYTICAL
