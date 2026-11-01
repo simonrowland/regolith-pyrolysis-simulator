@@ -14563,11 +14563,11 @@ def _printed_composition_candidates(
     vocabulary: tuple[VocabEntry, ...],
     *,
     fallback_locator: Locator | None = None,
-) -> list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]]:
-    """Printed maps with their comparison fingerprint and source payload."""
+) -> list[tuple[PrintedFingerprint, Locator, str]]:
+    """Printed maps with their normalized comparison fingerprint and locator."""
 
     names = {e.printed for e in vocabulary if e.field == "sample.printed_composition"}
-    found: list[tuple[PrintedFingerprint, Locator, str, Mapping[str, Any]]] = []
+    found: list[tuple[PrintedFingerprint, Locator, str]] = []
 
     def walk(obj: object, parent_loc: Locator | None, depth: int) -> None:
         if depth > 14:
@@ -14586,11 +14586,7 @@ def _printed_composition_candidates(
                         and value_loc is not None
                         and isinstance(raw_value, Mapping)
                     ):
-                        printed_payload = _printed_map_payload(raw_value)
-                        if isinstance(printed_payload, Mapping):
-                            found.append(
-                                (fingerprint, value_loc, name, printed_payload)
-                            )
+                        found.append((fingerprint, value_loc, name))
                 if name not in _WALK_SKIP_KEYS and name != "locator":
                     walk(value, loc, depth + 1)
         elif isinstance(obj, list):
@@ -14627,10 +14623,10 @@ def _printed_composition_from_roots(
         preferred_fps = {item[0] for item in preferred}
         if len(preferred_fps) != 1:
             return None
-        _fingerprint, loc, _name, printed_map = preferred[0]
+        fingerprint, loc, _name = preferred[0]
     else:
-        _fingerprint, loc, _name, printed_map = found[0]
-    return located_value(printed_map, loc)
+        fingerprint, loc, _name = found[0]
+    return located_value(dict(fingerprint), loc)
 
 
 def _is_printed_initial_charge(
@@ -14682,7 +14678,7 @@ def _printed_map_is_typed_initial(
         return True
     return any(
         fingerprint == target and name == "starting_glass_wt_pct"
-        for fingerprint, _located, name, _printed
+        for fingerprint, _located, name
         in _printed_composition_candidates(
             _lab_roots(equipment, values), vocabulary, fallback_locator=locator
         )
@@ -14736,7 +14732,7 @@ def _printed_map_is_observation_level(
     own_roots = _lab_roots(equipment, own_values)
     if any(
         fingerprint == target
-        for fingerprint, _loc, _name, _printed
+        for fingerprint, _loc, _name
         in _printed_composition_candidates(
             own_roots, vocabulary, fallback_locator=locator
         )
@@ -20499,6 +20495,9 @@ class Migrator:
                                 numeric_values_as=(
                                     "decimal"
                                     if source_id == "lpi-lunar-soils"
+                                    else "string"
+                                    if source_id
+                                    == "banya-watanabe-1977-feto-p2o5-solid-iron"
                                     else "source"
                                 ),
                             )
