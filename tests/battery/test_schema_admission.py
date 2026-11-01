@@ -11,6 +11,7 @@ from simulator.battery import migrate as M
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     EvidenceClass,
     NoticeKind,
     Quantity,

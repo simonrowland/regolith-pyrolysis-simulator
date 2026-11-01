@@ -4719,6 +4719,11 @@ def test_migrate_lifts_markova_shaped_oxide_map(tmp_path: Path) -> None:
     ident = t0.identity.composition
     assert ident is not None and ident.is_value
     assert ident.value.amount_basis is AmountBasis.MOLE_FRACTION
+    t0_expected = wt_pct_to_mole_fraction(
+        {name: as_decimal(value) for name, value in printed.items()}
+    )
+    assert dict(ident.value.components) == dict(t0_expected.components)
+    assert dict(ident.value.components)["SiO2"] > 0
     experiment = result.experiments[t0.experiment_id]
     assert experiment.sample.printed_composition is not None
     assert as_decimal(experiment.sample.printed_composition.state.value["SiO2"]) == as_decimal(
