@@ -10,8 +10,12 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _PRINTED_COMPOSITION_TOTAL_KEYS,
+    _classify_composition_cell,
     _is_engine_oxide_component,
+    _is_composition_condition_key,
     _knudsen_effusion_chamber_background_not_for_identity,
+    _wt_percent_conversion_or_refusal,
 )
 from simulator.battery.records import (
     Bench,
@@ -426,6 +430,55 @@ def charge_moles_by_species(
     dropped: list[str] = []
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
+    printed = experiment.sample.printed_composition
+    printed_raw = (
+        _printed_composition_map(printed.state.value)
+        if printed is not None and printed.state.is_value
+        else None
+    )
+    printed_basis = (
+        _amount_basis_token(printed.state.value)
+        if printed is not None and printed.state.is_value
+        else None
+    )
+    printed_is_mass_percent = printed_basis in (
+        None,
+        AmountBasis.MASS_PERCENT.value,
+    )
+    printed_route_usable = False
+    numeric_printed: dict[str, Decimal] = {}
+    if mass is not None and isinstance(printed_raw, Mapping):
+        malformed = False
+        for key, item in printed_raw.items():
+            kind, amount = _classify_composition_cell(item)
+            if kind == "malformed":
+                malformed = True
+                break
+            if kind == "number" and amount is not None:
+                numeric_printed[str(key)] = amount
+        if not malformed and numeric_printed:
+            if not printed_is_mass_percent:
+                printed_route_usable = True
+            else:
+                _converted, refusal = _wt_percent_conversion_or_refusal(
+                    numeric_printed,
+                    closure_context=printed_raw,
+                    declared_component_map=printed_raw,
+                )
+                if refusal is None:
+                    engine_printed = {
+                        name: value
+                        for name, value in printed_raw.items()
+                        if str(name).strip().casefold()
+                        not in _PRINTED_COMPOSITION_TOTAL_KEYS
+                        and not _is_composition_condition_key(str(name))
+                    }
+                    try:
+                        _engine_printed_oxides(engine_printed)
+                    except _EnginePrintRefused:
+                        pass
+                    else:
+                        printed_route_usable = True
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
@@ -443,7 +496,16 @@ def charge_moles_by_species(
                     bool(composition.inference),
                     2,
                 )
-        elif mass is not None and comp.amount_basis is AmountBasis.MOLE_FRACTION:
+        elif (
+            mass is not None
+            and comp.amount_basis is AmountBasis.MOLE_FRACTION
+            and not (
+                composition.inference is not None
+                and composition.inference.relation == "wt_pct_to_mole_fraction"
+                and printed_raw is not None
+                and not printed_route_usable
+            )
+        ):
             masses = [(species, _molar_mass_kg_mol(species), fraction) for species, fraction in comp.components]
             if all(item[1] is not None for item in masses):
                 mean_molar_mass = sum(
@@ -470,56 +532,43 @@ def charge_moles_by_species(
                                 bool(composition.inference),
                                 0,
                             )
-    printed = experiment.sample.printed_composition
     if (
         mass is not None
         and printed is not None
         and printed.state.is_value
+        and printed_route_usable
     ):
-        raw = _printed_composition_map(printed.state.value)
-        if isinstance(raw, Mapping):
-            numeric = {}
-            for key, item in raw.items():
-                if isinstance(item, Mapping):
-                    continue
-                try:
-                    numeric[str(key)] = as_decimal(item)
-                except (ValueError, TypeError, ArithmeticError):
-                    # A printed composition may be a categorical Value payload
-                    # (e.g. {kind: categorical, categorical: 'Fe-Mn or Fe-Sn'});
-                    # non-numeric leaves carry no wt% and route nothing.
-                    continue
-            for species, wt_pct in numeric.items():
-                molar_mass = _molar_mass_kg_mol(species)
-                if molar_mass is None:
-                    # The print names a species no route can charge; the
-                    # reduced set must not be scored as the whole charge.
-                    dropped.append(species)
-                    continue
-                species_mass = _multiply(
-                    mass, Value.point_of(wt_pct / Decimal(100))
+        for species, wt_pct in numeric_printed.items():
+            molar_mass = _molar_mass_kg_mol(species)
+            if molar_mass is None:
+                # The print names a species no route can charge; the
+                # reduced set must not be scored as the whole charge.
+                dropped.append(species)
+                continue
+            species_mass = _multiply(
+                mass, Value.point_of(wt_pct / Decimal(100))
+            )
+            value = (
+                None
+                if species_mass is None
+                else _divide(species_mass, Value.point_of(molar_mass))
+            )
+            if value is not None:
+                # Premise: w_i is printed wt% and m_i=m*w_i/100.
+                # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
+                # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
+                ranked(
+                    species,
+                    Waypoint(
+                        f"charge_moles_by_species.{species}",
+                        value,
+                        "mass_times_printed_wt_percent",
+                        WaypointAuthority.DERIVED,
+                        ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
+                    ),
+                    bool(printed.inference),
+                    1,
                 )
-                value = (
-                    None
-                    if species_mass is None
-                    else _divide(species_mass, Value.point_of(molar_mass))
-                )
-                if value is not None:
-                    # Premise: w_i is printed wt% and m_i=m*w_i/100.
-                    # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
-                    # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
-                    ranked(
-                        species,
-                        Waypoint(
-                            f"charge_moles_by_species.{species}",
-                            value,
-                            "mass_times_printed_wt_percent",
-                            WaypointAuthority.DERIVED,
-                            ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
-                        ),
-                        bool(printed.inference),
-                        1,
-                    )
     results = {
         species: _result(
             f"charge_moles_by_species.{species}",

@@ -120,7 +120,7 @@ def test_nonfinite_printed_mass_component_refuses_charge_before_value_build() ->
     )
     assert not result.by_species
     assert result.absence is not None
-    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert result.absence.reason is GapReason.MISSING_EVIDENCE
 
 
 def test_charge_moles_sanity_and_typed_absence() -> None:
