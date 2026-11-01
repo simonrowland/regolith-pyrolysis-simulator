@@ -1,0 +1,77 @@
+source_id: takeda-1986-liquid-copper-soda-slag
+inputs:
+  pdftotext: text/takeda-1986-liquid-copper-soda-slag/pdftotext-layout.txt
+  mineru: text/takeda-1986-liquid-copper-soda-slag/mineru/p005-p008
+table_draft:
+  converter: tools/mineru_table_draft.py convert
+  tables_found: 0
+  qa_content_lists: 2
+  qa_printed_tables: 0
+  invented_details_blocks_ignored: 6
+  mapping: []
+  compare: compare ran; the lone prose observation has no MinerU table cell because the index has 0 printed tables; no digit mismatch is reported
+transcribed_rows:
+  - observation_id: takeda_1986_cu2o_melting_point
+    type: transition_point
+    quantity: transition_temperature
+    source: prose
+    page: 2
+    published_page: 609
+  - observation_id: takeda_1986_cu_cu2o_reference_oxygen_potential
+    disposition: typed_refused_unit_unspecified
+    source: prose
+    page: 3
+    published_page: 610
+  - observation_id: takeda_1986_miscibility_gap_endpoints
+    disposition: typed_refused_schema_gap
+    source: prose
+    page: 4
+    published_page: 611
+  - observation_id: takeda_1986_soda_composition_and_carbonate_ratio
+    disposition: typed_refused_schema_gap
+    source: prose
+    page: 2
+    published_page: 609
+  - observation_id: takeda_1986_cuo05_activity_ranges
+    disposition: typed_refused_schema_gap
+    source: prose
+    page: 5
+    published_page: 612
+  - observation_id: takeda_1986_carbonate_co2_stoichiometric_reference
+    disposition: typed_refused_schema_gap
+    source: prose
+    page: 6
+    published_page: 613
+context_rows:
+  - {observation_id: takeda_1986_experimental_conditions, page: 1, published_page: 608}
+  - {observation_id: takeda_1986_oxygen_cell_equation_and_reference, page: 1, published_page: 608}
+  - {observation_id: takeda_1986_cu_cu2o_reference_oxygen_potential, page: 3, published_page: 610}
+  - {observation_id: takeda_1986_cuo05_equilibrium_constants_and_copper_activity, page: 3, published_page: 610}
+  - {observation_id: takeda_1986_miscibility_gap_endpoints, page: 4, published_page: 611}
+  - {observation_id: takeda_1986_soda_composition_and_carbonate_ratio, page: 2, published_page: 609}
+  - {observation_id: takeda_1986_cuo05_activity_ranges, page: 5, published_page: 612}
+  - {observation_id: takeda_1986_carbonate_co2_stoichiometric_reference, page: 6, published_page: 613}
+  - {observation_id: takeda_1986_carbonate_co2_observations, page: 6, published_page: 613}
+  - {observation_id: takeda_1986_acid_oxide_carbonate_decomposition_ratios, page: 6, published_page: 613}
+  - {observation_id: takeda_1986_intermediate_compound_stoichiometries, page: 7, published_page: 614}
+  - {observation_id: takeda_1986_cited_binary_phase_diagram_composition, page: 4, published_page: 611}
+  - {observation_id: takeda_1986_co2_analytical_method, page: 2, published_page: 609}
+  - {observation_id: takeda_1986_alumina_binary_slag_composition, page: 2, published_page: 609}
+  - {observation_id: takeda_1986_alumina_cu2o_slag_composition, page: 7, published_page: 614}
+  - {observation_id: takeda_1986_abstract_activity_minimum_composition, page: 1, published_page: 608}
+  - {observation_id: takeda_1986_copper_solubility_and_activity_summary, page: 5, published_page: 612}
+  - {observation_id: takeda_1986_kojo_external_comparison, page: 5, published_page: 612}
+  - {observation_id: takeda_1986_yamato_external_comparison, page: 7, published_page: 614}
+  - {observation_id: takeda_1986_summary_binary_composition, page: 8, published_page: 615}
+  - {observation_id: takeda_1986_figures_not_digitized, page: 2, published_page: 609}
+figure_policy:
+  figures: 11
+  numeric_figure_points_digitized: false
+  captions_retained_in: species.Cu2O.context[takeda_1986_figures_not_digitized]
+context_row_count: 21
+verification:
+  pdf_pages_1_to_4: page renders at 300 dpi checked against pdftotext prose cells
+  pdf_pages_5_to_8: MinerU markdown and pdftotext numeric prose agree
+  numeric_prose_cells: takeda-1986-liquid-copper-soda-slag.cells.csv
+  isolated_migration: {observations: 1, hard_issues: 0, unavailable_queue_entries: 2}
+  unavailable_axes: [method, total_pressure_Pa]
