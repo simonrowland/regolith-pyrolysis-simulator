@@ -313,6 +313,31 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
     assert fusion_comparison_reference(other, engine=Engine.INTERNAL_ANALYTICAL) is other
 
 
+def test_distin_conversion_keeps_all_pinned_temperature_factors() -> None:
+    """Golden pin for Distin's existing per-temperature N_Fe2+^0 factors."""
+    expected = (
+        (Decimal("2058.15"), Decimal("0.9787")),
+        (Decimal("2153.15"), Decimal("0.9861")),
+        (Decimal("2233.15"), Decimal("0.9968")),
+    )
+    for temperature_K, factor in expected:
+        row = replace(_wustite_row(temperature_K), source_id=_DISTIN)
+
+        converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
+
+        assert converted.value.point == factor
+        notice = next(
+            item
+            for item in converted.notices
+            if item.reason.startswith("reference_converted_via_iron_saturation;")
+        )
+        assert f"factor={factor}" in notice.reason
+        state = converted.identity.reference_state.value
+        assert isinstance(state, StandardState)
+        assert state.endmember.formula == "FeO"
+        assert state.component_basis == "FeO"
+
+
 def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
     temperature = Decimal("1673.15")
     work = F.work()
