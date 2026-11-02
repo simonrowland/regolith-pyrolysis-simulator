@@ -76,6 +76,16 @@ _WINDOW = "1649.15-1766.15 K"
 _EXTRAPOLATED = "D&G iron-boundary line extrapolated"
 _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
+_DOYLE_SOURCES = (
+    "doyle-1988-feo-activity-multicomponent-magma",
+    "doyle-1989-tio2-feo-activity-magma",
+)
+_HOLZHEID_POINTS = (
+    (Decimal("1573.15"), Decimal("2.02")),
+    (Decimal("1673.15"), Decimal("1.94")),
+    (Decimal("1873.15"), Decimal("1.66")),
+)
+_HOLZHEID_EXTRAPOLATED = "Holzheid 1997 wustite-to-stoichiometric FeO ratio extrapolated"
 
 
 def _formation_J(table_id: str, temperature_K: Decimal) -> Decimal:
@@ -336,6 +346,73 @@ def test_distin_conversion_keeps_all_pinned_temperature_factors() -> None:
         assert isinstance(state, StandardState)
         assert state.endmember.formula == "FeO"
         assert state.component_basis == "FeO"
+
+
+@pytest.mark.parametrize("source_id", _DOYLE_SOURCES)
+def test_doyle_reference_conversion_uses_holzheid_printed_anchors(
+    source_id: str,
+) -> None:
+    for temperature_K, factor in _HOLZHEID_POINTS:
+        row = replace(
+            _wustite_row(temperature_K),
+            source_id=source_id,
+        )
+
+        converted = fusion_comparison_reference(
+            row, engine=Engine.INTERNAL_ANALYTICAL
+        )
+
+        assert converted.value.point == factor
+        notice = next(
+            item
+            for item in converted.notices
+            if item.reason.startswith("reference_converted_via_iron_saturation;")
+        )
+        assert "Holzheid 1997" in notice.reason
+        assert "1300 C: 2.02" in notice.reason
+        assert "1400 C: 1.94" in notice.reason
+        assert "1600 C: 1.66" in notice.reason
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_factor"),
+    (
+        (Decimal("1623.15"), Decimal("1.978364")),
+        (Decimal("1773.15"), Decimal("1.786677")),
+    ),
+)
+def test_holzheid_log_ratio_interpolates_in_reciprocal_temperature(
+    temperature_K: Decimal, expected_factor: Decimal
+) -> None:
+    row = replace(_wustite_row(temperature_K), source_id=_DOYLE_SOURCES[0])
+
+    converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
+
+    assert converted.value.point.quantize(Decimal("0.000001")) == expected_factor
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_factor"),
+    (
+        (Decimal("1473.15"), Decimal("2.114870")),
+        (Decimal("1973.15"), Decimal("1.553844")),
+    ),
+)
+def test_holzheid_ratio_extrapolates_with_an_out_of_band_notice(
+    temperature_K: Decimal, expected_factor: Decimal
+) -> None:
+    row = replace(_wustite_row(temperature_K), source_id=_DOYLE_SOURCES[0])
+
+    converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
+
+    assert converted.value.point.quantize(Decimal("0.000001")) == expected_factor
+    extrapolated = next(
+        item
+        for item in converted.notices
+        if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert extrapolated.reason == _HOLZHEID_EXTRAPOLATED
+    assert extrapolated.band == "1300-1600 C"
 
 
 def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
