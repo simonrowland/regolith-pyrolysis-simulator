@@ -874,17 +874,19 @@ def normalized_composition(
         else None
     )
     point_printed_pairs = _printed_component_pairs(point_printed_map)
+    observation_identity = getattr(observation, "identity", None)
     # A component-result row is an observable, not a bulk composition claim.
     # Use the sample charge as green did; the closure guard then checks that
     # actual engine input rather than the single measured oxide.
     single_component_observation = (
         observation is not None
-        and observation.identity.quantity.is_value
-        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and observation.identity.species.formula is not None
+        and observation_identity is not None
+        and observation_identity.quantity.is_value
+        and observation_identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation_identity.species.formula is not None
         and point_printed_pairs is not None
         and len(point_printed_pairs) == 1
-        and point_printed_pairs[0][0] == observation.identity.species.formula
+        and point_printed_pairs[0][0] == observation_identity.species.formula
         and (
             _located_present(experiment.sample.printed_composition)
             or _located_present(experiment.sample.initial_composition)
@@ -944,11 +946,7 @@ def normalized_composition(
                 unsupported = True
                 missing.append(path)
                 printed_mass_percent_refused = True
-                if (
-                    refusal == "mass-percent composition has duplicate component keys"
-                    or "partial analysis contains unsupported component(s) above "
-                    "0.5 wt%" in refusal
-                ):
+                if refusal == "mass-percent composition has duplicate component keys":
                     return WaypointResult(
                         "normalized_composition",
                         None,
@@ -959,7 +957,11 @@ def normalized_composition(
                             (path,),
                         ),
                     )
-                continue
+                if (
+                    "partial analysis contains unsupported component(s) above "
+                    not in refusal
+                ):
+                    continue
         if field == "initial_composition" and isinstance(raw, Composition):
             refusal = _derived_mass_percent_refusal(located, point)
             if (

@@ -6003,7 +6003,8 @@ def _located_printed_and_initial(
             name = normalized_name
             amount = normalized_wt[normalized_name]
         if (
-            has_mass_suffix
+            state.is_value
+            and has_mass_suffix
             and stem == normalized_name
             and _is_engine_oxide_component(normalized_name)
             and normalized_key_counts[normalized_name] == 1
