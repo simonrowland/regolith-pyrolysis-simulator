@@ -69,7 +69,10 @@ from simulator.melt_backend.magemin import (
 def test_magemin_resolves_explicit_binary_from_backend_config(tmp_path):
     binary = tmp_path / "MAGEMin"
     binary.write_text("fake MAGEMin binary")
+    backend = MAGEMinBackend()
+    backend._config = {"binary_path": str(binary)}
 
+    assert backend._resolve_binary_path() == binary
     assert MAGEMinBackend._resolve_binary_path_for_config({
         "binary_path": str(binary),
     }) == binary
