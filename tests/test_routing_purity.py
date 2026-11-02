@@ -1,4 +1,5 @@
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -89,6 +90,90 @@ def test_stage_purity_report_flags_non_designated_stage_landings():
     assert stage["impurity_species_kg"] == {"SiO2": 1.0}
     assert stage["purity_fraction"] == pytest.approx(0.9)
     assert stage["verdict"] == "MIXED"
+
+
+def _populated_stage_four_purity_train(*, empty_keys=False):
+    na_key = "" if empty_keys else NA_COLLECTOR_STAGE_KEY
+    k_key = "" if empty_keys else K_TRAP_STAGE_KEY
+    return SimpleNamespace(
+        stages=[
+            SimpleNamespace(
+                stage_number=4,
+                sub_order=0,
+                stage_key=na_key,
+                label="Na/Mg collector",
+                collected_kg={"Na": 5.0, "Mg": 5.5},
+            ),
+            SimpleNamespace(
+                stage_number=4,
+                sub_order=1,
+                stage_key=k_key,
+                label="K trap",
+                collected_kg={"K": 9.0},
+            ),
+        ]
+    )
+
+
+def test_stage_purity_report_pins_explicit_stage_four_collectors():
+    report = stage_purity_report(_populated_stage_four_purity_train())
+
+    assert report == {
+        "stage_4_alkali_mg_cyclone": {
+            "stage_number": 4,
+            "label": "Na/Mg collector",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {"Mg": 5.5, "Na": 5.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 10.5,
+            "impurity_kg": 0.0,
+            "total_kg": 10.5,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"Mg": True, "Na": True},
+        },
+        "stage_4b_k_trap": {
+            "stage_number": 4,
+            "label": "K trap",
+            "accepted_species": ["K"],
+            "designated_species_kg": {"K": 9.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 9.0,
+            "impurity_kg": 0.0,
+            "total_kg": 9.0,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"K": True},
+        },
+    }
+
+
+def test_stage_purity_report_pins_empty_stage_four_collapse():
+    report = stage_purity_report(
+        _populated_stage_four_purity_train(empty_keys=True)
+    )
+
+    # This row records the empty-key collapse: the K trap overwrites the Na/Mg row.
+    assert report == {
+        "stage_4_alkali_mg_cyclone": {
+            "stage_number": 4,
+            "label": "K trap",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {"K": 9.0},
+            "designated_kg": 0.0,
+            "impurity_kg": 9.0,
+            "total_kg": 9.0,
+            "purity_fraction": 0.0,
+            "verdict": "CONTAMINATED",
+            "warning": "non-designated condensate present",
+        },
+    }
 
 
 def test_stage_purity_activity_uses_explicit_accepted_species_capture_state():
