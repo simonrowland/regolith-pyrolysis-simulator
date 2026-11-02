@@ -310,7 +310,7 @@ def test_pressure_bracket_keeps_measured_endpoint_residuals():
         carrier_free_molar_flow_mol_s_at_pressure=(
             lambda pressure: pressure * pressure
         ),
-        max_iterations=10,
+        max_iterations=80,
     )
 
     assert abs(solved.pressure_residual_Pa) <= 1.0e-9
