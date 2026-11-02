@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections import Counter, OrderedDict
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
@@ -3088,6 +3089,46 @@ def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
             "work", {"raw": b"y", "table": "3"},
             ["composition"], "unhashable distinct", "source", None,
         ),
+        migrate_module.QueueEntry(
+            "work", {"raw": OrderedDict((("a", 1), ("b", 2)))},
+            ["composition"], "ordered mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": OrderedDict((("b", 2), ("a", 1)))},
+            ["composition"], "ordered mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Counter(a=1)},
+            ["composition"], "counter mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Counter(a=1, b=0)},
+            ["composition"], "counter mapping", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": [1]},
+            ["composition"], "list and tuple", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": (1,)},
+            ["composition"], "list and tuple", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": 1},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": 1.0},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": True},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": Decimal("1")},
+            ["composition"], "equal numeric scalars", "source", None,
+        ),
     ]
     expected = []
     for entry in entries:
@@ -3101,7 +3142,7 @@ def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
     assert [
         next(index for index, original in enumerate(entries) if original is entry)
         for entry in migrator.result.queue
-    ] == [0, 2, 3, 4, 6]
+    ] == [0, 2, 3, 4, 6, 8, 9, 10, 12, 13, 14]
 
 
 @pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))

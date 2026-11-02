@@ -25749,47 +25749,53 @@ class Migrator:
         # Parent-row queue entries can resolve to the same exploded child as a
         # child-local entry. Deduplicate only after observation ids are final.
         # QueueEntry equality compares these fields directly. Freeze nested
-        # locator containers for the normal seen-set path; values that remain
-        # unhashable use the equality fallback below.
+        # locator containers for the seen-set path; types whose equality is
+        # not represented exactly use the equality fallback below.
         def freeze(value: object) -> object:
-            if isinstance(value, Mapping):
+            value_type = type(value)
+            if value_type is dict:
                 return frozenset(
                     (freeze(key), freeze(item)) for key, item in value.items()
                 )
-            if isinstance(value, list):
+            if value_type is list:
                 return (list, tuple(freeze(item) for item in value))
-            if isinstance(value, tuple):
+            if value_type is tuple:
                 return (tuple, tuple(freeze(item) for item in value))
-            if isinstance(value, (set, frozenset)):
-                return (set, frozenset(freeze(item) for item in value))
-            return value
+            if value_type in {str, int, float, bool, type(None), Decimal}:
+                return value
+            raise TypeError(
+                f"unsupported QueueEntry key value type {value_type.__name__}"
+            )
 
         def entry_key(entry: QueueEntry) -> tuple[object, ...]:
-            return (
-                entry.work_id,
-                freeze(entry.locator),
-                freeze(entry.axes),
-                entry.why,
-                entry.source,
-                entry.observation_id,
+            return tuple(
+                freeze(value)
+                for value in (
+                    entry.work_id,
+                    entry.locator,
+                    entry.axes,
+                    entry.why,
+                    entry.source,
+                    entry.observation_id,
+                )
             )
 
         unique_entries: list[QueueEntry] = []
         seen_entries: set[tuple[object, ...]] = set()
-        unhashable_entries: list[QueueEntry] = []
+        equality_fallback_entries: list[QueueEntry] = []
         for entry in self.result.queue:
             try:
                 key = entry_key(entry)
                 hash(key)
             except TypeError:
-                # Preserve dataclass equality when a locator leaf cannot be
-                # represented by a hashable structural key.
+                # Preserve QueueEntry equality for key values whose types are
+                # not represented exactly by the structural key.
                 if entry not in unique_entries:
                     unique_entries.append(entry)
-                    unhashable_entries.append(entry)
+                    equality_fallback_entries.append(entry)
                 continue
             if key in seen_entries or any(
-                entry == previous for previous in unhashable_entries
+                entry == previous for previous in equality_fallback_entries
             ):
                 continue
             unique_entries.append(entry)
