@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 732
-- Extracts (`literature_extract.v1`): 730
+- Sources: 733
+- Extracts (`literature_extract.v1`): 731
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 730
+- Extracts with no PDF: 731
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -651,6 +651,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `slag-003-hino-kitagawa-banya-1993` | Hino, M., Kitagawa, S. and Ban-Ya, S. (1993), "Sulphide Capacities of CaO-Al2O3-MgO and CaO-Al2O3-SiO2 Slags", ISIJ International 33(1), 36–42, DOI 10.2355/isijinternational.33.36 | 10.2355/isijinternational.33.36 | ABSENT, `` | `raw/hino-kitagawa-banya-1993-sulphide/hino-kitagawa-banya-1993-sulphide.pdf` (present, 2d860f4f); `text/slag-003-hino-kitagawa-banya-1993/` (0 files, ABSENT); `tables/slag-003-hino-kitagawa-banya-1993/` (0 files, ABSENT) | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` (18 rows, draft) | `ledger/slag-003-hino-kitagawa-banya-1993.yaml`: extracted (2026-09-07) |
 | `smales-1971-lpsc-12022` | Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings of the Second Lunar Science Conference 2, 1253–1258. |  | ABSENT, `` | `raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf` (present, 7af2b6b0); `text/smales-1971-lpsc-12022/` (19 files, exists); `tables/smales-1971-lpsc-12022/` (0 files, ABSENT) | `data/literature/extracts/smales-1971-lpsc-12022.yaml` (2 rows, draft, private_path) | `ledger/smales-1971-lpsc-12022.yaml`: decoded (2026-09-06) |
 | `smythe-brenan-2015-cerium-redox` | Smythe, D. J. & Brenan, J. M. (2015), Cerium oxidation state in silicate melts, Geochimica et Cosmochimica Acta 170:173-187. | 10.1016/j.gca.2015.07.016 | ABSENT, `` | `raw/smythe-brenan-2015-cerium-redox/smythe-brenan-2015-cerium-redox.pdf` (present, 2ec97a9d); `text/smythe-brenan-2015-cerium-redox/` (15 files, exists); `tables/smythe-brenan-2015-cerium-redox/` (0 files, ABSENT) | `data/literature/extracts/smythe-brenan-2015-cerium-redox.yaml` (1 rows, draft) | `ledger/smythe-brenan-2015-cerium-redox.yaml`: — (—) |
+| `snyder-carmichael-1992-olivine-liquid-feo-activity` | Snyder, D. A. and Carmichael, I. S. E. (1992), “Olivine-liquid equilibria and the chemical activities of FeO, NiO, Fe2O3, and MgO in natural basic melts,” Geochimica et Cosmochimica Acta 56, 303–318. |  | ABSENT, `` | `raw/snyder-carmichael-1992-olivine-liquid-feo-activity/snyder-carmichael-1992-olivine-liquid-feo-activity.pdf` (present, db20fd37); `text/snyder-carmichael-1992-olivine-liquid-feo-activity/` (63 files, exists); `tables/snyder-carmichael-1992-olivine-liquid-feo-activity/` (0 files, ABSENT) | `data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml` (29 rows, draft) | `ledger/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml`: — (—) |
 | `sossi-2020-cu-zn-isotope-evap-formalism` | Sossi, P. A., Moynier, F., Treilles, R., Mokhtari, M., Wang, X. & Siebert, J. (2020), "An experimentally-determined general formalism for evaporation and isotope fractionation of Cu and Zn from silicate melts between 1300 and 1500 °C and 1 bar", Geochimica et Cosmochimica Acta 288:316-340, DOI 10.1016/j.gca.2020.08.011 | 10.1016/j.gca.2020.08.011 | ABSENT, `` | `raw/sossi-2020-cu-zn-isotope-evap-formalism/sossi-2020-cu-zn-isotope-evap-formalism.pdf` (present, 1d1b34d2); `text/sossi-2020-cu-zn-isotope-evap-formalism/` (81 files, exists); `tables/sossi-2020-cu-zn-isotope-evap-formalism/` (0 files, ABSENT) | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` (75 rows, draft) | `ledger/sossi-2020-cu-zn-isotope-evap-formalism.yaml`: decoded (2026-09-06) |
 | `sossi-2020-magma-ocean-redox` | Sossi, P. A., Burnham, A. D., Badro, J., Lanzirotti, A., Newville, M., and O'Neill, H. St.C. (2020). Redox state of Earth's magma ocean and its Venus-like early atmosphere. Science Advances 6, eabd1387. | 10.1126/sciadv.abd1387 | ABSENT, `` | `raw/sossi-2020-magma-ocean-redox/sossi-2020-magma-ocean-redox.pdf` (present, 829723d5); `text/sossi-2020-magma-ocean-redox/` (39 files, exists); `tables/sossi-2020-magma-ocean-redox/` (0 files, ABSENT) | `data/literature/extracts/sossi-2020-magma-ocean-redox.yaml` (12 rows, draft) | `ledger/sossi-2020-magma-ocean-redox.yaml`: — (—) |
 | `span-wagner-1996-co2-psat` | Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid Region from the Triple-Point Temperature to 1100 K at Pressures up to 800 MPa", J. Phys. Chem. Ref. Data 25:1509–1596, DOI 10.1063/1.555991 — CO2(s/l/g) saturation from multiparameter EOS (triple point 216.592 K; solid CO2 sublimation from separate ice tables). Primary solid sublimation cross-check: Giauque & Egan (1937) J. Chem. Phys. 5:45–54 (historical calorimetric triple-point / vapor pressure). | 10.1063/1.555991 | ABSENT, `` | `raw/span-wagner-1996-co2-psat/span-wagner-1996-co2-psat.pdf` (ABSENT, ); `text/span-wagner-1996-co2-psat/` (0 files, ABSENT); `tables/span-wagner-1996-co2-psat/` (0 files, ABSENT) | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` (1 rows, draft) | `ledger/span-wagner-1996-co2-psat.yaml`: extracted (2026-09-06) |
@@ -1389,6 +1390,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `slag-003-hino-kitagawa-banya-1993`
 - `smales-1971-lpsc-12022`
 - `smythe-brenan-2015-cerium-redox`
+- `snyder-carmichael-1992-olivine-liquid-feo-activity`
 - `sossi-2020-cu-zn-isotope-evap-formalism`
 - `sossi-2020-magma-ocean-redox`
 - `span-wagner-1996-co2-psat`
