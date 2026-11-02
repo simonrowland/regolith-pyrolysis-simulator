@@ -311,6 +311,8 @@ def _kress91_gate_key_referenced_log_fO2(
 
 # Holzheid, Palme & Chakraborty 1997, DOI 10.1016/S0009-2541(97)00030-2:
 # gamma_FeO(wustite(l)) = 1.70 +/- 0.22; stoich-FeO(l) multipliers below.
+# Their ratio is the ratio of formation equilibrium constants, so log10 of
+# the multiplier is linear in 1/T. Keep all three printed anchors exact.
 HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL = 1.70
 HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA = 0.22
 HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C = (
@@ -468,27 +470,44 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def _linear_interpolate_or_clamp(
-    points: tuple[tuple[float, float], ...],
-    x: float,
-) -> tuple[float, str]:
-    if x <= points[0][0]:
-        return points[0][1], 'clamped_below_verified_range'
-    if x >= points[-1][0]:
-        return points[-1][1], 'clamped_above_verified_range'
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
-        if x0 <= x <= x1:
-            frac = (x - x0) / (x1 - x0)
-            return y0 + frac * (y1 - y0), 'interpolated_verified_range'
-    return points[-1][1], 'clamped_above_verified_range'
+def _holzheid_stoich_feo_multiplier(T_K: float) -> tuple[float, str]:
+    points = tuple(
+        (temperature_C + 273.15, multiplier)
+        for temperature_C, multiplier in HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+    )
+    for point_temperature_K, multiplier in points:
+        if T_K == point_temperature_K:
+            return multiplier, 'printed_anchor'
+
+    if T_K < points[0][0]:
+        left, right = points[:2]
+        status = 'extrapolated_below_verified_range'
+    elif T_K > points[-1][0]:
+        left, right = points[-2:]
+        status = 'extrapolated_above_verified_range'
+    else:
+        status = 'interpolated_verified_range'
+        left, right = next(
+            (left, right)
+            for left, right in zip(points, points[1:])
+            if left[0] < T_K < right[0]
+        )
+
+    left_T, left_ratio = left
+    right_T, right_ratio = right
+    inverse_temperature_fraction = (
+        (1.0 / T_K - 1.0 / left_T)
+        / (1.0 / right_T - 1.0 / left_T)
+    )
+    log_ratio = math.log10(left_ratio) + inverse_temperature_fraction * (
+        math.log10(right_ratio) - math.log10(left_ratio)
+    )
+    return 10.0**log_ratio, status
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     T_C = float(T_K) - 273.15
-    multiplier, status = _linear_interpolate_or_clamp(
-        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
-        T_C,
-    )
+    multiplier, status = _holzheid_stoich_feo_multiplier(float(T_K))
     central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
     sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
     return {

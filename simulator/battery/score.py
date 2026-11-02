@@ -2613,7 +2613,7 @@ def _b1259_tridymite_cristobalite_delta_g(
 # conversion. d/dT of a + b T - c T ln T is b - c (ln T + 1).
 _HOLZHEID_EQ9_J = (Decimal("-244118"), Decimal("115.559"), Decimal("8.474"))
 _HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
-# Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite. Comparison only.
+# Holzheid 1997 printed values used in the D&G uncertainty comparison notice.
 _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
