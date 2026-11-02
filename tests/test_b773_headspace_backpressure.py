@@ -123,3 +123,27 @@ def test_runtime_ar_n2_cover_keeps_held_total_pressure_in_gas_film(monkeypatch):
     for partials_Pa, pressure_Pa in observed:
         expected_Pa = max(sum(partials_Pa.values()), held_total_Pa)
         assert pressure_Pa == pytest.approx(expected_Pa, rel=1.0e-12)
+
+
+def test_solved_melt_partials_do_not_replace_downstream_overhead_report(
+    monkeypatch,
+):
+    sim = _lunar_simulator()
+    post_condensation_reports = []
+    original_update = sim.overhead_model.update
+
+    def capture_post_condensation_report(*args, **kwargs):
+        overhead = original_update(*args, **kwargs)
+        post_condensation_reports.append(dict(overhead.composition))
+        return overhead
+
+    monkeypatch.setattr(
+        sim.overhead_model, "update", capture_post_condensation_report
+    )
+    snapshot = sim.step()
+
+    assert post_condensation_reports
+    expected = post_condensation_reports[-1]
+    assert snapshot.melt_headspace_composition_mbar
+    assert snapshot.overhead.composition == expected
+    assert sim.overhead.composition == expected

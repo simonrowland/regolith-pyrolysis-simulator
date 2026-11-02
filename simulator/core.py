@@ -15900,11 +15900,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._melt_headspace_composition_mbar.update(
                 solved_headspace_partials_mbar
             )
-            self.overhead.composition.update(solved_headspace_partials_mbar)
-            self.overhead.pressure_mbar = max(
-                self.overhead.pressure_mbar,
-                sum(solved_headspace_partials_mbar.values()),
-            )
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0
