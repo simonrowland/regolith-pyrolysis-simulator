@@ -78,6 +78,19 @@ def test_magemin_resolves_explicit_binary_from_backend_config(tmp_path):
     }) == binary
 
 
+def test_magemin_instance_binary_locator_override_is_used():
+    backend = MAGEMinBackend()
+    backend._config = {}
+    resolved_binary = Path("/bin/true")
+    calls = []
+    backend._locate_binary = (
+        lambda explicit: calls.append(explicit) or resolved_binary
+    )
+
+    assert backend._resolve_binary_path() == resolved_binary
+    assert calls == [None]
+
+
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.

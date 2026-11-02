@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -20,9 +21,36 @@ import simulator.melt_backend.magemin as magemin_module
 
 @pytest.fixture(autouse=True)
 def _clear_projected_liquid_fraction_grid_cache():
-    magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
+    with magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+        magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
     yield
-    magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
+    with magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+        magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
+
+
+class _LockCheckingGridCache(OrderedDict):
+    def _assert_locked(self):
+        assert magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK.locked()
+
+    def get(self, key, default=None):
+        self._assert_locked()
+        return super().get(key, default)
+
+    def move_to_end(self, key, last=True):
+        self._assert_locked()
+        return super().move_to_end(key, last=last)
+
+    def __setitem__(self, key, value):
+        self._assert_locked()
+        return super().__setitem__(key, value)
+
+    def __len__(self):
+        self._assert_locked()
+        return super().__len__()
+
+    def popitem(self, last=True):
+        self._assert_locked()
+        return super().popitem(last=last)
 
 
 def _fixture_feed_masses_kg(feedstocks_data: dict) -> dict[str, float]:
@@ -356,6 +384,66 @@ def test_diagnostic_does_not_reuse_failed_grid_status(monkeypatch, tmp_path):
     assert len(_GridBackend.calls) == 2
 
 
+def test_projected_grid_cache_operations_are_locked_but_solves_are_not(
+    monkeypatch, tmp_path
+):
+    _GridBackend.instances = []
+    _GridBackend.calls = []
+    _GridBackend.fail = False
+    monkeypatch.setattr(magemin_module, "MAGEMinBackend", _GridBackend)
+    fake_engine = tmp_path / "MAGEMin"
+    fake_engine.write_text("stable fake engine")
+    monkeypatch.setattr(
+        _GridBackend,
+        "_resolve_binary_path_for_config",
+        classmethod(lambda _cls, _config: fake_engine),
+    )
+    cache = _LockCheckingGridCache()
+    monkeypatch.setattr(
+        magemin_module,
+        "_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE",
+        cache,
+    )
+    original_solve = _GridBackend.find_liquidus_solidus
+
+    def assert_solve_outside_lock(self, **kwargs):
+        assert not magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK.locked()
+        return original_solve(self, **kwargs)
+
+    monkeypatch.setattr(
+        _GridBackend,
+        "find_liquidus_solidus",
+        assert_solve_outside_lock,
+    )
+
+    last_composition = None
+    for silica_kg in range(5):
+        last_composition = _diagnostic_input()
+        last_composition["SiO2"] += silica_kg
+        diagnostic = magemin_module.projected_engine_liquid_fraction_diagnostic(
+            composition_kg=last_composition,
+            temperature_C=1300.0,
+            fO2_log=-9.0,
+            pressure_bar=0.2,
+            backend_config={"warm_worker": False},
+        )
+        assert diagnostic["status"] == "ok"
+
+    repeated = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=last_composition,
+        temperature_C=1300.0,
+        fO2_log=-9.0,
+        pressure_bar=0.2,
+        backend_config={"warm_worker": False},
+    )
+    assert repeated["status"] == "ok"
+    assert len(_GridBackend.calls) == 5
+    with magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+        assert len(cache) <= (
+            magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LIMIT
+        )
+
+
 def test_diagnostic_refuses_configured_non_qfm_buffer(monkeypatch):
     _GridBackend.instances = []
     _GridBackend.calls = []
@@ -464,6 +552,9 @@ def _run_real_ticks_with_diagnostic(
         exchange_o2_mol_by_tick = []
         flux_kg_hr_by_tick = []
         for _ in range(3):
+            if diagnostic_enabled:
+                with magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+                    magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
             snapshot = sim.step()
             if diagnostic_enabled:
                 for species, mass_kg in sim.melt.composition_kg.items():
