@@ -55,6 +55,15 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
 ):
     sim = _lunar_simulator()
     sim._melt_headspace_composition_mbar = {"O2": 0.0005}
+    batch_builds = 0
+    original_build_batch = sim.build_vapour_batch
+
+    def count_batch_builds(*args, **kwargs):
+        nonlocal batch_builds
+        batch_builds += 1
+        return original_build_batch(*args, **kwargs)
+
+    monkeypatch.setattr(sim, "build_vapour_batch", count_batch_builds)
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: True)
     monkeypatch.setattr(
         sim,
@@ -74,6 +83,7 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
     )
     snapshot = sim.step()
 
+    assert batch_builds == 1
     assert snapshot.evap_flux.total_kg_hr > 0.0
     solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
     assert solver["status"] == "converged"
