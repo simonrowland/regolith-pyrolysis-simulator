@@ -4224,23 +4224,6 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
                 or token.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             ):
                 source_map.setdefault(str(name), value)
-    point_conditions = payload.get("point_conditions")
-    for scope in (payload, point_conditions):
-        if not isinstance(scope, Mapping):
-            continue
-        for name, value in scope.items():
-            if _volatile_closure_component(str(name)) is None:
-                continue
-            if isinstance(value, Located):
-                if not value.state.is_value:
-                    continue
-                value = value.state.value
-            elif isinstance(value, Mapping) and isinstance(value.get("state"), Mapping):
-                state = value["state"]
-                if str(state.get("tag") or "value") != "value":
-                    continue
-                value = state.get("value")
-            source_map.setdefault(str(name), value)
     return source_map or None
 
 
@@ -4468,8 +4451,7 @@ def _preserve_printed_composition_context(
     closure_context: object,
 ) -> Located[Mapping[str, Any]] | None:
     source_values = _printed_map_payload(
-        _source_printed_composition_values(wt, closure_context),
-        numeric_values_as="source",
+        _source_printed_composition_values(wt, closure_context)
     )
     source_locator = _composition_source_locator(closure_context)
     if printed is None or not printed.state.is_value:
@@ -6003,9 +5985,31 @@ def _located_printed_and_initial(
         declared_component_map=declared_component_map,
     )
     source_values = _source_printed_composition_values(wt, closure_context)
+    printed_map = {}
+    normalized_wt = {
+        _mass_percent_component_key(name)[0]: amount for name, amount in wt.items()
+    }
+    mass_loss_row = (
+        isinstance(closure_context, Mapping)
+        and "mass_loss_pct" in closure_context
+    )
+    for name, amount in source_values.items():
+        stem, has_mass_suffix = _mass_percent_component_stem(name)
+        normalized_name, _ = _mass_percent_component_key(name)
+        if state.is_value and normalized_name in normalized_wt:
+            name = normalized_name
+            amount = normalized_wt[normalized_name]
+        if (
+            not mass_loss_row
+            and state.is_value
+            and has_mass_suffix
+            and stem == normalized_name
+            and _is_engine_oxide_component(normalized_name)
+        ):
+            name = normalized_name
+        printed_map[name] = amount
     printed = located_value(
-        _printed_map_payload(source_values, numeric_values_as="source"),
-        _composition_source_locator(closure_context, fallback=locator),
+        _printed_map_payload(printed_map), locator
     )
     if not state.is_value:
         return printed, Located(state, locator=locator)
@@ -15371,9 +15375,6 @@ def sample_from_equipment(
             closure_context=values,
             declared_component_map=_named_printed_composition_map(values),
         )
-        printed = _preserve_printed_composition_context(
-            printed, oxide_map, values
-        )
         if oxide_map is None and refusal_reason:
             initial = Located(
                 State.unknown(
@@ -23099,9 +23100,13 @@ class Migrator:
                 observation_id=point_id,
             )
         extra_pc: dict[str, Located[Any]] = {}
-        # Retain the source cells beside the typed vector so consumers can use
-        # either row-local representation without reconstructing printed values.
-        if printed is not None:
+        # The point composition already retains its source inputs, so attaching
+        # the same print again would change green's waypoint precedence. Keep it
+        # when conversion refused so the refusal remains visible.
+        if printed is not None and not (
+            not point_composition_refusal
+            and (row_bound_redox_composition or point_composition_located is not None)
+        ):
             extra_pc["printed_composition"] = printed
         elif (
             q_token_point is Quantity.MASS_LOSS_FRACTION

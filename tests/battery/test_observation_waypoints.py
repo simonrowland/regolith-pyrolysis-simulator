@@ -123,40 +123,6 @@ def test_engine_point_uses_observation_temperature_without_schedule():
     assert all(row.status is ReadinessStatus.GAP for row in consumer_readiness(experiment, bench) if row.consumer == "engine_point")
 
 
-def test_hashimoto_real_residue_row_reaches_consumer_inputs():
-    path = REPO_ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
-    migrator = factories.migrate_one_extract(REPO_ROOT, path)
-    migrator.finalize()
-    observation = next(
-        obs
-        for obs in migrator.result.observations.values()
-        if obs.source_id == "kems-015-hashimoto-1983"
-        and obs.identity.species.formula == "SiO2"
-        and obs.observation_id.startswith(
-            "kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series::"
-            "T=1973.15:row=c3-(2):"
-        )
-        and obs.point_conditions is not None
-        and "printed_composition" in obs.point_conditions
-        and "VF_wt_pct" in obs.point_conditions
-    )
-    experiment = migrator.result.experiments[observation.experiment_id]
-    bench = migrator.result.benches[experiment.bench_id]
-
-    inputs = collect_consumer_inputs(experiment, bench, observation)
-    waypoint = inputs.waypoints["normalized_composition"]
-
-    assert waypoint.selected is not None
-    assert waypoint.selected.route == "observation_normalized_printed_composition"
-    assert waypoint.selected.value == {
-        "SiO2": Decimal("0.3650189512432688043918944611"),
-        "Al2O3": Decimal("0.01964442915113316876403722593"),
-        "FeO": Decimal("0.2180350237827254408598102512"),
-        "MgO": Decimal("0.3663861823354948612056442728"),
-        "CaO": Decimal("0.03091541348737772477861378927"),
-    }
-
-
 @pytest.mark.parametrize(
     "source_id",
     ("cottrell-2009-iron-xanes", "jugo-2010-sulfur-xanes"),

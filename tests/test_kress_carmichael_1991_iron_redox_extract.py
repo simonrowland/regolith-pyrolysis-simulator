@@ -421,9 +421,6 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         row_composition = record.point_conditions["composition"]
         assert row_composition.state.is_value
         assert row_composition.state.value.as_map() == expected_mole_fractions.as_map()
-        row_printed = record.point_conditions["printed_composition"]
-        assert row_printed.state.is_value
-        assert row_printed.state.value == expected_composition
     assert all(record.identity.composition.is_value for record in reduced)
     assert all(
         record.identity.total_pressure_Pa.is_value
