@@ -208,9 +208,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         source_row = source_rows[row.observation_id.split("::", 1)[1]][1]
         source_experiment = experiments[source_row["experiment"]]
         printed = source_experiment["sample"]["printed_composition"]["state"]["value"]
-        printed_components = (
-            printed.get("components", ()) if isinstance(printed, dict) else printed
-        )
+        printed_components = printed.items() if isinstance(printed, dict) else printed
         printed_sum = sum(
             (Decimal(amount) for _name, amount in printed_components), Decimal("0")
         )
