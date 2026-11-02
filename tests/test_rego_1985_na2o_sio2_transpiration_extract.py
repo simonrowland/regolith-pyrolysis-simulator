@@ -1,6 +1,8 @@
 """Render-grounded pins for Rego, Sigworth, and Philbrook (1985)."""
 
+from collections import Counter
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -50,6 +52,26 @@ RENDER_GRID = {
     31: ("40.66", "17.9", "1.003", "108.50", "3.93"),
 }
 
+# Independent expected outputs from the rendered Table I inputs and printed
+# Eqs. [4] and [6], with full precision carried through Eq. [6]. pNa is
+# unit-converted to Pa by the real migrator after its final atm rounding.
+EXPECTED_PNA_PA = (
+    "226.968", "243.18", "387.0615", "639.36075", "713.328", "1033.515",
+    "1023.3825", "1459.08", "2036.6325", "1540.14", "2462.1975", "2036.6325",
+    "4164.4575", "4346.8425", "7335.93", "1408.4175", "1246.2975", "1165.2375",
+    "1357.755", "1661.73", "1408.4175", "2391.27", "2634.45", "2522.9925",
+    "3374.1225", "2654.715", "3526.11", "5400.6225", "6079.5", "6261.885",
+    "9382.695",
+)
+EXPECTED_ACTIVITY = (
+    "2.67e-9", "3.0e-9", "7.62e-9", "2.08e-8", "2.53e-8", "5.48e-8",
+    "5.31e-8", "1.06e-7", "2.05e-7", "1.18e-7", "2.99e-7", "2.09e-7",
+    "8.54e-7", "9.22e-7", "2.57e-6", "1.52e-8", "1.22e-8", "1.06e-8",
+    "1.43e-8", "2.14e-8", "1.54e-8", "4.39e-8", "5.30e-8", "4.88e-8",
+    "8.63e-8", "5.42e-8", "9.42e-8", "2.17e-7", "2.73e-7", "2.93e-7",
+    "6.36e-7",
+)
+
 TABLE_FIELDS = (
     "Na2O_mol_pct_as_published",
     "CO_flow_rate_ml_min_as_published",
@@ -82,6 +104,67 @@ def _assert_render_grid(document):
         assert row["locator"]["published_page"] == 316
         assert row["locator"]["table"] == "I"
         assert row["locator"]["row"] == str(run)
+
+
+def _assert_migrated_reductions_and_conditions(observations):
+    assert len(EXPECTED_PNA_PA) == len(EXPECTED_ACTIVITY) == 31
+    for run, rendered in RENDER_GRID.items():
+        suffix = f"{run:02d}"
+        input_row = observations[f"{SID}::rego_1985_table1_run_{suffix}_inputs"]
+        pressure_row = observations[f"{SID}::rego_1985_table1_run_{suffix}_pna_eq4"]
+        activity_row = observations[f"{SID}::rego_1985_table1_run_{suffix}_activity_eq6"]
+
+        assert pressure_row.identity.quantity.value is Quantity.P_PARTIAL
+        assert pressure_row.value.point == Decimal(EXPECTED_PNA_PA[run - 1])
+        assert activity_row.identity.quantity.value is Quantity.ACTIVITY
+        assert activity_row.value.point == Decimal(EXPECTED_ACTIVITY[run - 1])
+        assert pressure_row.locator.page == 1
+        assert pressure_row.locator.equation == "4"
+        assert activity_row.locator.page == 2
+        assert activity_row.locator.equation == "6"
+        assert pressure_row.identity.species.phase.value is Phase.G
+        assert activity_row.identity.species.phase.value is Phase.L
+
+        temperature_c = Decimal("1300" if run <= 15 else "1400")
+        na2o = Decimal(rendered[0]) / Decimal(100)
+        expected_composition = (("Na2O", na2o), ("SiO2", Decimal(1) - na2o))
+        expected_pressure_pa = Decimal(rendered[2]) * Decimal("101325")
+        for observation in (input_row, pressure_row, activity_row):
+            identity = observation.identity
+            assert identity.temperature_K.value == temperature_c + Decimal("273.15")
+            assert identity.composition.value.components == expected_composition
+            assert identity.total_pressure_Pa.value == expected_pressure_pa
+            if observation is input_row:
+                assert identity.fO2_Pa is None
+            else:
+                assert identity.fO2_Pa is not None and identity.fO2_Pa.is_unknown
+
+            conditions = observation.point_conditions
+            assert conditions is not None
+            assert conditions["T_C"].state.value == temperature_c
+            assert conditions["T_C"].locator.page == 4
+            assert conditions["T_C"].locator.table == "I"
+            assert conditions["composition"].state.value.components == expected_composition
+            assert conditions["composition"].locator.page == 4
+            assert conditions["composition"].locator.table == "I"
+            assert conditions["total_pressure_Pa"].state.value == expected_pressure_pa
+            if observation is pressure_row:
+                assert conditions["total_pressure_Pa"].locator.page == 1
+                assert conditions["total_pressure_Pa"].locator.equation == "4"
+            else:
+                assert conditions["total_pressure_Pa"].locator.page == 4
+                assert conditions["total_pressure_Pa"].locator.table == "I"
+            assert conditions["atmosphere"].state.value == (
+                "pure CO gas (Matheson, UHP grade, 99.8 pct min)"
+            )
+            assert conditions["atmosphere"].locator.page == 2
+            assert conditions["fO2_log"].state.is_unknown
+            assert conditions["fO2_log"].locator.page == 1
+
+        reference_state = activity_row.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        assert reference_state.value.endmember.formula == "Na2O"
+        assert reference_state.value.endmember.phase.value is Phase.L
 
 
 def test_table1_render_grid_has_all_31_rows_and_detects_mutation():
@@ -126,11 +209,17 @@ def test_isolated_migration_binds_rendered_rows_and_refuses_only_the_input_bundl
         f"{SID}::rego_1985_table1_run_{run:02d}_inputs" for run in range(1, 32)
     }
     assert unavailable == expected_inputs
+    assert len(result.queue) == 93
+    assert {entry.observation_id for entry in result.queue} == expected_inputs
+    assert Counter(axis for entry in result.queue for axis in entry.axes) == Counter(
+        {"quantity": 31, "method": 31, "value": 31}
+    )
     print(
         "isolated migration:",
         f"obs={len(result.observations)}",
         f"hard={len(result.validation.hard_issues)}",
         f"unavailable={len(unavailable)}",
+        f"queue={len(result.queue)}",
     )
 
     unknown_quantity = {
@@ -145,62 +234,12 @@ def test_isolated_migration_binds_rendered_rows_and_refuses_only_the_input_bundl
         for observation in result.observations.values()
     )
 
-    def migrated(observation_id):
-        return result.observations[f"{SID}::{observation_id}"]
-
-    # Rendered Table I values reach the migrated pNa and activity rows.
-    pna_1 = migrated("rego_1985_table1_run_01_pna_eq4")
-    pna_31 = migrated("rego_1985_table1_run_31_pna_eq4")
-    activity_1 = migrated("rego_1985_table1_run_01_activity_eq6")
-    activity_31 = migrated("rego_1985_table1_run_31_activity_eq6")
-    assert pna_1.identity.quantity.value is Quantity.P_PARTIAL
-    assert pna_1.identity.species.phase.value is Phase.G
-    assert pna_1.value.point == Decimal("226.968")
-    assert pna_31.value.point == Decimal("9382.695")
-    assert activity_1.identity.quantity.value is Quantity.ACTIVITY
-    assert activity_1.identity.species.phase.value is Phase.L
-    assert activity_1.value.point == Decimal("2.67e-9")
-    assert activity_31.value.point == Decimal("6.36e-7")
-    reference_state = activity_1.identity.reference_state
-    assert reference_state is not None and reference_state.is_value
-    assert reference_state.value.endmember.formula == "Na2O"
-    assert reference_state.value.endmember.phase.value is Phase.L
-
-    # Table I and both equation locators remain distinct after migration.
-    assert migrated("rego_1985_table1_run_10_inputs").locator.table == "I"
-    assert migrated("rego_1985_table1_run_10_inputs").locator.page == 4
-    assert pna_1.locator.page == 1
-    assert pna_1.locator.equation == "4"
-    assert activity_1.locator.page == 2
-    assert activity_1.locator.equation == "6"
-
-    for run in range(1, 32):
-        input_row = migrated(f"rego_1985_table1_run_{run:02d}_inputs")
-        pressure_row = migrated(f"rego_1985_table1_run_{run:02d}_pna_eq4")
-        activity_row = migrated(f"rego_1985_table1_run_{run:02d}_activity_eq6")
-        for observation in (input_row, pressure_row, activity_row):
-            assert observation.identity.temperature_K is not None
-            assert observation.identity.temperature_K.is_value
-            assert observation.identity.composition is not None
-            assert observation.identity.composition.is_value
-            assert observation.identity.total_pressure_Pa is not None
-            assert observation.identity.total_pressure_Pa.is_value
-            assert observation.point_conditions["T_C"].state.is_value
-            assert observation.point_conditions["T_C"].locator.page == 4
-            assert observation.point_conditions["composition"].state.is_value
-            assert observation.point_conditions["fO2_log"].state.is_unknown
-        assert pressure_row.identity.fO2_Pa is not None
-        assert pressure_row.identity.fO2_Pa.is_unknown
-        assert activity_row.identity.fO2_Pa is not None
-        assert activity_row.identity.fO2_Pa.is_unknown
-
-    first = migrated("rego_1985_table1_run_01_activity_eq6")
-    assert first.identity.temperature_K.value == Decimal("1573.15")
-    assert first.identity.total_pressure_Pa.value == Decimal("102844.875")
-    assert first.identity.composition.value.components == (
-        ("Na2O", Decimal("0.1789")),
-        ("SiO2", Decimal("0.8211")),
-    )
+    _assert_migrated_reductions_and_conditions(result.observations)
+    migrated_input_row_10 = result.observations[
+        f"{SID}::rego_1985_table1_run_10_inputs"
+    ]
+    assert migrated_input_row_10.locator.table == "I"
+    assert migrated_input_row_10.locator.page == 4
 
     input_row_10 = next(
         row
@@ -214,3 +253,18 @@ def test_isolated_migration_binds_rendered_rows_and_refuses_only_the_input_bundl
     )
     assert input_row_10["values"]["Na_mg_in_leached_solution_as_published"] == "14.2"
     assert input_row_16["values"]["CO_moles_collected_x10_minus2_as_published"] == "3.88"
+
+
+def test_tenfold_run_18_activity_mutation_fails_the_migrated_pins():
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    observations = dict(migrator.result.observations)
+    observation_id = f"{SID}::rego_1985_table1_run_18_activity_eq6"
+    observation = observations[observation_id]
+    observations[observation_id] = replace(
+        observation,
+        value=replace(observation.value, point=observation.value.point * Decimal(10)),
+    )
+
+    with pytest.raises(AssertionError):
+        _assert_migrated_reductions_and_conditions(observations)
