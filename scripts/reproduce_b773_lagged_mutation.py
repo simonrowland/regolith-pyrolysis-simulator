@@ -12,30 +12,28 @@ from reproduce_b773_evap_oscillation import _cases, _run_case
 def _acceptance_failures(result: dict) -> list[str]:
     failures: list[str] = []
     hours = result["hours"]
-    if any(not row["flux_kg_hr"] for row in hours):
-        failures.append("empty_flux_hour")
+    started = False
+    for row in hours:
+        if row["flux_kg_hr"]:
+            started = True
+        elif started:
+            failures.append(f"empty_flux_hour_after_start_{row['hour']}")
     species = set().union(*(set(row["flux_kg_hr"]) for row in hours))
     for name in sorted(species):
-        started = False
-        was_off = False
-        flips_after_start = 0
-        previous = False
-        for row in hours:
-            present = name in row["flux_kg_hr"]
-            if present:
-                started = True
-            if started and previous != present:
-                flips_after_start += 1
-            if started and was_off and present:
-                failures.append(f"{name}_restarted_after_off")
+        for left, middle, right in zip(hours, hours[1:], hours[2:]):
+            present = tuple(
+                float(row["flux_kg_hr"].get(name, 0.0)) > _NONZERO_KG_HR
+                for row in (left, middle, right)
+            )
+            same_campaign = len(
+                {row["campaign"] for row in (left, middle, right)}
+            ) == 1
+            if present == (True, False, True) and same_campaign:
+                failures.append(
+                    f"{name}_period_two_hours_"
+                    f"{left['hour']}_{middle['hour']}_{right['hour']}"
+                )
                 break
-            if started and previous and not present:
-                was_off = True
-            previous = present
-        if flips_after_start > 1 and not any(
-            failure.startswith(f"{name}_") for failure in failures
-        ):
-            failures.append(f"{name}_alternated")
     return failures
 
 

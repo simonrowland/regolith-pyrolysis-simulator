@@ -60,6 +60,9 @@ def _run_case(case: dict) -> dict:
     if initial_temperature_C is not None:
         session.simulator.melt.temperature_C = float(initial_temperature_C)
     sim = session.simulator
+    initial_cleaned_melt_mol = dict(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    )
     original_make_snapshot = sim._make_snapshot
 
     def make_snapshot_with_evaporation_diagnostic(*args, **kwargs):
@@ -74,6 +77,37 @@ def _run_case(case: dict) -> dict:
     sim._make_snapshot = make_snapshot_with_evaporation_diagnostic
     execution = RunExecutor().execute_session(session, hours=int(run.hours))
     ledger_accounts = sim.atom_ledger.kg_by_account()
+    gross_inputs = sim.atom_ledger.gross_account_flows().get("inputs", {})
+    gross_input_species_mol = (
+        gross_inputs.get("species_mol_by_account", {})
+        if isinstance(gross_inputs, dict)
+        else {}
+    )
+    overhead_input_mol = (
+        gross_input_species_mol.get("process.overhead_gas", {})
+        if isinstance(gross_input_species_mol, dict)
+        else {}
+    )
+    from simulator.accounting.ledger import _species_mol_to_kg
+
+    ledger_evolved_kg = _species_mol_to_kg(
+        overhead_input_mol,
+        sim.atom_ledger.registry,
+    )
+    final_cleaned_melt_mol = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    )
+    initial_sio2_mol = float(initial_cleaned_melt_mol.get("SiO2", 0.0))
+    final_sio2_mol = float(final_cleaned_melt_mol.get("SiO2", 0.0))
+    from simulator.state import MOLAR_MASS
+
+    # Match the runner's SiO-equivalent depletion: one mol of SiO2 lost is
+    # one mol SiO-equivalent; mol × g/mol ÷ 1000 gives kg, and no loss gives 0.
+    sio_evolved_kg = (
+        max(0.0, initial_sio2_mol - final_sio2_mol)
+        * MOLAR_MASS["SiO"]
+        / 1000.0
+    )
     hours = []
     evolved_kg: dict[str, float] = {}
     stage_capture_kg: dict[str, dict[str, float]] = {}
@@ -146,6 +180,10 @@ def _run_case(case: dict) -> dict:
         ),
         "hours": hours,
         "evolved_kg": evolved_kg,
+        "ledger_evolved_kg": ledger_evolved_kg,
+        "initial_sio2_mol": initial_sio2_mol,
+        "final_sio2_mol": final_sio2_mol,
+        "sio_evolved_kg": sio_evolved_kg,
         "stage_capture_kg": stage_capture_kg,
         "ledger_stage_capture_kg": ledger_stage_capture_kg,
         "ledger_terminal_offgas_kg": {
@@ -318,7 +356,7 @@ def main() -> int:
                 return original_fit(self, *fit_args, **fit_kwargs)
             original_data = self.vapor_pressures
             modified_data = deepcopy(original_data)
-            modified_data["oxide_vapors"]["SiO"]["antoine"]["A"] = None
+            modified_data["oxide_vapors"]["SiO"]["antoine"].pop("A", None)
             self.vapor_pressures = modified_data
             try:
                 return original_fit(self, *fit_args, **fit_kwargs)
