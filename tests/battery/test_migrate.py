@@ -189,7 +189,7 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
     assert not comparison_method_cell_constant_cancels(different)
 
 
-def test_vapour_provenance_keeps_recorded_sample_phase() -> None:
+def test_vapour_provenance_keeps_explicit_condensed_form() -> None:
     condensed_form = {"state": "liquid_melt", "basis": "explicit_author"}
     provenance = _provenance_from_extract(
         {
@@ -201,10 +201,7 @@ def test_vapour_provenance_keeps_recorded_sample_phase() -> None:
         quantity=Quantity.P_PARTIAL,
     )
 
-    assert provenance == {
-        "measured_condensed_form": condensed_form,
-        "measured_sample_phase": "K2O-SiO2_binary_silicate_melt",
-    }
+    assert provenance == {"measured_condensed_form": condensed_form}
 
 
 @pytest.mark.parametrize(

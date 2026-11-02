@@ -9019,23 +9019,17 @@ def test_shilov_ceramic_row_state_gets_nonblocking_domain_notice() -> None:
     assert notice.affected_quantities == (Quantity.P_PARTIAL,)
 
 
-@pytest.mark.parametrize(
-    "measured_phase",
-    (
-        {
+def test_recorded_liquid_measurement_phase_overrides_solid_sample_description() -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    reference = replace(
+        reference,
+        provenance={
             "measured_condensed_form": {
                 "state": "liquid_melt",
                 "basis": "explicit_author",
             }
         },
-        {"measured_sample_phase": "K2O-SiO2_binary_silicate_melt"},
-    ),
-)
-def test_recorded_liquid_measurement_phase_overrides_solid_sample_description(
-    measured_phase: dict[str, object],
-) -> None:
-    experiment, reference = _vapour_over_sample_form("solid")
-    reference = replace(reference, provenance=measured_phase)
+    )
 
     residual, calls = _score_sample_phase_vapour(
         reference, experiment, Engine.INTERNAL_ANALYTICAL

@@ -431,7 +431,6 @@ PHASE_MAP: dict[str, Phase] = {
 _SAMPLE_SOURCE_PHASE_LABELS = frozenset(
     {
         "basaltic_silicate_melt",
-        "k2o-sio2_binary_silicate_melt",
         "silicate_melt_ferrobasalt_fcmas",
         "cao-al2o3-sio2 liquid oxide melt",
     }
@@ -468,7 +467,6 @@ _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
     "solution": Phase.L,
     "liquid solution": Phase.L,
     "liquid_solution": Phase.L,
-    "k2o-sio2_binary_silicate_melt": Phase.L,
 }
 
 
