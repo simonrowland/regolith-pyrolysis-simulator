@@ -81,6 +81,7 @@ from simulator.accounting.yield_disposition import (
 )
 from simulator.chemistry.kernel import (
     CHEMISTRY_KERNEL_RUN_INPUT_KEYS,
+    ChemistryIntent,
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
@@ -2577,6 +2578,48 @@ def _oxygen_reservoir_exchange_observables(
     return {"oxygen_reservoir": _json_safe(exchange)}
 
 
+def _projected_engine_liquid_fraction_for_snapshot(
+    sim: PyrolysisSimulator,
+    snapshot: HourSnapshot,
+) -> dict[str, Any] | None:
+    """Wire an isolated MAGEMin diagnostic to this historical snapshot."""
+    gate = getattr(snapshot, "liquid_fraction_gate", {}) or {}
+    if not isinstance(gate, Mapping) or gate.get("provider") != "magemin":
+        return None
+    registry = getattr(sim, "_chem_registry", None)
+    if registry is None:
+        return None
+    provider = registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    backend = getattr(provider, "_backend", None)
+    try:
+        if backend is None or not backend.is_available():
+            return None
+    except Exception:
+        return None
+
+    melt_inventory = snapshot.inventory.copy()
+    melt_mass_kg = float(snapshot.melt_mass_kg)
+    composition_kg = {
+        str(species): melt_mass_kg * float(wt_pct) / 100.0
+        for species, wt_pct in snapshot.composition_wt_pct.items()
+    }
+    for species, mass_kg in melt_inventory.inert_melt_components_kg.items():
+        composition_kg[str(species)] = (
+            composition_kg.get(str(species), 0.0) + float(mass_kg)
+        )
+
+    from simulator.melt_backend.magemin import (
+        projected_engine_liquid_fraction_diagnostic,
+    )
+
+    return projected_engine_liquid_fraction_diagnostic(
+        composition_kg=composition_kg,
+        temperature_C=snapshot.temperature_C,
+        fO2_log=snapshot.oxygen_reservoir.get("melt_intrinsic_fO2_log"),
+        backend_config=copy.deepcopy(getattr(backend, "_config", {}) or {}),
+    )
+
+
 def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     summary = dict(getattr(snapshot, "mre_uncertified_yield", {}) or {})
     if not summary:
@@ -2866,6 +2909,20 @@ def build_per_hour_summary(
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
+    projected_fraction = _projected_engine_liquid_fraction_for_snapshot(
+        sim,
+        snapshot,
+    )
+    if projected_fraction is not None:
+        oxygen_reservoir = dict(summary.get("oxygen_reservoir") or {})
+        liquid_fraction_gate = dict(
+            oxygen_reservoir.get("liquid_fraction_gate") or {}
+        )
+        liquid_fraction_gate["projected_engine_liquid_fraction"] = (
+            projected_fraction
+        )
+        oxygen_reservoir["liquid_fraction_gate"] = liquid_fraction_gate
+        summary["oxygen_reservoir"] = oxygen_reservoir
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):
         stage3 = sim._stage3_fe_wt_pct_diagnostic()
         summary["stage_3_capture"] = {

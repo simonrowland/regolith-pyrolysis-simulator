@@ -96,6 +96,7 @@ from __future__ import annotations
 import builtins
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
+from functools import lru_cache
 import fcntl
 import json
 import math
@@ -3996,3 +3997,237 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def _warn(self, message: str) -> None:
         if message not in self._warnings:
             self._warnings.append(message)
+
+
+@dataclass(frozen=True)
+class _MAGEMinDiagnosticProjection:
+    kept_oxide_kg: Mapping[str, float]
+    dropped_species_mass_kg: Mapping[str, float]
+    dropped_species_mass_fractions: Mapping[str, float]
+    dropped_mass_fraction: float
+
+
+class MAGEMinDiagnosticProjectionRefusal(MeltCompositionError):
+    """Typed refusal when a projected diagnostic is unsafe or empty."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        total_dropped_fraction: float,
+        dropped_species_mass_fractions: Optional[Mapping[str, float]] = None,
+    ) -> None:
+        self.total_dropped_fraction = float(total_dropped_fraction)
+        self.dropped_species_mass_fractions = dict(
+            dropped_species_mass_fractions or {}
+        )
+        super().__init__(message)
+
+
+def project_magemin_diagnostic_composition(
+    composition_kg: Mapping[str, float],
+) -> _MAGEMinDiagnosticProjection:
+    """Project a copied melt mass map onto oxides supported by ig MAGEMin."""
+    masses: Dict[str, float] = {}
+    try:
+        for raw_species, raw_mass in composition_kg.items():
+            species = str(raw_species)
+            mass_kg = float(raw_mass)
+            if not math.isfinite(mass_kg) or mass_kg < 0.0:
+                raise ValueError(f"invalid mass for {species}: {raw_mass!r}")
+            if mass_kg > 0.0:
+                masses[species] = mass_kg
+    except Exception as exc:
+        raise MAGEMinDiagnosticProjectionRefusal(
+            f"invalid projected diagnostic composition: {exc}",
+            total_dropped_fraction=0.0,
+        ) from exc
+
+    total_mass_kg = sum(masses.values())
+    if total_mass_kg <= 0.0:
+        raise MAGEMinDiagnosticProjectionRefusal(
+            "empty projected diagnostic composition",
+            total_dropped_fraction=0.0,
+        )
+
+    unsupported_ig_oxides = {"MnO", "P2O5", "NiO", "CoO"}
+    kept_basis = set(OXIDE_SPECIES) - unsupported_ig_oxides
+    kept = {
+        species: mass_kg
+        for species, mass_kg in sorted(masses.items())
+        if species in kept_basis
+    }
+    dropped_mass_kg = {
+        species: mass_kg
+        for species, mass_kg in sorted(masses.items())
+        if species not in kept_basis
+    }
+    dropped_fractions = {
+        species: mass_kg / total_mass_kg
+        for species, mass_kg in dropped_mass_kg.items()
+    }
+    total_dropped_fraction = sum(dropped_fractions.values())
+
+    # The 2% cap leaves over 3x headroom above the default lunar feeds'
+    # measured 0.27-0.52% dropped mass, while refusing materially different
+    # compositions before they are presented as a useful projected value.
+    if total_dropped_fraction > 0.02:
+        raise MAGEMinDiagnosticProjectionRefusal(
+            "dropped mass fraction exceeds 2%",
+            total_dropped_fraction=total_dropped_fraction,
+            dropped_species_mass_fractions=dropped_fractions,
+        )
+
+    return _MAGEMinDiagnosticProjection(
+        kept_oxide_kg=kept,
+        dropped_species_mass_kg=dropped_mass_kg,
+        dropped_species_mass_fractions=dropped_fractions,
+        dropped_mass_fraction=total_dropped_fraction,
+    )
+
+
+@lru_cache(maxsize=128)
+def _projected_engine_liquid_fraction_grid(
+    kept_oxide_amounts: Tuple[Tuple[str, float], ...],
+    dropped_amounts: Tuple[Tuple[str, float], ...],
+    fO2_log: float,
+    backend_config_json: str,
+) -> Tuple[str, Tuple[Tuple[float, float], ...]]:
+    """Run one isolated MAGEMin temperature search for an immutable bulk."""
+    del dropped_amounts  # The key must change when a dropped trace changes.
+    backend: Optional[MAGEMinBackend] = None
+    try:
+        backend_config = json.loads(backend_config_json)
+        backend = MAGEMinBackend()
+        if not backend.initialize(backend_config) or not backend.is_available():
+            return "unavailable", ()
+        result = backend.find_liquidus_solidus(
+            composition_kg=dict(kept_oxide_amounts),
+            fO2_log=fO2_log,
+            pressure_bar=1e-6,
+        )
+        status = str(getattr(result, "status", "unavailable"))
+        if status != "ok":
+            return status, ()
+        samples = tuple(
+            (float(sample.temperature_C), float(sample.frac_M))
+            for sample in (getattr(result, "samples", ()) or ())
+        )
+        return ("ok", samples) if samples else ("grid_unavailable", ())
+    except Exception:
+        return "solve_failed", ()
+    finally:
+        if backend is not None:
+            try:
+                backend.close()
+            except Exception:
+                pass
+
+
+def projected_engine_liquid_fraction_diagnostic(
+    *,
+    composition_kg: Mapping[str, float],
+    temperature_C: float,
+    fO2_log: float,
+    backend_config: Mapping[str, Any],
+) -> Dict[str, Any]:
+    """Return a projected MAGEMin fraction without touching simulation state."""
+    result: Dict[str, Any] = {
+        "fraction": None,
+        "temperature_C": None,
+        "status": "invalid_input",
+        "provider": "magemin",
+        "dropped_species_mass_fractions": {},
+        "total_dropped_mass_fraction": 0.0,
+        "value_source": "none",
+    }
+    try:
+        temperature = float(temperature_C)
+        fO2 = float(fO2_log)
+        if not math.isfinite(temperature) or not math.isfinite(fO2):
+            return result
+        result["temperature_C"] = temperature
+        projection = project_magemin_diagnostic_composition(dict(composition_kg))
+        result["dropped_species_mass_fractions"] = dict(
+            projection.dropped_species_mass_fractions
+        )
+        result["total_dropped_mass_fraction"] = (
+            projection.dropped_mass_fraction
+        )
+        backend_config_json = json.dumps(
+            dict(backend_config),
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+            allow_nan=False,
+        )
+    except MAGEMinDiagnosticProjectionRefusal as exc:
+        result["status"] = "projection_refused"
+        result["dropped_species_mass_fractions"] = dict(
+            exc.dropped_species_mass_fractions
+        )
+        result["total_dropped_mass_fraction"] = exc.total_dropped_fraction
+        return result
+    except Exception:
+        return result
+
+    kept = tuple(sorted(
+        (str(species), float(mass_kg))
+        for species, mass_kg in projection.kept_oxide_kg.items()
+    ))
+    dropped = tuple(sorted(
+        (str(species), float(mass_kg))
+        for species, mass_kg in projection.dropped_species_mass_kg.items()
+    ))
+    try:
+        status, samples = _projected_engine_liquid_fraction_grid(
+            kept,
+            dropped,
+            fO2,
+            backend_config_json,
+        )
+        result["status"] = status
+        if status != "ok":
+            return result
+        points = {
+            float(sample_temperature): float(fraction)
+            for sample_temperature, fraction in samples
+            if math.isfinite(float(sample_temperature))
+            and math.isfinite(float(fraction))
+        }
+        ordered = sorted(points.items())
+        if len(ordered) < 2:
+            result["status"] = "grid_unavailable"
+            return result
+        if temperature < ordered[0][0] or temperature > ordered[-1][0]:
+            result["status"] = "temperature_outside_grid"
+            return result
+        for (lower_T, lower_fraction), (upper_T, upper_fraction) in zip(
+            ordered,
+            ordered[1:],
+        ):
+            if temperature == lower_T:
+                fraction = lower_fraction
+                break
+            if lower_T <= temperature <= upper_T:
+                weight = (temperature - lower_T) / (upper_T - lower_T)
+                fraction = lower_fraction + (
+                    upper_fraction - lower_fraction
+                ) * weight
+                break
+        else:
+            fraction = ordered[-1][1]
+        if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
+            result["status"] = "invalid_grid_fraction"
+            return result
+        result.update({
+            "fraction": fraction,
+            "status": "ok",
+            "value_source": "magemin_ig_projected_oxide_grid",
+        })
+        return result
+    except Exception:
+        result["fraction"] = None
+        result["status"] = "diagnostic_failed"
+        result["value_source"] = "none"
+        return result
