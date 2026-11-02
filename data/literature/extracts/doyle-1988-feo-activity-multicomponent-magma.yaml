@@ -54,7 +54,21 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: &doyle_1988_wustite_standard_state
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe(1-x)O
+              phase: {tag: value, value: l}
+              polymorph:
+                tag: not_applicable
+                reason: non-stoichiometric liquid wüstite has no crystalline polymorph
+              charge: {tag: value, value: 0}
+            component_basis: Fe(1-x)O
+            reference_pressure_bar: '1.01325'
+        inferred: false
       values:
         quantity: activity
         method_class: measured_reduced
@@ -102,8 +116,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -212,7 +226,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -256,8 +270,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -366,7 +380,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -410,8 +424,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -520,7 +534,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -564,8 +578,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -674,7 +688,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -718,8 +732,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -828,7 +842,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -876,8 +890,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -986,7 +1000,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1030,8 +1044,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1140,7 +1154,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1184,8 +1198,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1294,7 +1308,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1338,8 +1352,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1448,7 +1462,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1492,8 +1506,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1602,7 +1616,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1650,8 +1664,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1760,7 +1774,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1804,8 +1818,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -1914,7 +1928,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -1958,8 +1972,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2068,7 +2082,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2112,8 +2126,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2222,7 +2236,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2270,8 +2284,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2380,7 +2394,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2424,8 +2438,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2534,7 +2548,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2578,8 +2592,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2688,7 +2702,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2732,8 +2746,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2842,7 +2856,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -2886,8 +2900,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -2996,7 +3010,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3040,8 +3054,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3150,7 +3164,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3194,8 +3208,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3304,7 +3318,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3348,8 +3362,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3458,7 +3472,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3506,8 +3520,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3616,7 +3630,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3660,8 +3674,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3770,7 +3784,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3814,8 +3828,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -3924,7 +3938,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -3968,8 +3982,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -4078,7 +4092,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4122,8 +4136,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -4232,7 +4246,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4276,8 +4290,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -4386,7 +4400,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4430,8 +4444,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -4540,7 +4554,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4584,8 +4598,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
         oxide_absences_as_printed:
           K2O:
@@ -4694,7 +4708,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4742,8 +4756,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -4841,7 +4855,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -4885,8 +4899,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -4984,7 +4998,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5028,8 +5042,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5127,7 +5141,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5171,8 +5185,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5270,7 +5284,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5314,8 +5328,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5413,7 +5427,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5461,8 +5475,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5560,7 +5574,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5604,8 +5618,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5703,7 +5717,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5747,8 +5761,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5846,7 +5860,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -5890,8 +5904,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -5989,7 +6003,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6033,8 +6047,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6132,7 +6146,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6176,8 +6190,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6275,7 +6289,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6319,8 +6333,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6418,7 +6432,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6466,8 +6480,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6565,7 +6579,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6609,8 +6623,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6708,7 +6722,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6752,8 +6766,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6851,7 +6865,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -6895,8 +6909,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -6994,7 +7008,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7038,8 +7052,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7137,7 +7151,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7181,8 +7195,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7280,7 +7294,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7324,8 +7338,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7423,7 +7437,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7467,8 +7481,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7566,7 +7580,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7610,8 +7624,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7709,7 +7723,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7753,8 +7767,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7852,7 +7866,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -7896,8 +7910,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -7995,7 +8009,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8039,8 +8053,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8138,7 +8152,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8182,8 +8196,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8281,7 +8295,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8325,8 +8339,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8424,7 +8438,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8468,8 +8482,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8567,7 +8581,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8611,8 +8625,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8710,7 +8724,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8754,8 +8768,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8853,7 +8867,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -8897,8 +8911,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -8996,7 +9010,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9040,8 +9054,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9139,7 +9153,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9183,8 +9197,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9282,7 +9296,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9326,8 +9340,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9425,7 +9439,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9469,8 +9483,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9568,7 +9582,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9612,8 +9626,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9711,7 +9725,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9755,8 +9769,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9854,7 +9868,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -9898,8 +9912,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -9997,7 +10011,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10041,8 +10055,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10140,7 +10154,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10184,8 +10198,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10283,7 +10297,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10327,8 +10341,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10426,7 +10440,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10470,8 +10484,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10569,7 +10583,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10613,8 +10627,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10712,7 +10726,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10756,8 +10770,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10855,7 +10869,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -10899,8 +10913,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -10998,7 +11012,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11042,8 +11056,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11141,7 +11155,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11185,8 +11199,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11284,7 +11298,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11328,8 +11342,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11427,7 +11441,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11471,8 +11485,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11570,7 +11584,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11614,8 +11628,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11713,7 +11727,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11757,8 +11771,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11856,7 +11870,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -11900,8 +11914,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -11999,7 +12013,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12043,8 +12057,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12142,7 +12156,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12186,8 +12200,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12285,7 +12299,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12329,8 +12343,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12428,7 +12442,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12472,8 +12486,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12571,7 +12585,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12615,8 +12629,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12714,7 +12728,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12758,8 +12772,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -12857,7 +12871,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -12901,8 +12915,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13000,7 +13014,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13044,8 +13058,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13143,7 +13157,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13187,8 +13201,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13286,7 +13300,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13330,8 +13344,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13429,7 +13443,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13473,8 +13487,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13572,7 +13586,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13616,8 +13630,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13715,7 +13729,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13759,8 +13773,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -13858,7 +13872,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -13902,8 +13916,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14001,7 +14015,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14045,8 +14059,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14144,7 +14158,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14188,8 +14202,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14287,7 +14301,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14331,8 +14345,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14430,7 +14444,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14474,8 +14488,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14573,7 +14587,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14617,8 +14631,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14716,7 +14730,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14760,8 +14774,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -14859,7 +14873,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -14903,8 +14917,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15002,7 +15016,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15046,8 +15060,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15145,7 +15159,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15189,8 +15203,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15288,7 +15302,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15332,8 +15346,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15431,7 +15445,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15475,8 +15489,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15574,7 +15588,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15618,8 +15632,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15717,7 +15731,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15761,8 +15775,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -15860,7 +15874,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -15904,8 +15918,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16003,7 +16017,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16047,8 +16061,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16146,7 +16160,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16190,8 +16204,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16289,7 +16303,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16333,8 +16347,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16432,7 +16446,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16476,8 +16490,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16575,7 +16589,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16619,8 +16633,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16718,7 +16732,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16762,8 +16776,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -16861,7 +16875,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -16905,8 +16919,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17004,7 +17018,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17048,8 +17062,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17147,7 +17161,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17191,8 +17205,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17290,7 +17304,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17334,8 +17348,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17433,7 +17447,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17477,8 +17491,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17576,7 +17590,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17620,8 +17634,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17719,7 +17733,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17763,8 +17777,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -17862,7 +17876,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -17906,8 +17920,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18005,7 +18019,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18049,8 +18063,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18148,7 +18162,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18192,8 +18206,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18291,7 +18305,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18335,8 +18349,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18434,7 +18448,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18478,8 +18492,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18577,7 +18591,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18621,8 +18635,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
@@ -18720,7 +18734,7 @@ species:
         phase: liquid
       units: dimensionless
       phase: l
-      standard_state: molten Fe0.947O (COUGHLIN, 1954)
+      standard_state: *doyle_1988_wustite_standard_state
       values:
         quantity: activity
         method_class: measured_reduced
@@ -18764,8 +18778,8 @@ species:
           note: The source describes a vertical quench furnace and glass run products but makes no quench-preservation
             claim.
         standard_state_as_printed: molten Fe0.947O (COUGHLIN, 1954)
-        standard_state_schema_gap: No exact enum for the stated nonstoichiometric molten Fe0.947O reference; preserve
-          verbatim and do not substitute stoichiometric FeO. See simulator/battery/enums.py::ReferenceStateConvention.
+        standard_state_schema_gap: Typed as Fe(1-x)O(l); the printed reference "molten Fe0.947O (COUGHLIN, 1954)"
+          remains verbatim in standard_state_as_printed, without substituting stoichiometric FeO.
         activity_relation_as_printed: a_FeO = f_O2^0.5 exp(28719.2/T - 5.837), Eq. (5), PDF p. 2.
       point_conditions:
         temperature_K:
