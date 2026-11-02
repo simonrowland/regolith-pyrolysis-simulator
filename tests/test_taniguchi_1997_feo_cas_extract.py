@@ -183,14 +183,35 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         and observation.point_conditions["T_C"].state.is_value
         and observation.point_conditions["fO2_Pa"].locator is not None
         and observation.point_conditions["fO2_Pa"].inference.relation == "atm_to_Pa"
-        and observation.identity.composition.is_value
-        and observation.identity.composition.value.amount_basis.value == "mass_percent"
         and observation.identity.fO2_Pa.is_value
         and observation.identity.total_pressure_Pa.is_unknown
         and observation.identity.total_pressure_Pa.reason
         == "no total_pressure_Pa mapped from source"
         and observation.point_conditions["composition"].locator is not None
         for observation in observations
+    )
+    accepted_compositions = [
+        observation
+        for observation in observations
+        if observation.identity.composition.is_value
+    ]
+    refused_compositions = [
+        observation
+        for observation in observations
+        if observation.identity.composition.is_unknown
+    ]
+    # b-704 refuses the partial/non-oxide assays and any composition above
+    # the allowed kept-sum window; only 31 complete maps remain usable.
+    assert len(accepted_compositions) == 31
+    assert len(refused_compositions) == 110
+    assert all(
+        "mass-percent composition is not usable:" in item.identity.composition.reason
+        and (
+            "kept sum=0 wt% is below 95 wt%" in item.identity.composition.reason
+            or "unsupported component(s) above 0.5 wt%" in item.identity.composition.reason
+            or "mass-percent composition exceeds the accepted kept-sum limit" in item.identity.composition.reason
+        )
+        for item in refused_compositions
     )
     for observation in observations:
         experiment = migrator.result.experiments[observation.experiment_id]
@@ -199,4 +220,17 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             ("Fe" if name == "T.Fe" else name): Decimal(amount)
             for name, amount in printed_map.items()
         }
-        assert observation.identity.composition.value.as_map() == expected
+        # b-704 projects only the printed metallic-iron trace at or below the
+        # 0.5 wt% dropped-component threshold from an otherwise closed assay.
+        if expected.get("Fe", Decimal("0")) <= Decimal("0.5"):
+            expected.pop("Fe", None)
+        if observation.identity.composition.is_value:
+            assert observation.identity.composition.value.amount_basis.value == "mass_percent"
+            assert observation.identity.composition.value.as_map() == expected
+        elif (
+            "unsupported component(s) above 0.5 wt%"
+            in observation.identity.composition.reason
+        ):
+            iron = printed_map.get("T.Fe", printed_map.get("Fe"))
+            assert iron is not None
+            assert f"Fe={iron} wt%" in observation.identity.composition.reason

@@ -8,9 +8,9 @@ that was never there. Dropped printed species stay on their own branch.
 from dataclasses import replace
 from decimal import Decimal
 
-from simulator.battery.enums import ValueKind
-from simulator.battery.migrate import wt_pct_to_mole_fraction
-from simulator.battery.records import Located, Sample, Value
+from simulator.battery.enums import AmountBasis, ValueKind
+from simulator.battery.migrate import _wt_percent_conversion_state
+from simulator.battery.records import Composition, Located, Sample, Value
 from simulator.battery.waypoints import (
     GapReason,
     ReadinessStatus,
@@ -122,12 +122,21 @@ def test_both_present_unusable_forms_are_both_named() -> None:
 def test_dropped_printed_species_still_names_only_the_species() -> None:
     printed = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "FeOT": Decimal("20")}
     wt = {"SiO2": Decimal("50"), "MgO": Decimal("30")}
+    refusal = _wt_percent_conversion_state(wt, declared_component_map=wt)
+    # b-704 rejects the 80 wt% oxide subset; this consumer pin uses an
+    # independent mole-fraction identity to isolate sibling arbitration.
+    assert refusal.is_unknown
+    assert "kept sum=80 wt% is below 95 wt%" in refusal.reason
     experiment = replace(
         factories.kems_experiment(),
         sample=Sample(
             printed_composition=factories.located(printed),
             initial_composition=Located(
-                factories.State.of(wt_pct_to_mole_fraction(wt)),
+                factories.State.of(Composition(
+                    "printed_oxides",
+                    (("SiO2", Decimal("0.5")), ("MgO", Decimal("0.5"))),
+                    AmountBasis.MOLE_FRACTION,
+                )),
                 factories.loc(),
             ),
         ),

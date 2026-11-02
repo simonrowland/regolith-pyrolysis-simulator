@@ -11,6 +11,7 @@ from simulator.battery import migrate as M
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     EvidenceClass,
     NoticeKind,
     Quantity,
@@ -491,7 +492,20 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     assert bool(charge_moles_by_species(experiment, None).by_species) == valid
     assert sample.printed_composition.state.is_value
     if not valid:
-        assert sample.initial_composition.state.is_unknown
+        if components == [["SiO2", "60"], ["Cl", "40"]]:
+            # b-704 closure counts printed Cl toward the mass total. Its
+            # oxide projection survives round-trip, while engine and charge
+            # consumers still refuse the unsupported Cl-bearing print.
+            assert sample.initial_composition.state.is_value
+            assert (
+                sample.initial_composition.state.value.amount_basis
+                is AmountBasis.MOLE_FRACTION
+            )
+            assert sample.initial_composition.state.value.components == (
+                ("SiO2", Decimal("1")),
+            )
+        else:
+            assert sample.initial_composition.state.is_unknown
     elif sample.initial_composition.state.is_value:
         from simulator.battery.score import composition_wt_pct
 
@@ -722,14 +736,11 @@ def test_review_printed_composition_matrix(boundary, reason, case, components):
         sample["initial_composition"] = canonical
     elif reason is not None and boundary != "sample_initial":
         sample["initial_composition"] = {"state": {"tag": "unknown", "reason": reason}}
-    if case == "malformed" and boundary != "sample_printed":
-        with pytest.raises(ValueError):
-            _serialized_consumer_inputs(sample, conditions)
-        return
     inputs = _serialized_consumer_inputs(sample, conditions)
     requests = engine_point_requests(inputs)
     valid = case == "valid" or (
-        boundary.endswith("with_sample_initial") and case in ("negative", "zero", "infinite", "nan")
+        boundary.endswith("with_sample_initial")
+        and case in ("negative", "zero", "infinite", "nan", "malformed")
     ) or (
         case == "ambiguous" and not boundary.endswith("with_sample_initial")
     )

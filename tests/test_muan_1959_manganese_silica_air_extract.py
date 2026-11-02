@@ -195,7 +195,10 @@ def test_muan_typed_rows_migrate_with_species_phase_temperature_and_conditions()
         if observation_id.startswith("muan1959_t1_"):
             composition = row.point_conditions["composition"]
             assert composition.state.is_unknown
-            assert "unsupported or ambiguous components" in composition.state.reason
+            # b-704 refuses the printed Mn3O4 95–99 wt% maps as an unsupported
+            # component above the 0.5 wt% dropped-mass limit.
+            assert "unsupported component(s) above 0.5 wt%" in composition.state.reason
+            assert "Mn3O4=" in composition.state.reason
             assert row.identity.composition.is_unknown
             printed_charge = values["point_conditions"]["composition"]["state"]["value"]["components"]
             row_number = int(observation_id.split("_r", 1)[1].split("_", 1)[0])
