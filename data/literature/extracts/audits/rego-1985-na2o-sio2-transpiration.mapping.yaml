@@ -1,0 +1,29 @@
+source_id: rego-1985-na2o-sio2-transpiration
+table: I
+page: 4
+printed_page: 316
+mineru_table_key: p004-t01
+columns:
+  1: Run Number
+  2: Mol Pct Na2O
+  3: Flow Rate of CO (ml/min)
+  4: P (atm)
+  5: mg Na in leached solution
+  6: Moles CO Collected (× 10⁻²)
+stored_observation:
+  quantity: p_partial Na and activity Na2O
+  species:
+  - Na
+  - Na2O
+  method_class: measured_reduced for Eq. [4] Na pressure and Eq. [6] Na2O activity; measured_direct typed-refused
+    bundle preserves printed Table I inputs
+  conditions: row-specific T_C, binary composition, pure CO carrier gas and P (atm); no numeric O2/fO2 condition
+  standard_state: pure liquid Na2O, as printed in the abstract
+render_audit:
+  result: 31 experimental rows (15 at 1300 C and 16 at 1400 C); six printed columns; two merged temperature headings
+  mineru_qa: numeric agreement 0.980; comma_dot_decimal=6; multiple_numbers=6; numeric_mismatch=4
+  render_checks: 18 Table I data cells, both temperature headings, and the column-scale exponent were checked on
+    PDF page 4 render
+  numeric_table_cells_audited: 189
+  audit_file: rego-1985-na2o-sio2-transpiration-cells.csv
+  compare_output: rego-1985-na2o-sio2-transpiration-mineru-compare.csv
