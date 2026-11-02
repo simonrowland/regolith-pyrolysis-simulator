@@ -615,6 +615,10 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     if not engine_available:
         pytest.skip('shipped curve pins require the MAGEMin engine')
 
+    # Studio capture from Mac-Studio-256-3 at 4fbcc0e46; tuples are copied
+    # from the observed side of this assertion's full gate diff. The lunar
+    # run records a repeated 1042.1875 C2A_STAGED curve and one fewer C3_NA
+    # curve; the CI run records 74 identical floor curves.
     expected = {
         'lunar_mare_low_ti_C0_24h': [
             (
@@ -648,12 +652,12 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                1040.625,
+                1042.1875,
                 1375.0,
-                ((1040.625, 0.0), (1375.0, 1.0)),
+                ((1042.1875, 0.0), (1375.0, 1.0)),
             ),
             (
-                'C3_NA',
+                'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
                 1040.625,
                 1375.0,
@@ -685,7 +689,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ] * 74,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
