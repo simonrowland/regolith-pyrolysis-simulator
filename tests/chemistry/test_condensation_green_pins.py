@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.condensation import CondensationModel
+from simulator.condensation_routing import stage_key_for_stage
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
 from tests.chemistry.conftest import full_builtin_provider_run
@@ -33,8 +34,17 @@ def route_totals(monkeypatch):
             row["inlet"] += flux.species_kg_hr.get(species, 0.0)
             row["terminal"] += result.remaining_by_species.get(species, 0.0)
             row["wall"] += result.wall_deposit_by_species.get(species, 0.0)
-            for stage, captures in result.condensed_by_stage_species.items():
-                row[str(stage)] += captures.get(species, 0.0)
+            for stage_key, captures in result.condensed_by_stage_species.items():
+                stage_number = next(
+                    stage.stage_number
+                    for stage in model.train.stages
+                    if stage_key_for_stage(
+                        stage,
+                        falsey_sub_order_is_zero=True,
+                        include_collector_fallback=True,
+                    ) == stage_key
+                )
+                row[str(stage_number)] += captures.get(species, 0.0)
         return result
 
     monkeypatch.setattr(CondensationModel, "_route", measure)

@@ -19,6 +19,7 @@ from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
     product_stage_number,
+    stage_list_index_for_destination,
     target_species_for_stage_number,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
@@ -31,6 +32,16 @@ def test_default_train_targets_use_canonical_registry(stage_number):
     assert train.stages[stage_number].target_species == (
         target_species_for_stage_number(stage_number)
     )
+
+
+def test_stage_list_index_resolves_stage_keys_for_all_collector_bands():
+    train = CondensationTrain.create_default()
+
+    assert stage_list_index_for_destination(train, "stage_0_hot_duct") == 0
+    assert stage_list_index_for_destination(
+        train, "stage_5_vortex_dust_filter") == 5
+    assert stage_list_index_for_destination(
+        train, K_TRAP_STAGE_KEY) == 8
 
 
 @pytest.mark.parametrize(
@@ -219,8 +230,7 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     condensed = route.condensed_for_species("K")
     impurity = sum(
         species_kg.get("K", 0.0)
-        for stage_number, species_kg in route.impurity_by_stage_species.items()
-        if stage_number != 4
+        for species_kg in route.impurity_by_stage_species.values()
     )
 
     assert condensed > 0.0
@@ -252,15 +262,15 @@ def test_default_k_route_allocation_numeric_pin():
         MeltState(temperature_C=1650.0),
     )
     assert route.condensed_by_stage_species == {
-        4: {'K': 0.9999661577804508},
-        5: {'K': 3.344749012837271e-05},
-        6: {'K': 3.947289899573387e-07},
+        K_TRAP_STAGE_KEY: {'K': 0.9999661577804508},
+        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
+        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
     }
     assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        5: {'K': 3.344749012837271e-05},
-        6: {'K': 3.947289899573387e-07},
+        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
+        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
     }
 
 
@@ -336,10 +346,11 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
         MeltState(temperature_C=1650.0),
     )
 
-    assert route.condensed_by_stage_species[4]['Na'] > 0.0
-    assert route.condensed_by_stage_species[4]['K'] > 0.0
-    assert 'Na' not in route.impurity_by_stage_species.get(4, {})
-    assert 'K' not in route.impurity_by_stage_species.get(4, {})
+    assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
+    assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
+    assert 'Na' not in route.impurity_by_stage_species.get(
+        NA_COLLECTOR_STAGE_KEY, {})
+    assert 'K' not in route.impurity_by_stage_species.get(K_TRAP_STAGE_KEY, {})
     na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert na_key == 'Na#67'

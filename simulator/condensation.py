@@ -2068,7 +2068,7 @@ class CondensationRouteResult:
 
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     retained_in_source_by_species: Dict[str, float] = field(default_factory=dict)
-    condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    condensed_by_stage_species: Dict[str, Dict[str, float]] = field(default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
     wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = field(
         default_factory=dict)
@@ -2089,7 +2089,7 @@ class CondensationRouteResult:
     wall_alkali_binding_diagnostic_state_by_segment: Dict[
         str, Dict[str, Any]
     ] = field(default_factory=dict)
-    impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    impurity_by_stage_species: Dict[str, Dict[str, float]] = field(default_factory=dict)
     antoine_extrapolations: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     antoine_extrapolation_warnings: tuple[str, ...] = ()
     cold_spot_warnings: tuple[str, ...] = ()
@@ -3062,14 +3062,14 @@ class CondensationModel:
 
         remaining_by_species = {}
         retained_in_source_by_species: Dict[str, float] = {}
-        condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
+        condensed_by_stage_species: Dict[str, Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
         wall_deposit_fraction_by_species: Dict[str, float] = {}
         wall_deposit_account_fractions_by_species: Dict[
             str, Dict[str, float]] = {}
         self.last_wall_deposition_rate_shadow_candidate = {}
-        impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
+        impurity_by_stage_species: Dict[str, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
         wall_sticking_alpha_by_species: dict[str, float] = {}
@@ -3215,7 +3215,7 @@ class CondensationModel:
                     species, temps=self.condensation_temperatures_C,
                     vapor_pressure_data=self.vapor_pressure_data,
                 ),
-                'hkl_condensed_by_stage': {},
+                'hkl_condensed_by_stage_key': {},
                 'stage_alpha_records_by_stage': {},
             }
 
@@ -3342,10 +3342,15 @@ class CondensationModel:
                     continue
                 deposit = supply * eta
                 if deposit > 1e-15:
-                    route['hkl_condensed_by_stage'][stage.stage_number] = deposit
+                    stage_key = stage_key_for_stage(
+                        stage,
+                        falsey_sub_order_is_zero=True,
+                        include_collector_fallback=True,
+                    )
+                    route['hkl_condensed_by_stage_key'][stage_key] = deposit
                     if not species_accepted_on_stage(stage, species):
-                        route.setdefault('impurity_stage_numbers', set()).add(
-                            stage.stage_number,
+                        route.setdefault('impurity_stage_keys', set()).add(
+                            stage_key,
                         )
                     stage_removed[species] = deposit
             for species, deposit in stage_removed.items():
@@ -3452,13 +3457,13 @@ class CondensationModel:
             wall_deposit_account_fractions_by_species[species] = {}
 
             stage_route = stage_route_by_species[species]
-            hkl_condensed_by_stage = dict(
-                stage_route['hkl_condensed_by_stage']
+            hkl_condensed_by_stage_key = dict(
+                stage_route['hkl_condensed_by_stage_key']
             )
             stage_alpha_records_by_stage = dict(
                 stage_route['stage_alpha_records_by_stage']
             )
-            hkl_condensed_total_kg = sum(hkl_condensed_by_stage.values())
+            hkl_condensed_total_kg = sum(hkl_condensed_by_stage_key.values())
             wall_hkl_by_segment = dict(
                 wall_hkl_by_species.get(species, {})
             )
@@ -3512,11 +3517,11 @@ class CondensationModel:
                         wall_deposit_by_segment_species, species, wall_hkl_kg, self.pipe_segments,
                     )
                 )
-            impurity_stages = stage_route.get('impurity_stage_numbers', ())
-            for stage_number, deposit in hkl_condensed_by_stage.items():
-                condensed_by_stage_species.setdefault(stage_number, {})[species] = deposit
-                if stage_number in impurity_stages:
-                    impurity_by_stage_species.setdefault(stage_number, {})[species] = deposit
+            impurity_stage_keys = stage_route.get('impurity_stage_keys', ())
+            for stage_key, deposit in hkl_condensed_by_stage_key.items():
+                condensed_by_stage_species.setdefault(stage_key, {})[species] = deposit
+                if stage_key in impurity_stage_keys:
+                    impurity_by_stage_species.setdefault(stage_key, {})[species] = deposit
             remaining_by_species[species] = flowing_rates[species]
 
         from simulator.diagnostics import (

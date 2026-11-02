@@ -28,6 +28,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.condensation_routing import stage_key_for_stage
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.instrumentation import (
     FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL,
@@ -2735,8 +2736,8 @@ def _oxygen_atom_mol_by_species(
     return dict(sorted(result.items()))
 
 
-def stage_purity(train: Any) -> dict[int, dict[str, float]]:
-    result: dict[int, dict[str, float]] = {}
+def stage_purity(train: Any) -> dict[str, dict[str, float]]:
+    result: dict[str, dict[str, float]] = {}
     for stage in train.stages:
         total = stage.total_collected_kg()
         if total <= 0:
@@ -2744,7 +2745,12 @@ def stage_purity(train: Any) -> dict[int, dict[str, float]]:
         purities = {}
         for species, kg in stage.collected_kg.items():
             purities[species] = (kg / total) * 100.0
-        result[stage.stage_number] = purities
+        stage_key = stage_key_for_stage(
+            stage,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=True,
+        )
+        result[stage_key] = purities
     return result
 
 

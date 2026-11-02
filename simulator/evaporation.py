@@ -5144,23 +5144,23 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        from simulator.condensation_routing import collection_stage_index
+        from simulator.condensation_routing import stage_list_index_for_destination
 
-        for stage_number, stage_species in (
+        for stage_key, stage_species in (
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
             if projected_kg <= 1e-12:
                 continue
-            stage_idx = collection_stage_index(
-                self.train, int(stage_number), species,
+            stage_idx = stage_list_index_for_destination(
+                self.train, str(stage_key),
             )
             if stage_idx is None:
                 continue
             stage = self.train.stages[stage_idx]
             is_impurity = (
                 route_result.impurity_by_stage_species
-                .get(stage_number, {})
+                .get(stage_key, {})
                 .get(species, 0.0)
                 > 0.0
             )

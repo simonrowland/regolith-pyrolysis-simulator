@@ -740,8 +740,9 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     )
 
     _assert_synthetic_sio_route_authority(route)
-    assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
+    assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
+    assert 0.0 < route.condensed_by_stage_species[
+        "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor.
     # Production at ae5998456 explicitly reports P_sat=0 for that reactive
@@ -766,7 +767,7 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert authority["authoritative_for_condensation"] is False
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
-    assert route.condensed_by_stage_species[3]["SiO"] > 0.0
+    assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert authority["authority_level"] == "extrapolated"
     assert authority["reason"] == "antoine_psat_unavailable_at_T"
     assert authority["valid_range_K"]

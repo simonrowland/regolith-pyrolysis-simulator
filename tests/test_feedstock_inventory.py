@@ -1710,8 +1710,8 @@ def test_credit_line_k_product_route_is_removed_from_vapor_denominator():
         wall_deposit_fraction_by_species={"K": 0.0},
         wall_deposit_account_fractions_by_species={"K": {}},
         condensed_for_species=lambda species: 0.01 if species == "K" else 0.0,
-        condensed_by_stage_species={4: {"K": 0.01}},
-        impurity_by_stage_species={4: {}},
+        condensed_by_stage_species={"stage_4b_k_trap": {"K": 0.01}},
+        impurity_by_stage_species={"stage_4b_k_trap": {}},
     )
     sim._route_evaporated_species_to_condensation(route_result, "K", 0.01)
 

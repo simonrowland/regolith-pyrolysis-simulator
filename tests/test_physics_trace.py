@@ -57,14 +57,14 @@ def _representative_sim(
     return sim
 
 
-def test_stage_purity_query_pins_current_stage_four_collapse():
+def test_stage_purity_query_keeps_stage_four_collectors_separate():
     train = SimpleNamespace(stages=[
         SimpleNamespace(
             stage_number=4,
             sub_order=0,
             stage_key="stage_4_alkali_mg_cyclone",
-            collected_kg={"Na": 5.0, "Mg": 5.5},
-            total_collected_kg=lambda: 10.5,
+            collected_kg={"Na": 5.0},
+            total_collected_kg=lambda: 5.0,
         ),
         SimpleNamespace(
             stage_number=4,
@@ -75,7 +75,12 @@ def test_stage_purity_query_pins_current_stage_four_collapse():
         ),
     ])
 
-    assert stage_purity(train) == {4: {"K": 100.0}}
+    expected = {
+        "stage_4_alkali_mg_cyclone": {"Na": 100.0},
+        "stage_4b_k_trap": {"K": 100.0},
+    }
+    assert stage_purity(train) == expected
+    assert MassBalance().stage_purity(train) == expected
 
 
 def test_accounting_query_facade_matches_legacy_wrappers():

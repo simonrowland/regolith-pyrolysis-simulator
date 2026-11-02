@@ -166,7 +166,7 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
         species_kg_hr={"SiO": 1e-6}, total_kg_hr=1e-6,
         carrier_authority_by_species=_carrier_record("SiO", VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING),
     ), sim.melt)
-    captured = route.condensed_by_stage_species[3]["SiO"]
+    captured = route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"]
     assert captured > 0.0
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas", {"SiO": 1.0}, material_origin="feedstock",

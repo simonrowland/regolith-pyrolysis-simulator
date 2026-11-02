@@ -640,8 +640,10 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
         assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
     else:
-        assert default_result.condensed_by_stage_species[1]["SiO"] > 0.0
-        assert "SiO" not in overridden_result.condensed_by_stage_species.get(1, {})
+        assert default_result.condensed_by_stage_species[
+            "stage_1_fe_condenser"]["SiO"] > 0.0
+        assert "SiO" not in overridden_result.condensed_by_stage_species.get(
+            "stage_1_fe_condenser", {})
 
 
 def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback():
@@ -686,8 +688,10 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     default_route = route_calcium()
     custom_route = route_calcium(custom_vapor_pressures)
 
-    default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
-    custom_stage4 = custom_route.condensed_by_stage_species.get(4, {}).get("Ca", 0.0)
+    default_stage4 = default_route.condensed_by_stage_species[
+        "stage_4_alkali_mg_cyclone"]["Ca"]
+    custom_stage4 = custom_route.condensed_by_stage_species.get(
+        "stage_4_alkali_mg_cyclone", {}).get("Ca", 0.0)
     # Raising the owning wall saturation curve reduces supersaturation.
     assert custom_stage4 < default_stage4
 
@@ -1047,7 +1051,8 @@ def test_yaml_only_collector_band_reaches_all_consumers(
             assert calls and set(calls) == {band}, consumer
         allocations.append(route.condensed_by_stage_species)
         # The YAML experiment must affect capture, beyond reporting the band.
-        assert route.condensed_by_stage_species[4]['K'] != 0.069231258147549
+        assert route.condensed_by_stage_species[
+            "stage_4b_k_trap"]['K'] != 0.069231258147549
         assert independent.train.stages[4].temp_range_C == (250, 250)
         assert independent.condensation_model.train is independent.train
     assert allocations[0] == allocations[1]
