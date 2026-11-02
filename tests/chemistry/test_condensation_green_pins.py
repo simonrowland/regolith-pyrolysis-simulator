@@ -10,6 +10,7 @@ import pytest
 from simulator.condensation import CondensationModel
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from tests.chemistry.conftest import full_builtin_provider_run
 
 
@@ -24,7 +25,7 @@ def route_totals(monkeypatch):
                   **{str(stage): 0.0 for stage in range(8)}}
         for species in SPECIES
     }
-    original = CondensationModel._route
+    original = CondensationModel.route
 
     def measure(model, flux, melt):
         result = original(model, flux, melt)
@@ -37,8 +38,40 @@ def route_totals(monkeypatch):
                 row[str(stage)] += captures.get(species, 0.0)
         return result
 
-    monkeypatch.setattr(CondensationModel, "_route", measure)
+    monkeypatch.setattr(CondensationModel, "route", measure)
     return totals
+
+
+def test_route_totals_measure_only_returned_allocation(route_totals):
+    model = CondensationModel(CondensationTrain(stages=[]))
+    model.train.collection_route["stage3_route"] = "through"
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        species_partial_pressures_mbar={"Na": 0.5, "SiO": 0.5},
+        stage_area_m2_by_stage={str(stage): 1.0 for stage in range(8)},
+    )
+
+    refused_flux = EvaporationFlux({"Na": 0.02, "SiO": 0.05})
+    bypass_result = model.route(refused_flux, MeltState())
+
+    assert model.last_stage3_route_diagnostic["event"] == "stage3_opening_refused"
+    assert bypass_result.remaining_by_species["Na"] == pytest.approx(0.02)
+    assert bypass_result.remaining_by_species["SiO"] == pytest.approx(0.05)
+    assert route_totals["Na"]["inlet"] == pytest.approx(0.02)
+    assert route_totals["Na"]["terminal"] == pytest.approx(0.02)
+    assert route_totals["SiO"]["inlet"] == pytest.approx(0.05)
+    assert route_totals["SiO"]["terminal"] == pytest.approx(0.05)
+
+    model.train.collection_route["stage3_route"] = "through"
+    passed_result = model.route(EvaporationFlux({"SiO": 0.03}), MeltState())
+
+    assert passed_result.remaining_by_species["SiO"] == pytest.approx(0.03)
+    # With no stages, all input remains terminal: Na 0.02 + 0 = 0.02 kg/h;
+    # SiO 0.05 from the refused parcel + 0.03 from the admitted parcel = 0.08 kg/h.
+    assert route_totals["Na"]["inlet"] == pytest.approx(0.02)
+    assert route_totals["Na"]["terminal"] == pytest.approx(0.02)
+    assert route_totals["SiO"]["inlet"] == pytest.approx(0.08)
+    assert route_totals["SiO"]["terminal"] == pytest.approx(0.08)
 
 
 def assert_pin(name, actual, tmp_path, runner_output=None):
