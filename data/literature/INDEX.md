@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 736
-- Extracts (`literature_extract.v1`): 734
+- Sources: 737
+- Extracts (`literature_extract.v1`): 735
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 734
+- Extracts with no PDF: 735
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -620,6 +620,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `shornikov-2020-perovskite-chemical-fractionation` | Shornikov, S. I., & Yakovlev, O. I. (2020). The chemical fractionation of perovskite at evaporation. Experiment in Geosciences, 26(1), 37–39. |  | ABSENT, `` | `raw/shornikov-2020-perovskite-chemical-fractionation/shornikov-2020-perovskite-chemical-fractionation.pdf` (present, b9ca58eb); `text/shornikov-2020-perovskite-chemical-fractionation/` (22 files, exists); `tables/shornikov-2020-perovskite-chemical-fractionation/` (2 files, exists) | `data/literature/extracts/shornikov-2020-perovskite-chemical-fractionation.yaml` (5 rows, draft) | `ledger/shornikov-2020-perovskite-chemical-fractionation.yaml`: — (—) |
 | `shornikov-2021-mgo-feo-silicate` | Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the MgO–FeO–SiO2 Melts, Experiment in Geosciences 27(1):67–69. |  | ABSENT, `` | `raw/shornikov-2021-mgo-feo-silicate/shornikov-2021-mgo-feo-silicate.pdf` (present, 6e3e5595); `text/shornikov-2021-mgo-feo-silicate/` (25 files, exists); `tables/shornikov-2021-mgo-feo-silicate/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2021-mgo-feo-silicate.yaml` (0 rows, draft) | `ledger/shornikov-2021-mgo-feo-silicate.yaml`: extracted (2026-10-04) |
 | `shornikov-2022-k2o-al2o3-melts` | Shornikov, S. I., and A. A. Slobodov (2022), “Thermodynamic properties of the K2O–Al2O3 melts,” Experiment in Geosciences 28(1), 72–75. |  | ABSENT, `` | `raw/shornikov-2022-k2o-al2o3-melts/shornikov-2022-k2o-al2o3-melts.pdf` (present, de8c2e24); `text/shornikov-2022-k2o-al2o3-melts/` (16 files, exists); `tables/shornikov-2022-k2o-al2o3-melts/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2022-k2o-al2o3-melts.yaml` (1 rows, draft) | `ledger/shornikov-2022-k2o-al2o3-melts.yaml`: extracted (2026-10-05) |
+| `shornikov-2022-meteorite-redox-evaporation` | Shornikov, S. I. (2022), “Thermodynamic Study of Fractional Evaporation of Refractory Meteorite Matter Melts Under Various Redox Conditions,” in Advances in Geochemistry, Analytical Chemistry, and Planetary Sciences, pp. 351–363. https://doi.org/10.1007/978-3-031-09883-3_19. | 10.1007/978-3-031-09883-3_19 | ABSENT, `` | `raw/shornikov-2022-meteorite-redox-evaporation/shornikov-2022-meteorite-redox-evaporation.pdf` (present, 1a76f527); `text/shornikov-2022-meteorite-redox-evaporation/` (9 files, exists); `tables/shornikov-2022-meteorite-redox-evaporation/` (4 files, exists) | `data/literature/extracts/shornikov-2022-meteorite-redox-evaporation.yaml` (3 rows, draft) | `ledger/shornikov-2022-meteorite-redox-evaporation.yaml`: — (—) |
 | `shornikov-2022-na2o-al2o3-melts` | Shornikov, S. I., O. I. Yakovlev, and V. S. Minaev (2022), “Thermodynamic properties of the Na2O–Al2O3 melts,” Experiment in Geosciences 28(1), 69–71. |  | ABSENT, `` | `raw/shornikov-2022-na2o-al2o3-melts/shornikov-2022-na2o-al2o3-melts.pdf` (present, 873bc986); `text/shornikov-2022-na2o-al2o3-melts/` (25 files, exists); `tables/shornikov-2022-na2o-al2o3-melts/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2022-na2o-al2o3-melts.yaml` (3 rows, draft) | `ledger/shornikov-2022-na2o-al2o3-melts.yaml`: extracted (2026-10-05) |
 | `shornikov-2023-cai-melt-evaporation` | Shornikov, S. I., and Yakovlev, O. I. (2023). Experimental study of evaporation of the Ca–Al–inclusions of chondrite melts. Experiment in Geosciences, 29(1), 8–10. |  | ABSENT, `` | `raw/shornikov-2023-cai-melt-evaporation/shornikov-2023-cai-melt-evaporation.pdf` (present, 72aed8e0); `text/shornikov-2023-cai-melt-evaporation/` (15 files, exists); `tables/shornikov-2023-cai-melt-evaporation/` (2 files, exists) | `data/literature/extracts/shornikov-2023-cai-melt-evaporation.yaml` (0 rows, draft) | `ledger/shornikov-2023-cai-melt-evaporation.yaml`: extracted (2026-10-05) |
 | `shornikov-2023-calcium-phosphate` | Shornikov, S. I. and Demidova, S. I. (2023). Thermodynamic properties of the CaO–P4O10 melts. Experiment in Geosciences, 29(1), 55–57. |  | ABSENT, `` | `raw/shornikov-2023-calcium-phosphate/shornikov-2023-calcium-phosphate.pdf` (present, 7d8732ea); `text/shornikov-2023-calcium-phosphate/` (18 files, exists); `tables/shornikov-2023-calcium-phosphate/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2023-calcium-phosphate.yaml` (4 rows, draft) | `ledger/shornikov-2023-calcium-phosphate.yaml`: extracted (2026-10-05) |
@@ -1362,6 +1363,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `shornikov-2020-perovskite-chemical-fractionation`
 - `shornikov-2021-mgo-feo-silicate`
 - `shornikov-2022-k2o-al2o3-melts`
+- `shornikov-2022-meteorite-redox-evaporation`
 - `shornikov-2022-na2o-al2o3-melts`
 - `shornikov-2023-cai-melt-evaporation`
 - `shornikov-2023-calcium-phosphate`
@@ -1687,7 +1689,7 @@ The builder does not pick a winner.
 - source_id_alias `shornikov-2018`: `shornikov-2018-cai-complex-gas-species`, `shornikov-2018-cai-double-inversion`, `shornikov-2018-spinel-solid-solutions`, `shornikov-2018-thermodynamic-evaporation-model` — needs owner/controller resolution
 - source_id_alias `shornikov-2019`: `shornikov-2019-ca-feo-vapor`, `shornikov-2019-lunar-meteorite-evaporation-model`, `shornikov-2019-mgo-titania-melts`, `shornikov-2019-perovskite-evaporation`, `shornikov-2019-perovskite-evaporation-rjpc`, `shornikov-2019-perovskite-evaporation-thermodynamics`, `shornikov-2019-spinel-evaporation-abstract` — needs owner/controller resolution
 - source_id_alias `shornikov-2020`: `shornikov-2020-cao-mgo-thermodynamics`, `shornikov-2020-cao-tio2-melts`, `shornikov-2020-mgo-feo-melts`, `shornikov-2020-perovskite-chemical-fractionation` — needs owner/controller resolution
-- source_id_alias `shornikov-2022`: `shornikov-2022-k2o-al2o3-melts`, `shornikov-2022-na2o-al2o3-melts` — needs owner/controller resolution
+- source_id_alias `shornikov-2022`: `shornikov-2022-k2o-al2o3-melts`, `shornikov-2022-meteorite-redox-evaporation`, `shornikov-2022-na2o-al2o3-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2023`: `shornikov-2023-cai-melt-evaporation`, `shornikov-2023-calcium-phosphate`, `shornikov-2023-mgo-phosphate-melts`, `shornikov-2023-natural-cai-evaporation`, `shornikov-2023-silica-phosphate-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2024`: `shornikov-2024-alkali-phosphate`, `shornikov-2024-cai-silica-evaporation`, `shornikov-2024-iron-phosphate-melts`, `shornikov-2024-sodium-phosphate-melts`, `shornikov-2024-wollastonite-evaporation` — needs owner/controller resolution
 - source_id_alias `shornikov-2025`: `shornikov-2025-ca-al-inclusion-kems`, `shornikov-2025-ca-al-inclusion-thermodynamics`, `shornikov-2025-calcium-oxide-evaporation`, `shornikov-2025-lithium-phosphate-melts`, `shornikov-2025-lithium-silicate-melts`, `shornikov-2025-perovskite-condensation`, `shornikov-2025-saratov-alkali-evaporation` — needs owner/controller resolution
