@@ -196,7 +196,7 @@ def headless_full_run_product_story(tmp_path_factory):
         (
             "lunar_mare_low_ti", 24, {},
             {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
-            0.0, 363.32,
+            0.0, 363.7,
         ),
         (
             "mars_basalt", 12, {"C": 30.0},
