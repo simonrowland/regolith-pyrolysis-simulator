@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+from pathlib import Path
+import re
 from types import SimpleNamespace
 
 import pytest
@@ -16,9 +18,6 @@ from tests.chemistry.conftest import _build_sim
 import simulator.melt_backend.magemin as magemin_module
 
 
-_IG_UNSUPPORTED_OXIDES = {"MnO", "P2O5", "NiO", "CoO"}
-
-
 def _fixture_feed_masses_kg(feedstocks_data: dict) -> dict[str, float]:
     composition = feedstocks_data["lunar_mare_low_ti"]["composition_wt_pct"]
     total_wt_pct = sum(float(value) for value in composition.values())
@@ -28,16 +27,29 @@ def _fixture_feed_masses_kg(feedstocks_data: dict) -> dict[str, float]:
     }
 
 
+def _documented_ig_dropped_oxides() -> set[str]:
+    # Independent expected support source: the MAGEMin ig oxide description
+    # in docs/melt-backends.md, not the production projection's derived set.
+    docs = Path(__file__).resolve().parents[2] / "docs/melt-backends.md"
+    match = re.search(
+        r"oxides outside the `ig` system \(([^)]*)\) are dropped",
+        docs.read_text(),
+    )
+    assert match is not None
+    return {item.strip() for item in match.group(1).split(",")}
+
+
 def test_projection_reports_exact_fixture_dropped_mass_fractions(
     feedstocks_data,
 ):
     masses_kg = _fixture_feed_masses_kg(feedstocks_data)
     total_mass_kg = sum(masses_kg.values())
+    documented_dropped_oxides = _documented_ig_dropped_oxides()
     expected_dropped = {
         species: mass_kg / total_mass_kg
         for species, mass_kg in sorted(masses_kg.items())
         if species not in OXIDE_SPECIES
-        or species in _IG_UNSUPPORTED_OXIDES
+        or species in documented_dropped_oxides
     }
 
     projection = magemin_module.project_magemin_diagnostic_composition(
@@ -50,7 +62,7 @@ def test_projection_reports_exact_fixture_dropped_mass_fractions(
         species: mass_kg
         for species, mass_kg in masses_kg.items()
         if species in OXIDE_SPECIES
-        and species not in _IG_UNSUPPORTED_OXIDES
+        and species not in documented_dropped_oxides
     }
 
 
@@ -65,6 +77,7 @@ def test_snapshot_projection_counts_overlapping_inert_mass_once(
         feedstocks_data,
         setpoints_data,
     )
+    sim.setpoints["projected_engine_liquid_fraction_diagnostic"] = True
     feed_masses_kg = _fixture_feed_masses_kg(feedstocks_data)
     overlap_species = next(
         species
@@ -82,11 +95,12 @@ def test_snapshot_projection_counts_overlapping_inert_mass_once(
     assert diagnostic_composition == feed_masses_kg
 
     total_feed_mass_kg = sum(feed_masses_kg.values())
+    documented_dropped_oxides = _documented_ig_dropped_oxides()
     expected_dropped = {
         species: mass_kg / total_feed_mass_kg
         for species, mass_kg in sorted(feed_masses_kg.items())
         if species not in OXIDE_SPECIES
-        or species in _IG_UNSUPPORTED_OXIDES
+        or species in documented_dropped_oxides
     }
     projection = magemin_module.project_magemin_diagnostic_composition(
         diagnostic_composition
@@ -140,7 +154,8 @@ class _GridBackend(magemin_module.MAGEMinBackend):
     def __init__(self):
         self.__class__.instances.append(self)
 
-    def initialize(self, _config):
+    def initialize(self, config):
+        self._config = dict(config)
         return True
 
     def is_available(self):
@@ -168,10 +183,9 @@ def _diagnostic_input() -> dict[str, float]:
     return {"SiO2": 10.0, "FeO": 7.0, "NiO": 0.001}
 
 
-def test_diagnostic_reuses_grid_but_interpolates_each_temperature_and_keys_trace(
+def test_diagnostic_recomputes_grid_and_interpolates_each_temperature_and_keys_trace(
     monkeypatch,
 ):
-    magemin_module._projected_engine_liquid_fraction_grid.cache_clear()
     _GridBackend.instances = []
     _GridBackend.calls = []
     _GridBackend.fail = False
@@ -197,7 +211,11 @@ def test_diagnostic_reuses_grid_but_interpolates_each_temperature_and_keys_trace
     assert warmer["fraction"] == pytest.approx(0.8)
     assert first["fraction"] != warmer["fraction"]
     assert first["pressure_bar"] == warmer["pressure_bar"] == 0.2
-    assert len(_GridBackend.instances) == 1
+    assert first["fO2_log"] == warmer["fO2_log"] == -9.0
+    assert first["fO2_buffer"] == warmer["fO2_buffer"] == "qfm"
+    assert "buffer_n = fO2_log - QFM(T)" in first["fO2_description"]
+    assert "10.0 wt%" in first["fO2_description"]
+    assert len(_GridBackend.instances) == 2
     assert _GridBackend.calls[0]["pressure_bar"] == 0.2
 
     changed_pressure = magemin_module.projected_engine_liquid_fraction_diagnostic(
@@ -209,8 +227,8 @@ def test_diagnostic_reuses_grid_but_interpolates_each_temperature_and_keys_trace
     )
     assert changed_pressure["status"] == "ok"
     assert changed_pressure["pressure_bar"] == 0.4
-    assert len(_GridBackend.instances) == 2
-    assert _GridBackend.calls[1]["pressure_bar"] == 0.4
+    assert len(_GridBackend.instances) == 3
+    assert _GridBackend.calls[2]["pressure_bar"] == 0.4
 
     changed_trace = _diagnostic_input()
     changed_trace["NiO"] += 1.0e-9
@@ -222,11 +240,31 @@ def test_diagnostic_reuses_grid_but_interpolates_each_temperature_and_keys_trace
         backend_config={"warm_worker": False},
     )
     assert changed["status"] == "ok"
-    assert len(_GridBackend.instances) == 3
+    assert len(_GridBackend.instances) == 4
+
+
+def test_diagnostic_refuses_configured_non_qfm_buffer(monkeypatch):
+    _GridBackend.instances = []
+    _GridBackend.calls = []
+    _GridBackend.fail = False
+    monkeypatch.setattr(magemin_module, "MAGEMinBackend", _GridBackend)
+
+    diagnostic = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=_diagnostic_input(),
+        temperature_C=1100.0,
+        fO2_log=-9.0,
+        pressure_bar=0.2,
+        backend_config={"fO2_buffer": "nno"},
+    )
+
+    assert diagnostic["status"] == "unsupported_fO2_buffer"
+    assert diagnostic["fraction"] is None
+    assert diagnostic["fO2_log"] == -9.0
+    assert diagnostic["fO2_buffer"] == "nno"
+    assert _GridBackend.calls == []
 
 
 def test_diagnostic_converts_solver_failure_to_typed_status(monkeypatch):
-    magemin_module._projected_engine_liquid_fraction_grid.cache_clear()
     _GridBackend.instances = []
     _GridBackend.calls = []
     _GridBackend.fail = True
@@ -241,6 +279,19 @@ def test_diagnostic_converts_solver_failure_to_typed_status(monkeypatch):
     )
 
     assert diagnostic["status"] == "solve_failed"
+    assert diagnostic["fraction"] is None
+
+
+def test_diagnostic_config_failure_is_a_typed_status():
+    diagnostic = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=_diagnostic_input(),
+        temperature_C=1100.0,
+        fO2_log=-9.0,
+        pressure_bar=0.2,
+        backend_config=object(),
+    )
+
+    assert diagnostic["status"] == "diagnostic_failed"
     assert diagnostic["fraction"] is None
 
 
@@ -301,15 +352,17 @@ def _run_real_ticks_with_diagnostic(
         flux_kg_hr_by_tick = []
         for _ in range(3):
             snapshot = sim.step()
-            for species, mass_kg in sim.melt.composition_kg.items():
-                assert snapshot._magemin_diagnostic_composition_kg[
-                    species
-                ] == mass_kg
-            for species, mass_kg in sim.inventory.inert_melt_components_kg.items():
-                # Ledger kg projection includes conversion roundoff vs provenance.
-                assert snapshot._magemin_diagnostic_composition_kg[
-                    species
-                ] == pytest.approx(mass_kg, rel=1e-12)
+            if diagnostic_enabled:
+                for species, mass_kg in sim.melt.composition_kg.items():
+                    assert snapshot._magemin_diagnostic_composition_kg[
+                        species
+                    ] == mass_kg
+                for species, mass_kg in sim.inventory.inert_melt_components_kg.items():
+                    # Ledger-projected kg includes kg→mol→kg roundoff vs the
+                    # inventory map, which retains the provenance input.
+                    assert snapshot._magemin_diagnostic_composition_kg[
+                        species
+                    ] == pytest.approx(mass_kg, rel=1e-12)
             gate = snapshot.liquid_fraction_gate["evaporation"]
             assert gate["solidus_T_C"] < 1100.0 < gate["liquidus_T_C"]
             assert gate["liquid_fraction"] > 0.0
@@ -426,6 +479,8 @@ def test_projected_diagnostic_is_default_off_and_keeps_runner_output_unchanged(
     sim._update_temperature = lambda: None
     sim._register_freeze_gate_liquid_fraction_providers()
     snapshot = sim.step()
+    assert not hasattr(snapshot, "_magemin_diagnostic_composition_kg")
+    assert not hasattr(snapshot, "_magemin_diagnostic_pressure_bar")
 
     def fail_if_solved(**_kwargs):
         raise AssertionError("default-off diagnostic must not run")
@@ -460,8 +515,12 @@ def test_runner_projection_uses_complete_historical_melt_and_pressure(monkeypatc
             "fraction": 0.5,
         }
 
+    class _NonCopyableConfig(dict):
+        def __deepcopy__(self, _memo):
+            raise RuntimeError("backend configuration cannot be deep-copied")
+
     class _AvailableBackend:
-        _config = {"warm_worker": False}
+        _config = _NonCopyableConfig(warm_worker=False)
 
         def is_available(self):
             return True
