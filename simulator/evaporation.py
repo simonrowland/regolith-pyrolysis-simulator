@@ -879,14 +879,6 @@ class EvaporationMixin:
                 equilibrium,
                 gate_authority=gate_authority,
             )
-        cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt'
-        )
-        available_o2_kg = float(
-            self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                'O2', 0.0
-            )
-        )
         writer_detail: dict[str, Any] = {}
         participants: dict[str, float] = {}
         current_effective_capacity = None
@@ -895,29 +887,12 @@ class EvaporationMixin:
         def project_inventory_limited_flux(
             raw_flux: EvaporationFlux,
         ) -> EvaporationFlux:
-            rates = self._analytic_evaporation_depletion_rates(
-                raw_flux.species_kg_hr,
+            return self._apply_analytic_evaporation_depletion(
+                raw_flux,
                 dt_hr=1.0,
                 phase_scalar=1.0,
-                cleaned_melt_kg=cleaned_melt_kg,
-                available_o2_kg=available_o2_kg,
                 min_rate_kg_hr=0.0,
             )
-            projected = EvaporationFlux(
-                species_kg_hr=rates,
-                alpha_authority_status_by_species={
-                    species: status
-                    for species, status in (
-                        raw_flux.alpha_authority_status_by_species.items()
-                    )
-                    if float(rates.get(species, 0.0)) > 1.0e-12
-                },
-                carrier_authority_by_species=(
-                    raw_flux.carrier_authority_by_species
-                ),
-            )
-            projected.update_totals()
-            return projected
 
         def evaluate_flux(
             partials_Pa: Mapping[str, float],
@@ -1124,7 +1099,6 @@ class EvaporationMixin:
         pressure_Pa = pressure_guess_Pa
         solver_converged = False
         solver_residual = math.inf
-        solver_iterations = 0
         solved = None
         source_below_threshold = False
         for outer_iteration in range(16):
@@ -1220,7 +1194,6 @@ class EvaporationMixin:
                 1.0e-300,
             )
             solver_residual = solved.residual_relative
-            solver_iterations += solved.iterations
             if solved.converged and pressure_change <= 1.0e-9:
                 solver_converged = True
                 break
@@ -1268,24 +1241,11 @@ class EvaporationMixin:
                 if solver_converged
                 else 'not_converged'
             ),
-            'iterations': solver_iterations,
             'outer_iterations': outer_iteration + 1,
-            'total_pressure_Pa': pressure_Pa,
-            'pressure_residual_Pa': solved.pressure_residual_Pa,
-            'residual_relative': solver_residual,
-            'residual_kg_s_by_species': dict(
-                solved.residual_kg_s_by_species
-            ),
-            'residual_relative_by_species': dict(
-                solved.residual_relative_by_species
-            ),
-            'partials_Pa': dict(solved.partials_Pa),
             'source_max_kg_hr': max(
                 (
                     float(rate)
-                    for rate in project_inventory_limited_flux(
-                        solved.flux
-                    ).species_kg_hr.values()
+                    for rate in committed_probe.species_kg_hr.values()
                 ),
                 default=0.0,
             ),
@@ -4561,14 +4521,31 @@ class EvaporationMixin:
         return source_mol_hr
 
     def _apply_analytic_evaporation_depletion(
-        self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
+        self,
+        evap_flux: EvaporationFlux,
+        dt_hr: float = 1.0,
+        *,
+        phase_scalar: float | None = None,
+        min_rate_kg_hr: float | None = None,
     ) -> EvaporationFlux:
         """Apply sub-tick first-order depletion to raw HKL evaporation rates."""
         if dt_hr <= 0.0 or not evap_flux.species_kg_hr:
             return evap_flux
 
-        phase_scalar = self._record_phase_context_diagnostic(
-            'evaporation_depletion', scalar_liquid_fraction=1.0)
+        if phase_scalar is None:
+            phase_scalar = self._record_phase_context_diagnostic(
+                'evaporation_depletion', scalar_liquid_fraction=1.0
+            )
+        if min_rate_kg_hr is None:
+            min_rate_kg_hr = (
+                0.0
+                if getattr(
+                    self,
+                    '_solved_headspace_partials_Pa_this_tick',
+                    None,
+                ) is not None
+                else 1.0e-12
+            )
         effective_rates = self._analytic_evaporation_depletion_rates(
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
@@ -4581,15 +4558,7 @@ class EvaporationMixin:
                     'O2', 0.0
                 )
             ),
-            min_rate_kg_hr=(
-                0.0
-                if getattr(
-                    self,
-                    '_solved_headspace_partials_Pa_this_tick',
-                    None,
-                ) is not None
-                else 1.0e-12
-            ),
+            min_rate_kg_hr=min_rate_kg_hr,
         )
         smoothed = EvaporationFlux(
             species_kg_hr=effective_rates,

@@ -89,6 +89,8 @@ def test_lunar_c2a_hot_entry_has_no_empty_hours_or_period_two_species():
 def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
     monkeypatch,
 ):
+    from simulator import overhead
+
     sim = _lunar_simulator()
     sim._melt_headspace_composition_mbar = {"O2": 0.0005}
     batch_builds = 0
@@ -117,23 +119,37 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
         "_analytic_evaporation_depletion_rates",
         inventory_limited_rates,
     )
+    solved_results = []
+    original_solver = overhead.solve_quasi_steady_headspace_partials_Pa
+
+    def capture_solved_result(**kwargs):
+        solved = original_solver(**kwargs)
+        solved_results.append(solved)
+        return solved
+
+    monkeypatch.setattr(
+        overhead,
+        "solve_quasi_steady_headspace_partials_Pa",
+        capture_solved_result,
+    )
     snapshot = sim.step()
 
     assert batch_builds == 1
     assert snapshot.evap_flux.total_kg_hr > 0.0
-    solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
-    assert solver["status"] == "converged"
-    assert solver["residual_relative"] <= 1.0e-9
+    solver_diagnostic = sim._last_evaporation_flux_diagnostic["headspace_solver"]
+    assert solver_diagnostic["status"] == "converged"
+    assert solved_results[-1].converged
+    assert solved_results[-1].residual_relative <= 1.0e-9
     assert all(
         residual <= 1.0e-9
-        for residual in solver["residual_relative_by_species"].values()
+        for residual in solved_results[-1].residual_relative_by_species.values()
     )
-    assert solver["residual_relative_by_species"]["O2"] == 0.0
+    assert solved_results[-1].residual_relative_by_species["O2"] == 0.0
     assert snapshot.melt_headspace_composition_mbar["O2"] == pytest.approx(
         0.0005,
         abs=1.0e-14,
     )
-    assert solver["published_from_final_committed_inlet"]
+    assert solver_diagnostic["published_from_final_committed_inlet"]
     for species in ("Fe", "Ca"):
         expected = float(
             (snapshot.melt_headspace_composition_mbar or {}).get(species, 0.0)
@@ -364,7 +380,7 @@ def test_closed_line_runtime_publishes_equilibrium_partials_with_zero_flux(
     assert snapshot.evap_flux.total_kg_hr == 0.0
     solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
     assert solver["status"] != "not_converged"
-    equilibrium_partials = solver["partials_Pa"]
+    equilibrium_partials = sim._solved_headspace_partials_Pa_this_tick
     assert equilibrium_partials
     for species, partial_Pa in equilibrium_partials.items():
         assert snapshot.melt_headspace_composition_mbar[species] * 100.0 == pytest.approx(
