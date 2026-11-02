@@ -315,10 +315,30 @@ def solve_quasi_steady_headspace_partials_Pa(
                 else 0.0
             )
             source = source_kg_s.get(species, 0.0)
-            residuals[species] = source - removal
-            relative_by_species[species] = abs(source - removal) / max(
-                source, removal, 1.0e-300
+            residual = source - removal
+            residuals[species] = residual
+            partial = max(0.0, float(candidate.get(species, 0.0)))
+            source_slope = max(
+                0.0,
+                float(beta_kg_s_Pa_by_species.get(species, 0.0)),
             )
+            removal_slope = (
+                molar_mass * flow / pressure if pressure > 0.0 else 0.0
+            )
+            # A binary64 partial can move only by one ulp. Near equilibrium,
+            # the residual slope is -(beta_i + G_i), where beta_i is the
+            # source slope and G_i=M_i*n/P is the removal slope; half an ulp
+            # therefore bounds the nearest representable residual. Units are
+            # Pa × kg/(s Pa) = kg/s. Keep the raw committed residual above,
+            # but do not iterate for an error smaller than this bound; when
+            # beta_i+G_i is zero the bound vanishes and no flux is excused.
+            representable_residual_kg_s = (
+                0.5 * math.ulp(partial) * (source_slope + removal_slope)
+            )
+            relative_by_species[species] = max(
+                0.0,
+                abs(residual) - representable_residual_kg_s,
+            ) / max(source, removal, 1.0e-300)
         for species, raw_rate in fixed_molar_flow_mol_s_by_species.items():
             key = str(species)
             molar_mass = max(
@@ -360,86 +380,129 @@ def solve_quasi_steady_headspace_partials_Pa(
         flow: float,
         seed: Mapping[str, float],
     ):
-        candidate = dict(seed)
-        total_iterations = 0
-
-        def species_residual(species: str, partial: float):
-            trial = dict(candidate)
-            trial[species] = partial
-            _raw, _committed, residuals, relative_by_species = actual_state(
-                trial, pressure, flow
+        lower_by_species = {species: 0.0 for species in species_ids}
+        upper_by_species = {
+            species: max(0.0, float(equilibrium_Pa[species]))
+            for species in species_ids
+        }
+        low_candidate = dict(seed)
+        high_candidate = dict(seed)
+        low_candidate.update(lower_by_species)
+        high_candidate.update(upper_by_species)
+        _low_raw, _low_committed, low_residuals, low_relative = actual_state(
+            low_candidate, pressure, flow
+        )
+        _high_raw, _high_committed, high_residuals, high_relative = actual_state(
+            high_candidate, pressure, flow
+        )
+        total_iterations = 2
+        candidate = {
+            species: min(
+                upper_by_species[species],
+                max(0.0, float(seed.get(species, 0.0))),
             )
-            return residuals.get(species, 0.0), relative_by_species.get(
-                species, 0.0
-            )
-
-        for _sweep in range(min(max_iterations, 12)):
-            for species in species_ids:
-                equilibrium = max(0.0, float(equilibrium_Pa[species]))
-                low, high = 0.0, equilibrium
-                low_residual, low_relative = species_residual(species, low)
-                high_residual, high_relative = species_residual(species, high)
-                total_iterations += 2
-                best_partial, best_residual, best_relative = (
-                    (low, low_residual, low_relative)
-                    if low_relative <= high_relative
-                    else (high, high_residual, high_relative)
+            for species in species_ids
+        }
+        candidate.update({
+            species: float(value)
+            for species, value in seed.items()
+            if species not in candidate
+        })
+        bracketed = {}
+        for species in species_ids:
+            low_residual = float(low_residuals.get(species, 0.0))
+            high_residual = float(high_residuals.get(species, 0.0))
+            bracketed[species] = low_residual >= 0.0 and high_residual <= 0.0
+            if not bracketed[species]:
+                candidate[species] = (
+                    lower_by_species[species]
+                    if low_relative.get(species, 0.0)
+                    <= high_relative.get(species, 0.0)
+                    else upper_by_species[species]
                 )
-                if low_relative <= relative_tolerance:
-                    candidate[species] = low
-                    continue
-                if high_relative <= relative_tolerance:
-                    candidate[species] = high
-                    continue
-                if low_residual < 0.0 or high_residual > 0.0:
-                    candidate[species] = min(
-                        (low, high), key=lambda value: abs(
-                            species_residual(species, value)[0]
-                        )
-                    )
-                    continue
-                for _iteration in range(max_iterations):
-                    denominator = high_residual - low_residual
-                    trial = (
-                        low - low_residual * (high - low) / denominator
-                        if denominator != 0.0 and math.isfinite(denominator)
-                        else 0.5 * (low + high)
-                    )
-                    width = high - low
-                    if not low + 0.01 * width < trial < high - 0.01 * width:
-                        trial = 0.5 * (low + high)
-                    residual, relative = species_residual(species, trial)
-                    total_iterations += 1
-                    if relative < best_relative:
-                        best_partial, best_residual, best_relative = (
-                            trial, residual, relative
-                        )
-                    if relative <= relative_tolerance:
-                        best_partial, best_residual, best_relative = (
-                            trial, residual, relative
-                        )
-                        break
-                    if residual > 0.0:
-                        low, low_residual = trial, residual
-                        high_residual *= 0.5
-                    else:
-                        high, high_residual = trial, residual
-                        low_residual *= 0.5
-                candidate[species] = best_partial
-            raw, committed, residuals, relative_by_species = actual_state(
-                candidate, pressure, flow
+
+        best_candidate = dict(candidate)
+        current_state = actual_state(best_candidate, pressure, flow)
+        total_iterations += 1
+        best_state = current_state
+        best_relative = participant_relative(current_state[3])
+        if best_relative <= relative_tolerance:
+            return (
+                best_candidate, best_state[0], best_state[2], best_state[3],
+                total_iterations,
             )
-            total_iterations += 1
-            if participant_relative(relative_by_species) <= relative_tolerance:
+
+        for _iteration in range(max_iterations):
+            raw, committed, residuals, relative_by_species = current_state
+            relative = participant_relative(relative_by_species)
+            if relative < best_relative:
+                best_candidate = dict(candidate)
+                best_state = (raw, committed, residuals, relative_by_species)
+                best_relative = relative
+            if relative <= relative_tolerance:
                 return (
-                    candidate, raw, residuals, relative_by_species,
+                    dict(candidate), raw, residuals, relative_by_species,
                     total_iterations,
                 )
-        raw, _committed, residuals, relative_by_species = actual_state(
-            candidate, pressure, flow
+
+            next_candidate = dict(candidate)
+            for species in species_ids:
+                if not bracketed[species]:
+                    continue
+                partial = min(
+                    upper_by_species[species],
+                    max(0.0, float(candidate.get(species, 0.0))),
+                )
+                residual = float(residuals.get(species, 0.0))
+                if residual > 0.0:
+                    lower_by_species[species] = partial
+                    low_residuals[species] = residual
+                elif residual < 0.0:
+                    upper_by_species[species] = partial
+                    high_residuals[species] = residual
+                else:
+                    next_candidate[species] = partial
+                    continue
+
+                low = lower_by_species[species]
+                high = upper_by_species[species]
+                low_residual = float(low_residuals[species])
+                high_residual = float(high_residuals[species])
+                width = high - low
+                beta = max(
+                    0.0,
+                    float(beta_kg_s_Pa_by_species.get(species, 0.0)),
+                )
+                molar_mass = max(
+                    0.0,
+                    float(molar_mass_kg_mol_by_species.get(species, 0.0)),
+                )
+                removal_slope = (
+                    molar_mass * flow / pressure if pressure > 0.0 else 0.0
+                )
+                slope = beta + removal_slope
+                # Residual is committed source minus removal. The source
+                # slope is approximated by beta_i, while removal contributes
+                # G_i=M_i*n/P, so Newton gives p + residual/(beta_i+G_i).
+                # Units are (kg/s)/(kg/(s Pa)) = Pa. Clamp the trial to the
+                # sign bracket; if the slope vanishes, bisect its endpoints.
+                trial = (
+                    partial + residual / slope
+                    if slope > 0.0 and math.isfinite(slope)
+                    else 0.5 * (low + high)
+                )
+                if not low < trial < high:
+                    trial = 0.5 * (low + high)
+                next_candidate[species] = trial
+            candidate = next_candidate
+            if _iteration + 1 < max_iterations:
+                current_state = actual_state(candidate, pressure, flow)
+                total_iterations += 1
+
+        return (
+            best_candidate, best_state[0], best_state[2], best_state[3],
+            total_iterations,
         )
-        total_iterations += 1
-        return candidate, raw, residuals, relative_by_species, total_iterations
 
     def pressure_root(flow_function):
         low = lower
@@ -535,8 +598,9 @@ def solve_quasi_steady_headspace_partials_Pa(
                 seed,
             )
             candidate_at_value = solved_at_value[0]
+            residual_at_value = sum(candidate_at_value.values()) - value
             return (
-                sum(candidate_at_value.values()) - value,
+                residual_at_value,
                 solved_at_value,
                 flow_at_value,
             )
@@ -558,7 +622,14 @@ def solve_quasi_steady_headspace_partials_Pa(
         )
         if low_residual > 0.0 and high_residual <= 0.0:
             for _iteration in range(max_iterations):
-                trial = 0.5 * (low + high)
+                denominator = high_residual - low_residual
+                trial = (
+                    low - low_residual * (high - low) / denominator
+                    if denominator != 0.0 and math.isfinite(denominator)
+                    else 0.5 * (low + high)
+                )
+                if not low < trial < high:
+                    trial = 0.5 * (low + high)
                 trial_residual, trial_solved, trial_flow = (
                     nonlinear_pressure_residual(trial)
                 )
@@ -577,9 +648,11 @@ def solve_quasi_steady_headspace_partials_Pa(
                     )
                     break
                 if trial_residual > 0.0:
-                    low = trial
+                    low, low_residual = trial, trial_residual
+                    high_residual *= 0.5
                 else:
-                    high = trial
+                    high, high_residual = trial, trial_residual
+                    low_residual *= 0.5
         pressure = best_pressure
         candidate, raw_flux, residuals, relative_by_species = best_solved[:4]
         flow = best_flow
