@@ -1983,6 +1983,19 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     assert after_mol["CaO"] < before_mol["CaO"]
     transition.validate_conservation(sim.species_formula_registry)
 
+    ca_after_first_hour = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("Ca", 0.0)
+    transitions_after_first_hour = len(sim.atom_ledger.transitions)
+    sim.melt.campaign_hour += 1
+    sim._step_c7_ca_aluminothermic()
+    ca_after_second_hour = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("Ca", 0.0)
+    assert ca_mol > 0.0
+    assert ca_after_second_hour == pytest.approx(ca_after_first_hour)
+    assert len(sim.atom_ledger.transitions) == transitions_after_first_hour
+
     # This branch stores fO2 as a scalar: with no C7 source term and unchanged
     # Fe inventories, the scalar must remain exactly unchanged. At the b-899
     # rebase, replace this with the redox owner's Kress inverse on the new
@@ -3268,6 +3281,35 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
         100.0 * stage_3_capture["Fe_kg"] / stage_3_capture["total_kg"]
     )
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+
+
+def test_native_fe_pre_evap_boundary_does_not_create_period_two_source() -> None:
+    sim = _make_sim()
+    sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.melt.temperature_C = 1650.0
+    sim.melt.campaign_hour = 7
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = sim.melt.temperature_C + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+
+    source_on_by_hour = []
+    for _ in range(3):
+        snapshot = sim.step()
+        partition = (snapshot.fe_redox_split or {}).get(
+            "native_fe_partition", {}
+        )
+        source_on_by_hour.append(
+            float(partition.get("native_fe_vapor_mol", 0.0) or 0.0) > 1.0e-12
+        )
+
+    assert source_on_by_hour[0]
+    stopped = False
+    for source_on in source_on_by_hour:
+        if not source_on:
+            stopped = True
+        elif stopped:
+            pytest.fail("native Fe vapor source restarted after an off hour")
 
 
 def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:

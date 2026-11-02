@@ -3689,6 +3689,9 @@ class ExtractionMixin:
         self._last_c7_ca_silent_zero_notes = {
             'silent_zero_notes': [dict(n) for n in _c7_sz_notes],
         }
+        # C7 prices its dedicated Ca transport in the pre-evaporation source
+        # phase. The carried-in headspace is its boundary at operation start;
+        # the one-shot C7 transition is then captured during this same pass.
         p_bulk_pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Ca'))
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(

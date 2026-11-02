@@ -610,7 +610,6 @@ def test_joint_release_stays_within_pipe_capacity():
     solid_peak = 2.0 * gas_per_extent
     admitted = solid_peak
     throughput = 1.5 * solid_peak
-    scale = throughput / (solid_peak + admitted)
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -646,7 +645,7 @@ def test_joint_release_stays_within_pipe_capacity():
     ):
         # Stand in for the b-773 current-hour solve. Before the b-1107 fix,
         # C0 bakeout still ignores this state and reads the persisted map.
-        sim._solved_headspace_partials_Pa_this_tick = {"SO2": 18.0}
+        sim._solved_headspace_partials_Pa_this_tick = {"SO2": 1.0}
         sim._last_evaporation_flux_diagnostic = {
             "headspace_solver": {
                 "oxygen_partial_frozen": True,
@@ -661,6 +660,7 @@ def test_joint_release_stays_within_pipe_capacity():
 
     sim._calculate_evaporation = _evaporate
     seen = {}
+    headspace_seen = []
     transport_calls = []
     real_estimate = sim.overhead_model.estimate_transport_state
 
@@ -705,6 +705,7 @@ def test_joint_release_stays_within_pipe_capacity():
         }]
 
     def _bakeout(**kwargs):
+        headspace_seen.append(kwargs.get("headspace_mbar"))
         sim._volatiles_train_spec = type("Train", (), {
             "max_throughput_kg_hr": throughput,
         })()
@@ -717,7 +718,12 @@ def test_joint_release_stays_within_pipe_capacity():
     sim._apply_c0_bakeout = _bakeout
     sim._apply_analytic_evaporation_depletion = lambda flux: flux
     sim.step()
-    pump_admitted = 2.0 * scale
+    assert headspace_seen == [{"SO2": 0.01}]
+    pump_scale = sim._last_subsolidus_bakeout["pump_scale"]
+    pump_admitted = (
+        sim._last_subsolidus_bakeout["hk_demand_mol_hr_by_species"]["SO2"]
+        * pump_scale
+    )
     decision = [
         call for call in transport_calls
         if set(call["species"]) >= {"Fe", "SO2", "O2"}
@@ -729,11 +735,13 @@ def test_joint_release_stays_within_pipe_capacity():
     assert demand_kg_hr > capacity_kg_hr
     transport_scale = capacity_kg_hr / demand_kg_hr
     accepted = pump_admitted * transport_scale
-    fe_kg_hr = admitted * scale * transport_scale
+    fe_kg_hr = admitted * pump_scale * transport_scale
     so2_kg_hr = accepted * _molar("SO2")
     o2_kg_hr = accepted * 0.5 * _molar("O2")
     assert fe_kg_hr + so2_kg_hr + o2_kg_hr == pytest.approx(capacity_kg_hr)
-    assert decision[0]["species"]["Fe"] == pytest.approx(admitted * scale)
+    assert decision[0]["species"]["Fe"] == pytest.approx(
+        admitted * pump_scale
+    )
     assert decision[0]["species"]["SO2"] == pytest.approx(
         pump_admitted * _molar("SO2")
     )
@@ -747,8 +755,8 @@ def test_joint_release_stays_within_pipe_capacity():
     assert salt_before > seen["salt_mol"] > 0.0
     cap_record = sim._last_subsolidus_bakeout["transport_cap"]
     released = sim._last_subsolidus_bakeout["released_kg_hr_by_species"]
-    assert released["SO2"].hex() == "0x1.2db144f5aea2ap-11"
-    assert released["O2"].hex() == "0x1.2d6684738bcd3p-13"
+    assert released["SO2"].hex() == "0x1.2620a85b4d20fp-11"
+    assert released["O2"].hex() == "0x1.25d7c7b1725f4p-13"
     assert cap_record["demand_kg_hr"] == pytest.approx(demand_kg_hr)
     assert cap_record["capacity_kg_hr"] == pytest.approx(capacity_kg_hr)
     assert cap_record["scale"] == pytest.approx(transport_scale)
@@ -794,6 +802,17 @@ def test_joint_release_stays_within_pipe_capacity():
     assert sim._subsolidus_pending_release is None
     assert sim._last_subsolidus_bakeout["committed"] is True
     assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
+
+    hourly_release = [released["SO2"]]
+    for _ in range(2):
+        sim.step()
+        hourly_release.append(
+            sim._last_subsolidus_bakeout["released_kg_hr_by_species"].get(
+                "SO2", 0.0
+            )
+        )
+    assert all(rate > 0.0 for rate in hourly_release)
+    assert headspace_seen == [{"SO2": 0.01}] * 3
 
 
 def test_c0_same_step_pipe_cap_numeric_pin():

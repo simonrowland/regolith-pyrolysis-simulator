@@ -8016,6 +8016,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             pressure_source = '_melt_headspace_composition_mbar'
         overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
+        # Native Fe is partitioned in _step_one_hour before ordinary
+        # evaporation. At this point the carried-in headspace is the gas
+        # boundary the source sees; the later same-hour flux has not formed.
         P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
@@ -15733,11 +15736,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
-        # Hertz-Knudsen reads the headspace persisted last step. A same-step
-        # ordinary-only provisional would replace that combined basis.
+        # The solid-host evaluator is the next operator after ordinary
+        # evaporation, so its incoming boundary is the current-hour gas state
+        # already solved above. Its released gas joins the shared pipe-cap
+        # decision below; no second headspace balance is introduced here.
+        solid_release_partials_Pa = (
+            capacity_result.partial_pressures_Pa
+            if capacity_result is not None
+            else self._solved_headspace_partials_Pa_this_tick
+        )
+        solid_release_headspace_mbar = None
+        if isinstance(solid_release_partials_Pa, Mapping):
+            from simulator.overhead import headspace_partials_mbar_from_Pa
+
+            solid_release_headspace_mbar = headspace_partials_mbar_from_Pa(
+                solid_release_partials_Pa
+            )
         bakeout_diag = self._apply_c0_bakeout(
             liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
-            headspace_mbar=None,
+            headspace_mbar=solid_release_headspace_mbar,
             admitted_gas_kg_hr=dict(evap_flux.species_kg_hr),
             commit_release=False,
         )
