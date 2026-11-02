@@ -91,7 +91,7 @@ def test_projection_counts_historical_metal_mass_toward_dropped_mass_cap():
     assert excessive.value.total_dropped_fraction == pytest.approx(3 / 102)
 
 
-class _GridBackend:
+class _GridBackend(magemin_module.MAGEMinBackend):
     instances = []
     calls = []
     fail = False
