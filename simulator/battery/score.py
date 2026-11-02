@@ -191,7 +191,11 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
-from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.fe_redox import (
+    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
+    feo_iw_log10_fO2_bar,
+    holzheid_stoich_feo_gamma_band,
+)
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
@@ -2613,9 +2617,7 @@ def _b1259_tridymite_cristobalite_delta_g(
 # conversion. d/dT of a + b T - c T ln T is b - c (ln T + 1).
 _HOLZHEID_EQ9_J = (Decimal("-244118"), Decimal("115.559"), Decimal("8.474"))
 _HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
-# Holzheid 1997 printed values used in the D&G uncertainty comparison notice.
-_HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
-_HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
+# Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite.
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
 _HOLZHEID_WUSTITE_SOURCE_IDS = frozenset(
@@ -2624,11 +2626,6 @@ _HOLZHEID_WUSTITE_SOURCE_IDS = frozenset(
         "doyle-1989-tio2-feo-activity-magma",
         "colson-floden-haugen-2005-nio-feo-o2-activities",
     }
-)
-_HOLZHEID_WUSTITE_TO_STOICHIOMETRIC_POINTS_K = (
-    (Decimal("1573.15"), Decimal("2.02")),
-    (Decimal("1673.15"), Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C)),
-    (Decimal("1873.15"), Decimal(_HOLZHEID_PRINTED_FACTOR_1600_C)),
 )
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
 _DISTIN_N_FE2_PLUS_FACTORS = {
@@ -2927,13 +2924,15 @@ def _iron_saturated_feo_calibration() -> tuple[
         raise ValueError("iron-fusion shift missing above 1809 K")
     factor_1400 = _feo_reference_factor(calibration, Decimal("1673.15"))
     factor_1600 = _feo_reference_factor(calibration, Decimal("1873.15"))
+    holzheid_1400 = Decimal(str(HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[1][1]))
+    holzheid_1600 = Decimal(str(HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[2][1]))
     eq9_slope = _holzheid_eq9_slope_J_per_mol_K(_HOLZHEID_EQ9_SLOPE_AT_K)
     comparison = (
         "Holzheid printed comparison at 1400 C: "
         f"{_display_decimal(factor_1400, '0.001')} vs "
-        f"{_HOLZHEID_PRINTED_FACTOR_1400_C}; at 1600 C: "
+        f"{holzheid_1400}; at 1600 C: "
         f"{_display_decimal(factor_1600, '0.001')} vs "
-        f"{_HOLZHEID_PRINTED_FACTOR_1600_C}; equation (9) slope "
+        f"{holzheid_1600}; equation (9) slope "
         f"{_display_decimal(eq9_slope, '0')} vs "
         f"{_display_decimal(slope, '0.0')} J/mol/K"
     )
@@ -2960,7 +2959,7 @@ def _iron_saturated_feo_comparison(
     N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
     multiply this partial. Distin p. 75 converts to the stoichiometric oxide
     by an earlier procedure and prints no factor. Distin's source-keyed
-    per-temperature composition factors and Holzheid's printed Doyle/Colson
+    per-temperature composition factors and Holzheid's printed Doyle
     phase ratios enter the same transform; D&G remains the fallback for
     sources without a printed reference-phase conversion.
 
@@ -3010,13 +3009,18 @@ def _iron_saturated_feo_comparison(
                 band=missing,
             )
             return replace(reference, notices=union_notices(reference.notices, (notice,)))
-        factor, extrapolated = _holzheid_wustite_to_stoichiometric_factor(
-            temperature_K
-        )
+        holzheid_band = holzheid_stoich_feo_gamma_band(float(temperature_K))
+        factor = Decimal(str(holzheid_band["conversion_multiplier"]))
+        conversion_status = str(holzheid_band["conversion_status"])
+        extrapolated = conversion_status.startswith("extrapolated_")
         transformed, _log10_shift_dex = _transform_iron_saturated_feo_reference(
             reference, factor
         )
         converted = transformed.value.point
+        printed_points = ", ".join(
+            f"{temperature_C:g} C: {point_factor:g}"
+            for temperature_C, point_factor in HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+        )
         notice = Notice(
             kind=NoticeKind.DERIVATION_USES_COMPILATION,
             affected_quantities=(quantity,),
@@ -3024,8 +3028,8 @@ def _iron_saturated_feo_comparison(
                 "reference_converted_via_iron_saturation; "
                 "method=Holzheid 1997 printed wustite-to-stoichiometric "
                 "FeO(l) activity-coefficient ratio, log10 ratio interpolated "
-                "linearly in 1/T; printed points: 1300 C: 2.02, 1400 C: 1.94, "
-                "1600 C: 1.66; validity band=1300-1600 C; "
+                f"linearly in 1/T; printed points: {printed_points}; "
+                "validity band=1300-1600 C; "
                 f"source_value={reference.value.point}; converted_value={converted}; "
                 f"factor={factor}; T={temperature_K} K"
             ),
@@ -3131,8 +3135,9 @@ def _iron_saturated_feo_comparison(
         reference, factor
     )
     converted = transformed.value.point
+    holzheid_1400 = Decimal(str(HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[1][1]))
     log_f_spread_dex = (
-        Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
+        holzheid_1400 / Decimal("1.792")
     ).log10()
     iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
     conversion_notice = Notice(
@@ -3143,8 +3148,8 @@ def _iron_saturated_feo_comparison(
             "(JACS 68:798-816), Table III B, p. 803 direct Fe/wustite "
             "pCO2/pCO ratios, which the authors flag as less reliable on "
             "p. 811; uncertainty ±0.035 dex in log f centred on 1.792, "
-            "reaching Holzheid/Barin 1.94 at 1400 C; credible-route "
-            "log-f spread log10(1.94/1.792) = "
+            f"reaching Holzheid/Barin {holzheid_1400} at 1400 C; credible-route "
+            f"log-f spread log10({holzheid_1400}/1.792) = "
             f"{_display_decimal(log_f_spread_dex, '0.0001')} dex; "
             "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
             f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
@@ -3218,44 +3223,6 @@ def _transform_iron_saturated_feo_reference(
         value=replace(reference.value, point=converted),
     )
     return transformed, factor.log10()
-
-
-def _holzheid_wustite_to_stoichiometric_factor(
-    temperature_K: Decimal,
-) -> tuple[Decimal, bool]:
-    """Return Holzheid's printed γ(stoich FeO)/γ(wüstite) factor.
-
-    The printed ratio already compares the two liquid reference phases, so no
-    Masson Temkin N0 composition factor is added. Interpolate log10(ratio)
-    linearly in 1/T and extrapolate beyond the printed 1300–1600 C range. At
-    1400 C (1673.15 K) this returns the printed 1.94 exactly.
-    """
-    points = _HOLZHEID_WUSTITE_TO_STOICHIOMETRIC_POINTS_K
-    for point_temperature, factor in points:
-        if temperature_K == point_temperature:
-            return factor, False
-
-    extrapolated = not points[0][0] <= temperature_K <= points[-1][0]
-    segment = next(
-        (
-            (left, right)
-            for left, right in zip(points, points[1:])
-            if left[0] <= temperature_K <= right[0]
-        ),
-        points[:2] if temperature_K < points[0][0] else points[-2:],
-    )
-    (left_temperature, left_factor), (right_temperature, right_factor) = segment
-    inverse_temperature_fraction = (
-        (Decimal(1) / temperature_K - Decimal(1) / left_temperature)
-        / (Decimal(1) / right_temperature - Decimal(1) / left_temperature)
-    )
-    left_log_factor = left_factor.log10()
-    right_log_factor = right_factor.log10()
-    log_factor = left_log_factor + inverse_temperature_fraction * (
-        right_log_factor - left_log_factor
-    )
-    factor = (log_factor * Decimal(10).ln()).exp()
-    return factor, extrapolated
 
 
 def fusion_comparison_reference(

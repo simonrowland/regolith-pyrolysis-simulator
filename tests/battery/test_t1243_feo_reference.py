@@ -354,11 +354,10 @@ def test_holzheid_reference_conversion_uses_printed_anchors(
     source_id: str,
 ) -> None:
     for temperature_K, factor in _HOLZHEID_POINTS:
-        row = _wustite_row(temperature_K)
+        row = replace(_wustite_row(temperature_K), source_id=source_id)
         if source_id.startswith("colson-"):
             identity = replace(row.identity, quantity=Quantity.ACTIVITY_COEFFICIENT)
             row = replace(row, identity=identity)
-        row = replace(row, source_id=source_id)
 
         converted = fusion_comparison_reference(
             row, engine=Engine.INTERNAL_ANALYTICAL
