@@ -4091,6 +4091,7 @@ def _projected_engine_liquid_fraction_grid(
     kept_oxide_amounts: Tuple[Tuple[str, float], ...],
     dropped_amounts: Tuple[Tuple[str, float], ...],
     fO2_log: float,
+    pressure_bar: float,
     backend_config_json: str,
 ) -> Tuple[str, Tuple[Tuple[float, float], ...]]:
     """Run one isolated MAGEMin temperature search for an immutable bulk."""
@@ -4104,7 +4105,7 @@ def _projected_engine_liquid_fraction_grid(
         result = backend.find_liquidus_solidus(
             composition_kg=dict(kept_oxide_amounts),
             fO2_log=fO2_log,
-            pressure_bar=1e-6,
+            pressure_bar=pressure_bar,
         )
         status = str(getattr(result, "status", "unavailable"))
         if status != "ok":
@@ -4129,12 +4130,14 @@ def projected_engine_liquid_fraction_diagnostic(
     composition_kg: Mapping[str, float],
     temperature_C: float,
     fO2_log: float,
+    pressure_bar: float,
     backend_config: Mapping[str, Any],
 ) -> Dict[str, Any]:
     """Return a projected MAGEMin fraction without touching simulation state."""
     result: Dict[str, Any] = {
         "fraction": None,
         "temperature_C": None,
+        "pressure_bar": None,
         "status": "invalid_input",
         "provider": "magemin",
         "dropped_species_mass_fractions": {},
@@ -4144,9 +4147,16 @@ def projected_engine_liquid_fraction_diagnostic(
     try:
         temperature = float(temperature_C)
         fO2 = float(fO2_log)
-        if not math.isfinite(temperature) or not math.isfinite(fO2):
+        pressure = float(pressure_bar)
+        if (
+            not math.isfinite(temperature)
+            or not math.isfinite(fO2)
+            or not math.isfinite(pressure)
+            or pressure < 0.0
+        ):
             return result
         result["temperature_C"] = temperature
+        result["pressure_bar"] = pressure
         projection = project_magemin_diagnostic_composition(dict(composition_kg))
         result["dropped_species_mass_fractions"] = dict(
             projection.dropped_species_mass_fractions
@@ -4184,6 +4194,7 @@ def projected_engine_liquid_fraction_diagnostic(
             kept,
             dropped,
             fO2,
+            pressure,
             backend_config_json,
         )
         result["status"] = status

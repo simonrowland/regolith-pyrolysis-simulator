@@ -16813,6 +16813,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # b-149 silent-zero class (diagnostic only).
             silent_zero_diagnostic=self._silent_zero_diagnostic_payload(),
         )
+        # Keep the diagnostic's historical inputs outside the dataclass
+        # fields so HourSnapshot serialization and the physics path stay
+        # unchanged. This retains non-oxide melt species for the projection's
+        # dropped-mass cap.
+        diagnostic_composition_kg = dict(self.melt.composition_kg)
+        for species, mass_kg in self.inventory.inert_melt_components_kg.items():
+            diagnostic_composition_kg[str(species)] = (
+                diagnostic_composition_kg.get(str(species), 0.0)
+                + float(mass_kg)
+            )
+        snapshot._magemin_diagnostic_composition_kg = (
+            diagnostic_composition_kg
+        )
+        snapshot._magemin_diagnostic_pressure_bar = (
+            float(self.melt.p_total_mbar) / 1000.0
+        )
         if error_category:
             setattr(snapshot, 'mass_balance_error_category', error_category)
         return snapshot

@@ -2583,6 +2583,11 @@ def _projected_engine_liquid_fraction_for_snapshot(
     snapshot: HourSnapshot,
 ) -> dict[str, Any] | None:
     """Wire an isolated MAGEMin diagnostic to this historical snapshot."""
+    setpoints = getattr(sim, "setpoints", {}) or {}
+    if not isinstance(setpoints, Mapping) or (
+        setpoints.get("projected_engine_liquid_fraction_diagnostic") is not True
+    ):
+        return None
     gate = getattr(snapshot, "liquid_fraction_gate", {}) or {}
     if not isinstance(gate, Mapping) or gate.get("provider") != "magemin":
         return None
@@ -2597,25 +2602,24 @@ def _projected_engine_liquid_fraction_for_snapshot(
     except Exception:
         return None
 
-    melt_inventory = snapshot.inventory.copy()
-    melt_mass_kg = float(snapshot.melt_mass_kg)
-    composition_kg = {
-        str(species): melt_mass_kg * float(wt_pct) / 100.0
-        for species, wt_pct in snapshot.composition_wt_pct.items()
-    }
-    for species, mass_kg in melt_inventory.inert_melt_components_kg.items():
-        composition_kg[str(species)] = (
-            composition_kg.get(str(species), 0.0) + float(mass_kg)
-        )
+    composition_kg = getattr(
+        snapshot, "_magemin_diagnostic_composition_kg", None
+    )
+    pressure_bar = getattr(
+        snapshot, "_magemin_diagnostic_pressure_bar", None
+    )
+    if not isinstance(composition_kg, Mapping) or pressure_bar is None:
+        return None
 
     from simulator.melt_backend.magemin import (
         projected_engine_liquid_fraction_diagnostic,
     )
 
     return projected_engine_liquid_fraction_diagnostic(
-        composition_kg=composition_kg,
+        composition_kg=dict(composition_kg),
         temperature_C=snapshot.temperature_C,
         fO2_log=snapshot.oxygen_reservoir.get("melt_intrinsic_fO2_log"),
+        pressure_bar=pressure_bar,
         backend_config=copy.deepcopy(getattr(backend, "_config", {}) or {}),
     )
 
