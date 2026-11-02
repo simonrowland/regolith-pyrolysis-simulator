@@ -149,6 +149,7 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
         0.0005,
         abs=1.0e-14,
     )
+    assert snapshot.melt_headspace_composition_mbar["O2"] == 0.0005
     assert solver_diagnostic["published_from_final_committed_inlet"]
     for species in ("Fe", "Ca"):
         expected = float(
