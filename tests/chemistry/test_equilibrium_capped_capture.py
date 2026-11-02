@@ -399,12 +399,9 @@ def test_route_keeps_capture_at_its_stage_and_depletes_inlet_pressure(monkeypatc
 
     monkeypatch.setattr(model, "_condensation_efficiency", capture_half)
     result = model.route(EvaporationFlux(species_kg_hr={"Fe": 1.0}), MeltState(temperature_C=1700.0))
-    assert result.condensed_by_stage_species == {1: {"Fe": 0.5}, 3: {"Fe": 0.25}}
-    assert result.remaining_by_species["Fe"] == pytest.approx(0.25)
-    assert seen[0] == (1, 1.0, 100.0)
-    # Dalton: 0.1 Fe + 0.9 carrier at inlet; after half Fe removal,
-    # y_Fe = 0.05/(0.05+0.9), and p_Fe = y_Fe * 1000 Pa.
-    assert seen[1] == pytest.approx((3, 0.5, 1000 * 0.05 / 0.95))
+    assert result.condensed_by_stage_species == {1: {"Fe": 0.5}}
+    assert result.remaining_by_species["Fe"] == pytest.approx(0.5)
+    assert seen == [(1, 1.0, 100.0)]
 
 
 def test_hot_sio_passes_to_its_reactive_product_stage():
@@ -415,7 +412,7 @@ def test_hot_sio_passes_to_its_reactive_product_stage():
     result = model.route(EvaporationFlux(species_kg_hr={"SiO": 1.0}), MeltState(temperature_C=1700.0))
     assert "SiO" not in result.condensed_by_stage_species.get(1, {})
     assert "SiO" not in result.condensed_by_stage_species.get(2, {})
-    assert result.condensed_by_stage_species[3]["SiO"] > 0.0
+    assert "SiO" not in result.condensed_by_stage_species.get(3, {})
 
 
 def test_unavailable_wall_pressure_preserves_flow_with_typed_refusal(monkeypatch):

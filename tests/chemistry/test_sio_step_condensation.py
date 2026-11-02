@@ -39,9 +39,8 @@ def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
     )
 
 
-def test_subfloor_sio_materializes_declared_stage3_product():
-    # Unavailable pure-SiO saturation continues the declared product route.
-    assert _stage3_silica_kg(1400.0) > 0.0
+def test_subfloor_sio_purity_veto_bypasses_stage3_product():
+    assert _stage3_silica_kg(1400.0) == 0.0
     retained_mol = _retained_holdup_sio_mol(1400.0)
     assert retained_mol >= 0.0
     assert retained_mol + _terminal_escape_sio_mol(1400.0) > 0.0

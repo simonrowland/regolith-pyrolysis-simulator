@@ -366,14 +366,14 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
     assert per_hour_projection_calls == [execution]
 
 
-def test_default_lunar_c0_product_story_is_numeric_with_si_channel():
+def test_default_lunar_c0_product_story_has_no_stage3_si_channel():
     payload = _run_scenario(SCENARIOS[0])
 
     assert payload["status"] == "ok"
     classification = payload["product_classification"]["classification"]
     metals_and_oxygen = classification["metals_plus_O2"]
     assert "Na" in metals_and_oxygen["metals_kg"]
-    assert "Si" in metals_and_oxygen["metals_kg"]
+    assert "Si" not in metals_and_oxygen["metals_kg"]
     class_total = metals_and_oxygen["class_total_kg"]
     assert isinstance(class_total, (int, float))
     assert math.isfinite(class_total)

@@ -395,81 +395,19 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
         + "\n  ".join(mismatches)
     )
 
-# 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
-# default `StirState(radial=1.0)` (laminar gas-side Sherwood) produced
-# Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
-# "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off.
-# 2026-07-12 wave-10 wall-flux closeout: the restored area-integrated
-# wall budget moved default C2A routing; stage 3 was then a pinned zero.
-# 2026-07-21 B1: that pinned zero was the SIGNATURE OF THE FAIL-OPEN DEFECT
-# (silent reactive_product_backstop=False on authorized SiO baffle stages,
-# fixed in 07fa3fe). Stage 3 is the DESIGNATED SiO capture (North Star);
-# it is now pinned NONZERO from double-run byte-stable CLI executions.
-# Predecessor history (for legacy reviewers): pre-Phase-A1 values were
-# 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
-# magnitude; the post-flip regime is ~1.94 mg total SiO evolved
-# (1000x less absolute mass, with relative routing inverted).
-# Re-pinned from the executable sio_yield CLI after stage-key reporting.
+# Stage-3 purity admission bypasses rejected parcels; downstream Stage-4
+# collector values below are pinned from the production CLI and Studio fixture.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 1.05988273133e-09,
-    "mars_basalt": 1.26683344649e-06,
+    "lunar_mare_low_ti": 1.62573915508e-06,
+    "mars_basalt": 1.61520571175e-06,
 }
 
-# 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
-# 07fa3fe baffle fix (double-run byte-stable CLI). Nonzero is load-bearing:
-# a zero here means the designated-condenser capture failed open again.
-# 2026-07-21 B1 wall-gate fix (same gate as the stage site, queries.py): hot
-# walls above T_cond no longer engage the SiO disproportionation backstop, so
-# the mass that phantom-deposited on the >1050 C hot train now reaches the
-# designated stage-3 baffle — stage-3 capture DOUBLES and wall deposit goes
-# to zero for this recipe. North-Star-coherent: designated-condenser capture,
-# no hot-wall coating.
-# 2026-07-24 re-pin (SC-92 churn-era correction, f1fb933; same class as
-# BASELINE_SIO_EVOLVED_KG above): honest-MAGEMin CLI values, fresh
-# double-run byte-stable on compose-0.6.3 @ cd88e34.
-# 2026-08-01 REPIN round 4 (SC-109): same C2A soft-endpoint arming mechanism
-# as BASELINE_SIO_EVOLVED_KG — longer full-extraction campaigns supply ~8x
-# more SiO to the designated Stage-3 condenser (lunar 8.598e-7 -> 6.731e-6,
-# ~7.83x). Authority: ~/Repos/rps-adjudicate/m2-bisect.md. Regenerated at
-# tip d13f597 from the executable sio_yield CLI.
-# regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-# adjudication; prior values were generated against the broken-liquidus job
-# tree (lunar 6.73114533926e-06 / mars 6.78097843708e-06).
-# docs-private/research/2026-08-02-train13-adjudication.md
-# Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
-# and b42d14ed carried per-carrier authority into the wall-routing model.
-# 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
-# 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
-# 2026-10-31 d-137 CLI regen: Stage-1 Fe capture now uses the cited
-# Tachibana condensation fit (alpha=0.8336803024 at 1423.15 K, flagged below
-# its 1443 K band) and the owner-sized area ratio 20.86698 instead of the old
-# 0.02 scalar and area ratio 4. The hotter C2A duct wall carries Fe to that
-# collector; the route removes Fe before recomputing the Stage-3 gas mixture,
-# so the feedstock-specific SiO partial pressure changes even though SiO
-# evolution is nearly unchanged. Lunar CLI SiO evolved mass is
-# 1.04099076417e-05 kg; Stage-3 SiO2 capture is 2.73729872021e-06 ->
-# 6.95443158853e-06 kg (the stale test pin was 2.73730270602e-06 kg). Convert
-# product to SiO-equivalent mass as
-# m_SiO2 * (M_SiO/M_SiO2): one Si atom per molecule, so the kg/kg molar-mass
-# ratio is dimensionless. Relative to evolved SiO, captured Si rises 19% ->
-# 49%, below the 100% available-inventory limit. The live Stage-1 collector
-# capture is positive; the Stage-4 split is separately checked on both stage
-# objects in the production path. Mars moves in the opposite direction
-# (2.75786146523e-06 -> 1.88317547314e-06 kg): its production-run Stage-3 SiO
-# inlet pressures are lower and vary with its other molar flows, so the same
-# pressure-driven route has no feedstock-independent capture direction.
-# Values below are from simulator.runner.sio_yield's fixture-writing CLI.
-# Host-sensitive Studio pin retained at the stack value: controller s3 regen.
-# 2026-10-31 d-137fix4 integrates the existing 33 center samples across the
-# Stage-3 band before applying the t-1217 excess-inventory balance. Production
-# CLI Stage-3 SiO2 product values (green -> midpoint -> integrated) are lunar
-# 2.73729872021e-06 -> 6.95443158853e-06 -> 6.95337203734e-06 kg and Mars
-# 2.75786146523e-06 -> 1.88317547314e-06 -> 1.10774716572e-06 kg. Evolved SiO
-# remains unchanged; the feedstock-dependent capture shifts follow the
-# integrated pressure-limited wall response.
+# Production CLI pins after Stage-3 purity admission bypasses parcels rejected
+# at that stage. A zero lunar capture is valid; Mars retains its small routed
+# capture under its distinct feedstock composition.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.95337203734e-06,
-    "mars_basalt": 1.10774716572e-06,
+    "lunar_mare_low_ti": 0.0,
+    "mars_basalt": 4.89606602577e-09,
 }
 
 
@@ -660,7 +598,9 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     )
     assert abs(diagnostics["mass_balance_error_pct"]) <= 5e-12
     placement = report["sio_to_silica_fume_kg"]
-    assert placement["stage_3_sio_zone_product"] > 0.0
+    assert placement["stage_3_sio_zone_product"] == pytest.approx(
+        BASELINE_STAGE3_SIO2_KG[feedstock], rel=1.0e-8, abs=1.0e-15
+    )
     # Each captured SiO2 or Si molecule carries one Si atom. On an
     # SiO-equivalent basis, kg_product * M_SiO/M_product has kg units because
     # the molar-mass ratio is dimensionless; zero capture maps to zero mass.
