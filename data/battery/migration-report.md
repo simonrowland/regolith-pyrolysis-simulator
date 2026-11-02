@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 87677
-records out (observations): 177421
-works: 725
-experiments: 6768
-queue size: 117155
+rows in: 87749
+records out (observations): 177493
+works: 727
+experiments: 6795
+queue size: 117156
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 723
+index sources: 725
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,16 +196,16 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 722 (mismatch) |
+| citations | 147 | 724 (mismatch) |
 | doi_works | 56 | 392 (mismatch) |
-| no_doi_works | 91 | 333 (mismatch) |
-| admission_statuses | 374 | 29637 (mismatch) |
+| no_doi_works | 91 | 335 (mismatch) |
+| admission_statuses | 374 | 29709 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1338 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 21702 (mismatch) |
+| formulas | 1625 | 21774 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
 | absent_admissions | 3511 | 14914 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
@@ -19159,6 +19159,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml` | 20 | 20 | 43 |
 | `data/literature/extracts/fuyuki-2007-sio-recombination.yaml` | 0 | 0 | 1 |
@@ -19405,6 +19406,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/miao-li-yan-2023-fe-v-spinel-gibbs.yaml` | 39 | 39 | 3 |
 | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` | 111 | 111 | 186 |
 | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` | 3 | 6 | 27 |
+| `data/literature/extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml` | 72 | 72 | 0 |
 | `data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/morishita-2004-sio2-partial-enthalpy.yaml` | 7 | 61 | 7 |
 | `data/literature/extracts/morita-1999-chromium-oxide-activity.yaml` | 210 | 210 | 280 |
@@ -19822,8 +19824,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 294705
+advisory issues: 294849
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 294705 |
+| `identity_incomplete` | 294849 |
