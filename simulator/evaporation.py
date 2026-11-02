@@ -1255,6 +1255,9 @@ class EvaporationMixin:
         self._solved_headspace_partials_Pa_this_tick = dict(
             solved.writer_partials_Pa
         )
+        solved_inlet_flux = self._subsolidus_transport_inlet_flux(
+            project_inventory_limited_flux(selected_flux)
+        )
         diagnostic = dict(
             getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
         )
@@ -1299,6 +1302,9 @@ class EvaporationMixin:
             'candidate_partials_Pa': dict(solved.candidate_partials_Pa),
             'writer_partials_Pa': dict(solved.writer_partials_Pa),
             'fixed_species': sorted(set(fixed_partials_Pa) | set(fixed_flows)),
+            'solved_committed_inlet_kg_hr_by_species': dict(
+                solved_inlet_flux.species_kg_hr
+            ),
             'oxygen_partial_frozen': True,
             'writer_path': dict(writer_detail),
         }

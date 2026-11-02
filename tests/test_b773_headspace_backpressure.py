@@ -147,3 +147,41 @@ def test_solved_melt_partials_do_not_replace_downstream_overhead_report(
     assert snapshot.melt_headspace_composition_mbar
     assert snapshot.overhead.composition == expected
     assert sim.overhead.composition == expected
+
+
+def test_binding_c0_pipe_cap_publishes_partials_for_final_committed_flux():
+    from simulator.state import CampaignPhase
+
+    sim = _lunar_simulator()
+    sim.campaign_mgr.campaigns["C0"]["p_total_mbar_default"] = 0.0
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    cap_changes = []
+    original_cap = sim._cap_c0_joint_release_to_pipe_capacity
+
+    def capture_binding_cap(flux):
+        before = float(flux.total_kg_hr)
+        result = original_cap(flux)
+        cap_changes.append((before, float(flux.total_kg_hr)))
+        return result
+
+    sim._cap_c0_joint_release_to_pipe_capacity = capture_binding_cap
+    snapshot = sim.step()
+
+    assert any(after < before for before, after in cap_changes)
+    assert "headspace_solver" in sim._last_evaporation_flux_diagnostic
+    final_inlet = sim._subsolidus_transport_inlet_flux(snapshot.evap_flux)
+    capacity = sim._effective_transport_capacity_this_tick
+    transport = sim.overhead_model.estimate_transport_state(
+        final_inlet,
+        sim.melt,
+        p_downstream_bar=sim._headspace_downstream_pressure_bar(capacity),
+        effective_transport_capacity=capacity,
+    )
+    expected = sim.overhead_model.species_partial_pressures(
+        final_inlet,
+        transport["vapor_pressure_mbar"],
+        sim.species_formula_registry,
+    )
+
+    assert snapshot.melt_headspace_composition_mbar == pytest.approx(expected)

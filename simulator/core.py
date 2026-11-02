@@ -15893,13 +15893,46 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self, '_solved_headspace_partials_Pa_this_tick', None
         )
         if isinstance(solved_headspace_partials_Pa, Mapping):
-            solved_headspace_partials_mbar = {
-                str(species): max(0.0, float(partial_Pa)) / 100.0
-                for species, partial_Pa in solved_headspace_partials_Pa.items()
-            }
-            self._melt_headspace_composition_mbar.update(
-                solved_headspace_partials_mbar
+            evaporation_diagnostic = getattr(
+                self, '_last_evaporation_flux_diagnostic', {}
+            ) or {}
+            solver_diagnostic = evaporation_diagnostic.get(
+                'headspace_solver', {}
             )
+            solved_inlet = (
+                solver_diagnostic.get(
+                    'solved_committed_inlet_kg_hr_by_species', {}
+                )
+                if isinstance(solver_diagnostic, Mapping)
+                else {}
+            )
+            final_inlet = inlet_flux.species_kg_hr
+            flux_unchanged = all(
+                math.isclose(
+                    float(solved_inlet.get(species, 0.0)),
+                    float(final_inlet.get(species, 0.0)),
+                    rel_tol=1.0e-12,
+                    abs_tol=1.0e-15,
+                )
+                for species in set(solved_inlet) | set(final_inlet)
+            )
+            if flux_unchanged:
+                solved_headspace_partials_mbar = {
+                    str(species): max(0.0, float(partial_Pa)) / 100.0
+                    for species, partial_Pa in solved_headspace_partials_Pa.items()
+                }
+                self._melt_headspace_composition_mbar.update(
+                    solved_headspace_partials_mbar
+                )
+            # C0 and ledger commit filters can change the inlet after the
+            # solve. Keep the owner projection already computed from that
+            # final flux: J_i=G_i*p_i, so p_i=J_i/G_i has units Pa and is the
+            # removal side of beta_i*(P_eq,i-p_i)=G_i*p_i. The closed-line
+            # zero-flow boundary is handled by its equilibrium partials.
+            if isinstance(solver_diagnostic, dict):
+                solver_diagnostic['published_from_final_committed_inlet'] = (
+                    not flux_unchanged
+                )
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0
