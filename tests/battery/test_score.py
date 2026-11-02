@@ -8958,15 +8958,21 @@ def test_subsolidus_notice_covers_psat_and_sio_rails(
     experiment, reference = _vapour_over_sample_form("solid")
     if quantity is Quantity.P_SAT:
         identity = F.psat_identity(formula, T_K=Decimal("2100"))
+        # The partial-pressure fixture also carries printed fO2/total-P
+        # point conditions. They do not apply to this pure-component P_SAT row.
+        reference = replace(reference, identity=identity, point_conditions=None)
     else:
         identity = replace(
             reference.identity,
             species=replace(reference.identity.species, formula=formula),
         )
-    reference = replace(
-        reference,
-        identity=identity,
+        reference = replace(reference, identity=identity)
+
+    assert (
+        validate_quantity_profile(reference.identity).kind is IdentityEqualKind.EQUAL
     )
+    if quantity is Quantity.P_SAT:
+        assert reference.point_conditions is None
 
     residual, calls = _score_sample_phase_vapour(
         reference, experiment, Engine.INTERNAL_ANALYTICAL
