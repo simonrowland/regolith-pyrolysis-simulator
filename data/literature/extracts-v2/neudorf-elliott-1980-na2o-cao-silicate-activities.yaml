@@ -1,0 +1,4201 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml
+observations:
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.244'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.00000000006309573444801932494343601366'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −10.2 at 25 wt pct Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 1
+    published_page: 607
+    pdf_page_index: 0
+    section: Abstract
+    note: approximately −10.2 at 25 wt pct Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −10.2 at 25 wt pct Na2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.244'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 609
+        pdf_page_index: 2
+        section: Results and Discussion
+        note: Results text maps 25 w/o Na2O to 24.4 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −10.2 at 25 wt pct Na2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 1
+              published_page: 607
+              pdf_page_index: 0
+              section: Abstract
+              note: approximately −10.2 at 25 wt pct Na2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 607
+              pdf_page_index: 0
+              section: Abstract
+              note: approximately −10.2 at 25 wt pct Na2O
+        output_unit: K
+        references: []
+  provenance:
+    printed_value: '-10.2'
+    printed_form: log10
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.393'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.000000005011872336272722850015541869'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −8.3 at 40 wt pct Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 1
+    published_page: 607
+    pdf_page_index: 0
+    section: Abstract
+    note: approximately −8.3 at 40 wt pct Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −8.3 at 40 wt pct Na2O
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.393'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I row at 40 w/o Na2O prints 39.3 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Abstract
+        note: approximately −8.3 at 40 wt pct Na2O
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 1
+              published_page: 607
+              pdf_page_index: 0
+              section: Abstract
+              note: approximately −8.3 at 40 wt pct Na2O
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              published_page: 607
+              pdf_page_index: 0
+              section: Abstract
+              note: approximately −8.3 at 40 wt pct Na2O
+        output_unit: K
+        references: []
+  provenance:
+    printed_value: '-8.3'
+    printed_form: log10
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_sio2_activity_na_binary_at_1070c
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - SiO2
+          - '0.65'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+    attribution: Neudorf and Elliott (1980), PDF page 6, Results and Discussion.
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 6
+        published_page: 612
+        pdf_page_index: 5
+        section: Na2O-CaO-SiO2 System
+        note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 6
+    published_page: 612
+    pdf_page_index: 5
+    section: Na2O-CaO-SiO2 System
+    note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 6
+        published_page: 612
+        pdf_page_index: 5
+        section: Na2O-CaO-SiO2 System
+        note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - SiO2
+            - '0.65'
+          amount_basis: mole_fraction
+      locator:
+        page: 6
+        published_page: 612
+        pdf_page_index: 5
+        section: Na2O-CaO-SiO2 System
+        note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 6
+        published_page: 612
+        pdf_page_index: 5
+        section: Na2O-CaO-SiO2 System
+        note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 6
+              published_page: 612
+              pdf_page_index: 5
+              section: Na2O-CaO-SiO2 System
+              note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 612
+              pdf_page_index: 5
+              section: Na2O-CaO-SiO2 System
+              note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+        output_unit: K
+        references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
+  derivation:
+    relation: The authors calculate the silica activity using Gibbs-Duhem equation [8] and interpolate the Table II log aSiO2
+      fit at NSiO2 = 0.65.
+    inputs:
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
+    - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
+    parameters: []
+    output_unit: dimensionless activity
+    references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.344'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: 'row 1: 25 w/o Na2O'
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: I
+    note: 'row 1: 25 w/o Na2O'
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.344'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I row 1 prints 34.4 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.294'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: 'row 2: 30 w/o Na2O'
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: I
+    note: 'row 2: 30 w/o Na2O'
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.294'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I row 2 prints 29.4 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: 'row 3: 35 w/o Na2O'
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: I
+    note: 'row 3: 35 w/o Na2O'
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I row 3 prints 34.3 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.393'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: 'row 4: 40 w/o Na2O'
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: I
+    note: 'row 4: 40 w/o Na2O'
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.393'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I row 4 prints 39.3 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T across the study range; this row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: I
+        note: Table I reports coefficients for log aNa2O = A/T + B.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row1
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_composition_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273'
+    composition:
+      tag: unknown
+      reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_composition_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 1; T = 1273 K
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: left-hand equation row 1; T = 1273 K
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 1; T = 1273 K
+    composition:
+      state:
+        tag: unknown
+        reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The left-hand Table II equation is a relation over R = NNa2O/NSiO2.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_composition_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323'
+    composition:
+      tag: unknown
+      reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_composition_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 2; T = 1323 K
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: left-hand equation row 2; T = 1323 K
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 2; T = 1323 K
+    composition:
+      state:
+        tag: unknown
+        reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The left-hand Table II equation is a relation over R = NNa2O/NSiO2.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row3
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_composition_fit_as_published'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373'
+    composition:
+      tag: unknown
+      reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_composition_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 3; T = 1373 K
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: left-hand equation row 3; T = 1373 K
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: left-hand equation row 3; T = 1373 K
+    composition:
+      state:
+        tag: unknown
+        reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The left-hand Table II equation is a relation over R = NNa2O/NSiO2.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row1
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.244'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: right-hand equation row 1; NNa2O = 0.244
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: right-hand equation row 1; NNa2O = 0.244
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T; this composition row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The right-hand Table II equation is log aSiO2 = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.244'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: Table II right row 1 prints NNa2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row2
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.294'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: right-hand equation row 2; NNa2O = 0.294
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: right-hand equation row 2; NNa2O = 0.294
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T; this composition row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The right-hand Table II equation is log aSiO2 = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.294'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: Table II right row 2 prints NNa2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: right-hand equation row 3; NNa2O = 0.343
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: right-hand equation row 3; NNa2O = 0.343
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T; this composition row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The right-hand Table II equation is log aSiO2 = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: Table II right row 3 prints NNa2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log_activity_temperature_fit_as_published'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.393'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'log_activity_temperature_fit_as_published'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: right-hand equation row 4; NNa2O = 0.393
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: II
+    note: right-hand equation row 4; NNa2O = 0.393
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The printed fit is a function of T; this composition row has no single point temperature.
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: The right-hand Table II equation is log aSiO2 = A/T + B.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.393'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: II
+        note: Table II right row 4 prints NNa2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row1_mixing_properties
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.244'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 1; composition 24.4 m/o Na2O.
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: III
+    note: Table III data row 1; composition 24.4 m/o Na2O.
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 1; composition 24.4 m/o Na2O.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.244'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 1; composition 24.4 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 1; composition 24.4 m/o Na2O.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 1; composition 24.4 m/o Na2O.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 1; composition 24.4 m/o Na2O.
+        output_unit: K
+        references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row1
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row2_mixing_properties
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.294'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 2; composition 29.4 m/o Na2O.
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: III
+    note: Table III data row 2; composition 29.4 m/o Na2O.
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 2; composition 29.4 m/o Na2O.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.294'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 2; composition 29.4 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 2; composition 29.4 m/o Na2O.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 2; composition 29.4 m/o Na2O.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 2; composition 29.4 m/o Na2O.
+        output_unit: K
+        references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row2
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row3_mixing_properties
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.343'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 3; composition 34.3 m/o Na2O.
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: III
+    note: Table III data row 3; composition 34.3 m/o Na2O.
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 3; composition 34.3 m/o Na2O.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.343'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 3; composition 34.3 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 3; composition 34.3 m/o Na2O.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 3; composition 34.3 m/o Na2O.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 3; composition 34.3 m/o Na2O.
+        output_unit: K
+        references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row3
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table3_row4_mixing_properties
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_mole_fraction
+        components:
+        - - Na2O
+          - '0.393'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 4; composition 39.3 m/o Na2O.
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 5
+    published_page: 611
+    pdf_page_index: 4
+    table: III
+    note: Table III data row 4; composition 39.3 m/o Na2O.
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1050'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 4; composition 39.3 m/o Na2O.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_mole_fraction
+          components:
+          - - Na2O
+            - '0.393'
+          amount_basis: mole_fraction
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 4; composition 39.3 m/o Na2O.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        page: 5
+        published_page: 611
+        pdf_page_index: 4
+        table: III
+        note: Table III data row 4; composition 39.3 m/o Na2O.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 4; composition 39.3 m/o Na2O.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: III
+              note: Table III data row 4; composition 39.3 m/o Na2O.
+        output_unit: K
+        references: []
+  derived_from:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_na2o_fit_row2
+  - neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table2_sio2_fit_row4
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row1_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.35'
+        - - CaO
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 1; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 1; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.35'
+          - - CaO
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 1 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row2_calculated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - CaO
+          - '0.02'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 2; calculated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 2; calculated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.33'
+          - - CaO
+            - '0.02'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 2 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row2_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.33'
+        - - CaO
+          - '0.02'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 2; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 2; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.33'
+          - - CaO
+            - '0.02'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 2 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row3_calculated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.31'
+        - - CaO
+          - '0.04'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 3; calculated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 3; calculated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.31'
+          - - CaO
+            - '0.04'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 3 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row3_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.31'
+        - - CaO
+          - '0.04'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 3; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 3; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.31'
+          - - CaO
+            - '0.04'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 3 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row4_calculated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.29'
+        - - CaO
+          - '0.06'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 4; calculated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 4; calculated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.29'
+          - - CaO
+            - '0.06'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 4 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row4_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.29'
+        - - CaO
+          - '0.06'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 4; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 4; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.29'
+          - - CaO
+            - '0.06'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 4 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row5_calculated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.27'
+        - - CaO
+          - '0.08'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 5; calculated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 5; calculated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.27'
+          - - CaO
+            - '0.08'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 5 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row5_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.27'
+        - - CaO
+          - '0.08'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 5; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 5; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.27'
+          - - CaO
+            - '0.08'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 5 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row6_calculated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - CaO
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 6; calculated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 6; calculated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - CaO
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 6 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
+- observation_id: neudorf-elliott-1980-na2o-cao-silicate-activities::neudorf_elliott_1980_table4_row6_interpolated_log_a_star_na2o
+  experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1343.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_partial_ternary_mole_fraction
+        components:
+        - - Na2O
+          - '0.25'
+        - - CaO
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: value
+      value: '21278.25'
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: log_a_star_as_printed, printed_log_form_as_published,
+      column_as_printed, NNa2O_as_printed, NCaO_as_printed, NNa_plus_as_printed, table_reference_footnote_as_printed, standard_state_as_printed,
+      quantity, method_class, admission_status, refusal_reason, oxygen_partial_pressure'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated; those figure-only values are intentionally
+      undigitized, so no parent observation rows are stored.
+    decided_by:
+      worker: w1102ne-ne80
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: row 6; interpolated log a*Na2O
+  notices: []
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  locator:
+    page: 7
+    published_page: 613
+    pdf_page_index: 6
+    table: IV
+    note: row 6; interpolated log a*Na2O
+  read_from: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+  point_conditions:
+    temperature_C:
+      state:
+        tag: value
+        value: '1070'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_partial_ternary_mole_fraction
+          components:
+          - - Na2O
+            - '0.25'
+          - - CaO
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV row 6 prints NNa2O and NCaO.
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    temperature_K:
+      state:
+        tag: value
+        value: '1343.15'
+      locator:
+        page: 7
+        published_page: 613
+        pdf_page_index: 6
+        table: IV
+        note: Table IV caption gives 1070 °C.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1070'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 613
+              pdf_page_index: 6
+              table: IV
+              note: Table IV caption gives 1070 °C.
+        output_unit: K
+        references: []
