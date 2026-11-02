@@ -5996,14 +5996,24 @@ def _located_printed_and_initial(
     normalized_wt = {
         _mass_percent_component_key(name)[0]: amount for name, amount in wt.items()
     }
+    has_blank_suffixed_oxide = any(
+        _mass_percent_component_key(name)[1]
+        and _is_engine_oxide_component(_mass_percent_component_key(name)[0])
+        and _classify_composition_cell(amount)[0] == "blank"
+        for name, amount in source_values.items()
+    )
     for name, amount in source_values.items():
         stem, has_mass_suffix = _mass_percent_component_stem(name)
         normalized_name, _ = _mass_percent_component_key(name)
-        if state.is_value and normalized_name in normalized_wt:
+        if (
+            not has_blank_suffixed_oxide
+            and state.is_value
+            and normalized_name in normalized_wt
+        ):
             name = normalized_name
             amount = normalized_wt[normalized_name]
         if (
-            state.is_value
+            not has_blank_suffixed_oxide
             and has_mass_suffix
             and stem == normalized_name
             and _is_engine_oxide_component(normalized_name)
