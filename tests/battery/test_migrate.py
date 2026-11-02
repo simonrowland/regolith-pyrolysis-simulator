@@ -9438,12 +9438,8 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     return extract
 
 
-@pytest.mark.parametrize(
-    "field",
-    ("partial_molar_enthalpy_kJ_mol-1", "value"),
-)
-def test_partial_molar_enthalpy_extract_fields_migrate_as_numeric_points(
-    tmp_path: Path, field: str
+def test_partial_molar_enthalpy_value_field_migrates_as_numeric_point(
+    tmp_path: Path,
 ) -> None:
     from simulator.battery.enums import QUANTITY_UNITS
 
@@ -9452,7 +9448,7 @@ def test_partial_molar_enthalpy_extract_fields_migrate_as_numeric_points(
         "quantity": "partial_molar_enthalpy",
         "method_class": "measured_direct",
         "admission_status": "admitted",
-        field: printed_value,
+        "value": printed_value,
     }
     extract = _scalar_extract(
         quantity="partial_molar_enthalpy",
@@ -9470,7 +9466,72 @@ def test_partial_molar_enthalpy_extract_fields_migrate_as_numeric_points(
         "kJ_per_declared_mol_basis"
     )
     assert observation.value.kind is ValueKind.POINT
-    assert observation.value.point == as_decimal(values[field])
+    assert observation.value.point == as_decimal(values["value"])
+
+
+def test_sugawara_partial_molar_enthalpy_mol_minus_one_unit_is_identity(
+    tmp_path: Path,
+) -> None:
+    units = "kJ·mol−1"
+    values = {
+        "quantity": "partial_molar_enthalpy",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "partial_molar_enthalpy_Na2O": "-227",
+    }
+    selection = select_declared_source(
+        Quantity.PARTIAL_MOLAR_ENTHALPY, units, values
+    )
+    assert selection.field_name == "partial_molar_enthalpy_Na2O"
+    assert selection.value.kind is ValueKind.POINT
+    assert selection.amount == as_decimal("-227")
+    assert selection.unit_trail == "identity:kJ_per_mol"
+
+    extract = _scalar_extract(
+        quantity="partial_molar_enthalpy",
+        units=units,
+        values=values,
+        obs_type="gibbs_table",
+    )
+    extract["species"]["Na"]["observations"][0]["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.quantity.value is Quantity.PARTIAL_MOLAR_ENTHALPY
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal(
+        values["partial_molar_enthalpy_Na2O"]
+    )
+
+
+def test_partial_molar_enthalpy_without_printed_unit_is_typed_unavailable(
+    tmp_path: Path,
+) -> None:
+    values = {
+        "quantity": "partial_molar_enthalpy",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "value": "12.5",
+    }
+    extract = _scalar_extract(
+        quantity="partial_molar_enthalpy",
+        units="kJ/mol",
+        values=values,
+        obs_type="gibbs_table",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.pop("units")
+    row["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.quantity.value is Quantity.PARTIAL_MOLAR_ENTHALPY
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.value.unavailable_reason == (
+        "missing printed unit for value; refusing ungrounded numeric value"
+    )
 
 
 def test_partial_molar_enthalpy_without_a_mapped_field_stays_typed_unavailable(
