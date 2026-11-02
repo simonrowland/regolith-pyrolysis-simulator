@@ -10,15 +10,11 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
-    _PRINTED_COMPOSITION_TOTAL_KEYS,
-    _classify_composition_cell,
-    _is_composition_condition_key,
+    _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
-    _mass_percent_component_key,
-    _percent_composition_closure_error,
+    _printed_mass_percent_map_refusal,
     _volatile_closure_component,
-    _wt_percent_conversion_or_refusal,
 )
 from simulator.battery.records import (
     Bench,
@@ -440,40 +436,36 @@ def charge_moles_by_species(
         else None
     )
     raw_printed = _printed_composition_map(source_map)
-    source_pairs = _printed_component_pairs(source_map)
-    mass_percent_source = (
-        _amount_basis_token(source_map) == AmountBasis.MASS_PERCENT.value
-        or source_pairs is not None
-        or (
-            isinstance(source_map, Mapping)
-            and any(_is_engine_oxide_component(str(name)) for name in source_map)
-        )
+    mass_percent_source, printed_map_refusal = _printed_mass_percent_map_refusal(
+        source_map, {}, reject_dropped_components=False
     )
     printed_mass_percent_refused = False
+    printed_chloride_mass_percent_refused = False
     if printed is not None and printed.state.is_value and mass_percent_source:
-        closure_amounts: dict[str, Decimal] = {}
-        for name, item in source_pairs or ():
-            kind, amount = _classify_composition_cell(item)
-            if kind == "malformed":
-                raw_printed = None
-                printed_mass_percent_refused = True
-                break
-            if (
-                kind == "number"
-                and amount is not None
-                and name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-                and not _is_composition_condition_key(name)
-            ):
-                closure_amounts[name] = amount
-        if (
-            not printed_mass_percent_refused
-            and _percent_composition_closure_error(closure_amounts, "mass")
-            is not None
-        ):
+        if printed_map_refusal is not None:
             raw_printed = None
             printed_mass_percent_refused = True
         elif raw_printed is None:
             printed_mass_percent_refused = True
+        elif sum(
+            (
+                as_decimal(amount)
+                for name, amount in raw_printed.items()
+                if (
+                    (volatile := _volatile_closure_component(str(name)))
+                    is not None
+                    and volatile[0] == "Cl"
+                )
+            ),
+            Decimal("0"),
+        ) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+            # Chloride contributes to closure but is not a chargeable oxide.
+            # Do not charge a misleading partial oxide inventory when it is a
+            # major printed component; other unknown labels keep green's
+            # species-by-species charge behavior.
+            raw_printed = None
+            printed_mass_percent_refused = True
+            printed_chloride_mass_percent_refused = True
     derived_initial_refused = (
         composition is not None
         and composition.state.is_value
@@ -481,6 +473,7 @@ def charge_moles_by_species(
         and composition.inference.relation == "wt_pct_to_mole_fraction"
         and (
             _derived_mass_percent_refusal(composition, {}) is not None
+            or printed_chloride_mass_percent_refused
             or (
                 printed_mass_percent_refused
                 and not _structured_wt_percent_parameters(composition)
@@ -547,8 +540,7 @@ def charge_moles_by_species(
                 if isinstance(item, Mapping):
                     continue
                 try:
-                    name, _has_mass_suffix = _mass_percent_component_key(str(key))
-                    numeric[name] = as_decimal(item)
+                    numeric[str(key)] = as_decimal(item)
                 except (ValueError, TypeError, ArithmeticError):
                     # A printed composition may be a categorical Value payload
                     # (e.g. {kind: categorical, categorical: 'Fe-Mn or Fe-Sn'});
@@ -660,12 +652,7 @@ def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
         return None
     basis = _amount_basis_token(raw)
     if basis == AmountBasis.MASS_PERCENT.value:
-        pairs = _typed_component_pairs(raw)
-        return (
-            [(_mass_percent_component_key(name)[0], value) for name, value in pairs]
-            if pairs is not None
-            else None
-        )
+        return _typed_component_pairs(raw)
     if basis is not None or "components" in raw:
         return None
     if any(key in raw for key in ("state", "kind", "amount_basis")):
@@ -680,47 +667,8 @@ def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
             return None
         if isinstance(amount, bool) or not amount.is_finite():
             return None
-        name, _has_mass_suffix = _mass_percent_component_key(str(key))
-        pairs.append((name, value))
+        pairs.append((str(key), value))
     return pairs or None
-
-
-def _mass_percent_refusal(
-    wt: Mapping[str, Decimal],
-    declared: Mapping[str, object],
-    source: object,
-    point: Mapping[str, object],
-) -> str | None:
-    row: dict[str, object] = {}
-    for name, value in point.items():
-        if isinstance(value, Located):
-            if not value.state.is_value or value.inference is not None:
-                continue
-            value = value.state.value
-        row[str(name)] = value
-    _composition, refusal = _wt_percent_conversion_or_refusal(
-        wt,
-        closure_context={"printed_composition": source, "point_conditions": row},
-        declared_component_map=declared,
-    )
-    return refusal
-
-
-def _printed_mass_percent_refusal(
-    raw: object, point: Mapping[str, object]
-) -> str | None:
-    pairs = _printed_component_pairs(raw)
-    if pairs is None:
-        return None
-    if len({name.strip().casefold() for name, _value in pairs}) != len(pairs):
-        return "mass-percent composition has duplicate component keys"
-    declared = dict(pairs)
-    wt: dict[str, Decimal] = {}
-    for name, value in pairs:
-        kind, amount = _classify_composition_cell(value)
-        if kind == "number" and amount is not None:
-            wt[name] = amount
-    return _mass_percent_refusal(wt, declared, raw, point)
 
 
 def _structured_wt_percent_parameters(
@@ -747,7 +695,6 @@ def _derived_mass_percent_refusal(
     ):
         return None
     declared: dict[str, object] = {}
-    wt: dict[str, Decimal] = {}
     for name, parameter in parameters:
         component = name[len("original_") : -len("_wt_pct")]
         if isinstance(parameter, Located):
@@ -755,10 +702,10 @@ def _derived_mass_percent_refusal(
         else:
             value = parameter
         declared[component] = value
-        kind, amount = _classify_composition_cell(value)
-        if kind == "number" and amount is not None:
-            wt[component] = amount
-    return _mass_percent_refusal(wt, declared, declared, point)
+    _is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+        declared, point, reject_dropped_components=True
+    )
+    return refusal
 
 
 def _parse_component_amounts(
@@ -968,20 +915,29 @@ def normalized_composition(
             continue
         raw = located.state.value
         if field == "printed_composition" and isinstance(raw, Mapping):
-            basis = _amount_basis_token(raw)
-            if (
-                basis == AmountBasis.MASS_PERCENT.value
-                or (
-                    basis is None
-                    and any(_is_engine_oxide_component(str(name)) for name in raw)
-                )
-            ):
-                refusal = _printed_mass_percent_refusal(raw, point)
-                if refusal is not None:
-                    unsupported = True
-                    missing.append(path)
-                    printed_mass_percent_refused = True
-                    continue
+            _is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+                raw, point, reject_dropped_components=True
+            )
+            if refusal is not None:
+                unsupported = True
+                missing.append(path)
+                printed_mass_percent_refused = True
+                if (
+                    refusal == "mass-percent composition has duplicate component keys"
+                    or "partial analysis contains unsupported component(s) above "
+                    "0.5 wt%" in refusal
+                ):
+                    return WaypointResult(
+                        "normalized_composition",
+                        None,
+                        (),
+                        WaypointAbsence(
+                            "normalized_composition",
+                            GapReason.UNSUPPORTED_PRINT_FORM,
+                            (path,),
+                        ),
+                    )
+                continue
         if field == "initial_composition" and isinstance(raw, Composition):
             refusal = _derived_mass_percent_refusal(located, point)
             if (
@@ -1061,11 +1017,6 @@ def normalized_composition(
                             printed_path = path
                     else:
                         raw = _printed_composition_map(raw)
-                        normalized_pairs = _printed_component_pairs(
-                            located.state.value
-                        )
-                        if isinstance(raw, Mapping) and normalized_pairs is not None:
-                            raw = dict(normalized_pairs)
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):

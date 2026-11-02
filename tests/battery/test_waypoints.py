@@ -1054,12 +1054,11 @@ def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes()
         ),
         bench,
     )
-    assert derived_with_refused_sibling.selected is None
-    assert derived_with_refused_sibling.absence is not None
-    assert (
-        derived_with_refused_sibling.absence.reason
-        is GapReason.UNSUPPORTED_PRINT_FORM
-    )
+    assert derived_with_refused_sibling.selected is not None
+    assert derived_with_refused_sibling.selected.route == "normalized_initial_composition"
+    assert derived_with_refused_sibling.selected.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    ).as_map()
 
     standalone_derived = normalized_composition(
         replace(
@@ -1086,6 +1085,56 @@ def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes()
     )
     assert independent_result.selected is not None
     assert independent_result.selected.value == independent.state.value.as_map()
+
+
+def test_b704_waypoint_guard_normalizes_wt_suffix_before_closure() -> None:
+    base = factories.kems_experiment()
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            initial_composition=None,
+            printed_composition=factories.located(
+                {"SiO2_wt_pct": Decimal("45"), "MgO_wt_pct": Decimal("45")}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
+    base = factories.kems_experiment()
+    locator = factories.loc()
+    derived = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("50"), "SiO2": Decimal("50")}
+            )
+        ),
+        locator,
+        Derivation("wt_pct_to_mole_fraction", ("source",), (), "mol_fraction"),
+    )
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            initial_composition=derived,
+            printed_composition=factories.located(
+                {"MgO": Decimal("40"), "SiO2": Decimal("Infinity")}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:

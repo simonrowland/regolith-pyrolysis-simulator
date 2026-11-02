@@ -13,7 +13,12 @@ from simulator.battery.migrate import (
     load_yaml, _sample_from_plain, _wt_percent_conversion_state,
     wt_pct_to_mole_fraction_derivation,
 )
-from simulator.battery.waypoints import GapReason, ReadinessStatus, WaypointAuthority
+from simulator.battery.waypoints import (
+    GapReason,
+    ReadinessStatus,
+    WaypointAuthority,
+    charge_moles_by_species,
+)
 from tests.battery import factories as f
 from tests.battery.test_bench_generators import case, complete_kems, complete_rps
 
@@ -372,6 +377,42 @@ def test_unsupported_print_reports_refusal_not_single_species():
                    and g.reason is GapReason.UNSUPPORTED_PRINT_FORM
                    for g in result.readiness.gaps)
         assert not any(g.reason is GapReason.SINGLE_SPECIES_CHARGE for g in result.readiness.gaps)
+
+
+def test_charge_keeps_verbatim_mass_percent_component_keys():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located(
+                {"MgO": D(50), "SiO2_wt_pct": D(50)}
+            ),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert list(charge.by_species) == ["MgO"]
+
+
+def test_charge_refuses_duplicate_normalized_mass_percent_species():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=f.located({"MgO": D(50), "mgo": D(50)}),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert not charge.by_species
+    assert charge.absence is not None
+    assert charge.absence.reason is GapReason.MISSING_EVIDENCE
 
 
 @pytest.mark.parametrize("weights", [{"MgO": 0, "SiO2": 0}, {"unknown_species": 50, "MgO": 50}])

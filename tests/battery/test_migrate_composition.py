@@ -3037,7 +3037,7 @@ def test_mass_percent_printed_provenance_keeps_source_component_names() -> None:
 
     assert printed is not None
     assert printed.state.is_value
-    assert printed.state.value == {"SiO2_wt_pct": "60", "AlO1.5": "40"}
+    assert printed.state.value == {"SiO2": "60", "Al2O3": "40"}
 
 
 @pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))
@@ -5016,42 +5016,40 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
     # Hashimoto 1983, Table 3, p. 116. The two C3-(2) run observations at
     # 1700 and 1800 C are the explicitly labelled run rows; the other two
     # pins cover the remaining printed temperatures.
-    # Printed provenance retains the source's *_wt_pct column names; only the
-    # converted identity uses normalized oxide names.
     expected_by_row = {
         (
             "table3_residue_composition_series_quoted__run_17c3-2::"
             "T=1973.15:row=c3-(2):"
         ): {
-            "SiO2_wt_pct": Decimal("39.09"),
-            "Al2O3_wt_pct": Decimal("3.57"),
-            "FeO_wt_pct": Decimal("27.92"),
-            "MgO_wt_pct": Decimal("26.32"),
-            "CaO_wt_pct": Decimal("3.09"),
+            "SiO2": Decimal("39.09"),
+            "Al2O3": Decimal("3.57"),
+            "FeO": Decimal("27.92"),
+            "MgO": Decimal("26.32"),
+            "CaO": Decimal("3.09"),
         },
         (
             "table3_residue_composition_series_quoted__run_18c3-2::"
             "T=2073.15:row=c3-(2):"
         ): {
-            "SiO2_wt_pct": Decimal("45.30"),
-            "Al2O3_wt_pct": Decimal("4.33"),
-            "FeO_wt_pct": Decimal("12.87"),
-            "MgO_wt_pct": Decimal("33.57"),
-            "CaO_wt_pct": Decimal("3.93"),
+            "SiO2": Decimal("45.30"),
+            "Al2O3": Decimal("4.33"),
+            "FeO": Decimal("12.87"),
+            "MgO": Decimal("33.57"),
+            "CaO": Decimal("3.93"),
         },
         "table3_residue_composition_series::T=2173.15:row=19b2:": {
-            "SiO2_wt_pct": Decimal("37.94"),
-            "Al2O3_wt_pct": Decimal("3.55"),
-            "FeO_wt_pct": Decimal("29.14"),
-            "MgO_wt_pct": Decimal("26.09"),
-            "CaO_wt_pct": Decimal("3.29"),
+            "SiO2": Decimal("37.94"),
+            "Al2O3": Decimal("3.55"),
+            "FeO": Decimal("29.14"),
+            "MgO": Decimal("26.09"),
+            "CaO": Decimal("3.29"),
         },
         "table3_residue_composition_series::T=2273.15:row=20b2:": {
-            "SiO2_wt_pct": Decimal("40.87"),
-            "Al2O3_wt_pct": Decimal("4.14"),
-            "FeO_wt_pct": Decimal("20.46"),
-            "MgO_wt_pct": Decimal("30.81"),
-            "CaO_wt_pct": Decimal("3.72"),
+            "SiO2": Decimal("40.87"),
+            "Al2O3": Decimal("4.14"),
+            "FeO": Decimal("20.46"),
+            "MgO": Decimal("30.81"),
+            "CaO": Decimal("3.72"),
         },
     }
     rows = [
@@ -5140,14 +5138,17 @@ def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
         (
             "kems-015-hashimoto-1983.yaml",
             "::T=2073.15:row=b8-(2):",
+            {"SiO2", "Al2O3", "FeO", "MgO", "CaO"},
             None,
-            ".SiO2_wt_pct",
         ),
         (
             "smythe-brenan-2015-cerium-redox.yaml",
             "row=ds11-c38:",
+            {
+                "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
+                "Na2O", "K2O", "P2O5",
+            },
             None,
-            ".total",
         ),
         (
             "smythe-brenan-2015-cerium-redox.yaml",
@@ -5187,6 +5188,12 @@ def test_b704_waypoints_preserve_green_suffix_and_total_handling(
             printed, state=State.of(oxide_only)
         )
         observation = replace(observation, point_conditions=point_conditions)
+    elif row_token == "row=ds11-c38:":
+        # This row also carries an independent printed mole-fraction route.
+        # Isolate the closure assertion to the incomplete wt% map below.
+        point_conditions = dict(observation.point_conditions)
+        point_conditions.pop("composition", None)
+        observation = replace(observation, point_conditions=point_conditions)
     experiment = result.experiments[observation.experiment_id]
 
     waypoint = normalized_composition(experiment, _bench(), observation)
@@ -5215,26 +5222,26 @@ def test_b704_waypoints_preserve_green_suffix_and_total_handling(
             "burnham-2015-europium-redox.yaml",
             "burnham_2015_eu_glasses_ad_1400_fm10p5::T=1673.15",
             {
-                "SiO2": Decimal("0.5049458537553273702862355504"),
-                "Al2O3": Decimal("0.08953938926861110222912129391"),
-                "MgO": Decimal("0.1530185996607377811606459628"),
-                "CaO": Decimal("0.2524961573153237463239971925"),
+                "SiO2": Decimal("0.5049458537553273816542552134"),
+                "Al2O3": Decimal("0.08953938926861110424495235825"),
+                "MgO": Decimal("0.1530185996607377846056063220"),
+                "CaO": Decimal("0.2524961573153237294951861064"),
             },
         ),
         (
             "kress-carmichael-1991-iron-redox-calibration.yaml",
             "kc91_fe3_t5_B27::T=1710.15",
             {
-                "SiO2": Decimal("0.5547006776234626671942286320"),
-                "TiO2": Decimal("0.01554763773103709860256304398"),
-                "Al2O3": Decimal("0.08984819686101508537518088141"),
-                "Fe2O3": Decimal("0.03945861816145157104309105154"),
-                "FeO": Decimal("0.03144116729029423686753613422"),
-                "MnO": Decimal("0.001582846840746962967156111479"),
-                "MgO": Decimal("0.1120910690156758058306665901"),
-                "CaO": Decimal("0.1254376460586280468178866150"),
-                "Na2O": Decimal("0.02855988945220116658624516449"),
-                "K2O": Decimal("0.001332250965487358715445775200"),
+                "SiO2": Decimal("0.5547006776234626671942286324"),
+                "TiO2": Decimal("0.01554763773103709860256304399"),
+                "Al2O3": Decimal("0.08984819686101508537518088147"),
+                "Fe2O3": Decimal("0.03945861816145157104309105157"),
+                "FeO": Decimal("0.03144116729029423686753613424"),
+                "MnO": Decimal("0.001582846840746962967156111480"),
+                "MgO": Decimal("0.1120910690156758058306665902"),
+                "CaO": Decimal("0.1254376460586280468178866151"),
+                "Na2O": Decimal("0.02855988945220116658624516451"),
+                "K2O": Decimal("0.001332250965487358715445775201"),
             },
         ),
         (
@@ -5251,6 +5258,23 @@ def test_b704_waypoints_preserve_green_suffix_and_total_handling(
                 "Na2O": Decimal("0.02608939345180641525337614298"),
                 "K2O": Decimal("0.004621674859555161565835116089"),
                 "FeO": Decimal("0.07704269536309537157366345464"),
+            },
+        ),
+        (
+            "lpi-lunar-soils.yaml",
+            "lpi_1983_soil_10002_provenance_and_characterization",
+            {
+                "SiO2": Decimal("0.4482179563822329719411890738"),
+                "TiO2": Decimal("0.06198483717310117768844669253"),
+                "Al2O3": Decimal("0.08520184745324768904604932940"),
+                "Cr2O3": Decimal("0.001260807500710294509781235738"),
+                "FeO": Decimal("0.1363876711001578529321725113"),
+                "MnO": Decimal("0.001800931385365283375364425907"),
+                "MgO": Decimal("0.1229854768329683614376478292"),
+                "CaO": Decimal("0.1360065465485117312513237041"),
+                "Na2O": Decimal("0.004843918023047031788070297471"),
+                "K2O": Decimal("0.001084999714845602663994452366"),
+                "P2O5": Decimal("0.0002250078858120033659604482770"),
             },
         ),
         (
@@ -5292,6 +5316,95 @@ def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
     assert waypoint.absence is None
     assert waypoint.selected is not None
     assert waypoint.selected.value == expected
+
+
+def test_burnham_redox_engine_point_keeps_green_composition_payload(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "burnham-2015-europium-redox.yaml", write=False
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if "burnham_2015_eu_glasses_ad_qz_1400_fm9p5" in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+    assert "printed_composition" not in (observation.point_conditions or {})
+
+    request = next(
+        item
+        for item in engine_point_requests(
+            collect_consumer_inputs(
+                experiment, _bench(), observation
+            )
+        )
+        if item.readiness.engine == "internal-analytical"
+    )
+    assert request.payload == {
+        "engine": "internal-analytical",
+        "temperature_C": 1400.0,
+        "pressure_bar": 1.01325,
+        "fO2_log": -9.5,
+        "composition_mol": {
+            "SiO2": 0.6335121030470231,
+            "Al2O3": 0.06561522757749116,
+            "MgO": 0.11638849242068056,
+            "CaO": 0.18448417695480515,
+        },
+        "composition_method_class": "calculated",
+        "composition_notice": (
+            "calculated from printed oxide wt% composition; "
+            "relation=wt_pct_to_mole_fraction; "
+            "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+            "original_unit=wt_pct; locator=Locator(page=33, published_page=254, "
+            "pdf_page_index=32, page_verification=None, table_caption_page=None, "
+            "table_continued=None, table='1', figure=None, paragraph=None, "
+            "section=None, equation=None, line_range=None, note='Table 1 "
+            "composition for AD+qz; wt % oxide. Eu2O3 is retained separately "
+            "as printed.', source_path=None, record=None)"
+        ),
+    }
+
+
+def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.waypoints import GapReason, normalized_composition
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "thomas-wood-2021-chlorine-silicate-melts.yaml",
+        write=False,
+    )
+    observation = next(
+        row
+        for row in result.observations.values()
+        if "row=agi/cl-027:" in row.observation_id
+    )
+    printed = observation.point_conditions["printed_composition"]
+    assert printed.state.value == {
+        "SiO2": Decimal("50.76"),
+        "TiO2": Decimal("1.02"),
+        "Al2O3": Decimal("15.32"),
+        "FeO": Decimal("9.61"),
+        "MgO": Decimal("9.19"),
+        "CaO": Decimal("12.26"),
+        "Na2O": Decimal("2.01"),
+        "Cl_wt_pct": Decimal("1.6"),
+    }
+    composition = observation.point_conditions["composition"]
+    assert not composition.state.is_value
+    assert "Cl=1.6 wt%" in composition.state.reason
+    assert "partial analysis contains unsupported component(s) above 0.5 wt%" in (
+        composition.state.reason
+    )
+
+    experiment = result.experiments[observation.experiment_id]
+    waypoint = normalized_composition(experiment, _bench(), observation)
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
@@ -6321,9 +6434,9 @@ def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() 
         printed = observation.point_conditions["printed_composition"]
         starting = observation.point_conditions["starting_composition"]
         assert printed.state.value == {
-            "SiO2_wt_pct": "53.62",
-            "MgO_wt_pct": "44.44",
-            "CaO_wt_pct": "1.64",
+            "SiO2": "53.62",
+            "MgO": "44.44",
+            "CaO": "1.64",
         }
         assert starting.state.value["Nb_ppm"] == "84"
         assert starting.state.value["Ta_ppm"] == "204"

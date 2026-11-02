@@ -285,7 +285,7 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
                 "Al2O3": "2.46",
                 "SiO2": "33.8",
                 "CaO": "2.04",
-                "TiO2": "0.110",
+                "TiO2": "0.11",
                 "FeO": "36.7",
             }
 

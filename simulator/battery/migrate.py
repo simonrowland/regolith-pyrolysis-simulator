@@ -52,6 +52,7 @@ from dataclasses import dataclass, field, fields, is_dataclass, replace
 from decimal import Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
+from functools import lru_cache
 from pathlib import Path
 from types import UnionType
 from typing import (
@@ -838,6 +839,7 @@ def _mass_percent_component_stem(name: str) -> tuple[str, bool]:
     )
 
 
+@lru_cache(maxsize=2048)
 def _mass_percent_component_key(name: str) -> tuple[str, bool]:
     """Normalize a printed wt% key using the parser's oxide alias resolver."""
 
@@ -1577,8 +1579,7 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
-    # Keep the original scalar types as well as the printed key spellings.
-    return located_value(_printed_map_payload(raw_components), locator)
+    return located_value(_printed_map_payload(wt), locator)
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -4125,6 +4126,7 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
 )
 
 
+@lru_cache(maxsize=2048)
 def _volatile_closure_component(name: str) -> tuple[str, int] | None:
     token = str(name).strip()
     alias = _VOLATILE_CLOSURE_COMPONENTS.get(token.casefold())
@@ -4303,19 +4305,38 @@ def _unrecognized_printed_chemical_components(
         if declared_component_map is not None
         else set()
     )
+    direct_chloride = any(
+        (volatile := _volatile_closure_component(str(name))) is not None
+        and volatile[0] == "Cl"
+        for name in (*wt, *declared_names)
+    )
     source_map = {
         **wt,
         **(_printed_composition_source_map(closure_context) or {}),
         **(declared_component_map or {}),
     }
+    # Chlorine is printed in some rows alongside an oxide composition map.
+    # It contributes to closure, but unlike closure-only H2O/CO2/LOI it is an
+    # unsupported component and remains subject to the dropped-mass limit.
+    if not direct_chloride:
+        source_map.update(
+            {
+                name: amount
+                for name, amount in _printed_volatile_mass_percent(
+                    closure_context
+                ).items()
+                if name == "Cl"
+            }
+        )
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+        volatile = _volatile_closure_component(name)
         # A declared map may retain trace analyses in ppm beside its wt% oxides.
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or name.casefold().endswith(("_ppm", " ppm"))
-            or _volatile_closure_component(name) is not None
+            or (volatile is not None and (volatile[0] != "Cl" or direct_chloride))
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
             or _is_composition_condition_key(name)
@@ -4900,6 +4921,131 @@ def _wt_percent_conversion_or_refusal(
         return converted, None
     except (ArithmeticError, ValueError) as exc:
         return None, f"mass-percent composition is not usable: {exc}"
+
+
+def _printed_mass_percent_map_refusal(
+    raw: object,
+    point_conditions: Mapping[str, object],
+    *,
+    reject_dropped_components: bool,
+) -> tuple[bool, str | None]:
+    """Check a printed wt% map while leaving waypoint payloads untouched.
+
+    Charge accounting uses closure only; composition waypoints also apply the
+    shared b-704 dropped-component policy.
+    """
+
+    if not isinstance(raw, Mapping):
+        return False, None
+    body: object = raw
+    state = raw.get("state")
+    if isinstance(state, Mapping):
+        if str(state.get("tag") or "value") != "value":
+            return False, None
+        body = state.get("value")
+    if not isinstance(body, Mapping):
+        return False, None
+
+    basis = body.get("amount_basis")
+    if isinstance(basis, AmountBasis):
+        basis = basis.value
+    if basis not in (None, "") and str(basis) != AmountBasis.MASS_PERCENT.value:
+        return False, None
+    typed_mass_percent = str(basis) == AmountBasis.MASS_PERCENT.value
+    components = body.get("components")
+    if typed_mass_percent:
+        if isinstance(components, Mapping):
+            pairs = [(str(name), value) for name, value in components.items()]
+        elif isinstance(components, (list, tuple)):
+            if any(
+                not isinstance(item, (list, tuple)) or len(item) != 2
+                for item in components
+            ):
+                return True, "mass-percent composition contains invalid component cells"
+            pairs = [(str(item[0]), item[1]) for item in components]
+        else:
+            return True, "mass-percent composition contains invalid component cells"
+    elif "components" in body or any(
+        key in body for key in ("kind", "tag")
+    ):
+        return False, None
+    else:
+        pairs = [
+            (str(name), value)
+            for name, value in body.items()
+            if str(name) not in _WALK_SKIP_KEYS and str(name) != "locator"
+        ]
+
+    pairs = [
+        (name, value)
+        for name, value in pairs
+        if name.strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+        and not _is_composition_condition_key(name)
+    ]
+    if not typed_mass_percent and not pairs:
+        return False, None
+    if not pairs:
+        return True, _percent_composition_closure_error({}, "mass")
+
+    normalized_names = [
+        _mass_percent_component_key(name)[0].strip().casefold()
+        for name, _value in pairs
+    ]
+    if len(set(normalized_names)) != len(normalized_names):
+        return True, "mass-percent composition has duplicate component keys"
+
+    declared: dict[str, object] = {}
+    wt: dict[str, Decimal] = {}
+    for name, value in pairs:
+        declared[name] = value
+        kind, amount = _classify_composition_cell(value)
+        if kind == "malformed":
+            return True, "mass-percent composition contains invalid component cells"
+        if kind == "number" and amount is not None:
+            wt[name] = amount
+
+    row: dict[str, object] = {}
+    for name, value in point_conditions.items():
+        if isinstance(value, Located):
+            if not value.state.is_value or value.inference is not None:
+                continue
+            value = value.state.value
+        row[str(name)] = value
+    closure_context = {
+        "printed_composition": raw,
+        "point_conditions": row,
+    }
+    if reject_dropped_components:
+        _composition, refusal = _wt_percent_conversion_or_refusal(
+            wt,
+            closure_context=closure_context,
+            declared_component_map=declared,
+        )
+        if refusal is not None:
+            return True, refusal
+        chloride = _printed_volatile_mass_percent(raw, closure_context).get("Cl")
+        if (
+            chloride is not None
+            and chloride > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+        ):
+            return (
+                True,
+                "partial analysis contains unsupported component(s) above "
+                f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: Cl={chloride} wt%",
+            )
+        return True, None
+
+    closure_amounts = {
+        name: amount
+        for name, amount in wt.items()
+        if _volatile_closure_component(
+            _mass_percent_component_key(name)[0]
+        ) is None
+    }
+    closure_amounts.update(
+        _printed_volatile_mass_percent(raw, closure_context)
+    )
+    return True, _percent_composition_closure_error(closure_amounts, "mass")
 
 
 def _wt_percent_conversion_or_raise(
@@ -5843,15 +5989,22 @@ def _located_printed_and_initial(
         and not (isinstance(declared_component_map, Mapping) and declared_component_map)
     ):
         return None, None
-    printed_map = _source_printed_composition_values(wt, closure_context)
-    # Store the printed source cells here; identity comparison uses the
-    # normalized fingerprint separately.
-    printed = located_value(_printed_map_payload(printed_map), locator)
     state = _wt_percent_conversion_state(
         wt,
         closure_context=closure_context or wt,
         declared_component_map=declared_component_map,
     )
+    printed_map = (
+        {
+            str(key): as_decimal(value)
+            for key, value in wt.items()
+            if str(key) not in _COMPOSITION_CONDITION_KEYS
+            and _as_dec_or_none(value) is not None
+        }
+        if state.is_value
+        else _source_printed_composition_values(wt, closure_context)
+    )
+    printed = located_value(_printed_map_payload(printed_map), locator)
     if not state.is_value:
         return printed, Located(state, locator=locator)
     conversion_map = _oxide_mass_percent_components(wt)
@@ -20478,7 +20631,6 @@ class Migrator:
                 }
             row_printed_values = row_sample.printed_composition.state.value
             row_printed_fingerprint = _printed_fingerprint(row_printed_values)
-            row_printed_source_values = None
             row_printed_locator = row_sample.printed_composition.locator
             for source_values, source_fallback in (
                 (values, locator),
@@ -20492,26 +20644,15 @@ class Migrator:
                     and _printed_fingerprint(candidate_values)
                     == row_printed_fingerprint
                 ):
-                    row_printed_source_values = candidate_values
                     if row_printed_locator is None:
                         row_printed_locator = _composition_source_locator(
                             source_values, fallback=source_fallback
                         )
                     break
-            # When the matching source field is available, keep its cells as
-            # printed; the normalized sample-reader map is only the fallback.
             row_printed_composition = replace(
                 row_sample.printed_composition,
                 state=(
-                    State.of(
-                        _printed_map_payload(
-                            (
-                                row_printed_source_values
-                                if row_printed_source_values is not None
-                                else row_printed_values
-                            )
-                        )
-                    )
+                    State.of(row_printed_values)
                     if row_printed_locator is not None
                     else State.unknown(
                         "printed composition has no source locator"
@@ -22170,6 +22311,7 @@ class Migrator:
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
+        row_bound_redox_composition = False
         point_composition_role, point_composition_role_refusal = (
             _declared_composition_role(raw_item, parent_values)
         )
@@ -22945,7 +23087,13 @@ class Migrator:
                 observation_id=point_id,
             )
         extra_pc: dict[str, Located[Any]] = {}
-        if printed is not None:
+        # A ratio point without its own composition uses the parent's bulk.
+        # Its derived point condition already retains the wt% inputs, so adding
+        # the duplicate print here would change the green waypoint precedence.
+        # Keep the print when conversion refused so the refusal remains visible.
+        if printed is not None and not (
+            row_bound_redox_composition and not point_composition_refusal
+        ):
             extra_pc["printed_composition"] = printed
         elif (
             q_token_point is Quantity.MASS_LOSS_FRACTION
