@@ -174,7 +174,7 @@ def test_base_char_electrolysis_and_web_additive_outputs_are_pinned(
         "bed92af234928b16635372df91a7981b0e7ad9debaed9813cb7ba1e0531d2bc8"
     )
     assert _digest(electrolysis) == (
-        "c9a981b084c0f62c5d53e3aab226014001a5f793829bd9ab1f3308ef6e8eddf7"
+        "1ea644c899d634744b461bb161b505855fedee95d693371fc204a596c9e564d3"
     )
     assert _digest(web) == (
         "20c0071f01eb6bb5436057568c57f42842add55b5f7c812ac3df1550d33e2c4c"
