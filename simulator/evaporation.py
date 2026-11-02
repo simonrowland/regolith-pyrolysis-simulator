@@ -482,6 +482,15 @@ class FreezeGateCurveCacheKey(NamedTuple):
     redox_state_identity: tuple[tuple[str, Any], ...] | None
 
 
+class _SilicateProviderMeltInputs(NamedTuple):
+    composition_mol: dict[str, float]
+    inert_species: tuple[str, ...]
+    formula_identity: tuple[
+        tuple[str, tuple[tuple[str, float], ...]], ...
+    ]
+    amount_kg: float
+
+
 def _freeze_gate_notice_value(value: Any) -> float | str | None:
     if value is None:
         return None
@@ -2667,14 +2676,22 @@ class EvaporationMixin:
         pressure_bar: float,
         fO2_log: float,
         redox_state: RedoxState | None = None,
+        provider_melt_inputs: _SilicateProviderMeltInputs | None = None,
     ) -> FreezeGateCurveCacheKey:
         from simulator.reduced_real_determinism import _digest
+        from simulator.chemistry.kernel import ChemistryIntent
 
-        cleaned_mol = self.atom_ledger.project_account_mol(
-            _FREEZE_GATE_ACCOUNT
-        )
+        if provider_melt_inputs is None:
+            provider_inputs = self._silicate_provider_melt_inputs(
+                ChemistryIntent.GATE_LIQUID_FRACTION
+            )
+        else:
+            provider_inputs = provider_melt_inputs
+        assert provider_inputs is not None
+        provider_mol = provider_inputs.composition_mol
+        inert_species = provider_inputs.inert_species
         relevant_mol: dict[str, float] = {}
-        for species, mol in cleaned_mol.items():
+        for species, mol in provider_mol.items():
             species_key = str(species)
             if species_key not in _FREEZE_GATE_COMPOSITION_SPECIES:
                 continue
@@ -2699,7 +2716,7 @@ class EvaporationMixin:
                 if quantized_fraction <= 0.0:
                     continue
                 composition_key.append((species, round(quantized_fraction, 6)))
-        water_mol = max(float(cleaned_mol.get('H2O', 0.0)), 0.0)
+        water_mol = max(float(provider_mol.get('H2O', 0.0)), 0.0)
         tracked_total_mol = oxide_total_mol + water_mol
         water_fraction = (
             water_mol / tracked_total_mol
@@ -2710,15 +2727,6 @@ class EvaporationMixin:
             round(water_fraction / _FREEZE_GATE_WATER_FRACTION_QUANTUM)
             * _FREEZE_GATE_WATER_FRACTION_QUANTUM
         )
-        inert_components = (
-            getattr(self.inventory, 'inert_melt_components_kg', {}) or {}
-        )
-        inert_species = tuple(sorted(
-            str(species)
-            for species in inert_components
-            if species in cleaned_mol
-            and float(cleaned_mol[species]) > _FREEZE_GATE_EPSILON
-        ))
         pressure_bucket = (
             round(float(pressure_bar) / _FREEZE_GATE_PRESSURE_BAR_QUANTUM)
             * _FREEZE_GATE_PRESSURE_BAR_QUANTUM
@@ -2748,7 +2756,7 @@ class EvaporationMixin:
         provider_formula_species.add('H2O')
         provider_formula_species.update(
             str(species)
-            for species, mol in cleaned_mol.items()
+            for species, mol in provider_mol.items()
             if float(mol) > _FREEZE_GATE_EPSILON
         )
         provider_formula_identity = []
@@ -2769,7 +2777,9 @@ class EvaporationMixin:
                 (species_key, normalized_elements)
             )
         return FreezeGateCurveCacheKey(
-            schema='oxide_mol_fraction_p_fO2_v6',
+            # v7 moves explicitly inert species out of the submitted curve
+            # composition while keeping their membership as a separate input.
+            schema='oxide_mol_fraction_p_fO2_v7',
             pressure_bar=round(pressure_bucket, 6),
             fO2_log=round(fO2_bucket, 6),
             composition_mol_fractions=tuple(sorted(composition_key)),
@@ -2779,6 +2789,106 @@ class EvaporationMixin:
             ),
             inert_species=inert_species,
             redox_state_identity=redox_identity_key,
+        )
+
+    def _silicate_provider_melt_inputs(
+        self,
+        intent: Any,
+        composition_mol: Mapping[str, float] | None = None,
+        *,
+        composition_sig_figs: int | None = None,
+    ) -> _SilicateProviderMeltInputs | None:
+        """Build the filtered silicate payload shared by dispatch and replay."""
+        from simulator.chemistry.kernel import ChemistryIntent
+
+        if intent not in {
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+        }:
+            return None
+        if composition_mol is None:
+            composition_mol = self.atom_ledger.project_account_mol(
+                _FREEZE_GATE_ACCOUNT
+            )
+        store = getattr(self, '_pt0_determinism_store', None)
+        canonicalizer = getattr(
+            store,
+            'canonical_composition_mol_by_account',
+            None,
+        )
+        quantize_composition = (
+            store is not None
+            and getattr(store, 'quantize_live_controls', False)
+        )
+        if quantize_composition and not callable(canonicalizer):
+            raise RuntimeError(
+                'PT-0 live-control quantization requires composition '
+                'canonicalization support'
+            )
+        if quantize_composition:
+            # PT-0 dispatch canonicalizes the full ledger before removing
+            # explicit inerts. Keep replay identity on those exact submitted
+            # values, including any rounding interaction with inert species.
+            if composition_sig_figs is None:
+                composition_mol = canonicalizer(
+                    self,
+                    {_FREEZE_GATE_ACCOUNT: composition_mol},
+                ).get(_FREEZE_GATE_ACCOUNT, {})
+            else:
+                # Ladder lookups reproduce the source rung's canonicalization
+                # using the same owner resolver as the PT-0 store.
+                from simulator.reduced_real_determinism import (
+                    canonicalized_composition_mol_by_account,
+                )
+
+                composition_mol = canonicalized_composition_mol_by_account(
+                    {_FREEZE_GATE_ACCOUNT: composition_mol},
+                    sig_figs=composition_sig_figs,
+                ).get(_FREEZE_GATE_ACCOUNT, {})
+        inert_species = set(
+            (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
+        )
+        active_inert_species = tuple(sorted(
+            str(species)
+            for species in inert_species
+            if species in composition_mol
+            and float(composition_mol[species]) > 0.0
+        ))
+        submitted_mol = {
+            species: float(mol)
+            for species, mol in composition_mol.items()
+            if species not in inert_species and float(mol) > 0.0
+        }
+        formula_registry = getattr(self, 'species_formula_registry', {}) or {}
+        formula_identity = tuple(
+            (
+                str(species),
+                tuple(
+                    sorted(
+                        (str(element), float(count))
+                        for element, count in resolve_species_formula(
+                            str(species), formula_registry
+                        ).elements.items()
+                    )
+                ),
+            )
+            for species, mol in sorted(submitted_mol.items())
+            if float(mol) > 0.0
+        )
+        from simulator.melt_backend.base import positive_melt_mass_by_species
+
+        mass_by_species = positive_melt_mass_by_species(
+            composition_kg=None,
+            composition_mol=submitted_mol,
+            species_formula_registry=formula_registry,
+        )
+        return _SilicateProviderMeltInputs(
+            composition_mol=submitted_mol,
+            inert_species=active_inert_species,
+            formula_identity=formula_identity,
+            amount_kg=sum(mass_by_species.values()),
         )
 
     def _freeze_gate_curve_from_gate_dispatch(

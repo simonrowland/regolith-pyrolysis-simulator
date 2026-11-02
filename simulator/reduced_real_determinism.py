@@ -606,6 +606,49 @@ class PT0DeterminismStore:
             control_quantization=self._control_quantization,
         )
 
+    def _physics_ladder_key_for_lookup(
+        self,
+        sim: Any,
+        replay_key: Mapping[str, Any],
+        rung_tag: str,
+    ) -> dict[str, Any]:
+        sig_figs = _physics_ladder_sig_figs(rung_tag)
+        default_key = canonical_physics_ladder_bucket_key_from_replay_key(
+            replay_key,
+            rung_tag,
+        )
+        if sim is None:
+            return default_key
+        provider_input_builder = getattr(
+            sim,
+            "_silicate_provider_melt_inputs",
+            None,
+        )
+        if not callable(provider_input_builder):
+            return default_key
+        intent = _equilibrium_payload_intent(sim)
+        provider_inputs = provider_input_builder(
+            intent,
+            composition_sig_figs=int(sig_figs),
+        )
+        if provider_inputs is None:
+            return default_key
+        rung_replay_key = copy.deepcopy(dict(replay_key))
+        rung_replay_key["composition_mol_fraction"] = (
+            _backend_boundary_composition(
+                sim,
+                intent,
+                None,
+                namespace_id=str(replay_key["namespace_id"]),
+                sig_figs=int(sig_figs),
+                composition_mol=provider_inputs.composition_mol,
+            )
+        )
+        return canonical_physics_ladder_bucket_key_from_replay_key(
+            rung_replay_key,
+            rung_tag,
+        )
+
     def _equilibrium_from_payload(
         self,
         sim: Any,
@@ -1160,7 +1203,8 @@ class PT0DeterminismStore:
                 )
                 if entry is None:
                     for rung_tag, _sig_figs in PHYSICS_BUCKET_LADDER_RUNGS:
-                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        rung_key = self._physics_ladder_key_for_lookup(
+                            sim,
                             candidate_key,
                             rung_tag,
                         )
@@ -1179,7 +1223,8 @@ class PT0DeterminismStore:
                             break
                 if entry is None:
                     for rung_tag, _sig_figs in PHYSICS_BUCKET_CONTROL_LADDER_RUNGS:
-                        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                        rung_key = self._physics_ladder_key_for_lookup(
+                            sim,
                             candidate_key,
                             rung_tag,
                         )
@@ -2408,8 +2453,9 @@ def _backend_boundary_composition(
     *,
     namespace_id: str,
     sig_figs: int,
+    composition_mol: Mapping[str, float],
 ) -> list[tuple[str, float]]:
-    cleaned = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
+    cleaned = dict(composition_mol)
     backend = _resolved_backend_for_cache_identity(sim, intent, provider_role)
     species_registry = getattr(sim, "species_formula_registry", None)
     family = namespace_id.partition(":")[0]
@@ -2967,8 +3013,9 @@ def canonical_replay_key(
         )
     else:
         T_K = live_T_K
+    raw_pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
     pressure_bar = _quantize(
-        float(sim.melt.p_total_mbar) / 1000.0,
+        raw_pressure_bar,
         quantization.pressure_bar_quantum,
         quantization.pressure_bar_decimals,
     )
@@ -3026,13 +3073,6 @@ def canonical_replay_key(
         provider_role=provider_role,
     )
     namespace_id = dependency_vector["namespace_id"]
-    total_amount_kg = sum(
-        float(value)
-        for value in sim.atom_ledger.project_account_kg(
-            _CLEANED_MELT_ACCOUNT
-        ).values()
-        if float(value) > 0.0
-    )
     include_amount = _namespace_output_is_extensive(namespace_id)
     transport_getter = getattr(sim, "_vapor_pressure_dispatch_pO2_bar", None)
     transport_pO2 = (
@@ -3057,6 +3097,37 @@ def canonical_replay_key(
     )
     if redox_identity is not None:
         redox_key["redox_state_identity"] = redox_identity
+    provider_melt_inputs = sim._silicate_provider_melt_inputs(
+        intent,
+    )
+    if provider_melt_inputs is not None:
+        submitted_mol = provider_melt_inputs.composition_mol
+    else:
+        store = getattr(sim, "_pt0_determinism_store", None)
+        canonicalizer = getattr(
+            store,
+            "canonical_composition_mol_by_account",
+            None,
+        )
+        if store is not None and getattr(store, "quantize_live_controls", False):
+            if not callable(canonicalizer):
+                raise RuntimeError(
+                    "PT-0 live-control quantization requires composition "
+                    "canonicalization support"
+                )
+            submitted_mol = canonicalizer(sim).get(_CLEANED_MELT_ACCOUNT, {})
+        else:
+            submitted_mol = sim.atom_ledger.project_account_mol(
+                _CLEANED_MELT_ACCOUNT
+            )
+    freeze_gate_cache_key = None
+    if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+        freeze_gate_cache_key = sim._freeze_gate_cache_key(
+            pressure_bar=pressure_bar,
+            fO2_log=quantized_fO2_log,
+            redox_state=redox_state,
+            provider_melt_inputs=provider_melt_inputs,
+        )
     key = {
         "namespace_id": namespace_id,
         "composition_mol_fraction": _backend_boundary_composition(
@@ -3065,6 +3136,7 @@ def canonical_replay_key(
             provider_role,
             namespace_id=namespace_id,
             sig_figs=quantization.composition_sig_figs,
+            composition_mol=submitted_mol,
         ),
         "controls": {
             "T_K": T_K,
@@ -3076,7 +3148,26 @@ def canonical_replay_key(
         "redox": redox_key,
         **dependency_vector,
     }
+    if provider_melt_inputs is not None and (
+        intent is not ChemistryIntent.GATE_LIQUID_FRACTION
+    ):
+        key["submitted_formula_identity"] = (
+            provider_melt_inputs.formula_identity
+        )
+    if freeze_gate_cache_key is not None:
+        key["freeze_gate_cache_key"] = freeze_gate_cache_key
     if include_amount:
+        total_amount_kg = (
+            provider_melt_inputs.amount_kg
+            if provider_melt_inputs is not None
+            else sum(
+                float(value)
+                for value in sim.atom_ledger.project_account_kg(
+                    _CLEANED_MELT_ACCOUNT
+                ).values()
+                if float(value) > 0.0
+            )
+        )
         key["total_submitted_amount_kg"] = _sigfig(
             total_amount_kg,
             quantization.composition_sig_figs,

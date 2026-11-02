@@ -1,0 +1,488 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jallcom.2021.160784
+  citation: Chatain, S., David, N., Bonina, D., Flèche, J.-L., Bonnet, C., Courouau, J.-L. & Rouhard, M. (2021). Thermodynamic
+    study of the sodium chromite NaCrO2. Journal of Alloys and Compounds 882, 160784.
+  source_ids:
+  - chatain-2021-nacro2-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9be13c6816d4d54f6819300d2ff8d273028bebc4
+    files:
+    - asset_id: pdf:chatain-2021-nacro2-thermodynamics
+      role: pdf
+      path: raw/chatain-2021-nacro2-thermodynamics/chatain-2021-nacro2-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 4dacbef187b68fa24a03743165119c3d21c00abb98f33186b126dce6e3c90402
+    - asset_id: pdftotext:chatain-2021-nacro2-thermodynamics
+      role: pdftotext
+      path: text/chatain-2021-nacro2-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:chatain-2021-nacro2-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jallcom.2021.160784
+experiments:
+- experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jallcom.2021.160784
+  locator:
+    page: 6
+    table: '1'
+    note: row=1; column=Δf,TG°(NaCrO2)
+context:
+- observation_id: chatain_2021_cp_dsc_protocol
+  type: measurement_protocol
+  locator:
+    page: 10
+    section: 4.2 Differential Scanning Calorimetry
+  units: as printed
+  values:
+    instrument_as_printed: SETARAM DSC-111
+    crucible_as_printed: alumina
+    gas_as_printed: argon flow after primary purges
+    initial_temperature_C: 30
+    initial_hold_min: 30
+    isothermal_step_spacing_C: 20
+    upper_temperature_C_as_printed: about 600
+    isothermal_step_duration_h: 1
+    heating_rate_C_min: 10
+    cooling_rate_C_min: 10
+    thermal_cycle_as_printed: Cooled to room temperature; cycle under argon repeated before opening; each powder underwent
+      the double thermal cycle twice.
+    blank_as_printed: empty crucibles in sample and reference cells under the same program
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_cp_dsc_protocol
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_dta_protocol
+  type: measurement_protocol
+  locator:
+    page: 10
+    section: 4.3 Differential Thermal Analysis
+  units: as printed
+  values:
+    instrument_as_printed: SETARAM TG-DTA Setsys
+    atmosphere_as_printed: pure argon, Air Products 99.9997% purity
+    argon_flow_L_h: 1
+    crucible_as_printed: platinum crucible with a lid and a silica cover lid
+    heating_rates_C_min:
+    - 5
+    - 7
+    - 10
+    rate_zero_semantics: Equilibrium transition temperature determined by extrapolation to rate=0 using the onset temperature
+      of the heat-flow peak reduced to the blank line.
+    thermocouple_as_printed: PtRh 6%/30%
+    calibration_metals_as_printed: aluminium, gold, palladium
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_dta_protocol
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_gibbs_thermodynamic_relations
+  type: thermochemical_cycle_context
+  locator:
+    page: 15
+    section: 6.1 Heat capacity measurements
+    equations: (6)-(8)
+  units: as printed
+  values:
+    formulae_as_printed:
+      equation_6: ΔfG°(T) = ΔfH°(T) − TΔfS°(T)
+      equation_7: ΔfH°(T) = ΔfH°298 K + ∫[298.15 K..T] Cp(T)dT − Σ[H°(T) − H°298 K]elements
+      equation_8: ΔfS°(T) = S°298 K + ∫[298.15 K..T] [Cp°(T)/T]dT − ΣS°(T)elements
+    status: context_only
+    note: Equation (8) is a formation-entropy function with an absolute S°298 K anchor; the paper does not print a separate
+      relative S-S298 table or numeric H(T)-H(298) values.
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_gibbs_thermodynamic_relations
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_reaction_enthalpy_context
+  type: thermochemical_cycle_context
+  locator:
+    page: 3
+    section: literature enthalpy of formation
+  units: kJ/mol as printed
+  values:
+    quantity_as_printed: reaction enthalpy
+    status: typed_refused_schema_gap
+    method_class: quoted_attributed
+    candidate_tokens:
+    - delta_fH
+    schema_gap: The paper reports reaction enthalpy values, not standard formation enthalpies. No exact general reaction-enthalpy
+      quantity is present in simulator/battery/enums.py::Quantity or mapped by simulator/battery/migrate.py::QUANTITY_ALIASES
+      and TYPE_QUANTITY; delta_fH would change the printed meaning.
+    gross_et_al_reaction_enthalpy_as_printed: -101.4±1.0
+    gross_et_al_attribution: Gross et al. [13], as cited by Chatain et al.
+    gross_et_al_locator:
+      page: 3
+      section: literature enthalpy of formation
+    gross_et_al_basis_as_printed: heat of combination of Na2O and Cr2O3 oxides and heat of solution in hydrochloric acid
+    gross_et_al_uncertainty_note: confidence level not stated
+    van_vuuren_reaction_enthalpy_as_printed: -142.0±3.8
+    van_vuuren_attribution: Van Vuuren [15], as cited by Chatain et al.
+    van_vuuren_locator:
+      page: 4
+      section: literature enthalpy of formation
+    van_vuuren_method_as_printed: DSC, 240-490 °C
+    van_vuuren_reaction_as_described: formation of NaCrO2 from Na2O and Cr2O3
+    van_vuuren_uncertainty_note: confidence level not stated
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_reaction_enthalpy_context
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_sample_synthesis_and_phase_identity
+  type: sample_preparation
+  locator:
+    page: 7
+    section: 4.1 NaCrO2
+  units: as printed
+  values:
+    phase_as_printed: solid NaCrO2
+    commercial_sample:
+      supplier: Neyco
+      purity_as_printed: 99 %
+      morphology_as_printed: irregular chips, 1 to 10 mm
+    synthesized_sample:
+      location_as_printed: CEA, Non aqueous corrosion study laboratory
+      Na2CO3_charge: 0.0322 mol
+      Cr2O3_charge: 0.0322 mol
+      precursor_details_as_printed: Equimolar anhydrous Na2CO3 (AnalaR Normapur, 99.9%) and Cr2O3 (Alfa Aesar, 99%) powders.
+      heating_rate_C_min: '7.8'
+      atmosphere_as_printed: slight neutral argon flow
+      argon_flow_L_h_as_printed: approximately 7
+      temperature_range_C_as_printed:
+      - 850
+      - 900
+      duration_h: 5
+      reaction_as_printed: Na2CO3(s) + Cr2O3(s) ↔ 2 NaCrO2(s) + CO2(g)
+      oxygen_partial_pressure_note: Measured with a Zirox probe at the furnace exit; no numeric value is printed.
+      reaction_completion_as_printed: Weight loss was followed and heat treatment repeated until the Na2CO3 and Cr2O3 reaction
+        was complete; XRD was used to check completion.
+      storage_as_printed: green powder kept in a glove box under dry nitrogen
+    xrd_phase_identity:
+      method_as_printed: Bruker D8 Discover diffractometer with Cu Kα1 radiation; ground powder analyzed in an airtight dome
+        under argon.
+      phase_as_printed: NaCrO2, NaFeO2 prototype, hexagonal, space group R\bar{3}m, Z=3
+      phase_identity_locator:
+        page: 8
+        figure: '3'
+      reference_cell_parameters_as_printed: a=2.9747±0.0001 Å and c=15.9538±0.0003 Å, attributed to [23] in the Figure 3 caption.
+      reference_cell_parameters_locator:
+        page: 8
+        figure: '3'
+      reaction_completion_as_printed: Reactant peaks disappeared within the method error of 0.5% in volume; the diffractogram
+        agreed with the NaCrO2 database.
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_sample_synthesis_and_phase_identity
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_table2_gdms_characterization
+  type: measured_bulk_sample_analysis
+  locator:
+    page: 9
+    table: '2'
+    row: a) experimental NaCrO2
+  caption_locator:
+    page: 10
+    table: '2'
+  units: µg.g-1 as printed
+  values:
+    method_class: measured_direct
+    method_as_printed: Glow-discharge mass spectrometry (GD-MS) on ground powder amalgamated in an ultra-pure silver pellet
+      (Ag Alfa Aesar 99.999%).
+    quantity_as_printed: elemental impurity concentration
+    status: typed_refused_schema_gap
+    schema_gap: Elemental concentrations have no exact quantity token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES;
+      concentration_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES but does not map this measured
+      concentration to a Quantity. The existing deguzman-2026-simulant-physicochemical.yaml uses elemental_concentration,
+      but that label is absent from the closed Quantity enum and QUANTITY_ALIASES. This sample-characterization table is kept
+      as typed-refused context rather than assigned a near-match quantity.
+    printed_row_count_per_sample: 22
+    experimental_rows:
+    - element: B
+      impurity_content_ug_g: '7'
+    - element: Mg
+      impurity_content_ug_g: '25'
+    - element: Al
+      impurity_content_ug_g: '50'
+    - element: Si
+      impurity_content_ug_g: '70'
+    - element: P
+      impurity_content_ug_g: '12'
+    - element: S
+      impurity_content_ug_g: '45'
+    - element: Ca
+      impurity_content_ug_g: '25'
+    - element: Ti
+      impurity_content_ug_g: '0.85'
+    - element: V
+      impurity_content_ug_g: <3
+    - element: Mn
+      impurity_content_ug_g: <3
+    - element: Fe
+      impurity_content_ug_g: '250'
+    - element: Co
+      impurity_content_ug_g: '0.75'
+    - element: Ni
+      impurity_content_ug_g: '5.5'
+    - element: Cu
+      impurity_content_ug_g: '25'
+    - element: Zn
+      impurity_content_ug_g: '0.8'
+    - element: Sr
+      impurity_content_ug_g: '10'
+    - element: Zr
+      impurity_content_ug_g: <5
+    - element: Mo
+      impurity_content_ug_g: '2.1'
+    - element: Sn
+      impurity_content_ug_g: '0.5'
+    - element: Ba
+      impurity_content_ug_g: '3.1'
+    - element: Ta
+      impurity_content_ug_g: '2.0'
+    - element: Pb
+      impurity_content_ug_g: '0.2'
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_table2_gdms_characterization
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_table2_gdms_commercial_sample
+  type: measured_bulk_sample_analysis
+  locator:
+    page: 9
+    table: '2'
+    row: b) commercial NaCrO2
+  caption_locator:
+    page: 10
+    table: '2'
+  units: µg.g-1 as printed
+  values:
+    method_class: measured_direct
+    method_as_printed: Glow-discharge mass spectrometry (GD-MS)
+    quantity_as_printed: elemental impurity concentration
+    status: typed_refused_schema_gap
+    schema_gap: Elemental concentrations have no exact quantity token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES;
+      concentration_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES but does not map this measured
+      concentration to a Quantity. The existing deguzman-2026-simulant-physicochemical.yaml uses elemental_concentration,
+      but that label is absent from the closed Quantity enum and QUANTITY_ALIASES. This sample-characterization table is kept
+      as typed-refused context rather than assigned a near-match quantity.
+    printed_row_count: 22
+    commercial_rows:
+    - element: B
+      impurity_content_ug_g: '5'
+    - element: Mg
+      impurity_content_ug_g: '20'
+    - element: Al
+      impurity_content_ug_g: '130'
+    - element: Si
+      impurity_content_ug_g: '250'
+    - element: P
+      impurity_content_ug_g: '7'
+    - element: S
+      impurity_content_ug_g: '20'
+    - element: Ca
+      impurity_content_ug_g: '5'
+    - element: Ti
+      impurity_content_ug_g: '1.2'
+    - element: V
+      impurity_content_ug_g: '1.0'
+    - element: Mn
+      impurity_content_ug_g: <3
+    - element: Fe
+      impurity_content_ug_g: '400'
+    - element: Co
+      impurity_content_ug_g: '1.0'
+    - element: Ni
+      impurity_content_ug_g: '3.0'
+    - element: Cu
+      impurity_content_ug_g: '10'
+    - element: Zn
+      impurity_content_ug_g: '0.4'
+    - element: Sr
+      impurity_content_ug_g: '0.1'
+    - element: Zr
+      impurity_content_ug_g: <5
+    - element: Mo
+      impurity_content_ug_g: '1.1'
+    - element: Sn
+      impurity_content_ug_g: '0.1'
+    - element: Ba
+      impurity_content_ug_g: '2.1'
+    - element: Ta
+      impurity_content_ug_g: '0.2'
+    - element: Pb
+      impurity_content_ug_g: '1.0'
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_table2_gdms_commercial_sample
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_table3_dft_parameters
+  type: model_table
+  locator:
+    page: 12
+    table: '3'
+  units: lattice lengths Å; volume Å3; bulk modulus GPa
+  values:
+    quantity_as_printed: lattice parameters, equilibrium volume and bulk modulus
+    calculation_method_as_printed: CASTEP DFT/GGA; values in italics are calculated
+    attribution_as_printed: experimental comparator values [18]
+    status: typed_refused_schema_gap
+    schema_gap: No exact quantity token covers lattice constants, unit-cell volume, bulk modulus, or pressure derivative;
+      see simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+      Kept as typed-refused context rather than relabeling as another physical quantity.
+    printed_row_count: 2
+    rows:
+    - row_as_printed: Exp.
+      method_class: quoted_attributed
+      Z: '3'
+      a_A: '2.968'
+      b_A: '2.968'
+      c_A: '15.94'
+      alpha_deg: '90'
+      beta_deg: '90'
+      gamma_deg: '120'
+      volume_A3: '120.645'
+      B0_GPa: null
+      B0_prime: null
+    - row_as_printed: Calc.
+      method_class: quoted_attributed
+      calculation_method_as_printed: CASTEP DFT/GGA
+      Z: null
+      a_A: '3.028'
+      b_A: '3.028'
+      c_A: '15.984'
+      alpha_deg: '90'
+      beta_deg: '90'
+      gamma_deg: '120'
+      volume_A3: '127.022'
+      B0_GPa: '121.14'
+      B0_prime: '3.65'
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_table3_dft_parameters
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_table4_gamma_frequencies
+  type: model_table
+  locator:
+    page: 13
+    table: '4'
+  units: cm-1 and degeneracy as printed
+  values:
+    quantity_as_printed: Gamma-point harmonic vibrational frequency and mode degeneracy
+    method_class: quoted_attributed
+    method_class_reason: The frequencies are model outputs from the authors' CASTEP calculation; the supporting model inputs
+      are not fully stored, so quoted_attributed is used under d-110.
+    calculation_method_as_printed: CASTEP harmonic frequencies from the mass-weighted second-derivative Hessian
+    status: typed_refused_schema_gap
+    schema_gap: No exact quantity token represents a harmonic vibrational frequency or mode degeneracy; see simulator/battery/enums.py::Quantity,
+      simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+      Kept as typed-refused model context.
+    printed_row_count: 14
+    rows:
+    - frequency_cm_1: '69.135847'
+      degeneracy: '4'
+    - frequency_cm_1: '126.073050'
+      degeneracy: '2'
+    - frequency_cm_1: '153.784178'
+      degeneracy: '4'
+    - frequency_cm_1: '170.803531'
+      degeneracy: '2'
+    - frequency_cm_1: '284.958325'
+      degeneracy: '1'
+    - frequency_cm_1: '305.271195'
+      degeneracy: '2'
+    - frequency_cm_1: '408.208746'
+      degeneracy: '4'
+    - frequency_cm_1: '410.547233'
+      degeneracy: '2'
+    - frequency_cm_1: '415.498866'
+      degeneracy: '2'
+    - frequency_cm_1: '419.262014'
+      degeneracy: '4'
+    - frequency_cm_1: '497.073448'
+      degeneracy: '1'
+    - frequency_cm_1: '526.283746'
+      degeneracy: '1'
+    - frequency_cm_1: '537.228558'
+      degeneracy: '2'
+    - frequency_cm_1: '580.187810'
+      degeneracy: '2'
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_table4_gamma_frequencies
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_theoretical_entropy_function
+  type: model_equation_context
+  locator:
+    page: 13
+    section: 5.2 Results
+    equation: theoretical entropy function
+  units: J K-1 mol-1 as reported for S°298.15
+  values:
+    quantity_as_printed: absolute theoretical standard entropy S(T)
+    method_class: quoted_attributed
+    attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic model
+    method_class_reason: The function is calculated from the authors' model; its inputs are not fully stored, so quoted_attributed
+      is used under d-110.
+    formula_as_printed: S = Nk_B(4D(x_D) - 3ln(1 - e^(-x_D)) + Σ[i=4..3n] x_i/(e^(x_i)-1) - ln(1 - e^(-x_D)))
+    variable_definitions_as_printed: x_i = hν_i(0)/(k_B T); x_D = Θ_D/T; D(x_D) is the Debye function.
+    final_log_term_as_rendered: x_D
+    formula_render_check: PDF page 13, 600 dpi; the final logarithm subscript is printed as D and is retained as printed.
+    status: typed_refused_schema_gap
+    schema_gap: Quantity.S exists, but select_declared_source in simulator/battery/migrate.py has no generic source form for
+      this entropy function; the formula is retained as typed-refused model context rather than approximated as S-S298 or
+      a numeric series.
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_theoretical_entropy_function
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2
+- observation_id: chatain_2021_xrd_after_825c_treatment
+  type: phase_identification_context
+  locator:
+    page: 16
+    section: 6.2 Decomposition temperature of NaCrO2
+  units: as printed
+  values:
+    treatment_temperature_C: 825
+    treatment_duration_h: 5
+    container_as_printed: sealed quartz ampoule
+    result_as_printed: XRD showed only NaCrO2 for both powder types; decomposition was not confirmed.
+  context_id: chatain-2021-nacro2-thermodynamics::context::chatain_2021_xrd_after_825c_treatment
+  work_id: 10.1016/j.jallcom.2021.160784
+  source_id: chatain-2021-nacro2-thermodynamics
+  species: NaCrO2

@@ -1,0 +1,868 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.33.43
+  citation: K. Kunisada and H. Iwai (1993), “Effects of CaO, MnO, MgO and Al2O3 on the Sulfide Capacities of Na2O-SiO2 Slags,”
+    ISIJ International 33(1), 43–47.
+  source_ids:
+  - kunisada-iwai-1993-na-silicate-sulfide-capacity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9be13c6816d4d54f6819300d2ff8d273028bebc4
+    files:
+    - asset_id: pdf:kunisada-iwai-1993-na-silicate-sulfide-capacity
+      role: pdf
+      path: raw/kunisada-iwai-1993-na-silicate-sulfide-capacity/kunisada-iwai-1993-na-silicate-sulfide-capacity.pdf
+      sha256:
+        tag: value
+        value: 7079a601d757767d683b3d7553a607056ba7e249e2cd7112a27a9ad7621a6b6d
+    - asset_id: pdftotext:kunisada-iwai-1993-na-silicate-sulfide-capacity
+      role: pdftotext
+      path: text/kunisada-iwai-1993-na-silicate-sulfide-capacity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kunisada-iwai-1993-na-silicate-sulfide-capacity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.33.43
+experiments:
+- experiment_id: 10.2355/isijinternational.33.43::kunisada-iwai-1993-na-silicate-sulfide-capacity
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.33.43
+  locator:
+    page: 2
+    published_page: 44
+    pdf_page_index: 1
+    table: '1'
+    note: row=1; column=S; printed_cell=0.003
+context:
+- observation_id: kunisada_iwai_1993_capacity_correlation_binary
+  type: table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 44
+    section: 3.1. Na2O-SiO2 slags
+    equation: '4'
+  units: log C_S; B in mole ratio
+  values:
+    quantity: sulfide_capacity
+    method_class: author_derived
+    attribution: K. Kunisada and H. Iwai, present work.
+    equation_as_printed: log C_S = 4.64 B - 6.88 at 1500 °C
+    definition_as_printed: B = (Na2O)/(SiO2), mole ratio
+    standard_deviation_as_printed: 0.37 for log C_S
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_correlation_binary
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_capacity_correlation_modified_basicity
+  type: table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 46
+    section: 3.2. Effects of CaO, MnO, MgO and Al2O3
+    equation: '6'
+  units: log C_S; B' in mole ratio
+  values:
+    quantity: sulfide_capacity
+    method_class: author_derived
+    attribution: K. Kunisada and H. Iwai, present work.
+    rows_as_printed:
+    - parameters: m = 0.7 for CaO; 0.4 for MnO; 0.3 for MgO; m' = 0.5 for Al2O3
+    - equation: log C_S = 4.64 B' - 6.88 at 1500 °C
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_correlation_modified_basicity
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_capacity_correlation_optical_basicity
+  type: table_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 47
+    section: 3.3. Relation between Sulfide Capacity and Theoretical Optical Basicity
+    equation: '8'
+  units: log C_S; theoretical optical basicity
+  values:
+    quantity: sulfide_capacity
+    method_class: author_derived
+    attribution: K. Kunisada and H. Iwai, present work.
+    equation_as_printed: log C_S = 27.0 Λ_th - 21.2 at 1500 °C
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_correlation_optical_basicity
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_capacity_correlations_abstract
+  type: table_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 43
+    section: Abstract
+  units: log C_S; mole ratio for B and B'; theoretical optical basicity for Λ_th
+  values:
+    quantity: sulfide_capacity
+    method_class: author_derived
+    attribution: K. Kunisada and H. Iwai, present work; printed abstract correlations.
+    rows_as_printed:
+    - equation: log C_S = 4.64 B' - 6.88 at 1500 °C
+    - equation: log C_S = 27.0 Λ_th - 21.2 at 1500 °C
+    - equation: B' = {(Na2O) + m(MO)}/{(SiO2) + m'(MO')}, mole ratio
+      parameters: m = 0.7 for CaO; 0.4 for MnO; 0.3 for MgO; m' = 0.5 for Al2O3
+    figure_point_values: not_digitized
+    Na2O_activity_values: not_reported
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_correlations_abstract
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_capacity_definition_and_gas_potentials
+  type: method
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 44
+    section: 2. Experimental
+  units: as printed
+  values:
+    quantity: sulfide-capacity definition and gas potentials
+    method_class: method_only
+    capacity_definition_as_printed: C_S = (wt% S) (P_O2 / P_S2)^(1/2)
+    log_basis_as_printed: log C_S; the paper does not print a base subscript
+    partial_pressures_as_printed:
+      temperature_C: '1500'
+      pO2_Pa: 1.34 × 10^-3
+      pS2_Pa: 1.81 × 10^2
+      derivation: Calculated thermodynamically from the inlet gas composition using the printed gas reactions.
+    gas_reactions_as_printed:
+    - reaction: 4CO + 2SO2 = 4CO2 + S2
+      delta_G_standard_as_printed: 404840 - 202.4 T J; superscript 5 on T is a reference marker.
+    - reaction: 2CO + O2 = 2CO2
+      delta_G_standard_as_printed: -564840 + 173.6 T J; superscript 5 on T is a reference marker.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports calculated gas partial pressures but does not report total experimental pressure.
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 44
+        section: 2. Experimental
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_definition_and_gas_potentials
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_capacity_modified_basicity_definition
+  type: table_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 45
+    section: 3.2. Effects of CaO, MnO, MgO and Al2O3
+    equation: '5'
+  units: B' in mole ratio
+  values:
+    quantity: sulfide-capacity basicity definition
+    method_class: author_derived
+    attribution: K. Kunisada and H. Iwai, present work.
+    equation_as_printed: B' = {(Na2O) + m(MO)}/{(SiO2) + m'(MO')}
+    definition_as_printed: (MO) = (CaO), (MnO), (MgO); (MO') = (Al2O3), in mole fraction
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_capacity_modified_basicity_definition
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_experimental_conditions
+  type: method
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 43
+    section: 2. Experimental
+  units: as printed
+  values:
+    quantity: gas-slag equilibration method and experimental conditions
+    method_class: method_only
+    temperature_C_as_printed: '1500'
+    starting_sweep: argon
+    reactive_gas_mix_as_printed: 59.5 vol% CO, 39.7 vol% CO2, 0.8 vol% SO2
+    reactive_gas_flow_rate_as_printed: 504 cm3/min
+    equilibration_time_as_printed: 90–120 min
+    sample_mass_as_printed: 2–10 g
+    crucibles_as_printed:
+    - platinum, 10 mm I.D. × 15 mm H, for all slags
+    - magnesia, 20 mm I.D. × 20 mm H, for Na2O–SiO2–MgO slags
+    - alumina, 12 mm I.D. × 65 mm H, for Na2O–SiO2–Al2O3 slags
+    quench_statement_as_printed: Slag and crucible were quenched by pulling them to the top of the reaction tube.
+    quench_preservation: not_stated
+    sulfur_analysis_as_printed: Inductively coupled plasma spectrometry
+    oxide_analysis_as_printed: Atomic absorption spectroscopy for Na2O; inductively coupled plasma spectrometry for the other
+      oxides
+    analysis_relative_error_as_printed: 2%
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not report total experimental pressure.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 43
+        section: 2. Experimental
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_experimental_conditions
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_1
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 45
+    figure: '1'
+  units: log C_S and mole ratio B as printed on axes
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Relation between sulfide capacity and the slag basicity of B=(Na2O)/(SiO2) [mole ratio] for the Na2O-SiO2 binary
+      slags.
+    points: []
+    digitization: deferred; no figure values extracted
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_1
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_2
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 45
+    figure: '2'
+  units: log C_S and Na2O/SiO2 mole ratio as printed on axes
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of the present sulfide capacities with those previously obtained for Na2O-SiO2 slags [6–10].
+    points: []
+    digitization: deferred; present and literature figure values not extracted
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_2
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_3
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 45
+    figure: '3'
+  units: log C_S and mole ratio B as printed on axes
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Effects of CaO, MnO, MgO, and Al2O3 on the sulfide capacity of Na2O-SiO2 slags.
+    points: []
+    digitization: deferred; no figure values extracted
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_3
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_4
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 45
+    figure: '4'
+  units: Y versus oxide mole fraction as printed on axes
+  values:
+    quantity: additive-oxide contributions to sulfide capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Evaluation of the effects of CaO, MnO, MgO, and Al2O3 on the sulfide capacity of Na2O-SiO2 slags.
+    points: []
+    digitization: deferred; numerical m and m' values are retained from the text, not read from the figure
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_4
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_5
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 46
+    figure: '5'
+  units: log C_S and modified basicity B' as printed on axes
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Correlation of sulfide capacities with the modified slag basicity of Eq. (5).
+    points: []
+    digitization: deferred; no figure values extracted
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_5
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_figure_6
+  type: figure_record
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 46
+    figure: '6'
+  units: log C_S and theoretical optical basicity Λ_th as printed on axes
+  values:
+    quantity: sulfide_capacity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Relation between sulfide capacity and theoretical optical basicity for the Na2O-SiO2 system slags.
+    points: []
+    digitization: deferred; no figure values extracted
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_figure_6
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_optical_basicity_values
+  type: table_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 47
+    section: 3.3. Relation between Sulfide Capacity and Theoretical Optical Basicity
+  units: dimensionless optical basicity index
+  values:
+    quantity: printed pure-oxide optical-basicity indices
+    method_class: quoted_attributed
+    attribution: Kunisada and Iwai discussion of Duffy and Ingram [4] and Sosinsky and Sommerville [15].
+    rows_as_printed:
+    - oxide: Na2O
+      value_as_printed: '1.65'
+      wording: should be 1.65; original value was 1.15
+      attribution: authors' revised value compared with Duffy and Ingram [4]
+    - oxide: MnO
+      value_as_printed: '1.21'
+      wording: modified (effective) value proposed by Sosinsky and Sommerville [15]; original value was 0.59
+      attribution: Sosinsky and Sommerville [15] as described by Kunisada and Iwai
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_optical_basicity_values
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S
+- observation_id: kunisada_iwai_1993_table1_slag_compositions
+  type: table_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 44
+    table: '1'
+    note: Table 1, checked cell by cell against the 600-dpi page render.
+  units: wt%
+  values:
+    quantity: analyzed slag oxide and sulfur composition by sample
+    method_class: measured_direct
+    row_count_as_printed: 57
+    columns_as_printed:
+    - No.
+    - Na2O
+    - SiO2
+    - CaO
+    - MnO
+    - MgO
+    - Al2O3
+    - S
+    blank_cells: Empty cells remain empty; the source does not print zeros for absent oxide columns.
+    rows_as_printed:
+    - - '1'
+      - '29.1'
+      - '65.6'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.003'
+    - - '2'
+      - '32.4'
+      - '63.8'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.003'
+    - - '3'
+      - '32.8'
+      - '58.3'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.091'
+    - - '4'
+      - '37.3'
+      - '56.9'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.102'
+    - - '5'
+      - '37.4'
+      - '57.3'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.020'
+    - - '6'
+      - '37.5'
+      - '61.1'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.039'
+    - - '7'
+      - '38.5'
+      - '55.3'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.124'
+    - - '8'
+      - '38.8'
+      - '60.0'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.013'
+    - - '9'
+      - '40.3'
+      - '52.1'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.56'
+    - - '10'
+      - '40.5'
+      - '58.5'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.050'
+    - - '11'
+      - '43.2'
+      - '49.5'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.47'
+    - - '12'
+      - '43.5'
+      - '55.8'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.071'
+    - - '13'
+      - '45.5'
+      - '51.3'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.27'
+    - - '14'
+      - '49.2'
+      - '50.4'
+      - ''
+      - ''
+      - ''
+      - ''
+      - '0.85'
+    - - '101'
+      - '35.8'
+      - '50.4'
+      - '4.1'
+      - ''
+      - ''
+      - ''
+      - '0.21'
+    - - '102'
+      - '43.3'
+      - '46.2'
+      - '8.6'
+      - ''
+      - ''
+      - ''
+      - '0.99'
+    - - '103'
+      - '40.9'
+      - '47.0'
+      - '8.8'
+      - ''
+      - ''
+      - ''
+      - '0.68'
+    - - '104'
+      - '33.7'
+      - '49.0'
+      - '9.0'
+      - ''
+      - ''
+      - ''
+      - '0.26'
+    - - '105'
+      - '35.1'
+      - '45.5'
+      - '15.0'
+      - ''
+      - ''
+      - ''
+      - '1.24'
+    - - '106'
+      - '31.9'
+      - '47.1'
+      - '15.1'
+      - ''
+      - ''
+      - ''
+      - '1.37'
+    - - '107'
+      - '28.4'
+      - '41.2'
+      - '21.2'
+      - ''
+      - ''
+      - ''
+      - '1.38'
+    - - '108'
+      - '24.2'
+      - '44.2'
+      - '23.3'
+      - ''
+      - ''
+      - ''
+      - '1.39'
+    - - '109'
+      - '22.4'
+      - '47.4'
+      - '25.4'
+      - ''
+      - ''
+      - ''
+      - '0.68'
+    - - '110'
+      - '18.2'
+      - '42.3'
+      - '30.8'
+      - ''
+      - ''
+      - ''
+      - '1.49'
+    - - '111'
+      - '8.9'
+      - '41.5'
+      - '46.3'
+      - ''
+      - ''
+      - ''
+      - '0.87'
+    - - '201'
+      - '38.5'
+      - '49.4'
+      - ''
+      - '5.2'
+      - ''
+      - ''
+      - '0.60'
+    - - '202'
+      - '42.6'
+      - '49.8'
+      - ''
+      - '5.5'
+      - ''
+      - ''
+      - '0.50'
+    - - '203'
+      - '35.8'
+      - '45.8'
+      - ''
+      - '10.7'
+      - ''
+      - ''
+      - '0.77'
+    - - '204'
+      - '37.7'
+      - '48.0'
+      - ''
+      - '12.1'
+      - ''
+      - ''
+      - '1.22'
+    - - '205'
+      - '33.7'
+      - '42.6'
+      - ''
+      - '16.8'
+      - ''
+      - ''
+      - '1.19'
+    - - '206'
+      - '34.2'
+      - '43.5'
+      - ''
+      - '19.9'
+      - ''
+      - ''
+      - '1.72'
+    - - '207'
+      - '28.6'
+      - '36.9'
+      - ''
+      - '23.7'
+      - ''
+      - ''
+      - '2.00'
+    - - '208'
+      - '31.1'
+      - '39.3'
+      - ''
+      - '26.5'
+      - ''
+      - ''
+      - '1.63'
+    - - '209'
+      - '23.2'
+      - '34.3'
+      - ''
+      - '31.1'
+      - ''
+      - ''
+      - '1.64'
+    - - '210'
+      - '27.3'
+      - '34.4'
+      - ''
+      - '35.7'
+      - ''
+      - ''
+      - '2.85'
+    - - '211'
+      - '17.0'
+      - '29.2'
+      - ''
+      - '40.0'
+      - ''
+      - ''
+      - '2.80'
+    - - '301'
+      - '37.5'
+      - '46.4'
+      - ''
+      - ''
+      - '13.2'
+      - ''
+      - '0.47'
+    - - '302'
+      - '36.6'
+      - '42.6'
+      - ''
+      - ''
+      - '16.0'
+      - ''
+      - '0.37'
+    - - '303'
+      - '35.2'
+      - '43.2'
+      - ''
+      - ''
+      - '17.2'
+      - ''
+      - '1.08'
+    - - '304'
+      - '33.0'
+      - '44.9'
+      - ''
+      - ''
+      - '17.7'
+      - ''
+      - '0.52'
+    - - '305'
+      - '33.1'
+      - '46.9'
+      - ''
+      - ''
+      - '18.4'
+      - ''
+      - '1.07'
+    - - '306'
+      - '30.5'
+      - '47.8'
+      - ''
+      - ''
+      - '18.9'
+      - ''
+      - '0.47'
+    - - '307'
+      - '26.6'
+      - '47.9'
+      - ''
+      - ''
+      - '21.8'
+      - ''
+      - '0.41'
+    - - '308'
+      - '16.1'
+      - '58.8'
+      - ''
+      - ''
+      - '21.9'
+      - ''
+      - '0.010'
+    - - '309'
+      - '15.0'
+      - '59.7'
+      - ''
+      - ''
+      - '21.9'
+      - ''
+      - '0.006'
+    - - '310'
+      - '16.9'
+      - '56.2'
+      - ''
+      - ''
+      - '24.1'
+      - ''
+      - '0.036'
+    - - '311'
+      - '30.2'
+      - '42.0'
+      - ''
+      - ''
+      - '24.2'
+      - ''
+      - '0.69'
+    - - '401'
+      - '46.0'
+      - '48.4'
+      - ''
+      - ''
+      - ''
+      - '3.8'
+      - '0.55'
+    - - '402'
+      - '41.4'
+      - '47.4'
+      - ''
+      - ''
+      - ''
+      - '9.1'
+      - '0.33'
+    - - '403'
+      - '41.0'
+      - '47.6'
+      - ''
+      - ''
+      - ''
+      - '10.6'
+      - '0.54'
+    - - '404'
+      - '28.5'
+      - '59.5'
+      - ''
+      - ''
+      - ''
+      - '12.2'
+      - '0.003'
+    - - '405'
+      - '31.0'
+      - '53.8'
+      - ''
+      - ''
+      - ''
+      - '13.7'
+      - '0.013'
+    - - '406'
+      - '36.3'
+      - '46.4'
+      - ''
+      - ''
+      - ''
+      - '15.6'
+      - '0.052'
+    - - '407'
+      - '38.1'
+      - '45.2'
+      - ''
+      - ''
+      - ''
+      - '16.7'
+      - '0.20'
+    - - '408'
+      - '36.7'
+      - '42.1'
+      - ''
+      - ''
+      - ''
+      - '20.0'
+      - '0.120'
+    - - '409'
+      - '32.6'
+      - '39.4'
+      - ''
+      - ''
+      - ''
+      - '28.1'
+      - '0.082'
+    - - '410'
+      - '30.2'
+      - '34.2'
+      - ''
+      - ''
+      - ''
+      - '35.3'
+      - '0.057'
+  context_id: kunisada-iwai-1993-na-silicate-sulfide-capacity::context::kunisada_iwai_1993_table1_slag_compositions
+  work_id: 10.2355/isijinternational.33.43
+  source_id: kunisada-iwai-1993-na-silicate-sulfide-capacity
+  species: S

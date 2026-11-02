@@ -1,0 +1,1000 @@
+schema_version: literature_extract.v1
+source_id: chatain-2021-nacro2-thermodynamics
+source:
+  citation: >-
+    Chatain, S., David, N., Bonina, D., Flèche, J.-L., Bonnet, C., Courouau, J.-L. & Rouhard, M. (2021). Thermodynamic study of the sodium chromite NaCrO2. Journal of Alloys and Compounds 882, 160784.
+  doi: 10.1016/j.jallcom.2021.160784
+  url: https://doi.org/10.1016/j.jallcom.2021.160784
+  year: 2021
+  corpus_asset: raw/chatain-2021-nacro2-thermodynamics/chatain-2021-nacro2-thermodynamics.pdf
+extraction:
+  method: >-
+    Transcribed first from MinerU tables and markdown and the born-digital pdftotext-layout file; flagged cells, pages without MinerU tables, and each printed table's row/column layout were checked against PDF page renders.
+  date: '2026-10-31'
+  worker: w1031nc-chat21
+  provenance_path: text/chatain-2021-nacro2-thermodynamics/pdftotext-layout.txt
+  source_note: >-
+    No numerical Cp(T), H(T)-H(298), or S-S298 series is printed: Cp and G plots are figure-only and were not digitized. The paper prints absolute theoretical S as 94.5 at 298.15 K on page 13 and as 94.53 with S°298K on page 15; both printed temperatures are retained with separate locators, along with the theoretical entropy function. Cp and G fits are retained as typed refusals because the coefficient-only function form has no point-series representation. No numerical vapour-pressure values or raw EMF/KEMS readings are printed; Table 1 reports attributed Gibbs-energy fits. No source supplement was present in the corpus or supporting-files location.
+review_status: draft
+fidelity_samples:
+  - path: species.NaCrO2.observations[chatain_2021_table1_ref7_ii].values.equation_as_printed
+    value: '-953.5+0.278xT (±3.3 kJ/mol)'
+    locator:
+      page: 6
+      table: '1'
+      row: '6'
+      equation: II
+  - path: species.NaCrO2.context[chatain_2021_table2_gdms_characterization].values.experimental_rows[10].impurity_content_ug_g
+    value: '250'
+    locator:
+      page: 9
+      table: '2'
+      row: a) experimental NaCrO2, Fe
+  - path: species.NaCrO2.context[chatain_2021_table3_dft_parameters].values.rows[1].volume_A3
+    value: '127.022'
+    locator:
+      page: 12
+      table: '3'
+      row: Calc.
+  - path: species.NaCrO2.context[chatain_2021_table4_gamma_frequencies].values.rows[13].frequency_cm_1
+    value: '580.187810'
+    locator:
+      page: 13
+      table: '4'
+      row: '14'
+  - path: species.NaCrO2.observations[chatain_2021_experimental_cp_fit].values.equation_as_printed
+    value: '-80.575+0.04736xT(K)-2.9x10-5xT(K)^2-1641963/T(K)^2 (±1.5%)'
+    locator:
+      page: 14
+      equation: Cp fit
+  - path: species.NaCrO2.observations[chatain_2021_formation_gibbs_fit].values.equation_as_printed
+    value: '-876.094+0.191xT (±2%)'
+    locator:
+      page: 15
+      equation: Gibbs-energy fit
+species:
+  NaCrO2:
+    observations:
+      - observation_id: chatain_2021_table1_ref3_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '1'
+          column: 'Δf,TG°(NaCrO2)'
+        T_range_K: [573, 773]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [3], as printed by Chatain et al.
+          reference_as_printed: '[3]'
+          method_as_printed: 'e.m.f. Air, Pt/YDT*/Na(l), O(Na); *Yttria doped Thoria'
+          equilibrium_as_printed: Na(l)-Cr(s)-NaCrO2(s)
+          equation_as_printed: '-1132+0.510xT'
+          fit_note_as_printed: fit of experimental points
+          T_range_as_printed: 573-773 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref4_gibbs_fit_i
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '2'
+          equation: I
+        T_range_K: [700, 1100]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [4], as printed by Chatain et al.
+          reference_as_printed: '[4]'
+          method_as_printed: 'e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+          fit_label_as_printed: I
+          cell_scheme_as_printed: Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF
+          equilibrium_as_printed: NaCrO2-Cr-Cr2O3
+          equation_as_printed: '-883.368+0.2108xT'
+          T_range_as_printed: 700-1100 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref4_gibbs_fit_ii
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '2'
+          equation: II
+        T_range_K: [700, 1100]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [4], as printed by Chatain et al.
+          reference_as_printed: '[4]'
+          method_as_printed: 'e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+          fit_label_as_printed: II
+          cell_scheme_as_printed: NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni
+          equilibrium_as_printed: NaCrO2-Cr-Cr2O3
+          equation_as_printed: '-864.707+0.2074xT'
+          T_range_as_printed: 700-1100 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref4_gibbs_fit_average
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '2'
+          equation: Average
+        T_range_K: [700, 1100]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [4], as printed by Chatain et al.
+          reference_as_printed: '[4]'
+          method_as_printed: 'e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+          fit_label_as_printed: Average
+          equilibrium_as_printed: NaCrO2-Cr-Cr2O3
+          equation_as_printed: 'Average. -874+0.209xT (±8.4 kJ/mol)'
+          uncertainty_as_printed: ±8.4 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 700-1100 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref5_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '3'
+        T_range_K: [800, 980]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [5], as printed by Chatain et al.
+          reference_as_printed: '[5]'
+          method_as_printed: 'e.m.f. In, In2O3/YDT/Na,Na2O'
+          equilibrium_as_printed: Na(l)-Cr(s)-NaCrO2(s)
+          equation_as_printed: '-819.409+0.16508xT'
+          T_range_as_printed: 800-980 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref6_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '4'
+        T_range_K: [784, 1012]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [6], as printed by Chatain et al.
+          reference_as_printed: '[6]'
+          method_as_printed: 'e.m.f. Pt, NaCrO2,Cr2O3,Na2CrO4/15 YSZ*/O2 (air), Pt; *15 w% zirconia stabilised Yttria'
+          equilibrium_as_printed: NaCrO2-Cr2O3-Na2CrO4
+          equation_as_printed: '-869.98+0.18575xT (±1.86 kJ/mol)'
+          uncertainty_as_printed: ±1.86 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 784-1012 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref8_emf_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '5'
+          equation: EMF
+        T_range_K: [657, 825]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [8], as printed by Chatain et al.
+          reference_as_printed: '[8]'
+          method_as_printed: 'e.m.f. In, In2O3/YDT/Na,Cr,NaCrO2'
+          equilibrium_as_printed: Na(l)-Cr(s)-NaCrO2(s)
+          equation_as_printed: '-800.847+0.14785xT (±1.35 kJ/mol)'
+          uncertainty_as_printed: ±1.35 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 657-825 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref7_gibbs_fit_i
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '6'
+          equation: I
+        T_range_K: [782, 1014]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [7], as printed by Chatain et al.
+          reference_as_printed: '[7]'
+          method_as_printed: 'e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt; II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt'
+          fit_label_as_printed: I
+          cell_scheme_as_printed: Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt
+          equilibrium_as_printed: NaCrO2-Cr-Cr2O3
+          equation_as_printed: '-908+0.2317xT (±1.6 kJ/mol)'
+          uncertainty_as_printed: ±1.6 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 782-1014 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref7_ii
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '6'
+          equation: II
+        T_range_K: [809, 1040]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [7], as printed by Chatain et al.
+          reference_as_printed: '[7]'
+          method_as_printed: 'e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt; II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt'
+          fit_label_as_printed: II
+          cell_scheme_as_printed: Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt
+          equilibrium_as_printed: NaCrO2-Cr-Cr2O3
+          equation_as_printed: '-953.5+0.278xT (±3.3 kJ/mol)'
+          uncertainty_as_printed: ±3.3 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 809-1040 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref9_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '7'
+        T_range_K: [820, 1006]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [9], as printed by Chatain et al.
+          reference_as_printed: '[9]'
+          method_as_printed: 'e.m.f. Pt/NaCrO2+Na2CrO4+Cr2O3/(1-x)ZrO2+xCaO/air/Pt'
+          equilibrium_as_printed: NaCrO2-Cr2O3-Na2CrO4
+          equation_as_printed: '-856.1+0.1693xT (±2.5 kJ/mol)'
+          uncertainty_as_printed: ±2.5 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 820-1006 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref10_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '8'
+        T_range_K: [573, 773]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [10], as printed by Chatain et al.
+          reference_as_printed: '[10]'
+          method_as_printed: 'e.m.f. Me/In-In2O3/electrolyte/Na-Cr-NaCrO2/Me'
+          equilibrium_as_printed: Na(l)-Cr-NaCrO2
+          equation_as_printed: '-995.79+0.269xT'
+          T_range_as_printed: 573-773 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying EMF readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored EMF measurement series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref8_kems_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '9'
+          equation: KEMS
+        T_range_K: [825, 1025]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [8], as printed by Chatain et al.
+          reference_as_printed: '[8]'
+          method_as_printed: Knudsen cell mass spectrometry (Mo crucible)
+          equilibrium_as_printed: NaCrO2-Cr2O3-Cr
+          equation_as_printed: '-870.773+0.193171xT'
+          T_range_as_printed: 825-1025 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying KEMS readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored KEMS pressure series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '10'
+        T_range_K: [930, 1044]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [12], as printed by Chatain et al.
+          reference_as_printed: '[12]'
+          method_as_printed: Knudsen-effusion mass-loss (stainless steel crucible)
+          equilibrium_as_printed: NaCrO2(s)-Cr2O3(s)-Cr(s)
+          equation_as_printed: '-847.0+0.1772xT (±3.7 kJ/mol)'
+          uncertainty_as_printed: ±3.7 kJ/mol
+          confidence_level: not_stated
+          T_range_as_printed: 930-1044 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying KEMS readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored KEMS pressure series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref11_i
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '11'
+          equation: I
+        T_range_K: [510, 1000]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [11], as printed by Chatain et al.
+          reference_as_printed: '[11]'
+          method_as_printed: Knudsen cell mass spectrometry (Thoria liners in Ni or stainless steel crucible)
+          fit_label_as_printed: I
+          equilibrium_as_printed: NaCrO2(s)-Cr2O3(s)-Cr(s)
+          equation_as_printed: '-(876±18)+(0.194±0.009)xT'
+          intercept_as_printed: -(876±18)
+          slope_as_printed: 0.194±0.009
+          uncertainty_as_printed: ±18 kJ/mol for intercept; ±0.009 for slope
+          confidence_level: not_stated
+          T_range_as_printed: 510-1000 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying KEMS readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored KEMS pressure series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_table1_ref11_ii
+        type: gibbs_table
+        locator:
+          page: 6
+          table: '1'
+          row: '11'
+          equation: II
+        T_range_K: [660, 890]
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Table 1 reference [11], as printed by Chatain et al.
+          reference_as_printed: '[11]'
+          method_as_printed: Knudsen cell mass spectrometry (Thoria liners in Ni or stainless steel crucible)
+          fit_label_as_printed: II
+          equilibrium_as_printed: NaCrO2(s)-Na4CrO4(s)-Na2O(s)
+          equation_as_printed: '-(909.4±27)+(0.203±0.029)xT'
+          intercept_as_printed: -(909.4±27)
+          slope_as_printed: 0.203±0.029
+          uncertainty_as_printed: ±27 kJ/mol for intercept; ±0.029 for slope
+          confidence_level: not_stated
+          T_range_as_printed: 660-890 K
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Coefficient-only Gibbs-energy functions have no extract-to-battery point-series representation; the underlying KEMS readings are not printed here.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not a stored KEMS pressure series; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_previous_cp_sreedharan_fit
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 4
+          section: literature heat-capacity measurements
+          equation: Cp fit
+        phase: cr
+        units: J K-1 mol-1
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          attribution: Sreedharan et al. [6], as cited by Chatain et al.
+          equation_as_printed: 'Cp (J K-1 mol-1)=27.15+0.1247xT(K)'
+          temperature_range_C_as_printed: 77-327 °C
+          measurement_method_as_printed: DSC
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The linear coefficient fit is not a numeric Cp point series; its source readings are not printed here.
+          method_class_reason: >-
+            This is a literature fit without its source points; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_previous_cp_iyer_fit
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 4
+          section: literature heat-capacity measurements
+          equation: Cp fit
+        phase: cr
+        units: J K-1 mol-1
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          attribution: Iyer et al. [17], as cited by Chatain et al. on page 4; a page 14 comparison prints [16].
+          equation_as_printed: 'Cp (J K-1 mol-1)=-75.364+0.02512xT(K)'
+          temperature_range_C_as_printed: 50-566 °C
+          measurement_method_as_printed: enthalpy-increment measurements with a high-temperature Calvet microcalorimeter
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The linear coefficient fit is not a numeric Cp point series; its source readings are not printed here.
+          method_class_reason: >-
+            This is a literature fit without its source points; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_theoretical_cp_fit
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 13
+          section: 5.2 Results
+          equation: theoretical Cp regression
+        phase: cr
+        units: J mol-1 K-1; T in K
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp fit.
+          calculation_method_as_printed: CASTEP DFT with a quasi-harmonic model
+          equation_as_printed: 'Cp (J mol-1 K-1)=97.42+1.46x10-6T^2+0,00792T-1532260T^-2'
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The coefficient-only Cp function has no extract-to-battery point-series representation; the full E(V) model input is only plotted in Figure 5 and is not digitized.
+          method_class_reason: >-
+            The paper reports a DFT/quasi-harmonic fit, but the model inputs are not all stored; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_experimental_cp_fit
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 14
+          section: 6.1 Heat capacity measurements
+          equation: experimental Cp fit
+        phase: cr
+        units: J K-1 mol-1; T in K
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' DSC data fit
+          measurement_method_as_printed: DSC-111
+          sample_scope_as_printed: commercial and experimental NaCrO2 powders
+          temperature_range_C_as_printed: 25-600 °C
+          equation_as_printed: '-80.575+0.04736xT(K)-2.9x10-5xT(K)^2-1641963/T(K)^2 (±1.5%)'
+          uncertainty_as_printed: ±1.5%
+          confidence_level: not_stated
+          mean_point_dispersion_as_printed: 3% experimental powder; 2% commercial powder
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The polynomial coefficient fit is not a numeric Cp point series; the measured values are shown only in Figure 6 and are not digitized.
+          method_class_reason: >-
+            This is the authors' fit to measured DSC data, but the input points are only plotted; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_formation_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 15
+          section: 6.1 Heat capacity measurements
+          equation: formation Gibbs-energy fit
+        phase: cr
+        units: kJ/mol O2 as printed
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), abstract and section 6.1
+          equation_as_printed: '-876.094+0.191xT (±2%)'
+          uncertainty_as_printed: ±2%
+          confidence_level: not_stated
+          calculation_inputs_as_printed: >-
+            Experimental Cp, ΔfH° at 298 K, theoretical S°298K=94.53, and JANAF functions for the elements.
+          unavailable_inputs: >-
+            Numerical Cp curve points are figure-only and the JANAF elemental function inputs are not reproduced in this extract.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The coefficient-only Gibbs-energy function has no extract-to-battery point-series representation; its full numerical inputs are not stored.
+          method_class_reason: >-
+            This is the authors' fitted output from measured and model inputs, but those inputs are not fully stored; quoted_attributed is retained under d-110.
+      - observation_id: chatain_2021_gross_formation_enthalpy_298
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          section: literature enthalpy of formation
+          paragraph: Gross et al. value
+        phase: cr
+        units: kJ/mol
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298'}
+            locator:
+              page: 3
+              section: literature enthalpy of formation
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          attribution: Gross et al. [13], as cited by Chatain et al.
+          standard_state_as_printed: standard enthalpy of formation at 298 K
+          T_K: '298'
+          value: '-874.2'
+          sigma: '7.3'
+          confidence_level: not_stated
+          derivation_note: >-
+            The paper reports this value from Gross et al. [13]; the stated ±7.3 kJ/mol accuracy includes the reaction-enthalpy and Na2O/Cr2O3 formation-enthalpy uncertainties.
+        uncertainty: ±7.3 kJ/mol
+      - observation_id: chatain_2021_jain_dft_formation_enthalpy_298
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 4
+          section: literature enthalpy of formation
+          paragraph: Jain et al. DFT value
+        phase: cr
+        units: kJ/mol
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298'}
+            locator:
+              page: 4
+              section: literature enthalpy of formation
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          attribution: Jain et al. [16], as cited by Chatain et al.
+          calculation_method_as_printed: mixed GGA and GGA+U
+          standard_state_as_printed: standard enthalpy of formation at 298 K
+          T_K: '298'
+          value: '-883.1'
+          provenance_note: DFT result from prior work; not an experimental measurement by Chatain et al.
+      - observation_id: chatain_2021_theoretical_cp_29815
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 13
+          section: 5.2 Results
+          paragraph: theoretical standard Cp and entropy values
+        phase: cr
+        units: J/mol K
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298.15'}
+            locator:
+              page: 13
+              section: 5.2 Results
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp output.
+          calculation_method_as_printed: CASTEP DFT with a quasi-harmonic model
+          T_K: '298.15'
+          cp_298_15_k: '82.9'
+          model_class_reason: >-
+            This is a reported model output; the E(V) input values are plotted only in Figure 5 and were not digitized, so quoted_attributed is used under d-110.
+      - observation_id: chatain_2021_absolute_standard_entropy_29815
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 13
+          section: 5.2 Results
+          paragraph: theoretical standard Cp and entropy values
+        phase: cr
+        units: J/mol K
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298.15'}
+            locator:
+              page: 13
+              section: 5.2 Results
+        values:
+          quantity: S
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
+          calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
+          entropy_basis: absolute standard entropy, not S-S298
+          T_K: '298.15'
+          entropy: '94.5'
+          model_class_reason: >-
+            This is the theoretical entropy value reported at 298.15 K; its inputs are not fully stored, so quoted_attributed is used under d-110.
+      - observation_id: chatain_2021_absolute_standard_entropy_298
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 15
+          section: 6.1 Heat capacity measurements
+          paragraph: inputs to formation Gibbs-energy calculation
+        phase: cr
+        units: J/mol K
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '298'}
+            locator:
+              page: 15
+              section: 6.1 Heat capacity measurements
+        values:
+          quantity: S
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
+          calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
+          entropy_basis: absolute standard entropy, not S-S298
+          T_K: '298'
+          entropy: '94.53'
+          temperature_discrepancy_note: >-
+            Page 13 prints S=94.5 at 298.15 K; page 15 prints S°298K=94.53. Both printed temperatures are retained without conversion.
+          model_class_reason: >-
+            This is a reported model output; the E(V) input values are plotted only in Figure 5 and were not digitized, so quoted_attributed is used under d-110.
+      - observation_id: chatain_2021_dta_transition_temperature
+        type: transition_point
+        locator:
+          page: 2
+          section: Abstract
+        phase: cr
+        units: deg C
+        values:
+          method_class: quoted_attributed
+          quantity: transition_temperature
+          attribution: Chatain et al. (2021), authors' DTA result.
+          T_C: '819'
+          measured_by_as_printed: differential thermal analysis (DTA)
+          reported_result_as_printed: 819±4 °C
+          reported_temperature_semantics: phase transition; the paper says XRD did not confirm decomposition
+          heating_rates_C_min_as_printed: ['5', '7', '10']
+          zero_rate_as_printed: '0'
+          atmosphere_as_printed: pure argon, 1 L h-1
+          uncertainty_as_printed: ±4 °C
+          confidence_level: not_stated
+          method_class_reason: >-
+            The reported transition temperature is extrapolated to heating rate zero, but the three measured onset temperatures are not printed; quoted_attributed is retained under d-110.
+        uncertainty: ±4 °C
+    context:
+      - observation_id: chatain_2021_sample_synthesis_and_phase_identity
+        type: sample_preparation
+        locator:
+          page: 7
+          section: 4.1 NaCrO2
+        units: as printed
+        values:
+          phase_as_printed: solid NaCrO2
+          commercial_sample:
+            supplier: Neyco
+            purity_as_printed: 99 %
+            morphology_as_printed: irregular chips, 1 to 10 mm
+          synthesized_sample:
+            location_as_printed: CEA, Non aqueous corrosion study laboratory
+            Na2CO3_charge: 0.0322 mol
+            Cr2O3_charge: 0.0322 mol
+            precursor_details_as_printed: >-
+              Equimolar anhydrous Na2CO3 (AnalaR Normapur, 99.9%) and Cr2O3 (Alfa Aesar, 99%) powders.
+            heating_rate_C_min: '7.8'
+            atmosphere_as_printed: slight neutral argon flow
+            argon_flow_L_h_as_printed: approximately 7
+            temperature_range_C_as_printed: [850, 900]
+            duration_h: 5
+            reaction_as_printed: Na2CO3(s) + Cr2O3(s) ↔ 2 NaCrO2(s) + CO2(g)
+            oxygen_partial_pressure_note: >-
+              Measured with a Zirox probe at the furnace exit; no numeric value is printed.
+            reaction_completion_as_printed: >-
+              Weight loss was followed and heat treatment repeated until the Na2CO3 and Cr2O3 reaction was complete; XRD was used to check completion.
+            storage_as_printed: green powder kept in a glove box under dry nitrogen
+          xrd_phase_identity:
+            method_as_printed: >-
+              Bruker D8 Discover diffractometer with Cu Kα1 radiation; ground powder analyzed in an airtight dome under argon.
+            phase_as_printed: NaCrO2, NaFeO2 prototype, hexagonal, space group R\bar{3}m, Z=3
+            phase_identity_locator: {page: 8, figure: '3'}
+            reference_cell_parameters_as_printed: >-
+              a=2.9747±0.0001 Å and c=15.9538±0.0003 Å, attributed to [23] in the Figure 3 caption.
+            reference_cell_parameters_locator: {page: 8, figure: '3'}
+            reaction_completion_as_printed: >-
+              Reactant peaks disappeared within the method error of 0.5% in volume; the diffractogram agreed with the NaCrO2 database.
+      - observation_id: chatain_2021_xrd_after_825c_treatment
+        type: phase_identification_context
+        locator:
+          page: 16
+          section: 6.2 Decomposition temperature of NaCrO2
+        units: as printed
+        values:
+          treatment_temperature_C: 825
+          treatment_duration_h: 5
+          container_as_printed: sealed quartz ampoule
+          result_as_printed: XRD showed only NaCrO2 for both powder types; decomposition was not confirmed.
+      - observation_id: chatain_2021_table2_gdms_characterization
+        type: measured_bulk_sample_analysis
+        locator:
+          page: 9
+          table: '2'
+          row: a) experimental NaCrO2
+        caption_locator: {page: 10, table: '2'}
+        units: µg.g-1 as printed
+        values:
+          method_class: measured_direct
+          method_as_printed: >-
+            Glow-discharge mass spectrometry (GD-MS) on ground powder amalgamated in an ultra-pure silver pellet (Ag Alfa Aesar 99.999%).
+          quantity_as_printed: elemental impurity concentration
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Elemental concentrations have no exact quantity token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES; concentration_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES but does not map this measured concentration to a Quantity. The existing deguzman-2026-simulant-physicochemical.yaml uses elemental_concentration, but that label is absent from the closed Quantity enum and QUANTITY_ALIASES. This sample-characterization table is kept as typed-refused context rather than assigned a near-match quantity.
+          printed_row_count_per_sample: 22
+          experimental_rows:
+            - {element: B, impurity_content_ug_g: '7'}
+            - {element: Mg, impurity_content_ug_g: '25'}
+            - {element: Al, impurity_content_ug_g: '50'}
+            - {element: Si, impurity_content_ug_g: '70'}
+            - {element: P, impurity_content_ug_g: '12'}
+            - {element: S, impurity_content_ug_g: '45'}
+            - {element: Ca, impurity_content_ug_g: '25'}
+            - {element: Ti, impurity_content_ug_g: '0.85'}
+            - {element: V, impurity_content_ug_g: '<3'}
+            - {element: Mn, impurity_content_ug_g: '<3'}
+            - {element: Fe, impurity_content_ug_g: '250'}
+            - {element: Co, impurity_content_ug_g: '0.75'}
+            - {element: Ni, impurity_content_ug_g: '5.5'}
+            - {element: Cu, impurity_content_ug_g: '25'}
+            - {element: Zn, impurity_content_ug_g: '0.8'}
+            - {element: Sr, impurity_content_ug_g: '10'}
+            - {element: Zr, impurity_content_ug_g: '<5'}
+            - {element: Mo, impurity_content_ug_g: '2.1'}
+            - {element: Sn, impurity_content_ug_g: '0.5'}
+            - {element: Ba, impurity_content_ug_g: '3.1'}
+            - {element: Ta, impurity_content_ug_g: '2.0'}
+            - {element: Pb, impurity_content_ug_g: '0.2'}
+      - observation_id: chatain_2021_table2_gdms_commercial_sample
+        type: measured_bulk_sample_analysis
+        locator:
+          page: 9
+          table: '2'
+          row: b) commercial NaCrO2
+        caption_locator: {page: 10, table: '2'}
+        units: µg.g-1 as printed
+        values:
+          method_class: measured_direct
+          method_as_printed: Glow-discharge mass spectrometry (GD-MS)
+          quantity_as_printed: elemental impurity concentration
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Elemental concentrations have no exact quantity token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES; concentration_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES but does not map this measured concentration to a Quantity. The existing deguzman-2026-simulant-physicochemical.yaml uses elemental_concentration, but that label is absent from the closed Quantity enum and QUANTITY_ALIASES. This sample-characterization table is kept as typed-refused context rather than assigned a near-match quantity.
+          printed_row_count: 22
+          commercial_rows:
+            - {element: B, impurity_content_ug_g: '5'}
+            - {element: Mg, impurity_content_ug_g: '20'}
+            - {element: Al, impurity_content_ug_g: '130'}
+            - {element: Si, impurity_content_ug_g: '250'}
+            - {element: P, impurity_content_ug_g: '7'}
+            - {element: S, impurity_content_ug_g: '20'}
+            - {element: Ca, impurity_content_ug_g: '5'}
+            - {element: Ti, impurity_content_ug_g: '1.2'}
+            - {element: V, impurity_content_ug_g: '1.0'}
+            - {element: Mn, impurity_content_ug_g: '<3'}
+            - {element: Fe, impurity_content_ug_g: '400'}
+            - {element: Co, impurity_content_ug_g: '1.0'}
+            - {element: Ni, impurity_content_ug_g: '3.0'}
+            - {element: Cu, impurity_content_ug_g: '10'}
+            - {element: Zn, impurity_content_ug_g: '0.4'}
+            - {element: Sr, impurity_content_ug_g: '0.1'}
+            - {element: Zr, impurity_content_ug_g: '<5'}
+            - {element: Mo, impurity_content_ug_g: '1.1'}
+            - {element: Sn, impurity_content_ug_g: '0.1'}
+            - {element: Ba, impurity_content_ug_g: '2.1'}
+            - {element: Ta, impurity_content_ug_g: '0.2'}
+            - {element: Pb, impurity_content_ug_g: '1.0'}
+      - observation_id: chatain_2021_cp_dsc_protocol
+        type: measurement_protocol
+        locator:
+          page: 10
+          section: 4.2 Differential Scanning Calorimetry
+        units: as printed
+        values:
+          instrument_as_printed: SETARAM DSC-111
+          crucible_as_printed: alumina
+          gas_as_printed: argon flow after primary purges
+          initial_temperature_C: 30
+          initial_hold_min: 30
+          isothermal_step_spacing_C: 20
+          upper_temperature_C_as_printed: about 600
+          isothermal_step_duration_h: 1
+          heating_rate_C_min: 10
+          cooling_rate_C_min: 10
+          thermal_cycle_as_printed: >-
+            Cooled to room temperature; cycle under argon repeated before opening; each powder underwent the double thermal cycle twice.
+          blank_as_printed: empty crucibles in sample and reference cells under the same program
+      - observation_id: chatain_2021_dta_protocol
+        type: measurement_protocol
+        locator:
+          page: 10
+          section: 4.3 Differential Thermal Analysis
+        units: as printed
+        values:
+          instrument_as_printed: SETARAM TG-DTA Setsys
+          atmosphere_as_printed: pure argon, Air Products 99.9997% purity
+          argon_flow_L_h: 1
+          crucible_as_printed: platinum crucible with a lid and a silica cover lid
+          heating_rates_C_min: [5, 7, 10]
+          rate_zero_semantics: >-
+            Equilibrium transition temperature determined by extrapolation to rate=0 using the onset temperature of the heat-flow peak reduced to the blank line.
+          thermocouple_as_printed: PtRh 6%/30%
+          calibration_metals_as_printed: aluminium, gold, palladium
+      - observation_id: chatain_2021_reaction_enthalpy_context
+        type: thermochemical_cycle_context
+        locator:
+          page: 3
+          section: literature enthalpy of formation
+        units: kJ/mol as printed
+        values:
+          quantity_as_printed: reaction enthalpy
+          status: typed_refused_schema_gap
+          method_class: quoted_attributed
+          candidate_tokens: [delta_fH]
+          schema_gap: >-
+            The paper reports reaction enthalpy values, not standard formation enthalpies. No exact general reaction-enthalpy quantity is present in simulator/battery/enums.py::Quantity or mapped by simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY; delta_fH would change the printed meaning.
+          gross_et_al_reaction_enthalpy_as_printed: '-101.4±1.0'
+          gross_et_al_attribution: Gross et al. [13], as cited by Chatain et al.
+          gross_et_al_locator:
+            page: 3
+            section: literature enthalpy of formation
+          gross_et_al_basis_as_printed: heat of combination of Na2O and Cr2O3 oxides and heat of solution in hydrochloric acid
+          gross_et_al_uncertainty_note: confidence level not stated
+          van_vuuren_reaction_enthalpy_as_printed: '-142.0±3.8'
+          van_vuuren_attribution: Van Vuuren [15], as cited by Chatain et al.
+          van_vuuren_locator:
+            page: 4
+            section: literature enthalpy of formation
+          van_vuuren_method_as_printed: DSC, 240-490 °C
+          van_vuuren_reaction_as_described: formation of NaCrO2 from Na2O and Cr2O3
+          van_vuuren_uncertainty_note: confidence level not stated
+      - observation_id: chatain_2021_table3_dft_parameters
+        type: model_table
+        locator:
+          page: 12
+          table: '3'
+        units: lattice lengths Å; volume Å3; bulk modulus GPa
+        values:
+          quantity_as_printed: lattice parameters, equilibrium volume and bulk modulus
+          calculation_method_as_printed: CASTEP DFT/GGA; values in italics are calculated
+          attribution_as_printed: experimental comparator values [18]
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            No exact quantity token covers lattice constants, unit-cell volume, bulk modulus, or pressure derivative; see simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES. Kept as typed-refused context rather than relabeling as another physical quantity.
+          printed_row_count: 2
+          rows:
+            - row_as_printed: Exp.
+              method_class: quoted_attributed
+              Z: '3'
+              a_A: '2.968'
+              b_A: '2.968'
+              c_A: '15.94'
+              alpha_deg: '90'
+              beta_deg: '90'
+              gamma_deg: '120'
+              volume_A3: '120.645'
+              B0_GPa: null
+              B0_prime: null
+            - row_as_printed: Calc.
+              method_class: quoted_attributed
+              calculation_method_as_printed: CASTEP DFT/GGA
+              Z: null
+              a_A: '3.028'
+              b_A: '3.028'
+              c_A: '15.984'
+              alpha_deg: '90'
+              beta_deg: '90'
+              gamma_deg: '120'
+              volume_A3: '127.022'
+              B0_GPa: '121.14'
+              B0_prime: '3.65'
+      - observation_id: chatain_2021_table4_gamma_frequencies
+        type: model_table
+        locator:
+          page: 13
+          table: '4'
+        units: cm-1 and degeneracy as printed
+        values:
+          quantity_as_printed: Gamma-point harmonic vibrational frequency and mode degeneracy
+          method_class: quoted_attributed
+          method_class_reason: >-
+            The frequencies are model outputs from the authors' CASTEP calculation; the supporting model inputs are not fully stored, so quoted_attributed is used under d-110.
+          calculation_method_as_printed: CASTEP harmonic frequencies from the mass-weighted second-derivative Hessian
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            No exact quantity token represents a harmonic vibrational frequency or mode degeneracy; see simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES. Kept as typed-refused model context.
+          printed_row_count: 14
+          rows:
+            - {frequency_cm_1: '69.135847', degeneracy: '4'}
+            - {frequency_cm_1: '126.073050', degeneracy: '2'}
+            - {frequency_cm_1: '153.784178', degeneracy: '4'}
+            - {frequency_cm_1: '170.803531', degeneracy: '2'}
+            - {frequency_cm_1: '284.958325', degeneracy: '1'}
+            - {frequency_cm_1: '305.271195', degeneracy: '2'}
+            - {frequency_cm_1: '408.208746', degeneracy: '4'}
+            - {frequency_cm_1: '410.547233', degeneracy: '2'}
+            - {frequency_cm_1: '415.498866', degeneracy: '2'}
+            - {frequency_cm_1: '419.262014', degeneracy: '4'}
+            - {frequency_cm_1: '497.073448', degeneracy: '1'}
+            - {frequency_cm_1: '526.283746', degeneracy: '1'}
+            - {frequency_cm_1: '537.228558', degeneracy: '2'}
+            - {frequency_cm_1: '580.187810', degeneracy: '2'}
+      - observation_id: chatain_2021_theoretical_entropy_function
+        type: model_equation_context
+        locator:
+          page: 13
+          section: 5.2 Results
+          equation: theoretical entropy function
+        units: J K-1 mol-1 as reported for S°298.15
+        values:
+          quantity_as_printed: absolute theoretical standard entropy S(T)
+          method_class: quoted_attributed
+          attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic model
+          method_class_reason: >-
+            The function is calculated from the authors' model; its inputs are not fully stored, so quoted_attributed is used under d-110.
+          formula_as_printed: >-
+            S = Nk_B(4D(x_D) - 3ln(1 - e^(-x_D)) + Σ[i=4..3n] x_i/(e^(x_i)-1) - ln(1 - e^(-x_D)))
+          variable_definitions_as_printed: >-
+            x_i = hν_i(0)/(k_B T); x_D = Θ_D/T; D(x_D) is the Debye function.
+          final_log_term_as_rendered: x_D
+          formula_render_check: PDF page 13, 600 dpi; the final logarithm subscript is printed as D and is retained as printed.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            Quantity.S exists, but select_declared_source in simulator/battery/migrate.py has no generic source form for this entropy function; the formula is retained as typed-refused model context rather than approximated as S-S298 or a numeric series.
+      - observation_id: chatain_2021_gibbs_thermodynamic_relations
+        type: thermochemical_cycle_context
+        locator:
+          page: 15
+          section: 6.1 Heat capacity measurements
+          equations: (6)-(8)
+        units: as printed
+        values:
+          formulae_as_printed:
+            equation_6: 'ΔfG°(T) = ΔfH°(T) − TΔfS°(T)'
+            equation_7: 'ΔfH°(T) = ΔfH°298 K + ∫[298.15 K..T] Cp(T)dT − Σ[H°(T) − H°298 K]elements'
+            equation_8: 'ΔfS°(T) = S°298 K + ∫[298.15 K..T] [Cp°(T)/T]dT − ΣS°(T)elements'
+          status: context_only
+          note: >-
+            Equation (8) is a formation-entropy function with an absolute S°298 K anchor; the paper does not print a separate relative S-S298 table or numeric H(T)-H(298) values.
