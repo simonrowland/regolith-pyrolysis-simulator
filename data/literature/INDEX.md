@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 740
-- Extracts (`literature_extract.v1`): 738
+- Sources: 741
+- Extracts (`literature_extract.v1`): 739
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 738
+- Extracts with no PDF: 739
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -167,6 +167,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `fray-schmitt-2009-ch4-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1 correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K). | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-ch4-1/fray-schmitt-2009-ch4-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-ch4-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-ch4-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-ch4-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-co-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1 correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy. | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-co-1/fray-schmitt-2009-co-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-co-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-co-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-co-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-nh3` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of the 2024 QCM ice fit. |  | ABSENT, `` | `raw/fray-schmitt-2009-nh3/fray-schmitt-2009-nh3.pdf` (ABSENT, ); `text/fray-schmitt-2009-nh3/` (0 files, ABSENT); `tables/fray-schmitt-2009-nh3/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-nh3.yaml`: extracted (2026-09-06) |
+| `fredrickson-chasanov-1973-na2o-enthalpy-1300k` | Fredrickson, D. R. & Chasanov, M. G. (1973), “The enthalpy of sodium oxide Na2O to 1300 K by drop calorimetry”, Journal of Chemical Thermodynamics 5, 485–490. |  | ABSENT, `` | `raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/fredrickson-chasanov-1973-na2o-enthalpy-1300k.pdf` (present, 41a5b949); `text/fredrickson-chasanov-1973-na2o-enthalpy-1300k/` (16 files, exists); `tables/fredrickson-chasanov-1973-na2o-enthalpy-1300k/` (0 files, ABSENT) | `data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml` (14 rows, draft) | `ledger/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml`: — (—) |
 | `frischat-oel-1966-sodium-calcium-silicate-transport` | Frischat, G. H. and Oel, H. J. (1966). Transportvorgänge in glasigem und kristallinem Na2O·2CaO·3SiO2. Glastechnische Berichte 39(2), 50–61. |  | ABSENT, `` | `raw/frischat-oel-1966-sodium-calcium-silicate-transport/frischat-oel-1966-sodium-calcium-silicate-transport.pdf` (present, f83f51c2); `text/frischat-oel-1966-sodium-calcium-silicate-transport/` (38 files, exists); `tables/frischat-oel-1966-sodium-calcium-silicate-transport/` (0 files, ABSENT) | `data/literature/extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml` (0 rows, draft) | `ledger/frischat-oel-1966-sodium-calcium-silicate-transport.yaml`: — (—) |
 | `fujisawa-1990-cao-al2o3-activities` | T. Fujisawa, C. Yamauchi, and H. Sakao, "Equilibrium between Molten Iron Alloys and CaO-Al2O3-CaS Slags Saturated with CaS," Tetsu-to-Hagane, 76(3) (1990), 368-375. | 10.2355/tetsutohagane1955.76.3_368 | ABSENT, `` | `raw/fujisawa-1990-cao-al2o3-activities/fujisawa-1990-cao-al2o3-activities.pdf` (present, 9da85446); `text/fujisawa-1990-cao-al2o3-activities/` (76 files, exists); `tables/fujisawa-1990-cao-al2o3-activities/` (8 files, exists) | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` (0 rows, draft) | `ledger/fujisawa-1990-cao-al2o3-activities.yaml`: extracted (2026-10-04) |
 | `fujisawa-1994-na-sn-carbonate-thermodynamics` | Fujisawa, Toshiharu; Fukuyama, Hiroyuki; Shimotori, Jun; Yamauchi, Chikabumi (1994). Thermodynamics of NaO0.5-CO2-SnO2 Slag and Estimation of Distribution Ratio of Sn between the Slag and Molten Copper. Materials Transactions, JIM 35(6), 414-422. | 10.2320/matertrans1989.35.414 | ABSENT, `` | `raw/fujisawa-1994-na-sn-carbonate-thermodynamics/fujisawa-1994-na-sn-carbonate-thermodynamics.pdf` (present, ef5dfdc0); `text/fujisawa-1994-na-sn-carbonate-thermodynamics/` (64 files, exists); `tables/fujisawa-1994-na-sn-carbonate-thermodynamics/` (0 files, ABSENT) | `data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml` (20 rows, draft) | `ledger/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml`: — (—) |
@@ -914,6 +915,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `fray-schmitt-2009-ch4-1`
 - `fray-schmitt-2009-co-1`
 - `fray-schmitt-2009-nh3`
+- `fredrickson-chasanov-1973-na2o-enthalpy-1300k`
 - `frischat-oel-1966-sodium-calcium-silicate-transport`
 - `fujisawa-1990-cao-al2o3-activities`
 - `fujisawa-1994-na-sn-carbonate-thermodynamics`

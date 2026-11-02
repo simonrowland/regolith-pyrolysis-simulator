@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 740
-  extracts: 738
+  sources: 741
+  extracts: 739
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 738
+  extracts_without_pdf: 739
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -159,6 +159,7 @@ gaps:
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
+  - fredrickson-chasanov-1973-na2o-enthalpy-1300k
   - frischat-oel-1966-sodium-calcium-silicate-transport
   - fujisawa-1990-cao-al2o3-activities
   - fujisawa-1994-na-sn-carbonate-thermodynamics
@@ -9592,6 +9593,64 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  aliases: []
+  citation: Fredrickson, D. R. & Chasanov, M. G. (1973), “The enthalpy of sodium oxide Na2O to 1300 K
+    by drop calorimetry”, Journal of Chemical Thermodynamics 5, 485–490.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
+    review_status: draft
+    rows: 14
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/fredrickson-chasanov-1973-na2o-enthalpy-1300k.pdf
+      present: true
+      sha256: 41a5b949fd23f037320cb9c7eac7b2fe82d0eb22402d3b9ee856f0621795d42f
+      matches_simulator: null
+    sidecar:
+      path: raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/sidecar.yaml
+      present: true
+    text:
+      path: text/fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      exists: true
+      file_count: 16
+    tables:
+      path: tables/fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8935c18298cc693945d95bf99f3f896beb867c50
 - source_id: frischat-oel-1966-sodium-calcium-silicate-transport
   aliases: []
   citation: Frischat, G. H. and Oel, H. J. (1966). Transportvorgänge in glasigem und kristallinem Na2O·2CaO·3SiO2.
