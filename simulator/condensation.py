@@ -3527,14 +3527,27 @@ class CondensationModel:
                     or vapour_carrier_authority_severity(prior_status)
                     > vapour_carrier_authority_severity(current_status)
                 ):
-                    wall_carrier_authority_by_species[str(species)] = (
-                        copy.deepcopy(dict(prior_record))
-                    )
+                    # d-019: a higher-severity replacement keeps the losing
+                    # carrier's extrapolation flag. The singular notice stays
+                    # the winner's; include_all_notices keeps every flag.
+                    if isinstance(current_record, Mapping):
+                        wall_carrier_authority_by_species[str(species)] = (
+                            merge_vapour_carrier_extrapolation_notices(
+                                prior_record,
+                                current_record,
+                                include_all_notices=True,
+                            )
+                        )
+                    else:
+                        wall_carrier_authority_by_species[str(species)] = (
+                            copy.deepcopy(dict(prior_record))
+                        )
                 elif isinstance(current_record, Mapping):
                     wall_carrier_authority_by_species[str(species)] = (
                         merge_vapour_carrier_extrapolation_notices(
                             current_record,
                             prior_record,
+                            include_all_notices=True,
                         )
                     )
         sticking_notice['vapour_carrier_authority_required'] = True

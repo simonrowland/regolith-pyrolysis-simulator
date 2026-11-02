@@ -6,6 +6,10 @@ import pytest
 
 from simulator import condensation
 from simulator.accounting.queries import wall_deposit_candidate_for_surface_kg
+from simulator.vapour_rail.instrumentation import (
+    vapour_carrier_authority_severity,
+    vapour_carrier_authority_status,
+)
 from simulator.state import (
     CondensationStage,
     CondensationTrain,
@@ -977,3 +981,111 @@ def test_cold_wall_source_class_controls_certification(
     assert record["output_status"] == expected_output_status
     if source_class == "internal-analytical":
         assert "cannot certify" in record["certification_status_reason"]
+
+
+def _extrapolation_notice(temperature_K: float) -> dict[str, object]:
+    return {
+        "authority_level": "extrapolated",
+        "temperature_K": temperature_K,
+        "valid_range_K": [701.0, 1361.0],
+        "reason": "outside source band",
+    }
+
+
+def _carrier_with_notices(
+    species: str,
+    *,
+    refused: bool,
+    singular_K: float,
+    also_K: tuple[float, ...] = (),
+) -> dict[str, object]:
+    singular = _extrapolation_notice(singular_K)
+    notices = [singular, *(_extrapolation_notice(temperature) for temperature in also_K)]
+    if refused:
+        pressure = {"kind": "refusal", "code": "test_refusal"}
+        flux = {"kind": "refusal", "code": "test_refusal"}
+    else:
+        pressure = {"kind": "value", "pa": 1.0}
+        flux = {"kind": "eligible"}
+    return {
+        "species_id": species,
+        "pressure": pressure,
+        "flux": flux,
+        "is_refused": refused,
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "modeled-PENDING",
+        "is_flux_active": False,
+        "extra": {
+            "extrapolation_notice": singular,
+            "extrapolation_notices": notices,
+        },
+    }
+
+
+@pytest.mark.parametrize("path", ["strictly_higher", "equal"])
+def test_carrier_merge_keeps_notices_on_both_severity_paths(path: str) -> None:
+    """d-019: replacing or tying a carrier must keep every extrapolation flag."""
+
+    species = "Mg"
+    if path == "strictly_higher":
+        prior = _carrier_with_notices(
+            species, refused=True, singular_K=500.0, also_K=(700.0,)
+        )
+        current = _carrier_with_notices(species, refused=False, singular_K=900.0)
+        winner_pressure_kind = "refusal"
+        winner_temperature_K = 500.0
+    else:
+        prior = _carrier_with_notices(
+            species, refused=False, singular_K=500.0, also_K=(700.0,)
+        )
+        current = _carrier_with_notices(
+            species, refused=False, singular_K=900.0, also_K=(1100.0,)
+        )
+        winner_pressure_kind = "value"
+        winner_temperature_K = 900.0
+    prior_severity = vapour_carrier_authority_severity(
+        vapour_carrier_authority_status(prior, expected_species_id=species)
+    )
+    current_severity = vapour_carrier_authority_severity(
+        vapour_carrier_authority_status(current, expected_species_id=species)
+    )
+    if path == "strictly_higher":
+        assert prior_severity > current_severity
+    else:
+        assert prior_severity == current_severity
+
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={species: 1.0},
+        campaign_name="C0",
+    )
+    model.last_sticking_alpha_provenance_notice = {
+        "vapour_carrier_authority_by_species": {species: prior},
+    }
+    model.route(
+        EvaporationFlux(
+            species_kg_hr={species: 1.0e-3},
+            total_kg_hr=1.0e-3,
+            carrier_authority_by_species={species: current},
+        ),
+        MeltState(temperature_C=1700.0),
+    )
+
+    stored = model.last_sticking_alpha_provenance_notice[
+        "vapour_carrier_authority_by_species"
+    ][species]
+    extra = stored["extra"]
+    expected_temperatures = {
+        notice["temperature_K"]
+        for record in (prior, current)
+        for notice in record["extra"]["extrapolation_notices"]
+    }
+    stored_temperatures = {
+        notice["temperature_K"] for notice in extra["extrapolation_notices"]
+    }
+    assert stored["pressure"]["kind"] == winner_pressure_kind
+    assert extra["extrapolation_notice"]["temperature_K"] == winner_temperature_K
+    assert stored_temperatures == expected_temperatures
+    assert extra["extrapolation_notice"] in extra["extrapolation_notices"]
