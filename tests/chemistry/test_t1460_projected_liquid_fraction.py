@@ -416,7 +416,6 @@ def test_diagnostic_is_neutral_across_three_real_exchange_ticks(
     feedstocks_data,
     setpoints_data,
 ):
-    magemin_module._projected_engine_liquid_fraction_grid.cache_clear()
     _GridBackend.instances = []
     _GridBackend.calls = []
     _GridBackend.fail = False
