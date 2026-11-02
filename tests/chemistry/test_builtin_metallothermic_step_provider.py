@@ -1475,6 +1475,75 @@ def test_staged_na_fe_hold_keeps_typed_refusal_when_joint_window_is_empty(
     )
 
 
+def test_staged_na_fe_hold_records_malformed_curve_as_unavailable(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:malformed-na-fe-window",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1250.0,
+        "path": ((1100.0, 0.0), ("bad-temperature", 0.5), (1250.0, 1.0)),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "unavailable"
+    assert diagnostic["reason"] == "liquid_fraction_provider_invalid_curve"
+    assert diagnostic["malformed_fields"] == ["path"]
+    assert diagnostic["provider"] == sim._liquid_fraction_provider
+    assert diagnostic["configured_temperature_C"] == pytest.approx(1250.0)
+    target, _ = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        sim.melt,
+    )
+    assert target == pytest.approx(1250.0)
+
+
+def test_staged_na_fe_hold_does_not_swallow_interpolation_type_error(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:type-error-na-fe-window",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1250.0,
+        "path": ((1100.0, 0.0), (1250.0, 1.0)),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    def programming_error(*_args, **_kwargs):
+        raise TypeError("programming error in curve interpolation")
+
+    monkeypatch.setattr(sim, "_interpolate_freeze_gate_curve", programming_error)
+
+    with pytest.raises(TypeError, match="programming error"):
+        sim._recompute_staged_na_fe_hold_setpoint()
+
+
 def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
     return IntentRequest(
         intent=ChemistryIntent.METALLOTHERMIC_STEP,
