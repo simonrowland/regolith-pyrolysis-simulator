@@ -1026,8 +1026,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     snapshot = sim.step()
 
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
-    # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
-    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # 1600 C to 1400 C. b-773's same-hour headspace solve and film floor move
+    # the non-phosphorus flux from 0.06423670196107581 to
+    # 0.0020785039480261808 kg/hr.
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
@@ -1037,7 +1038,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     pins = capacity_pin_values(snapshot)
     # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.0020785039480261808, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1066,12 +1067,12 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         )
     ) == pytest.approx(
         # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # ramp move the first step from 1600 C to 1400 C. b-773 re-pins the
+        # same-hour non-phosphorus flux as the total committed flux.
         (
             1,
             1400.0,
-            0.06423670196107581,
+            0.0020785039480261808,
             2.4701307994323103,
             998.7072055554551,
         ),
