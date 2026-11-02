@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
 from simulator.battery.records import Observation
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -29,6 +29,17 @@ def assert_no_unavailable_observation_values(
     assert not unavailable_ids, (
         f"migrated observations are unavailable: {unavailable_ids}"
     )
+
+
+def assert_wustite_reference_state(reference_state) -> None:
+    assert reference_state is not None and reference_state.is_value
+    standard_state = reference_state.value
+    assert standard_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert standard_state.endmember.formula == "Fe(1-x)O"
+    assert standard_state.endmember.phase.is_value
+    assert standard_state.endmember.phase.value is Phase.L
+    assert standard_state.component_basis == "Fe(1-x)O"
+    assert standard_state.reference_pressure_bar is None
 
 
 def iter_locators(value: object):

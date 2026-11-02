@@ -14,11 +14,11 @@ from simulator.battery.enums import (
     EvidenceClass,
     Phase,
     Quantity,
-    ReferenceStateConvention,
     ValueKind,
 )
 from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
+from tests.literature_extract_test_helpers import assert_wustite_reference_state
 from tools.validate_literature_extracts import validate_extract_document
 
 EXTRACT = REPO_ROOT / "data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml"
@@ -223,16 +223,6 @@ def _setpoint_id(activity: str) -> str:
     return f"doyle_1989_table1b_setpoint_{activity.replace('.', '')}"
 
 
-def _assert_wustite_reference_state(reference_state) -> None:
-    assert reference_state is not None and reference_state.is_value
-    standard_state = reference_state.value
-    assert standard_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-    assert standard_state.endmember.formula == "Fe(1-x)O"
-    assert standard_state.endmember.phase.is_value
-    assert standard_state.endmember.phase.value is Phase.L
-    assert standard_state.component_basis == "Fe(1-x)O"
-
-
 def _assert_source_matches_every_render_pin(document: dict) -> None:
     species = document["species"]["FeO"]
     observations = species["observations"]
@@ -435,6 +425,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         parent_id = _setpoint_id(activity)
         source = source_rows[_table1a_id(panel, row_number)]
         migrated = observations[f"{SOURCE_ID}::{source['observation_id']}"]
+        assert "reference_pressure_bar" not in source["standard_state"]
         assert migrated.value.point == Decimal(activity)
         assert migrated.uncertainty.verbatim == source["uncertainty"]
         assert migrated.uncertainty.verbatim["value"] == uncertainty
@@ -466,7 +457,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         assert identity.composition.value == expected_composition
         assert migrated.point_conditions["composition"].state.value == expected_composition
         assert migrated.point_conditions["composition"].locator.page == 4
-        _assert_wustite_reference_state(identity.reference_state)
+        assert_wustite_reference_state(identity.reference_state)
         assert source["standard_state"]["state"]["value"]["endmember"]["formula"] == "Fe(1-x)O"
 
     # Render-backed locators from both printed tables reach migrated values.
@@ -497,4 +488,4 @@ def test_missing_one_typed_reference_fails_the_pin(tmp_path: Path) -> None:
     row = migrator.result.observations[f"{SOURCE_ID}::{mutated['observation_id']}"]
     assert row.identity.reference_state is None or row.identity.reference_state.is_unknown
     with pytest.raises(AssertionError):
-        _assert_wustite_reference_state(row.identity.reference_state)
+        assert_wustite_reference_state(row.identity.reference_state)
