@@ -78,7 +78,8 @@ def test_magemin_resolves_explicit_binary_from_backend_config(tmp_path):
     }) == binary
 
 
-def test_magemin_instance_binary_locator_override_is_used():
+def test_magemin_instance_binary_locator_override_is_used(monkeypatch):
+    _disable_configured_magemin_path(monkeypatch)
     backend = MAGEMinBackend()
     backend._config = {}
     resolved_binary = Path("/bin/true")
