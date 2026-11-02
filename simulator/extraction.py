@@ -2281,15 +2281,16 @@ class ExtractionMixin:
             self.campaign_mgr.last_c3_na_hold_adjustment = None
             return
 
-        curve = self._melt_redox_liquidus_gate_curve()
+        curve = None
         malformed_curve_diagnostic = None
-        if isinstance(curve, Mapping):
-            try:
+        try:
+            curve = self._melt_redox_liquidus_gate_curve()
+            if isinstance(curve, Mapping):
                 curve = self._validated_melt_redox_liquidus_curve(curve)
-            except EvaporationFluxRefusal as exc:
-                if exc.reason != 'liquid_fraction_provider_invalid_curve':
-                    raise
-                malformed_curve_diagnostic = dict(exc.diagnostic)
+        except EvaporationFluxRefusal as exc:
+            if exc.reason != 'liquid_fraction_provider_invalid_curve':
+                raise
+            malformed_curve_diagnostic = dict(exc.diagnostic)
         crossover_temperature_C = (
             BuiltinMetallothermicStepProvider._crossover_temperature_C(
                 'Na',

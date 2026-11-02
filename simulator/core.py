@@ -5393,6 +5393,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if isinstance(memo, dict):
                 memo.pop(key, None)
             raise
+        solidus_T_C = normalized_curve['solidus_T_C']
+        liquidus_T_C = normalized_curve['liquidus_T_C']
         normalized_record = gate_curve_memo_record(
             normalized_curve,
             record.get('origin'),
