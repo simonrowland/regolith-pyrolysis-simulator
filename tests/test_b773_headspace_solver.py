@@ -123,6 +123,37 @@ def test_zero_pipe_removal_reaches_equilibrium_with_zero_net_source():
     assert solved.flux.species_kg_hr["Na"] == pytest.approx(0.0)
 
 
+def test_fixed_pressure_residual_uses_nonlinear_committed_source():
+    # Direct counterexample from the review: q(p)=1-exp(-(2-p)) kg/s,
+    # while removal is p kg/s. The root is p=0.72153546 Pa; a writer that
+    # repeats the closed form reports the initial p=1 Pa as balanced.
+    def evaluate(partials, _total_pressure):
+        partial = float(partials["Na"])
+        return _flux(1.0 - math.exp(-(2.0 - partial)))
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": 2.0},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": 1.0},
+        molar_mass_kg_mol_by_species={"Na": 1.0},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda _pressure: 1.0,
+        pressure_bracket_Pa=(0.0, 3.0),
+        evaluate_flux=evaluate,
+        write_partials=lambda _flux: {"Na": 1.0},
+        fixed_pressure_Pa=1.0,
+        fixed_pressure_molar_flow_mol_s=1.0,
+    )
+
+    assert solved.converged
+    assert solved.candidate_partials_Pa["Na"] == pytest.approx(
+        0.72153546, abs=1.0e-8
+    )
+    assert solved.flux.species_kg_hr["Na"] / 3600.0 == pytest.approx(
+        solved.candidate_partials_Pa["Na"], rel=1.0e-9
+    )
+
+
 def test_controlled_capacity_closed_form_has_zero_and_large_capacity_limits():
     model = OverheadGasModel()
     beta = 1.0e-6  # kg/(s Pa)
