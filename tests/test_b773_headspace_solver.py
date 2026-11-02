@@ -282,6 +282,40 @@ def test_committed_flux_bracket_uses_observed_residual_slope():
     assert solved.partials_Pa["Na"] == pytest.approx(0.2, abs=1.0e-10)
 
 
+def test_pressure_bracket_keeps_measured_endpoint_residuals():
+    beta = 1.0
+    equilibrium = 2.0
+
+    def evaluate(partials, _total_pressure):
+        return _flux(beta * max(0.0, equilibrium - partials["Na"]))
+
+    def nonlinear_commit(raw_flux):
+        raw_kg_s = float(raw_flux.species_kg_hr["Na"]) / 3600.0
+        # This synthetic inventory response is monotone and nonlinear; the
+        # raw-source square divided by its 2 kg/s scale still has units kg/s.
+        return _flux(raw_kg_s * raw_kg_s / 2.0)
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": equilibrium},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": beta},
+        molar_mass_kg_mol_by_species={"Na": 1.0},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda pressure: pressure * pressure,
+        pressure_bracket_Pa=(0.0, 4.0),
+        evaluate_flux=evaluate,
+        commit_flux=nonlinear_commit,
+        fixed_pressure_Pa=1.0,
+        fixed_pressure_molar_flow_mol_s=0.1,
+        carrier_free_molar_flow_mol_s_at_pressure=(
+            lambda pressure: pressure * pressure
+        ),
+        max_iterations=10,
+    )
+
+    assert abs(solved.pressure_residual_Pa) <= 1.0e-9
+
+
 def test_controlled_capacity_uses_shared_partial_solver_at_allowed_pressure():
     # At 200 Pa, a 0.25 mol/s pure 40 g/mol carrier is 36 kg/hr. With
     # beta=2e-6 kg/(s Pa) and P_eq=5 Pa, the hand balance gives p_Na=0.1923077

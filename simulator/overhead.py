@@ -716,7 +716,6 @@ def solve_quasi_steady_headspace_partials_Pa(
                     break
                 if trial_residual > 0.0:
                     low, low_residual = trial, trial_residual
-                    high_residual *= 0.5
                 else:
                     high, high_residual = trial, trial_residual
                     low_residual *= 0.5
