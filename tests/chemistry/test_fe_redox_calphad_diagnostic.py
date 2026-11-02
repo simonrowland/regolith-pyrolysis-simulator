@@ -44,14 +44,38 @@ _T_K = 1673.15
 
 def test_holzheid_multiplier_uses_reciprocal_temperature_and_extrapolates():
     expected = (
-        (1200, 2.114870, "extrapolated_below_verified_range"),
-        (1300, 2.02, "printed_anchor"),
-        (1400, 1.94, "printed_anchor"),
-        (1500, 1.786677, "interpolated_verified_range"),
-        (1600, 1.66, "printed_anchor"),
-        (1700, 1.553844, "extrapolated_above_verified_range"),
+        (
+            1200,
+            2.114870,
+            "extrapolated_below_verified_range",
+            3.595278,
+            3.130007,
+            4.060550,
+            0.465271,
+        ),
+        (1300, 2.02, "printed_anchor", 3.434000, 2.989600, 3.878400, 0.444400),
+        (1400, 1.94, "printed_anchor", 3.298000, 2.871200, 3.724800, 0.426800),
+        (
+            1500,
+            1.786677,
+            "interpolated_verified_range",
+            3.037351,
+            2.644282,
+            3.430420,
+            0.393069,
+        ),
+        (1600, 1.66, "printed_anchor", 2.822000, 2.456800, 3.187200, 0.365200),
+        (
+            1700,
+            1.553844,
+            "extrapolated_above_verified_range",
+            2.641535,
+            2.299689,
+            2.983380,
+            0.341846,
+        ),
     )
-    for temperature_C, multiplier, status in expected:
+    for temperature_C, multiplier, status, central, low, high, sigma in expected:
         band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
         if status == "printed_anchor":
             assert band["conversion_multiplier"] == multiplier
@@ -60,6 +84,10 @@ def test_holzheid_multiplier_uses_reciprocal_temperature_and_extrapolates():
                 multiplier, rel=0, abs=1e-6
             )
         assert band["conversion_status"] == status
+        assert band["central"] == pytest.approx(central, rel=0, abs=1e-6)
+        assert band["measurement_low"] == pytest.approx(low, rel=0, abs=1e-6)
+        assert band["measurement_high"] == pytest.approx(high, rel=0, abs=1e-6)
+        assert band["measurement_sigma"] == pytest.approx(sigma, rel=0, abs=1e-6)
 
 
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
