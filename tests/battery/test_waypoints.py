@@ -125,6 +125,27 @@ def test_nonfinite_printed_mass_component_refuses_charge_before_value_build() ->
     assert result.absence.reason is GapReason.MISSING_EVIDENCE
 
 
+@pytest.mark.parametrize(
+    "chloride,expected_species",
+    [(None, {"MgO"}), ("0.1 ± 0.01", {"MgO"}), ("not numeric", set())],
+)
+def test_printed_volatile_cells_do_not_abort_or_partially_parse_charge(
+    chloride, expected_species
+) -> None:
+    sample = replace(
+        _charge(single=False),
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=None,
+        printed_composition=factories.located(
+            {"MgO": Decimal("99.9" if chloride is not None else "100"), "Cl": chloride}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert set(result) == expected_species
+
+
 def test_charge_moles_sanity_and_typed_absence() -> None:
     experiment = replace(factories.kems_experiment(), sample=_charge())
     result = charge_moles_by_species(experiment, _bench())
@@ -1135,6 +1156,39 @@ def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
     assert waypoint.selected is None
     assert waypoint.absence is not None
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_charge() -> None:
+    from simulator.battery.records import Derivation
+
+    base = factories.kems_experiment()
+    locator = factories.loc()
+    initial = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction({"SiO2": Decimal("100")})
+        ),
+        locator,
+        Derivation("wt_pct_to_mole_fraction", ("source",), (), "mol_fraction"),
+    )
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            mass_kg=factories.located(Value.point_of("0.001")),
+            initial_composition=initial,
+            printed_composition=factories.located(
+                {"MgO": Decimal("100"), "SiO2": None}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+    charge = charge_moles_by_species(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert set(charge) == {"MgO"}
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:

@@ -1574,12 +1574,27 @@ def _mass_percent_printed_from_plain(
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
+    declared_component_map = _declared_printed_composition_map(payload)
+    dropped = _unrecognized_printed_chemical_components(
+        wt, payload, declared_component_map=declared_component_map
+    )
+    if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+        return _located_from_plain(payload, lambda value: value)
     locator = (
         _locator_from_plain(payload.get("locator"))
         if isinstance(payload, Mapping)
         else None
     )
-    return located_value(_printed_map_payload(wt), locator)
+    source_values = {
+        _mass_percent_component_key(name)[0]: amount
+        for name, amount in raw_components.items()
+    }
+    printed_values = {
+        name: source_values.get(name, amount) for name, amount in wt.items()
+    }
+    return located_value(
+        _printed_map_payload(printed_values, numeric_values_as="source"), locator
+    )
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -4305,29 +4320,20 @@ def _unrecognized_printed_chemical_components(
         if declared_component_map is not None
         else set()
     )
-    direct_chloride = any(
-        (volatile := _volatile_closure_component(str(name))) is not None
-        and volatile[0] == "Cl"
-        for name in (*wt, *declared_names)
-    )
     source_map = {
         **wt,
         **(_printed_composition_source_map(closure_context) or {}),
         **(declared_component_map or {}),
     }
-    # Chlorine is printed in some rows alongside an oxide composition map.
-    # It contributes to closure, but unlike closure-only H2O/CO2/LOI it is an
-    # unsupported component and remains subject to the dropped-mass limit.
-    if not direct_chloride:
-        source_map.update(
-            {
-                name: amount
-                for name, amount in _printed_volatile_mass_percent(
-                    closure_context
-                ).items()
-                if name == "Cl"
-            }
-        )
+    source_map.update(
+        {
+            name: amount
+            for name, amount in _printed_volatile_mass_percent(
+                closure_context
+            ).items()
+            if name == "Cl"
+        }
+    )
     dropped: dict[str, Decimal] = {}
     for raw_name, raw_amount in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
@@ -4336,7 +4342,7 @@ def _unrecognized_printed_chemical_components(
         if (
             name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or name.casefold().endswith(("_ppm", " ppm"))
-            or (volatile is not None and (volatile[0] != "Cl" or direct_chloride))
+            or (volatile is not None and volatile[0] != "Cl")
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
             or _is_composition_condition_key(name)
@@ -4480,7 +4486,11 @@ def _preserve_printed_composition_context(
         printed = replace(printed, locator=source_locator)
     values = dict(printed.state.value)
     for name, amount in source_values.items():
-        values.setdefault(name, amount)
+        normalized_name = _mass_percent_component_key(name)[0]
+        if normalized_name in values:
+            values[normalized_name] = amount
+        else:
+            values.setdefault(name, amount)
     if values == printed.state.value:
         return printed
     return replace(printed, state=State.of(values))

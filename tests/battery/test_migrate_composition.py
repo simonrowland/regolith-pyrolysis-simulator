@@ -5407,6 +5407,20 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
+def test_inline_chloride_above_dropped_limit_is_refused() -> None:
+    printed = {"MgO": Decimal("99"), "Cl": Decimal("1")}
+
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        printed,
+        closure_context=printed,
+        declared_component_map=printed,
+    )
+
+    assert converted is None
+    assert refusal is not None
+    assert "Cl=1 wt%" in refusal
+
+
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path,
