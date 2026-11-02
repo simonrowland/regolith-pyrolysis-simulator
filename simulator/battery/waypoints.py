@@ -507,7 +507,15 @@ def charge_moles_by_species(
         and printed is not None
         and printed.state.is_value
     ):
-        raw = _printed_composition_map(printed.state.value)
+        source_map = printed.state.value
+        is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+            source_map, {}, reject_dropped_components=False
+        )
+        raw = (
+            None
+            if is_mass_percent and refusal is not None
+            else _printed_composition_map(source_map)
+        )
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():
