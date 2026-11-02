@@ -19,6 +19,12 @@ SOURCE_ID = "frischat-oel-1966-sodium-calcium-silicate-transport"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 TABLE2_ID = "frischat_oel_1966_table2_na_self_diffusion_results"
 TABLE1_ID = "frischat_oel_1966_table1_composition_analyses"
+# Figure locators and units below are pinned to the rendered source PDF pages.
+FIGURES_6_TO_8 = (
+    ("frischat_oel_1966_figure6_diffusion_candidate", "6"),
+    ("frischat_oel_1966_figure7_conductivity_candidate", "7"),
+    ("frischat_oel_1966_figure8_comparison_candidate", "8"),
+)
 
 # Independently transcribed from the page 54 PDF render after checking the
 # MinerU/pdftotext reads. Columns follow the printed left/right layout.
@@ -52,6 +58,22 @@ def _document() -> dict:
 def _context(document: dict, observation_id: str) -> dict:
     records = document["species"]["Na"]["context"]
     return next(record for record in records if record["observation_id"] == observation_id)
+
+
+def _assert_figure_source_pins(document: dict) -> None:
+    for observation_id, figure_number in FIGURES_6_TO_8:
+        locator = _context(document, observation_id)["locator"]
+        assert (
+            locator["page"],
+            locator["published_page"],
+            locator["pdf_page_index"],
+            locator["figure"],
+        ) == (6, 55, 5, figure_number)
+
+    figure10 = _context(
+        document, "frischat_oel_1966_figure10_diffusion_conductivity_candidate"
+    )
+    assert figure10["units"] == "D in cm2/s as printed; temperature in K as plotted"
 
 
 def _actual_table2_grid(document: dict) -> tuple[tuple[str | None, ...], ...]:
@@ -133,6 +155,20 @@ def test_rendered_table_cells_and_context_only_migration() -> None:
     ) == 30
     assert sum(row[0] is not None for row in _actual_table2_grid(document)) == 12
     assert sum(row[3] is not None for row in _actual_table2_grid(document)) == 9
+    grid = _actual_table2_grid(document)
+    assert sum(row[0] is not None for row in grid) + sum(
+        row[3] is not None for row in grid
+    ) == 21
+    census = document["typed_absence_notes"][0]
+    assert "18 printed temperature cells" in census
+    assert "30 printed D cells: 48 printed numeric cells" in census
+    assert "three inherited values" in census
+    assert "51 populated numeric entries" in census
+    assert [rows[index]["glass"]["T_C"] for index in (2, 6, 10)] == [
+        "305",
+        "435",
+        "575",
+    ]
     assert len(document["typed_absences"]) == 22
 
     diffusion = _context(document, TABLE2_ID)["values"]
@@ -181,6 +217,24 @@ def test_mutating_a_rendered_value_is_detected() -> None:
     sample_two["CaO"]["deviation_as_printed"] = "(−0,34)"
     with pytest.raises(AssertionError):
         _assert_rendered_tables(mutated)
+
+
+def test_figure_source_pins_detect_page_and_unit_mutations() -> None:
+    document = _document()
+    _assert_figure_source_pins(document)
+
+    for observation_id, _figure_number in FIGURES_6_TO_8:
+        mutated = deepcopy(document)
+        _context(mutated, observation_id)["locator"]["page"] = 999
+        with pytest.raises(AssertionError):
+            _assert_figure_source_pins(mutated)
+
+    mutated = deepcopy(document)
+    _context(
+        mutated, "frischat_oel_1966_figure10_diffusion_conductivity_candidate"
+    )["units"] = "D in arbitrary_wrong_unit as printed; temperature in K as plotted"
+    with pytest.raises(AssertionError):
+        _assert_figure_source_pins(mutated)
 
 
 def test_fit_transference_and_phase_locators_are_render_pinned() -> None:

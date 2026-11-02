@@ -21,9 +21,10 @@ tables:
       6: Polykristall, gamma activity, D in cm2/s
     cell_audit:
       machine_read_agreement: >-
-        Table QA reports 51 numeric cells and 1.000 agreement between the
-        MinerU table draft and pdftotext. The render resolves comma-decimal
-        values and checks the complete row/column assignment.
+        Table QA reports 51 populated grid entries and 1.000 agreement between
+        the MinerU table draft and pdftotext. The source prints 18 temperature
+        cells and 30 D cells, totaling 48 printed numeric cells; the other three
+        grid entries are inherited glass temperatures.
       layout_check: >-
         Rendered PDF page 5 (printed page 54) verifies the six-column grouping,
         row assignments, both separate 435 °C and 575 °C glass rows, and all
@@ -35,21 +36,24 @@ tables:
       printed_rows_and_values:
         - {printed_row: 1, temperature_C: [207, 512], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
         - {printed_row: 2, temperature_C: [305, 520], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
-        - {printed_row: 3, temperature_C: [305, 575], numeric_D_cells: [glass_beta, poly_beta, poly_gamma], absent_D_cells: [glass_gamma]}
+        - {printed_row: 3, temperature_C: [305, 575], inherited_glass_temperature_C: 305, numeric_D_cells: [glass_beta, poly_beta, poly_gamma], absent_D_cells: [glass_gamma]}
         - {printed_row: 4, temperature_C: [375, 633], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
         - {printed_row: 5, temperature_C: [425, 643], numeric_D_cells: [glass_gamma, poly_gamma], absent_D_cells: [glass_beta, poly_beta]}
         - {printed_row: 6, temperature_C: [435, 701], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
-        - {printed_row: 7, temperature_C: [435, 775], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
+        - {printed_row: 7, temperature_C: [435, 775], inherited_glass_temperature_C: 435, numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
         - {printed_row: 8, temperature_C: [517, 790], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
         - {printed_row: 9, temperature_C: [520, 885], numeric_D_cells: [glass_gamma, poly_gamma], absent_D_cells: [glass_beta, poly_beta]}
         - {printed_row: 10, temperature_C: [575, null], numeric_D_cells: [glass_beta, glass_gamma], absent_D_cells: [poly_temperature, poly_beta, poly_gamma]}
-        - {printed_row: 11, temperature_C: [575, null], numeric_D_cells: [glass_gamma], absent_D_cells: [glass_beta, poly_temperature, poly_beta, poly_gamma]}
+        - {printed_row: 11, temperature_C: [575, null], inherited_glass_temperature_C: 575, numeric_D_cells: [glass_gamma], absent_D_cells: [glass_beta, poly_temperature, poly_beta, poly_gamma]}
         - {printed_row: 12, temperature_C: [633, null], numeric_D_cells: [glass_beta, glass_gamma], absent_D_cells: [poly_temperature, poly_beta, poly_gamma]}
     printed_count_reconciliation: >-
-      12 printed body rows; 21 numeric temperature cells (12 glass and 9
-      polycrystal); 30 numeric D cells and 18 blank D cells. Total 51 numeric
-      cells, matching the table QA census. Blank cells are typed absences, not
-      zeros.
+      12 printed body rows; 18 printed temperature cells (9 glass and 9
+      polycrystal) plus 30 printed D cells, totaling 48 printed numeric cells.
+      The populated grid has 21 temperature entries (12 glass and 9
+      polycrystal) plus 30 D entries, totaling 51 populated numeric entries.
+      Glass rows 3, 7, and 11 inherit 305, 435, and 575 °C respectively from
+      their preceding glass temperature groups. The three blank polycrystal
+      temperature cells and 18 blank D cells are typed absences, not zeros.
     row_assignment_basis: >-
       Column headings identify Glas versus Polykristall, beta-plus versus gamma
       activity, and D in cm2/s. The page render confirms these assignments.
@@ -156,23 +160,27 @@ prose_cells:
     confidence_level: not stated
   figure_candidates:
     - figure: '6'
-      page: 5
-      printed_page: 54
+      page: 6
+      printed_page: 55
+      pdf_page_index: 5
       scope: sodium self-diffusion in glass and polycrystal; includes off-stoichiometric curves
       status: figure_only; undigitised
     - figure: '7'
-      page: 5
-      printed_page: 54
+      page: 6
+      printed_page: 55
+      pdf_page_index: 5
       scope: electrical conductivity in glass and polycrystal
       status: figure_only; undigitised
     - figure: '8'
-      page: 5
-      printed_page: 54
+      page: 6
+      printed_page: 55
+      pdf_page_index: 5
       scope: comparison with Na self-diffusion in comparable soda-lime silicate glasses
       status: figure_only; undigitised
     - figure: '10'
       page: 9
       printed_page: 58
+      units_as_printed: D in cm2/s
       render_check: >-
         Render confirms the printed four-item curve legend: measured and
         conductivity-calculated Na self-diffusion series; no plotted points

@@ -598,7 +598,7 @@ species:
 
       - observation_id: frischat_oel_1966_figure6_diffusion_candidate
         type: figure_record
-        locator: {page: 5, published_page: 54, pdf_page_index: 4, figure: '6'}
+        locator: {page: 6, published_page: 55, pdf_page_index: 5, figure: '6'}
         phase: glass and polycrystal, with additional off-stoichiometric curves
         units: D in cm2/s; temperature in K as plotted
         values:
@@ -614,7 +614,7 @@ species:
 
       - observation_id: frischat_oel_1966_figure7_conductivity_candidate
         type: figure_record
-        locator: {page: 5, published_page: 54, pdf_page_index: 4, figure: '7'}
+        locator: {page: 6, published_page: 55, pdf_page_index: 5, figure: '7'}
         phase: glass and polycrystal
         units: Ω⁻¹ cm⁻¹; temperature in K as plotted
         values:
@@ -625,7 +625,7 @@ species:
 
       - observation_id: frischat_oel_1966_figure8_comparison_candidate
         type: figure_record
-        locator: {page: 5, published_page: 54, pdf_page_index: 4, figure: '8'}
+        locator: {page: 6, published_page: 55, pdf_page_index: 5, figure: '8'}
         phase: glass
         units: D in cm2/s; temperature in K as plotted
         values:
@@ -640,7 +640,7 @@ species:
         type: figure_record
         locator: {page: 9, published_page: 58, pdf_page_index: 8, figure: '10'}
         phase: glass and polycrystal
-        units: D in m2/s as printed; temperature in K as plotted
+        units: D in cm2/s as printed; temperature in K as plotted
         values:
           quantity: sodium_self_diffusion_coefficient
           method_class: figure_only
@@ -673,10 +673,13 @@ species:
 
 typed_absence_notes:
   - >-
-    Table 2 contains 12 printed body rows, 21 numeric temperature cells, 30
-    numeric D cells, and 18 blank D cells. The three additional blank cells are
-    the Polykristall temperature cells for rows 10-12. All blanks are represented
-    in typed_absences; none is zero or imputed.
+    Table 2 contains 12 printed body rows, 18 printed temperature cells, and 30
+    printed D cells: 48 printed numeric cells. Glass rows 3, 7, and 11 have
+    blank temperature cells; they carry forward the preceding 305, 435, and
+    575 °C group temperatures as three inherited values. The populated grid has
+    21 temperature entries and 30 D entries: 51 populated numeric entries. The
+    18 blank D cells and the three blank Polykristall temperature cells for rows
+    10-12 are represented in typed_absences; none is zero or imputed.
   - >-
     Glass samples were rapidly cooled and some remained without crystallizing
     (page 2). The source gives no fO2 or experimental total pressure for Table 2;
