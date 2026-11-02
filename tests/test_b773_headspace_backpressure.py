@@ -98,3 +98,28 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
             expected,
             abs=1.0e-12,
         )
+
+
+def test_runtime_ar_n2_cover_keeps_held_total_pressure_in_gas_film(monkeypatch):
+    sim = _lunar_simulator()
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {"Ar": 20.0, "N2": 30.0}
+    observed = []
+    original_dispatch = sim._dispatch_only
+
+    def capture_evaporation_controls(intent, **kwargs):
+        controls = kwargs.get("control_inputs") or {}
+        if "overhead_partials_Pa" in controls:
+            observed.append((dict(controls["overhead_partials_Pa"]), float(
+                controls["overhead_pressure_pa"]
+            )))
+        return original_dispatch(intent, **kwargs)
+
+    monkeypatch.setattr(sim, "_dispatch_only", capture_evaporation_controls)
+    sim.step()
+
+    assert observed
+    held_total_Pa = 10000.0
+    for partials_Pa, pressure_Pa in observed:
+        expected_Pa = max(sum(partials_Pa.values()), held_total_Pa)
+        assert pressure_Pa == pytest.approx(expected_Pa, rel=1.0e-12)

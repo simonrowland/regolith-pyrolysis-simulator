@@ -931,7 +931,11 @@ class EvaporationMixin:
                 equilibrium,
                 gate_authority=gate_authority,
                 overhead_partials_override_Pa=source_partials_Pa,
-                overhead_pressure_override_Pa=total_pressure_Pa,
+                overhead_pressure_override_Pa=(
+                    total_pressure_Pa
+                    if current_effective_capacity is not None
+                    else None
+                ),
             )
 
         def write_partials(raw_flux: EvaporationFlux) -> Mapping[str, float]:
