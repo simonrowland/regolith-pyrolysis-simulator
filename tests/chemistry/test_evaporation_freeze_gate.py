@@ -3606,6 +3606,7 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
         'solidus_T_C': 900.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sims[0], curve)
     analytical_backend = sims[0].backend
     for index, sim in enumerate(sims):
         sim.backend = analytical_backend
@@ -3621,7 +3622,7 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
     second = sims[1]._freeze_gate_curve()
 
     assert calls == [0]
-    assert second == first == curve
+    assert second == first == expected_curve
     assert len(shared_cache) == 1
 
 
@@ -6005,6 +6006,7 @@ def test_gate_memo_origin_missing_is_a_miss(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['origin'] = None
     sim._freeze_gate_liquid_fraction_cache = {
@@ -6021,7 +6023,7 @@ def test_gate_memo_origin_missing_is_a_miss(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert result['disposition'] == 'live'
     assert len(producer_calls) == 1
 
@@ -6056,6 +6058,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
@@ -6078,7 +6081,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert result['origin']['producer_evidence'] == (
         admission_module.admission_fingerprint(identity, provenance[0])
     )
@@ -6151,6 +6154,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     assert record['origin']['producer_evidence'] == 'unproven'
     sim._freeze_gate_liquid_fraction_cache = {
@@ -6166,7 +6170,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
     result = sim._freeze_gate_curve_record()
     notice = admission_module.binding_admission_run_notice(sim)
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert notice is not None
     reason = (
         'unproven gate producer; register its adapter; in-process reuse '
@@ -6264,6 +6268,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     assert record['origin']['producer_evidence'] == 'evidence-unavailable'
     assert len(provenance_calls) == 1
@@ -6288,7 +6293,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert len(producer_calls) == 1
     assert len(provenance_calls) == 2
     notice = admission_module.binding_admission_run_notice(sim)
