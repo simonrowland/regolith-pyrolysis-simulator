@@ -12,6 +12,7 @@ import yaml
 import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     OXYGEN_SPECIES,
@@ -1169,20 +1170,47 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    post_scale_subfloor_species = sum(
-        1
-        for rate in demand_species.values()
-        if 0.0 < float(rate) * float(cap_record["scale"])
-        <= _NONTRIVIAL_FLUX_KG_HR
-    )
-    # Premise: the cap scales each species, then the live flux map drops rates
-    # at/below the per-species floor. Algebra: at most n omitted rates times
-    # the floor can separate the aggregate from capacity. Units are
-    # species × kg/hr = kg/hr; with no omitted species, the allowance is zero.
-    cap_floor_tolerance_kg_hr = (
-        post_scale_subfloor_species * _NONTRIVIAL_FLUX_KG_HR
-    )
-    assert abs(released_kg_hr - capacity_kg_hr) <= cap_floor_tolerance_kg_hr
+    # Premise: pipe capacity equals the pre-cap vapour total times the joint
+    # scale, in vapour kg/hr. The cap keeps every finite scaled rate above
+    # 1e-15 kg/hr. A vapour credit is omitted when the parent-oxide mass,
+    # scaled_vapour_kg_hr * oxide_per_product_kg, is at or below
+    # _NUMERICAL_FLOOR_KG. Mass conservation requires
+    # oxide_per_product_kg = 1 + O2_per_product_kg, so that factor is not 1
+    # and the omitted vapour rate is not the floor.
+    # Algebra: the snapshot total is the committed vapour. Its separation
+    # from capacity is the sum of those omitted vapour rates. Units:
+    # kg/hr + kg/hr = kg/hr. Limiting case: no carrier under the floor
+    # leaves an allowance of zero, so the totals match.
+    scale = float(cap_record["scale"])
+    omitted_vapor_kg_hr = 0.0
+    omitted_species: list[str] = []
+    metals = sim.vapor_pressures.get("metals", {})
+    oxides = sim.vapor_pressures.get("oxide_vapors", {})
+    for species, demand_rate in demand_species.items():
+        scaled_kg_hr = float(demand_rate) * scale
+        if scaled_kg_hr <= 0.0:
+            continue
+        sp_data = metals.get(species) or oxides.get(species) or {}
+        if not sp_data.get("parent_oxide"):
+            continue
+        stoich = sim._evaporation_stoich(species, sp_data)
+        oxide_kg = scaled_kg_hr * float(stoich["oxide_per_product_kg"])
+        if oxide_kg > _NUMERICAL_FLOOR_KG:
+            continue
+        omitted_vapor_kg_hr += scaled_kg_hr
+        omitted_species.append(str(species))
+    for species in omitted_species:
+        assert species not in released_species
+    gap_kg_hr = abs(released_kg_hr - capacity_kg_hr)
+    # Premise: in exact arithmetic the committed vapour is the pipe
+    # capacity minus those omitted vapour rates. Both totals are about
+    # 1e-4 kg/hr, so their difference is resolved only to the float64
+    # spacing of that magnitude. Algebra: the absolute residual is at
+    # most one ulp of the larger total. Unit: kg/hr. Limiting case: one
+    # extra omitted carrier is a scaled rate the cap keeps only above
+    # 1e-15 kg/hr, which is far above one ulp of this capacity.
+    rounding_kg_hr = math.ulp(max(abs(capacity_kg_hr), abs(released_kg_hr)))
+    assert abs(gap_kg_hr - omitted_vapor_kg_hr) <= rounding_kg_hr
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
