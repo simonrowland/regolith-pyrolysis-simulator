@@ -316,6 +316,41 @@ def test_pressure_bracket_keeps_measured_endpoint_residuals():
     assert abs(solved.pressure_residual_Pa) <= 1.0e-9
 
 
+def test_nonlinear_pressure_secant_keeps_measured_low_residual():
+    source_offset_kg_s = 3.0
+
+    def evaluate(partials, _total_pressure):
+        return _flux(2.0 - partials["Na"])
+
+    def offset_committed_source(raw_flux):
+        raw_kg_s = float(raw_flux.species_kg_hr["Na"]) / 3600.0
+        return _flux(raw_kg_s + source_offset_kg_s)
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": 2.0},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": 1.0},
+        molar_mass_kg_mol_by_species={"Na": 1.0},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda pressure: pressure**2,
+        pressure_bracket_Pa=(1.4, 2.5),
+        evaluate_flux=evaluate,
+        commit_flux=offset_committed_source,
+        relative_tolerance=1.0e-12,
+        max_iterations=2,
+    )
+
+    # At fixed P, committed source is (2 - p) + 3 kg/s. With M=1 kg/mol and
+    # n(P)=P² mol/s under the synthetic unit scale, removal M*n/P*p is P*p
+    # kg/s. Thus p=5/(1+P), so closure has P²+P-5=0. With zero offset, the
+    # raw source returns to the unmodified 1 Pa root.
+    expected_pressure = (-1.0 + math.sqrt(21.0)) / 2.0
+    assert solved.total_pressure_Pa == pytest.approx(
+        expected_pressure,
+        abs=1.0e-3,
+    )
+
+
 def test_controlled_capacity_uses_shared_partial_solver_at_allowed_pressure():
     # At 200 Pa, a 0.25 mol/s pure 40 g/mol carrier is 36 kg/hr. With
     # beta=2e-6 kg/(s Pa) and P_eq=5 Pa, the hand balance gives p_Na=0.1923077

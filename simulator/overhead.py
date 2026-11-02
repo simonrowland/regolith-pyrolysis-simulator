@@ -718,7 +718,6 @@ def solve_quasi_steady_headspace_partials_Pa(
                     low, low_residual = trial, trial_residual
                 else:
                     high, high_residual = trial, trial_residual
-                    low_residual *= 0.5
         pressure = best_pressure
         candidate, raw_flux, residuals, relative_by_species = best_solved[:4]
         flow = best_flow
