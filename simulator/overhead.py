@@ -140,250 +140,275 @@ class QuasiSteadyHeadspaceSolve:
     residual_relative: float
     iterations: int
     converged: bool
+    total_pressure_Pa: float
+    pressure_residual_Pa: float
+    used_carrier_free_fallback: bool
+
+
+def _headspace_partials_at_pressure_Pa(
+    total_pressure_Pa: float,
+    *,
+    equilibrium_Pa: Mapping[str, float],
+    beta_kg_s_Pa_by_species: Mapping[str, float],
+    fixed_partials_Pa: Mapping[str, float],
+    fixed_molar_flow_mol_s_by_species: Mapping[str, float],
+    molar_mass_kg_mol_by_species: Mapping[str, float],
+    molar_flow_mol_s: float,
+) -> dict[str, float]:
+    """Evaluate the closed-form species partials at a trial total pressure."""
+    pressure = max(0.0, float(total_pressure_Pa))
+    flow = max(0.0, float(molar_flow_mol_s))
+    partials = {
+        str(species): max(0.0, float(value))
+        for species, value in fixed_partials_Pa.items()
+        if math.isfinite(float(value))
+    }
+    for species, raw_equilibrium in equilibrium_Pa.items():
+        key = str(species)
+        equilibrium = max(0.0, float(raw_equilibrium))
+        beta = max(
+            0.0,
+            float(beta_kg_s_Pa_by_species.get(key, 0.0)),
+        )
+        molar_mass = max(
+            0.0,
+            float(molar_mass_kg_mol_by_species.get(key, 0.0)),
+        )
+        removal_per_partial = (
+            molar_mass * flow / pressure if pressure > 0.0 else 0.0
+        )  # kg/(s Pa) — M_i [kg/mol] × n [mol/s] / P [Pa]
+        denominator = beta + removal_per_partial
+        partials[key] = (
+            equilibrium * beta / denominator if denominator > 0.0 else 0.0
+        )
+    if flow <= 0.0:
+        for rate in fixed_molar_flow_mol_s_by_species.values():
+            if float(rate) > 0.0:
+                partials['__unbounded_fixed_flow__'] = math.inf
+                break
+        return partials
+    for species, raw_rate in fixed_molar_flow_mol_s_by_species.items():
+        rate = max(0.0, float(raw_rate))
+        if rate <= 0.0:
+            continue
+        partials[str(species)] = rate * pressure / flow
+    return partials
 
 
 def solve_quasi_steady_headspace_partials_Pa(
     *,
     equilibrium_Pa: Mapping[str, float],
     fixed_partials_Pa: Mapping[str, float],
-    initial_partials_Pa: Mapping[str, float],
-    evaluate_flux: Callable[[Mapping[str, float]], EvaporationFlux],
+    beta_kg_s_Pa_by_species: Mapping[str, float],
+    molar_mass_kg_mol_by_species: Mapping[str, float],
+    fixed_molar_flow_mol_s_by_species: Mapping[str, float],
+    molar_flow_mol_s_at_pressure: Callable[[float], float],
+    pressure_bracket_Pa: tuple[float, float],
+    evaluate_flux: Callable[[Mapping[str, float], float], EvaporationFlux],
     write_partials: Callable[[EvaporationFlux], Mapping[str, float]],
+    fixed_pressure_Pa: float | None = None,
+    fixed_pressure_molar_flow_mol_s: float | None = None,
+    carrier_free_molar_flow_mol_s_at_pressure: Callable[[float], float] | None = None,
     relative_tolerance: float = 1.0e-9,
     max_iterations: int = 80,
 ) -> QuasiSteadyHeadspaceSolve:
-    """Solve the current-hour flux and the existing overhead writer together.
+    """Close the species balances with one bracketed total-pressure solve.
 
-    The flux evaluator is the existing read-only EVAPORATION_FLUX route;
-    ``write_partials`` is the current transport writer. Thus each path keeps
-    its own existing pressure-from-flux rule. Without an effective capacity,
-    ``estimate_transport_state`` inverts the shared Poiseuille mass-flow
-    function with the resolved downstream pressure, then
-    ``species_partial_pressures`` projects molar fractions onto that pressure.
-    A declared effective capacity uses the existing allowed upstream
-    pressure; a zero-forward-conductance closed line uses the existing allowed
-    pressure as well. A PN2/Ar sweep without a declared capacity uses the same
-    inverse pipe law and its existing pressure floor. No sweep rate, blower
-    head, or choke default is introduced here. Oxygen remains fixed at its
-    incoming value while the other partials are solved; no oxygen root is
-    implied by this operation.
+    Premise: total pressure ``P`` sets molar flow ``n(P)`` from the existing
+    pipe law. Carrier-free Poiseuille is ``M_mix*K*(P²-P_d²)`` kg/s, so
+    ``n(P)=K*(P²-P_d²)`` mol/s after dividing by ``M_mix``. Controlled flow
+    uses fixed ``n=C/M_mix``; frozen oxygen remains a fixed partial, and
+    provider species that do not backpressure retain their fixed molar rates.
+    Algebra: ``x_i=p_i/P`` gives removal ``M_i*x_i*n=G_i*p_i`` with
+    ``G_i=M_i*n(P)/P`` kg/(s Pa). Equating this to the series source
+    ``beta_i*(P_eq,i-p_i)`` gives
+    ``p_i(P)=beta_i*P_eq,i/(beta_i+G_i(P))``. Fixed molar flow ``n_k`` gives
+    ``p_k(P)=n_k*P/n(P)``. Carrier-free closure is the scalar
+    ``S(P)=sum(p_i(P))+fixed partials=P``. Since ``n(P)/P`` increases for
+    ``P>P_d``, each solved partial falls; ``P/n(P)`` falls, so fixed-flow
+    partials fall too. Therefore ``S(P)-P`` decreases strictly and bracketed
+    bisection converges. If ``n(P)=0`` or ``sum(P_eq)<=P_d``, participants
+    reach ``P_eq`` and their net flux is zero. Fixed-pressure paths evaluate
+    the same closed form directly; a capacity overflow switches to the
+    supplied carrier-free law.
 
-    Premise: inside one hour, each participating species' kinetic rate is
-    priced at the partial pressure for that same hour, and its headspace
-    residence is short relative to the hour. The coupled equations are
-    ``J_i = provider(P_eq,i, p_i)`` and ``p_i = writer_i(J)``. The writer map
-    is antitone in each species' own backpressured partial when other partials
-    are held fixed, so direct substitution can alternate. For each coordinate,
-    ``writer_i(J(p_i)) - p_i`` is strictly decreasing; bracket its zero on
-    ``[0, P_eq,i]`` and take a safeguarded secant step. Re-evaluate the mixture
-    after each coordinate because the existing mole-fraction writer couples
-    species. Retain the best evaluated vector if the bounded sweeps stall.
-
-    Unit check: every candidate and writer partial is Pa, each residual is
-    Pa, and dividing by ``max(P_eq, |p|, |writer(p)|)`` makes the stopping
-    residual dimensionless. The zero-removal limit is ``J=0`` at ``p=P_eq``;
-    increasing pipe removal drives ``p`` toward zero and the provider's
-    zero-backpressure rate. That rate is the free-Langmuir rate only when the
-    existing provider has no gas-film resistance. For the carrier-free Na
-    check, ``M K = 1.02563e-7 kg/(s Pa²)`` and
-    ``M K p² = β(P_eq-p)``; rearranging gives
-    ``p = (-β + sqrt(β² + 4 M K β P_eq))/(2 M K) = 1.20745 Pa``. Both sides
-    of the balance are kg/s, and substituting ``p=0`` recovers the
-    free-source limit.
+    Units: beta and ``G`` are kg/(s Pa); ``p`` and ``S`` are Pa; ``C/M_mix``
+    is mol/s. As ``C→0``, ``p→P_eq`` and net flux tends to zero; as
+    ``C→∞``, ``p→0`` and flux tends to the zero-backpressure source. For Na,
+    ``M*K=1.02563e-7 kg/(s Pa²)`` and
+    ``M*K*p²=beta*(P_eq-p)`` gives ``p=1.20745 Pa``; both sides are kg/s,
+    and ``p=0`` recovers the free-source limit.
     """
 
     if not math.isfinite(float(relative_tolerance)) or relative_tolerance <= 0.0:
         raise ValueError("relative_tolerance must be finite and positive")
     if max_iterations < 1:
         raise ValueError("max_iterations must be positive")
+    species_ids = tuple(sorted(str(key) for key in equilibrium_Pa))
+    fixed = {
+        str(key): max(0.0, float(value))
+        for key, value in fixed_partials_Pa.items()
+        if math.isfinite(float(value))
+    }
+    lower, upper = (max(0.0, float(value)) for value in pressure_bracket_Pa)
+    if upper < lower:
+        raise ValueError("pressure_bracket_Pa must be ordered")
 
-    bounds: dict[str, float] = {}
-    for species, raw_bound in equilibrium_Pa.items():
-        try:
-            bound = float(raw_bound)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(bound) and bound > 0.0:
-            bounds[str(species)] = bound
-    species_ids = tuple(sorted(bounds))
-    fixed: dict[str, float] = {}
-    for species, raw_value in fixed_partials_Pa.items():
-        try:
-            value = float(raw_value)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(value):
-            fixed[str(species)] = max(0.0, value)
+    def partials_at(pressure: float, flow: float) -> dict[str, float]:
+        return _headspace_partials_at_pressure_Pa(
+            pressure,
+            equilibrium_Pa=equilibrium_Pa,
+            beta_kg_s_Pa_by_species=beta_kg_s_Pa_by_species,
+            fixed_partials_Pa=fixed,
+            fixed_molar_flow_mol_s_by_species=(
+                fixed_molar_flow_mol_s_by_species
+            ),
+            molar_mass_kg_mol_by_species=molar_mass_kg_mol_by_species,
+            molar_flow_mol_s=flow,
+        )
 
-    def evaluate(candidate: Mapping[str, float], iteration: int):
-        full_partials = dict(fixed)
-        full_partials.update(candidate)
-        flux = evaluate_flux(full_partials)
-        written = {
-            str(species): max(0.0, float(value))
-            for species, value in write_partials(flux).items()
-            if math.isfinite(float(value))
-        }
-        residuals = {
-            species: written.get(species, 0.0) - candidate[species]
+    def pressure_sum_residual(
+        pressure: float,
+        flow: float,
+    ) -> tuple[float, dict[str, float]]:
+        partials = partials_at(pressure, flow)
+        return sum(partials.values()) - pressure, partials
+
+    used_fallback = False
+    pressure = 0.0
+    iteration_count = 0
+    pressure_residual = math.inf
+    pressure_closed = fixed_pressure_Pa is None
+    if fixed_pressure_Pa is not None:
+        pressure = max(0.0, float(fixed_pressure_Pa))
+        flow = max(
+            0.0,
+            float(fixed_pressure_molar_flow_mol_s or 0.0),
+        )
+        pressure_residual, candidate = pressure_sum_residual(pressure, flow)
+        if (
+            pressure_residual > relative_tolerance * max(pressure, 1.0)
+            and carrier_free_molar_flow_mol_s_at_pressure is not None
+        ):
+            used_fallback = True
+            pressure_closed = True
+        else:
+            iteration_count = 1
+    if fixed_pressure_Pa is None or used_fallback:
+        flow_function = (
+            carrier_free_molar_flow_mol_s_at_pressure
+            if used_fallback
+            else molar_flow_mol_s_at_pressure
+        )
+        if flow_function is None:
+            raise ValueError("carrier-free pressure fallback has no pipe law")
+        low = lower
+        high = max(upper, lower)
+
+        def residual_at(value: float) -> tuple[float, dict[str, float]]:
+            flow_value = max(0.0, float(flow_function(value)))
+            return pressure_sum_residual(value, flow_value)
+
+        low_residual, low_partials = residual_at(low)
+        if low_residual <= 0.0:
+            pressure = low
+            pressure_residual = low_residual
+            candidate = low_partials
+            iteration_count = 1
+        else:
+            high_residual, high_partials = residual_at(high)
+            for _ in range(64):
+                if high_residual <= 0.0:
+                    break
+                high = max(high * 2.0, high + 1.0)
+                high_residual, high_partials = residual_at(high)
+            else:
+                high_residual = math.inf
+            if high_residual > 0.0:
+                pressure = high
+                pressure_residual = high_residual
+                candidate = high_partials
+                iteration_count = max_iterations
+            else:
+                best_pressure = high
+                best_residual = high_residual
+                best_partials = high_partials
+                for iteration in range(1, max_iterations + 1):
+                    trial = 0.5 * (low + high)
+                    residual, mid_partials = residual_at(trial)
+                    if abs(residual) < abs(best_residual):
+                        best_pressure = trial
+                        best_residual = residual
+                        best_partials = mid_partials
+                    if abs(residual) <= relative_tolerance * max(
+                        trial, sum(mid_partials.values()), 1.0e-300
+                    ):
+                        best_pressure = trial
+                        best_residual = residual
+                        best_partials = mid_partials
+                        break
+                    if residual > 0.0:
+                        low = trial
+                    else:
+                        high = trial
+                pressure = best_pressure
+                pressure_residual = best_residual
+                candidate = best_partials
+                iteration_count = iteration
+
+    flux = evaluate_flux(candidate, pressure)
+    written = {
+        str(species): max(0.0, float(value))
+        for species, value in write_partials(flux).items()
+        if math.isfinite(float(value))
+    }
+    residuals = {
+        species: written.get(species, 0.0) - candidate.get(species, 0.0)
+        for species in species_ids
+    }
+    relative = max(
+        (
+            abs(residuals[species])
+            / max(
+                float(equilibrium_Pa[species]),
+                abs(candidate.get(species, 0.0)),
+                abs(written.get(species, 0.0)),
+                1.0e-300,
+            )
             for species in species_ids
-        }
+        ),
+        default=0.0,
+    )
+    if fixed_pressure_Pa is None or used_fallback:
+        relative = max(
+            relative,
+            abs(pressure_residual)
+            / max(pressure, sum(candidate.values()), 1.0e-300),
+        )
+    if (
+        pressure_closed
+        and pressure == lower
+        and sum(float(value) for value in equilibrium_Pa.values()) <= lower
+    ):
         relative = max(
             (
                 abs(residuals[species])
-                / max(
-                    bounds[species],
-                    abs(candidate[species]),
-                    abs(written.get(species, 0.0)),
-                    1.0e-300,
-                )
+                / max(float(equilibrium_Pa[species]), 1.0e-300)
                 for species in species_ids
             ),
             default=0.0,
         )
-        return flux, written, residuals, relative, iteration, dict(candidate)
-
-    candidate = {
-        species: min(
-            bounds[species],
-            max(0.0, float(initial_partials_Pa.get(species, 0.0) or 0.0)),
-        )
-        for species in species_ids
-    }
-    if not species_ids:
-        flux, written, residuals, relative, _, _ = evaluate({}, 1)
-        return QuasiSteadyHeadspaceSolve(
-            candidate_partials_Pa={},
-            writer_partials_Pa=written,
-            flux=flux,
-            residual_Pa_by_species=residuals,
-            residual_relative=relative,
-            iterations=1,
-            converged=True,
-        )
-
-    best = evaluate(candidate, 1)
-    if len(species_ids) == 1:
-        species = species_ids[0]
-        low = {species: 0.0}
-        high = {species: bounds[species]}
-        low_eval = evaluate(low, 2)
-        high_eval = evaluate(high, 3)
-        if low_eval[3] < best[3]:
-            best = low_eval
-        if high_eval[3] < best[3]:
-            best = high_eval
-        if best[3] <= relative_tolerance:
-            return QuasiSteadyHeadspaceSolve(
-                candidate_partials_Pa=best[5],
-                writer_partials_Pa=best[1],
-                flux=best[0],
-                residual_Pa_by_species=best[2],
-                residual_relative=best[3],
-                iterations=best[4],
-                converged=True,
-            )
-        if low_eval[2][species] >= 0.0 and high_eval[2][species] <= 0.0:
-            for iteration in range(4, max_iterations + 1):
-                mid = {species: 0.5 * (low[species] + high[species])}
-                current = evaluate(mid, iteration)
-                if current[3] < best[3]:
-                    best = current
-                if current[3] <= relative_tolerance:
-                    best = current
-                    break
-                if current[2][species] > 0.0:
-                    low, low_eval = mid, current
-                else:
-                    high, high_eval = mid, current
-                if high[species] == low[species]:
-                    break
-            return QuasiSteadyHeadspaceSolve(
-                candidate_partials_Pa=best[5],
-                writer_partials_Pa=best[1],
-                flux=best[0],
-                residual_Pa_by_species=best[2],
-                residual_relative=best[3],
-                iterations=best[4],
-                converged=best[3] <= relative_tolerance,
-            )
-
-    # Holding other species' partials fixed makes each coordinate residual
-    # ``writer_i(p)-p_i`` monotone decreasing: increasing p_i reduces its
-    # kinetic source and therefore its mole fraction in the same writer. Use a
-    # safeguarded regula-falsi step inside [0, P_eq,i] for each coordinate,
-    # updating the other coordinates between steps. Each endpoint call uses
-    # the unchanged flux and transport owners; no pipe law is duplicated.
-    # One coordinate update counts as one bounded iteration. If no source
-    # exists, p_i=0 is the endpoint root; otherwise the upper endpoint has
-    # J_i=0.
-    current = best
-    for iteration in range(2, max_iterations + 1):
-        current = evaluate(candidate, iteration)
-        if current[3] < best[3]:
-            best = current
-        if current[3] <= relative_tolerance:
-            best = current
-            break
-        species = species_ids[(iteration - 2) % len(species_ids)]
-        residual = current[2][species]
-        pressure = candidate[species]
-        if abs(residual) <= relative_tolerance * max(
-            bounds[species], abs(pressure), 1.0e-300
-        ):
-            continue
-
-        if residual > 0.0:
-            low_pressure = pressure
-            low_residual = residual
-            high_pressure = bounds[species]
-            endpoint = dict(candidate)
-            endpoint[species] = high_pressure
-            high_eval = evaluate(endpoint, iteration)
-            if high_eval[3] < best[3]:
-                best = high_eval
-            high_residual = high_eval[2][species]
-        else:
-            low_pressure = 0.0
-            endpoint = dict(candidate)
-            endpoint[species] = low_pressure
-            low_eval = evaluate(endpoint, iteration)
-            if low_eval[3] < best[3]:
-                best = low_eval
-            low_residual = low_eval[2][species]
-            high_pressure = pressure
-            high_residual = residual
-
-        if low_residual >= 0.0 and high_residual <= 0.0:
-            span = high_pressure - low_pressure
-            denominator = high_residual - low_residual
-            trial_pressure = (
-                low_pressure
-                - low_residual * span / denominator
-                if denominator != 0.0
-                else 0.5 * (low_pressure + high_pressure)
-            )
-            trial_pressure = min(
-                high_pressure,
-                max(low_pressure, trial_pressure),
-            )
-        else:
-            trial_pressure = (
-                low_pressure
-                if abs(low_residual) < abs(high_residual)
-                else high_pressure
-            )
-        if trial_pressure != pressure:
-            candidate[species] = trial_pressure
-
     return QuasiSteadyHeadspaceSolve(
-        candidate_partials_Pa=best[5],
-        writer_partials_Pa=best[1],
-        flux=best[0],
-        residual_Pa_by_species=best[2],
-        residual_relative=best[3],
-        iterations=best[4],
-        converged=best[3] <= relative_tolerance,
+        candidate_partials_Pa=candidate,
+        writer_partials_Pa=written,
+        flux=flux,
+        residual_Pa_by_species=residuals,
+        residual_relative=relative,
+        iterations=iteration_count,
+        converged=relative <= relative_tolerance,
+        total_pressure_Pa=pressure,
+        pressure_residual_Pa=pressure_residual,
+        used_carrier_free_fallback=used_fallback,
     )
 
 
@@ -1897,6 +1922,29 @@ class OverheadGasModel:
             p_upstream_Pa,
             p_downstream_Pa,
         )
+
+    def _pipe_molar_flow_mol_s(
+        self,
+        p_upstream_Pa: float,
+        T_C: float,
+        *,
+        p_downstream_Pa: float = 0.0,
+    ) -> float:
+        """Return molar flow from the shared Poiseuille mass-flow law."""
+        T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+        # The shared law returns kg/s and is linear in M_avg. Setting
+        # M_avg=1 kg/mol and dividing by that same value yields mol/s while
+        # reusing its K, geometry, viscosity, and downstream-pressure law.
+        mass_flow_kg_s = compressible_poiseuille_mass_flow(
+            self.pipe_diameter_m,
+            self.pipe_length_m,
+            1.0,
+            self._gas_dynamic_viscosity_Pa_s(T_K),
+            T_K,
+            p_upstream_Pa,
+            p_downstream_Pa,
+        )
+        return max(0.0, mass_flow_kg_s / 1.0)
 
     @staticmethod
     def _gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
