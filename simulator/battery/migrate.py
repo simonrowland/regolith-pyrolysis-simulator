@@ -1539,6 +1539,16 @@ def _mass_percent_printed_from_plain(
         else {}
     )
     raw_components_are_unique = len(raw_components) == len(items)
+    locator = (
+        _locator_from_plain(payload.get("locator"))
+        if isinstance(payload, Mapping)
+        else None
+    )
+
+    def preserved_envelope() -> Located[Mapping[str, Any]]:
+        if isinstance(payload, Mapping) and "state" in payload:
+            return _located_from_plain(payload, lambda value: value)
+        return located_value(body, locator)
 
     if (
         isinstance(body, Mapping)
@@ -1546,7 +1556,7 @@ def _mass_percent_printed_from_plain(
     ):
         # This source envelope is intentionally typed provenance, not a plain
         # oxide map. Keep it intact even when its cells are numeric.
-        return _located_from_plain(payload, lambda value: value)
+        return preserved_envelope()
 
     wt = _mass_percent_components(payload)
     if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
@@ -1559,40 +1569,29 @@ def _mass_percent_printed_from_plain(
                 and items
                 and raw_components_are_unique
             ):
-                if (
-                    any(
-                        _classify_composition_cell(amount)[0] != "number"
-                        for _name, amount in items
-                    )
-                ):
-                    locator = (
-                        _locator_from_plain(payload.get("locator"))
-                        if isinstance(payload, Mapping)
-                        else None
-                    )
-                    return located_value(_printed_map_payload(raw_components), locator)
+                return located_value(_printed_map_payload(raw_components), locator)
         if _mass_percent_pairs(payload) is not None:
-            return _located_from_plain(payload, lambda value: value)
+            return preserved_envelope()
         return None
     declared_component_map = _declared_printed_composition_map(payload)
     dropped = _unrecognized_printed_chemical_components(
         wt, payload, declared_component_map=declared_component_map
     )
     if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
-        return _located_from_plain(payload, lambda value: value)
+        return preserved_envelope()
     if (
         _mass_percent_pairs(payload) is not None
-        and any(name not in _COMPOSITION_COMPONENTS for name in raw_components)
+        and any(
+            name not in _COMPOSITION_COMPONENTS
+            and _volatile_closure_component(name) is None
+            and name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+            for name in raw_components
+        )
     ):
         # Green preserves typed envelopes whose printed keys are not canonical
         # component names. Canonical names are only for the closure decision.
-        return _located_from_plain(payload, lambda value: value)
-    locator = (
-        _locator_from_plain(payload.get("locator"))
-        if isinstance(payload, Mapping)
-        else None
-    )
-    return located_value(_printed_map_payload(wt), locator)
+        return preserved_envelope()
+    return located_value(_printed_map_payload(raw_components), locator)
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -4403,6 +4402,8 @@ def _source_printed_composition_values(
     for key, value in source_map.items():
         name = str(key)
         normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
+        if normalized_name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
         if not (
             normalized_name in declared_names
             or (
@@ -4410,32 +4411,9 @@ def _source_printed_composition_values(
                 and not is_sample_code_formula(normalized_name)
                 and _is_printed_chemical_component_name(normalized_name)
             )
-            or normalized_name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
         printed[name] = value
-
-    scopes: list[Mapping[str, Any]] = []
-    if isinstance(closure_context, Mapping):
-        scopes.append(closure_context)
-        point_conditions = closure_context.get("point_conditions")
-        if isinstance(point_conditions, Mapping):
-            scopes.append(point_conditions)
-    printed_volatile_components = {
-        _volatile_closure_component(name)[0]
-        for name, amount in printed.items()
-        if _volatile_closure_component(name) is not None
-        and _printed_mass_percent_number(amount) is not None
-    }
-    for scope in scopes:
-        for raw_name, raw_amount in scope.items():
-            alias = _volatile_closure_component(str(raw_name))
-            if alias is None or alias[0] in printed_volatile_components:
-                continue
-            amount = _printed_mass_percent_number(raw_amount)
-            if amount is not None:
-                printed[str(raw_name)] = raw_amount
-                printed_volatile_components.add(alias[0])
     return printed
 
 
@@ -4473,8 +4451,7 @@ def _preserve_printed_composition_context(
     closure_context: object,
 ) -> Located[Mapping[str, Any]] | None:
     source_values = _printed_map_payload(
-        _source_printed_composition_values(wt, closure_context),
-        numeric_values_as="source",
+        _source_printed_composition_values(wt, closure_context)
     )
     source_locator = _composition_source_locator(closure_context)
     if printed is None or not printed.state.is_value:
@@ -4487,9 +4464,18 @@ def _preserve_printed_composition_context(
     for name, amount in source_values.items():
         normalized_name = _mass_percent_component_key(name)[0]
         if name in values:
-            values[name] = amount
+            current = values[name]
+            source_number = _printed_mass_percent_number(amount)
+            current_number = _printed_mass_percent_number(current)
+            if source_number is not None and source_number == current_number:
+                values[name] = amount
         elif normalized_name in values:
-            values[normalized_name] = amount
+            current = values[normalized_name]
+            source_number = _printed_mass_percent_number(amount)
+            current_number = _printed_mass_percent_number(current)
+            if source_number is not None and source_number == current_number:
+                del values[normalized_name]
+                values[name] = amount
         else:
             values[name] = amount
     if values == printed.state.value:
@@ -6000,11 +5986,21 @@ def _located_printed_and_initial(
     )
     source_values = _source_printed_composition_values(wt, closure_context)
     printed_map = {}
+    normalized_wt = {
+        _mass_percent_component_key(name)[0]: amount for name, amount in wt.items()
+    }
+    mass_loss_row = (
+        isinstance(closure_context, Mapping)
+        and "mass_loss_pct" in closure_context
+    )
     for name, amount in source_values.items():
         stem, has_mass_suffix = _mass_percent_component_stem(name)
         normalized_name, _ = _mass_percent_component_key(name)
+        if state.is_value and normalized_name in normalized_wt:
+            name = normalized_name
+            amount = normalized_wt[normalized_name]
         if (
-            not declared_component_map
+            not mass_loss_row
             and state.is_value
             and has_mass_suffix
             and stem == normalized_name
@@ -6013,7 +6009,7 @@ def _located_printed_and_initial(
             name = normalized_name
         printed_map[name] = amount
     printed = located_value(
-        _printed_map_payload(printed_map, numeric_values_as="source"), locator
+        _printed_map_payload(printed_map), locator
     )
     if not state.is_value:
         return printed, Located(state, locator=locator)
@@ -14916,12 +14912,6 @@ def _printed_map_is_observation_level(
         )
     ):
         return True
-    own_source_map = _printed_composition_source_map(own_values)
-    if (
-        own_source_map is not None
-        and _printed_fingerprint(own_source_map) == target
-    ):
-        return True
     # Same fallback sample_from_equipment uses (top-level oxide keys or a
     # printed mole-fraction map), now unable to reach into row lists.
     fallback = _initial_oxide_map_from_values(own_values)
@@ -15368,8 +15358,6 @@ def sample_from_equipment(
     printed = None if catalogue_marked else _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
-    if not catalogue_marked:
-        printed = _preserve_printed_composition_context(printed, None, values)
     initial = catalogue
     if printed is None and catalogue is None and not catalogue_marked:
         refusal_reason: list[str] = []
@@ -23112,12 +23100,12 @@ class Migrator:
                 observation_id=point_id,
             )
         extra_pc: dict[str, Located[Any]] = {}
-        # A ratio point without its own composition uses the parent's bulk.
-        # Its derived point condition already retains the wt% inputs, so adding
-        # the duplicate print here would change the green waypoint precedence.
-        # Keep the print when conversion refused so the refusal remains visible.
+        # The point composition already retains its source inputs, so attaching
+        # the same print again would change green's waypoint precedence. Keep it
+        # when conversion refused so the refusal remains visible.
         if printed is not None and not (
-            row_bound_redox_composition and not point_composition_refusal
+            not point_composition_refusal
+            and (row_bound_redox_composition or point_composition_located is not None)
         ):
             extra_pc["printed_composition"] = printed
         elif (

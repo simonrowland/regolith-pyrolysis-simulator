@@ -507,15 +507,7 @@ def charge_moles_by_species(
         and printed is not None
         and printed.state.is_value
     ):
-        source_map = printed.state.value
-        is_mass_percent, refusal = _printed_mass_percent_map_refusal(
-            source_map, {}, reject_dropped_components=False
-        )
-        raw = (
-            None
-            if is_mass_percent and refusal is not None
-            else _printed_composition_map(source_map)
-        )
+        raw = _printed_composition_map(printed.state.value)
         if isinstance(raw, Mapping):
             numeric = {}
             for key, item in raw.items():
@@ -651,6 +643,51 @@ def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
             return None
         pairs.append((str(key), value))
     return pairs or None
+
+
+def _structured_wt_percent_parameters(
+    located: Located[Composition],
+) -> tuple[tuple[str, object], ...]:
+    if located.inference is None:
+        return ()
+    return tuple(
+        (str(name), value)
+        for name, value in located.inference.parameters
+        if str(name).startswith("original_")
+        and str(name).endswith("_wt_pct")
+    )
+
+
+def _derived_mass_percent_refusal(
+    located: Located[Composition],
+    point: Mapping[str, object],
+    *,
+    sibling_printed_mass_percent_refused: bool = False,
+) -> str | None:
+    parameters = _structured_wt_percent_parameters(located)
+    if (
+        located.inference is None
+        or located.inference.relation != "wt_pct_to_mole_fraction"
+    ):
+        return None
+    if not parameters:
+        return (
+            "sibling printed mass-percent composition was refused"
+            if sibling_printed_mass_percent_refused
+            else None
+        )
+    declared: dict[str, object] = {}
+    for name, parameter in parameters:
+        component = name[len("original_") : -len("_wt_pct")]
+        if isinstance(parameter, Located):
+            value = parameter.state.value if parameter.state.is_value else None
+        else:
+            value = parameter
+        declared[component] = value
+    _is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+        declared, point, reject_dropped_components=True
+    )
+    return refusal
 
 
 def _parse_component_amounts(
@@ -814,36 +851,6 @@ def _printed_wt_token(raw: object, amount: Decimal) -> str:
     return text or "0"
 
 
-def _derived_mass_percent_refusal(
-    located: Located[Composition],
-    point: Mapping[str, object],
-    *,
-    sibling_printed_mass_percent_refused: bool = False,
-) -> str | None:
-    inference = located.inference
-    if inference is None or inference.relation != "wt_pct_to_mole_fraction":
-        return None
-    components: dict[str, object] = {}
-    for name, parameter in inference.parameters:
-        if not name.startswith("original_") or not name.endswith("_wt_pct"):
-            continue
-        value = (
-            parameter.state.value
-            if isinstance(parameter, Located) and parameter.state.is_value
-            else parameter
-        )
-        components[name[len("original_") : -len("_wt_pct")]] = value
-    if components:
-        _, refusal = _printed_mass_percent_map_refusal(
-            components, point, reject_dropped_components=True
-        )
-        if refusal is not None:
-            return refusal
-    if sibling_printed_mass_percent_refused and not components:
-        return "sibling printed mass-percent composition was refused"
-    return None
-
-
 def normalized_composition(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
@@ -889,6 +896,44 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        if field == "printed_composition" and isinstance(raw, Mapping):
+            _is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+                raw, point, reject_dropped_components=True
+            )
+            if refusal is not None:
+                unsupported = True
+                missing.append(path)
+                printed_mass_percent_refused = True
+                if (
+                    refusal == "mass-percent composition has duplicate component keys"
+                    or "partial analysis contains unsupported component(s) above "
+                    "0.5 wt%" in refusal
+                ):
+                    return WaypointResult(
+                        "normalized_composition",
+                        None,
+                        (),
+                        WaypointAbsence(
+                            "normalized_composition",
+                            GapReason.UNSUPPORTED_PRINT_FORM,
+                            (path,),
+                        ),
+                    )
+                continue
+        if field == "initial_composition" and isinstance(raw, Composition):
+            refusal = _derived_mass_percent_refusal(located, point)
+            if (
+                refusal is None
+                and printed_mass_percent_refused
+                and located.inference is not None
+                and located.inference.relation == "wt_pct_to_mole_fraction"
+                and not _structured_wt_percent_parameters(located)
+            ):
+                refusal = "sibling printed mass-percent composition was refused"
+            if refusal is not None:
+                unsupported = True
+                missing.append(path)
+                continue
         if field == "initial_composition" and not isinstance(raw, Composition):
             unsupported = True
             missing.append(path)
@@ -898,28 +943,6 @@ def normalized_composition(
         basis_inference: Derivation | None = None
         refused_components: tuple[str, ...] = ()
         as_moles = False
-        if field == "printed_composition":
-            if isinstance(raw, Mapping):
-                is_mass_percent, refusal = _printed_mass_percent_map_refusal(
-                    raw, point, reject_dropped_components=True
-                )
-                if is_mass_percent and refusal is not None:
-                    printed_mass_percent_refused = True
-                    unsupported = True
-                    missing.append(path)
-                    continue
-        if field == "initial_composition" and isinstance(raw, Composition):
-            refusal = _derived_mass_percent_refusal(
-                located,
-                point,
-                sibling_printed_mass_percent_refused=(
-                    printed_mass_percent_refused
-                ),
-            )
-            if refusal is not None:
-                unsupported = True
-                missing.append(path)
-                continue
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
             if isinstance(components, Mapping):

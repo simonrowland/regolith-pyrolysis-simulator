@@ -5472,6 +5472,200 @@ def test_burnham_redox_engine_point_keeps_green_composition_payload(
     }
 
 
+def _internal_engine_point_for_real_extract(
+    extract_name: str, observation_fragment: str
+):
+    path = REPO_ROOT / "data" / "literature" / "extracts" / extract_name
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    observation = next(
+        row
+        for row in migrator.result.observations.values()
+        if observation_fragment in row.observation_id
+    )
+    experiment = migrator.result.experiments[observation.experiment_id]
+    bench = (
+        migrator.result.benches.get(experiment.bench_id)
+        if experiment.bench_id
+        else None
+    )
+    if bench is None:
+        bench = _bench()
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    return next(
+        request
+        for request in engine_point_requests(inputs)
+        if request.readiness.engine == "internal-analytical"
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "extract_name,observation_fragment,expected_composition,"
+        "expected_method,expected_notice"
+    ),
+    [
+        pytest.param(
+            "kems-042-plante-1979.yaml",
+            "plante1979_table2_s1126_r011_quoted",
+            {"K2O": 0.33331181591376485, "SiO2": 0.6666881840862351},
+            None,
+            id="plante-composition-remains-selected",
+        ),
+        pytest.param(
+            "burnham-2015-europium-redox.yaml",
+            "burnham_2015_eu_glasses_morb_1400_fm3p1::T=1673.15:h=9c0023663d9e",
+            {
+                "SiO2": 0.5437123616112215,
+                "Al2O3": 0.07464658136836831,
+                "FeO": 0.08461239030570825,
+                "MgO": 0.12032361639854668,
+                "CaO": 0.17670505031615533,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct; locator=Locator(page=33, "
+                "published_page=254, pdf_page_index=32, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='1', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note='Table 1 composition for MORB; "
+                "wt % oxide. Eu2O3 is retained separately as printed.', "
+                "source_path=None, record=None)"
+            ),
+            id="burnham-calculated-provenance-restored",
+        ),
+        pytest.param(
+            "ts1985.yaml",
+            "ts1985_na2o_table2_X0p40_T1300C",
+            {"Na2O": 0.4, "SiO2": 0.6},
+            None,
+            None,
+            id="ts1985-accepted-print-restored",
+        ),
+        pytest.param(
+            "sossi-2020-magma-ocean-redox.yaml",
+            "sossi_2020_per_f_o2_6_xanes",
+            {
+                "SiO2": 0.4068489528220175,
+                "Al2O3": 0.022117146419593673,
+                "FeO": 0.06248542978669028,
+                "MgO": 0.48915300024874675,
+                "CaO": 0.019313792063263995,
+                "Na2O": 0.0,
+                "K2O": 0.0,
+                "SO2": 8.167865968775996e-05,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct | FeOT (total iron) treated as FeO; "
+                "printed key FeOT; locator=Locator(page=14, "
+                "published_page=None, pdf_page_index=None, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='S4', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note=None, source_path=None, record=None)"
+            ),
+            id="sossi-sulfur-bearing-print-restored",
+        ),
+        pytest.param(
+            "smythe-brenan-2015-cerium-redox.yaml",
+            "row=ds09-c3-37",
+            {
+                "SiO2": 0.7829848990705266,
+                "TiO2": 0.0030057828571927255,
+                "Al2O3": 0.09126840011594776,
+                "MgO": 0.010160498722650815,
+                "CaO": 0.020271051941312426,
+                "Na2O": 0.06345254501714619,
+                "K2O": 0.026684223119929712,
+                "Ce2O3": 0.002172599155293784,
+            },
+            None,
+            None,
+            id="smythe-volatile-sibling-preserved",
+        ),
+        pytest.param(
+            "kems-015-hashimoto-1983.yaml",
+            "T=2073.15:row=c5-(1)",
+            {
+                "SiO2": 0.40709580956160435,
+                "Al2O3": 0.02700382669858546,
+                "FeO": 0.030054813370486367,
+                "MgO": 0.49255019146982815,
+                "CaO": 0.04329535889949569,
+            },
+            None,
+            None,
+            id="hashimoto-wt-percent-keys-canonicalized",
+        ),
+    ],
+)
+def test_m1_regression_rows_keep_green_internal_engine_point_composition(
+    extract_name: str,
+    observation_fragment: str,
+    expected_composition: dict[str, float],
+    expected_method: str | None,
+    expected_notice: str | None,
+) -> None:
+    request = _internal_engine_point_for_real_extract(
+        extract_name, observation_fragment
+    )
+
+    assert request.readiness.status.value == "ready"
+    assert request.payload is not None
+    assert request.payload["composition_mol"] == expected_composition
+    assert request.payload.get("composition_method_class") == expected_method
+    assert request.payload.get("composition_notice") == expected_notice
+
+
+def test_m1_kang_row_keeps_green_missing_evidence_gap() -> None:
+    from simulator.battery.waypoints import GapReason
+
+    request = _internal_engine_point_for_real_extract(
+        "kang-2007-sio2-activity-cas-low-silica.yaml",
+        "kang_2007_t3_sample_404_sio2_activity",
+    )
+
+    assert request.readiness.status.value == "gap"
+    assert request.payload is None
+    assert any(
+        gap.reason is GapReason.MISSING_EVIDENCE
+        for gap in request.readiness.gaps
+    )
+
+
+def test_aithala_named_printed_map_keeps_green_waypoint_precedence() -> None:
+    request = _internal_engine_point_for_real_extract(
+        "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+        "aithala_2026_2100_30_wdsepma_composition",
+    )
+
+    assert request.readiness.status.value == "ready"
+    assert request.payload is not None
+    assert request.payload["composition_mol"] == {
+        "SiO2": 0.5030149189926973,
+        "TiO2": 0.004232904404515707,
+        "Al2O3": 0.07083370833170857,
+        "FeO": 0.12841698080949054,
+        "MgO": 0.19764649559059078,
+        "CaO": 0.08900277026118869,
+        "Na2O": 0.006743724941578754,
+        "K2O": 5.2202540287216184e-05,
+        "P2O5": 5.629412794243211e-05,
+    }
+    assert request.payload["composition_notice"] == (
+        "calculated from printed FeOT; relation=total_iron_as_FeO; "
+        "inputs=FeOT; total iron reported as FeO; Fe3+/Fe2+ not printed"
+    )
+
+
 def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
     tmp_path: Path,
 ) -> None:
