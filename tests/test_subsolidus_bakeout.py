@@ -594,13 +594,19 @@ def test_ordinary_gas_and_solid_share_one_throughput():
 
 
 @pytest.mark.parametrize(
-    ("temperature_C", "expect_release"),
-    [(1000.0 - 273.15, True), (375.0 - 273.15, False)],
+    ("temperature_C", "expect_release", "throughput_kg_hr", "expect_scaled"),
+    [
+        (1000.0 - 273.15, True, 10.0, False),
+        (1000.0 - 273.15, True, 0.05, True),
+        (375.0 - 273.15, False, 10.0, False),
+    ],
 )
 def test_c0_solid_release_participates_in_same_hour_headspace_solve(
     monkeypatch,
     temperature_C,
     expect_release,
+    throughput_kg_hr,
+    expect_scaled,
 ):
     from simulator import overhead
 
@@ -657,7 +663,7 @@ def test_c0_solid_release_participates_in_same_hour_headspace_solve(
 
     def bakeout(**kwargs):
         sim._volatiles_train_spec = type("Train", (), {
-            "max_throughput_kg_hr": 10.0,
+            "max_throughput_kg_hr": throughput_kg_hr,
         })()
         kwargs["seam_refusal_for"] = lambda _species, _temperature_K: None
         kwargs["evaluator_loader"] = lambda: evaluator
@@ -701,6 +707,10 @@ def test_c0_solid_release_participates_in_same_hour_headspace_solve(
     if expect_release:
         assert release["SO2"] > 0.0
         assert release["O2"] > 0.0
+        if expect_scaled:
+            assert sim._last_subsolidus_bakeout["pump_scale"] < 1.0
+        else:
+            assert sim._last_subsolidus_bakeout["pump_scale"] == 1.0
         assert solved.residual_relative_by_species["O2"] <= 1.0e-9
         assert solved.flux.species_kg_hr["SO2"] == pytest.approx(
             release["SO2"], rel=1.0e-9, abs=1.0e-15

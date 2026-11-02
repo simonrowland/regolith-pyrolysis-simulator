@@ -3322,12 +3322,17 @@ def test_native_fe_uses_start_map_without_publishing_its_own_vapor(monkeypatch) 
 
     routed_vapor_mol = []
     map_at_native_route = []
+    map_after_native_route = []
     original_route = sim._route_native_fe_vapor_to_condensation
 
     def capture_native_fe_route(vapor_mol, **kwargs):
         routed_vapor_mol.append(float(vapor_mol))
         map_at_native_route.append(dict(sim._melt_headspace_composition_mbar))
-        return original_route(vapor_mol, **kwargs)
+        result = original_route(vapor_mol, **kwargs)
+        map_after_native_route.append(
+            dict(sim._melt_headspace_composition_mbar)
+        )
+        return result
 
     monkeypatch.setattr(
         sim,
@@ -3340,6 +3345,7 @@ def test_native_fe_uses_start_map_without_publishing_its_own_vapor(monkeypatch) 
     # Native-Fe vapor's missing headspace coupling is tracked separately in
     # t-1189 chunk 7; its vapor is not published into this map.
     assert map_at_native_route == [start_of_hour_headspace]
+    assert map_after_native_route == [start_of_hour_headspace]
 
 
 def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:

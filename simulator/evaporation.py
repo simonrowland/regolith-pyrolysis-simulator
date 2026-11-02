@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping, Sequence
 from numbers import Real
 from typing import Any, NamedTuple
 
@@ -788,6 +788,12 @@ class EvaporationMixin:
         equilibrium: Any,
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+        solid_host_participant_pressures_Pa: Mapping[str, float] | None = None,
+        solid_host_release_species: Sequence[str] = (),
+        solid_host_release_callback: Callable[
+            [Mapping[str, float], Mapping[str, float]],
+            tuple[Mapping[str, float], float],
+        ] | None = None,
     ) -> EvaporationFlux:
         """Solve current evaporation against the existing overhead writer."""
         from simulator.config_flags import bool_feature_flag
@@ -799,11 +805,23 @@ class EvaporationMixin:
 
         T_K = float(self.melt.temperature_C) + 273.15
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-        if (
+        ordinary_evaporation_disabled = (
             (liquid_fraction is not None
              and legacy_raw_liquid_fraction_is_zero(liquid_fraction))
             or T_K < 400.0
-        ):
+        )
+        solid_host_participants = {
+            str(species): float(pressure)
+            for species, pressure in (
+                solid_host_participant_pressures_Pa or {}
+            ).items()
+            if math.isfinite(float(pressure)) and float(pressure) > 0.0
+        }
+        solid_host_coupled = bool(
+            solid_host_participants
+            and callable(solid_host_release_callback)
+        )
+        if ordinary_evaporation_disabled and not solid_host_coupled:
             return self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
@@ -812,23 +830,32 @@ class EvaporationMixin:
         # The root probes only change gas partials and total pressure. The
         # equilibrium, inventory, and catalog inputs stay fixed for this hour,
         # so reuse the typed batch instead of rebuilding its ledger closure.
-        resolved_batch_flux_state = self._resolve_evaporation_batch_flux_state(
-            equilibrium,
-            temperature_K=T_K,
-        )
-        (
-            vapor_pressures,
-            flux_overlay_report,
-            vapour_batch,
-            resolve_error,
-            vapor_pressure_diagnostic,
-            effective_pressure_source,
-        ) = resolved_batch_flux_state
-        if resolve_error or not vapor_pressures:
-            return self._calculate_evaporation(
-                equilibrium,
-                gate_authority=gate_authority,
+        if ordinary_evaporation_disabled:
+            resolved_batch_flux_state = None
+            vapor_pressures: dict[str, float] = {}
+            resolve_error: dict[str, Any] = {}
+        else:
+            resolved_batch_flux_state = (
+                self._resolve_evaporation_batch_flux_state(
+                    equilibrium,
+                    temperature_K=T_K,
+                )
             )
+            (
+                vapor_pressures,
+                _flux_overlay_report,
+                _vapour_batch,
+                resolve_error,
+                _vapor_pressure_diagnostic,
+                _effective_pressure_source,
+            ) = resolved_batch_flux_state
+            if resolve_error or (
+                not vapor_pressures and not solid_host_coupled
+            ):
+                return self._calculate_evaporation(
+                    equilibrium,
+                    gate_authority=gate_authority,
+                )
 
         base_partials_Pa = {
             str(species): self._evaporation_bulk_partial_pressure_pa(
@@ -837,13 +864,18 @@ class EvaporationMixin:
             for species in (
                 set(vapor_pressures)
                 | set(getattr(self, '_melt_headspace_composition_mbar', {}) or {})
+                | set(solid_host_participants)
             )
         }
         self._solved_headspace_partials_Pa_this_tick = None
         controls, _molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=base_partials_Pa,
-            vapour_batch_flux_pressures_Pa=vapor_pressures,
+            vapour_batch_flux_pressures_Pa=(
+                vapor_pressures
+                if resolved_batch_flux_state is not None
+                else {}
+            ),
         )
         transport_molar_masses = {
             species: (
@@ -854,6 +886,15 @@ class EvaporationMixin:
             )
             for species, molar_mass in _molar_masses.items()
         }
+        if solid_host_coupled:
+            for species in (
+                set(solid_host_participants)
+                | {str(name) for name in solid_host_release_species}
+            ):
+                transport_molar_masses[species] = resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol()
         series_config = controls.get('evaporation_series_resistance') or {}
         if not isinstance(series_config, Mapping):
             series_config = {}
@@ -877,15 +918,19 @@ class EvaporationMixin:
             and math.isfinite(float(pressure))
             and float(pressure) > 0.0
         }
-        if not eligible_participants:
+        if not eligible_participants and not solid_host_coupled:
             return self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
             )
         writer_detail: dict[str, Any] = {}
-        participants: dict[str, float] = {}
+        participants: dict[str, float] = {
+            **eligible_participants,
+            **solid_host_participants,
+        }
         current_effective_capacity = None
         probe_diagnostics: dict[int, dict[str, Any]] = {}
+        ordinary_flux_by_solver_flux_id: dict[int, EvaporationFlux] = {}
 
         def project_inventory_limited_flux(
             raw_flux: EvaporationFlux,
@@ -895,6 +940,21 @@ class EvaporationMixin:
                 dt_hr=1.0,
                 phase_scalar=1.0,
                 min_rate_kg_hr=0.0,
+            )
+
+        def committed_solver_flux(flux: EvaporationFlux) -> EvaporationFlux:
+            if solid_host_coupled:
+                return flux
+            return project_inventory_limited_flux(flux)
+
+        def solver_transport_inlet_flux(
+            flux: EvaporationFlux,
+        ) -> EvaporationFlux:
+            committed = committed_solver_flux(flux)
+            return (
+                committed
+                if solid_host_coupled
+                else self._subsolidus_transport_inlet_flux(committed)
             )
 
         def evaluate_flux(
@@ -908,22 +968,67 @@ class EvaporationMixin:
                 source_partials_Pa[species] = max(
                     0.0, float(partials_Pa.get(species, 0.0))
                 )
-            flux = self._calculate_evaporation(
-                equilibrium,
-                gate_authority=gate_authority,
-                record_degraded_path_engagement=False,
-                overhead_partials_override_Pa=source_partials_Pa,
-                overhead_pressure_override_Pa=(
-                    total_pressure_Pa
-                    if current_effective_capacity is not None
-                    else None
-                ),
-                _resolved_batch_flux_state=resolved_batch_flux_state,
-            )
+            if ordinary_evaporation_disabled:
+                flux = EvaporationFlux()
+                self._last_evaporation_flux_diagnostic = {}
+            else:
+                flux = self._calculate_evaporation(
+                    equilibrium,
+                    gate_authority=gate_authority,
+                    record_degraded_path_engagement=False,
+                    overhead_partials_override_Pa=source_partials_Pa,
+                    overhead_pressure_override_Pa=(
+                        total_pressure_Pa
+                        if current_effective_capacity is not None
+                        else None
+                    ),
+                    _resolved_batch_flux_state=resolved_batch_flux_state,
+                )
             probe_diagnostics[id(flux)] = dict(
                 getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
             )
-            return flux
+            if not solid_host_coupled:
+                return flux
+
+            ordinary_flux = project_inventory_limited_flux(flux)
+            assert solid_host_release_callback is not None
+            raw_solid_rates, raw_joint_scale = solid_host_release_callback(
+                dict(partials_Pa),
+                dict(ordinary_flux.species_kg_hr),
+            )
+            solid_rates = {
+                str(species): float(rate)
+                for species, rate in raw_solid_rates.items()
+                if math.isfinite(float(rate)) and float(rate) > 0.0
+            }
+            joint_scale = float(raw_joint_scale)
+            if not math.isfinite(joint_scale) or not 0.0 <= joint_scale <= 1.0:
+                joint_scale = 1.0
+            # C0's provider returns one throughput scale for solid release
+            # plus admitted ordinary gas. Apply it before closure so this
+            # source vector matches the later ordinary-flux commit.
+            combined_rates = {
+                str(species): float(rate) * joint_scale
+                for species, rate in ordinary_flux.species_kg_hr.items()
+                if float(rate) * joint_scale > 1.0e-15
+            }
+            for species, rate in solid_rates.items():
+                combined_rates[species] = (
+                    float(combined_rates.get(species, 0.0)) + rate
+                )
+            combined_flux = EvaporationFlux(
+                species_kg_hr=combined_rates,
+                alpha_authority_status_by_species=dict(
+                    ordinary_flux.alpha_authority_status_by_species
+                ),
+                carrier_authority_by_species=copy.deepcopy(
+                    ordinary_flux.carrier_authority_by_species
+                ),
+            )
+            combined_flux.update_totals()
+            probe_diagnostics[id(combined_flux)] = probe_diagnostics[id(flux)]
+            ordinary_flux_by_solver_flux_id[id(combined_flux)] = ordinary_flux
+            return combined_flux
 
         def select_probe_diagnostic(flux: EvaporationFlux) -> None:
             diagnostic = probe_diagnostics.get(id(flux))
@@ -1035,19 +1140,23 @@ class EvaporationMixin:
             1.0,
         )
         free_source_partials_Pa = dict(fixed_partials_Pa)
-        for species in eligible_participants:
+        for species in participants:
             free_source_partials_Pa[species] = 0.0
         free_source_raw_flux = evaluate_flux(
             free_source_partials_Pa,
             pressure_guess_Pa,
         )
-        free_source_flux = self._subsolidus_transport_inlet_flux(
-            project_inventory_limited_flux(free_source_raw_flux)
+        free_source_flux = solver_transport_inlet_flux(
+            free_source_raw_flux
         )
-        participants = {
+        active_ordinary_participants = {
             species: pressure
             for species, pressure in eligible_participants.items()
             if float(free_source_flux.species_kg_hr.get(species, 0.0)) > 1.0e-12
+        }
+        participants = {
+            **active_ordinary_participants,
+            **solid_host_participants,
         }
         if not participants:
             select_probe_diagnostic(free_source_raw_flux)
@@ -1060,7 +1169,11 @@ class EvaporationMixin:
                 molar_mass = float(
                     transport_molar_masses.get(key, 0.0) or 0.0
                 )
-                if key in participants or key == 'O2' or molar_mass <= 0.0:
+                if (
+                    key in participants
+                    or (key == 'O2' and not solid_host_coupled)
+                    or molar_mass <= 0.0
+                ):
                     continue
                 rate_kg_s = max(0.0, float(rate_kg_hr)) / 3600.0
                 if rate_kg_s > 0.0:
@@ -1106,12 +1219,11 @@ class EvaporationMixin:
         source_below_threshold = False
         for outer_iteration in range(16):
             probe_diagnostics.clear()
+            ordinary_flux_by_solver_flux_id.clear()
             current_flux = (
                 free_source_flux
                 if outer_iteration == 0
-                else self._subsolidus_transport_inlet_flux(
-                    project_inventory_limited_flux(solved.flux)
-                )
+                else solver_transport_inlet_flux(solved.flux)
             )
             configure_transport_boundary(current_flux)
             beta_by_species = slopes_from_flux(
@@ -1179,12 +1291,12 @@ class EvaporationMixin:
                 molar_flow_mol_s_at_pressure=pipe_molar_flow,
                 pressure_bracket_Pa=(downstream_Pa, upper_pressure_Pa),
                 evaluate_flux=evaluate_flux,
-                commit_flux=project_inventory_limited_flux,
+                commit_flux=committed_solver_flux,
                 relative_tolerance=1.0e-9,
                 max_iterations=80,
                 **solve_options,
             )
-            committed_probe = project_inventory_limited_flux(solved.flux)
+            committed_probe = committed_solver_flux(solved.flux)
             source_below_threshold = not any(
                 float(rate) > 1.0e-12
                 for rate in committed_probe.species_kg_hr.values()
@@ -1203,10 +1315,23 @@ class EvaporationMixin:
 
         assert solved is not None
         select_probe_diagnostic(solved.flux)
-        selected_flux = EvaporationFlux() if source_below_threshold else solved.flux
+        if source_below_threshold:
+            selected_flux = EvaporationFlux()
+        elif solid_host_coupled:
+            selected_flux = ordinary_flux_by_solver_flux_id.get(id(solved.flux))
+            if selected_flux is None:
+                raise RuntimeError(
+                    "same-hour solid-host solve lost its ordinary source flux"
+                )
+        else:
+            selected_flux = solved.flux
         self._solved_headspace_partials_Pa_this_tick = dict(solved.partials_Pa)
-        solved_inlet_flux = self._subsolidus_transport_inlet_flux(
-            project_inventory_limited_flux(selected_flux)
+        solved_inlet_flux = (
+            committed_solver_flux(solved.flux)
+            if solid_host_coupled
+            else self._subsolidus_transport_inlet_flux(
+                project_inventory_limited_flux(selected_flux)
+            )
         )
         diagnostic = dict(
             getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
@@ -1221,7 +1346,7 @@ class EvaporationMixin:
                     solved.residual_kg_s_by_species
                 ),
             })
-            if 'O2' in vapor_pressures:
+            if 'O2' in vapor_pressures and not solid_host_coupled:
                 notices.append({
                     'code': 'oxygen_partial_held_during_unconverged_solve',
                     'severity': 'warning',
@@ -1337,6 +1462,12 @@ class EvaporationMixin:
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
         overhead_pressure_override_Pa: float | None = None,
         solve_headspace_feedback: bool = False,
+        solid_host_participant_pressures_Pa: Mapping[str, float] | None = None,
+        solid_host_release_species: Sequence[str] = (),
+        solid_host_release_callback: Callable[
+            [Mapping[str, float], Mapping[str, float]],
+            tuple[Mapping[str, float], float],
+        ] | None = None,
         record_degraded_path_engagement: bool = True,
         _resolved_batch_flux_state: tuple[
             dict[str, float],
@@ -1393,6 +1524,11 @@ class EvaporationMixin:
             return self._calculate_evaporation_with_headspace_feedback(
                 equilibrium,
                 gate_authority=gate_authority,
+                solid_host_participant_pressures_Pa=(
+                    solid_host_participant_pressures_Pa
+                ),
+                solid_host_release_species=solid_host_release_species,
+                solid_host_release_callback=solid_host_release_callback,
             )
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()

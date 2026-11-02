@@ -216,7 +216,12 @@ def _headspace_partials_at_pressure_Pa(
         rate = max(0.0, float(raw_rate))
         if rate <= 0.0:
             continue
-        partials[str(species)] = rate * pressure / flow
+        key = str(species)
+        # Premise: a carried-in partial and a current fixed molar source of
+        # the same species both occupy the headspace. Dalton's law adds their
+        # pressures: p_i = p_i,carried + n_i*P/n_total. Units are
+        # (mol/s)*Pa/(mol/s) = Pa; zero source leaves the boundary unchanged.
+        partials[key] = partials.get(key, 0.0) + rate * pressure / flow
     return partials
 
 
@@ -418,9 +423,21 @@ def solve_quasi_steady_headspace_partials_Pa(
         for species, value in fixed.items():
             key = str(species)
             actual = max(0.0, float(candidate.get(key, 0.0)))
+            flow_source = max(
+                0.0,
+                float(fixed_molar_flow_mol_s_by_species.get(key, 0.0)),
+            )
+            expected = value
+            if flow_source > 0.0:
+                expected += (
+                    flow_source * pressure / flow if flow > 0.0 else math.inf
+                )
             residuals.setdefault(key, 0.0)
-            relative_by_species[key] = abs(actual - value) / max(
-                actual, value, 1.0e-300
+            residuals[key] = actual - expected
+            relative_by_species[key] = (
+                abs(actual - expected) / max(actual, expected, 1.0e-300)
+                if math.isfinite(expected)
+                else math.inf
             )
         for species in source_kg_s:
             residuals.setdefault(species, source_kg_s[species])
@@ -438,6 +455,40 @@ def solve_quasi_steady_headspace_partials_Pa(
             (relative_by_species.get(species, 0.0) for species in species_ids),
             default=0.0,
         )
+
+    if (
+        not any(value > 0.0 for value in fixed.values())
+        and not any(
+            float(value) > 0.0
+            for value in fixed_molar_flow_mol_s_by_species.values()
+        )
+        and not any(
+            float(value) > 0.0
+            for value in beta_kg_s_Pa_by_species.values()
+        )
+    ):
+        zero_partials = {species: 0.0 for species in species_ids}
+        raw_flux, committed, residuals, relative_by_species = actual_state(
+            zero_partials,
+            0.0,
+            0.0,
+        )
+        if not any(value > 0.0 for value in source_kg_s_by_species(committed).values()):
+            # Limiting case: with no fixed boundary gas, no fixed source, and
+            # zero source slope, the steady headspace contains no gas. P=0 and
+            # every participant partial is 0 Pa; this avoids dividing by the
+            # vanishing pipe flow in the ordinary pressure root.
+            return QuasiSteadyHeadspaceSolve(
+                partials_Pa=zero_partials,
+                flux=raw_flux,
+                residual_kg_s_by_species=residuals,
+                residual_relative_by_species=relative_by_species,
+                residual_relative=0.0,
+                iterations=1,
+                converged=True,
+                total_pressure_Pa=0.0,
+                pressure_residual_Pa=0.0,
+            )
 
     def species_roots_at_pressure(
         pressure: float,

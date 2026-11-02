@@ -13795,6 +13795,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         solid_host_area_m2: Any = None,
         alpha: Mapping[str, Any] | None = None,
         commit_release: bool = True,
+        probe_only: bool = False,
     ) -> Dict[str, Any]:
         """Price C0 subsolidus hosts and commit only an admitted extent.
 
@@ -13824,7 +13825,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             redox_notice_for_feedstock,
         )
 
-        self._subsolidus_pending_release = None
+        if not probe_only:
+            self._subsolidus_pending_release = None
         if temperature_K is None:
             temperature_K = float(self.melt.temperature_C) + 273.15
         feedstock_key = str(
@@ -13833,9 +13835,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or ""
         )
         melting = first_melt_backstop(liquid_fraction)
-        if self.melt.campaign == CampaignPhase.C0:
+        if self.melt.campaign == CampaignPhase.C0 and not probe_only:
             self.campaign_mgr.c0_first_melt_backstop = melting
         if melting and not self._subsolidus_handed_off:
+            if probe_only:
+                return {
+                    "temperature_K": float(temperature_K),
+                    "provider_status": None,
+                    "committed": False,
+                    "handoff": True,
+                    "released_kg_hr_by_species": {},
+                    "_headspace_participant_pressures_Pa": {},
+                    "_headspace_release_species": (),
+                }
             debits, credits = handoff_mol_maps(
                 self.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT),
                 self.atom_ledger.mol_by_account(FOULANT_ACCOUNT),
@@ -13978,20 +13990,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 debits, credits = mol_maps_for_extents(selected)
                 if debits or credits:
-                    if commit_release:
+                    if commit_release and not probe_only:
                         self._commit_subsolidus_bakeout_release(debits, credits)
                         committed = True
-                    else:
+                    elif not probe_only:
                         # The step commits this after the combined-species
                         # transport decision, and not before it.
                         self._subsolidus_pending_release = (debits, credits)
 
         released_kg = {}
-        if committed or self._subsolidus_pending_release is not None:
+        if (
+            probe_only
+            or committed
+            or self._subsolidus_pending_release is not None
+        ):
             released_kg = dict(
                 provider_diagnostic.get("released_kg_hr_by_species") or {}
             )
-        self._subsolidus_committed_kg_hr_by_species = released_kg
+        if not probe_only:
+            self._subsolidus_committed_kg_hr_by_species = released_kg
 
         diagnostic = {
             "temperature_K": float(temperature_K),
@@ -14019,6 +14036,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 if key in provider_diagnostic:
                     diagnostic[key] = provider_diagnostic[key]
+        if probe_only:
+            release_species = set()
+            for reaction in provider_reactions:
+                for term in reaction.get("stoichiometry") or ():
+                    species = str(term.get("species_id") or "")
+                    try:
+                        coefficient = float(
+                            term.get("nu_mol_per_mol_rxn", 0.0)
+                        )
+                    except (TypeError, ValueError):
+                        continue
+                    if (
+                        species
+                        and str(term.get("phase") or "") == "gas"
+                        and math.isfinite(coefficient)
+                        and coefficient > 0.0
+                    ):
+                        release_species.add(species)
+            diagnostic["_headspace_participant_pressures_Pa"] = dict(
+                pressures_Pa
+            )
+            diagnostic["_headspace_release_species"] = tuple(
+                sorted(release_species)
+            )
+            return diagnostic
         return self._record_subsolidus_bakeout(diagnostic)
 
     def _c0_pipe_capacity_kg_hr(
@@ -15657,6 +15699,69 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # and vapor pressures at the post-source, post-native composition.
         equilibrium = self._get_equilibrium()
 
+        solid_host_participant_pressures_Pa: Dict[str, float] = {}
+        solid_host_release_species: tuple[str, ...] = ()
+        solid_host_release_callback = None
+        if self.melt.campaign == CampaignPhase.C0:
+            carried_headspace_mbar = dict(
+                getattr(self, "_melt_headspace_composition_mbar", {}) or {}
+            )
+            solid_host_probe = self._apply_c0_bakeout(
+                liquid_fraction=getattr(equilibrium, "liquid_fraction", None),
+                headspace_mbar=carried_headspace_mbar,
+                admitted_gas_kg_hr={},
+                commit_release=False,
+                probe_only=True,
+            )
+            solid_host_participant_pressures_Pa = dict(
+                solid_host_probe.get(
+                    "_headspace_participant_pressures_Pa", {}
+                )
+            )
+            solid_host_release_species = tuple(
+                solid_host_probe.get("_headspace_release_species", ()) or ()
+            )
+            if solid_host_participant_pressures_Pa:
+                def solid_host_release_at_partials(
+                    partials_Pa,
+                    ordinary_species_kg_hr,
+                ):
+                    from simulator.overhead import (
+                        headspace_partials_mbar_from_Pa,
+                    )
+
+                    probe = self._apply_c0_bakeout(
+                        liquid_fraction=getattr(
+                            equilibrium,
+                            "liquid_fraction",
+                            None,
+                        ),
+                        headspace_mbar=headspace_partials_mbar_from_Pa(
+                            partials_Pa
+                        ),
+                        admitted_gas_kg_hr=ordinary_species_kg_hr,
+                        commit_release=False,
+                        probe_only=True,
+                    )
+                    raw_scale = probe.get("pump_scale", 1.0)
+                    try:
+                        joint_scale = float(raw_scale)
+                    except (TypeError, ValueError):
+                        joint_scale = 1.0
+                    if (
+                        not math.isfinite(joint_scale)
+                        or not 0.0 <= joint_scale <= 1.0
+                    ):
+                        joint_scale = 1.0
+                    return (
+                        dict(
+                            probe.get("released_kg_hr_by_species", {}) or {}
+                        ),
+                        joint_scale,
+                    )
+
+                solid_host_release_callback = solid_host_release_at_partials
+
         # --- 4b. Evaporation flux ---
         # Hertz-Knudsen-Langmuir: how fast each species leaves the melt.
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
@@ -15664,6 +15769,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         evap_flux = EvaporationFlux()
         self._solved_headspace_partials_Pa_this_tick = None
         capacity_result = None
+        solid_host_headspace_solved = False
         if evaporation_campaign:
             if (
                 self._overhead_headspace_enabled()
@@ -15738,10 +15844,41 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._calculate_evaporation(
                     equilibrium,
                     solve_headspace_feedback=True,
+                    solid_host_participant_pressures_Pa=(
+                        solid_host_participant_pressures_Pa
+                    ),
+                    solid_host_release_species=solid_host_release_species,
+                    solid_host_release_callback=solid_host_release_callback,
                 )
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
+                solver_diagnostic = dict(
+                    getattr(self, "_last_evaporation_flux_diagnostic", {})
+                    or {}
+                ).get("headspace_solver", {})
+                solved_equilibrium = (
+                    solver_diagnostic.get("equilibrium_Pa", {})
+                    if isinstance(solver_diagnostic, Mapping)
+                    else {}
                 )
+                solver_status = (
+                    solver_diagnostic.get("status")
+                    if isinstance(solver_diagnostic, Mapping)
+                    else None
+                )
+                solid_host_headspace_solved = bool(
+                    solid_host_release_callback is not None
+                    and solver_status in {
+                        "converged",
+                        "source_below_threshold",
+                    }
+                    and isinstance(solved_equilibrium, Mapping)
+                    and set(solid_host_participant_pressures_Pa).issubset(
+                        solved_equilibrium
+                    )
+                )
+                if not solid_host_headspace_solved:
+                    evap_flux = self._apply_analytic_evaporation_depletion(
+                        evap_flux
+                    )
         # The solid-host evaluator is the next operator after ordinary
         # evaporation, so its incoming boundary is the current-hour gas state
         # already solved above. Its released gas joins the shared pipe-cap
@@ -15779,9 +15916,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if rate * joint_scale > 1.0e-15
                 }
                 evap_flux.update_totals()
-        # Ruling A: C0 joint release (ordinary gas plus solid-host gas)
-        # is capped this step. Outside C0 this leaves the flux alone.
-        evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
+        # Ruling A remains the fallback cap when no same-hour solid-host
+        # headspace root ran. That root already balances the current combined
+        # source against pipe flow; another cap here would invalidate its
+        # solved partial pressures before the release commits.
+        if not solid_host_headspace_solved:
+            evap_flux = self._cap_c0_joint_release_to_pipe_capacity(evap_flux)
         overhead_flux = evap_flux
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
         self._commit_pending_subsolidus_release()
