@@ -76,9 +76,10 @@ _WINDOW = "1649.15-1766.15 K"
 _EXTRAPOLATED = "D&G iron-boundary line extrapolated"
 _HOLZHEID = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
 _DISTIN = "distin-1971-ferrous-silicate-melts"
-_DOYLE_SOURCES = (
+_HOLZHEID_SOURCES = (
     "doyle-1988-feo-activity-multicomponent-magma",
     "doyle-1989-tio2-feo-activity-magma",
+    "colson-floden-haugen-2005-nio-feo-o2-activities",
 )
 _HOLZHEID_POINTS = (
     (Decimal("1573.15"), Decimal("2.02")),
@@ -348,15 +349,16 @@ def test_distin_conversion_keeps_all_pinned_temperature_factors() -> None:
         assert state.component_basis == "FeO"
 
 
-@pytest.mark.parametrize("source_id", _DOYLE_SOURCES)
-def test_doyle_reference_conversion_uses_holzheid_printed_anchors(
+@pytest.mark.parametrize("source_id", _HOLZHEID_SOURCES)
+def test_holzheid_reference_conversion_uses_printed_anchors(
     source_id: str,
 ) -> None:
     for temperature_K, factor in _HOLZHEID_POINTS:
-        row = replace(
-            _wustite_row(temperature_K),
-            source_id=source_id,
-        )
+        row = _wustite_row(temperature_K)
+        if source_id.startswith("colson-"):
+            identity = replace(row.identity, quantity=Quantity.ACTIVITY_COEFFICIENT)
+            row = replace(row, identity=identity)
+        row = replace(row, source_id=source_id)
 
         converted = fusion_comparison_reference(
             row, engine=Engine.INTERNAL_ANALYTICAL
@@ -384,7 +386,7 @@ def test_doyle_reference_conversion_uses_holzheid_printed_anchors(
 def test_holzheid_log_ratio_interpolates_in_reciprocal_temperature(
     temperature_K: Decimal, expected_factor: Decimal
 ) -> None:
-    row = replace(_wustite_row(temperature_K), source_id=_DOYLE_SOURCES[0])
+    row = replace(_wustite_row(temperature_K), source_id=_HOLZHEID_SOURCES[0])
 
     converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
 
@@ -401,7 +403,7 @@ def test_holzheid_log_ratio_interpolates_in_reciprocal_temperature(
 def test_holzheid_ratio_extrapolates_with_an_out_of_band_notice(
     temperature_K: Decimal, expected_factor: Decimal
 ) -> None:
-    row = replace(_wustite_row(temperature_K), source_id=_DOYLE_SOURCES[0])
+    row = replace(_wustite_row(temperature_K), source_id=_HOLZHEID_SOURCES[0])
 
     converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
 
