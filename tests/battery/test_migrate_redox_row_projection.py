@@ -145,8 +145,10 @@ def test_aithala_own_composition_retains_its_printed_map() -> None:
 
     assert printed.state.is_value
     assert printed.locator is not None
-    assert printed.state.value["FeO*"] == "15.01±0.12"
-    assert printed.state.value["SiO2"] == "49.17±0.32"
+    # Green 4e3a09d90 stores this map with canonical names and central values
+    # (FeO* is total iron as FeOT); the closure guard does not change that.
+    assert printed.state.value["FeOT"] == "15.01"
+    assert printed.state.value["SiO2"] == "49.17"
 
 
 def test_aithala_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
