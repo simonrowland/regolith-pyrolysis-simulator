@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 722
-- Extracts (`literature_extract.v1`): 720
+- Sources: 723
+- Extracts (`literature_extract.v1`): 721
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 720
+- Extracts with no PDF: 721
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -132,6 +132,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `datz-smith-taylor-1961-nacl-vapor` | Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–), molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961), "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.1700984 — monomer/dimer partials over liquid NaCl (independent of Stull Antoine). Thermochemical: NIST-JANAF NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020). | 10.1063/1.1700984 | ABSENT, `` | `raw/datz-smith-taylor-1961-nacl-vapor/datz-smith-taylor-1961-nacl-vapor.pdf` (ABSENT, ); `text/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT); `tables/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT) | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` (1 rows, draft) | `ledger/datz-smith-taylor-1961-nacl-vapor.yaml`: extracted (2026-09-06) |
 | `day-2020-trinitite-volatility` | Day, J. M. D., Moynier, F., Sossi, P. A., Wang, K., Meshik, A. P., Pravdivtseva, O. V., and Pettit, D. R. (2020). Moderately volatile element behaviour at high temperature determined from nuclear detonation. Geochemical Perspectives Letters 13, 54–60. | 10.7185/geochemlet.2014 | ABSENT, `` | `raw/day-2020-trinitite-volatility/day-2020-trinitite-volatility.pdf` (present, 2d5b0645); `text/day-2020-trinitite-volatility/` (10 files, exists); `tables/day-2020-trinitite-volatility/` (0 files, ABSENT) | `data/literature/extracts/day-2020-trinitite-volatility.yaml` (6 rows, draft, private_path) | `ledger/day-2020-trinitite-volatility.yaml`: — (—) |
 | `de-abreu-2024-li2o-sio2-thermochemistry` | de Abreu, D. A. and Fabrichnaya, O. (2024). Critical Experiments and Thermodynamic Modeling of the Li2O-SiO2 System. Solids, 5, 303–320. | 10.3390/solids5020020 | ABSENT, `` | `raw/de-abreu-2024-li2o-sio2-thermochemistry/de-abreu-2024-li2o-sio2-thermochemistry.pdf` (present, 95686a94); `text/de-abreu-2024-li2o-sio2-thermochemistry/` (1 files, exists); `tables/de-abreu-2024-li2o-sio2-thermochemistry/` (0 files, ABSENT) | `data/literature/extracts/de-abreu-2024-li2o-sio2-thermochemistry.yaml` (26 rows, draft) | `ledger/de-abreu-2024-li2o-sio2-thermochemistry.yaml`: — (—) |
+| `de-maria-1969-rend-lincei` | Giovanni De Maria and Vincenzo Piacente, “Mass spectrometric study of rock like lunar surface material”, Atti della Accademia Nazionale dei Lincei, Rendiconti, Serie 8, 47(6), 525–536 (1969). |  | ABSENT, `` | `raw/de-maria-1969-rend-lincei/de-maria-1969-rend-lincei.pdf` (present, 866c1fb5); `text/de-maria-1969-rend-lincei/` (18 files, exists); `tables/de-maria-1969-rend-lincei/` (4 files, exists) | `data/literature/extracts/de-maria-1969-rend-lincei.yaml` (39 rows, draft) | `ledger/de-maria-1969-rend-lincei.yaml`: extracted (2026-10-05) |
 | `decapitani-kirschen-1998-excess-function` | DeCapitani, C. and Kirschen, M. (1998), “A generalized multicomponent excess function with application to immiscible liquids in the system CaO-SiO2-TiO2”, Geochimica et Cosmochimica Acta, 62(23/24), 3753–3763. | 10.1016/S0016-7037(98)00319-6 | ABSENT, `` | `raw/decapitani-kirschen-1998-excess-function/decapitani-kirschen-1998-excess-function.pdf` (present, 9a3ece38); `text/decapitani-kirschen-1998-excess-function/` (23 files, exists); `tables/decapitani-kirschen-1998-excess-function/` (0 files, ABSENT) | `data/literature/extracts/decapitani-kirschen-1998-excess-function.yaml` (90 rows, draft) | `ledger/decapitani-kirschen-1998-excess-function.yaml`: — (—) |
 | `deffrennes-2020-ca-o-calphad` | G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad, 69 (2020), 101764. | 10.1016/j.calphad.2020.101764 | ABSENT, `` | `raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf` (present, 8b5c40c4); `text/deffrennes-2020-ca-o-calphad/` (3 files, exists); `tables/deffrennes-2020-ca-o-calphad/` (8 files, exists) | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` (3 rows, draft) | `ledger/deffrennes-2020-ca-o-calphad.yaml`: extracted (2026-10-04) |
 | `deguzman-2026-simulant-physicochemical` | De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou, Kyriaki & Gacesa, Marko (2026), "Physicochemical properties of lunar regolith simulant for in situ oxygen production", arXiv:2601.14719. |  | ABSENT, `` | `raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf` (present, ebfc9d3f); `text/deguzman-2026-simulant-physicochemical/` (32 files, exists); `tables/deguzman-2026-simulant-physicochemical/` (0 files, ABSENT) | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` (10 rows, draft) | `ledger/deguzman-2026-simulant-physicochemical.yaml`: decoded (2026-09-06) |
@@ -861,6 +862,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `datz-smith-taylor-1961-nacl-vapor`
 - `day-2020-trinitite-volatility`
 - `de-abreu-2024-li2o-sio2-thermochemistry`
+- `de-maria-1969-rend-lincei`
 - `decapitani-kirschen-1998-excess-function`
 - `deffrennes-2020-ca-o-calphad`
 - `deguzman-2026-simulant-physicochemical`

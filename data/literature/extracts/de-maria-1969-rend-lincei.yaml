@@ -1,0 +1,4745 @@
+schema_version: literature_extract.v1
+source_id: de-maria-1969-rend-lincei
+source:
+  citation: Giovanni De Maria and Vincenzo Piacente, “Mass spectrometric study of rock like lunar surface material”, Atti
+    della Accademia Nazionale dei Lincei, Rendiconti, Serie 8, 47(6), 525–536 (1969).
+  year: 1969
+  corpus_asset: raw/de-maria-1969-rend-lincei/de-maria-1969-rend-lincei.pdf
+extraction:
+  method: MinerU Markdown and table drafts transcribed; Table I and all other stored table values checked against PDF page
+    renders.
+  date: '2026-11-01'
+  worker: w1101demaria-demaria69
+  provenance_path: text/de-maria-1969-rend-lincei/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Na.observations[de_maria_1969_table1_mq_23].values.points[0].ion_intensity_as_printed
+  value: 2 · 10^-13
+  locator:
+    page: 7
+    published_page: 529
+    pdf_page_index: 6
+    table: I
+    row: '1210'
+- path: species.K.observations[de_maria_1969_table1_mq_39_row_1880_upper_limit_typed_refusal].values.ion_intensity_as_printed
+  value: < 0.5 · 10^-13
+  locator:
+    page: 7
+    published_page: 529
+    pdf_page_index: 6
+    table: I
+    row: '1880'
+- path: species.SiO.observations[de_maria_1969_table1_mq_44].values.points[1].ion_intensity_as_printed
+  value: 10 · 10^-12
+  locator:
+    page: 7
+    published_page: 529
+    pdf_page_index: 6
+    table: I
+    row: '1880'
+- path: species.Fe.observations[de_maria_1969_table1_mq_56].values.points[2].ion_intensity_as_printed
+  value: 12.6 · 10^-12
+  locator:
+    page: 8
+    published_page: 530
+    pdf_page_index: 7
+    table: I
+    row: '1980'
+- path: species.Na.observations[de_maria_1969_results_na_partial_pressure].values.points[0].pressure_as_printed
+  value: of the order 10^-5 atm
+  locator:
+    page: 13
+    published_page: 535
+    pdf_page_index: 12
+    section: Results
+    row: Na at 1200° K
+- path: species.Na.observations[de_maria_1969_table2_mq_23_appearance_potential_typed_refusal].values.appearance_potential_as_printed
+  value: 5.1 ± 0.3 eV
+  locator:
+    page: 12
+    published_page: 534
+    pdf_page_index: 11
+    table: II
+    row: '23'
+experiments:
+  de_maria_1969_andesinic_basalt_kems:
+    method: knudsen_effusion
+    method_as_printed: Knudsen effusion technique coupled to mass spectrometry.
+    locator:
+      page: 4
+      published_page: 526
+      pdf_page_index: 3
+      section: Experimental Procedure
+    conditions:
+      total_pressure_Pa: &id001
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+          note: The paper reports background pressure limits in the cell compartment and analyzer, not total sample-vapor
+            pressure.
+      fO2_Pa: &id002
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 14
+          published_page: 536
+          pdf_page_index: 13
+          section: Conclusions
+          note: No experimental oxygen fugacity is stated. The molybdenum reaction and hypothetical neutral conditions are
+            not an fO2 value.
+      composition: &id003
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+          note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+      apparatus:
+        state:
+          tag: value
+          value: Molybdenum Knudsen effusion cell with 1 mm knife-edge orifice, coupled to a Bendix 3015 time-of-flight mass
+            spectrometer.
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+    sample:
+      form:
+        state:
+          tag: value
+          value: Crushed andesinic basalt of Nuraghe Silvanis.
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+      characterization:
+        state:
+          tag: value
+          value: Vesicular aspect and porphyritic structure of vitrophyric type.
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+      composition:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 4
+          published_page: 526
+          pdf_page_index: 3
+          section: Experimental Procedure
+          note: The paper points to reference 10, Table IV, sample 2, but does not reproduce the composition values.
+species:
+  Na:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_23
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 23 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1780
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: Na+
+        ion_mass_to_charge_as_printed: '23'
+        species_assignment_as_printed: Na+ parent ion
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 2
+          table_column_number: 2
+          locator: &id004
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1210'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id004
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 3
+          table_column_number: 2
+          locator: &id005
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1280'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id005
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 4
+          table_column_number: 2
+          locator: &id006
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1350'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id006
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 5
+          table_column_number: 2
+          locator: &id007
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1420'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id007
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 18 · 10^-13
+          table_row_number: 6
+          table_column_number: 2
+          locator: &id008
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1500'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id008
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.8E-12'
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 20 · 10^-13
+          table_row_number: 7
+          table_column_number: 2
+          locator: &id009
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1560'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id009
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 5.0 · 10^-12
+          table_row_number: 8
+          table_column_number: 2
+          locator: &id010
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1600'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id010
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '5.0E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 8.0 · 10^-12
+          table_row_number: 9
+          table_column_number: 2
+          locator: &id011
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id011
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '8.0E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 7.2 · 10^-12
+          table_row_number: 10
+          table_column_number: 2
+          locator: &id012
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 23 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id012
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '7.2E-12'
+        gas_species: Na(g)
+    - observation_id: de_maria_1969_table1_mq_23_row_1780_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id013
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1780'
+        note: Table I, m/e 23 ion-intensity cell.
+      T_range_K:
+      - 1780
+      - 1780
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1780'
+          locator: *id013
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: Na+
+        ion_mass_to_charge_as_printed: '23'
+        species_assignment_as_printed: Na+ parent ion
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table2_mq_23_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '23'
+        note: Table II, m/e 23, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '23'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 5.1 ± 0.3 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '23'
+        possible_parent_species_as_printed: Na
+        appearance_potential_as_printed: 5.1 ± 0.3 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_results_na_partial_pressure
+      type: partial_pressure
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id014
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        row: Na at 1200° K
+      T_range_K:
+      - 1200
+      - 1200
+      phase: gas
+      regime: kems_effusion
+      units: atm
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      derivation:
+        relation: The authors estimate the partial pressures following the procedure described in reference 6.
+        output_unit: atm
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+            row: Na at 1200° K
+            note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
+          but the intermediate current and calibration inputs are not printed.
+        gas_species: Na(g)
+        formula: Na
+        points:
+        - T_K: '1200'
+          temperature_as_printed: 1200° K
+          pressure_atm: 1e-5
+          pressure_as_printed: of the order 10^-5 atm
+          pressure_qualifier: order_of_magnitude
+          approximate: true
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id014
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          locator: *id014
+      uncertainty:
+        note: Na and K are printed as order-of-magnitude values; no confidence level or numeric uncertainty is stated.
+    context:
+    - observation_id: de_maria_1969_abstract_temperature_range_context
+      type: abstract_summary_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 3
+        published_page: 525
+        pdf_page_index: 2
+        section: Abstract
+      units: K as printed
+      values:
+        temperature_range_as_printed: 300°–2330° K.
+        study_summary_as_printed: Vaporization of the andesinic basalt sample was studied by coupling Knudsen effusion with
+          mass spectrometry.
+    - observation_id: de_maria_1969_method_apparatus_and_calibration
+      type: method_and_calibration_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+      units: as printed
+      values:
+        instrument_and_temperature_as_printed: High-temperature Bendix Co. time-of-flight mass spectrometer, model 3015; resolving
+          power 750; ion flight path 200 cm. Radiation heating and electron bombardment were used; temperatures as high as
+          2400° K were reached with electron-bombardment heating.
+        temperature_measurement_and_calibration_as_printed: Temperature was measured with a Leeds and Northrup optical pyrometer
+          and a W, W—Re thermocouple. The discrepancies never exceeded 12°C. The optical pyrometer was calibrated at the melting
+          point of gold [8]; bottom-window transmission correction was based on Benford [9].
+        background_pressure_as_printed: Below 10^-6 Torr in the Knudsen-cell region and 10^-7 Torr in the analyzer.
+        beam_and_readout_as_printed: A molecular beam shutter distinguished ions formed from neutral particles in the beam
+          from ions created by surface ionization or background gases. Two standard readout channels were used for ion-intensity
+          ratios and isotopic distributions.
+        container_as_printed: Molybdenum effusion cell, 1.2 cm high, 1 cm external diameter, with a 1 mm knife-edge orifice;
+          previously outgassed at 1800° K.
+        sample_as_printed: Crushed andesinic basalt of Nuraghe Silvanis; its composition corresponds to Table IV, sample no.
+          2, of reference 10. The rock is described as vesicular and porphyritic of vitrophyric type.
+        silver_and_pressure_calibration_as_printed: “Two silver calibrations were made, before and after the vaporization
+          of the sample. The reproducibility of the instrument sensitivity factor was within 15%. On the basis of an extensive
+          observation made during several years in this laboratory, we are led to believe that this procedure would affect
+          the pressure calibration within an uncertainty of 10–15% at the most.”
+    - observation_id: de_maria_1969_sample_vaporization_temperature_context
+      type: experiment_temperature_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 6
+        published_page: 528
+        pdf_page_index: 5
+        section: Results
+      units: as printed
+      values:
+        quantitative_evaporation_as_printed: 178 mgr of sample; starting from room temperature; stages at intervals of about
+          100°C; about four hours at each stage; the series lasted five days.
+        initial_stage_as_printed: Temperature interval 300°–500° K; weight loss 7.3 mgr (4.1% of sample), compared with 4.71%
+          calculated water in the original sample.
+        intermediate_stage_as_printed: In the temperature range 500°–1800° K the weight loss was negligible while the alkaline
+          metals and presumably part of the alkaline-earth elements volatilized.
+        container_reaction_as_printed: At 1200° K the crucible inner free surfaces began to be covered by brown granules,
+          later identified by X-ray as nonstoichiometric molybdenum oxides.
+        melting_as_printed: Melting of the sample occurred between 1200° and 1300° K.
+        table_conditions_as_printed: Table I intensities were measured at 70 eV electron energy and corrected for surface
+          ionization and photo-effect following the usual procedure [5].
+        surface_ionization_as_printed: At 1600° K and 70 eV, the surface-ionization contribution to Na+ intensity was about
+          15% of the total peak.
+    - observation_id: de_maria_1969_appearance_potential_method_context
+      type: appearance_potential_calibration_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 9
+        published_page: 531
+        pdf_page_index: 8
+        section: Results
+      units: as printed
+      values:
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+        curve_scope_as_printed: Figures 2, 3, and 4 show ionization-efficiency curves for Na+, K+, SiO+, Fe+, m/e 25 and 26,
+          and m/e 50, 51, and 52. They are not digitized in this extract.
+    - observation_id: de_maria_1969_vaporization_stage_context
+      type: vaporization_interpretation_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 10
+        published_page: 532
+        pdf_page_index: 9
+        section: Results
+      units: as printed
+      values:
+        first_stage_as_printed: Between 1300° and 1900° K, alkaline and alkaline-earth metals vaporized largely as atomic
+          or oxygen-containing heteronuclear polyatomic species, and to a lesser degree species containing Al and presumably
+          Si.
+        second_stage_as_printed: Approximately 2000°–2300° K; Si and Fe and part of Al volatilized. Si volatilized mainly
+          as SiO; iron and aluminum as monatomic species.
+        third_stage_as_printed: Above 2300° K; residue largely composed of Al2O3 and molybdenum oxide volatilized. Evaporation
+          was not completed because the residue appeared to have reacted strongly with the container and weight loss exceeded
+          initial sample weight.
+        molybdenum_oxide_ions_as_printed: At 70 eV, volatilized molybdenum oxide produced MoO3+, MoO2+, and MoO+ ion peaks,
+          mainly from the outer crucible surfaces.
+    - observation_id: de_maria_1969_mass40_and_species_interpretation_context
+      type: ion_assignment_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+      units: as printed
+      values:
+        mass40_as_printed: Between 1400° and 1800° K, the m/e 40 peak was attributed to re-evaporation of calcium from the
+          shields.
+        sio_isotopic_peaks_as_printed: The m/e 44, 45, and 46 currents agree reasonably with SiO isotopic distribution; SiO
+          appearance was noticed at about 1800° K.
+        surface_ionization_mass50_52_as_printed: The surface-ionization contribution for m/e 50, 51, and 52 was of the order
+          of 5–10% of the whole peak.
+    - observation_id: de_maria_1969_activity_estimates_context
+      type: author_calculation_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+      units: as printed
+      values:
+        printed_calculation_as_printed: From the partial-pressure estimates, the authors calculate an order of 10^-5, 10^-6,
+          and 4·10^-2 for the activities of Na, K, and Fe, respectively, using vapor-pressure data revised by Nesmeyanov [17].
+        activity_values_as_printed:
+          Na: order 10^-5
+          K: order 10^-6
+          Fe: 4·10^-2
+        not_scored_reason: The external Nesmeyanov vapor-pressure inputs are not stored; the printed results are retained
+          as context, not an activity observation with incomplete lineage.
+    - observation_id: de_maria_1969_oxygen_reaction_statement
+      type: oxygen_potential_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Conclusions
+      units: as printed
+      values:
+        observed_oxygen_reaction_quote: The failure to detect oxygen—made more difficult because of the relatively high background
+          peak at mass 16—shows that most of the oxygen in the sample reacted with the molybdenum to form non-stoichiometric
+          oxides that began to volatilize at approximately 2000° K.
+        fO2_assignment: No experimental fO2 value is printed or assigned.
+    - observation_id: de_maria_1969_neutral_conditions_statements
+      type: oxygen_potential_context
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 14
+        published_page: 536
+        pdf_page_index: 13
+        section: Conclusions
+      units: as printed
+      values:
+        neutral_condition_hypothesis_quote: Nevertheless it is legitimate to argue that a respectable amount of the oxygen
+          in the sample could, in neutral conditions, vaporize in free form at a temperature as low as 1700° K.
+        container_conclusion_quote: The present study illustrates the necessity of finding a suitable container to study the
+          material in the most perfect neutral conditions possible.
+        fO2_assignment: No experimental fO2 value is printed or assigned.
+    - observation_id: de_maria_1969_figure_only_inventory
+      type: figure_only_inventory
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 5
+        published_page: 527
+        pdf_page_index: 4
+        figure: '1'
+      units: not digitized
+      values:
+        figure_read_candidates:
+        - figure: '1'
+          subject: Comparison of atomic composition of the sample and Surveyor V lunar material.
+          locator:
+            page: 5
+            published_page: 527
+            pdf_page_index: 4
+            figure: '1'
+        - figure: '2'
+          subject: Ionization-efficiency curves for Na+, K+, and SiO+ over the basalt sample.
+          locator:
+            page: 9
+            published_page: 531
+            pdf_page_index: 8
+            figure: '2'
+        - figure: '3'
+          subject: Ionization-efficiency curves for Fe+, m/e 25, and m/e 26 over the basalt sample.
+          locator:
+            page: 10
+            published_page: 532
+            pdf_page_index: 9
+            figure: '3'
+        - figure: '4'
+          subject: Ionization-efficiency curves for m/e 50, 51, and 52 over the basalt sample.
+          locator:
+            page: 11
+            published_page: 533
+            pdf_page_index: 10
+            figure: '4'
+        admission_status: figure_only
+        note: No figure-only data were digitized.
+  unidentified_ion:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_24
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 24 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1280
+      - 1780
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 24
+        ion_mass_to_charge_as_printed: '24'
+        species_assignment_as_printed: fragment; parent species not identified; the text later discusses possible pyrolysis
+          products
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 4 · 10^-13
+          table_row_number: 3
+          table_column_number: 3
+          locator: &id015
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1280'
+            note: Table I, m/e 24 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id015
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 4E-13
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: ~ 2 · 10^-13
+          table_row_number: 4
+          table_column_number: 3
+          locator: &id016
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1350'
+            note: Table I, m/e 24 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id016
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+          qualifier: approximate
+          qualifier_as_printed: '~'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 8
+          table_column_number: 3
+          locator: &id017
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1600'
+            note: Table I, m/e 24 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id017
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 9
+          table_column_number: 3
+          locator: &id018
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 24 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id018
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 10
+          table_column_number: 3
+          locator: &id019
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 24 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id019
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+    - observation_id: de_maria_1969_table1_mq_24_row_1420_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id020
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1420'
+        note: Table I, m/e 24 ion-intensity cell.
+      T_range_K:
+      - 1420
+      - 1420
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1420'
+          locator: *id020
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: m/e 24
+        ion_mass_to_charge_as_printed: '24'
+        species_assignment_as_printed: fragment; parent species not identified; the text later discusses possible pyrolysis
+          products
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table1_mq_24_row_1780_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id021
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1780'
+        note: Table I, m/e 24 ion-intensity cell.
+      T_range_K:
+      - 1780
+      - 1780
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1780'
+          locator: *id021
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: m/e 24
+        ion_mass_to_charge_as_printed: '24'
+        species_assignment_as_printed: fragment; parent species not identified; the text later discusses possible pyrolysis
+          products
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table1_mq_25
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 25 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1830
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 25
+        ion_mass_to_charge_as_printed: '25'
+        species_assignment_as_printed: fragment; source says an undetermined higher-mass species is possible
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 12 · 10^-13
+          table_row_number: 2
+          table_column_number: 4
+          locator: &id022
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1210'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id022
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 3
+          table_column_number: 4
+          locator: &id023
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1280'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id023
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 4
+          table_column_number: 4
+          locator: &id024
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1350'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id024
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 5
+          table_column_number: 4
+          locator: &id025
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1420'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id025
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 6
+          table_column_number: 4
+          locator: &id026
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1500'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id026
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 7
+          table_column_number: 4
+          locator: &id027
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1560'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id027
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 8
+          table_column_number: 4
+          locator: &id028
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1600'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id028
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 9
+          table_column_number: 4
+          locator: &id029
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id029
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 10
+          table_column_number: 4
+          locator: &id030
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id030
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: ~ 1 · 10^-13
+          table_row_number: 11
+          table_column_number: 4
+          locator: &id031
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1780'
+            note: Table I, m/e 25 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id031
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 1E-13
+          qualifier: approximate
+          qualifier_as_printed: '~'
+    - observation_id: de_maria_1969_table1_mq_25_row_1830_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id032
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1830'
+        note: Table I, m/e 25 ion-intensity cell.
+      T_range_K:
+      - 1830
+      - 1830
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1830'
+          locator: *id032
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: m/e 25
+        ion_mass_to_charge_as_printed: '25'
+        species_assignment_as_printed: fragment; source says an undetermined higher-mass species is possible
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table1_mq_26
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 26 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1980
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 26
+        ion_mass_to_charge_as_printed: '26'
+        species_assignment_as_printed: possible parent ion; exact parent species not identified
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 4.5 · 10^-12
+          table_row_number: 2
+          table_column_number: 5
+          locator: &id033
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1210'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id033
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '4.5E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 3.0 · 10^-12
+          table_row_number: 3
+          table_column_number: 5
+          locator: &id034
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1280'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id034
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.0E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 2.5 · 10^-12
+          table_row_number: 4
+          table_column_number: 5
+          locator: &id035
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1350'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id035
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.5E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 3.0 · 10^-12
+          table_row_number: 5
+          table_column_number: 5
+          locator: &id036
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1420'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id036
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.0E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 2.5 · 10^-12
+          table_row_number: 6
+          table_column_number: 5
+          locator: &id037
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1500'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id037
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.5E-12'
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 4.8 · 10^-12
+          table_row_number: 7
+          table_column_number: 5
+          locator: &id038
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1560'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id038
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '4.8E-12'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 9.0 · 10^-12
+          table_row_number: 8
+          table_column_number: 5
+          locator: &id039
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1600'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id039
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '9.0E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 10 · 10^-12
+          table_row_number: 9
+          table_column_number: 5
+          locator: &id040
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id040
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-11'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 8.2 · 10^-12
+          table_row_number: 10
+          table_column_number: 5
+          locator: &id041
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id041
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '8.2E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 2.0 · 10^-12
+          table_row_number: 11
+          table_column_number: 5
+          locator: &id042
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1780'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id042
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 9.0 · 10^-13
+          table_row_number: 12
+          table_column_number: 5
+          locator: &id043
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1830'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id043
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '9.0E-13'
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: ~ 2.0 · 10^-13
+          table_row_number: 13
+          table_column_number: 5
+          locator: &id044
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1880'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id044
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-13'
+          qualifier: approximate
+          qualifier_as_printed: '~'
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 5.0 · 10^-13
+          table_row_number: 14
+          table_column_number: 5
+          locator: &id045
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1900'
+            note: Table I, m/e 26 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id045
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '5.0E-13'
+    - observation_id: de_maria_1969_table1_mq_26_row_1980_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id046
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1980'
+        note: Table I, m/e 26 ion-intensity cell.
+      T_range_K:
+      - 1980
+      - 1980
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1980'
+          locator: *id046
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: m/e 26
+        ion_mass_to_charge_as_printed: '26'
+        species_assignment_as_printed: possible parent ion; exact parent species not identified
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table1_mq_50
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 50 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1900
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 50
+        ion_mass_to_charge_as_printed: '50'
+        species_assignment_as_printed: possible (NaAl) fragment; paper also discusses a possible organic source
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 25 · 10^-13
+          table_row_number: 2
+          table_column_number: 4
+          locator: &id047
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1210'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id047
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.5E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 20 · 10^-13
+          table_row_number: 3
+          table_column_number: 4
+          locator: &id048
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1280'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id048
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 4
+          table_column_number: 4
+          locator: &id049
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1350'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id049
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 12 · 10^-13
+          table_row_number: 5
+          table_column_number: 4
+          locator: &id050
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1420'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id050
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 6
+          table_column_number: 4
+          locator: &id051
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1500'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id051
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 7
+          table_column_number: 4
+          locator: &id052
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1560'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id052
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 8
+          table_column_number: 4
+          locator: &id053
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1600'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id053
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 17 · 10^-13
+          table_row_number: 9
+          table_column_number: 4
+          locator: &id054
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1660'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id054
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.7E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 20 · 10^-13
+          table_row_number: 10
+          table_column_number: 4
+          locator: &id055
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1710'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id055
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 11
+          table_column_number: 4
+          locator: &id056
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1780'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id056
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 12
+          table_column_number: 4
+          locator: &id057
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1830'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id057
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: ~ 1 · 10^-13
+          table_row_number: 13
+          table_column_number: 4
+          locator: &id058
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 50 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id058
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 1E-13
+          qualifier: approximate
+          qualifier_as_printed: '~'
+    - observation_id: de_maria_1969_table1_mq_50_row_1900_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id059
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        row: '1900'
+        note: Table I, m/e 50 ion-intensity cell.
+      T_range_K:
+      - 1900
+      - 1900
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1900'
+          locator: *id059
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: m/e 50
+        ion_mass_to_charge_as_printed: '50'
+        species_assignment_as_printed: possible (NaAl) fragment; paper also discusses a possible organic source
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table1_mq_51
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 51 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1900
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 51
+        ion_mass_to_charge_as_printed: '51'
+        species_assignment_as_printed: possible (NaSi) or (MgAl) parent species
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 20 · 10^-13
+          table_row_number: 2
+          table_column_number: 5
+          locator: &id060
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1210'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id060
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 18 · 10^-13
+          table_row_number: 3
+          table_column_number: 5
+          locator: &id061
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1280'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id061
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.8E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 4
+          table_column_number: 5
+          locator: &id062
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1350'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id062
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 5
+          table_column_number: 5
+          locator: &id063
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1420'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id063
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 8 · 10^-13
+          table_row_number: 6
+          table_column_number: 5
+          locator: &id064
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1500'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id064
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 8E-13
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 12 · 10^-13
+          table_row_number: 7
+          table_column_number: 5
+          locator: &id065
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1560'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id065
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-12'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 13 · 10^-13
+          table_row_number: 8
+          table_column_number: 5
+          locator: &id066
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1600'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id066
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.3E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 9
+          table_column_number: 5
+          locator: &id067
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1660'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id067
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 10
+          table_column_number: 5
+          locator: &id068
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1710'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id068
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 11 · 10^-13
+          table_row_number: 11
+          table_column_number: 5
+          locator: &id069
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1780'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id069
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.1E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 12
+          table_column_number: 5
+          locator: &id070
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1830'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id070
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 1 · 10^-13
+          table_row_number: 13
+          table_column_number: 5
+          locator: &id071
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id071
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 1E-13
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 0.5 · 10^-13
+          table_row_number: 14
+          table_column_number: 5
+          locator: &id072
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1900'
+            note: Table I, m/e 51 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id072
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-14
+    - observation_id: de_maria_1969_table1_mq_52
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 52 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1900
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 52
+        ion_mass_to_charge_as_printed: '52'
+        species_assignment_as_printed: possible (MgSi) parent species
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 18 · 10^-13
+          table_row_number: 2
+          table_column_number: 6
+          locator: &id073
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1210'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id073
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.8E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 3
+          table_column_number: 6
+          locator: &id074
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1280'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id074
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 4
+          table_column_number: 6
+          locator: &id075
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1350'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id075
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 6 · 10^-13
+          table_row_number: 5
+          table_column_number: 6
+          locator: &id076
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1420'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id076
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 6E-13
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 6 · 10^-13
+          table_row_number: 6
+          table_column_number: 6
+          locator: &id077
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1500'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id077
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 6E-13
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 7 · 10^-13
+          table_row_number: 7
+          table_column_number: 6
+          locator: &id078
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1560'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id078
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 7E-13
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 8
+          table_column_number: 6
+          locator: &id079
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1600'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id079
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 13 · 10^-13
+          table_row_number: 9
+          table_column_number: 6
+          locator: &id080
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1660'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id080
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.3E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 10
+          table_column_number: 6
+          locator: &id081
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1710'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id081
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 11 · 10^-13
+          table_row_number: 11
+          table_column_number: 6
+          locator: &id082
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1780'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id082
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.1E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 3 · 10^-13
+          table_row_number: 12
+          table_column_number: 6
+          locator: &id083
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1830'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id083
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 3E-13
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 1 · 10^-13
+          table_row_number: 13
+          table_column_number: 6
+          locator: &id084
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id084
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 1E-13
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 0.5 · 10^-13
+          table_row_number: 14
+          table_column_number: 6
+          locator: &id085
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1900'
+            note: Table I, m/e 52 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id085
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-14
+    - observation_id: de_maria_1969_table1_mq_78
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 78 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1830
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 78
+        ion_mass_to_charge_as_printed: '78'
+        species_assignment_as_printed: KNaO suggested as parent; Na2O2 less likely; possible aromatic-hydrocarbon contribution
+          is also discussed
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 11 · 10^-12
+          table_row_number: 2
+          table_column_number: 8
+          locator: &id086
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1210'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id086
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.1E-11'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 6.5 · 10^-12
+          table_row_number: 3
+          table_column_number: 8
+          locator: &id087
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1280'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id087
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '6.5E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 6.0 · 10^-12
+          table_row_number: 4
+          table_column_number: 8
+          locator: &id088
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1350'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id088
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '6.0E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 6.0 · 10^-12
+          table_row_number: 5
+          table_column_number: 8
+          locator: &id089
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1420'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id089
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '6.0E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 4.5 · 10^-12
+          table_row_number: 6
+          table_column_number: 8
+          locator: &id090
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1500'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id090
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '4.5E-12'
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 28 · 10^-13
+          table_row_number: 7
+          table_column_number: 8
+          locator: &id091
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1560'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id091
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.8E-12'
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 30 · 10^-13
+          table_row_number: 8
+          table_column_number: 8
+          locator: &id092
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1600'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id092
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.0E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 18 · 10^-13
+          table_row_number: 9
+          table_column_number: 8
+          locator: &id093
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1660'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id093
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.8E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 10
+          table_column_number: 8
+          locator: &id094
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1710'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id094
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 11
+          table_column_number: 8
+          locator: &id095
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1780'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id095
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 12
+          table_column_number: 8
+          locator: &id096
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1830'
+            note: Table I, m/e 78 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id096
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+    - observation_id: de_maria_1969_table2_mq_24_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '24'
+        note: Table II, m/e 24, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '24'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as ~ 40 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '24'
+        possible_parent_species_as_printed: (fragment)
+        appearance_potential_as_printed: ~ 40 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_25_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '25'
+        note: Table II, m/e 25, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '25'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 21 ± 1 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '25'
+        possible_parent_species_as_printed: (fragment)
+        appearance_potential_as_printed: 21 ± 1 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_26_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '26'
+        note: Table II, m/e 26, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '26'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 15.0 ± 0.8 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '26'
+        possible_parent_species_as_printed: —
+        appearance_potential_as_printed: 15.0 ± 0.8 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_50_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '50'
+        note: Table II, m/e 50, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '50'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 18.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '50'
+        possible_parent_species_as_printed: (NaAl), fragment
+        appearance_potential_as_printed: 18.5 ± 1.0 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_51_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '51'
+        note: Table II, m/e 51, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '51'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 15.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '51'
+        possible_parent_species_as_printed: (NaSi), (MgAl)
+        appearance_potential_as_printed: 15.5 ± 1.0 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_52_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '52'
+        note: Table II, m/e 52, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '52'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 15.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '52'
+        possible_parent_species_as_printed: (MgSi)
+        appearance_potential_as_printed: 15.5 ± 1.0 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_table2_mq_78_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '78'
+        note: Table II, m/e 78, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '78'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as ~ 15 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '78'
+        possible_parent_species_as_printed: KNaO, (Na2O2)
+        appearance_potential_as_printed: ~ 15 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_results_mass80_to_mass78_ion_intensity_ratio
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        note: Reported average I+80/I+78 ratio; individual ratios at the three temperatures are not printed.
+      phase: gas
+      regime: kems_effusion
+      units: dimensionless
+      T_range_K:
+      - 1550
+      - 1840
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: no_single_temperature_for_average
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+            note: The reported 10.2 is an average across 1550°, 1720°, and 1840° K; no single temperature for the average
+              is stated.
+      derivation:
+        relation: Average of the I+80/I+78 ion-intensity ratios measured at the three printed temperatures.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+            note: The individual I+80/I+78 ratios are not printed; only their average is reported.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; this is the reported average of three ratios, while the
+          individual ratios are not printed.
+        ion_pair: I+80/I+78
+        ion_intensity_ratio: '10.2'
+        ion_intensity_ratio_as_printed: '10.2'
+        measurement_temperatures_as_printed:
+        - 1550° K
+        - 1720° K
+        - 1840° K
+        theoretical_K_abundance_as_printed: '6.3'
+        note: The authors report 10.2 as the average isotopic abundance of mass 80 and compare it with the theoretical 6.3
+          abundance due to K.
+  Al:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_27
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 27 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1660
+      - 1780
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: Al+
+        ion_mass_to_charge_as_printed: '27'
+        species_assignment_as_printed: Al+ parent ion
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 9
+          table_column_number: 6
+          locator: &id097
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 27 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id097
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 3 · 10^-13
+          table_row_number: 10
+          table_column_number: 6
+          locator: &id098
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 27 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id098
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 3E-13
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 11
+          table_column_number: 6
+          locator: &id099
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1780'
+            note: Table I, m/e 27 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id099
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        gas_species: Al(g)
+  K:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_39
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 39 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1210
+      - 1880
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: K+
+        ion_mass_to_charge_as_printed: '39'
+        species_assignment_as_printed: K+ parent ion; Table II also lists NaO as a less-likely parent
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1210'
+          temperature_as_printed: '1210'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 2
+          table_column_number: 7
+          locator: &id100
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1210'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1210'
+              locator: *id100
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1280'
+          temperature_as_printed: '1280'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 3
+          table_column_number: 7
+          locator: &id101
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1280'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1280'
+              locator: *id101
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '1350'
+          temperature_as_printed: '1350'
+          ion_intensity_as_printed: 30 · 10^-13
+          table_row_number: 4
+          table_column_number: 7
+          locator: &id102
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1350'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1350'
+              locator: *id102
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.0E-12'
+        - T_K: '1420'
+          temperature_as_printed: '1420'
+          ion_intensity_as_printed: 21 · 10^-13
+          table_row_number: 5
+          table_column_number: 7
+          locator: &id103
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1420'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1420'
+              locator: *id103
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.1E-12'
+        - T_K: '1500'
+          temperature_as_printed: '1500'
+          ion_intensity_as_printed: 35 · 10^-13
+          table_row_number: 6
+          table_column_number: 7
+          locator: &id104
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1500'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1500'
+              locator: *id104
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.5E-12'
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 6 · 10^-12
+          table_row_number: 7
+          table_column_number: 7
+          locator: &id105
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1560'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id105
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 6E-12
+        - T_K: '1600'
+          temperature_as_printed: '1600'
+          ion_intensity_as_printed: 8 · 10^-12
+          table_row_number: 8
+          table_column_number: 7
+          locator: &id106
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1600'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1600'
+              locator: *id106
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 8E-12
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 8 · 10^-12
+          table_row_number: 9
+          table_column_number: 7
+          locator: &id107
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id107
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 8E-12
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: 12 · 10^-12
+          table_row_number: 10
+          table_column_number: 7
+          locator: &id108
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id108
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-11'
+        - T_K: '1780'
+          temperature_as_printed: '1780'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 11
+          table_column_number: 7
+          locator: &id109
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1780'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1780'
+              locator: *id109
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 0 · 10^-13
+          table_row_number: 12
+          table_column_number: 7
+          locator: &id110
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1830'
+            note: Table I, m/e 39 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id110
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 0E-13
+        gas_species: K(g)
+    - observation_id: de_maria_1969_table1_mq_39_row_1880_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id111
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        row: '1880'
+        note: Table I, m/e 39 ion-intensity cell.
+      T_range_K:
+      - 1880
+      - 1880
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1880'
+          locator: *id111
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: K+
+        ion_mass_to_charge_as_printed: '39'
+        species_assignment_as_printed: K+ parent ion; Table II also lists NaO as a less-likely parent
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table2_mq_39_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '39'
+        note: Table II, m/e 39, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '39'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 6.0 ± 0.3 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '39'
+        possible_parent_species_as_printed: K, (NaO)
+        appearance_potential_as_printed: 6.0 ± 0.3 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_results_k_partial_pressure
+      type: partial_pressure
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id112
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        row: K at 1200° K
+      T_range_K:
+      - 1200
+      - 1200
+      phase: gas
+      regime: kems_effusion
+      units: atm
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      derivation:
+        relation: The authors estimate the partial pressures following the procedure described in reference 6.
+        output_unit: atm
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+            row: K at 1200° K
+            note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
+          but the intermediate current and calibration inputs are not printed.
+        gas_species: K(g)
+        formula: K
+        points:
+        - T_K: '1200'
+          temperature_as_printed: 1200° K
+          pressure_atm: 1e-4
+          pressure_as_printed: of the order 10^-4 atm
+          pressure_qualifier: order_of_magnitude
+          approximate: true
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1200'
+              locator: *id112
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          locator: *id112
+      uncertainty:
+        note: Na and K are printed as order-of-magnitude values; no confidence level or numeric uncertainty is stated.
+  Ca:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_40
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 40 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1560
+      - 1710
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: m/e 40
+        ion_mass_to_charge_as_printed: '40'
+        species_assignment_as_printed: Calcium peak attributed to re-evaporation from the shields, not to the basalt sample
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1560'
+          temperature_as_printed: '1560'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 7
+          table_column_number: 8
+          locator: &id113
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1560'
+            note: Table I, m/e 40 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1560'
+              locator: *id113
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1660'
+          temperature_as_printed: '1660'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 9
+          table_column_number: 8
+          locator: &id114
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1660'
+            note: Table I, m/e 40 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1660'
+              locator: *id114
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '1710'
+          temperature_as_printed: '1710'
+          ion_intensity_as_printed: ~ 5 · 10^-13
+          table_row_number: 10
+          table_column_number: 8
+          locator: &id115
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1710'
+            note: Table I, m/e 40 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1710'
+              locator: *id115
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+          qualifier: approximate
+          qualifier_as_printed: '~'
+        gas_species: Ca(g), attributed to the shields
+  SiO:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_44
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 7
+        published_page: 529
+        pdf_page_index: 6
+        table: I
+        note: Table I m/e 44 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1830
+      - 2330
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: SiO+
+        ion_mass_to_charge_as_printed: '44'
+        species_assignment_as_printed: SiO+ parent ion
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1830'
+          temperature_as_printed: '1830'
+          ion_intensity_as_printed: 5 · 10^-13
+          table_row_number: 12
+          table_column_number: 9
+          locator: &id116
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1830'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1830'
+              locator: *id116
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-13
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 10 · 10^-12
+          table_row_number: 13
+          table_column_number: 9
+          locator: &id117
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1880'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id117
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-11'
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 20 · 10^-12
+          table_row_number: 14
+          table_column_number: 9
+          locator: &id118
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1900'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id118
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-11'
+        - T_K: '1980'
+          temperature_as_printed: '1980'
+          ion_intensity_as_printed: 40 · 10^-12
+          table_row_number: 15
+          table_column_number: 9
+          locator: &id119
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '1980'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1980'
+              locator: *id119
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '4.0E-11'
+        - T_K: '2150'
+          temperature_as_printed: '2150'
+          ion_intensity_as_printed: 35 · 10^-12
+          table_row_number: 16
+          table_column_number: 9
+          locator: &id120
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '2150'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id120
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '3.5E-11'
+        - T_K: '2250'
+          temperature_as_printed: '2250'
+          ion_intensity_as_printed: 52 · 10^-13
+          table_row_number: 17
+          table_column_number: 9
+          locator: &id121
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '2250'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2250'
+              locator: *id121
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '5.2E-12'
+        - T_K: '2330'
+          temperature_as_printed: '2330'
+          ion_intensity_as_printed: 48 · 10^-13
+          table_row_number: 18
+          table_column_number: 9
+          locator: &id122
+            page: 7
+            published_page: 529
+            pdf_page_index: 6
+            table: I
+            row: '2330'
+            note: Table I, m/e 44 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2330'
+              locator: *id122
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '4.8E-12'
+        gas_species: SiO(g)
+    - observation_id: de_maria_1969_table1_mq_45
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 45 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1880
+      - 2330
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: SiO+ isotopic peak at m/e 45
+        ion_mass_to_charge_as_printed: '45'
+        species_assignment_as_printed: isotopic peak of SiO+ per the Results text
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 4 · 10^-13
+          table_row_number: 13
+          table_column_number: 2
+          locator: &id123
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id123
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 4E-13
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 7 · 10^-13
+          table_row_number: 14
+          table_column_number: 2
+          locator: &id124
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1900'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id124
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 7E-13
+        - T_K: '1980'
+          temperature_as_printed: '1980'
+          ion_intensity_as_printed: 15 · 10^-13
+          table_row_number: 15
+          table_column_number: 2
+          locator: &id125
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1980'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1980'
+              locator: *id125
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.5E-12'
+        - T_K: '2150'
+          temperature_as_printed: '2150'
+          ion_intensity_as_printed: 12 · 10^-13
+          table_row_number: 16
+          table_column_number: 2
+          locator: &id126
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2150'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id126
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-12'
+        - T_K: '2250'
+          temperature_as_printed: '2250'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 17
+          table_column_number: 2
+          locator: &id127
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2250'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2250'
+              locator: *id127
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+        - T_K: '2330'
+          temperature_as_printed: '2330'
+          ion_intensity_as_printed: 2 · 10^-13
+          table_row_number: 18
+          table_column_number: 2
+          locator: &id128
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2330'
+            note: Table I, m/e 45 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2330'
+              locator: *id128
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 2E-13
+        gas_species: SiO(g)
+    - observation_id: de_maria_1969_table1_mq_46
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 46 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1880
+      - 2330
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: SiO+ isotopic peak at m/e 46
+        ion_mass_to_charge_as_printed: '46'
+        species_assignment_as_printed: isotopic peak of SiO+ per the Results text
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 4 · 10^-13
+          table_row_number: 13
+          table_column_number: 3
+          locator: &id129
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id129
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 4E-13
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 6 · 10^-13
+          table_row_number: 14
+          table_column_number: 3
+          locator: &id130
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1900'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id130
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 6E-13
+        - T_K: '1980'
+          temperature_as_printed: '1980'
+          ion_intensity_as_printed: 12 · 10^-13
+          table_row_number: 15
+          table_column_number: 3
+          locator: &id131
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1980'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1980'
+              locator: *id131
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.2E-12'
+        - T_K: '2150'
+          temperature_as_printed: '2150'
+          ion_intensity_as_printed: 10 · 10^-13
+          table_row_number: 16
+          table_column_number: 3
+          locator: &id132
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2150'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2150'
+              locator: *id132
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.0E-12'
+        - T_K: '2250'
+          temperature_as_printed: '2250'
+          ion_intensity_as_printed: ~ 0.5 · 10^-13
+          table_row_number: 17
+          table_column_number: 3
+          locator: &id133
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2250'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2250'
+              locator: *id133
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-14
+          qualifier: approximate
+          qualifier_as_printed: '~'
+        - T_K: '2330'
+          temperature_as_printed: '2330'
+          ion_intensity_as_printed: ~ 0.5 · 10^-13
+          table_row_number: 18
+          table_column_number: 3
+          locator: &id134
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '2330'
+            note: Table I, m/e 46 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2330'
+              locator: *id134
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: 5E-14
+          qualifier: approximate
+          qualifier_as_printed: '~'
+        gas_species: SiO(g)
+    - observation_id: de_maria_1969_table2_mq_44_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '44'
+        note: Table II, m/e 44, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '44'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 12.5 ± 0.3 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '44'
+        possible_parent_species_as_printed: SiO
+        appearance_potential_as_printed: 12.5 ± 0.3 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_results_sio_appearance_potential_prose_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        section: Results
+        note: Paragraph following Table II; the prose gives a separate SiO appearance potential.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: The prose appearance-potential statement gives no experiment temperature.
+      uncertainty:
+        note: Printed as 12.0 ± 0.8 eV; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; the prose reports the SiO appearance potential determined
+          from the ionization-efficiency curve by linear extrapolation; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '44'
+        possible_parent_species_as_printed: SiO
+        appearance_potential_as_printed: 12.0 ± 0.8 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+  Fe:
+    observations:
+    - observation_id: de_maria_1969_table1_mq_56
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        note: Table I m/e 56 column; point locators identify each printed temperature row.
+      T_range_K:
+      - 1880
+      - 2150
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        method_as_printed: Table I intensities measured at 70 eV electron energy in the molecular beam; corrected for “surface
+          ionization” and “photo-effect” following the usual procedure [5].
+        ion_as_printed: Fe+
+        ion_mass_to_charge_as_printed: '56'
+        species_assignment_as_printed: Fe+ parent ion; Table II lists CaO and MgO2 as less-likely parents
+        ion_intensity_units_as_printed: amp.
+        points:
+        - T_K: '1880'
+          temperature_as_printed: '1880'
+          ion_intensity_as_printed: 25 · 10^-13
+          table_row_number: 13
+          table_column_number: 7
+          locator: &id135
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1880'
+            note: Table I, m/e 56 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1880'
+              locator: *id135
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.5E-12'
+        - T_K: '1900'
+          temperature_as_printed: '1900'
+          ion_intensity_as_printed: 20 · 10^-13
+          table_row_number: 14
+          table_column_number: 7
+          locator: &id136
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1900'
+            note: Table I, m/e 56 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1900'
+              locator: *id136
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '2.0E-12'
+        - T_K: '1980'
+          temperature_as_printed: '1980'
+          ion_intensity_as_printed: 12.6 · 10^-12
+          table_row_number: 15
+          table_column_number: 7
+          locator: &id137
+            page: 8
+            published_page: 530
+            pdf_page_index: 7
+            table: I
+            row: '1980'
+            note: Table I, m/e 56 ion-intensity cell.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1980'
+              locator: *id137
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          ion_intensity: '1.26E-11'
+        gas_species: Fe(g)
+    - observation_id: de_maria_1969_table1_mq_56_row_2150_upper_limit_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id138
+        page: 8
+        published_page: 530
+        pdf_page_index: 7
+        table: I
+        row: '2150'
+        note: Table I, m/e 56 ion-intensity cell.
+      T_range_K:
+      - 2150
+      - 2150
+      phase: gas
+      regime: kems_effusion
+      units: amp
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '2150'
+          locator: *id138
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      status: typed_refusal
+      reason: The table prints an upper-limit ion intensity; the source format has no exact censored ion_intensity value mapping.
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: The printed upper limit is preserved, but not read as an exact point.
+        schema_gap: ValueKind.BOUND exists, but simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS maps ion_intensity to
+          a numeric field and simulator/battery/migrate.py::select_declared_source does not decode a censored ion_intensity
+          point. This cell is retained verbatim as a typed refusal; no upper-limit threshold is treated as an exact point.
+        ion_as_printed: Fe+
+        ion_mass_to_charge_as_printed: '56'
+        species_assignment_as_printed: Fe+ parent ion; Table II lists CaO and MgO2 as less-likely parents
+        ion_intensity_as_printed: < 0.5 · 10^-13
+        qualifier_as_printed: <
+    - observation_id: de_maria_1969_table2_mq_56_appearance_potential_typed_refusal
+      type: rate_series
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator:
+        page: 12
+        published_page: 534
+        pdf_page_index: 11
+        table: II
+        row: '56'
+        note: Table II, m/e 56, appearance-potential cell.
+      phase: gas
+      regime: kems_effusion
+      units: eV
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            table: II
+            row: '56'
+            note: Table II gives no temperature for the appearance-potential measurement.
+      uncertainty:
+        note: Printed as 8.0 ± 0.3 eV where a width is shown; confidence level not stated.
+      values:
+        quantity: appearance_potential_as_published
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
+          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        admission_status: typed_refusal
+        status: typed_refusal
+        refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
+          token.
+        schema_gap: No appearance-potential observation type is accepted by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          and no exact appearance-potential quantity token exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES.
+          Similar printed values occur in kems-133-costa-2017 and shornikov-2000-silica-gas-equilibria, but neither supplies
+          an exact quantity token. rate_series is used only to preserve the typed refusal because it is an accepted observation
+          type; simulator/battery/migrate.py::TYPE_QUANTITY would otherwise infer mass_loss_rate, so the explicit descriptive
+          non-token quantity keeps these rows quantity-unknown. The phase gas is supported by simulator/battery/enums.py::Phase
+          and simulator/battery/migrate.py::PHASE_MAP.
+        mass_to_charge_as_printed: '56'
+        possible_parent_species_as_printed: Fe, (CaO), (MgO2)
+        appearance_potential_as_printed: 8.0 ± 0.3 eV
+        method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+          Hg+ as a standard to calibrate the energy scale.
+    - observation_id: de_maria_1969_results_fe_partial_pressure
+      type: partial_pressure
+      experiment: de_maria_1969_andesinic_basalt_kems
+      locator: &id139
+        page: 13
+        published_page: 535
+        pdf_page_index: 12
+        section: Results
+        row: Fe at 2000° K
+      T_range_K:
+      - 2000
+      - 2000
+      phase: gas
+      regime: kems_effusion
+      units: atm
+      point_conditions:
+        total_pressure_Pa: *id001
+        fO2_Pa: *id002
+        composition: *id003
+      derivation:
+        relation: The authors estimate the partial pressures following the procedure described in reference 6.
+        output_unit: atm
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+            row: Fe at 2000° K
+            note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
+          but the intermediate current and calibration inputs are not printed.
+        gas_species: Fe(g)
+        formula: Fe
+        points:
+        - T_K: '2000'
+          temperature_as_printed: 2000° K
+          pressure_atm: 5e-5
+          pressure_as_printed: 5 · 10^-5 atm
+          pressure_qualifier: printed_value
+          approximate: false
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2000'
+              locator: *id139
+            total_pressure_Pa: *id001
+            fO2_Pa: *id002
+            composition: *id003
+          locator: *id139
+      uncertainty:
+        note: No numeric uncertainty is stated.
