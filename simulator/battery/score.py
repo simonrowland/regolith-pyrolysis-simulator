@@ -2618,6 +2618,18 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_HOLZHEID_WUSTITE_SOURCE_IDS = frozenset(
+    {
+        "doyle-1988-feo-activity-multicomponent-magma",
+        "doyle-1989-tio2-feo-activity-magma",
+        "colson-floden-haugen-2005-nio-feo-o2-activities",
+    }
+)
+_HOLZHEID_WUSTITE_TO_STOICHIOMETRIC_POINTS_K = (
+    (Decimal("1573.15"), Decimal("2.02")),
+    (Decimal("1673.15"), Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C)),
+    (Decimal("1873.15"), Decimal(_HOLZHEID_PRINTED_FACTOR_1600_C)),
+)
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
 _DISTIN_N_FE2_PLUS_FACTORS = {
     Decimal("2058.15"): Decimal("0.9787"),
@@ -2947,7 +2959,10 @@ def _iron_saturated_feo_comparison(
     iron-and-liquid-oxide measurements. Page 801 states
     N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
     multiply this partial. Distin p. 75 converts to the stoichiometric oxide
-    by an earlier procedure and prints no factor.
+    by an earlier procedure and prints no factor. Distin's source-keyed
+    per-temperature composition factors and Holzheid's printed Doyle/Colson
+    phase ratios enter the same transform; D&G remains the fallback for
+    sources without a printed reference-phase conversion.
 
     Supercooled liquid FeO(l) is the comparison convention for a melt
     component below the oxide's melting marker. Rows outside the measured
@@ -2983,6 +2998,54 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
+    if reference.source_id in _HOLZHEID_WUSTITE_SOURCE_IDS:
+        temperature_K = temperature_of(identity)
+        if temperature_K is None:
+            missing = "Holzheid 1997 conversion requires temperature_K"
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(quantity,),
+                reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {missing}",
+                origin=reference.observation_id,
+                band=missing,
+            )
+            return replace(reference, notices=union_notices(reference.notices, (notice,)))
+        factor, extrapolated = _holzheid_wustite_to_stoichiometric_factor(
+            temperature_K
+        )
+        transformed, _log10_shift_dex = _transform_iron_saturated_feo_reference(
+            reference, factor
+        )
+        converted = transformed.value.point
+        notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(quantity,),
+            reason=(
+                "reference_converted_via_iron_saturation; "
+                "method=Holzheid 1997 printed wustite-to-stoichiometric "
+                "FeO(l) activity-coefficient ratio, log10 ratio interpolated "
+                "linearly in 1/T; printed points: 1300 C: 2.02, 1400 C: 1.94, "
+                "1600 C: 1.66; validity band=1300-1600 C; "
+                f"source_value={reference.value.point}; converted_value={converted}; "
+                f"factor={factor}; T={temperature_K} K"
+            ),
+            origin=reference.observation_id,
+        )
+        notices: tuple[Notice, ...] = (notice,)
+        if extrapolated:
+            notices += (
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(quantity,),
+                    reason="Holzheid 1997 wustite-to-stoichiometric FeO ratio extrapolated",
+                    origin=reference.observation_id,
+                    band="1300-1600 C",
+                ),
+            )
+        return replace(
+            transformed,
+            notices=union_notices(transformed.notices, notices),
+        )
     if (
         engine is Engine.OPENIMCC
         and reference.source_id == _DISTIN_SOURCE_ID
@@ -3157,6 +3220,44 @@ def _transform_iron_saturated_feo_reference(
     return transformed, factor.log10()
 
 
+def _holzheid_wustite_to_stoichiometric_factor(
+    temperature_K: Decimal,
+) -> tuple[Decimal, bool]:
+    """Return Holzheid's printed γ(stoich FeO)/γ(wüstite) factor.
+
+    The printed ratio already compares the two liquid reference phases, so no
+    Masson Temkin N0 composition factor is added. Interpolate log10(ratio)
+    linearly in 1/T and extrapolate beyond the printed 1300–1600 C range. At
+    1400 C (1673.15 K) this returns the printed 1.94 exactly.
+    """
+    points = _HOLZHEID_WUSTITE_TO_STOICHIOMETRIC_POINTS_K
+    for point_temperature, factor in points:
+        if temperature_K == point_temperature:
+            return factor, False
+
+    extrapolated = not points[0][0] <= temperature_K <= points[-1][0]
+    segment = next(
+        (
+            (left, right)
+            for left, right in zip(points, points[1:])
+            if left[0] <= temperature_K <= right[0]
+        ),
+        points[:2] if temperature_K < points[0][0] else points[-2:],
+    )
+    (left_temperature, left_factor), (right_temperature, right_factor) = segment
+    inverse_temperature_fraction = (
+        (Decimal(1) / temperature_K - Decimal(1) / left_temperature)
+        / (Decimal(1) / right_temperature - Decimal(1) / left_temperature)
+    )
+    left_log_factor = left_factor.log10()
+    right_log_factor = right_factor.log10()
+    log_factor = left_log_factor + inverse_temperature_fraction * (
+        right_log_factor - left_log_factor
+    )
+    factor = (log_factor * Decimal(10).ln()).exp()
+    return factor, extrapolated
+
+
 def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
@@ -3164,7 +3265,8 @@ def fusion_comparison_reference(
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
     energy. Iron-saturated Fe(1-x)O(l) activities and activity coefficients
-    move onto stoichiometric FeO(l) by the Darken & Gurry oxygen potential.
+    use a source-specific factor when available and otherwise the Darken &
+    Gurry oxygen potential to move onto stoichiometric FeO(l).
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
