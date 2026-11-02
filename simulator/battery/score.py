@@ -116,6 +116,8 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    _phase_for_sample_description,
+    _phase_for_recorded_vapour_sample,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -1027,6 +1029,7 @@ SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
 SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
     "sample_phase_crystalline_vs_liquid_engine"
 )
+SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN = "liquid_model_vs_subsolidus_sample"
 
 
 def crystalline_sample_detail(
@@ -1071,22 +1074,37 @@ def melt_activity_sample_phase_refusal(
     )
 
 
-def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
-    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+def _experiment_sample_phase(
+    experiment: Experiment | None,
+    *,
+    include_characterization: bool = False,
+) -> Phase | None:
+    """Classify the recorded sample, optionally using its characterization.
 
-    The store does not carry a typed Phase on the experiment. A missing
-    form and untyped prose are None and stay on the scoring path.
+    The migration module owns the closed sample-phase vocabulary. The vapour
+    refusal keeps its existing form-only behavior; the additive domain notice
+    can also use a reviewed characterization when form is absent.
     """
 
     if experiment is None:
         return None
-    form = experiment.sample.form
-    if form is None or not form.state.is_value:
-        return None
-    value = form.state.value
-    if not isinstance(value, str):
-        return None
-    return phase_for_sample_form(value)
+    fields = [experiment.sample.form]
+    if include_characterization:
+        fields.append(experiment.sample.characterization)
+    for field in fields:
+        if field is None or not field.state.is_value:
+            continue
+        value = field.state.value
+        if not isinstance(value, str):
+            continue
+        phase = (
+            _phase_for_sample_description(value)
+            if include_characterization
+            else phase_for_sample_form(value)
+        )
+        if phase is not None:
+            return phase
+    return None
 
 
 def vapour_crystalline_sample_liquid_engine_refusal(
@@ -1134,6 +1152,57 @@ def vapour_crystalline_sample_liquid_engine_refusal(
             "compound": compound,
         }
     return detail
+
+
+def liquid_model_subsolidus_sample_notice(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+    measured_condensed_form: object = None,
+    measured_sample_phase: object = None,
+    origin: str,
+) -> Notice | None:
+    """Nonblocking notice for a liquid model scored against a solid sample.
+
+    ``ENGINE_MODEL_CAVEAT`` carries this reason because the existing domain
+    kinds add flagged strata, which would change headline membership. The
+    notice preserves the current prediction, status, and eligibility.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in _VAPOUR_EQUILIBRIUM:
+        return None
+    formula = identity.species.formula if identity.species is not None else ""
+    if rail_for_quantity(quantity, species_formula=formula) not in {
+        Rail.VAPOUR,
+        Rail.SIO_EVOLUTION,
+    }:
+        return None
+    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
+        measured_condensed_form,
+        measured_sample_phase,
+    )
+    if not row_phase_recorded:
+        sample_phase = _experiment_sample_phase(
+            experiment,
+            include_characterization=True,
+        )
+    sample_phase_detail = crystalline_sample_detail(
+        sample_phase,
+        quantity=quantity,
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+    )
+    if sample_phase_detail is None:
+        return None
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+        origin=origin,
+    )
 
 
 def _sample_phase_not_observable_prediction(
@@ -11426,6 +11495,24 @@ def compile_residual(
         approximate_value_notices,
         _quench_notices(reference),
     )
+    liquid_sample_domain_notice = (
+        liquid_model_subsolidus_sample_notice(
+            identity,
+            engine=engine,
+            experiment=experiment,
+            measured_condensed_form=(
+                (reference.provenance or {}).get("measured_condensed_form")
+            ),
+            measured_sample_phase=(
+                (reference.provenance or {}).get("measured_sample_phase")
+            ),
+            origin=reference.observation_id,
+        )
+        if isinstance(identity, Identity)
+        else None
+    )
+    if liquid_sample_domain_notice is not None:
+        notices = union_notices(notices, (liquid_sample_domain_notice,))
     if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
         from simulator.battery.fo2_ladder import engine_intrinsic_fo2_notice
 

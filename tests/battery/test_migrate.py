@@ -48,7 +48,10 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
-from simulator.battery.score import predict_with_engine
+from simulator.battery.score import (
+    liquid_model_subsolidus_sample_notice,
+    predict_with_engine,
+)
 from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
@@ -185,6 +188,21 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
         "different_cells_or_geometry"
     )
     assert not comparison_method_cell_constant_cancels(different)
+
+
+def test_vapour_provenance_keeps_explicit_condensed_form() -> None:
+    condensed_form = {"state": "liquid_melt", "basis": "explicit_author"}
+    provenance = _provenance_from_extract(
+        {
+            "condensed_form": condensed_form,
+            "phase": "K2O-SiO2_binary_silicate_melt",
+        },
+        {},
+        None,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert provenance == {"measured_condensed_form": condensed_form}
 
 
 @pytest.mark.parametrize(
@@ -2997,6 +3015,46 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
         assert dict(observation.identity.composition.value.components) == expected
+
+
+def test_costa_pressure_rows_from_real_extract_resolve_solid_sample_notice(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-007-costa-2015.yaml")
+    pressure_record_ids = {
+        "costa_2015_fe_partial_pressure_ir_digitized",
+        "costa_2015_fe_partial_pressure_mo_digitized",
+        "costa_2015_mg_partial_pressure_ir_digitized",
+        "costa_2015_mg_partial_pressure_mo_digitized",
+    }
+    pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{record_id}::" in observation.observation_id
+            for record_id in pressure_record_ids
+        )
+    ]
+
+    assert len(pressure_rows) == 18
+    for observation in pressure_rows:
+        measured_form = (observation.provenance or {}).get(
+            "measured_condensed_form"
+        )
+        assert measured_form["state"] == "crystalline"
+        experiment = result.experiments[observation.experiment_id]
+        notice = liquid_model_subsolidus_sample_notice(
+            observation.identity,
+            engine=Engine.INTERNAL_ANALYTICAL,
+            experiment=experiment,
+            measured_condensed_form=measured_form,
+            measured_sample_phase=(observation.provenance or {}).get(
+                "measured_sample_phase"
+            ),
+            origin=observation.observation_id,
+        )
+        assert notice is not None
+        assert notice.reason == "liquid_model_vs_subsolidus_sample"
 
 
 def test_doi_canonicalisation_and_alias_registry() -> None:

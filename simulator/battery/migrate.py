@@ -453,6 +453,52 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     return PHASE_MAP.get(token)
 
 
+_SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
+    # Reviewed KEMS sample descriptions and states. These are exact labels;
+    # words embedded in mixed or temperature-dependent descriptions stay unknown.
+    "solid": Phase.CR,
+    "crystalline": Phase.CR,
+    "solid stoichiometric mgal2o4 spinel": Phase.CR,
+    "solid lump": Phase.CR,
+    "solid ceramic sample": Phase.CR,
+    "liquid": Phase.L,
+    "liquid_melt": Phase.L,
+    "melt": Phase.L,
+    "solution": Phase.L,
+    "liquid solution": Phase.L,
+    "liquid_solution": Phase.L,
+}
+
+
+def _phase_for_sample_description(description: str | None) -> Phase | None:
+    """Classify a reviewed sample description without loosening PHASE_MAP."""
+
+    phase = phase_for_sample_form(description)
+    if phase is not None or description is None:
+        return phase
+    return _SAMPLE_DESCRIPTION_PHASE_MAP.get(description.strip().casefold())
+
+
+def _phase_for_recorded_vapour_sample(
+    condensed_form: object,
+    sample_phase: object,
+) -> tuple[bool, Phase | None]:
+    """Read a row's explicit condensed state before its experiment's sample."""
+
+    state = (
+        condensed_form.get("state")
+        if isinstance(condensed_form, Mapping)
+        else condensed_form
+    )
+    if isinstance(state, str) and state.strip():
+        phase = _phase_for_sample_description(state)
+        return True, phase
+    if _printed_phase_names_sample_source(sample_phase):
+        phase = _phase_for_sample_description(sample_phase)
+        return True, phase
+    return False, None
+
+
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
     "fugacity_series": Quantity.FUGACITY,
@@ -798,6 +844,15 @@ def _provenance_from_extract(
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
+    if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}:
+        condensed_form = obs.get("condensed_form", values.get("condensed_form"))
+        if condensed_form is not None:
+            selected = dict(selected or {})
+            selected["measured_condensed_form"] = condensed_form
+        sample_phase = obs.get("phase", values.get("phase"))
+        if _printed_phase_names_sample_source(sample_phase):
+            selected = dict(selected or {})
+            selected["measured_sample_phase"] = sample_phase
     if quantity is Quantity.LOG10_K_REACTION:
         for name in (
             "reaction_as_printed",
