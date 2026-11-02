@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 88024
-records out (observations): 177868
-works: 731
-experiments: 6829
-queue size: 117725
+rows in: 88441
+records out (observations): 178285
+works: 734
+experiments: 6833
+queue size: 118468
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 729
+index sources: 732
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 728 (mismatch) |
+| citations | 147 | 731 (mismatch) |
 | doi_works | 56 | 394 (mismatch) |
-| no_doi_works | 91 | 337 (mismatch) |
-| admission_statuses | 374 | 29961 (mismatch) |
+| no_doi_works | 91 | 340 (mismatch) |
+| admission_statuses | 374 | 30081 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1358 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -208,7 +208,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
 | formulas | 1625 | 21774 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 14937 (mismatch) |
+| absent_admissions | 3511 | 15234 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2827 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
@@ -19104,6 +19104,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` | 682 | 682 | 682 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
+| `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` | 120 | 120 | 150 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 |
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 |
@@ -19138,6 +19139,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` | 2 | 2 | 0 |
 | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/doyle-1988-feo-activity-multicomponent-magma.yaml` | 130 | 130 | 259 |
+| `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` | 167 | 167 | 334 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
 | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` | 8 | 13 | 8 |
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
@@ -19829,8 +19832,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 295008
+advisory issues: 295486
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 295008 |
+| `identity_incomplete` | 295486 |

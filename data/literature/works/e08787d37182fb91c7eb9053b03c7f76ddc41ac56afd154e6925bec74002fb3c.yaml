@@ -1,0 +1,468 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  citation: Charles, R. J. (1967). Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions. Journal of the American Ceramic Society,
+    50(12), 631–641.
+  source_ids:
+  - charles-1967-alkali-silicate-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:charles-1967-alkali-silicate-activities
+      role: pdf
+      path: raw/charles-1967-alkali-silicate-activities/charles-1967-alkali-silicate-activities.pdf
+      sha256:
+        tag: value
+        value: e06036723a8ba830daa18c5fbd480dfc7c919b6b4bf50582dfbc5b4368428153
+    - asset_id: pdftotext:charles-1967-alkali-silicate-activities
+      role: pdftotext
+      path: text/charles-1967-alkali-silicate-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:charles-1967-alkali-silicate-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c::charles-1967-alkali-silicate-activities
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  locator:
+    page: 2
+    published_page: 632
+    pdf_page_index: 1
+    table: I
+    note: row=1973
+context:
+- observation_id: charles_1967_k2o_reference_state
+  type: figure_record
+  units: dimensionless
+  locator:
+    page: 9
+    published_page: 639
+    pdf_page_index: 8
+    figure: '20'
+  phase: l
+  standard_state: pure liquid K2O
+  values:
+    quantity: activity_coefficient
+    species: K2O
+    printed_quantity: log gamma_K2O
+    method_class: figure_only
+    admission_status: figure_only
+    standard_state_as_printed: Using Eq. (23) and the K2O modification of Eq. (3), the volatilization results in Fig. 18 may
+      be converted to K2O activity coefficient data referred to a standard state of pure K2O(l).
+    axes_as_printed: log gamma_K2O versus X1 (mole fraction K2O)
+    digitization: Figure 20 estimated curves are undigitized.
+    numeric_points: none
+  context_id: charles-1967-alkali-silicate-activities::context::charles_1967_k2o_reference_state
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  source_id: charles-1967-alkali-silicate-activities
+  species: SiO2
+- observation_id: charles_1967_li2o_reference_state
+  type: figure_record
+  units: dimensionless
+  locator:
+    page: 2
+    published_page: 632
+    pdf_page_index: 1
+    equation: '4'
+  values:
+    quantity: activity_standard_state_statement
+    standard_state_as_printed: where the activity a2 is referred to pure liquid silica at the temperature of interest as the
+      standard state (similarly, lithia activity a1 is referred to pure liquid Li2O at the temperature of interest as standard
+      state).
+    method_class: model_derived
+    note: This statement identifies the reference phase and temperature for silica and Li2O activities in Eq. (4).
+  context_id: charles-1967-alkali-silicate-activities::context::charles_1967_li2o_reference_state
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  source_id: charles-1967-alkali-silicate-activities
+  species: SiO2
+- observation_id: charles_1967_na2o_reference_state_and_figure_activity
+  type: figure_record
+  units: dimensionless
+  locator:
+    page: 8
+    published_page: 638
+    pdf_page_index: 7
+    figure: '16'
+  phase: l
+  standard_state: pure liquid Na2O at the temperature of interest
+  T_C: '1200'
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 638
+        pdf_page_index: 7
+        figure: '16'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: 638
+        pdf_page_index: 7
+        figure: '16'
+  values:
+    quantity: activity
+    species: Na2O
+    printed_quantity: log a_Na2O
+    method_class: figure_only
+    admission_status: figure_only
+    standard_state_as_printed: The present Na2O activity data (referred to pure liquid Na2O at the temperature of interest
+      as the standard state and calculated in a somewhat indirect fashion from the Na2O-SiO2 phase diagram and volatility
+      and cell potential data)
+    axes_as_printed: log a_Na2O versus X1 (mole fraction Na2O)
+    digitization: Figure 16 is a plotted comparison at 1200 C; curves and points are undigitized.
+    numeric_points: none
+    series_as_printed:
+    - Charles
+    - Holmquist
+    - Pearce
+  context_id: charles-1967-alkali-silicate-activities::context::charles_1967_na2o_reference_state_and_figure_activity
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  source_id: charles-1967-alkali-silicate-activities
+  species: SiO2
+- observation_id: charles_1967_printed_fit_equations
+  type: figure_record
+  units: per-item units as printed
+  locator:
+    page: 2
+    published_page: 632
+    pdf_page_index: 1
+    section: Li2O-SiO2
+  values:
+    quantity: printed_fit_equations_and_free_energy_values
+    method_class: model_derived
+    equations_as_printed:
+    - equation: '4'
+      expression: log a2 / X2 = log gamma2 = (Tc/T) log gamma2c
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '4'
+    - equation: '5'
+      expression: log10 a2* = 1/4.575 [(-DeltaHm + A Tm + B/2 Tm^2 - C/Tm)(1/Tc - 1/Tm) + A ln(Tc/Tm) + B/2(Tc - Tm) + C/2(1/Tc^2
+        - 1/Tm^2)] = log10 a2c
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '5'
+    - equation: '6'
+      expression: Delta Cp solid->liquid = A + B T + C/T^2
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '6'
+    - equation: '7'
+      expression: log10 a2c (below 1473 K) = log10 a2* - (Delta Ht/4.575)(1/Tc - 1/Tt)
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '7'
+    - equation: '8'
+      expression: d ln gamma2 / d(1/T) = DeltaHbar2 / R = Tc ln gamma2c = 2.3 Tc log gamma2c
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '8'
+    - equation: '13'
+      expression: log gamma2 = − integral from X1=0.36 to X1 of [X1/(1−X1)] d log(R1^2/X1) + log gamma2 at X1=0.36
+      locator:
+        page: 3
+        published_page: 633
+        pdf_page_index: 2
+        equation: '13'
+    - equation: '20'
+      expression: log gamma2 = − integral from X1=0.26 to X1 of [X1/(1−X1)] d log(R1^2/X1) + log gamma2 at X1=0.26
+      locator:
+        page: 6
+        published_page: 636
+        pdf_page_index: 5
+        equation: '20'
+    - equation: '21'
+      expression: log gamma2(T) = log gamma2(1473) + ([log gamma2(1473)−log gamma2(1673)]/(1/1473−1/1673))(1/1473−1/T)
+      locator:
+        page: 9
+        published_page: 639
+        pdf_page_index: 8
+        equation: '21'
+    - equation: '22'
+      expression: DeltaFm(X1=0.333) = −80,000/3 + Q(T)
+      locator:
+        page: 9
+        published_page: 639
+        pdf_page_index: 8
+        equation: '22'
+    - equation: '23'
+      expression: log a1 at X1=0.33 = 3Q(T)/(4.575T) − 80,000/(4.575T) − 2 log a2 at X1=0.33
+      locator:
+        page: 9
+        published_page: 639
+        pdf_page_index: 8
+        equation: '23'
+    - equation: '3'
+      expression: a1 is proportional to R1 squared.
+      locator:
+        page: 1
+        published_page: 631
+        pdf_page_index: 0
+        equation: '3'
+    - equation: '14'
+      expression: ln(sqrt(a1 a2)) = DeltaFm / RT
+      locator:
+        page: 3
+        published_page: 633
+        pdf_page_index: 2
+        equation: '14'
+    - equation: '15'
+      expression: DeltaFm = RT(X1 ln a1 + X2 ln a2)
+      locator:
+        page: 4
+        published_page: 634
+        pdf_page_index: 3
+        equation: '15'
+    thermochemical_inputs_as_printed:
+    - name: silica_heat_of_fusion_selected
+      value_as_printed: 1835 cal/mole
+      attribution_as_printed: Mosesman and Pitzer, quoted by Charles; obtained by Kracek from freezing-point depressions of
+        silica by Rb2O and Cs2O
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+    - name: silica_heat_of_fusion_alternative
+      value_as_printed: approximately 2100 cal/mole
+      attribution_as_printed: Kelley, as quoted by Charles
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+    - name: cristobalite_melting_point_used
+      value_as_printed: 1986 K
+      attribution_as_printed: Greig's work, cited by Mosesman and Pitzer and quoted by Charles
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+    - name: silica_heat_capacity_difference_A
+      value_as_printed: '-1.02'
+      unit_as_printed: cal/(mol K)
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '6'
+    - name: silica_heat_capacity_difference_B
+      value_as_printed: 1.64(10^-3)
+      unit_as_printed: cal/(mol K^2)
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '6'
+    - name: silica_heat_capacity_difference_C
+      value_as_printed: -3.45(10^6)
+      unit_as_printed: cal K/mol
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '6'
+    - name: cristobalite_tridymite_transition_temperature
+      value_as_printed: 1743 K
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '7'
+    - name: cristobalite_tridymite_transition_heat
+      value_as_printed: about 50 cal/mole
+      attribution_as_printed: Mosesman and Pitzer, as quoted by Charles
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+        equation: '7'
+    - name: solid_silica_heat_capacity
+      value_as_printed: Cp(tridymite or cristobalite) = 14.40 + 2.04(10^-3)T
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+    - name: liquid_silica_heat_capacity
+      value_as_printed: Cp(liquid silica) = 13.38 + 3.68(10^-3)T - 3.45(10^5)T^-2
+      locator:
+        page: 2
+        published_page: 632
+        pdf_page_index: 1
+    explicit_free_energy_values_as_printed:
+    - value: From 1000° to 1900°K, ΔF_m per mole of lithium metasilicate solution varies between -19 and -16 kcal/mole.
+      evidence_class: quoted_attributed
+      attribution: literature reference 19, as cited by Charles
+      locator:
+        page: 3
+        published_page: 633
+        pdf_page_index: 2
+        equation: '14'
+    - value: Over an appreciable temperature range the values given show a negligible change with temperature and may be approximated
+        by the value of -80 kcal/mole of glass.
+      evidence_class: quoted_attributed
+      attribution: Kracek reference 32 and Kelley reference 33, as cited by Charles
+      locator:
+        page: 9
+        published_page: 639
+        pdf_page_index: 8
+        equation: '22'
+    admission_status: typed_refused
+    refusal_reason: Free energy of mixing and formation from oxides have no exact quantity token; this context is preserved
+      but is not scored.
+    schema_gap: 'Free energy of mixing and formation from oxides are not DELTA_FG. Candidate tokens checked: tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY, simulator/battery/migrate.py::QUANTITY_ALIASES, and simulator/battery/enums.py::Quantity.
+      No exact quantity token exists; the values stay typed-refused in context and figure curves are not digitized.'
+    figure_only_candidates:
+    - figure: '1'
+      quantity: activity_coefficient
+      page: 2
+      published_page: 632
+      pdf_page_index: 1
+    - figure: '2'
+      quantity: volatility_data
+      page: 3
+      published_page: 633
+      pdf_page_index: 2
+    - figure: '3'
+      quantity: activity_coefficient
+      page: 3
+      published_page: 633
+      pdf_page_index: 2
+    - figure: '4'
+      quantity: activity_coefficient
+      page: 4
+      published_page: 634
+      pdf_page_index: 3
+    - figure: '5'
+      quantity: activity_comparison
+      page: 4
+      published_page: 634
+      pdf_page_index: 3
+    - figure: '6'
+      quantity: free_energy_of_mixing
+      page: 4
+      published_page: 634
+      pdf_page_index: 3
+    - figure: '7'
+      quantity: free_energy_of_mixing
+      page: 5
+      published_page: 635
+      pdf_page_index: 4
+    - figure: '8'
+      quantity: two_liquid_boundary
+      page: 5
+      published_page: 635
+      pdf_page_index: 4
+    - figure: '9'
+      quantity: activity_coefficient
+      page: 5
+      published_page: 635
+      pdf_page_index: 4
+    - figure: '10'
+      quantity: volatilization_and_cell_potential
+      page: 6
+      published_page: 636
+      pdf_page_index: 5
+    - figure: '11'
+      quantity: activity_coefficient
+      page: 6
+      published_page: 636
+      pdf_page_index: 5
+    - figure: '12'
+      quantity: activity_coefficient
+      page: 6
+      published_page: 636
+      pdf_page_index: 5
+    - figure: '13'
+      quantity: free_energy_of_mixing
+      page: 7
+      published_page: 637
+      pdf_page_index: 6
+    - figure: '14'
+      quantity: free_energy_of_mixing
+      page: 7
+      published_page: 637
+      pdf_page_index: 6
+    - figure: '15'
+      quantity: two_liquid_boundary
+      page: 7
+      published_page: 637
+      pdf_page_index: 6
+    - figure: '16'
+      quantity: activity
+      page: 8
+      published_page: 638
+      pdf_page_index: 7
+    - figure: '17'
+      quantity: activity_coefficient
+      page: 9
+      published_page: 639
+      pdf_page_index: 8
+    - figure: '18'
+      quantity: volatilization_data
+      page: 9
+      published_page: 639
+      pdf_page_index: 8
+    - figure: '19'
+      quantity: activity_coefficient
+      page: 9
+      published_page: 639
+      pdf_page_index: 8
+    - figure: '20'
+      quantity: activity_coefficient
+      page: 9
+      published_page: 639
+      pdf_page_index: 8
+  context_id: charles-1967-alkali-silicate-activities::context::charles_1967_printed_fit_equations
+  work_id: e08787d37182fb91c7eb9053b03c7f76ddc41ac56afd154e6925bec74002fb3c
+  source_id: charles-1967-alkali-silicate-activities
+  species: SiO2
