@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 727
-  extracts: 725
+  sources: 728
+  extracts: 726
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 725
+  extracts_without_pdf: 726
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -651,6 +651,7 @@ gaps:
   - street-2010-thermal-properties-simulants
   - su-2024-lunar-volatiles-thesis
   - sublimation-kinetics-2023-minerals
+  - sugawara-2013-soda-lime-melt-na2o-activity
   - sugawara-2024-na-silicate-molybdate-miscibility
   - sugawara-akaogi-2003-ni-co-fusion
   - sugawara-akaogi-2004-liquid-calorimetry
@@ -38331,6 +38332,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  aliases: []
+  citation: Sugawara, T.; Seto, M.; Kato, M.; Yoshida, S.; Matsuoka, J.; Miura, Y. (2013). Na2O activity
+    and thermodynamic mixing properties of SiO2–Na2O–CaO melt. Journal of Non-Crystalline Solids 371–372,
+    58–65.
+  doi: 10.1016/j.jnoncrysol.2013.03.031
+  report_number: null
+  identifier: 10.1016/j.jnoncrysol.2013.03.031
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml
+    review_status: draft
+    rows: 58
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-2013-soda-lime-melt-na2o-activity/sugawara-2013-soda-lime-melt-na2o-activity.pdf
+      present: true
+      sha256: e73b03894966d78af9bd94e458ad006630b4360ee6a5740d0a1078922abcd254
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-2013-soda-lime-melt-na2o-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/sugawara-2013-soda-lime-melt-na2o-activity
+      exists: true
+      file_count: 35
+    tables:
+      path: tables/sugawara-2013-soda-lime-melt-na2o-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-2013-soda-lime-melt-na2o-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: sugawara-2024-na-silicate-molybdate-miscibility
   aliases: []
   citation: Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and
