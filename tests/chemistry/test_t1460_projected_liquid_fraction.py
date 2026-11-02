@@ -190,7 +190,7 @@ def _diagnostic_input() -> dict[str, float]:
     return {"SiO2": 10.0, "FeO": 7.0, "NiO": 0.001}
 
 
-def test_diagnostic_reuses_grid_across_temperature_but_keys_pressure_and_trace(
+def test_diagnostic_reuses_grid_across_temperature_and_keys_all_solve_inputs(
     monkeypatch, tmp_path
 ):
     _GridBackend.instances = []
@@ -255,6 +255,38 @@ def test_diagnostic_reuses_grid_across_temperature_but_keys_pressure_and_trace(
     )
     assert changed["status"] == "ok"
     assert len(_GridBackend.calls) == 3
+
+    changed_kept_trace = _diagnostic_input()
+    changed_kept_trace["SiO2"] += 1.0e-9
+    changed_kept = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=changed_kept_trace,
+        temperature_C=1300.0,
+        fO2_log=-9.0,
+        pressure_bar=0.2,
+        backend_config={"warm_worker": False},
+    )
+    assert changed_kept["status"] == "ok"
+    assert len(_GridBackend.calls) == 4
+
+    changed_fO2 = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=_diagnostic_input(),
+        temperature_C=1300.0,
+        fO2_log=-8.0,
+        pressure_bar=0.2,
+        backend_config={"warm_worker": False},
+    )
+    assert changed_fO2["status"] == "ok"
+    assert len(_GridBackend.calls) == 5
+
+    changed_config = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        composition_kg=_diagnostic_input(),
+        temperature_C=1300.0,
+        fO2_log=-9.0,
+        pressure_bar=0.2,
+        backend_config={"warm_worker": False, "database": "igad"},
+    )
+    assert changed_config["status"] == "ok"
+    assert len(_GridBackend.calls) == 6
 
 
 def test_diagnostic_recomputes_when_resolved_engine_changes(monkeypatch, tmp_path):
