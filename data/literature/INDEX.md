@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 729
-- Extracts (`literature_extract.v1`): 727
+- Sources: 730
+- Extracts (`literature_extract.v1`): 728
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 727
+- Extracts with no PDF: 728
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -140,6 +140,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `distin-1971-ferrous-silicate-melts` | Distin, P. A., Whiteway, S. G. & Masson, C. R. (1971), "Thermodynamics and constitution of ferrous silicate melts", Canadian Metallurgical Quarterly 10(2):73-78. | 10.1179/cmq.1971.10.2.73 | ABSENT, `` | `raw/distin-1971-ferrous-silicate-melts/distin-1971-ferrous-silicate-melts.pdf` (present, 3049d522); `text/distin-1971-ferrous-silicate-melts/` (27 files, exists); `tables/distin-1971-ferrous-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` (24 rows, draft) | `ledger/distin-1971-ferrous-silicate-melts.yaml`: — (—) |
 | `dohmen-2003-coupled-kinetics` | Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (2003), "Role of element solubility on the kinetics of element partitioning: In situ observations and a thermodynamic kinetic model," Journal of Geophysical Research: Solid Earth, 108(B3), 2157. | 10.1029/2001JB000587 | ABSENT, `` | `raw/dohmen-2003-coupled-kinetics/dohmen-2003-coupled-kinetics.pdf` (present, 8a559094); `text/dohmen-2003-coupled-kinetics/` (62 files, exists); `tables/dohmen-2003-coupled-kinetics/` (0 files, ABSENT) | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` (2 rows, draft) | `ledger/dohmen-2003-coupled-kinetics.yaml`: — (—) |
 | `dong-2009-cr-v-slag-activities` | Dong, P., Seetharaman, S. and Wang, X. (2009), “Thermodynamic Activity of Chromium, Vanadium Oxide in CaO-SiO2-MgO-Al2O3 Slags,” MOLTEN 2009, Santiago, Chile, pp. 328–337. |  | ABSENT, `` | `raw/dong-2009-cr-v-slag-activities/dong-2009-cr-v-slag-activities.pdf` (present, 1a1aca1b); `text/dong-2009-cr-v-slag-activities/` (1 files, exists); `tables/dong-2009-cr-v-slag-activities/` (0 files, ABSENT) | `data/literature/extracts/dong-2009-cr-v-slag-activities.yaml` (0 rows, draft) | `ledger/dong-2009-cr-v-slag-activities.yaml`: — (—) |
+| `doyle-1989-tio2-feo-activity-magma` | Doyle, C. D. (1989), Effect of substitution of TiO2 for SiO2 on f(FeO) in magma, Geochimica et Cosmochimica Acta 53, 2631–2638. |  | ABSENT, `` | `raw/doyle-1989-tio2-feo-activity-magma/doyle-1989-tio2-feo-activity-magma.pdf` (present, a5329971); `text/doyle-1989-tio2-feo-activity-magma/` (33 files, exists); `tables/doyle-1989-tio2-feo-activity-magma/` (0 files, ABSENT) | `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` (167 rows, draft) | `ledger/doyle-1989-tio2-feo-activity-magma.yaml`: — (—) |
 | `drowart-1960-al2o3-kems` | Drowart, J., DeMaria, G., Burns, R. P. & Inghram, M. G. (1960), “Thermodynamics of Al2O3 Using a Mass Spectrometer,” Journal of Chemical Physics 32, 1366–1373. | 10.1063/1.1730923 | ABSENT, `` | `raw/drowart-1960-al2o3-kems/drowart-1960-al2o3-kems.pdf` (present, 71aaca0c); `text/drowart-1960-al2o3-kems/` (22 files, exists); `tables/drowart-1960-al2o3-kems/` (0 files, ABSENT) | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` (10 rows, draft) | `ledger/drowart-1960-al2o3-kems.yaml`: — (—) |
 | `ehrt-2008-sn-redox-aluminosilicate` | Ehrt, D. (2008). Redox behaviour of Sn4+/Sn2+ in alkali free aluminosilicate glasses and melts. Physics and Chemistry of Glasses: European Journal of Glass Science and Technology Part B, 49(2), 68–72. |  | ABSENT, `` | `raw/ehrt-2008-sn-redox-aluminosilicate/ehrt-2008-sn-redox-aluminosilicate.pdf` (present, 54012c7e); `text/ehrt-2008-sn-redox-aluminosilicate/` (14 files, exists); `tables/ehrt-2008-sn-redox-aluminosilicate/` (0 files, ABSENT) | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` (8 rows, draft) | `ledger/ehrt-2008-sn-redox-aluminosilicate.yaml`: — (—) |
 | `engelschion-2020-eac1a-simulant` | Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. & Sperl, M. (2020), "EAC-1A: A novel large-volume lunar regolith simulant", Scientific Reports 10:5473, DOI 10.1038/s41598-020-62312-4. | 10.1038/s41598-020-62312-4 | ABSENT, `` | `raw/engelschion-2020-eac1a-simulant/engelschion-2020-eac1a-simulant.pdf` (present, 7dbfc4c4); `text/engelschion-2020-eac1a-simulant/` (18 files, exists); `tables/engelschion-2020-eac1a-simulant/` (0 files, ABSENT) | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` (2 rows, draft) | `ledger/engelschion-2020-eac1a-simulant.yaml`: decoded (2026-09-06) |
@@ -876,6 +877,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `distin-1971-ferrous-silicate-melts`
 - `dohmen-2003-coupled-kinetics`
 - `dong-2009-cr-v-slag-activities`
+- `doyle-1989-tio2-feo-activity-magma`
 - `drowart-1960-al2o3-kems`
 - `ehrt-2008-sn-redox-aluminosilicate`
 - `engelschion-2020-eac1a-simulant`
