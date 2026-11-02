@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 732
-  extracts: 730
+  sources: 734
+  extracts: 732
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 730
+  extracts_without_pdf: 732
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -137,6 +137,7 @@ gaps:
   - doyle-1989-tio2-feo-activity-magma
   - drowart-1960-al2o3-kems
   - ehrt-2008-sn-redox-aluminosilicate
+  - eliezer-howald-1978-potassium-silicate-vapor-pressure
   - engelschion-2020-eac1a-simulant
   - evans-2009-sulfur-mn-ni-w-xanes
   - ewing-1963-sodium-potassium-properties
@@ -642,6 +643,7 @@ gaps:
   - slag-003-hino-kitagawa-banya-1993
   - smales-1971-lpsc-12022
   - smythe-brenan-2015-cerium-redox
+  - snyder-carmichael-1992-olivine-liquid-feo-activity
   - sossi-2020-cu-zn-isotope-evap-formalism
   - sossi-2020-magma-ocean-redox
   - span-wagner-1996-co2-psat
@@ -8299,6 +8301,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  aliases: []
+  citation: Eliezer, N., Howald, R. A., Marinkovic, M., and Eliezer, I. (1978). Vapor Pressure Measurements,
+    Thermodynamic Parameters, and Phase Diagram for the System Potassium Oxide-Silicon Oxide at High Temperatures.
+    The Journal of Physical Chemistry 82(9), 1021–1026.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+    review_status: draft
+    rows: 17
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/eliezer-howald-1978-potassium-silicate-vapor-pressure/eliezer-howald-1978-potassium-silicate-vapor-pressure.pdf
+      present: true
+      sha256: 5e37949b30d48a4d5dc0d457f50a1a7c5d75baa4e6aa85c3f8988985c07b91d7
+      matches_simulator: null
+    sidecar:
+      path: raw/eliezer-howald-1978-potassium-silicate-vapor-pressure/sidecar.yaml
+      present: true
+    text:
+      path: text/eliezer-howald-1978-potassium-silicate-vapor-pressure
+      exists: true
+      file_count: 29
+    tables:
+      path: tables/eliezer-howald-1978-potassium-silicate-vapor-pressure
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: engelschion-2020-eac1a-simulant
   aliases: []
   citation: 'Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. &
@@ -37804,6 +37865,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: snyder-carmichael-1992-olivine-liquid-feo-activity
+  aliases: []
+  citation: Snyder, D. A. and Carmichael, I. S. E. (1992), “Olivine-liquid equilibria and the chemical
+    activities of FeO, NiO, Fe2O3, and MgO in natural basic melts,” Geochimica et Cosmochimica Acta 56,
+    303–318.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+    review_status: draft
+    rows: 29
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/snyder-carmichael-1992-olivine-liquid-feo-activity/snyder-carmichael-1992-olivine-liquid-feo-activity.pdf
+      present: true
+      sha256: db20fd37e954fcfd1c0759af796a6cf4c1a3ec0a56254b3627939fa8b2a85930
+      matches_simulator: null
+    sidecar:
+      path: raw/snyder-carmichael-1992-olivine-liquid-feo-activity/sidecar.yaml
+      present: true
+    text:
+      path: text/snyder-carmichael-1992-olivine-liquid-feo-activity
+      exists: true
+      file_count: 63
+    tables:
+      path: tables/snyder-carmichael-1992-olivine-liquid-feo-activity
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: sossi-2020-cu-zn-isotope-evap-formalism
   aliases: []
   citation: Sossi, P. A., Moynier, F., Treilles, R., Mokhtari, M., Wang, X. & Siebert, J. (2020), "An

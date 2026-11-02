@@ -1,0 +1,50 @@
+source_id: snyder-carmichael-1992-olivine-liquid-feo-activity
+source:
+  citation: Snyder, D. A. and Carmichael, I. S. E. (1992), “Olivine-liquid equilibria and the chemical activities of FeO, NiO, Fe2O3, and MgO in natural basic melts,” Geochimica et Cosmochimica Acta 56, 303–318.
+extraction:
+  method: Table 4 value columns are cross-checked to the Table 2 run key and Table 3 glass composition. The Table 4 activity values are retained as author-derived outputs; no formula reduction is performed.
+  date: '2026-11-02'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - species: FeO
+    observation_id: snyder_1992_table4_fe0_947o_activity_08-58
+    field: activity_as_printed
+    value: '0.53'
+    locator: {page: 7, published_page: 309, table: '4', record: 08-58, table_row_number: 2, table_column_number: 5}
+  - species: FeO
+    observation_id: snyder_1992_table4_fe0_947o_activity_48-60
+    field: activity_as_printed
+    value: '0.27'
+    locator: {page: 7, published_page: 309, table: '4', record: 48-60, table_row_number: 10, table_column_number: 5}
+  - species: FeO
+    observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-60
+    field: gamma_as_printed
+    value: '5.1'
+    locator: {page: 7, published_page: 309, table: '4', record: 48-60, table_row_number: 10, table_column_number: 8}
+tables:
+  - page: 7
+    table_index: 6
+    type: activity_coefficient
+    quantity: activity
+    evidence_class: author_derived
+    unit: dimensionless
+    phase: l
+    published_page: 309
+    rows: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    values:
+      - {column: 5, species: FeO, quantity: activity, phase: l, evidence_class: author_derived}
+      - {column: 8, species: FeO, quantity: activity_coefficient, phase: l, evidence_class: author_derived}
+    conditions:
+      - key: temperature_K
+        state: values.T_K from Table 2 by printed run id
+        locator: {page: 3, published_page: 305, table: '2'}
+      - key: fO2_log
+        state: values.fO2_log_as_printed from Table 2 by printed run id; reference pressure absent
+        locator: {page: 3, published_page: 305, table: '2'}
+      - key: total_pressure_Pa
+        state: one atmosphere, as stated in Experimental Procedures
+        locator: {page: 2, published_page: 304, section: Experimental Procedures}
+      - key: composition
+        state: Table 3 post-run glass weight percentages by printed run id
+        locator: {page: 4, published_page: 306, table: '3'}
