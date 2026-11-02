@@ -2706,6 +2706,46 @@ def test_typeerror_from_liquid_fraction_interpolation_propagates(
         sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
 
 
+@pytest.mark.parametrize(
+    'error, expected_type',
+    [
+        (ValueError('invalid path value'), EvaporationFluxRefusal),
+        (TypeError('interpolation programming error'), TypeError),
+    ],
+    ids=('typed-refusal-is-visible', 'programming-error-propagates'),
+)
+def test_phase_context_diagnostic_does_not_swallow_liquid_fraction_failures(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    error,
+    expected_type,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+    sim._melt_redox_gate_authority_tick_hour = sim.melt.hour
+    sim._melt_redox_gate_authority_this_tick = curve
+
+    def fail_interpolation(*_args, **_kwargs):
+        raise error
+
+    monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', fail_interpolation)
+
+    with pytest.raises(expected_type):
+        sim._record_phase_context_diagnostic('test')
+
+
 def test_typed_thermoengine_out_of_domain_is_not_labelled_unavailable(
     monkeypatch,
     vapor_pressure_data,
