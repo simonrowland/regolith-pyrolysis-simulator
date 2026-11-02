@@ -469,12 +469,6 @@ _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
     "liquid solution": Phase.L,
     "liquid_solution": Phase.L,
     "k2o-sio2_binary_silicate_melt": Phase.L,
-    # Costa & Jacobson (2015)'s pressure experiments record this sample as
-    # crystalline olivine; the physics ruling confirms it remained solid.
-    (
-        "crystalline olivine fo93fa7 (93% forsterite, 7% fayalite; "
-        "percent basis not separately stated)"
-    ): Phase.CR,
 }
 
 
