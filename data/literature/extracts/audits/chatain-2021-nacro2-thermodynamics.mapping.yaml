@@ -1,0 +1,148 @@
+source_id: chatain-2021-nacro2-thermodynamics
+source:
+  citation: Chatain et al. (2021), Thermodynamic study of the sodium chromite NaCrO2, Journal of Alloys and Compounds 882, 160784.
+  doi: 10.1016/j.jallcom.2021.160784
+input_order:
+  primary_machine_text:
+    - text/chatain-2021-nacro2-thermodynamics/mineru/p005-p008
+    - text/chatain-2021-nacro2-thermodynamics/mineru/p012-p015
+    - text/chatain-2021-nacro2-thermodynamics/pdftotext-layout.txt
+  render_policy: Used only for missing MinerU pages, malformed/mismatched table cells, and row/column or locator checks.
+  table_tool:
+    convert: tools/mineru_table_draft.py convert
+    qa: tools/mineru_table_qa.py
+    compare: tools/mineru_table_draft.py compare
+    qa_result: >-
+      QA found 17 Table 3 numeric cells with 1.000 digit agreement and no flags. The Table 1 and Table 4 drafts classified their body rows as headers (zero numeric candidates), so their contents were manually transcribed from pdftotext and checked against the page 6 and page 13 renders.
+table_mappings:
+  - printed_table: '1'
+    pdf_page: 6
+    printed_rows: 11
+    equation_subrows: 15
+    temperature_ranges: 13
+    columns:
+      temperature: T_range_K, preserved as printed
+      Gibbs_energy: values.equation_as_printed, with equation and uncertainty notation preserved
+      method_and_equilibrium: values.method_as_printed and values.equilibrium_as_printed
+      reference: values.reference_as_printed and values.attribution
+    quantity: delta_fG
+    species: NaCrO2
+    phase: cr
+    units_as_printed: kJ/mol O2
+    method_class: quoted_attributed
+    disposition: >-
+      Store each printed literature fit as an unavailable typed refusal: no numeric EMF/KEMS points are printed, and no generic coefficient-function series source form is available through simulator/battery/migrate.py::select_declared_source.
+    render_verification: >-
+      Page 6 render confirms all 11 physical rows and equation assignments. It resolves the concatenated temperature spans at row 6 (782-1014; 809-1040 K) and row 11 (510-1000; 660-890 K).
+  - printed_table: '2'
+    pdf_pages:
+      data: 9
+      caption: 10
+    printed_rows_per_sample: 22
+    stored_measurements: 44
+    numeric_values: 39
+    censored_values: 5
+    columns: Element and impurity content in µg g-1
+    species: NaCrO2 sample
+    phase: not applicable to bulk sample impurity contents
+    method_class: measured_direct
+    disposition: >-
+      The two sample panels are preserved in page-specific context records with typed_refused_schema_gap status. `elemental_concentration` occurs in an existing extract but is not a Quantity or QUANTITY_ALIASES token; no near-match quantity is assigned.
+    render_verification: >-
+      PDF page 9 render confirms all 22 analyte rows for each panel, all digits and five less-than values. Page 10 render confirms the Table 2 caption and the printed <0.1 µg g-1 omission rule.
+  - printed_table: '3'
+    pdf_page: 12
+    printed_rows: 2
+    numeric_cells: 17
+    columns: Z, a, b, c, alpha, beta, gamma, V0, B0, B0 prime
+    species: NaCrO2
+    method_classes:
+      Exp.: quoted_attributed, reference [18]
+      Calc.: quoted_attributed, authors' DFT outputs with incomplete stored inputs
+    units_as_printed: lattice lengths Å; volume Å3; bulk modulus GPa
+    disposition: typed-refused model context; no exact lattice-parameter, volume, or bulk-modulus quantity token
+    render_verification: PDF page 12 render confirms row and column assignments; MinerU and pdftotext digits agree.
+  - printed_table: '4'
+    pdf_page: 13
+    printed_rows: 14
+    numeric_cells: 28
+    columns: harmonic Gamma frequency and degeneracy
+    species: NaCrO2
+    method_class: quoted_attributed, authors' CASTEP model outputs with incomplete stored inputs
+    units_as_printed: cm-1 and degeneracy
+    disposition: typed-refused model context; no exact harmonic-frequency or mode-degeneracy quantity token
+    render_verification: PDF page 13 render confirms all row assignments and digits.
+non_table_mappings:
+  - page: 3
+    quantity: delta_fH
+    stored: Gross reaction enthalpy context and Gross formation enthalpy point
+    disposition: Gross values are located before the physical page break; reaction enthalpy remains typed-refused context
+  - page: 4
+    quantities: delta_fH, cp
+    stored: Jain formation enthalpy; Van Vuuren reaction-enthalpy context; attributed Sreedharan and Iyer Cp fits
+    disposition: the Jain formation enthalpy is a point; reaction enthalpy and coefficient-only Cp fits remain typed-refused context/observations as appropriate
+  - page: 13
+    quantities: cp, S
+    stored: theoretical Cp fit, theoretical Cp at 298.15 K, absolute S=94.5 at 298.15 K, theoretical entropy formula
+    disposition: numeric point values are stored with the printed temperature; coefficient-only Cp and entropy formula are typed-refused
+  - page: 14
+    quantity: cp
+    stored: authors' experimental Cp polynomial, temperature range, uncertainty and point dispersion
+    disposition: typed-refused; the Cp data points are figure-only
+  - page: 15
+    quantities: delta_fG, S
+    stored: authors' Gibbs-energy fit, equations (6)-(8), and S°298K=94.53
+    disposition: S=94.53 is stored at 298 K as printed; page 13 separately reports S=94.5 at 298.15 K, and both printed temperatures are retained
+  - page: 2
+    quantity: transition_temperature
+    stored: DTA transition temperature 819±4 °C, extrapolated to zero heating rate
+    method_class: quoted_attributed because the measured onsets are not printed
+  - page: 7
+    stored: commercial/synthesized sample preparation and reaction conditions
+    locator_note: XRD phase and reference cell parameters are in Figure 3 caption on PDF page 8
+  - page: 16
+    stored: 825 °C, 5 h sealed-ampoule XRD check; only NaCrO2 was observed
+    condition_note: oxygen probe was at furnace exit, with no numeric value; no total pressure or fO2 is assigned
+schema_gaps:
+  - measured GD-MS elemental impurity concentration: Quantity and QUANTITY_ALIASES do not contain an exact token; concentration_series is permitted by OBSERVATION_TYPES but has no default Quantity mapping. Existing deguzman-2026-simulant-physicochemical.yaml uses elemental_concentration, which is not a migrator token.
+  - Table 3 lattice parameters, cell volume, bulk modulus and pressure derivative: no exact Quantity/alias token.
+  - Table 4 harmonic vibrational frequency and mode degeneracy: no exact Quantity/alias token.
+  - general reaction enthalpy: delta_fH would mislabel a reaction enthalpy as a standard formation enthalpy.
+  - coefficient-only Cp and Gibbs-energy equations and theoretical entropy function: select_declared_source has no generic source form for these functions; printed equations are retained verbatim as typed refusals.
+code_checks:
+  observation_types: tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  quantity_enum: simulator/battery/enums.py::Quantity
+  quantity_aliases: simulator/battery/migrate.py::QUANTITY_ALIASES
+  type_quantity: simulator/battery/migrate.py::TYPE_QUANTITY
+  source_selector: simulator/battery/migrate.py::select_declared_source
+identity_axis_samples:
+  - observation_id: chatain_2021_gross_formation_enthalpy_298
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298
+  - observation_id: chatain_2021_theoretical_cp_29815
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298.15
+  - observation_id: chatain_2021_absolute_standard_entropy_29815
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298.15
+  - observation_id: chatain_2021_absolute_standard_entropy_298
+    composition: not_applicable
+    total_pressure_Pa: not_applicable
+    fO2_Pa: not_applicable
+    temperature_K: 298
+  - observation_id: chatain_2021_dta_transition_temperature
+    composition: not_applicable
+    total_pressure_Pa: unknown, not printed
+    fO2_Pa: not_applicable
+    temperature_K: not_applicable; measured temperature is the transition result at point_conditions.temperature_K = 1092.15 K
+j01_census:
+  numeric_series_cells: 0
+  unavailable_series_cells: 0
+  source_contribution: {}
+store_regeneration: not run; expected new-source delta is 26 observations (20 unavailable and 6 points); no committed battery-store regen

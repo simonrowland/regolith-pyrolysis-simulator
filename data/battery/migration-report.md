@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 87084
-records out (observations): 176718
-works: 719
-experiments: 6723
-queue size: 116920
+rows in: 87637
+records out (observations): 177271
+works: 724
+experiments: 6766
+queue size: 117097
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 717
+index sources: 722
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,20 +196,20 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 716 (mismatch) |
-| doi_works | 56 | 387 (mismatch) |
+| citations | 147 | 721 (mismatch) |
+| doi_works | 56 | 392 (mismatch) |
 | no_doi_works | 91 | 332 (mismatch) |
-| admission_statuses | 374 | 29154 (mismatch) |
+| admission_statuses | 374 | 29617 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1338 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 21266 (mismatch) |
+| formulas | 1625 | 21699 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 14804 (mismatch) |
+| absent_admissions | 3511 | 14894 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2796 (mismatch) |
+| range_only_T | 3125 | 2811 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
 | missing_phases | 237 | 1357 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -19057,6 +19057,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/banya-2004-sulphide-capacity-cao-al2o3.yaml` | 2 | 2 | 1 |
 | `data/literature/extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml` | 207 | 138 | 207 |
+| `data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml` | 45 | 45 | 45 |
 | `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 |
@@ -19103,6 +19104,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` | 682 | 682 | 682 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 |
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chen-2019-sioch-cp-entropy-gibbs.yaml` | 33 | 760 | 33 |
 | `data/literature/extracts/chen-2022-mgo-sio2-tio2-phase-equilibria.yaml` | 198 | 198 | 311 |
@@ -19190,6 +19192,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/inada-2026-forsterite-h2-h2o.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml` | 446 | 446 | 17 |
+| `data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml` | 267 | 267 | 68 |
 | `data/literature/extracts/inoue-suito-1982-vanadium-mgo-saturated-slag.yaml` | 549 | 549 | 0 |
 | `data/literature/extracts/itoh-1985-beta-alumina-na2o-emf.yaml` | 9 | 9 | 9 |
 | `data/literature/extracts/itoh-1989-zno-solid-zinc-silicate.yaml` | 67 | 67 | 67 |
@@ -19335,6 +19338,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kropf-2009-alkalis-chondrules-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kume-2000-cao-activities.yaml` | 375 | 375 | 687 |
 | `data/literature/extracts/kunisada-1986-na-silicate-dephosphorization.yaml` | 278 | 278 | 220 |
+| `data/literature/extracts/kunisada-iwai-1993-na-silicate-sulfide-capacity.yaml` | 214 | 214 | 0 |
 | `data/literature/extracts/kupcak-malis-1992-na2o-sio2-oxygen-probe-emf.yaml` | 21 | 21 | 56 |
 | `data/literature/extracts/kushiro-1971-apollo12-phase-equilibria.yaml` | 8 | 8 | 1 |
 | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 84 |
@@ -19666,6 +19670,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` | 5 | 5 | 21 |
 | `data/literature/extracts/tachibana-2002-enstatite-evaporation-kinetics.yaml` | 6 | 54 | 6 |
 | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` | 6 | 6 | 23 |
+| `data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` | 13 | 13 | 26 |
 | `data/literature/extracts/taniguchi-1997-feo-cas.yaml` | 141 | 141 | 282 |
 | `data/literature/extracts/terashima-2026-sro-slag-activity-preprint.yaml` | 119 | 119 | 37 |
@@ -19816,8 +19821,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 293700
+advisory issues: 294551
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 293700 |
+| `identity_incomplete` | 294551 |

@@ -15,11 +15,16 @@ from engines.builtin.vapor_pressure import (
     wall_condensation_antoine_coefficients,
 )
 from simulator import condensation as condensation_module
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+)
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
 from simulator.runner import (
     SIO_ALPHA_PROVENANCE,
     _apply_sio_wall_sweep_controls,
+    _stage_silica_fume_kg,
     _sio_wall_terminal_mol,
     build_sio_yield_report,
 )
@@ -28,6 +33,7 @@ from simulator.state import (
     CondensationStage,
     CondensationTrain,
     EvaporationFlux,
+    MOLAR_MASS,
     MeltState,
 )
 
@@ -67,6 +73,39 @@ def test_sio_alpha_provenance_receipt_and_fixtures_refuse_evaporation_label():
     for _, golden_name in GOLDENS:
         golden = json.loads((FIXTURE_DIR / golden_name).read_text())
         assert golden["alpha_provenance"] == SIO_ALPHA_PROVENANCE
+
+
+def test_sio_yield_reports_both_stage_four_silica_collectors():
+    sim = SimpleNamespace(
+        train=SimpleNamespace(
+            stages=[
+                SimpleNamespace(
+                    stage_number=2,
+                    sub_order=0,
+                    stage_key="stage_2_cr_oxide_harvest",
+                    collected_kg={"SiO2": 0.75},
+                ),
+                SimpleNamespace(
+                    stage_number=4,
+                    sub_order=0,
+                    stage_key=NA_COLLECTOR_STAGE_KEY,
+                    collected_kg={"SiO2": 1.25},
+                ),
+                SimpleNamespace(
+                    stage_number=4,
+                    sub_order=1,
+                    stage_key=K_TRAP_STAGE_KEY,
+                    collected_kg={"SiO2": 2.5},
+                ),
+            ]
+        )
+    )
+
+    placement = _stage_silica_fume_kg(sim)
+
+    assert placement["stage_4_alkali_mg_carryover"] == 1.25
+    assert placement["stage_4b_k_trap_carryover"] == 2.5
+    assert placement["unreported_stage_silica_capture"] == 0.75
 
 
 def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
@@ -370,9 +409,10 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved
 # (1000x less absolute mass, with relative routing inverted).
+# Re-pinned from the executable sio_yield CLI after stage-key reporting.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 0.01,  # absolute ceiling; live ~5.07e-4 kg
-    "mars_basalt": 0.01,        # absolute ceiling; live ~5.49e-4 kg
+    "lunar_mare_low_ti": 1.05988273133e-09,
+    "mars_basalt": 1.26683344649e-06,
 }
 
 # 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
@@ -554,7 +594,9 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     assert stage_3 == pytest.approx(
         BASELINE_STAGE3_SIO2_KG[feedstock], rel=1e-8
     )
-    assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
+    assert stage_4 == pytest.approx(
+        BASELINE_STAGE4_SIO2_KG[feedstock], rel=1e-8
+    )
     # 2026-07-29 t-475: bounded flowing-gas partial pressures keep Na/K/SiO
     # off the hot train. Lunar Cr now has a tiny admissible deposit instead of
     # being erased by an out-of-range melt-P_sat refusal.
@@ -617,6 +659,29 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
     )
     assert abs(diagnostics["mass_balance_error_pct"]) <= 5e-12
+    placement = report["sio_to_silica_fume_kg"]
+    assert placement["stage_3_sio_zone_product"] > 0.0
+    # Each captured SiO2 or Si molecule carries one Si atom. On an
+    # SiO-equivalent basis, kg_product * M_SiO/M_product has kg units because
+    # the molar-mass ratio is dimensionless; zero capture maps to zero mass.
+    sio2_to_sio_equivalent = MOLAR_MASS["SiO"] / MOLAR_MASS["SiO2"]
+    si_to_sio_equivalent = MOLAR_MASS["SiO"] / MOLAR_MASS["Si"]
+    captured_sio2_kg = sum(
+        kg for field, kg in placement.items()
+        if field not in {
+            "condensation_train_silicon_coproduct",
+            "terminal_offgas_escape",
+        }
+    )
+    reported_sio_equivalent_kg = (
+        captured_sio2_kg * sio2_to_sio_equivalent
+        + placement["condensation_train_silicon_coproduct"]
+        * si_to_sio_equivalent
+        + placement["terminal_offgas_escape"]
+    )
+    assert reported_sio_equivalent_kg == pytest.approx(
+        report["sio_evolved_kg"], rel=1.0e-8
+    )
     authority = report["fouling_rate"]["sticking_alpha_authority"]
     extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]
     assert extrapolations

@@ -2711,22 +2711,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'canonicalization support'
                 )
             account_mol_overrides = canonicalizer(self)
-        if intent in {
-            ChemistryIntent.SILICATE_LIQUIDUS,
-            ChemistryIntent.SILICATE_EQUILIBRIUM,
-            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
-            ChemistryIntent.GATE_LIQUID_FRACTION,
-        }:
-            inert_species = set(
-                (getattr(self.inventory, 'inert_melt_components_kg', {}) or {})
-            )
+        provider_melt_inputs = self._silicate_provider_melt_inputs(
+            intent,
+        )
+        if provider_melt_inputs is not None:
             if account_mol_overrides is None:
-                cleaned_melt_mol = self.atom_ledger.project_account_mol(
-                    'process.cleaned_melt'
-                )
-                account_mol_overrides = {
-                    'process.cleaned_melt': cleaned_melt_mol,
-                }
+                account_mol_overrides = {}
             else:
                 account_mol_overrides = {
                     account: dict(species_mol)
@@ -2736,13 +2726,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # but they are outside silicate-engine chemistry. Preserve their
             # inventory while excluding only that explicit inert partition from
             # AlphaMELTS/MAGEMin diagnostic account views.
-            account_mol_overrides['process.cleaned_melt'] = {
-                species: float(mol)
-                for species, mol in account_mol_overrides.get(
-                    'process.cleaned_melt', {}
-                ).items()
-                if species not in inert_species and float(mol) > 0.0
-            }
+            account_mol_overrides['process.cleaned_melt'] = (
+                provider_melt_inputs.composition_mol
+            )
         if (
             intent is ChemistryIntent.METALLOTHERMIC_STEP
             and temperature_C_override is None
