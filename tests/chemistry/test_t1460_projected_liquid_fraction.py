@@ -18,6 +18,13 @@ from tests.chemistry.conftest import _build_sim
 import simulator.melt_backend.magemin as magemin_module
 
 
+@pytest.fixture(autouse=True)
+def _clear_projected_liquid_fraction_grid_cache():
+    magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
+    yield
+    magemin_module._PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.clear()
+
+
 def _fixture_feed_masses_kg(feedstocks_data: dict) -> dict[str, float]:
     composition = feedstocks_data["lunar_mare_low_ti"]["composition_wt_pct"]
     total_wt_pct = sum(float(value) for value in composition.values())
@@ -183,13 +190,20 @@ def _diagnostic_input() -> dict[str, float]:
     return {"SiO2": 10.0, "FeO": 7.0, "NiO": 0.001}
 
 
-def test_diagnostic_recomputes_grid_and_interpolates_each_temperature_and_keys_trace(
-    monkeypatch,
+def test_diagnostic_reuses_grid_across_temperature_but_keys_pressure_and_trace(
+    monkeypatch, tmp_path
 ):
     _GridBackend.instances = []
     _GridBackend.calls = []
     _GridBackend.fail = False
     monkeypatch.setattr(magemin_module, "MAGEMinBackend", _GridBackend)
+    fake_engine = tmp_path / "MAGEMin"
+    fake_engine.write_text("stable fake engine")
+    monkeypatch.setattr(
+        _GridBackend,
+        "_resolve_binary_path_for_config",
+        classmethod(lambda _cls, _config: fake_engine),
+    )
 
     first = magemin_module.projected_engine_liquid_fraction_diagnostic(
         composition_kg=_diagnostic_input(),
@@ -215,7 +229,7 @@ def test_diagnostic_recomputes_grid_and_interpolates_each_temperature_and_keys_t
     assert first["fO2_buffer"] == warmer["fO2_buffer"] == "qfm"
     assert "buffer_n = fO2_log - QFM(T)" in first["fO2_description"]
     assert "10.0 wt%" in first["fO2_description"]
-    assert len(_GridBackend.instances) == 2
+    assert len(_GridBackend.calls) == 1
     assert _GridBackend.calls[0]["pressure_bar"] == 0.2
 
     changed_pressure = magemin_module.projected_engine_liquid_fraction_diagnostic(
@@ -227,8 +241,8 @@ def test_diagnostic_recomputes_grid_and_interpolates_each_temperature_and_keys_t
     )
     assert changed_pressure["status"] == "ok"
     assert changed_pressure["pressure_bar"] == 0.4
-    assert len(_GridBackend.instances) == 3
-    assert _GridBackend.calls[2]["pressure_bar"] == 0.4
+    assert len(_GridBackend.calls) == 2
+    assert _GridBackend.calls[1]["pressure_bar"] == 0.4
 
     changed_trace = _diagnostic_input()
     changed_trace["NiO"] += 1.0e-9
@@ -240,7 +254,74 @@ def test_diagnostic_recomputes_grid_and_interpolates_each_temperature_and_keys_t
         backend_config={"warm_worker": False},
     )
     assert changed["status"] == "ok"
-    assert len(_GridBackend.instances) == 4
+    assert len(_GridBackend.calls) == 3
+
+
+def test_diagnostic_recomputes_when_resolved_engine_changes(monkeypatch, tmp_path):
+    _GridBackend.instances = []
+    _GridBackend.calls = []
+    _GridBackend.fail = False
+    monkeypatch.setattr(magemin_module, "MAGEMinBackend", _GridBackend)
+    engines = [tmp_path / "MAGEMin-a", tmp_path / "MAGEMin-b"]
+    for engine in engines:
+        engine.write_text("same-size fake engine")
+    resolved_engine = [engines[0]]
+    monkeypatch.setattr(
+        _GridBackend,
+        "_resolve_binary_path_for_config",
+        classmethod(lambda _cls, _config: resolved_engine[0]),
+    )
+
+    inputs = {
+        "composition_kg": _diagnostic_input(),
+        "temperature_C": 1300.0,
+        "fO2_log": -9.0,
+        "pressure_bar": 0.2,
+        "backend_config": {"warm_worker": False},
+    }
+    first = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        **inputs
+    )
+    resolved_engine[0] = engines[1]
+    second = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        **inputs
+    )
+
+    assert first["status"] == second["status"] == "ok"
+    assert len(_GridBackend.calls) == 2
+
+
+def test_diagnostic_does_not_reuse_failed_grid_status(monkeypatch, tmp_path):
+    _GridBackend.instances = []
+    _GridBackend.calls = []
+    _GridBackend.fail = True
+    monkeypatch.setattr(magemin_module, "MAGEMinBackend", _GridBackend)
+    fake_engine = tmp_path / "MAGEMin"
+    fake_engine.write_text("stable fake engine")
+    monkeypatch.setattr(
+        _GridBackend,
+        "_resolve_binary_path_for_config",
+        classmethod(lambda _cls, _config: fake_engine),
+    )
+    inputs = {
+        "composition_kg": _diagnostic_input(),
+        "temperature_C": 1100.0,
+        "fO2_log": -9.0,
+        "pressure_bar": 0.2,
+        "backend_config": {"warm_worker": False},
+    }
+
+    failed = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        **inputs
+    )
+    _GridBackend.fail = False
+    retried = magemin_module.projected_engine_liquid_fraction_diagnostic(
+        **inputs
+    )
+
+    assert failed["status"] == "solve_failed"
+    assert retried["status"] == "ok"
+    assert len(_GridBackend.calls) == 2
 
 
 def test_diagnostic_refuses_configured_non_qfm_buffer(monkeypatch):

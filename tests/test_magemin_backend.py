@@ -65,6 +65,16 @@ from simulator.melt_backend.magemin import (
     MAGEMinBackend,
 )
 
+
+def test_magemin_resolves_explicit_binary_from_backend_config(tmp_path):
+    binary = tmp_path / "MAGEMin"
+    binary.write_text("fake MAGEMin binary")
+
+    assert MAGEMinBackend._resolve_binary_path_for_config({
+        "binary_path": str(binary),
+    }) == binary
+
+
 # Thread-rendezvous guards throughout this module: these bound a HANG, they do
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
