@@ -79,15 +79,12 @@ def test_carrier_free_pipe_matches_hand_solved_na_partial_and_closes_residual():
         ),
     )
     assert solved.converged
-    assert solved.candidate_partials_Pa["Na"] == pytest.approx(
+    assert solved.partials_Pa["Na"] == pytest.approx(
         1.20745, abs=5.0e-6
     )
     assert solved.residual_relative <= 1.0e-9
-    assert solved.writer_partials_Pa["Na"] == pytest.approx(
-        solved.candidate_partials_Pa["Na"], rel=1.0e-9
-    )
     # Independent dimensional check for the selected root: both sides are kg/s.
-    p = solved.candidate_partials_Pa["Na"]
+    p = solved.partials_Pa["Na"]
     assert beta * (equilibrium - p) == pytest.approx(
         molar_mass * coefficient * p * p, rel=2.0e-5
     )
@@ -102,7 +99,7 @@ def test_zero_pipe_removal_reaches_equilibrium_with_zero_net_source():
         pipe_K=0.0,
     )
     assert solved.converged
-    assert solved.candidate_partials_Pa["Na"] == pytest.approx(equilibrium)
+    assert solved.partials_Pa["Na"] == pytest.approx(equilibrium)
     assert solved.flux.species_kg_hr["Na"] == pytest.approx(0.0)
 
 
@@ -128,76 +125,43 @@ def test_fixed_pressure_residual_uses_nonlinear_committed_source():
     )
 
     assert solved.converged
-    assert solved.candidate_partials_Pa["Na"] == pytest.approx(
+    assert solved.partials_Pa["Na"] == pytest.approx(
         0.72153546, abs=1.0e-8
     )
     assert solved.flux.species_kg_hr["Na"] / 3600.0 == pytest.approx(
-        solved.candidate_partials_Pa["Na"], rel=1.0e-9
+        solved.partials_Pa["Na"], rel=1.0e-9
     )
 
 
-def test_controlled_capacity_closed_form_has_zero_and_large_capacity_limits():
-    model = OverheadGasModel()
-    beta = 1.0e-6  # kg/(s Pa)
-    equilibrium = 10.0  # Pa
-    species_mass = 0.02298976928  # kg/mol — exact existing Na composition mass
-    common = {
-        "allowed_pressure_Pa": 100.0,
-        "beta_kg_s_Pa_by_species": {"Na": beta},
-        "equilibrium_Pa_by_species": {"Na": equilibrium},
-        "molar_mass_kg_mol_by_species": {"Na": species_mass},
-        "species_kg_for_M_avg": {"Na": 1.0},
-    }
+def test_controlled_capacity_uses_shared_partial_solver_at_allowed_pressure():
+    # At 200 Pa, a 0.25 mol/s pure 40 g/mol carrier is 36 kg/hr. With
+    # beta=2e-6 kg/(s Pa) and P_eq=5 Pa, the hand balance gives p_Na=0.1923077
+    # Pa; source and removal are each 9.6153846e-6 kg/s.
+    beta = 2.0e-6
+    equilibrium = 5.0
+    molar_mass = 0.04
 
-    zero_capacity, mixture_mass, used_fallback = (
-        model._controlled_capacity_partials_Pa(
-            effective_capacity_kg_hr=0.0,
-            **common,
-        )
-    )
-    assert not used_fallback
-    assert mixture_mass == pytest.approx(species_mass)
-    assert zero_capacity["Na"] == pytest.approx(equilibrium)
-    assert beta * (equilibrium - zero_capacity["Na"]) == pytest.approx(0.0)
+    def evaluate(partials, _total_pressure):
+        return _flux(beta * (equilibrium - partials["Na"]))
 
-    large_capacity, _, _ = model._controlled_capacity_partials_Pa(
-        effective_capacity_kg_hr=1.0e12,
-        **common,
-    )
-    assert large_capacity["Na"] < equilibrium * 1.0e-8
-    assert beta * (equilibrium - large_capacity["Na"]) == pytest.approx(
-        beta * equilibrium,
-        rel=1.0e-8,
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": equilibrium},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": beta},
+        molar_mass_kg_mol_by_species={"Na": molar_mass},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda _pressure: 0.25,
+        pressure_bracket_Pa=(0.0, 201.0),
+        evaluate_flux=evaluate,
+        fixed_pressure_Pa=200.0,
+        fixed_pressure_molar_flow_mol_s=0.25,
     )
 
-
-def test_controlled_capacity_closed_form_uses_species_molar_mass_basis():
-    model = OverheadGasModel()
-    beta = 2.0e-6  # kg/(s Pa)
-    equilibrium = 5.0  # Pa
-    capacity_kg_hr = 36.0
-    allowed_pressure = 200.0  # Pa
-    species_mass = 0.02298976928  # kg/mol — exact existing Na composition mass
-    mixture_mass = species_mass
-    molar_capacity = capacity_kg_hr / 3600.0 / mixture_mass
-    removal_per_partial = species_mass * molar_capacity / allowed_pressure
-    expected = beta * equilibrium / (beta + removal_per_partial)
-
-    partials, reported_mixture_mass, used_fallback = (
-        model._controlled_capacity_partials_Pa(
-            allowed_pressure_Pa=allowed_pressure,
-            effective_capacity_kg_hr=capacity_kg_hr,
-            beta_kg_s_Pa_by_species={"Na": beta},
-            equilibrium_Pa_by_species={"Na": equilibrium},
-            molar_mass_kg_mol_by_species={"Na": species_mass},
-            species_kg_for_M_avg={"Na": 1.0},
-        )
-    )
-    assert not used_fallback
-    assert reported_mixture_mass == pytest.approx(mixture_mass)
-    assert partials["Na"] == pytest.approx(expected)
-    assert beta * (equilibrium - partials["Na"]) == pytest.approx(
-        removal_per_partial * partials["Na"]
+    assert solved.converged
+    assert solved.partials_Pa["Na"] == pytest.approx(0.1923077, abs=5.0e-8)
+    assert solved.flux.species_kg_hr["Na"] / 3600.0 == pytest.approx(
+        9.6153846e-6,
+        abs=5.0e-13,
     )
 
 
@@ -214,7 +178,7 @@ def test_large_pipe_conductance_approaches_zero_partial_and_free_source(beta):
         molar_mass=molar_mass,
     )
     assert solved.converged
-    assert solved.candidate_partials_Pa["Na"] < 1.0e-6 * equilibrium
+    assert solved.partials_Pa["Na"] < 1.0e-6 * equilibrium
     free_source_kg_s = beta * equilibrium
     assert solved.flux.total_kg_hr / 3600.0 == pytest.approx(
         free_source_kg_s, rel=1.0e-6
@@ -241,7 +205,7 @@ def test_swept_nonzero_downstream_pressure_balances_at_review_value():
         fixed_pressure=total_pressure,
     )
     assert solved.converged
-    assert solved.candidate_partials_Pa["Na"] == pytest.approx(
+    assert solved.partials_Pa["Na"] == pytest.approx(
         0.0832375, abs=5.0e-8
     )
     assert solved.residual_relative <= 1.0e-9
@@ -263,7 +227,7 @@ def test_amplitude_and_empty_hour_are_stable():
     ]
     assert all(root.converged for root in roots)
     assert all(root.residual_relative <= 1.0e-9 for root in roots)
-    assert roots[0].candidate_partials_Pa["Na"] < roots[-1].candidate_partials_Pa["Na"]
+    assert roots[0].partials_Pa["Na"] < roots[-1].partials_Pa["Na"]
 
     empty = solve_quasi_steady_headspace_partials_Pa(
         equilibrium_Pa={},
@@ -312,10 +276,10 @@ def test_scalar_pressure_root_closes_two_species_balance_and_S_is_monotone():
     assert solved.converged
     assert solved.residual_relative <= 1.0e-9
     assert solved.total_pressure_Pa == pytest.approx(2.0, abs=1.0e-9)
-    assert solved.candidate_partials_Pa["Na"] == pytest.approx(
+    assert solved.partials_Pa["Na"] == pytest.approx(
         2.0 / 3.0, abs=1.0e-9
     )
-    assert solved.candidate_partials_Pa["K"] == pytest.approx(
+    assert solved.partials_Pa["K"] == pytest.approx(
         4.0 / 3.0, abs=1.0e-9
     )
 
@@ -395,6 +359,6 @@ def test_bounded_nonconvergence_returns_best_iterate_and_residual():
         max_iterations=1,
     )
     assert not solved.converged
-    assert math.isfinite(solved.candidate_partials_Pa["Na"])
+    assert math.isfinite(solved.partials_Pa["Na"])
     assert solved.residual_relative > 0.0
     assert solved.flux.species_kg_hr["Na"] > 0.0
