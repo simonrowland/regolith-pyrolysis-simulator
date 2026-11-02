@@ -8,7 +8,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, UncertaintyKind, ValueKind
+from simulator.battery.enums import (
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    UncertaintyKind,
+    ValueKind,
+)
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -119,7 +125,25 @@ def _assert_activity_render_pins(document: dict, migrated) -> None:
         source = _source_observation(document, observation_id)
         assert source["locator"]["page"] == 4
         assert source["locator"]["table"] == "3"
+        assert source["standard_state"]["inferred"] is True
+        assert source["standard_state"]["state"]["tag"] == "value"
+        assert source["standard_state"]["state"]["value"] == {
+            "convention": "raoultian_pure_endmember",
+            "endmember": {
+                "formula": "Na2O",
+                "phase": {"tag": "value", "value": "l"},
+            },
+            "component_basis": "Na2O",
+        }
         assert source["values"]["log10_activity_as_published"] == printed
+        standard_state_as_printed = source["values"]["standard_state_as_printed"]
+        assert "Eq. (3), PDF p. 2 (published p. 59)" in standard_state_as_printed
+        assert "Eq. (4), PDF p. 3 (published p. 60)" in standard_state_as_printed
+        assert "[27] (2011), Section 3, Eq. (14), PDF p. 3 (published p. 1392)" in (
+            standard_state_as_printed
+        )
+        assert "the compilation of these data [27]" in standard_state_as_printed
+        assert "Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i" in standard_state_as_printed
         sio2, na2o = T3_COMPOSITION_RENDER_PINS[observation_id]
         assert source["values"]["sample_composition_as_printed"] == (
             f"{sio2}SiO2–{na2o}Na2O"
@@ -137,8 +161,24 @@ def _assert_activity_render_pins(document: dict, migrated) -> None:
             ("SiO2", Decimal(sio2) / Decimal("100")),
             ("Na2O", Decimal(na2o) / Decimal("100")),
         )
-        assert row.identity.reference_state.is_unknown
+        assert row.identity.reference_state.is_value
+        reference_state = row.identity.reference_state.value
+        assert (
+            reference_state.convention
+            is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        )
+        assert reference_state.endmember.formula == "Na2O"
+        assert reference_state.endmember.phase.value is Phase.L
+        assert reference_state.component_basis == "Na2O"
         assert row.value.point == expected_value
+        if "this_study" in observation_id:
+            anchor = row.provenance["activity_calibration_anchor"]
+            assert anchor["source"] == "Sugawara et al. [27] (2011)"
+            assert "critically evaluated" in anchor["method_as_printed"]
+            assert "least squares method" in anchor["method_as_printed"]
+            assert anchor["locators"]["activity_model"]["equation"] == "14"
+            assert anchor["locators"]["activity_model"]["published_page"] == 1392
+            assert "(X^L_SiO2)^i" in anchor["activity_model_as_printed"]
         atmosphere = row.point_conditions["atmosphere"]
         if "sugawara_27" in observation_id:
             assert atmosphere.state.is_unknown
@@ -386,5 +426,30 @@ def test_row6_activity_tenfold_mutation_is_rejected_by_migrated_pins() -> None:
             T3_RENDER_PINS["sugawara_2013_t3_this_study_row_6_1573K"][1]
             * Decimal("10")
         )
+        with pytest.raises(AssertionError):
+            _assert_activity_render_pins(document, runner.result)
+
+
+def test_reference_state_mutation_is_rejected_by_migrated_pins() -> None:
+    document = _document()
+    target = _source_observation(
+        document, "sugawara_2013_t3_this_study_row_3_1473K"
+    )
+    target["standard_state"] = deepcopy(target["standard_state"])
+    target["standard_state"]["state"] = {
+        "tag": "unknown",
+        "reason": "reference-state mutation",
+    }
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        mutated_extract = Path(temp_dir) / f"{SOURCE_ID}.yaml"
+        mutated_extract.write_text(
+            yaml.safe_dump(document, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        runner = migrate_one_extract(ROOT, mutated_extract, index={}, aliases={})
+        runner.finalize()
+        row_id = f"{SOURCE_ID}::sugawara_2013_t3_this_study_row_3_1473K"
+        assert runner.result.observations[row_id].identity.reference_state.is_unknown
         with pytest.raises(AssertionError):
             _assert_activity_render_pins(document, runner.result)
