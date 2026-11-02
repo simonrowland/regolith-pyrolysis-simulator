@@ -216,8 +216,9 @@ def solve_quasi_steady_headspace_partials_Pa(
 
     Premise: total pressure ``P`` sets molar flow ``n(P)`` from the existing
     pipe law. Carrier-free Poiseuille is ``M_mix*K*(P²-P_d²)`` kg/s, so
-    ``n(P)=K*(P²-P_d²)`` mol/s after dividing by ``M_mix``. Controlled flow
-    uses fixed ``n=C/M_mix``; frozen oxygen remains a fixed partial, and
+    ``n(P)=K*(P²-P_d²)`` mol/s after dividing by ``M_mix``; K has units
+    mol/(s Pa²). Controlled flow uses fixed ``n=C/M_mix``; frozen oxygen
+    remains a fixed partial, and
     provider species that do not backpressure retain their fixed molar rates.
     Algebra: ``x_i=p_i/P`` gives removal ``M_i*x_i*n=G_i*p_i`` with
     ``G_i=M_i*n(P)/P`` kg/(s Pa). Equating this to the series source
@@ -227,14 +228,20 @@ def solve_quasi_steady_headspace_partials_Pa(
     ``S(P)=sum(p_i(P))+fixed partials=P``. Since ``n(P)/P`` increases for
     ``P>P_d``, each solved partial falls; ``P/n(P)`` falls, so fixed-flow
     partials fall too. Therefore ``S(P)-P`` decreases strictly and bracketed
-    bisection converges. If ``n(P)=0`` or ``sum(P_eq)<=P_d``, participants
-    reach ``P_eq`` and their net flux is zero. Fixed-pressure paths evaluate
-    the same closed form directly; a capacity overflow switches to the
-    supplied carrier-free law.
+    bisection converges. Without fixed-rate gas, the pressure bracket is
+    ``[P_d, max(P_d, sum(P_eq)+fixed partials)]``; the caller supplies at
+    least this upper bound, and the solver expands it if fixed-rate terms
+    keep the upper residual positive. If ``n(P)=0`` or
+    ``sum(P_eq)<=P_d``, participants reach ``P_eq`` and their net flux is
+    zero. Fixed-pressure paths evaluate the same closed form directly; a
+    capacity overflow switches to the supplied carrier-free law.
 
     Units: beta and ``G`` are kg/(s Pa); ``p`` and ``S`` are Pa; ``C/M_mix``
-    is mol/s. As ``C→0``, ``p→P_eq`` and net flux tends to zero; as
-    ``C→∞``, ``p→0`` and flux tends to the zero-backpressure source. For Na,
+    is mol/s. As pipe conductance tends to zero, ``G→0``, ``p→P_eq``, and
+    net flux tends to zero. As it grows without bound, ``G→∞``, ``p→0``,
+    and flux tends to ``beta*P_eq`` (the free-Langmuir flux when gas-film
+    resistance is disabled). The same limits hold as ``C→0`` and ``C→∞``
+    on the fixed-capacity path. For Na,
     ``M*K=1.02563e-7 kg/(s Pa²)`` and
     ``M*K*p²=beta*(P_eq-p)`` gives ``p=1.20745 Pa``; both sides are kg/s,
     and ``p=0`` recovers the free-source limit.
