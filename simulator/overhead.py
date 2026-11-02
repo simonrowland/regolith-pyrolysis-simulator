@@ -172,12 +172,12 @@ def solve_quasi_steady_headspace_partials_Pa(
     priced at the partial pressure for that same hour, and its headspace
     residence is short relative to the hour. The coupled equations are
     ``J_i = provider(P_eq,i, p_i)`` and ``p_i = writer_i(J)``. The writer map
-    is antitone in the backpressured partials, so direct substitution can
-    alternate. For one species, ``writer(J(p)) - p`` is strictly decreasing;
-    bracket its zero on ``[0, P_eq]`` and bisect. For several species, move
-    along the residual only when a backtracked trial reduces its largest
-    relative component, retaining the best evaluated point if the bounded
-    search stalls.
+    is antitone in each species' own backpressured partial when other partials
+    are held fixed, so direct substitution can alternate. For each coordinate,
+    ``writer_i(J(p_i)) - p_i`` is strictly decreasing; bracket its zero on
+    ``[0, P_eq,i]`` and take a safeguarded secant step. Re-evaluate the mixture
+    after each coordinate because the existing mole-fraction writer couples
+    species. Retain the best evaluated vector if the bounded sweeps stall.
 
     Unit check: every candidate and writer partial is Pa, each residual is
     Pa, and dividing by ``max(P_eq, |p|, |writer(p)|)`` makes the stopping
@@ -314,71 +314,67 @@ def solve_quasi_steady_headspace_partials_Pa(
     # safeguarded regula-falsi step inside [0, P_eq,i] for each coordinate,
     # updating the other coordinates between steps. Each endpoint call uses
     # the unchanged flux and transport owners; no pipe law is duplicated.
-    # A complete sweep counts as one bounded iteration. If no source exists,
-    # p_i=0 is the endpoint root; otherwise the upper endpoint has J_i=0.
+    # One coordinate update counts as one bounded iteration. If no source
+    # exists, p_i=0 is the endpoint root; otherwise the upper endpoint has
+    # J_i=0.
     current = best
     for iteration in range(2, max_iterations + 1):
-        moved = False
-        for species in species_ids:
-            current = evaluate(candidate, iteration)
-            if current[3] < best[3]:
-                best = current
-            if current[3] <= relative_tolerance:
-                best = current
-                break
-            residual = current[2][species]
-            pressure = candidate[species]
-            if abs(residual) <= relative_tolerance * max(
-                bounds[species], abs(pressure), 1.0e-300
-            ):
-                continue
-
-            if residual > 0.0:
-                low_pressure = pressure
-                low_residual = residual
-                high_pressure = bounds[species]
-                endpoint = dict(candidate)
-                endpoint[species] = high_pressure
-                high_residual = evaluate(endpoint, iteration)[2][species]
-            else:
-                low_pressure = 0.0
-                endpoint = dict(candidate)
-                endpoint[species] = low_pressure
-                low_residual = evaluate(endpoint, iteration)[2][species]
-                high_pressure = pressure
-                high_residual = residual
-
-            if low_residual >= 0.0 and high_residual <= 0.0:
-                span = high_pressure - low_pressure
-                denominator = high_residual - low_residual
-                trial_pressure = (
-                    low_pressure
-                    - low_residual * span / denominator
-                    if denominator != 0.0
-                    else 0.5 * (low_pressure + high_pressure)
-                )
-                trial_pressure = min(
-                    high_pressure,
-                    max(low_pressure, trial_pressure),
-                )
-            else:
-                trial_pressure = (
-                    low_pressure
-                    if abs(low_residual) < abs(high_residual)
-                    else high_pressure
-                )
-            if trial_pressure != pressure:
-                candidate[species] = trial_pressure
-                moved = True
-
         current = evaluate(candidate, iteration)
         if current[3] < best[3]:
             best = current
         if current[3] <= relative_tolerance:
             best = current
             break
-        if not moved:
-            break
+        species = species_ids[(iteration - 2) % len(species_ids)]
+        residual = current[2][species]
+        pressure = candidate[species]
+        if abs(residual) <= relative_tolerance * max(
+            bounds[species], abs(pressure), 1.0e-300
+        ):
+            continue
+
+        if residual > 0.0:
+            low_pressure = pressure
+            low_residual = residual
+            high_pressure = bounds[species]
+            endpoint = dict(candidate)
+            endpoint[species] = high_pressure
+            high_eval = evaluate(endpoint, iteration)
+            if high_eval[3] < best[3]:
+                best = high_eval
+            high_residual = high_eval[2][species]
+        else:
+            low_pressure = 0.0
+            endpoint = dict(candidate)
+            endpoint[species] = low_pressure
+            low_eval = evaluate(endpoint, iteration)
+            if low_eval[3] < best[3]:
+                best = low_eval
+            low_residual = low_eval[2][species]
+            high_pressure = pressure
+            high_residual = residual
+
+        if low_residual >= 0.0 and high_residual <= 0.0:
+            span = high_pressure - low_pressure
+            denominator = high_residual - low_residual
+            trial_pressure = (
+                low_pressure
+                - low_residual * span / denominator
+                if denominator != 0.0
+                else 0.5 * (low_pressure + high_pressure)
+            )
+            trial_pressure = min(
+                high_pressure,
+                max(low_pressure, trial_pressure),
+            )
+        else:
+            trial_pressure = (
+                low_pressure
+                if abs(low_residual) < abs(high_residual)
+                else high_pressure
+            )
+        if trial_pressure != pressure:
+            candidate[species] = trial_pressure
 
     return QuasiSteadyHeadspaceSolve(
         candidate_partials_Pa=best[5],
