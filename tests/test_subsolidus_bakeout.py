@@ -644,6 +644,16 @@ def test_joint_release_stays_within_pipe_capacity():
         overhead_partials_override_Pa=None,
         **_kwargs,
     ):
+        # Stand in for the b-773 current-hour solve. Before the b-1107 fix,
+        # C0 bakeout still ignores this state and reads the persisted map.
+        sim._solved_headspace_partials_Pa_this_tick = {"SO2": 18.0}
+        sim._last_evaporation_flux_diagnostic = {
+            "headspace_solver": {
+                "oxygen_partial_frozen": True,
+                "equilibrium_Pa": {},
+                "beta_kg_s_Pa_by_species": {},
+            },
+        }
         return EvaporationFlux(
             species_kg_hr={"Fe": admitted},
             total_kg_hr=admitted,
@@ -736,6 +746,9 @@ def test_joint_release_stays_within_pipe_capacity():
     assert seen["salt_mol"] == pytest.approx(salt_before - accepted)
     assert salt_before > seen["salt_mol"] > 0.0
     cap_record = sim._last_subsolidus_bakeout["transport_cap"]
+    released = sim._last_subsolidus_bakeout["released_kg_hr_by_species"]
+    assert released["SO2"].hex() == "0x1.2db144f5aea2ap-11"
+    assert released["O2"].hex() == "0x1.2d6684738bcd3p-13"
     assert cap_record["demand_kg_hr"] == pytest.approx(demand_kg_hr)
     assert cap_record["capacity_kg_hr"] == pytest.approx(capacity_kg_hr)
     assert cap_record["scale"] == pytest.approx(transport_scale)

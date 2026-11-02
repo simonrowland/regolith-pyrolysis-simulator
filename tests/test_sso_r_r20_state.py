@@ -3285,6 +3285,10 @@ def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -
     diagnostic = sim._native_fe_partition_diagnostic(1.0)
     assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
 
+    sim._melt_headspace_composition_mbar = {"Fe": 0.25}
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    assert diagnostic["native_fe_vapor_mol"].hex() == "0x1.a6d9c42f998a0p-1"
+
 
 def test_native_fe_saturation_uses_upstream_total_pressure(
     monkeypatch,
@@ -3362,6 +3366,17 @@ def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
     )
 
     assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)
+
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 0.1
+    sim.overhead_model.pipe_diameter_m = 5.0
+    sim._melt_headspace_composition_mbar = {"Ca": 0.001}
+    cfg["p_total_mbar"] = 0.1
+    _extent, diagnostic = sim._c7_transport_extent_mol(
+        cfg,
+        ca_per_extent=3.0,
+    )
+    assert diagnostic["transport_ca_mol"].hex() == "0x1.803337dfbbb2dp+10"
 
 
 def test_c7_and_native_fe_suppress_ledger_yields_at_transitional_kn_probe() -> None:
