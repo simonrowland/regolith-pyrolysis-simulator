@@ -2966,6 +2966,48 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
         for observation in closed_cell_pressure_rows
     )
 
+
+def test_costa_pressure_rows_from_real_extract_resolve_solid_sample_notice(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import liquid_model_subsolidus_sample_notice
+
+    result = _migrate_real_extract(tmp_path, "kems-007-costa-2015.yaml")
+    pressure_record_ids = {
+        "costa_2015_fe_partial_pressure_ir_digitized",
+        "costa_2015_fe_partial_pressure_mo_digitized",
+        "costa_2015_mg_partial_pressure_ir_digitized",
+        "costa_2015_mg_partial_pressure_mo_digitized",
+    }
+    pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{record_id}::" in observation.observation_id
+            for record_id in pressure_record_ids
+        )
+    ]
+
+    assert len(pressure_rows) == 18
+    for observation in pressure_rows:
+        measured_form = (observation.provenance or {}).get(
+            "measured_condensed_form"
+        )
+        assert measured_form["state"] == "crystalline"
+        experiment = result.experiments[observation.experiment_id]
+        notice = liquid_model_subsolidus_sample_notice(
+            observation.identity,
+            engine=Engine.INTERNAL_ANALYTICAL,
+            experiment=experiment,
+            measured_condensed_form=measured_form,
+            measured_sample_phase=(observation.provenance or {}).get(
+                "measured_sample_phase"
+            ),
+            origin=observation.observation_id,
+        )
+        assert notice is not None
+        assert notice.reason == "liquid_model_vs_subsolidus_sample"
+
     ion_current_rows = [
         observation
         for observation in result.observations.values()

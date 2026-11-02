@@ -8882,27 +8882,12 @@ def _score_sample_phase_vapour(reference, experiment, engine):
 
 
 _LIQUID_MODEL_SUBSOLIDUS_SAMPLE = "liquid_model_vs_subsolidus_sample"
-_COSTA_FO93FA7_SAMPLE = (
-    "Crystalline olivine Fo93Fa7 (93% forsterite, 7% fayalite; "
-    "percent basis not separately stated)"
-)
 
 
-def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
-    """A classified solid sample keeps its existing liquid-engine score."""
-
-    experiment, reference = _vapour_over_sample_form("oxide melt samples")
-    experiment = replace(
-        experiment,
-        sample=replace(
-            experiment.sample,
-            form=None,
-            characterization=F.located(_COSTA_FO93FA7_SAMPLE),
-        ),
-    )
+def test_solid_sample_vapour_notice_preserves_numeric_score_and_headline() -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
     baseline_experiment = replace(
-        experiment,
-        sample=replace(experiment.sample, characterization=None),
+        experiment, sample=replace(experiment.sample, form=None)
     )
 
     residual, calls = _score_sample_phase_vapour(
@@ -8914,6 +8899,7 @@ def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
 
     assert calls == baseline_calls == [reference.observation_id]
     assert residual.numeric is not None
+    assert residual.numeric == baseline.numeric
     (notice,) = tuple(
         notice
         for notice in residual.notices
@@ -8934,6 +8920,62 @@ def test_costa_olivine_vapour_sample_gets_nonblocking_domain_notice() -> None:
     )
     assert headline_without_notice is True
     assert headline_with_notice is headline_without_notice
+
+
+@pytest.mark.parametrize(
+    ("engine", "expected_notice"),
+    (
+        (Engine.VAPOROCK, True),
+        (Engine.OPENIMCC, True),
+        (Engine.INTERNAL_ANALYTICAL, True),
+        (Engine.ALPHAMELTS, False),
+    ),
+)
+def test_subsolidus_notice_is_scoped_to_single_liquid_engines(
+    engine: Engine, expected_notice: bool
+) -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    residual, calls = _score_sample_phase_vapour(reference, experiment, engine)
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    ) is expected_notice
+
+
+@pytest.mark.parametrize(
+    ("quantity", "formula", "expected_rail"),
+    (
+        (Quantity.P_SAT, "Mg", Rail.VAPOUR),
+        (Quantity.P_PARTIAL, "SiO", Rail.SIO_EVOLUTION),
+    ),
+)
+def test_subsolidus_notice_covers_psat_and_sio_rails(
+    quantity: Quantity, formula: str, expected_rail: Rail
+) -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    identity = reference.identity
+    species = replace(identity.species, formula=formula)
+    reference = replace(
+        reference,
+        identity=replace(identity, quantity=quantity, species=species),
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is expected_rail
+    assert residual.numeric is not None
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.affected_quantities == (quantity,)
 
 
 def test_shilov_ceramic_row_state_gets_nonblocking_domain_notice() -> None:
@@ -8981,7 +9023,7 @@ def test_shilov_ceramic_row_state_gets_nonblocking_domain_notice() -> None:
 def test_recorded_liquid_measurement_phase_overrides_solid_sample_description(
     measured_phase: dict[str, object],
 ) -> None:
-    experiment, reference = _vapour_over_sample_form("crystalline K2Si2O5")
+    experiment, reference = _vapour_over_sample_form("solid")
     reference = replace(reference, provenance=measured_phase)
 
     residual, calls = _score_sample_phase_vapour(
@@ -9040,7 +9082,7 @@ def test_recorded_liquid_row_state_overrides_solid_characterization() -> None:
 def test_free_prose_row_state_does_not_create_subsolidus_domain_notice(
     recorded_state: str,
 ) -> None:
-    experiment, reference = _vapour_over_sample_form("crystalline K2Si2O5")
+    experiment, reference = _vapour_over_sample_form("solid")
     reference = replace(
         reference,
         provenance={
