@@ -16813,19 +16813,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # b-149 silent-zero class (diagnostic only).
             silent_zero_diagnostic=self._silent_zero_diagnostic_payload(),
         )
-        # Keep the diagnostic's historical inputs outside the dataclass
-        # fields so HourSnapshot serialization and the physics path stay
-        # unchanged. _seed_atom_ledger loads inert_melt_components_kg into
-        # process.cleaned_melt, which _project_cleaned_melt_from_atom_ledger
-        # already exposes through MeltState.composition_kg; the inventory map
-        # is provenance, so merging it here would double-count shared species.
-        diagnostic_composition_kg = dict(self.melt.composition_kg)
-        snapshot._magemin_diagnostic_composition_kg = (
-            diagnostic_composition_kg
-        )
-        snapshot._magemin_diagnostic_pressure_bar = (
-            float(self.melt.p_total_mbar) / 1000.0
-        )
+        setpoints = getattr(self, 'setpoints', {}) or {}
+        if (
+            isinstance(setpoints, Mapping)
+            and setpoints.get('projected_engine_liquid_fraction_diagnostic')
+            is True
+        ):
+            # This opt-in diagnostic stores historical inputs outside the
+            # HourSnapshot dataclass. The cleaned-melt ledger projection is
+            # already reflected in MeltState.composition_kg; the inert map is
+            # provenance, so merging it would double-count shared species.
+            snapshot._magemin_diagnostic_composition_kg = dict(
+                self.melt.composition_kg
+            )
+            snapshot._magemin_diagnostic_pressure_bar = (
+                float(self.melt.p_total_mbar) / 1000.0
+            )
         if error_category:
             setattr(snapshot, 'mass_balance_error_category', error_category)
         return snapshot
