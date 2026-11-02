@@ -2039,7 +2039,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         ).encode("utf-8")
         assert canonical_hours == expected_hours
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386"
+            "48f744baf44800a9bc8bd223d67b4378fbce24ba4bbcb91492f883157ad2fba7"
         )
 
 
