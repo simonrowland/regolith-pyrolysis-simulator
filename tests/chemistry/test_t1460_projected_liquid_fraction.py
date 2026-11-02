@@ -10,7 +10,7 @@ import pytest
 
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.reduced_real_determinism import canonical_json_bytes
-from simulator.state import CampaignPhase, OXIDE_SPECIES
+from simulator.state import Atmosphere, CampaignPhase, OXIDE_SPECIES
 from tests.chemistry.conftest import _build_sim
 
 import simulator.melt_backend.magemin as magemin_module
@@ -190,6 +190,12 @@ def _run_real_tick_with_diagnostic(
     sim.melt.temperature_C = 1100.0
     sim.melt.target_temperature_C = 1100.0
     sim._update_temperature = lambda: None
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 0.1},
