@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 88441
-records out (observations): 178285
-works: 734
-experiments: 6833
-queue size: 118468
+rows in: 88487
+records out (observations): 178331
+works: 736
+experiments: 6835
+queue size: 118571
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 732
+index sources: 734
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 731 (mismatch) |
+| citations | 147 | 733 (mismatch) |
 | doi_works | 56 | 394 (mismatch) |
-| no_doi_works | 91 | 340 (mismatch) |
-| admission_statuses | 374 | 30081 (mismatch) |
+| no_doi_works | 91 | 342 (mismatch) |
+| admission_statuses | 374 | 30110 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1358 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -208,7 +208,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
 | formulas | 1625 | 21774 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15234 (mismatch) |
+| absent_admissions | 3511 | 15251 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2827 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
@@ -19143,6 +19143,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` | 167 | 167 | 334 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
 | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` | 8 | 13 | 8 |
+| `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` | 17 | 17 | 51 |
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml` | 24 | 381 | 24 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
@@ -19648,6 +19649,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 80 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/smythe-brenan-2015-cerium-redox.yaml` | 1 | 45 | 1 |
+| `data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml` | 29 | 29 | 60 |
 | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 220 |
 | `data/literature/extracts/sossi-2020-magma-ocean-redox.yaml` | 12 | 12 | 12 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
@@ -19661,7 +19663,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
-| `data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml` | 58 | 158 | 236 |
+| `data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml` | 58 | 158 | 228 |
 | `data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml` | 48 | 48 | 0 |
 | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
@@ -19832,8 +19834,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 295486
+advisory issues: 295506
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 295486 |
+| `identity_incomplete` | 295506 |

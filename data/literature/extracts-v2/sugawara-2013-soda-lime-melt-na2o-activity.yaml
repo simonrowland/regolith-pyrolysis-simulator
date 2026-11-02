@@ -38,8 +38,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -182,8 +192,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -326,8 +346,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -470,8 +500,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -569,6 +609,28 @@ observations:
         page: 2
         section: 2.1. Electromotive force measurement
   provenance:
+    activity_calibration_anchor:
+      source: Sugawara et al. [27] (2011)
+      method_as_printed: 'Abstract: “Enthalpies of mixing of liquids obtained from different calorimetry techniques are critically
+        evaluated.” The abstract says the “data on calorimetric enthalpy, activity of Na2O, cristobalite liquidus, and immiscibility
+        gap” determine the mixing properties “as a function of composition by the least squares method.”'
+      activity_model_as_printed: Section 3 is titled “Thermodynamic formulation of Gibbs energy of mixing”. It says “Gibbs
+        energy of mixing of liquid at temperature T and composition α, (G^L_Mix,T,α), is given by”. Equation (14) gives ΔG^L_Na2O,T,α
+        = RT ln a^L_Na2O,T,α = Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i; the text says “where h_i and S_i are the empirical constants
+        to be determined by regression analysis.”
+      interpretation: The 70SiO2–30Na2O anchor is evaluated from this fitted mixing model, not directly measured.
+      locators:
+        abstract:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1390
+          section: Abstract
+        activity_model:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1392
+          section: 3. Thermodynamic formulation of Gibbs energy of mixing
+          equation: '14'
     printed_value: '-9.01'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_3_1573K
@@ -607,8 +669,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -706,6 +778,28 @@ observations:
         page: 2
         section: 2.1. Electromotive force measurement
   provenance:
+    activity_calibration_anchor:
+      source: Sugawara et al. [27] (2011)
+      method_as_printed: 'Abstract: “Enthalpies of mixing of liquids obtained from different calorimetry techniques are critically
+        evaluated.” The abstract says the “data on calorimetric enthalpy, activity of Na2O, cristobalite liquidus, and immiscibility
+        gap” determine the mixing properties “as a function of composition by the least squares method.”'
+      activity_model_as_printed: Section 3 is titled “Thermodynamic formulation of Gibbs energy of mixing”. It says “Gibbs
+        energy of mixing of liquid at temperature T and composition α, (G^L_Mix,T,α), is given by”. Equation (14) gives ΔG^L_Na2O,T,α
+        = RT ln a^L_Na2O,T,α = Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i; the text says “where h_i and S_i are the empirical constants
+        to be determined by regression analysis.”
+      interpretation: The 70SiO2–30Na2O anchor is evaluated from this fitted mixing model, not directly measured.
+      locators:
+        abstract:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1390
+          section: Abstract
+        activity_model:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1392
+          section: 3. Thermodynamic formulation of Gibbs energy of mixing
+          equation: '14'
     printed_value: '-8.46'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1473K
@@ -744,8 +838,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -843,6 +947,28 @@ observations:
         page: 2
         section: 2.1. Electromotive force measurement
   provenance:
+    activity_calibration_anchor:
+      source: Sugawara et al. [27] (2011)
+      method_as_printed: 'Abstract: “Enthalpies of mixing of liquids obtained from different calorimetry techniques are critically
+        evaluated.” The abstract says the “data on calorimetric enthalpy, activity of Na2O, cristobalite liquidus, and immiscibility
+        gap” determine the mixing properties “as a function of composition by the least squares method.”'
+      activity_model_as_printed: Section 3 is titled “Thermodynamic formulation of Gibbs energy of mixing”. It says “Gibbs
+        energy of mixing of liquid at temperature T and composition α, (G^L_Mix,T,α), is given by”. Equation (14) gives ΔG^L_Na2O,T,α
+        = RT ln a^L_Na2O,T,α = Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i; the text says “where h_i and S_i are the empirical constants
+        to be determined by regression analysis.”
+      interpretation: The 70SiO2–30Na2O anchor is evaluated from this fitted mixing model, not directly measured.
+      locators:
+        abstract:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1390
+          section: Abstract
+        activity_model:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1392
+          section: 3. Thermodynamic formulation of Gibbs energy of mixing
+          equation: '14'
     printed_value: '-8.94'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1573K
@@ -881,8 +1007,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -980,6 +1116,28 @@ observations:
         page: 2
         section: 2.1. Electromotive force measurement
   provenance:
+    activity_calibration_anchor:
+      source: Sugawara et al. [27] (2011)
+      method_as_printed: 'Abstract: “Enthalpies of mixing of liquids obtained from different calorimetry techniques are critically
+        evaluated.” The abstract says the “data on calorimetric enthalpy, activity of Na2O, cristobalite liquidus, and immiscibility
+        gap” determine the mixing properties “as a function of composition by the least squares method.”'
+      activity_model_as_printed: Section 3 is titled “Thermodynamic formulation of Gibbs energy of mixing”. It says “Gibbs
+        energy of mixing of liquid at temperature T and composition α, (G^L_Mix,T,α), is given by”. Equation (14) gives ΔG^L_Na2O,T,α
+        = RT ln a^L_Na2O,T,α = Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i; the text says “where h_i and S_i are the empirical constants
+        to be determined by regression analysis.”
+      interpretation: The 70SiO2–30Na2O anchor is evaluated from this fitted mixing model, not directly measured.
+      locators:
+        abstract:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1390
+          section: Abstract
+        activity_model:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1392
+          section: 3. Thermodynamic formulation of Gibbs energy of mixing
+          equation: '14'
     printed_value: '-8.39'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_6_1573K
@@ -1018,8 +1176,18 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: The paper does not state the thermodynamic standard state of a(Na2O).
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1117,6 +1285,28 @@ observations:
         page: 2
         section: 2.1. Electromotive force measurement
   provenance:
+    activity_calibration_anchor:
+      source: Sugawara et al. [27] (2011)
+      method_as_printed: 'Abstract: “Enthalpies of mixing of liquids obtained from different calorimetry techniques are critically
+        evaluated.” The abstract says the “data on calorimetric enthalpy, activity of Na2O, cristobalite liquidus, and immiscibility
+        gap” determine the mixing properties “as a function of composition by the least squares method.”'
+      activity_model_as_printed: Section 3 is titled “Thermodynamic formulation of Gibbs energy of mixing”. It says “Gibbs
+        energy of mixing of liquid at temperature T and composition α, (G^L_Mix,T,α), is given by”. Equation (14) gives ΔG^L_Na2O,T,α
+        = RT ln a^L_Na2O,T,α = Σ_i (h_i − T s_i)(1−i)(X^L_SiO2)^i; the text says “where h_i and S_i are the empirical constants
+        to be determined by regression analysis.”
+      interpretation: The 70SiO2–30Na2O anchor is evaluated from this fitted mixing model, not directly measured.
+      locators:
+        abstract:
+          page: 1
+          pdf_page_index: 0
+          published_page: 1390
+          section: Abstract
+        activity_model:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1392
+          section: 3. Thermodynamic formulation of Gibbs energy of mixing
+          equation: '14'
     printed_value: '-8.73'
     printed_form: log10
 - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t4_partial_enthalpy_fit_48_30_22

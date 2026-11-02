@@ -3474,6 +3474,398 @@ entries:
     locator:
       note: extract-level typed absence
       source_path: data/literature/extracts/kems-016-stolyarova-1992.yaml
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: conditional method_class author_derived lacks measured lineage
+  axes:
+  - evidence.class
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_0p99658
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_1p00455
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_0p993
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_lt_0p99526
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K_approx_0p98
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_hbar2_x0297
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x021537_hm827
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.21537; column=partial molal enthalpy; table_row_number=2; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x028548_hm632
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.28548; column=partial molal enthalpy; table_row_number=3; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x033497_hm594
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.33497; column=partial molal enthalpy; table_row_number=2; table_column_number=4
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x034025_hm630
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.34025; column=partial molal enthalpy; table_row_number=3; table_column_number=4
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_tridymite_ko05_activity_1743
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: declared quantity is unknown; unsupported quantity 'excess_enthalpy_of_mixing_as_printed'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: declared quantity is unknown; unsupported quantity 'linear_equilibrium_constant_as_printed'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_0p99658
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_1p00455
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_0p993
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_lt_0p99526
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K_approx_0p98
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, units_as_printed, value_as_printed,
+    component_as_printed, composition_mol'
+  axes:
+  - value
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_hbar2_x0297
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, value_as_printed, units_as_printed,
+    component_as_printed, fit_as_printed, composition_mol'
+  axes:
+  - value
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x021537_hm827
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.21537; column=partial molal enthalpy; table_row_number=2; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x028548_hm632
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.28548; column=partial molal enthalpy; table_row_number=3; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x033497_hm594
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.33497; column=partial molal enthalpy; table_row_number=2; table_column_number=4
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x034025_hm630
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.34025; column=partial molal enthalpy; table_row_number=3; table_column_number=4
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: qualifier coefficient does not name a reference_state
+  axes:
+  - reference_state
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0102_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0297_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_0p99658
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_1p00455
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_0p993
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_lt_0p99526
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K_approx_0p98
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_hbar2_x0297
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0102_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0102_sio2_activity
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0297_loggamma2
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0297_sio2_activity
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x021537_hm827
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.21537; column=partial molal enthalpy; table_row_number=2; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x028548_hm632
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.28548; column=partial molal enthalpy; table_row_number=3; table_column_number=2
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x033497_hm594
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.33497; column=partial molal enthalpy; table_row_number=2; table_column_number=4
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x034025_hm630
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      table: I
+      note: row=X=0.34025; column=partial molal enthalpy; table_row_number=3; table_column_number=4
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_tridymite_ko05_activity_1743
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: 'source standard_state is not typed: KO0.5(s), as printed'
+  axes:
+  - reference_state
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_tridymite_ko05_activity_1743
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: unsupported quantity 'excess_enthalpy_of_mixing_as_printed'
+  axes:
+  - quantity
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+    locator:
+      page: 3
+      published_page: 1023
+      pdf_page_index: 2
+      section: Enthalpy data
+- work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source: data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
+  why: unsupported quantity 'linear_equilibrium_constant_as_printed'
+  axes:
+  - quantity
+  observations:
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_0p99658
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_1p00455
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_0p993
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_lt_0p99526
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
+  - observation_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K_approx_0p98
+    locator:
+      page: 5
+      published_page: 1025
+      pdf_page_index: 4
+      section: Thermodynamic properties of tridymite
+      equation: '10'
 - work_id: 07f09a909c4033fe08154b5f77e6ac909a5122a63b154c18c4acabea1733c5ee
   source: data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml
   why: 'no mapped activity field selected; source fields: quantity, method_class, admission_status, reason, component, curve_number,
@@ -145114,52 +145506,6 @@ entries:
       page: 10
       pdf_page_index: 9
       paragraph: chromium oxide crystal volatilisation mass balance
-- work_id: 10.1016/j.jnoncrysol.2013.03.031
-  source: data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml
-  why: The paper does not state the thermodynamic standard state of a(Na2O).
-  axes:
-  - reference_state
-  observations:
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_sugawara_27_row_5_1473K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1473 K, source table row 5; row=Sugawara et al. [27]
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_sugawara_27_row_5_1573K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1573 K, source table row 5; row=Sugawara et al. [27]
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_sugawara_27_row_7_1573K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1573 K, source table row 7; row=Sugawara et al. [27]
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_3_1473K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1473 K, source table row 3; row=This study
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_3_1573K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1573 K, source table row 3; row=This study
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1473K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1473 K, source table row 4; row=This study
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_4_1573K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1573 K, source table row 4; row=This study
-  - observation_id: sugawara-2013-soda-lime-melt-na2o-activity::sugawara_2013_t3_this_study_row_6_1573K
-    locator:
-      page: 4
-      table: '3'
-      note: log a(Na2O), T=1573 K, source table row 6; row=This study
 - work_id: 10.1016/j.jnoncrysol.2013.03.031
   source: data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml
   why: declared quantity is unknown; refusing to pick a number
@@ -575462,6 +575808,506 @@ entries:
       pdf_page_index: 56
       table: '8'
       note: row=9, Zincite; column=EPMA ZnO
+- work_id: cd017eb93be6b6e27651a2a7e51af2a8fee3ce81416ba71c6abbf0e674a989f4
+  source: data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+  why: conditional method_class author_derived lacks measured lineage
+  axes:
+  - evidence.class
+  observations:
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_fe0_947o_ln_activity_multivariate_fit
+    locator:
+      page: 9
+      published_page: 311
+      pdf_page_index: 8
+      table: '5'
+      note: Equation (15) and Fe0.947O fit coefficients
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_08-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=2; table_column_number=5; phase=liquid
+      record: 08-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_44-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=3; table_column_number=5; phase=liquid
+      record: 44-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_44-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=4; table_column_number=5; phase=liquid
+      record: 44-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_46-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=5; table_column_number=5; phase=liquid
+      record: 46-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_46-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=6; table_column_number=5; phase=liquid
+      record: 46-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-48
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=7; table_column_number=5; phase=liquid
+      record: 48-48
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=8; table_column_number=5; phase=liquid
+      record: 48-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=9; table_column_number=5; phase=liquid
+      record: 48-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=10; table_column_number=5; phase=liquid
+      record: 48-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=11; table_column_number=5; phase=liquid
+      record: 48-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_50-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=12; table_column_number=5; phase=liquid
+      record: 50-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_50-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=13; table_column_number=5; phase=liquid
+      record: 50-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_77-52
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=14; table_column_number=5; phase=liquid
+      record: 77-52
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_83-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=15; table_column_number=5; phase=liquid
+      record: 83-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_08-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=2; table_column_number=8; phase=liquid
+      record: 08-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_44-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=3; table_column_number=8; phase=liquid
+      record: 44-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_44-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=4; table_column_number=8; phase=liquid
+      record: 44-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_46-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=5; table_column_number=8; phase=liquid
+      record: 46-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_46-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=6; table_column_number=8; phase=liquid
+      record: 46-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-48
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=7; table_column_number=8; phase=liquid
+      record: 48-48
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=8; table_column_number=8; phase=liquid
+      record: 48-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=9; table_column_number=8; phase=liquid
+      record: 48-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=10; table_column_number=8; phase=liquid
+      record: 48-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=11; table_column_number=8; phase=liquid
+      record: 48-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_50-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=12; table_column_number=8; phase=liquid
+      record: 50-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_50-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=13; table_column_number=8; phase=liquid
+      record: 50-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_77-52
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=14; table_column_number=8; phase=liquid
+      record: 77-52
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_83-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=15; table_column_number=8; phase=liquid
+      record: 83-58
+- work_id: cd017eb93be6b6e27651a2a7e51af2a8fee3ce81416ba71c6abbf0e674a989f4
+  source: data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+  why: declared quantity is unknown; unsupported quantity 'ln_Fe0.947O_activity_multivariate_fit'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_fe0_947o_ln_activity_multivariate_fit
+    locator:
+      page: 9
+      published_page: 311
+      pdf_page_index: 8
+      table: '5'
+      note: Equation (15) and Fe0.947O fit coefficients
+- work_id: cd017eb93be6b6e27651a2a7e51af2a8fee3ce81416ba71c6abbf0e674a989f4
+  source: data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_fe0_947o_ln_activity_multivariate_fit
+    locator:
+      page: 9
+      published_page: 311
+      pdf_page_index: 8
+      table: '5'
+      note: Equation (15) and Fe0.947O fit coefficients
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_08-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=2; table_column_number=5; phase=liquid
+      record: 08-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_44-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=3; table_column_number=5; phase=liquid
+      record: 44-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_44-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=4; table_column_number=5; phase=liquid
+      record: 44-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_46-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=5; table_column_number=5; phase=liquid
+      record: 46-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_46-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=6; table_column_number=5; phase=liquid
+      record: 46-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-48
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=7; table_column_number=5; phase=liquid
+      record: 48-48
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=8; table_column_number=5; phase=liquid
+      record: 48-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=9; table_column_number=5; phase=liquid
+      record: 48-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=10; table_column_number=5; phase=liquid
+      record: 48-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_48-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=11; table_column_number=5; phase=liquid
+      record: 48-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_50-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=12; table_column_number=5; phase=liquid
+      record: 50-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_50-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=13; table_column_number=5; phase=liquid
+      record: 50-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_77-52
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=14; table_column_number=5; phase=liquid
+      record: 77-52
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_83-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated Fe0.947O liquid activity cell; table_row_number=15; table_column_number=5; phase=liquid
+      record: 83-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_08-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=2; table_column_number=8; phase=liquid
+      record: 08-58
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_44-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=3; table_column_number=8; phase=liquid
+      record: 44-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_44-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=4; table_column_number=8; phase=liquid
+      record: 44-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_46-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=5; table_column_number=8; phase=liquid
+      record: 46-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_46-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=6; table_column_number=8; phase=liquid
+      record: 46-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-48
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=7; table_column_number=8; phase=liquid
+      record: 48-48
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=8; table_column_number=8; phase=liquid
+      record: 48-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-57
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=9; table_column_number=8; phase=liquid
+      record: 48-57
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-60
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=10; table_column_number=8; phase=liquid
+      record: 48-60
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_48-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=11; table_column_number=8; phase=liquid
+      record: 48-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_50-56
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=12; table_column_number=8; phase=liquid
+      record: 50-56
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_50-61a
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=13; table_column_number=8; phase=liquid
+      record: 50-61A
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_77-52
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=14; table_column_number=8; phase=liquid
+      record: 77-52
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_table4_fe0_947o_activity_coefficient_83-58
+    locator:
+      page: 7
+      published_page: 309
+      pdf_page_index: 6
+      table: '4'
+      note: Calculated gamma_Fe0.947O liquid activity-coefficient cell; table_row_number=15; table_column_number=8; phase=liquid
+      record: 83-58
+- work_id: cd017eb93be6b6e27651a2a7e51af2a8fee3ce81416ba71c6abbf0e674a989f4
+  source: data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
+  why: unsupported quantity 'ln_Fe0.947O_activity_multivariate_fit'
+  axes:
+  - quantity
+  observations:
+  - observation_id: snyder-carmichael-1992-olivine-liquid-feo-activity::snyder_1992_fe0_947o_ln_activity_multivariate_fit
+    locator:
+      page: 9
+      published_page: 311
+      pdf_page_index: 8
+      table: '5'
+      note: Equation (15) and Fe0.947O fit coefficients
 - work_id: cd1d0ac84e37daf0b20071d9cc31c05d7fbd988cca7da54bc5cc567c309ac33e
   source: data/literature/extracts/pending-pages-moo3-vp.yaml
   why: absent method_class
