@@ -109,7 +109,19 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
+from threading import Lock
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    NoReturn,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.chemistry.qfm_oneill import oneill_qfm_log10_fO2_bar
@@ -1289,6 +1301,23 @@ def _assert_magemin_bulk_echo(
             )
 
 
+def _resolve_magemin_binary_path(
+    config: Mapping[str, Any],
+    locate_binary: Callable[[Optional[Any]], Optional[Path]],
+) -> Optional[Path]:
+    """Resolve the configured executable using initialize() precedence."""
+    explicit_path = config.get('binary_path')
+    if explicit_path:
+        return locate_binary(explicit_path)
+
+    from simulator.engine_local_config import configured_magemin_binary_path
+
+    binary_path = configured_magemin_binary_path()
+    if binary_path is None:
+        binary_path = locate_binary(None)
+    return binary_path
+
+
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
@@ -2157,7 +2186,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         return None
 
     def _resolve_binary_path(self) -> Optional[Path]:
-        return self._resolve_binary_path_for_config(self._config)
+        return _resolve_magemin_binary_path(
+            self._config,
+            self._locate_binary,
+        )
 
     @classmethod
     def _resolve_binary_path_for_config(
@@ -2165,16 +2197,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         config: Mapping[str, Any],
     ) -> Optional[Path]:
         """Resolve the executable with the same precedence as initialize()."""
-        explicit_path = config.get('binary_path')
-        if explicit_path:
-            return cls._locate_binary(explicit_path)
-
-        from simulator.engine_local_config import configured_magemin_binary_path
-
-        binary_path = configured_magemin_binary_path()
-        if binary_path is None:
-            binary_path = cls._locate_binary(None)
-        return binary_path
+        return _resolve_magemin_binary_path(config, cls._locate_binary)
 
     def get_engine_version(self) -> str:
         from simulator.engine_local_config import (
@@ -4060,6 +4083,7 @@ _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE: OrderedDict[
     Tuple[Any, ...],
     Tuple[Optional[str], Tuple[Tuple[float, float], ...]],
 ] = OrderedDict()
+_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK = Lock()
 
 
 def _projected_engine_liquid_fraction_grid_cache_key(
@@ -4284,13 +4308,14 @@ def projected_engine_liquid_fraction_diagnostic(
     )
     cached_grid = None
     if cache_key is not None:
-        cached_grid = _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.get(
-            cache_key
-        )
-        if cached_grid is not None:
-            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
+        with _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+            cached_grid = _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.get(
                 cache_key
             )
+            if cached_grid is not None:
+                _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
+                    cache_key
+                )
 
     try:
         if cached_grid is None:
@@ -4347,20 +4372,21 @@ def projected_engine_liquid_fraction_diagnostic(
             "value_source": "magemin_ig_projected_oxide_grid",
         })
         if cache_key is not None:
-            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE[cache_key] = (
-                buffer_name,
-                samples,
-            )
-            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
-                cache_key
-            )
-            while (
-                len(_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE)
-                > _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LIMIT
-            ):
-                _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.popitem(
-                    last=False
+            with _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LOCK:
+                _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE[cache_key] = (
+                    buffer_name,
+                    samples,
                 )
+                _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
+                    cache_key
+                )
+                while (
+                    len(_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE)
+                    > _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LIMIT
+                ):
+                    _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.popitem(
+                        last=False
+                    )
         return result
     except Exception:
         result["fraction"] = None
