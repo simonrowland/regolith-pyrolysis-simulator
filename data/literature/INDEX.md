@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 737
-- Extracts (`literature_extract.v1`): 735
+- Sources: 738
+- Extracts (`literature_extract.v1`): 736
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 735
+- Extracts with no PDF: 736
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -199,6 +199,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `holappa-xiao-2004-ferroalloy-slag-review` | Holappa, L. & Xiao, Y. (2004), Slags in ferroalloys production—review of present knowledge, Journal of the South African Institute of Mining and Metallurgy, August 2004, pp. 429-438. |  | ABSENT, `` | `raw/holappa-xiao-2004-ferroalloy-slag-review/holappa-xiao-2004-ferroalloy-slag-review.pdf` (present, 825f3c48); `text/holappa-xiao-2004-ferroalloy-slag-review/` (20 files, exists); `tables/holappa-xiao-2004-ferroalloy-slag-review/` (0 files, ABSENT) | `data/literature/extracts/holappa-xiao-2004-ferroalloy-slag-review.yaml` (0 rows, draft) | `ledger/holappa-xiao-2004-ferroalloy-slag-review.yaml`: — (—) |
 | `holzheid-1997-feo-nio-coo-activity-metal-saturated` | Holzheid, A., Palme, H. & Chakraborty, S. (1997), "The activities of NiO, CoO and FeO in silicate melts", Chemical Geology 139, 21-38. | 10.1016/S0009-2541(97)00030-2 | ABSENT, `` | `raw/holzheid-1997-feo-nio-coo-activity-metal-saturated/holzheid-1997-feo-nio-coo-activity-metal-saturated.pdf` (present, c5fff890); `text/holzheid-1997-feo-nio-coo-activity-metal-saturated/` (57 files, exists); `tables/holzheid-1997-feo-nio-coo-activity-metal-saturated/` (0 files, ABSENT) | `data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml` (41 rows, draft) | `ledger/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml`: decoded (2026-09-06) |
 | `holzheid-lodders-2001-copper-solubility` | Holzheid, A. and Lodders, K. (2001). Solubility of copper in silicate melts as function of oxygen and sulfur fugacities, temperature, and silicate composition. Geochimica et Cosmochimica Acta 65(12), 1933-1951. | 10.1016/S0016-7037(00)00545-2 | ABSENT, `` | `raw/holzheid-lodders-2001-copper-solubility/holzheid-lodders-2001-copper-solubility.pdf` (present, 7abaa176); `text/holzheid-lodders-2001-copper-solubility/` (1 files, exists); `tables/holzheid-lodders-2001-copper-solubility/` (0 files, ABSENT) | `data/literature/extracts/holzheid-lodders-2001-copper-solubility.yaml` (321 rows, draft) | `ledger/holzheid-lodders-2001-copper-solubility.yaml`: — (—) |
+| `huang-furukawa-aoto-2003-sodium-iron-oxides-kems` | Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part I. Mass spectrometric study of Na–Fe oxides", Thermochimica Acta 405, 61–66. | 10.1016/S0040-6031(03)00136-9 | ABSENT, `` | `raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.pdf` (present, 6214768a); `text/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/` (21 files, exists); `tables/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/` (0 files, ABSENT) | `data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml` (5 rows, draft) | `ledger/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml`: — (—) |
 | `iapws-95-psat-liquid` | Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535, DOI 10.1063/1.1461829; saturation pressure of liquid water (and ice via IAPWS ice formulations). Cross-check: NIST Chemistry WebBook SRD 69 water Antoine liquid branch (separate Stull/Bridgeman compilations — not Feistel 2007). | 10.1063/1.1461829 | ABSENT, `` | `raw/iapws-95-psat-liquid/iapws-95-psat-liquid.pdf` (ABSENT, ); `text/iapws-95-psat-liquid/` (0 files, ABSENT); `tables/iapws-95-psat-liquid/` (0 files, ABSENT) | `data/literature/extracts/iapws-95-psat-liquid.yaml` (1 rows, draft) | `ledger/iapws-95-psat-liquid.yaml`: extracted (2026-09-06) |
 | `inada-2026-forsterite-h2-h2o` | Inada S., Tachibana S. (2026). Evaporation kinetics of forsterite in H2-H2O gas mixtures. Geochimica et Cosmochimica Acta 429:196–206. | 10.1016/j.gca.2026.07.046 | ABSENT, `` | `raw/inada-2026-forsterite-h2-h2o/inada-2026-forsterite-h2-h2o.pdf` (present, 1d0b7b4b); `text/inada-2026-forsterite-h2-h2o/` (1 files, exists); `tables/inada-2026-forsterite-h2-h2o/` (0 files, ABSENT) | `data/literature/extracts/inada-2026-forsterite-h2-h2o.yaml` (0 rows, draft) | `ledger/inada-2026-forsterite-h2-h2o.yaml`: — (—) |
 | `inoue-1991-n-s-partition-cao-al2o3` | R. Inoue, H. Inoue, and H. Suito (1991), "Partitions of Nitrogen and Sulfur between CaO-Al2O3 Melts and Liquid Iron", ISIJ International 31(12), 1389-1395. | 10.2355/isijinternational.31.1389 | ABSENT, `` | `raw/inoue-1991-n-s-partition-cao-al2o3/inoue-1991-n-s-partition-cao-al2o3.pdf` (present, 5e606018); `text/inoue-1991-n-s-partition-cao-al2o3/` (34 files, exists); `tables/inoue-1991-n-s-partition-cao-al2o3/` (0 files, ABSENT) | `data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml` (446 rows, draft) | `ledger/inoue-1991-n-s-partition-cao-al2o3.yaml`: acquired (2026-10-04) |
@@ -943,6 +944,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `holappa-xiao-2004-ferroalloy-slag-review`
 - `holzheid-1997-feo-nio-coo-activity-metal-saturated`
 - `holzheid-lodders-2001-copper-solubility`
+- `huang-furukawa-aoto-2003-sodium-iron-oxides-kems`
 - `iapws-95-psat-liquid`
 - `inada-2026-forsterite-h2-h2o`
 - `inoue-1991-n-s-partition-cao-al2o3`

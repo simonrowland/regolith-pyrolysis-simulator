@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 737
-  extracts: 735
+  sources: 738
+  extracts: 736
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 735
+  extracts_without_pdf: 736
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -191,6 +191,7 @@ gaps:
   - holappa-xiao-2004-ferroalloy-slag-review
   - holzheid-1997-feo-nio-coo-activity-metal-saturated
   - holzheid-lodders-2001-copper-solubility
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-kems
   - iapws-95-psat-liquid
   - inada-2026-forsterite-h2-h2o
   - inoue-1991-n-s-partition-cao-al2o3
@@ -11461,6 +11462,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  aliases: []
+  citation: Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part
+    I. Mass spectrometric study of Na–Fe oxides", Thermochimica Acta 405, 61–66.
+  doi: 10.1016/S0040-6031(03)00136-9
+  report_number: null
+  identifier: 10.1016/S0040-6031(03)00136-9
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.pdf
+      present: true
+      sha256: 6214768a8a7a5a1b7c5f9059b1868b9ad2ae295a232d6a4f23c3655c8926d885
+      matches_simulator: null
+    sidecar:
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/sidecar.yaml
+      present: true
+    text:
+      path: text/huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      exists: true
+      file_count: 21
+    tables:
+      path: tables/huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8935c18298cc693945d95bf99f3f896beb867c50
 - source_id: iapws-95-psat-liquid
   aliases: []
   citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
