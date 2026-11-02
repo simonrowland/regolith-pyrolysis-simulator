@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 741
-  extracts: 739
+  sources: 742
+  extracts: 740
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 739
+  extracts_without_pdf: 740
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -336,6 +336,7 @@ gaps:
   - kramer-1991-glass-basicity-gas-solubility
   - krawczynski-grove-2012-high-ti-lunar-melts
   - kress-carmichael-1988-iron-oxidation-stoichiometry
+  - kress-carmichael-1989-lime-iron-silicate-redox
   - kress-carmichael-1991-iron-redox-calibration
   - kroger-fingas-1935-alkali-silicate-equilibria
   - kroger-janetzko-kreitlow-1958-glass-formation-heat
@@ -19850,6 +19851,64 @@ sources:
       last_stage: extracted
       date: '2026-10-03'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  aliases: []
+  citation: 'Kress, V.C. and Carmichael, I.S.E. (1989). The lime-iron-silicate melt system: Redox and
+    volume systematics. Geochimica et Cosmochimica Acta 53(11), 2883-2892.'
+  doi: 10.1016/0016-7037(89)90165-8
+  report_number: null
+  identifier: 10.1016/0016-7037(89)90165-8
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+    review_status: draft
+    rows: 260
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kress-carmichael-1989-lime-iron-silicate-redox/kress-carmichael-1989-lime-iron-silicate-redox.pdf
+      present: true
+      sha256: ea0680311d8ae1eda4a59b8ff737c3db59934973a4e07a141c66e2f96a849ad4
+      matches_simulator: null
+    sidecar:
+      path: raw/kress-carmichael-1989-lime-iron-silicate-redox/sidecar.yaml
+      present: true
+    text:
+      path: text/kress-carmichael-1989-lime-iron-silicate-redox
+      exists: true
+      file_count: 27
+    tables:
+      path: tables/kress-carmichael-1989-lime-iron-silicate-redox
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8935c18298cc693945d95bf99f3f896beb867c50
 - source_id: kress-carmichael-1991-iron-redox-calibration
   aliases: []
   citation: Kress, V.C. and Carmichael, I.S.E. (1991). The compressibility of silicate liquids containing
