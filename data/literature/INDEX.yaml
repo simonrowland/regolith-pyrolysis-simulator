@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 730
-  extracts: 728
+  sources: 731
+  extracts: 729
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 728
+  extracts_without_pdf: 729
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -98,6 +98,7 @@ gaps:
   - cacciatore-zajacz-2026-v-sc-oxybarometer
   - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   - cardiff-2007-vacuum-pyrolysis-gsfc
+  - charles-1967-alkali-silicate-activities
   - charnoz-2023-hydrogen-magma-ocean
   - chatain-2021-nacro2-thermodynamics
   - chaudary-1997-v-redox-binary-silicate
@@ -6013,6 +6014,64 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: charles-1967-alkali-silicate-activities
+  aliases: []
+  citation: Charles, R. J. (1967). Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions. Journal of the
+    American Ceramic Society, 50(12), 631–641.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/charles-1967-alkali-silicate-activities.yaml
+    review_status: draft
+    rows: 120
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/charles-1967-alkali-silicate-activities/charles-1967-alkali-silicate-activities.pdf
+      present: true
+      sha256: e06036723a8ba830daa18c5fbd480dfc7c919b6b4bf50582dfbc5b4368428153
+      matches_simulator: null
+    sidecar:
+      path: raw/charles-1967-alkali-silicate-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/charles-1967-alkali-silicate-activities
+      exists: true
+      file_count: 59
+    tables:
+      path: tables/charles-1967-alkali-silicate-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/charles-1967-alkali-silicate-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/charles-1967-alkali-silicate-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: charnoz-2023-hydrogen-magma-ocean
   aliases: []
   citation: 'Charnoz, S., Falco, A., Tremblin, P., Sossi, P., Caracas, R. & Lagage, P.-O. (2023), "The

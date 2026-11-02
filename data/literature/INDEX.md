@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 730
-- Extracts (`literature_extract.v1`): 728
+- Sources: 731
+- Extracts (`literature_extract.v1`): 729
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 728
+- Extracts with no PDF: 729
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -106,6 +106,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `cacciatore-zajacz-2026-v-sc-oxybarometer` | Cacciatore EE, Zajacz Z (2026). Experimental calibration of V–Sc oxybarometers based on clinopyroxene- and orthopyroxene-melt equilibria. Contributions to Mineralogy and Petrology 181:71. | 10.1007/s00410-026-02347-4 | ABSENT, `` | `raw/cacciatore-zajacz-2026-v-sc-oxybarometer/cacciatore-zajacz-2026-v-sc-oxybarometer.pdf` (present, d5e291a5); `text/cacciatore-zajacz-2026-v-sc-oxybarometer/` (53 files, exists); `tables/cacciatore-zajacz-2026-v-sc-oxybarometer/` (0 files, ABSENT) | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` (682 rows, draft) | `ledger/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml`: — (—) |
 | `cacciatore-zajacz-2026-v-sc-oxybarometer-supplement` | Cacciatore EE, Zajacz Z (2026). Supplementary Data for Experimental calibration of V–Sc oxybarometers based on clinopyroxene- and orthopyroxene-melt equilibria. Mendeley Data, version 1. | 10.17632/9c5rg4ywm6.1 | ABSENT, `` | `raw/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.pdf` (ABSENT, ); `text/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement/` (0 files, ABSENT); `tables/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement/` (0 files, ABSENT) | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.yaml` (0 rows, draft) | `ledger/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.yaml`: — (—) |
 | `cardiff-2007-vacuum-pyrolysis-gsfc` | Cardiff, Eric H., Pomeroy, Brian R., Banks, Ian S. and Benz, Alexis (2007), "Vacuum Pyrolysis and Related ISRU Techniques", Space Technology and Applications International Forum (STAIF). NTRS 20070014929 | NTRS 20070014929 | ABSENT, `` | `raw/cardiff-2007-vacuum-pyrolysis-gsfc/cardiff-2007-vacuum-pyrolysis-gsfc.pdf` (present, f9542e73); `text/cardiff-2007-vacuum-pyrolysis-gsfc/` (28 files, exists); `tables/cardiff-2007-vacuum-pyrolysis-gsfc/` (0 files, ABSENT) | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` (7 rows, draft) | `ledger/cardiff-2007-vacuum-pyrolysis-gsfc.yaml`: extracted (2026-09-12) |
+| `charles-1967-alkali-silicate-activities` | Charles, R. J. (1967). Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions. Journal of the American Ceramic Society, 50(12), 631–641. |  | ABSENT, `` | `raw/charles-1967-alkali-silicate-activities/charles-1967-alkali-silicate-activities.pdf` (present, e0603672); `text/charles-1967-alkali-silicate-activities/` (59 files, exists); `tables/charles-1967-alkali-silicate-activities/` (0 files, ABSENT) | `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` (120 rows, draft) | `ledger/charles-1967-alkali-silicate-activities.yaml`: — (—) |
 | `charnoz-2023-hydrogen-magma-ocean` | Charnoz, S., Falco, A., Tremblin, P., Sossi, P., Caracas, R. & Lagage, P.-O. (2023), "The effect of a small amount of hydrogen in the atmosphere of ultrahot magma-ocean planets: Atmospheric composition and escape", Astronomy & Astrophysics 674:A224. | 10.1051/0004-6361/202245763 | ABSENT, `` | `raw/charnoz-2023-hydrogen-magma-ocean/charnoz-2023-hydrogen-magma-ocean.pdf` (present, b375a3d3); `text/charnoz-2023-hydrogen-magma-ocean/` (59 files, exists); `tables/charnoz-2023-hydrogen-magma-ocean/` (0 files, ABSENT) | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` (0 rows, draft) | `ledger/charnoz-2023-hydrogen-magma-ocean.yaml`: decoded (2026-09-06) |
 | `chatain-2021-nacro2-thermodynamics` | Chatain, S., David, N., Bonina, D., Flèche, J.-L., Bonnet, C., Courouau, J.-L. & Rouhard, M. (2021). Thermodynamic study of the sodium chromite NaCrO2. Journal of Alloys and Compounds 882, 160784. | 10.1016/j.jallcom.2021.160784 | ABSENT, `` | `raw/chatain-2021-nacro2-thermodynamics/chatain-2021-nacro2-thermodynamics.pdf` (present, 4dacbef1); `text/chatain-2021-nacro2-thermodynamics/` (44 files, exists); `tables/chatain-2021-nacro2-thermodynamics/` (0 files, ABSENT) | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` (26 rows, draft) | `ledger/chatain-2021-nacro2-thermodynamics.yaml`: — (—) |
 | `chaudary-1997-v-redox-binary-silicate` | Chaudary, H., Miller, D. M., Brungs, M. P. and Belton, G. R. (1997). Redox chemistry of vanadium in molten binary silicates and slags. Molten Slags, Fluxes and Salts '97 Conference, 493–499. |  | ABSENT, `` | `raw/chaudary-1997-v-redox-binary-silicate/chaudary-1997-v-redox-binary-silicate.pdf` (present, 0ac1605f); `text/chaudary-1997-v-redox-binary-silicate/` (29 files, exists); `tables/chaudary-1997-v-redox-binary-silicate/` (0 files, ABSENT) | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` (0 rows, draft) | `ledger/chaudary-1997-v-redox-binary-silicate.yaml`: — (—) |
@@ -843,6 +844,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `cacciatore-zajacz-2026-v-sc-oxybarometer`
 - `cacciatore-zajacz-2026-v-sc-oxybarometer-supplement`
 - `cardiff-2007-vacuum-pyrolysis-gsfc`
+- `charles-1967-alkali-silicate-activities`
 - `charnoz-2023-hydrogen-magma-ocean`
 - `chatain-2021-nacro2-thermodynamics`
 - `chaudary-1997-v-redox-binary-silicate`
