@@ -1585,14 +1585,7 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
-    printed_values = (
-        raw_components
-        if raw_components_are_unique and raw_components
-        else _printed_composition_source_map(payload) or wt
-    )
-    return located_value(
-        _printed_map_payload(printed_values, numeric_values_as="source"), locator
-    )
+    return located_value(_printed_map_payload(wt), locator)
 
 
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
@@ -4486,10 +4479,12 @@ def _preserve_printed_composition_context(
     values = dict(printed.state.value)
     for name, amount in source_values.items():
         normalized_name = _mass_percent_component_key(name)[0]
-        if normalized_name in values:
+        if name in values:
+            values[name] = amount
+        elif normalized_name in values:
             values[normalized_name] = amount
         else:
-            values.setdefault(name, amount)
+            values[name] = amount
     if values == printed.state.value:
         return printed
     return replace(printed, state=State.of(values))
@@ -5032,16 +5027,6 @@ def _printed_mass_percent_map_refusal(
         )
         if refusal is not None:
             return True, refusal
-        chloride = _printed_volatile_mass_percent(raw, closure_context).get("Cl")
-        if (
-            chloride is not None
-            and chloride > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
-        ):
-            return (
-                True,
-                "partial analysis contains unsupported component(s) above "
-                f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: Cl={chloride} wt%",
-            )
         return True, None
 
     closure_amounts = {
@@ -5432,10 +5417,13 @@ def _printed_initial_charge_row_map(
     return None
 
 
-def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+def _mass_loss_oxide_map_from_mapping(
+    obj: object, *, fields: Sequence[str] | None = None
+) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
-    fields, _invalid = _residue_component_field_sets(obj)
+    if fields is None:
+        fields, _invalid = _residue_component_field_sets(obj)
     components: dict[str, Decimal] = {}
     for field in fields:
         name, _has_mass_suffix = _mass_percent_component_key(field)
@@ -6437,6 +6425,9 @@ def _owner_initial_from_printed(
         else:
             refusal_reason.append("printed composition is not a component map")
     if wt:
+        declared_component_map = _printed_composition_map(raw)
+        if declared_component_map is None:
+            declared_component_map = raw
         source_map = _source_printed_composition_values(wt, closure_context)
         if source_map:
             ordered_wt = {
@@ -6454,7 +6445,7 @@ def _owner_initial_from_printed(
             wt,
             locator,
             closure_context=raw if closure_context is None else closure_context,
-            declared_component_map=raw,
+            declared_component_map=declared_component_map,
         )
         if (
             initial is not None
@@ -21317,7 +21308,7 @@ class Migrator:
                 raw_item = point.get("item")
                 if not isinstance(raw_item, Mapping):
                     continue
-                _valid_fields, invalid_fields = _residue_component_field_sets(raw_item)
+                valid_fields, invalid_fields = _residue_component_field_sets(raw_item)
                 for field in invalid_fields:
                     self.result.registry_issues.append(
                         ValidationIssue(
@@ -21407,12 +21398,15 @@ class Migrator:
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
-                            raw_item
+                            raw_item, fields=valid_fields
                         ),
                         source_point_composition_context=(
                             raw_item
-                            if _residue_component_field_sets(raw_item)[0]
+                            if valid_fields
                             else None
+                        ),
+                        source_point_residue_fields=(
+                            valid_fields if valid_fields else None
                         ),
                         ordinal_point_id=(
                             series_point_id(
@@ -22256,6 +22250,7 @@ class Migrator:
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         source_point_composition_context: Mapping[str, Any] | None = None,
+        source_point_residue_fields: Sequence[str] | None = None,
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
@@ -22269,9 +22264,11 @@ class Migrator:
         if source_point_composition_context is None:
             point_declared_component_map = _named_printed_composition_map(raw_item)
         else:
-            residue_fields, _invalid_fields = _residue_component_field_sets(
-                source_point_composition_context
-            )
+            residue_fields = source_point_residue_fields
+            if residue_fields is None:
+                residue_fields, _invalid_fields = _residue_component_field_sets(
+                    source_point_composition_context
+                )
             point_declared_component_map = {
                 field: source_point_composition_context[field]
                 for field in residue_fields
@@ -25744,10 +25741,39 @@ class Migrator:
                         entry.work_id = exp.work_id
         # Parent-row queue entries can resolve to the same exploded child as a
         # child-local entry. Deduplicate only after observation ids are final.
+        # QueueEntry equality compares these fields directly; recursively
+        # freezing the locator lets the seen-set preserve that equality while
+        # making each lookup constant-time.
+        def freeze(value: object) -> object:
+            if isinstance(value, Mapping):
+                return frozenset(
+                    (freeze(key), freeze(item)) for key, item in value.items()
+                )
+            if isinstance(value, list):
+                return (list, tuple(freeze(item) for item in value))
+            if isinstance(value, tuple):
+                return (tuple, tuple(freeze(item) for item in value))
+            if isinstance(value, (set, frozenset)):
+                return (set, frozenset(freeze(item) for item in value))
+            return value
+
+        def entry_key(entry: QueueEntry) -> tuple[object, ...]:
+            return (
+                entry.work_id,
+                freeze(entry.locator),
+                freeze(entry.axes),
+                entry.why,
+                entry.source,
+                entry.observation_id,
+            )
+
         unique_entries: list[QueueEntry] = []
+        seen_entries: set[tuple[object, ...]] = set()
         for entry in self.result.queue:
-            if entry not in unique_entries:
+            key = entry_key(entry)
+            if key not in seen_entries:
                 unique_entries.append(entry)
+                seen_entries.add(key)
         self.result.queue[:] = unique_entries
 
     def _close_conditional_method_classes(self) -> None:

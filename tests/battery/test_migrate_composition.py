@@ -408,7 +408,7 @@ def test_hastie_typed_initial_charge_at_inclusive_mass_closure_boundary_converts
     assert actual.state.value.components == expected.components
 
 
-def test_volovetskii_starting_glass_material_state_is_initial() -> None:
+def test_volovetskii_starting_glass_with_excess_chloride_is_refused() -> None:
     path = REPO_ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml"
     document = yaml.safe_load(path.read_text(encoding="utf-8"))
     observation = next(
@@ -424,19 +424,17 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
     expected = selected.initial_composition
-    assert expected is not None and expected.state.is_value
+    assert expected is not None and expected.state.is_unknown
+    assert "Cl=0.81 wt%" in expected.state.reason
+    assert selected.printed_composition is not None
+    assert selected.printed_composition.state.is_value
     source_map = observation["values"]["composition_wt_pct"]
-    oxide_map = {
-        name: as_decimal(value)
-        for name, value in source_map.items()
-        if name not in {"Cl", "total"}
-    }
-    # The source's oxide cells sum to 95.68 wt%; Cl is printed separately.
-    assert sum(oxide_map.values()) == Decimal("95.68")
+    # The source oxide cells sum to 95.68 wt%; printed Cl is 0.81 wt%, above
+    # the shared 0.5 wt% dropped-component limit.
     assert as_decimal(source_map["Cl"]) == Decimal("0.81")
-    assert expected.state.value.components == wt_pct_to_mole_fraction(
-        oxide_map
-    ).components
+    assert as_decimal(selected.printed_composition.state.value["Cl"]) == Decimal(
+        "0.81"
+    )
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -3018,7 +3016,7 @@ def test_residue_fallback_refuses_malformed_printed_start_without_aborting(
     assert "missing major oxides: SiO2" in composition.reason
 
 
-def test_mass_percent_printed_provenance_keeps_source_component_names() -> None:
+def test_mass_percent_printed_provenance_uses_canonical_component_names() -> None:
     sample = migrate_module._sample_from_plain(
         {
             "printed_composition": {
@@ -3038,6 +3036,56 @@ def test_mass_percent_printed_provenance_keeps_source_component_names() -> None:
     assert printed is not None
     assert printed.state.is_value
     assert printed.state.value == {"SiO2": "60", "Al2O3": "40"}
+
+
+def test_vocabulary_printed_composition_restores_aliased_uncertainty_cell() -> None:
+    sample = sample_from_equipment(
+        {},
+        values={
+            "locator": {"table": "3", "row": "7"},
+            "composition_wt_pct": {
+                "SiO2": "50.0",
+                "FeO*": "50.0 ± 2.0",
+            },
+        },
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.is_value
+    assert sample.printed_composition.state.value["FeO*"] == "50.0 ± 2.0"
+
+
+def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator.result.works["work"] = None
+    entries = [
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [1, "a"]}},
+            ["composition", "phase"], "same", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"nested": {"row": [1, "a"]}, "table": "2"},
+            ["composition", "phase"], "same", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [2, "a"]}},
+            ["composition", "phase"], "different", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "2", "nested": {"row": [1, "a"]}},
+            ["phase", "composition"], "same", "source", None,
+        ),
+    ]
+    expected = []
+    for entry in entries:
+        if entry not in expected:
+            expected.append(entry)
+    migrator.result.queue[:] = entries
+
+    migrator._resolve_queue_ids()
+
+    assert migrator.result.queue == expected
+    assert [entries.index(entry) for entry in migrator.result.queue] == [0, 2, 3]
 
 
 @pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))
@@ -4394,7 +4442,7 @@ def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     )
 
 
-def test_volatile_mass_percent_initial_preserves_print_and_converts_oxide_basis() -> None:
+def test_volatile_mass_percent_initial_refuses_excess_chloride() -> None:
     raw = {
         "initial_composition": {
             "locator": {"table": "2", "page": 14},
@@ -4412,12 +4460,12 @@ def test_volatile_mass_percent_initial_preserves_print_and_converts_oxide_basis(
     sample = _sample_from_plain(raw)
 
     assert sample.printed_composition is not None
-    assert sample.printed_composition.state.value == {"SiO2": "60", "Cl": "40"}
+    assert sample.printed_composition.state.value == raw["initial_composition"][
+        "state"
+    ]["value"]
     assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_value
-    assert sample.initial_composition.state.value == wt_pct_to_mole_fraction(
-        {"SiO2": Decimal("60"), "Cl": Decimal("40")}
-    )
+    assert sample.initial_composition.state.is_unknown
+    assert "Cl=40 wt%" in sample.initial_composition.state.reason
 
 
 def _iter_store_observations() -> list[dict]:

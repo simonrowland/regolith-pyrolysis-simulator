@@ -889,6 +889,37 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
+        if field == "initial_composition" and not isinstance(raw, Composition):
+            unsupported = True
+            missing.append(path)
+            continue
+        basis_exempt: set[str] = set()
+        basis_notice: str | None = None
+        basis_inference: Derivation | None = None
+        refused_components: tuple[str, ...] = ()
+        as_moles = False
+        if field == "printed_composition":
+            if isinstance(raw, Mapping):
+                is_mass_percent, refusal = _printed_mass_percent_map_refusal(
+                    raw, point, reject_dropped_components=True
+                )
+                if is_mass_percent and refusal is not None:
+                    printed_mass_percent_refused = True
+                    unsupported = True
+                    missing.append(path)
+                    continue
+        if field == "initial_composition" and isinstance(raw, Composition):
+            refusal = _derived_mass_percent_refusal(
+                located,
+                point,
+                sibling_printed_mass_percent_refused=(
+                    printed_mass_percent_refused
+                ),
+            )
+            if refusal is not None:
+                unsupported = True
+                missing.append(path)
+                continue
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
             if isinstance(components, Mapping):
@@ -902,37 +933,6 @@ def normalized_composition(
                         "normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM, (path,)))
             if printed_species is not None:
                 printed_path = path
-        if field == "printed_composition" and isinstance(raw, Mapping):
-            is_mass_percent, refusal = _printed_mass_percent_map_refusal(
-                raw, point, reject_dropped_components=True
-            )
-            if is_mass_percent and refusal is not None:
-                printed_mass_percent_refused = True
-                unsupported = True
-                missing.append(path)
-                continue
-        if field == "initial_composition" and isinstance(raw, Composition):
-            refusal = _derived_mass_percent_refusal(
-                located,
-                point,
-                sibling_printed_mass_percent_refused=(
-                    printed_mass_percent_refused
-                ),
-            )
-            if refusal is not None:
-                unsupported = True
-                missing.append(path)
-                continue
-        if field == "initial_composition" and not isinstance(raw, Composition):
-            unsupported = True
-            missing.append(path)
-            continue
-        basis_exempt: set[str] = set()
-        basis_notice: str | None = None
-        basis_inference: Derivation | None = None
-        refused_components: tuple[str, ...] = ()
-        as_moles = False
-        if field == "printed_composition":
             if printed_species is None:
                 pairs = _printed_component_pairs(raw)
                 if pairs is not None:
