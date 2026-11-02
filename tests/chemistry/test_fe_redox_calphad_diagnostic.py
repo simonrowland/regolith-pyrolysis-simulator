@@ -42,6 +42,24 @@ _IRON_RICH_BASALT_WT = {
 _T_K = 1673.15
 
 
+def test_holzheid_multiplier_pins_current_celsius_interpolation_and_clamps():
+    """Golden pin before moving this conversion to reciprocal-temperature interpolation."""
+    expected = (
+        (1200, 2.02, "clamped_below_verified_range"),
+        (1300, 2.02, "clamped_below_verified_range"),
+        (1400, 1.94, "interpolated_verified_range"),
+        (1500, 1.80, "interpolated_verified_range"),
+        (1600, 1.66, "clamped_above_verified_range"),
+        (1700, 1.66, "clamped_above_verified_range"),
+    )
+    for temperature_C, multiplier, status in expected:
+        band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
+        assert band["conversion_multiplier"] == pytest.approx(
+            multiplier, rel=0, abs=1e-14
+        )
+        assert band["conversion_status"] == status
+
+
 def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
     return {
         oxide: wt / 100.0 / (MOLAR_MASS[oxide] / 1000.0)
