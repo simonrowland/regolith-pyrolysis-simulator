@@ -20534,7 +20534,7 @@ class Migrator:
                     inference=wt_pct_to_mole_fraction_derivation(
                         projected_oxide_map,
                         projected_oxide_locator or locator,
-                        source_note=_wt_percent_derivation_source_note(
+                        source_note=_omitted_trace_component_source_note(
                             projected_oxide_map,
                             projected_closure_context,
                             declared_component_map=_named_printed_composition_map(
@@ -23589,6 +23589,32 @@ class Migrator:
                 point_oxide_map, raw_item
             )
             if child_printed_map:
+                normalized_key_counts = Counter(
+                    normalized_name
+                    for name in child_printed_map
+                    for normalized_name, has_mass_suffix in (
+                        _mass_percent_component_key(str(name)),
+                    )
+                    if has_mass_suffix
+                    and _is_engine_oxide_component(normalized_name)
+                )
+                source_keys = set(child_printed_map)
+                printed_map = {}
+                for name, amount in child_printed_map.items():
+                    normalized_name, has_mass_suffix = (
+                        _mass_percent_component_key(str(name))
+                    )
+                    if (
+                        has_mass_suffix
+                        and _is_engine_oxide_component(normalized_name)
+                        and isinstance(point_oxide_map, Mapping)
+                        and normalized_name in point_oxide_map
+                        and normalized_key_counts[normalized_name] == 1
+                        and normalized_name not in source_keys
+                    ):
+                        name = normalized_name
+                    printed_map[name] = amount
+                child_printed_map = printed_map
                 point_conditions = {
                     **(point_conditions or {}),
                     "printed_composition": located_value(

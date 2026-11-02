@@ -5412,6 +5412,37 @@ def _internal_engine_point_for_real_extract(
             id="sossi-sulfur-bearing-print-restored",
         ),
         pytest.param(
+            "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
+            "aithala_2026_1800_30_xanes",
+            {
+                "Al2O3": 0.06887361206879163,
+                "CaO": 0.08717220545569997,
+                "FeO": 0.13850021506701168,
+                "K2O": 0.00019098707132811764,
+                "MgO": 0.19301273927716192,
+                "Na2O": 0.019818028418173754,
+                "P2O5": 0.0005681557637797296,
+                "SiO2": 0.4877472929677143,
+                "TiO2": 0.004116763910338897,
+            },
+            "calculated",
+            (
+                "calculated from printed oxide wt% composition; "
+                "relation=wt_pct_to_mole_fraction; "
+                "inputs=x_i = (w_i / M_i) / Σ_j (w_j / M_j) | "
+                "original_unit=wt_pct | FeOT (total iron) treated as FeO; "
+                "printed key FeOT; locator=Locator(page=14, "
+                "published_page='SI-8', pdf_page_index=None, "
+                "page_verification=None, table_caption_page=None, "
+                "table_continued=None, table='S-2', figure=None, "
+                "paragraph=None, section=None, equation=None, "
+                "line_range=None, note='WDS EPMA composition for 1800-30; "
+                "all oxide columns in wt.% as printed.', source_path=None, "
+                "record=None)"
+            ),
+            id="aithala-green-notice-has-one-feot-clause",
+        ),
+        pytest.param(
             "smythe-brenan-2015-cerium-redox.yaml",
             "row=ds09-c3-37",
             {
