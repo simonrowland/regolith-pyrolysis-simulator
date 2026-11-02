@@ -1,0 +1,97 @@
+source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+source_citation: Frischat and Oel (1966), Glastechnische Berichte 39(2), 50-61
+source_language: German
+audit_status: source_cells_resolved_schema_encoding_unresolved
+input_order:
+  primary_machine_reads:
+    - MinerU table blocks and markdown
+    - pdftotext-layout
+  backup: PDF page renders for the flagged decimal-comma cells and locator/layout checks
+tables:
+  - printed_table: '2'
+    page: 5
+    draft_key: p005-t01
+    printed_body_rows: 12
+    columns:
+      1: Glas temperature, °C
+      2: Glas, beta-plus activity, D in cm2/s
+      3: Glas, gamma activity, D in cm2/s
+      4: Polykristall temperature, °C
+      5: Polykristall, beta-plus activity, D in cm2/s
+      6: Polykristall, gamma activity, D in cm2/s
+    cell_audit:
+      machine_read_agreement: >-
+        MinerU and pdftotext agree on digits and signs for all 51 numeric cells.
+        Table QA reports 51 numeric cells and 1.000 agreement.
+      layout_check: >-
+        Rendered PDF page 5 (printed page 54) verifies the six-column grouping,
+        row assignments, both separate 435 °C and 575 °C glass rows, and all
+        printed integer temperatures.
+      flagged_decimal_cells: >-
+        Rendered PDF page 5 verifies all 30 D cells flagged for comma decimals.
+        Their transcribed decimal coefficients and exponents are the values in
+        the MinerU draft cells at CSV rows 4-15, columns 2, 3, 5, and 6.
+      printed_rows_and_values:
+        - {printed_row: 1, temperature_C: [207, 512], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
+        - {printed_row: 2, temperature_C: [305, 520], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
+        - {printed_row: 3, temperature_C: [305, 575], numeric_D_cells: [glass_beta, poly_beta, poly_gamma], absent_D_cells: [glass_gamma]}
+        - {printed_row: 4, temperature_C: [375, 633], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
+        - {printed_row: 5, temperature_C: [425, 643], numeric_D_cells: [glass_gamma, poly_gamma], absent_D_cells: [glass_beta, poly_beta]}
+        - {printed_row: 6, temperature_C: [435, 701], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
+        - {printed_row: 7, temperature_C: [435, 775], numeric_D_cells: [glass_beta, glass_gamma, poly_gamma], absent_D_cells: [poly_beta]}
+        - {printed_row: 8, temperature_C: [517, 790], numeric_D_cells: [glass_beta, glass_gamma, poly_beta], absent_D_cells: [poly_gamma]}
+        - {printed_row: 9, temperature_C: [520, 885], numeric_D_cells: [glass_gamma, poly_gamma], absent_D_cells: [glass_beta, poly_beta]}
+        - {printed_row: 10, temperature_C: [575, null], numeric_D_cells: [glass_beta, glass_gamma], absent_D_cells: [poly_temperature, poly_beta, poly_gamma]}
+        - {printed_row: 11, temperature_C: [575, null], numeric_D_cells: [glass_gamma], absent_D_cells: [glass_beta, poly_temperature, poly_beta, poly_gamma]}
+        - {printed_row: 12, temperature_C: [633, null], numeric_D_cells: [glass_beta, glass_gamma], absent_D_cells: [poly_temperature, poly_beta, poly_gamma]}
+    printed_count_reconciliation: >-
+      12 printed body rows; 21 numeric temperature cells (12 glass and 9
+      polycrystal); 30 numeric D cells and 18 blank D cells. Total 51 numeric
+      cells, matching the table QA census. Blank cells are typed absences, not
+      zeros.
+    row_assignment_basis: >-
+      Column headings identify Glas versus Polykristall, beta-plus versus gamma
+      activity, and D in cm2/s. The page render confirms these assignments.
+    figure_policy: >-
+      Fig. 6 sodium diffusion values and Fig. 7 conductivity points remain
+      figure_only and undigitised.
+composition:
+  printed_table: '1'
+  page: 2
+  render_check: >-
+    PDF page 2 (printed page 51) confirms the stoichiometric target composition
+    Sollwerte: Na2O 17,49; CaO 31,65; SiO2 50,86 Gew.-%; R2O3 is a dash.
+    Variant columns 1-3 are not assigned to Table 2 observations.
+prose_cells:
+  - {quantity: sodium_self_diffusion_arrhenius_fit, page: 1, printed_page: 50, render_check: verified, values: 'Glass: D = 3,67·10^-2 exp[-27,5 kcal/RT] cm2/s, 200-600 °C; Polykristall: D = 1,88·10^-2 exp[-29,9 kcal/RT] cm2/s, 500-900 °C'}
+  - {quantity: conductivity_arrhenius_fit, page: 11, printed_page: 60, render_check: verified, values: 'Glas: σ = 6,98·10^2 exp[-25,9 kcal/RT] Ω^-1 cm^-1, 250-600 °C; Polykristall: σ = 89,9 exp[-26,2 kcal/RT] Ω^-1 cm^-1, 470-900 °C'}
+  - {quantity: correlation_factor, page: 1, printed_page: 50, render_check: verified, values: 'f ≈ 0,2 for both materials'}
+  - {quantity: correlation_factor, page: 11, printed_page: 60, render_check: verified, values: 'f ≈ 0,2 for both materials; detailed values 0,16 for glass and 0,20 for crystal'}
+  - {quantity: sodium_transference_number, page: 7, printed_page: 56, render_check: verified, values: 'tNa+ = 1; attributed to reference [23], not a measurement in this paper'}
+schema_gap:
+  candidate_code_symbols:
+    - simulator/battery/enums.py::Quantity
+    - simulator/battery/migrate.py::QUANTITY_ALIASES
+    - simulator/battery/migrate.py::TYPE_QUANTITY
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  evidence: >-
+    No exact quantity token was found for sodium self-diffusion coefficient,
+    Arrhenius D0 or activation energy, conductivity Arrhenius-fit parameters,
+    correlation factor, or sodium transference number. The closed observation
+    types also have no exact transport-data type. Quantity.ELECTRICAL_CONDUCTIVITY
+    does not name the printed Arrhenius-fit parameters. Existing extracts
+    schreiber-1986-oxygen-diffusion-redox and alexander-2001-maps retain
+    diffusion coefficients in context when no coefficient token exists, but
+    the later quantity-unknown observation rule requires a valid observation
+    type. Resolving that conflict is required before final row encoding.
+phase_and_conditions:
+  glass_phase_token: glass
+  polycrystal_phase_token: cr
+  condition_policy: >-
+    Table 2 prints experimental temperatures and Table 1 prints the target
+    composition. The source does not print experimental total pressure or fO2
+    for these diffusion rows; no pressure or atmosphere is assumed.
+  quench_statement: >-
+    PDF page 2 (printed page 51) says rapid working could produce glass samples
+    without crystallization; use this statement as the located glass quench
+    preservation assertion if the glass rows are represented as observations.
