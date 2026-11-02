@@ -10204,7 +10204,7 @@ def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
     return backend.initialize(config)
 
 
-@pytest.mark.parametrize('gas_bar', [1e-9, 2e-9, 1e-6])
+@pytest.mark.parametrize('gas_bar', [1e-10, 1e-9, 2e-9, 1e-6])
 def test_alphamelts_transport_config_pin_before_shared_validation(
     monkeypatch, gas_bar,
 ):
@@ -10215,7 +10215,7 @@ def test_alphamelts_transport_config_pin_before_shared_validation(
     assert backend._vapor_transport_pO2_bar == gas_bar
 
 
-@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+@pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
 def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
     monkeypatch, gas_bar,
 ):
@@ -10246,7 +10246,7 @@ def test_thermoengine_public_config_reaches_gas_resolver(backend_cls, monkeypatc
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-@pytest.mark.parametrize('gas_bar', [0.0, 1e-10, float('nan'), float('inf')])
+@pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
 def test_melts_public_config_rejects_invalid_transport_oxygen(
     backend_cls, monkeypatch, gas_bar,
 ):
@@ -10515,18 +10515,40 @@ def test_live_lunar_transport_input_reaches_vaporock(backend_cls, route, monkeyp
 
 
 @pytest.mark.parametrize('backend_cls', [AlphaMELTSBackend, ThermoEngineBackend])
-def test_live_transport_refuses_below_active_environment_floor(backend_cls, monkeypatch):
+def test_live_transport_predicts_below_active_environment_floor(backend_cls, monkeypatch):
     from simulator.environment import vacuum_floor_bar_for_environment
 
     backend = backend_cls()
     assert _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, {})
     floor = vacuum_floor_bar_for_environment(body='moon')
-    with pytest.raises(ValueError, match='floor'):
-        backend.equilibrate(
-            temperature_C=1600.0, fO2_log=-12.0,
-            vapor_transport_pO2_bar=floor / 2,
-            vapor_transport_floor_bar=floor,
+    captured = {}
+
+    def native_solve(**kwargs):
+        captured.update(kwargs)
+        return EquilibriumResult(
+            status='ok',
+            liquid_fraction=1.0,
+            temperature_C=kwargs['temperature_C'],
+            pressure_bar=kwargs['pressure_bar'],
+            fO2_log=kwargs['fO2_log'],
+            requested_fO2_log=kwargs['fO2_log'],
+            liquid_composition_wt_pct=kwargs['comp_wt'],
         )
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', native_solve)
+    result = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-12.0,
+        pressure_bar=1.0,
+        vapor_transport_pO2_bar=floor / 2,
+        vapor_transport_floor_bar=floor,
+    )
+
+    assert result.status == 'ok'
+    assert captured['fO2_log'] == -12.0
+    assert backend._vapor_transport_pO2_bar == floor / 2
+    assert backend._vapor_transport_floor_bar == floor
 
 
 def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):
