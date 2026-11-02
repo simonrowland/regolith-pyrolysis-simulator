@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 729
-  extracts: 727
+  sources: 730
+  extracts: 728
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 727
+  extracts_without_pdf: 728
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -430,6 +430,7 @@ gaps:
   - nbs-1981-tn270-8-alkali-thermochemistry
   - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
   - neubert-2025-vanadium-slag-evaporation
+  - neudorf-elliott-1980-na2o-cao-silicate-activities
   - neuman-2026-levitation-k-isotopes
   - niggli-1913-silica-alkali-carbonate-equilibria
   - nist-srd69-p4
@@ -25357,6 +25358,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  aliases: []
+  citation: Neudorf, D. A. and Elliott, J. F. (1980), ‘Thermodynamic Properties of Na2O-SiO2-CaO Melts
+    at 1000 to 1100 °C’, Metallurgical Transactions B 11B, 607–614 (December 1980).
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml
+    review_status: draft
+    rows: 29
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/neudorf-elliott-1980-na2o-cao-silicate-activities/neudorf-elliott-1980-na2o-cao-silicate-activities.pdf
+      present: true
+      sha256: 451300e848e602e62f1007dbfddf1d52c11505a29ea1a2aa7ed2f9372720edc7
+      matches_simulator: null
+    sidecar:
+      path: raw/neudorf-elliott-1980-na2o-cao-silicate-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/neudorf-elliott-1980-na2o-cao-silicate-activities
+      exists: true
+      file_count: 33
+    tables:
+      path: tables/neudorf-elliott-1980-na2o-cao-silicate-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: neuman-2026-levitation-k-isotopes
   aliases: []
   citation: Neuman, M., Macris, C. A., Holzheid, A., Lodders, K., Fegley, B., Chen, H., and Wang, K. (2026).
