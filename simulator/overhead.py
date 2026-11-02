@@ -308,121 +308,76 @@ def solve_quasi_steady_headspace_partials_Pa(
                 converged=best[3] <= relative_tolerance,
             )
 
-    def residual_merit(evaluation) -> float:
-        return sum(
-            (
-                evaluation[2][species]
-                / max(
-                    bounds[species],
-                    abs(evaluation[5][species]),
-                    abs(evaluation[1].get(species, 0.0)),
-                    1.0e-300,
-                )
-            ) ** 2
-            for species in species_ids
-        )
-
-    # Antitone vector map: an undamped update changes sign on the next
-    # evaluation. Backtracking accepts a residual step only when the scaled
-    # Euclidean residual decreases; retaining the point with the smallest
-    # largest-component residual gives the required bounded best iterate.
+    # Holding other species' partials fixed makes each coordinate residual
+    # ``writer_i(p)-p_i`` monotone decreasing: increasing p_i reduces its
+    # kinetic source and therefore its mole fraction in the same writer. Use a
+    # safeguarded regula-falsi step inside [0, P_eq,i] for each coordinate,
+    # updating the other coordinates between steps. Each endpoint call uses
+    # the unchanged flux and transport owners; no pipe law is duplicated.
+    # A complete sweep counts as one bounded iteration. If no source exists,
+    # p_i=0 is the endpoint root; otherwise the upper endpoint has J_i=0.
     current = best
     for iteration in range(2, max_iterations + 1):
-        alpha = 1.0
-        accepted = None
-        while alpha >= 2.0**-20:
-            trial = {
-                species: min(
-                    bounds[species],
-                    max(
-                        0.0,
-                        candidate[species]
-                        + alpha * current[2][species],
-                    ),
-                )
-                for species in species_ids
-            }
-            if trial == candidate:
-                alpha *= 0.5
+        moved = False
+        for species in species_ids:
+            current = evaluate(candidate, iteration)
+            if current[3] < best[3]:
+                best = current
+            if current[3] <= relative_tolerance:
+                best = current
+                break
+            residual = current[2][species]
+            pressure = candidate[species]
+            if abs(residual) <= relative_tolerance * max(
+                bounds[species], abs(pressure), 1.0e-300
+            ):
                 continue
-            trial_eval = evaluate(trial, iteration)
-            if trial_eval[3] < best[3]:
-                best = trial_eval
-            if residual_merit(trial_eval) < residual_merit(current):
-                accepted = (trial, trial_eval)
-                break
-            alpha *= 0.5
-        if accepted is None:
-            # Mixture mole fractions couple the residual components. Estimate
-            # the full Jacobian in dimensionless coordinates x_i=p_i/P_eq,i,
-            # then solve J*dx=-r. The line search below keeps this local
-            # Newton proposal inside the physical pressure box and accepts it
-            # only when the scaled residual merit falls.
-            import numpy as np
 
-            jacobian = np.empty((len(species_ids), len(species_ids)), dtype=float)
-            for column, species in enumerate(species_ids):
-                delta_x = 1.0e-5
-                pressure = candidate[species]
-                delta_Pa = bounds[species] * delta_x
-                low_pressure = max(0.0, pressure - delta_Pa)
-                high_pressure = min(bounds[species], pressure + delta_Pa)
-                if high_pressure <= low_pressure:
-                    jacobian = np.empty((0, 0), dtype=float)
-                    break
-                low_trial = dict(candidate)
-                low_trial[species] = low_pressure
-                high_trial = dict(candidate)
-                high_trial[species] = high_pressure
-                low_eval = evaluate(low_trial, iteration)
-                high_eval = evaluate(high_trial, iteration)
-                delta_x_actual = (
-                    high_pressure - low_pressure
-                ) / bounds[species]
-                for row, residual_species in enumerate(species_ids):
-                    jacobian[row, column] = (
-                        (high_eval[2][residual_species]
-                         - low_eval[2][residual_species])
-                        / bounds[residual_species]
-                        / delta_x_actual
-                    )
-            if jacobian.shape != (len(species_ids), len(species_ids)):
-                break
-            scaled_residual = np.array([
-                current[2][species] / bounds[species]
-                for species in species_ids
-            ])
-            try:
-                newton_step = np.linalg.solve(jacobian, -scaled_residual)
-            except np.linalg.LinAlgError:
-                break
-            alpha = 1.0
-            while alpha >= 2.0**-20:
-                trial = {
-                    species: min(
-                        bounds[species],
-                        max(
-                            0.0,
-                            (candidate[species] / bounds[species]
-                             + alpha * float(newton_step[index]))
-                            * bounds[species],
-                        ),
-                    )
-                    for index, species in enumerate(species_ids)
-                }
-                if trial != candidate:
-                    trial_eval = evaluate(trial, iteration)
-                    if trial_eval[3] < best[3]:
-                        best = trial_eval
-                    if residual_merit(trial_eval) < residual_merit(current):
-                        accepted = (trial, trial_eval)
-                        break
-                alpha *= 0.5
-            if accepted is None:
-                break
-        candidate, current = accepted
+            if residual > 0.0:
+                low_pressure = pressure
+                low_residual = residual
+                high_pressure = bounds[species]
+                endpoint = dict(candidate)
+                endpoint[species] = high_pressure
+                high_residual = evaluate(endpoint, iteration)[2][species]
+            else:
+                low_pressure = 0.0
+                endpoint = dict(candidate)
+                endpoint[species] = low_pressure
+                low_residual = evaluate(endpoint, iteration)[2][species]
+                high_pressure = pressure
+                high_residual = residual
+
+            if low_residual >= 0.0 and high_residual <= 0.0:
+                span = high_pressure - low_pressure
+                denominator = high_residual - low_residual
+                trial_pressure = (
+                    low_pressure
+                    - low_residual * span / denominator
+                    if denominator != 0.0
+                    else 0.5 * (low_pressure + high_pressure)
+                )
+                trial_pressure = min(
+                    high_pressure,
+                    max(low_pressure, trial_pressure),
+                )
+            else:
+                trial_pressure = (
+                    low_pressure
+                    if abs(low_residual) < abs(high_residual)
+                    else high_pressure
+                )
+            if trial_pressure != pressure:
+                candidate[species] = trial_pressure
+                moved = True
+
+        current = evaluate(candidate, iteration)
+        if current[3] < best[3]:
+            best = current
         if current[3] <= relative_tolerance:
             best = current
+            break
+        if not moved:
             break
 
     return QuasiSteadyHeadspaceSolve(
