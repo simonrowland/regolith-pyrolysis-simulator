@@ -9499,6 +9499,42 @@ def test_partial_molar_enthalpy_without_a_mapped_field_stays_typed_unavailable(
     )
 
 
+def test_charles_partial_molar_enthalpy_kcal_row_uses_existing_conversion(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import QUANTITY_UNITS
+
+    # Charles 1967, Table I, 1973 K: value = 0.0038 kcal/mole as printed.
+    values = {
+        "quantity": "partial_molar_enthalpy",
+        "method_class": "model_derived",
+        "admission_status": "admitted",
+        "value": "0.0038",
+        "derivation": {
+            "relation": "partial molar heat from log gamma at the liquidus",
+            "inputs": ["fixture-source::activity"],
+            "output_unit": "kcal/mole",
+        },
+    }
+    extract = _scalar_extract(
+        quantity="partial_molar_enthalpy",
+        units="kcal/mole",
+        values=values,
+        obs_type="gibbs_table",
+    )
+    extract["species"]["Na"]["observations"][0]["phase"] = "l"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.quantity.value is Quantity.PARTIAL_MOLAR_ENTHALPY
+    assert QUANTITY_UNITS[observation.identity.quantity.value] == (
+        "kJ_per_declared_mol_basis"
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal("0.0158992")
+
+
 @pytest.mark.parametrize(
     ("printed", "operator", "expected"),
     (
