@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -54,6 +55,27 @@ def _representative_sim(
         sim.melt.temperature_C = hold_temperature_C
         sim.step()
     return sim
+
+
+def test_stage_purity_query_pins_current_stage_four_collapse():
+    train = SimpleNamespace(stages=[
+        SimpleNamespace(
+            stage_number=4,
+            sub_order=0,
+            stage_key="stage_4_alkali_mg_cyclone",
+            collected_kg={"Na": 5.0, "Mg": 5.5},
+            total_collected_kg=lambda: 10.5,
+        ),
+        SimpleNamespace(
+            stage_number=4,
+            sub_order=1,
+            stage_key="stage_4b_k_trap",
+            collected_kg={"K": 9.0},
+            total_collected_kg=lambda: 9.0,
+        ),
+    ])
+
+    assert stage_purity(train) == {4: {"K": 100.0}}
 
 
 def test_accounting_query_facade_matches_legacy_wrappers():
