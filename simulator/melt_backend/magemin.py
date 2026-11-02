@@ -94,6 +94,7 @@ library is called.
 from __future__ import annotations
 
 import builtins
+from collections import OrderedDict
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
 import fcntl
@@ -2156,15 +2157,23 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         return None
 
     def _resolve_binary_path(self) -> Optional[Path]:
-        explicit_path = self._config.get('binary_path')
+        return self._resolve_binary_path_for_config(self._config)
+
+    @classmethod
+    def _resolve_binary_path_for_config(
+        cls,
+        config: Mapping[str, Any],
+    ) -> Optional[Path]:
+        """Resolve the executable with the same precedence as initialize()."""
+        explicit_path = config.get('binary_path')
         if explicit_path:
-            return self._locate_binary(explicit_path)
+            return cls._locate_binary(explicit_path)
 
         from simulator.engine_local_config import configured_magemin_binary_path
 
         binary_path = configured_magemin_binary_path()
         if binary_path is None:
-            binary_path = self._locate_binary(None)
+            binary_path = cls._locate_binary(None)
         return binary_path
 
     def get_engine_version(self) -> str:
@@ -4046,6 +4055,55 @@ class MAGEMinDiagnosticProjectionRefusal(MeltCompositionError):
         super().__init__(message)
 
 
+_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LIMIT = 4
+_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE: OrderedDict[
+    Tuple[Any, ...],
+    Tuple[Optional[str], Tuple[Tuple[float, float], ...]],
+] = OrderedDict()
+
+
+def _projected_engine_liquid_fraction_grid_cache_key(
+    projection: _MAGEMinDiagnosticProjection,
+    *,
+    fO2_log: float,
+    pressure_bar: float,
+    backend_config: Mapping[str, Any],
+) -> Optional[Tuple[Any, ...]]:
+    """Key reusable grids by every solve input and the resolved executable."""
+    try:
+        config_identity = json.dumps(
+            dict(backend_config),
+            sort_keys=True,
+            separators=(",", ":"),
+            default=os.fspath,
+            allow_nan=False,
+        )
+        binary_path = MAGEMinBackend._resolve_binary_path_for_config(
+            backend_config
+        )
+        if binary_path is None:
+            return None
+        resolved_binary = binary_path.resolve(strict=True)
+        binary_stat = resolved_binary.stat()
+    except Exception:
+        # A configuration or executable that cannot be identified must not
+        # share a cached result; the diagnostic will still report solve status.
+        return None
+
+    return (
+        tuple(sorted(projection.kept_oxide_kg.items())),
+        tuple(sorted(projection.dropped_species_mass_kg.items())),
+        fO2_log,
+        pressure_bar,
+        config_identity,
+        (
+            str(resolved_binary),
+            binary_stat.st_mtime_ns,
+            binary_stat.st_size,
+        ),
+    )
+
+
 def project_magemin_diagnostic_composition(
     composition_kg: Mapping[str, float],
 ) -> _MAGEMinDiagnosticProjection:
@@ -4218,14 +4276,36 @@ def projected_engine_liquid_fraction_diagnostic(
         result["status"] = "diagnostic_failed"
         return result
 
-    try:
-        status, buffer_name, samples = _projected_engine_liquid_fraction_grid(
-            projection.kept_oxide_kg,
-            fO2_log=fO2,
-            pressure_bar=pressure,
-            temperature_C=temperature,
-            backend_config=backend_config,
+    cache_key = _projected_engine_liquid_fraction_grid_cache_key(
+        projection,
+        fO2_log=fO2,
+        pressure_bar=pressure,
+        backend_config=backend_config,
+    )
+    cached_grid = None
+    if cache_key is not None:
+        cached_grid = _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.get(
+            cache_key
         )
+        if cached_grid is not None:
+            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
+                cache_key
+            )
+
+    try:
+        if cached_grid is None:
+            status, buffer_name, samples = (
+                _projected_engine_liquid_fraction_grid(
+                    projection.kept_oxide_kg,
+                    fO2_log=fO2,
+                    pressure_bar=pressure,
+                    temperature_C=temperature,
+                    backend_config=backend_config,
+                )
+            )
+        else:
+            buffer_name, samples = cached_grid
+            status = "ok"
         result["fO2_buffer"] = buffer_name
         result["status"] = status
         if status != "ok":
@@ -4266,6 +4346,21 @@ def projected_engine_liquid_fraction_diagnostic(
             "status": "ok",
             "value_source": "magemin_ig_projected_oxide_grid",
         })
+        if cache_key is not None:
+            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE[cache_key] = (
+                buffer_name,
+                samples,
+            )
+            _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.move_to_end(
+                cache_key
+            )
+            while (
+                len(_PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE)
+                > _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE_LIMIT
+            ):
+                _PROJECTED_ENGINE_LIQUID_FRACTION_GRID_CACHE.popitem(
+                    last=False
+                )
         return result
     except Exception:
         result["fraction"] = None
