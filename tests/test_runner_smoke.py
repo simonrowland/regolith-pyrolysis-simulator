@@ -97,14 +97,15 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # Golden pins for all evaporation flux maps emitted during each shipped runner
 # scenario and the ledger-facing product outputs. These are captured separately
 # from the runner JSON because its public envelope does not include raw flux maps.
+# b-773: same-hour headspace solve updates the runner flux and ledger pins.
 SCENARIO_FLUX_LEDGER_PINS = {
     "lunar_mare_low_ti_C0_24h": {
         # d-252 / physics seq 923: computed C0 exit advances the 24 h run.
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
         # studio-2 and studio-3 (gate config).
-        "flux_maps_sha256": "b3e8f5d65e0868bb09f59134fef15e923c654145512225862d615fef2fcb457a",
-        "ledger_sha256": "f50e2c2aaf8cef9711951d08c5df8213a7dbd0f1af467b385502eeec6aa69324",
+        "flux_maps_sha256": "800f66a5e1e774b4216a7587b0e404a122c3fe0c9f5bbfcc9e5a4f9884c1943a",
+        "ledger_sha256": "40e8fb8f0d96d8187e2f0e9751e039109b2395e891c0e97507c452e3fbf1b1bb",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
