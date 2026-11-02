@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 742
-  extracts: 740
+  sources: 743
+  extracts: 741
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 740
+  extracts_without_pdf: 741
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -109,6 +109,7 @@ gaps:
   - cho-suito-1994-cas-slag-activities
   - colson-colson-1995-chromium-dimer-lpsc
   - colson-floden-1998-lpsc-co-nickel-activity
+  - colson-floden-haugen-2005-nio-feo-o2-activities
   - colson-keedy-1990-lpsc-redox-relationships
   - colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc
   - connolly-2016-si-o-liquid-vapor-caloric-vdw
@@ -6669,6 +6670,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  aliases: []
+  citation: Colson, R. O., Floden, A. M., Haugen, T. R., Malum, K. M., Sawarynski, M., Nermoe, M. K. B.,
+    Jacobs, K. E., & Holder, D. (2005). Activities of NiO, FeO, and O2− in silicate melts. Geochimica
+    et Cosmochimica Acta, 69(12), 3061–3073.
+  doi: 10.1016/j.gca.2005.02.005
+  report_number: null
+  identifier: 10.1016/j.gca.2005.02.005
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+    review_status: unknown
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/colson-floden-haugen-2005-nio-feo-o2-activities/colson-floden-haugen-2005-nio-feo-o2-activities.pdf
+      present: true
+      sha256: a8264684759301c4c830c586ab4e2dc44299e8ac244ae04d8733fa74b6220f21
+      matches_simulator: null
+    sidecar:
+      path: raw/colson-floden-haugen-2005-nio-feo-o2-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/colson-floden-haugen-2005-nio-feo-o2-activities
+      exists: true
+      file_count: 52
+    tables:
+      path: tables/colson-floden-haugen-2005-nio-feo-o2-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8935c18298cc693945d95bf99f3f896beb867c50
 - source_id: colson-keedy-1990-lpsc-redox-relationships
   aliases: []
   citation: Colson, R. O., & Keedy, C. R. (1990). Redox relationships in silicate melts and silicate melt
