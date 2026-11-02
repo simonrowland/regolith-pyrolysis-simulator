@@ -323,15 +323,22 @@ def solve_quasi_steady_headspace_partials_Pa(
 
     committed_flux = commit_flux or (lambda flux: flux)
 
+    def source_kg_s_by_species(flux: EvaporationFlux) -> dict[str, float]:
+        return {
+            str(species): max(0.0, float(rate)) / 3600.0
+            for species, rate in flux.species_kg_hr.items()
+        }
+
     def actual_state(
-        candidate: Mapping[str, float], pressure: float, flow: float
+        candidate: Mapping[str, float],
+        pressure: float,
+        flow: float,
+        *,
+        committed_source_slope_kg_s_Pa_by_species: Mapping[str, float] | None = None,
     ):
         raw_flux = evaluate_flux(candidate, pressure)
         committed = committed_flux(raw_flux)
-        source_kg_s = {
-            str(species): max(0.0, float(rate)) / 3600.0
-            for species, rate in committed.species_kg_hr.items()
-        }
+        source_kg_s = source_kg_s_by_species(committed)
         residuals: dict[str, float] = {}
         relative_by_species: dict[str, float] = {}
         for species in species_ids:
@@ -349,20 +356,22 @@ def solve_quasi_steady_headspace_partials_Pa(
             residual = source - removal
             residuals[species] = residual
             partial = max(0.0, float(candidate.get(species, 0.0)))
-            source_slope = max(
-                0.0,
-                float(beta_kg_s_Pa_by_species.get(species, 0.0)),
-            )
+            source_slope = abs(float(
+                (committed_source_slope_kg_s_Pa_by_species or {}).get(
+                    species,
+                    0.0,
+                )
+            ))
             removal_slope = (
                 molar_mass * flow / pressure if pressure > 0.0 else 0.0
             )
-            # A binary64 partial can move only by one ulp. Near equilibrium,
-            # the residual slope is -(beta_i + G_i), where beta_i is the
-            # source slope and G_i=M_i*n/P is the removal slope; half an ulp
-            # therefore bounds the nearest representable residual. Units are
-            # Pa × kg/(s Pa) = kg/s. Keep the raw committed residual above,
-            # but do not iterate for an error smaller than this bound; when
-            # beta_i+G_i is zero the bound vanishes and no flux is excused.
+            # A binary64 partial can move only by one ulp. Use the secant of
+            # the committed source across the current bracket, not beta_i from
+            # the uncapped HK source: an inventory plateau can make the real
+            # source slope nearly zero. Half an ulp times |dJ/dp|+G_i bounds
+            # the nearest representable residual, where G_i=M_i*n/P. Units
+            # are Pa × kg/(s Pa) = kg/s. Keep the raw committed residual
+            # above; if both measured slopes are zero, no flux is excused.
             representable_residual_kg_s = (
                 0.5 * math.ulp(partial) * (source_slope + removal_slope)
             )
@@ -420,12 +429,26 @@ def solve_quasi_steady_headspace_partials_Pa(
         high_candidate = dict(seed)
         low_candidate.update(lower_by_species)
         high_candidate.update(upper_by_species)
-        _low_raw, _low_committed, low_residuals, low_relative = actual_state(
+        _low_raw, low_committed, low_residuals, low_relative = actual_state(
             low_candidate, pressure, flow
         )
-        _high_raw, _high_committed, high_residuals, high_relative = actual_state(
+        _high_raw, high_committed, high_residuals, high_relative = actual_state(
             high_candidate, pressure, flow
         )
+        low_sources_kg_s = source_kg_s_by_species(low_committed)
+        high_sources_kg_s = source_kg_s_by_species(high_committed)
+
+        def committed_source_secants() -> dict[str, float]:
+            slopes: dict[str, float] = {}
+            for species in species_ids:
+                width = upper_by_species[species] - lower_by_species[species]
+                if width > 0.0:
+                    slopes[species] = (
+                        high_sources_kg_s.get(species, 0.0)
+                        - low_sources_kg_s.get(species, 0.0)
+                    ) / width
+            return slopes
+
         total_iterations = 2
         candidate = {
             species: min(
@@ -453,7 +476,14 @@ def solve_quasi_steady_headspace_partials_Pa(
                 )
 
         best_candidate = dict(candidate)
-        current_state = actual_state(best_candidate, pressure, flow)
+        current_state = actual_state(
+            best_candidate,
+            pressure,
+            flow,
+            committed_source_slope_kg_s_Pa_by_species=(
+                committed_source_secants()
+            ),
+        )
         total_iterations += 1
         best_state = current_state
         best_relative = participant_relative(current_state[3])
@@ -465,6 +495,7 @@ def solve_quasi_steady_headspace_partials_Pa(
 
         for _iteration in range(max_iterations):
             raw, committed, residuals, relative_by_species = current_state
+            current_sources_kg_s = source_kg_s_by_species(committed)
             relative = participant_relative(relative_by_species)
             if relative < best_relative:
                 best_candidate = dict(candidate)
@@ -488,9 +519,15 @@ def solve_quasi_steady_headspace_partials_Pa(
                 if residual > 0.0:
                     lower_by_species[species] = partial
                     low_residuals[species] = residual
+                    low_sources_kg_s[species] = current_sources_kg_s.get(
+                        species, 0.0
+                    )
                 elif residual < 0.0:
                     upper_by_species[species] = partial
                     high_residuals[species] = residual
+                    high_sources_kg_s[species] = current_sources_kg_s.get(
+                        species, 0.0
+                    )
                 else:
                     next_candidate[species] = partial
                     continue
@@ -519,7 +556,14 @@ def solve_quasi_steady_headspace_partials_Pa(
                 break
             candidate = next_candidate
             if _iteration + 1 < max_iterations:
-                current_state = actual_state(candidate, pressure, flow)
+                current_state = actual_state(
+                    candidate,
+                    pressure,
+                    flow,
+                    committed_source_slope_kg_s_Pa_by_species=(
+                        committed_source_secants()
+                    ),
+                )
                 total_iterations += 1
 
         return (

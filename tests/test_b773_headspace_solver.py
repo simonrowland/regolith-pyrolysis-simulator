@@ -145,6 +145,69 @@ def test_fixed_pressure_residual_uses_nonlinear_committed_source():
     )
 
 
+def test_near_equilibrium_floor_uses_flattened_committed_source_slope():
+    equilibrium = 1.0
+    beta = 1.0e-6
+    pressure = 1.0
+    molar_flow = 1.0e-14
+    molar_mass = 1.0
+    # With G=M*n/P=1e-14 kg/(s Pa), the uncapped balance gives
+    # p=beta*P_eq/(beta+G)=0.9999999900000001 Pa and
+    # J=beta*(P_eq-p)=9.99999993922529e-15 kg/s. The inventory cap
+    # 9.999999939062431e-15 kg/s makes the committed source flat there;
+    # its 3.906243e-23 kg/s residual is 3.9e-9 relative. The old
+    # beta-based half-ulp allowance is 5.55e-23 kg/s and erases it. The
+    # committed-source secant is about G, so that residual remains open.
+    committed_cap_kg_s = 9.999999939062431e-15
+
+    def evaluate(partials, _total_pressure):
+        source_kg_s = beta * max(
+            0.0,
+            equilibrium - float(partials["Na"]),
+        )
+        return _flux(source_kg_s)
+
+    def flatten_inventory_source(raw_flux):
+        # Once the frozen inventory is rate-limited, its committed source is
+        # flat even though the unconstrained HK slope remains beta.
+        raw_kg_s = float(raw_flux.species_kg_hr["Na"]) / 3600.0
+        return _flux(min(raw_kg_s, committed_cap_kg_s))
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": equilibrium},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": beta},
+        molar_mass_kg_mol_by_species={"Na": molar_mass},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda _pressure: molar_flow,
+        pressure_bracket_Pa=(0.0, 1.0),
+        evaluate_flux=evaluate,
+        commit_flux=flatten_inventory_source,
+        fixed_pressure_Pa=pressure,
+        fixed_pressure_molar_flow_mol_s=molar_flow,
+        max_iterations=1,
+    )
+
+    committed_kg_s = min(
+        float(solved.flux.species_kg_hr["Na"]) / 3600.0,
+        committed_cap_kg_s,
+    )
+    removal_kg_s = (
+        molar_mass
+        * molar_flow
+        / pressure
+        * solved.partials_Pa["Na"]
+    )
+    raw_relative = abs(committed_kg_s - removal_kg_s) / max(
+        committed_kg_s,
+        removal_kg_s,
+        1.0e-300,
+    )
+    assert not solved.converged
+    assert raw_relative > 1.0e-9
+    assert solved.residual_relative > 1.0e-9
+
+
 def test_near_equilibrium_closure_stops_at_binary64_partial_resolution():
     equilibrium = 8.7805834e-9
     beta = 4.20421149e-7
