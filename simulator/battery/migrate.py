@@ -6788,33 +6788,21 @@ def _named_fraction_bound_selection(
     raw = payload.get(key)
     field_units = _printed_unit_for_field(payload, key) or units
     if isinstance(raw, Mapping) and raw.get("kind") == ValueKind.BOUND.value:
-        try:
-            value = _value_from_plain(raw)
-        except (AssertionError, KeyError, TypeError, ValueError, ArithmeticError):
-            value = None
-        if (
-            value is None
-            or value.kind is not ValueKind.BOUND
-            or value.bound_operator not in {"<", "<=", ">", ">="}
-            or value.bound_value is None
-        ):
-            return _unavailable_selection(
-                f"{key} is not a clean structured one-sided bound: {raw!r}",
-                condition_ranges=condition_ranges,
-                unused_ancillary=_unused_ancillary(payload, key),
-                field_name=key,
-            )
+        selection = _structured_bound_selection(payload, key, condition_ranges)
+        assert selection is not None
+        if not selection.available:
+            return selection
+        value = selection.value
+        assert value.bound_value is not None
         bound = value.bound_value
         trail = "identity"
         if _percent_named_fraction_field(key, field_units):
             bound /= Decimal("100")
             trail = "percent_to_fraction"
-        return SourceSelection(
+        return replace(
+            selection,
             value=replace(value, bound_value=bound),
-            field_name=key,
             unit_trail=trail,
-            unused_ancillary=_unused_ancillary(payload, key),
-            condition_ranges=condition_ranges,
         )
     if isinstance(raw, Mapping):
         raw = raw.get("value")
@@ -6874,6 +6862,40 @@ def _named_fraction_bound_selection(
         ),
         field_name=key,
         unit_trail=trail,
+        unused_ancillary=_unused_ancillary(payload, key),
+        condition_ranges=condition_ranges,
+    )
+
+
+def _structured_bound_selection(
+    payload: Mapping[str, Any],
+    key: str,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    """Read a structured one-sided bound without converting it to a point."""
+
+    raw = payload.get(key)
+    if not isinstance(raw, Mapping) or raw.get("kind") != ValueKind.BOUND.value:
+        return None
+    try:
+        value = _value_from_plain(raw)
+    except (AssertionError, KeyError, TypeError, ValueError, ArithmeticError):
+        value = None
+    if (
+        value is None
+        or value.kind is not ValueKind.BOUND
+        or value.bound_operator not in {"<", "<=", ">", ">="}
+        or value.bound_value is None
+    ):
+        return _unavailable_selection(
+            f"{key} is not a clean structured one-sided bound: {raw!r}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    return SourceSelection(
+        value=value,
+        field_name=key,
         unused_ancillary=_unused_ancillary(payload, key),
         condition_ranges=condition_ranges,
     )
@@ -11320,6 +11342,10 @@ def _selection_from_named_field(
             condition_ranges=condition_ranges,
             field_name=field_name,
         )
+    if q_token is Quantity.ACTIVITY:
+        bound = _structured_bound_selection(payload, "activity", condition_ranges)
+        if bound is not None:
+            return bound
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:

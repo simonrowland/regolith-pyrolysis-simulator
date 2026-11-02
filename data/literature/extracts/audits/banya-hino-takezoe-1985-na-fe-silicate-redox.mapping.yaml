@@ -59,11 +59,22 @@ tables:
     '2': free_energy_change_as_printed
     '3': references_as_printed
   handling: All 11 standard free-energy expressions retained as context, not observations.
+figures:
+- page: 7
+  figure: '11'
+  published_page: 1771
+  handling: The prose bound is attached to the FetO-SiO2-Na2O slag domain in equilibrium with liquid iron at 1400°C. The dotted line marks the composition range where the regular-solution model applies; no discrete contour points or composition coordinates are transcribed.
 evidence_decisions:
   table_1_and_2_valence_ratios: 'measured_tabulated: the authors'' own Fe2+ and total-Fe wet-chemical analysis;
     the printed ratios are retained as ratios.'
   table_2_feto_activity: 'quoted_attributed: the authors calculate each activity from the printed P_H2O/P_H2 condition
     and Eq. (2); the condition and Table 3 free-energy context are stored, but neither is a stored observation parent
     accepted by the derivation lineage.'
-na2o_activity_for_openimcc: No Na2O activity point values are tabulated. Prose on PDF page 7 says a_Na2O(l) <= 10^-5.5
-  over the composition domain shown in Fig. 11; it is retained as context, not as a digitised observation.
+na2o_activity_upper_bound: >-
+  Model-derived upper bound, printed as a_Na2O(l) ≤ 10^-5.5, for FetO-SiO2-Na2O slags in equilibrium with liquid
+  iron at 1400°C across the displayed Figure 11 composition range. The authors calculate activities using
+  regular-solution relations Eqs. (24), (26), and (33); the plotted dotted line marks the model-applicable
+  composition range.
+  The extract retains the exact exponent and a structured approximate decimal bound for migration. No point activity
+  or per-composition coordinates are digitised. The bound is not measured or quoted from a reference; §4.4.3 cites
+  reference [36] for the Na2O·2SiO2 formation free energy used in the standard-state conversion.

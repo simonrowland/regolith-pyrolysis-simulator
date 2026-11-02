@@ -4756,21 +4756,112 @@ species:
             −12000 X_FeO X_SiO2 −52300 X_FeO1.5 X_SiO2
         note: Model parameters and expressions are retained as printed context only; they are not observation rows.
   Na2O:
-    observations: []
-    context:
-    - observation_id: banya_hino_takezoe_1985_fig11_printed_na2o_activity_bound
-      type: context_record
+    observations:
+    - observation_id: banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound
+      type: activity_coefficient
       locator:
         page: 7
         pdf_page_index: 6
         published_page: 1771
         section: 4.4.4
         figure: '11'
+        note: The prose gives the bound for the displayed Figure 11 composition range; no point was read from a contour.
+      phase: l
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Na2O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not_applicable
+            component_basis: Na2O
+        inferred: false
+        note: 'Section 4.4 states that the standard state is the stable pure substance at the considered temperature; the bound is printed as a_Na2O(l).'
+        locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 1771
+          section: 4.4.4
+          equation: '33'
       units: dimensionless activity
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1400'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1771
+            section: 4.4.4
+            figure: '11'
+        composition:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1771
+            section: 4.4.4
+            figure: '11'
+            note: No discrete composition coordinates for the domain bound are printed.
+        iron_saturation:
+          state:
+            tag: value
+            value: slag in equilibrium with liquid iron
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1771
+            section: 4.4.4
+            figure: '11'
+      derivation:
+        relation: Calculated by the authors using regular-solution relations and plotted as iso-activity contours in Figure 11.
+        output_unit: dimensionless
+        method:
+          state:
+            tag: value
+            value: Regular-solution relations from Eqs. (24), (26), and (33).
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1771
+            section: 4.4.4
+            equation: '24, 26, 33'
+        references:
+        - 'Reference [36]: D. N. Rego, G. K. Sigworth and W. O. Philbrook, Proc. of Japan-United States Seminer, Kyoto (1983), p. 87 [ISIJ].'
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 1771
+            section: 4.4.4
+            figure: '11'
+            note: Per-composition activities and contour coordinates are not tabulated.
       values:
+        quantity: activity
         method_class: model_derived
-        quantity_as_printed: a_Na2O(l) in the displayed Figure 11 composition domain
-        activity_upper_bound_as_printed: 10^-5.5
-        inequality_as_printed: ≤
-        note: The prose states a_Na2O(l) is no greater than 10^-5.5 in the composition domain shown; no plotted
-          point was read.
+        component: Na2O
+        activity:
+          kind: bound
+          bound_operator: '<='
+          bound_value: '3.162277660168379331998893544432719e-6'
+          approximate: true
+        activity_upper_bound_as_printed: '10^-5.5'
+        inequality_as_printed: '≤'
+        standard_state_as_printed: Na2O(l)
+        melt_system_as_printed: FetO-SiO2-Na2O slags in equilibrium with liquid iron
+        composition_domain_as_printed: Displayed composition range in Figure 11; dotted line marks where the regular-solution model applies.
+        T_C_as_printed: '1400'
