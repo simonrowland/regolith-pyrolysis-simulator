@@ -806,17 +806,21 @@ class EvaporationMixin:
                 gate_authority=gate_authority,
             )
 
-        (
-            vapor_pressures,
-            _overlay,
-            _batch,
-            resolve_error,
-            _pressure_diagnostic,
-            _pressure_source,
-        ) = self._resolve_evaporation_batch_flux_state(
+        # The root probes only change gas partials and total pressure. The
+        # equilibrium, inventory, and catalog inputs stay fixed for this hour,
+        # so reuse the typed batch instead of rebuilding its ledger closure.
+        resolved_batch_flux_state = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
         )
+        (
+            vapor_pressures,
+            flux_overlay_report,
+            vapour_batch,
+            resolve_error,
+            vapor_pressure_diagnostic,
+            effective_pressure_source,
+        ) = resolved_batch_flux_state
         if resolve_error or not vapor_pressures:
             return self._calculate_evaporation(
                 equilibrium,
@@ -934,6 +938,7 @@ class EvaporationMixin:
                     if current_effective_capacity is not None
                     else None
                 ),
+                _resolved_batch_flux_state=resolved_batch_flux_state,
             )
 
         def configure_transport_boundary(inlet_flux: EvaporationFlux) -> None:
@@ -1319,6 +1324,14 @@ class EvaporationMixin:
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
         overhead_pressure_override_Pa: float | None = None,
         solve_headspace_feedback: bool = False,
+        _resolved_batch_flux_state: tuple[
+            dict[str, float],
+            dict[str, Any],
+            Any,
+            dict[str, Any],
+            dict[str, Any],
+            Any,
+        ] | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -1416,6 +1429,13 @@ class EvaporationMixin:
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
         # Pre-RG effective values cross only the named typed seam below.
+        if _resolved_batch_flux_state is None:
+            resolved_batch_flux_state = self._resolve_evaporation_batch_flux_state(
+                equilibrium,
+                temperature_K=T_K,
+            )
+        else:
+            resolved_batch_flux_state = _resolved_batch_flux_state
         (
             vapor_pressures,
             flux_overlay_report,
@@ -1423,10 +1443,7 @@ class EvaporationMixin:
             resolve_error,
             vapor_pressure_diagnostic,
             effective_pressure_source,
-        ) = self._resolve_evaporation_batch_flux_state(
-            equilibrium,
-            temperature_K=T_K,
-        )
+        ) = resolved_batch_flux_state
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
