@@ -1,18 +1,18 @@
 # Battery v2.1 migration report
 
-rows in: 87995
-records out (observations): 177839
-works: 730
-experiments: 6828
-queue size: 117665
+rows in: 88024
+records out (observations): 177868
+works: 731
+experiments: 6829
+queue size: 117725
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 728
+index sources: 729
 hard issues: 1687
 
 ## Unavailable input work census
 
-unavailable derived values without derivation: 961
+unavailable derived values without derivation: 965
 
 Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
@@ -44,6 +44,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: T_K, without_atm_as_printed, without_atm, with_atm_as_printed, with_atm, enhancement_pct` | 5 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'clausius_clapeyron_averaged_log10_P_kPa'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing to pick a number` | 4 |
+| `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'partial_and_integral_mixing_thermodynamic_properties_as_printed'; refusing to pick a number` | 4 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_K_at_1273_K_Pa, a_K2O_at_1273_K` | 4 |
 | `unavailable_missing_input:no mapped p_partial field selected; source fields: sample, selected_subsamples, temperature_range_K, A, B, p_Na_at_1273_K_Pa, a_Na2O_at_1273_K` | 4 |
 | `unavailable_missing_input:declared quantity is unknown; unsupported quantity 'published_second_law_fit'; refusing to pick a number` | 3 |
@@ -196,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 727 (mismatch) |
+| citations | 147 | 728 (mismatch) |
 | doi_works | 56 | 394 (mismatch) |
-| no_doi_works | 91 | 336 (mismatch) |
-| admission_statuses | 374 | 29932 (mismatch) |
+| no_doi_works | 91 | 337 (mismatch) |
+| admission_statuses | 374 | 29961 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1358 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -19434,6 +19435,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml` | 51 | 51 | 14 |
 | `data/literature/extracts/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.yaml` | 45 | 45 | 25 |
 | `data/literature/extracts/neubert-2025-vanadium-slag-evaporation.yaml` | 148 | 148 | 148 |
+| `data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml` | 29 | 29 | 60 |
 | `data/literature/extracts/neuman-2026-levitation-k-isotopes.yaml` | 80 | 2307 | 80 |
 | `data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml` | 10 | 10 | 10 |
 | `data/literature/extracts/nist-srd69-p4.yaml` | 2 | 2 | 10 |
@@ -19827,8 +19829,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 294994
+advisory issues: 295008
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 294994 |
+| `identity_incomplete` | 295008 |
