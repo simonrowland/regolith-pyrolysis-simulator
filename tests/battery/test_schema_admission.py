@@ -630,6 +630,9 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
         if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            assert any(
+                path.endswith(f".{component}") for path in waypoint.absence.missing
+            )
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
     expected_valid = component == "MgO"
