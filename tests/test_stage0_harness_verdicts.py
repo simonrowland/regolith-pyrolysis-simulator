@@ -980,9 +980,12 @@ def test_domain_gate_reason_for_silicate_window_is_distinct(gate):
         )
         return
     valid, warnings, reason = gate.validate_with_reason(composition)
-    assert valid is False
+    assert valid is True
     assert any("SiO2" in warning for warning in warnings)
-    assert reason == "silicate_window"
+    assert reason is None
+    notice = next(warning for warning in warnings if "SiO2" in warning)
+    assert "authority=extrapolated" in notice
+    assert "certified_band=SiO2 [30, 80] wt%" in notice
 
 
 @pytest.mark.parametrize("gate", (AlphaMELTSDomainGate, MAGEMinDomainGate))
