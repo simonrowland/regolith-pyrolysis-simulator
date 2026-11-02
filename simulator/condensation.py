@@ -133,13 +133,13 @@ from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
     NA_COLLECTOR_STAGE_KEY,
-    STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
     designated_stage_number,
     is_designated_for_stage,
     species_accepted_on_stage,
+    stage_key_for_stage,
 )
 from simulator.state import (
     CampaignPhase,
@@ -7779,8 +7779,11 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
     for stage in train.stages:
         stage_number = int(stage.stage_number)
         explicit_key = getattr(stage, 'stage_key', '') or ''
-        stage_key = explicit_key or STAGE_KEY_BY_NUMBER.get(
-            stage_number, f'stage_{stage_number}')
+        stage_key = stage_key_for_stage(
+            stage,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=False,
+        ) or f'stage_{stage_number}'
         collected_kg = {
             species: _finite_nonnegative_value(
                 raw_kg,

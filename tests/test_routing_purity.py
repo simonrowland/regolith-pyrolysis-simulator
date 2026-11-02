@@ -157,9 +157,24 @@ def test_stage_purity_report_pins_empty_stage_four_collapse():
         _populated_stage_four_purity_train(empty_keys=True)
     )
 
-    # This row records the empty-key collapse: the K trap overwrites the Na/Mg row.
+    # The K trap contents previously overwrote the Na/Mg row for empty keys.
     assert report == {
         "stage_4_alkali_mg_cyclone": {
+            "stage_number": 4,
+            "label": "Na/Mg collector",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {"Mg": 5.5, "Na": 5.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 10.5,
+            "impurity_kg": 0.0,
+            "total_kg": 10.5,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"Mg": True, "Na": True},
+        },
+        "stage_4b_k_trap": {
             "stage_number": 4,
             "label": "K trap",
             "accepted_species": ["Mg", "Na"],
