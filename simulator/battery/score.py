@@ -2624,7 +2624,6 @@ _HOLZHEID_WUSTITE_SOURCE_IDS = frozenset(
     {
         "doyle-1988-feo-activity-multicomponent-magma",
         "doyle-1989-tio2-feo-activity-magma",
-        "colson-floden-haugen-2005-nio-feo-o2-activities",
     }
 )
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
