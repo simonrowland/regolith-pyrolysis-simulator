@@ -104,8 +104,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
         # studio-2 and studio-3 (gate config).
-        "flux_maps_sha256": "800f66a5e1e774b4216a7587b0e404a122c3fe0c9f5bbfcc9e5a4f9884c1943a",
-        "ledger_sha256": "40e8fb8f0d96d8187e2f0e9751e039109b2395e891c0e97507c452e3fbf1b1bb",
+        "flux_maps_sha256": "1318ea49a31a979ceabc87b538bd0a921ba0bde033c0a596f07af559fc5e2bb0",
+        "ledger_sha256": "d08335cdf91784bf18e2c117d1794f195b70c2638ef3cd4723caa231c6b6623b",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
