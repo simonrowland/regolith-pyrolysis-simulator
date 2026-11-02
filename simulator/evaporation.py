@@ -4959,9 +4959,14 @@ class EvaporationMixin:
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
             return {}
+        # Same parent-stock floor as the credit itself. A second literal
+        # here would omit or admit a carrier the provider still credits.
+        from engines.builtin.evaporation_transition import (
+            _NUMERICAL_FLOOR_KG,
+        )
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
-        if available_kg <= 1e-12:
+        if available_kg <= _NUMERICAL_FLOOR_KG:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
             species, 0.0)
@@ -5394,15 +5399,22 @@ class EvaporationMixin:
 
         parent_oxide = stoich['parent_oxide']
         rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        # The provider owns this floor. The caller returns before dispatch
+        # on the same comparison, so a second literal would be a second floor
+        # for one credit decision.
+        from engines.builtin.evaporation_transition import (
+            _NUMERICAL_FLOOR_KG,
+        )
+
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
-        if oxide_removed <= 1e-12:
+        if oxide_removed <= _NUMERICAL_FLOOR_KG:
             return (0.0, None) if return_transition else 0.0
 
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
-        if available_kg <= 1e-12:
+        if available_kg <= _NUMERICAL_FLOOR_KG:
             return (0.0, None) if return_transition else 0.0
 
         # Mirror the legacy validation: the AccountingError surface is
