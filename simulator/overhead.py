@@ -308,9 +308,24 @@ def solve_quasi_steady_headspace_partials_Pa(
                 converged=best[3] <= relative_tolerance,
             )
 
+    def residual_merit(evaluation) -> float:
+        return sum(
+            (
+                evaluation[2][species]
+                / max(
+                    bounds[species],
+                    abs(evaluation[5][species]),
+                    abs(evaluation[1].get(species, 0.0)),
+                    1.0e-300,
+                )
+            ) ** 2
+            for species in species_ids
+        )
+
     # Antitone vector map: an undamped update changes sign on the next
-    # evaluation. Backtracking makes progress conditional on reducing the
-    # dimensionless residual and preserves the best point if no trial does.
+    # evaluation. Backtracking accepts a residual step only when the scaled
+    # Euclidean residual decreases; retaining the point with the smallest
+    # largest-component residual gives the required bounded best iterate.
     current = best
     for iteration in range(2, max_iterations + 1):
         alpha = 1.0
@@ -333,12 +348,78 @@ def solve_quasi_steady_headspace_partials_Pa(
             trial_eval = evaluate(trial, iteration)
             if trial_eval[3] < best[3]:
                 best = trial_eval
-            if trial_eval[3] < current[3]:
+            if residual_merit(trial_eval) < residual_merit(current):
                 accepted = (trial, trial_eval)
                 break
             alpha *= 0.5
         if accepted is None:
-            break
+            # Mixture mole fractions couple the residual components. Estimate
+            # the full Jacobian in dimensionless coordinates x_i=p_i/P_eq,i,
+            # then solve J*dx=-r. The line search below keeps this local
+            # Newton proposal inside the physical pressure box and accepts it
+            # only when the scaled residual merit falls.
+            import numpy as np
+
+            jacobian = np.empty((len(species_ids), len(species_ids)), dtype=float)
+            for column, species in enumerate(species_ids):
+                delta_x = 1.0e-5
+                pressure = candidate[species]
+                delta_Pa = bounds[species] * delta_x
+                low_pressure = max(0.0, pressure - delta_Pa)
+                high_pressure = min(bounds[species], pressure + delta_Pa)
+                if high_pressure <= low_pressure:
+                    jacobian = np.empty((0, 0), dtype=float)
+                    break
+                low_trial = dict(candidate)
+                low_trial[species] = low_pressure
+                high_trial = dict(candidate)
+                high_trial[species] = high_pressure
+                low_eval = evaluate(low_trial, iteration)
+                high_eval = evaluate(high_trial, iteration)
+                delta_x_actual = (
+                    high_pressure - low_pressure
+                ) / bounds[species]
+                for row, residual_species in enumerate(species_ids):
+                    jacobian[row, column] = (
+                        (high_eval[2][residual_species]
+                         - low_eval[2][residual_species])
+                        / bounds[residual_species]
+                        / delta_x_actual
+                    )
+            if jacobian.shape != (len(species_ids), len(species_ids)):
+                break
+            scaled_residual = np.array([
+                current[2][species] / bounds[species]
+                for species in species_ids
+            ])
+            try:
+                newton_step = np.linalg.solve(jacobian, -scaled_residual)
+            except np.linalg.LinAlgError:
+                break
+            alpha = 1.0
+            while alpha >= 2.0**-20:
+                trial = {
+                    species: min(
+                        bounds[species],
+                        max(
+                            0.0,
+                            (candidate[species] / bounds[species]
+                             + alpha * float(newton_step[index]))
+                            * bounds[species],
+                        ),
+                    )
+                    for index, species in enumerate(species_ids)
+                }
+                if trial != candidate:
+                    trial_eval = evaluate(trial, iteration)
+                    if trial_eval[3] < best[3]:
+                        best = trial_eval
+                    if residual_merit(trial_eval) < residual_merit(current):
+                        accepted = (trial, trial_eval)
+                        break
+                alpha *= 0.5
+            if accepted is None:
+                break
         candidate, current = accepted
         if current[3] <= relative_tolerance:
             best = current

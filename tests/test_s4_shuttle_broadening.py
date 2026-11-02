@@ -109,9 +109,14 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
         )
         return {"saw_injection": shuttle_state["injected"]}
 
-    def fake_calculate_evaporation(equilibrium):
+    def fake_calculate_evaporation(
+        equilibrium,
+        *,
+        solve_headspace_feedback=False,
+    ):
         calls.append("evaporation")
         assert equilibrium == {"saw_injection": True}
+        assert solve_headspace_feedback
         return EvaporationFlux()
 
     monkeypatch.setattr(

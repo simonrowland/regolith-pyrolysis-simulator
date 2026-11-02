@@ -15725,7 +15725,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 evap_flux.update_totals()
             else:
-                evap_flux = self._calculate_evaporation(equilibrium)
+                evap_flux = self._calculate_evaporation(
+                    equilibrium,
+                    solve_headspace_feedback=True,
+                )
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )

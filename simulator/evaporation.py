@@ -765,6 +765,264 @@ class EvaporationMixin:
             self, '_melt_headspace_composition_mbar', {}) or {}
         return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
+    def _calculate_evaporation_with_headspace_feedback(
+        self,
+        equilibrium: Any,
+        *,
+        gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+    ) -> EvaporationFlux:
+        """Solve current evaporation against the existing overhead writer."""
+        from simulator.config_flags import bool_feature_flag
+        from simulator.overhead import solve_quasi_steady_headspace_partials_Pa
+
+        T_K = float(self.melt.temperature_C) + 273.15
+        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        if (
+            (liquid_fraction is not None
+             and legacy_raw_liquid_fraction_is_zero(liquid_fraction))
+            or T_K < 400.0
+        ):
+            return self._calculate_evaporation(
+                equilibrium,
+                gate_authority=gate_authority,
+            )
+
+        (
+            vapor_pressures,
+            _overlay,
+            _batch,
+            resolve_error,
+            _pressure_diagnostic,
+            _pressure_source,
+        ) = self._resolve_evaporation_batch_flux_state(
+            equilibrium,
+            temperature_K=T_K,
+        )
+        if resolve_error or not vapor_pressures:
+            return self._calculate_evaporation(
+                equilibrium,
+                gate_authority=gate_authority,
+            )
+
+        base_partials_Pa = {
+            str(species): self._evaporation_bulk_partial_pressure_pa(
+                str(species)
+            )
+            for species in (
+                set(vapor_pressures)
+                | set(getattr(self, '_melt_headspace_composition_mbar', {}) or {})
+            )
+        }
+        controls, _molar_masses = self._evaporation_flux_control_inputs(
+            equilibrium,
+            overhead_partials_Pa=base_partials_Pa,
+            vapour_batch_flux_pressures_Pa=vapor_pressures,
+        )
+        series_config = controls.get('evaporation_series_resistance') or {}
+        if not isinstance(series_config, Mapping):
+            series_config = {}
+        gas_resistance_enabled = bool_feature_flag(
+            series_config,
+            'gas_resistance_enabled',
+            True,
+        )
+        hkl_upper_bound_species = {
+            str(species)
+            for species in (
+                controls.get('hkl_upper_bound_transport_species', ()) or ()
+            )
+        }
+        eligible_participants = {
+            str(species): float(pressure)
+            for species, pressure in vapor_pressures.items()
+            if gas_resistance_enabled
+            and str(species) != 'O2'
+            and str(species) not in hkl_upper_bound_species
+            and math.isfinite(float(pressure))
+            and float(pressure) > 0.0
+        }
+        if not eligible_participants:
+            return self._calculate_evaporation(
+                equilibrium,
+                gate_authority=gate_authority,
+            )
+        cleaned_melt_kg = self.atom_ledger.kg_by_account(
+            'process.cleaned_melt'
+        )
+        available_o2_kg = float(
+            self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                'O2', 0.0
+            )
+        )
+        writer_detail: dict[str, Any] = {}
+
+        def project_inventory_limited_flux(
+            raw_flux: EvaporationFlux,
+        ) -> EvaporationFlux:
+            rates = self._analytic_evaporation_depletion_rates(
+                raw_flux.species_kg_hr,
+                dt_hr=1.0,
+                phase_scalar=1.0,
+                cleaned_melt_kg=cleaned_melt_kg,
+                available_o2_kg=available_o2_kg,
+            )
+            projected = EvaporationFlux(
+                species_kg_hr=rates,
+                alpha_authority_status_by_species={
+                    species: status
+                    for species, status in (
+                        raw_flux.alpha_authority_status_by_species.items()
+                    )
+                    if float(rates.get(species, 0.0)) > 1.0e-12
+                },
+                carrier_authority_by_species=(
+                    raw_flux.carrier_authority_by_species
+                ),
+            )
+            projected.update_totals()
+            return projected
+
+        def evaluate_flux(partials_Pa: Mapping[str, float]) -> EvaporationFlux:
+            return self._calculate_evaporation(
+                equilibrium,
+                gate_authority=gate_authority,
+                overhead_partials_override_Pa=partials_Pa,
+            )
+
+        def write_partials(raw_flux: EvaporationFlux) -> Mapping[str, float]:
+            committed_flux = project_inventory_limited_flux(raw_flux)
+            inlet_flux = self._subsolidus_transport_inlet_flux(committed_flux)
+            effective_capacity = self._controlled_o2_transport_capacity(
+                inlet_flux
+            )
+            downstream_pressure_bar = self._headspace_downstream_pressure_bar(
+                effective_capacity
+            )
+            transport_state = self.overhead_model.estimate_transport_state(
+                inlet_flux,
+                self.melt,
+                p_downstream_bar=downstream_pressure_bar,
+                effective_transport_capacity=effective_capacity,
+            )
+            if effective_capacity is not None:
+                writer_detail.update({
+                    'capacity_binding_cause': effective_capacity.binding_cause,
+                    'pipe_capacity_kg_hr': effective_capacity.pipe_capacity_kg_hr,
+                    'effective_capacity_kg_hr': (
+                        effective_capacity.effective_capacity_kg_hr
+                    ),
+                    'writer_path': (
+                        'controlled_capacity_allowed_upstream_pressure'
+                    ),
+                })
+            elif float(transport_state['conductance_kg_s']) <= 0.0:
+                writer_detail['writer_path'] = 'closed_line_allowed_pressure'
+            else:
+                writer_detail['writer_path'] = (
+                    'poiseuille_flux_inversion_with_resolved_downstream_pressure'
+                )
+            writer_detail['downstream_pressure_bar'] = downstream_pressure_bar
+            writer_detail['pipe_capacity_used_pct'] = transport_state[
+                'pipe_capacity_used_pct'
+            ]
+            partials_mbar = self.overhead_model.species_partial_pressures(
+                inlet_flux,
+                transport_state['vapor_pressure_mbar'],
+                self.species_formula_registry,
+            )
+            return {
+                species: float(partial_mbar) * 100.0
+                for species, partial_mbar in partials_mbar.items()
+            }
+
+        # Resolve the active backpressured set from a read-only free-source
+        # evaluation, then retain only species that survive the same freeze,
+        # native-Fe, and inventory projections as the committed flux. This
+        # avoids adding catalog species with no admitted source as zero-valued
+        # dimensions to the coupled root.
+        free_source_partials_Pa = dict(base_partials_Pa)
+        for species in eligible_participants:
+            free_source_partials_Pa[species] = 0.0
+        free_source_flux = project_inventory_limited_flux(
+            evaluate_flux(free_source_partials_Pa)
+        )
+        participants = {
+            species: pressure
+            for species, pressure in eligible_participants.items()
+            if float(free_source_flux.species_kg_hr.get(species, 0.0)) > 1.0e-12
+        }
+        if not participants:
+            return evaluate_flux(base_partials_Pa)
+        fixed_partials_Pa = {
+            species: pressure
+            for species, pressure in base_partials_Pa.items()
+            if species not in participants
+        }
+        initial_partials_Pa = {
+            species: base_partials_Pa.get(species, 0.0)
+            for species in participants
+        }
+
+        solved = solve_quasi_steady_headspace_partials_Pa(
+            equilibrium_Pa=participants,
+            fixed_partials_Pa=fixed_partials_Pa,
+            initial_partials_Pa=initial_partials_Pa,
+            evaluate_flux=evaluate_flux,
+            write_partials=write_partials,
+            relative_tolerance=1.0e-9,
+            max_iterations=80,
+        )
+        selected_flux = evaluate_flux({
+            **fixed_partials_Pa,
+            **solved.candidate_partials_Pa,
+        })
+        write_partials(selected_flux)
+        diagnostic = dict(
+            getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
+        )
+        notices = list(diagnostic.get('notice_flags', ()) or ())
+        if not solved.converged:
+            notices.append({
+                'code': 'headspace_partial_solver_not_converged',
+                'severity': 'warning',
+                'residual_relative': solved.residual_relative,
+                'residual_Pa_by_species': dict(
+                    solved.residual_Pa_by_species
+                ),
+            })
+            if 'O2' in vapor_pressures:
+                notices.append({
+                    'code': 'oxygen_partial_held_during_unconverged_solve',
+                    'severity': 'warning',
+                    'detail': (
+                        'O2 stayed at its incoming partial pressure; this solve '
+                        'does not test whether a coupled oxygen root would close.'
+                    ),
+                })
+        if writer_detail.get('effective_capacity_kg_hr') is not None:
+            notices.append({
+                'code': 'transport_capacity_used_as_operating_flow',
+                'severity': 'warning',
+                **writer_detail,
+            })
+        diagnostic['headspace_solver'] = {
+            'status': 'converged' if solved.converged else 'not_converged',
+            'iterations': solved.iterations,
+            'residual_relative': solved.residual_relative,
+            'residual_Pa_by_species': dict(
+                solved.residual_Pa_by_species
+            ),
+            'candidate_partials_Pa': dict(solved.candidate_partials_Pa),
+            'writer_partials_Pa': dict(solved.writer_partials_Pa),
+            'fixed_species': sorted(fixed_partials_Pa),
+            'oxygen_partial_frozen': True,
+            'writer_path': dict(writer_detail),
+        }
+        if notices:
+            diagnostic['notice_flags'] = notices
+        self._last_evaporation_flux_diagnostic = diagnostic
+        return selected_flux
+
     def _resolve_evaporation_batch_flux_state(
         self,
         equilibrium: Any,
@@ -834,6 +1092,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        solve_headspace_feedback: bool = False,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -877,6 +1136,11 @@ class EvaporationMixin:
         Returns:
             EvaporationFlux with species_kg_hr dict
         """
+        if solve_headspace_feedback and overhead_partials_override_Pa is None:
+            return self._calculate_evaporation_with_headspace_feedback(
+                equilibrium,
+                gate_authority=gate_authority,
+            )
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
         self._last_partial_melt_offgassing_diagnostic = {}
