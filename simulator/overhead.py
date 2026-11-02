@@ -469,26 +469,16 @@ def solve_quasi_steady_headspace_partials_Pa(
                 low_residual = float(low_residuals[species])
                 high_residual = float(high_residuals[species])
                 width = high - low
-                beta = max(
-                    0.0,
-                    float(beta_kg_s_Pa_by_species.get(species, 0.0)),
-                )
-                molar_mass = max(
-                    0.0,
-                    float(molar_mass_kg_mol_by_species.get(species, 0.0)),
-                )
-                removal_slope = (
-                    molar_mass * flow / pressure if pressure > 0.0 else 0.0
-                )
-                slope = beta + removal_slope
-                # Residual is committed source minus removal. The source
-                # slope is approximated by beta_i, while removal contributes
-                # G_i=M_i*n/P, so Newton gives p + residual/(beta_i+G_i).
-                # Units are (kg/s)/(kg/(s Pa)) = Pa. Clamp the trial to the
-                # sign bracket; if the slope vanishes, bisect its endpoints.
+                denominator = high_residual - low_residual
+                # Residuals are committed source minus removal in kg/s.
+                # Linear interpolation of their sign bracket gives
+                # p*=p_low-R_low*(p_high-p_low)/(R_high-R_low); the ratio
+                # has units Pa and uses the measured post-cap source response.
+                # An exact linear balance reaches its root in one step. If
+                # that slope vanishes or interpolation lands outside the bracket, bisect.
                 trial = (
-                    partial + residual / slope
-                    if slope > 0.0 and math.isfinite(slope)
+                    low - low_residual * width / denominator
+                    if denominator != 0.0 and math.isfinite(denominator)
                     else 0.5 * (low + high)
                 )
                 if not low < trial < high:
