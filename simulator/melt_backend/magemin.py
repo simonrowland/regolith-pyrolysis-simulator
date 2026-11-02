@@ -172,6 +172,12 @@ from simulator.feedstock_composition import (
 # achievement. Source for the O requirement: MAGEMinApp QFM tutorial, buffer
 # offset section, v1.8.5.
 _MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT = 10.0
+_MAGEMIN_PROJECTED_FO2_DESCRIPTION = (
+    "Absolute fO2 is held constant across the temperature grid via "
+    "buffer_n = fO2_log - QFM(T). The CLI vector carries a solver-only "
+    f"{_MAGEMIN_BUFFER_O_RESERVOIR_WT_PCT:.1f} wt% oxygen reservoir, "
+    "which is excluded from the reported composition."
+)
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -4105,8 +4111,9 @@ def _projected_engine_liquid_fraction_grid(
     kept_oxide_kg: Mapping[str, float],
     fO2_log: float,
     pressure_bar: float,
+    temperature_C: float,
     backend_config: Mapping[str, Any],
-) -> Tuple[str, Tuple[Tuple[float, float], ...]]:
+) -> Tuple[str, Optional[str], Tuple[Tuple[float, float], ...]]:
     """Run one isolated MAGEMin temperature search for the supplied bulk."""
     backend: Optional[MAGEMinBackend] = None
     try:
@@ -4115,7 +4122,13 @@ def _projected_engine_liquid_fraction_grid(
             not backend.initialize(dict(backend_config))
             or not backend.is_available()
         ):
-            return "unavailable", ()
+            return "unavailable", None, ()
+        buffer_name, _buffer_n, _warnings = backend._resolve_buffer(
+            temperature_C=temperature_C,
+            fO2_log=fO2_log,
+        )
+        if buffer_name != "qfm":
+            return "unsupported_fO2_buffer", buffer_name, ()
         result = backend.find_liquidus_solidus(
             composition_kg=dict(kept_oxide_kg),
             fO2_log=fO2_log,
@@ -4123,14 +4136,16 @@ def _projected_engine_liquid_fraction_grid(
         )
         status = str(getattr(result, "status", "unavailable"))
         if status != "ok":
-            return status, ()
+            return status, buffer_name, ()
         samples = tuple(
             (float(sample.temperature_C), float(sample.frac_M))
             for sample in (getattr(result, "samples", ()) or ())
         )
-        return ("ok", samples) if samples else ("grid_unavailable", ())
+        if not samples:
+            return "grid_unavailable", buffer_name, ()
+        return "ok", buffer_name, samples
     except Exception:
-        return "solve_failed", ()
+        return "solve_failed", None, ()
     finally:
         if backend is not None:
             try:
@@ -4152,6 +4167,9 @@ def projected_engine_liquid_fraction_diagnostic(
         "fraction": None,
         "temperature_C": None,
         "pressure_bar": None,
+        "fO2_log": None,
+        "fO2_buffer": None,
+        "fO2_description": _MAGEMIN_PROJECTED_FO2_DESCRIPTION,
         "status": "invalid_input",
         "provider": "magemin",
         "dropped_species_mass_fractions": {},
@@ -4171,6 +4189,7 @@ def projected_engine_liquid_fraction_diagnostic(
             return result
         result["temperature_C"] = temperature
         result["pressure_bar"] = pressure
+        result["fO2_log"] = fO2
         projection = project_magemin_diagnostic_composition(dict(composition_kg))
         result["dropped_species_mass_fractions"] = dict(
             projection.dropped_species_mass_fractions
@@ -4190,12 +4209,14 @@ def projected_engine_liquid_fraction_diagnostic(
         return result
 
     try:
-        status, samples = _projected_engine_liquid_fraction_grid(
+        status, buffer_name, samples = _projected_engine_liquid_fraction_grid(
             projection.kept_oxide_kg,
             fO2_log=fO2,
             pressure_bar=pressure,
+            temperature_C=temperature,
             backend_config=backend_config,
         )
+        result["fO2_buffer"] = buffer_name
         result["status"] = status
         if status != "ok":
             return result
