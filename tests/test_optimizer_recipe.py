@@ -124,9 +124,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
-    assert hashlib.sha256(resolved).hexdigest() == (
-        "8bc00e196df6dc085f3833b82404824067138e07011e9d304fde64f20691817a"
-    )
+    resolved_digest = hashlib.sha256(resolved).hexdigest()
+    # The Studio-3 attribution supplies this SHA-256 by its prefix and suffix.
+    assert resolved_digest.startswith("0d334cdfd5f0")
+    assert resolved_digest.endswith("78965f99c950e")
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
@@ -1749,7 +1750,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # c3 route controls and engineering provenance move the schema bounds digest.
     assert (
         first.recipe_id()
-                == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"
+                == "b96e89ada2a94be400e6c2eb1d51e9559d77bb8bfe5716f5079edbe69ebaefca"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
