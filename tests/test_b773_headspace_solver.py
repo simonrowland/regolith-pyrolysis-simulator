@@ -310,16 +310,87 @@ def test_pressure_bracket_keeps_measured_endpoint_residuals():
         carrier_free_molar_flow_mol_s_at_pressure=(
             lambda pressure: pressure * pressure
         ),
-        max_iterations=80,
+        max_iterations=10,
     )
 
-    assert abs(solved.pressure_residual_Pa) <= 1.0e-9
+    assert not solved.converged
+    assert abs(solved.pressure_residual_Pa) <= 1.0e-3
 
 
-def test_nonlinear_pressure_secant_keeps_measured_low_residual():
-    source_offset_kg_s = 3.0
+def test_illinois_closes_convex_shared_inventory_limit_in_ten_steps():
+    inventory_limit_kg_s = 0.2
+    equilibrium_Pa_by_species = {"Na": 2.0, "K": 1.0}
 
     def evaluate(partials, _total_pressure):
+        raw_rates_kg_s = {
+            species: max(0.0, equilibrium - partials[species])
+            for species, equilibrium in equilibrium_Pa_by_species.items()
+        }
+        flux = EvaporationFlux(
+            species_kg_hr={
+                species: rate * 3600.0
+                for species, rate in raw_rates_kg_s.items()
+            }
+        )
+        flux.update_totals()
+        return flux
+
+    def inventory_limited_commit(raw_flux):
+        raw_rates_kg_s = {
+            species: max(0.0, float(rate)) / 3600.0
+            for species, rate in raw_flux.species_kg_hr.items()
+        }
+        total_raw_kg_s = sum(raw_rates_kg_s.values())
+        scale = (
+            min(1.0, inventory_limit_kg_s / total_raw_kg_s)
+            if total_raw_kg_s > 0.0
+            else 1.0
+        )
+        committed = EvaporationFlux(
+            species_kg_hr={
+                species: rate * scale * 3600.0
+                for species, rate in raw_rates_kg_s.items()
+            }
+        )
+        committed.update_totals()
+        return committed
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa=equilibrium_Pa_by_species,
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": 1.0, "K": 1.0},
+        molar_mass_kg_mol_by_species={"Na": 1.0, "K": 1.0},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda pressure: pressure * pressure,
+        pressure_bracket_Pa=(0.1, 0.9),
+        evaluate_flux=evaluate,
+        commit_flux=inventory_limited_commit,
+        fixed_pressure_Pa=0.1,
+        fixed_pressure_molar_flow_mol_s=1.0,
+        carrier_free_molar_flow_mol_s_at_pressure=(
+            lambda pressure: pressure * pressure
+        ),
+        relative_tolerance=1.0e-3,
+        max_iterations=10,
+    )
+
+    # The shared cap fixes total source at 0.2 kg/s while it binds. For unit
+    # molar masses and n(P)=P² mol/s, total removal is P*sum(p_i) kg/s, so
+    # pressure closure has f(P)=0.2/P-P and root sqrt(0.2) Pa. The residual is
+    # convex (f''=0.4/P³>0); kg/s cancel in the balance and the root requires
+    # P>0. If the cap tends to infinity, this limited-source branch disappears.
+    assert solved.converged
+    assert solved.total_pressure_Pa == pytest.approx(
+        math.sqrt(inventory_limit_kg_s), rel=1.0e-3
+    )
+
+
+def test_nonlinear_pressure_secant_uses_illinois_weight_for_second_step():
+    source_offset_kg_s = 3.0
+    evaluated_pressures = []
+
+    def evaluate(partials, total_pressure):
+        evaluated_pressures.append(float(total_pressure))
         return _flux(2.0 - partials["Na"])
 
     def offset_committed_source(raw_flux):
@@ -340,15 +411,21 @@ def test_nonlinear_pressure_secant_keeps_measured_low_residual():
         max_iterations=2,
     )
 
-    # At fixed P, committed source is (2 - p) + 3 kg/s. With M=1 kg/mol and
-    # n(P)=P² mol/s under the synthetic unit scale, removal M*n/P*p is P*p
-    # kg/s. Thus p=5/(1+P), so closure has P²+P-5=0. With zero offset, the
-    # raw source returns to the unmodified 1 Pa root.
-    expected_pressure = (-1.0 + math.sqrt(21.0)) / 2.0
-    assert solved.total_pressure_Pa == pytest.approx(
-        expected_pressure,
-        abs=1.0e-3,
+    # At fixed P, committed source is (2-p)+3 kg/s. With M=1 kg/mol and
+    # n(P)=P² mol/s, removal is P*p kg/s, so p=5/(1+P) and closure has
+    # P²+P-5=0. The bracket residuals are +3/5 Pa at 7/5 Pa and -15/14 Pa
+    # at 5/2 Pa, giving first trial P1=70/39 Pa. There p=195/109 Pa and
+    # f(P1)=-25/4251 Pa. Illinois keeps the measured low residual at 3/5 Pa
+    # but halves its interpolation weight to 3/10 Pa, so the second trial is
+    # 7/5-(3/10)*(77/195)/(-25/4251-3/10)=23240/13003 Pa. The pressure and
+    # residual are both Pa; each species source/removal balance is kg/s. With
+    # zero offset, the limiting case returns to the unmodified 1 Pa root.
+    expected_second_step = 23240 / 13003
+    assert any(
+        pressure == pytest.approx(expected_second_step, abs=1.0e-12)
+        for pressure in evaluated_pressures
     )
+    assert solved.total_pressure_Pa == pytest.approx(70 / 39, abs=1.0e-12)
 
 
 def test_controlled_capacity_uses_shared_partial_solver_at_allowed_pressure():

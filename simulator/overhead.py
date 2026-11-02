@@ -652,7 +652,18 @@ def solve_quasi_steady_headspace_partials_Pa(
         )
         iteration_count += root_iterations
 
-    if pressure_closed and participant_relative(relative_by_species) > relative_tolerance:
+    if pressure_closed:
+        # Inventory correction can close species balances while changing their
+        # partial sum, so pressure closure must be checked against that state.
+        pressure_residual = sum(candidate.values()) - pressure
+    if pressure_closed and (
+        participant_relative(relative_by_species) > relative_tolerance
+        or abs(pressure_residual) > relative_tolerance * max(
+            pressure,
+            sum(candidate.values()),
+            1.0e-300,
+        )
+    ):
         def nonlinear_pressure_residual(value: float):
             flow_at_value = max(0.0, float(flow_function(value)))
             seed = partials_at(
@@ -682,6 +693,9 @@ def solve_quasi_steady_headspace_partials_Pa(
             high = max(high * 2.0, high + 1.0)
             high_residual, high_solved, high_flow = nonlinear_pressure_residual(high)
             iteration_count += high_solved[4]
+        # Illinois scales only the retained endpoint's interpolation weight;
+        # the measured residual remains intact for convergence and reporting.
+        low_weight, high_weight = low_residual, high_residual
         best_pressure, best_solved, best_flow, best_pressure_residual = (
             (low, low_solved, low_flow, low_residual)
             if low_residual <= 0.0
@@ -689,9 +703,9 @@ def solve_quasi_steady_headspace_partials_Pa(
         )
         if low_residual > 0.0 and high_residual <= 0.0:
             for _iteration in range(max_iterations):
-                denominator = high_residual - low_residual
+                denominator = high_weight - low_weight
                 trial = (
-                    low - low_residual * (high - low) / denominator
+                    low - low_weight * (high - low) / denominator
                     if denominator != 0.0 and math.isfinite(denominator)
                     else 0.5 * (low + high)
                 )
@@ -716,8 +730,10 @@ def solve_quasi_steady_headspace_partials_Pa(
                     break
                 if trial_residual > 0.0:
                     low, low_residual = trial, trial_residual
+                    low_weight, high_weight = trial_residual, 0.5 * high_weight
                 else:
                     high, high_residual = trial, trial_residual
+                    high_weight, low_weight = trial_residual, 0.5 * low_weight
         pressure = best_pressure
         candidate, raw_flux, residuals, relative_by_species = best_solved[:4]
         flow = best_flow
