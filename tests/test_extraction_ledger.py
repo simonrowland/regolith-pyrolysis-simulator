@@ -629,7 +629,7 @@ def test_mre_returned_oxygen_kg_comes_from_ledger_mol():
     assert produced_kg == pytest.approx(o2_kg_from_mol)
 
 
-def test_mre_refused_partition_fails_loud_without_energy_or_products():
+def test_mre_multi_oxide_partition_predicts_with_visible_uncertainty_flag():
     sim = _sim(
         {
             "mixed": {
@@ -659,47 +659,44 @@ def test_mre_refused_partition_fails_loud_without_energy_or_products():
     sim._mre_effective_current_A = 1000.0
 
     no_op_before = sim._chem_no_op_dispatch_count
+    dispatch = sim._dispatch_only
+    electrolysis_results = []
+
+    def capture_electrolysis(*args, **kwargs):
+        result = dispatch(*args, **kwargs)
+        if args and args[0] is ChemistryIntent.ELECTROLYSIS_STEP:
+            electrolysis_results.append(result)
+        return result
+
+    sim._dispatch_only = capture_electrolysis
     melt_before = dict(sim.atom_ledger.kg_by_account("process.cleaned_melt"))
-    metal_before = dict(sim.atom_ledger.kg_by_account("process.metal_phase"))
     o2_before = dict(
         sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
     )
 
-    with pytest.raises(RuntimeError, match=MRE_MULTI_OXIDE_PARTITION_REFUSAL):
-        sim._step_mre()
+    produced_o2_kg = sim._step_mre()
 
-    assert sim._chem_no_op_dispatch_count == no_op_before + 1
-    assert sim.atom_ledger.kg_by_account("process.cleaned_melt") == pytest.approx(
-        melt_before
+    assert sim._chem_no_op_dispatch_count == no_op_before
+    assert sim._mre_energy_this_hr == pytest.approx(2.0)
+    assert produced_o2_kg > 0.0
+    assert sim._mre_metals_this_hr
+    melt_after = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    assert any(melt_after.get(oxide, 0.0) < mass for oxide, mass in melt_before.items())
+    o2_after = sim.atom_ledger.kg_by_account("terminal.oxygen_mre_anode_stored")
+    assert o2_after.get("O2", 0.0) > o2_before.get("O2", 0.0)
+    assert electrolysis_results
+    diagnostic = electrolysis_results[-1].diagnostic
+    assert diagnostic["O2_produced_mol"] > 0.0
+    assert diagnostic["energy_kWh"] == pytest.approx(2.0)
+    assert diagnostic["certification_allowed"] is False
+    notice = next(
+        notice for notice in diagnostic["notices"]
+        if notice["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
     )
-    assert sim.atom_ledger.kg_by_account("process.metal_phase") == pytest.approx(
-        metal_before
-    )
-    assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_mre_anode_stored"
-    ) == pytest.approx(o2_before)
-    assert sim.product_ledger() == {}
-    assert sim._mre_metals_this_hr == {}
-    assert sim._mre_energy_this_hr == pytest.approx(0.0)
-    assert sim._mre_voltage_V == pytest.approx(0.0)
-    assert sim._mre_current_A == pytest.approx(0.0)
-    assert sim._mre_effective_current_A == pytest.approx(0.0)
-    assert sim.melt.mre_voltage_V == pytest.approx(0.0)
-    assert sim.melt.mre_current_A == pytest.approx(0.0)
-
-    refusal = sim._last_mre_refusal_diagnostic
-    assert refusal["intent"] == ChemistryIntent.ELECTROLYSIS_STEP.name
-    assert refusal["hour"] == 42
-    assert refusal["campaign_hour"] == 7
-    assert refusal["campaign"] == CampaignPhase.C5.name
-    assert refusal["temperature_C"] == pytest.approx(1600.0)
-    assert refusal["voltage_V"] == pytest.approx(2.0)
-    assert refusal["current_A"] == pytest.approx(1000.0)
-    assert refusal["diagnostic"]["reason_refused"] == (
-        MRE_MULTI_OXIDE_PARTITION_REFUSAL
-    )
-    assert "energy_kWh" not in refusal["diagnostic"]
-    assert sim._mre_refusal_history == [refusal]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"] == {
+        "oxide_to_metal_target_count": (0, 1)
+    }
 
 
 def test_condensed_species_projection_does_not_double_count_across_stages():
