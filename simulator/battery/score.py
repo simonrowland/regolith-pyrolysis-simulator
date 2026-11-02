@@ -3013,15 +3013,10 @@ def _iron_saturated_feo_comparison(
         # a_FeO(stoich)=N_Fe2+^0·a_FeO(source). Unit check: N_Fe2+^0 is
         # dimensionless, and its log10 is a dex shift. Sanity: at 1880 C,
         # 0.952×0.9861=0.9388 and log10(0.9861)=-0.0061 dex.
-        converted = reference.value.point * factor
-        log10_shift_dex = factor.log10()
-        stoichiometric = replace(
-            standard_state,
-            endmember=replace(
-                standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
-            ),
-            component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+        transformed, log10_shift_dex = _transform_iron_saturated_feo_reference(
+            reference, factor
         )
+        converted = transformed.value.point
         notice = Notice(
             kind=NoticeKind.DERIVATION_USES_COMPILATION,
             affected_quantities=(quantity,),
@@ -3036,10 +3031,8 @@ def _iron_saturated_feo_comparison(
             origin=reference.observation_id,
         )
         return replace(
-            reference,
-            identity=replace(identity, reference_state=State.of(stoichiometric)),
-            value=replace(reference.value, point=converted),
-            notices=union_notices(reference.notices, (notice,)),
+            transformed,
+            notices=union_notices(transformed.notices, (notice,)),
         )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
@@ -3071,17 +3064,13 @@ def _iron_saturated_feo_comparison(
             band=f"Darken & Gurry / JANAF FeO reference: {exc}",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
-    converted = reference.value.point * factor
+    transformed, _log10_shift_dex = _transform_iron_saturated_feo_reference(
+        reference, factor
+    )
+    converted = transformed.value.point
     log_f_spread_dex = (
         Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
     ).log10()
-    stoichiometric = replace(
-        standard_state,
-        endmember=replace(
-            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
-        ),
-        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
-    )
     iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
     conversion_notice = Notice(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
@@ -3136,11 +3125,36 @@ def _iron_saturated_feo_comparison(
     if row_band.notice is not None:
         notices += (row_band.notice,)
     return replace(
-        reference,
-        identity=replace(identity, reference_state=State.of(stoichiometric)),
-        value=replace(reference.value, point=converted),
-        notices=union_notices(reference.notices, notices),
+        transformed,
+        notices=union_notices(transformed.notices, notices),
     )
+
+
+def _transform_iron_saturated_feo_reference(
+    reference: Observation, factor: Decimal
+) -> tuple[Observation, Decimal]:
+    """Apply one selected Fe(1-x)O(l)-to-stoichiometric-FeO(l) factor."""
+    identity = reference.identity
+    assert isinstance(identity, Identity)
+    assert identity.reference_state is not None and identity.reference_state.is_value
+    standard_state = identity.reference_state.value
+    assert isinstance(standard_state, StandardState)
+    assert reference.value.point is not None
+
+    converted = reference.value.point * factor
+    transformed_state = replace(
+        standard_state,
+        endmember=replace(
+            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+        ),
+        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+    )
+    transformed = replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(transformed_state)),
+        value=replace(reference.value, point=converted),
+    )
+    return transformed, factor.log10()
 
 
 def fusion_comparison_reference(
