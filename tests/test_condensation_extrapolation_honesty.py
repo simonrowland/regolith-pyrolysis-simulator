@@ -605,9 +605,20 @@ def test_fe_scalar_alpha_record_reports_source_extrapolation_notice():
     assert record["alpha_s"].hex() == float(0.02).hex()
     assert record["value_ref"] == value_ref
     assert notice["certified_band_K"] == [1700.0, 1800.0]
+    assert notice["temperature_used_K"] == 1523.15
     assert notice["distance_below_band_K"] == pytest.approx(176.85)
-    assert notice["source_fit"]["source_id"] == "kems-007-costa-2015"
-    assert notice["source_fit"]["source"] == record["source"]
+    assert notice["distance_above_band_K"] == 0.0
+    assert notice["source_fit"] == {
+        "form": "scalar",
+        "value": 0.02,
+        "source_id": "kems-007-costa-2015",
+        "source": record["source"],
+        "source_url": record["source_url"],
+    }
+    assert notice["physical_bound"] == {
+        "lower_exclusive": 0.0,
+        "upper_inclusive": 1.0,
+    }
     assert record["material_source"] == value_ref
     assert notice["authority_level"] == "extrapolated"
     assert record["alpha_s_physical_bound_engaged"] is False
@@ -657,6 +668,7 @@ def test_scalar_fe_alpha_extrapolation_survives_stage_provenance():
     record = condensation._stage_alpha_record(stage, "Fe", materials)
 
     assert record["alpha_s"].hex() == float(0.02).hex()
+    assert record["temperature_range_K"] == [1700, 1800]
     assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
     assert record["alpha_s_domain_status"] == "extrapolated"
     assert record["alpha_s_extrapolated"] is True
