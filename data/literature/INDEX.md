@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 728
-- Extracts (`literature_extract.v1`): 726
+- Sources: 729
+- Extracts (`literature_extract.v1`): 727
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 726
+- Extracts with no PDF: 727
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -661,6 +661,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `street-2010-thermal-properties-simulants` | Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal Properties of Lunar Regolith Simulants, NASA/TM—2010-216348. Prepared for the Earth and Space 2010 Conference, Honolulu, Hawaii, March 14-17, 2010. | NTRS 20100024178 | ABSENT, `` | `raw/street-2010-thermal-properties-simulants/street-2010-thermal-properties-simulants.pdf` (present, d198b496); `text/street-2010-thermal-properties-simulants/` (14 files, exists); `tables/street-2010-thermal-properties-simulants/` (0 files, ABSENT) | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` (7 rows, draft) | `ledger/street-2010-thermal-properties-simulants.yaml`: extracted (2026-09-12) |
 | `su-2024-lunar-volatiles-thesis` | Su, Xue (2024), Lunar Stories Unfolded by Volatile Elements: From Water in the Lunar Mantle to Volcanic Eruptions on the Lunar Surface. PhD dissertation, University of Michigan. |  | ABSENT, `` | `raw/su-2024-lunar-volatiles-thesis/su-2024-lunar-volatiles-thesis.pdf` (present, 471f14fd); `text/su-2024-lunar-volatiles-thesis/` (181 files, exists); `tables/su-2024-lunar-volatiles-thesis/` (0 files, ABSENT) | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` (0 rows, draft) | `ledger/su-2024-lunar-volatiles-thesis.yaml`: — (—) |
 | `sublimation-kinetics-2023-minerals` | Shaw, M. G., Humbert, M. S., Brooks, G. A., Rhamdhani, M. A., Duffy, A. R. & Pownceby, M. I. (2023), "Metal and Oxide Sublimation from Lunar Regolith: A Kinetics Study", Minerals 13, 79, DOI 10.3390/min13010079 | 10.3390/min13010079 | ABSENT, `` | `raw/sublimation-kinetics-2023-minerals/sublimation-kinetics-2023-minerals.pdf` (present, 315f84f6); `text/sublimation-kinetics-2023-minerals/` (34 files, exists); `tables/sublimation-kinetics-2023-minerals/` (0 files, ABSENT) | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` (18 rows, draft) | `ledger/sublimation-kinetics-2023-minerals.yaml`: decoded (2026-09-06) |
+| `sugawara-2013-soda-lime-melt-na2o-activity` | Sugawara, T.; Seto, M.; Kato, M.; Yoshida, S.; Matsuoka, J.; Miura, Y. (2013). Na2O activity and thermodynamic mixing properties of SiO2–Na2O–CaO melt. Journal of Non-Crystalline Solids 371–372, 58–65. | 10.1016/j.jnoncrysol.2013.03.031 | ABSENT, `` | `raw/sugawara-2013-soda-lime-melt-na2o-activity/sugawara-2013-soda-lime-melt-na2o-activity.pdf` (present, e73b0389); `text/sugawara-2013-soda-lime-melt-na2o-activity/` (35 files, exists); `tables/sugawara-2013-soda-lime-melt-na2o-activity/` (0 files, ABSENT) | `data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml` (58 rows, draft) | `ledger/sugawara-2013-soda-lime-melt-na2o-activity.yaml`: — (—) |
 | `sugawara-2024-na-silicate-molybdate-miscibility` | Sugawara, T., Ohira, T., Kondo, R., and Jin, K. (2025; online 2024). Phase equilibria and thermodynamic analysis of liquid-liquid immiscibility in the system SiO2-Na2O-MoO3. Journal of Thermal Analysis and Calorimetry, 150, 7199-7206. | 10.1007/s10973-024-13659-7 | ABSENT, `` | `raw/sugawara-2024-na-silicate-molybdate-miscibility/sugawara-2024-na-silicate-molybdate-miscibility.pdf` (present, 196ffb5b); `text/sugawara-2024-na-silicate-molybdate-miscibility/` (28 files, exists); `tables/sugawara-2024-na-silicate-molybdate-miscibility/` (0 files, ABSENT) | `data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml` (48 rows, draft) | `ledger/sugawara-2024-na-silicate-molybdate-miscibility.yaml`: — (—) |
 | `sugawara-akaogi-2003-ni-co-fusion` | Sugawara T. and Akaogi M. (2003). Calorimetric measurements of fusion enthalpies for Ni2SiO4 and Co2SiO4 olivines and application to olivine-liquid partitioning. Geochimica et Cosmochimica Acta 67(14):2683–2693. | 10.1016/S0016-7037(03)00202-3 | ABSENT, `` | `raw/sugawara-akaogi-2003-ni-co-fusion/sugawara-akaogi-2003-ni-co-fusion.pdf` (present, 8ec87754); `text/sugawara-akaogi-2003-ni-co-fusion/` (1 files, exists); `tables/sugawara-akaogi-2003-ni-co-fusion/` (0 files, ABSENT) | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` (18 rows, draft) | `ledger/sugawara-akaogi-2003-ni-co-fusion.yaml`: — (—) |
 | `sugawara-akaogi-2004-liquid-calorimetry` | Sugawara T. and Akaogi M. (2004). Calorimetry of liquids in the system Na2O–Fe2O3–SiO2. American Mineralogist 89:1586–1596. | 10.2138/am-2004-11-1202 | ABSENT, `` | `raw/sugawara-akaogi-2004-liquid-calorimetry/sugawara-akaogi-2004-liquid-calorimetry.pdf` (ABSENT, ); `text/sugawara-akaogi-2004-liquid-calorimetry/` (0 files, ABSENT); `tables/sugawara-akaogi-2004-liquid-calorimetry/` (0 files, ABSENT) | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` (7 rows, draft) | `ledger/sugawara-akaogi-2004-liquid-calorimetry.yaml`: — (—) |
@@ -1395,6 +1396,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `street-2010-thermal-properties-simulants`
 - `su-2024-lunar-volatiles-thesis`
 - `sublimation-kinetics-2023-minerals`
+- `sugawara-2013-soda-lime-melt-na2o-activity`
 - `sugawara-2024-na-silicate-molybdate-miscibility`
 - `sugawara-akaogi-2003-ni-co-fusion`
 - `sugawara-akaogi-2004-liquid-calorimetry`
