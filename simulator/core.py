@@ -16815,14 +16815,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         # Keep the diagnostic's historical inputs outside the dataclass
         # fields so HourSnapshot serialization and the physics path stay
-        # unchanged. This retains non-oxide melt species for the projection's
-        # dropped-mass cap.
+        # unchanged. _seed_atom_ledger loads inert_melt_components_kg into
+        # process.cleaned_melt, which _project_cleaned_melt_from_atom_ledger
+        # already exposes through MeltState.composition_kg; the inventory map
+        # is provenance, so merging it here would double-count shared species.
         diagnostic_composition_kg = dict(self.melt.composition_kg)
-        for species, mass_kg in self.inventory.inert_melt_components_kg.items():
-            diagnostic_composition_kg[str(species)] = (
-                diagnostic_composition_kg.get(str(species), 0.0)
-                + float(mass_kg)
-            )
         snapshot._magemin_diagnostic_composition_kg = (
             diagnostic_composition_kg
         )
