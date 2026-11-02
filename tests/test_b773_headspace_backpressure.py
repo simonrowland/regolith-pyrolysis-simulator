@@ -210,7 +210,7 @@ def test_closed_line_runtime_publishes_equilibrium_partials_with_zero_flux(
     assert snapshot.evap_flux.total_kg_hr == 0.0
     solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
     assert solver["status"] != "not_converged"
-    equilibrium_partials = solver["candidate_partials_Pa"]
+    equilibrium_partials = solver["partials_Pa"]
     assert equilibrium_partials
     for species, partial_Pa in equilibrium_partials.items():
         assert snapshot.melt_headspace_composition_mbar[species] * 100.0 == pytest.approx(

@@ -143,14 +143,6 @@ class QuasiSteadyHeadspaceSolve:
     total_pressure_Pa: float
     pressure_residual_Pa: float
 
-    @property
-    def candidate_partials_Pa(self) -> dict[str, float]:
-        return self.partials_Pa
-
-    @property
-    def writer_partials_Pa(self) -> dict[str, float]:
-        return self.partials_Pa
-
 
 def _headspace_partials_at_pressure_Pa(
     total_pressure_Pa: float,
@@ -1335,74 +1327,6 @@ class OverheadGasModel:
                 else 'pipe'
             ),
         }
-
-    def _controlled_capacity_partials_Pa(
-        self,
-        *,
-        allowed_pressure_Pa: float,
-        effective_capacity_kg_hr: float,
-        beta_kg_s_Pa_by_species: Mapping[str, float],
-        equilibrium_Pa_by_species: Mapping[str, float],
-        molar_mass_kg_mol_by_species: Mapping[str, float],
-        species_kg_for_M_avg: Optional[Mapping[str, float]],
-    ) -> tuple[dict[str, float], float, bool]:
-        """Balance vapour partials against the existing controlled capacity.
-
-        Premise: on this boundary the existing effective capacity ``C`` is the
-        total gas mass flow at ``P_allowed``. The held gas molar mass is not
-        defined by the model, so ``M_mix`` uses the same vapour
-        ``species_kg_for_M_avg`` composition basis as the pipe law and is
-        reported as such. Algebra: ``n_cap=C/M_mix`` mol/s,
-        ``x_i=p_i/P_allowed``, and removal is
-        ``M_i*x_i*n_cap=G_i*p_i`` with
-        ``G_i=M_i*n_cap/P_allowed`` kg/(s Pa). Equating that to the source
-        ``beta_i*(P_eq,i-p_i)`` gives the closed form
-        ``p_i=beta_i*P_eq,i/(beta_i+G_i)``. Unit check: beta and G are both
-        kg/(s Pa), so the ratio is dimensionless and each result is Pa.
-        Limits: C->0 gives p_i->P_eq,i and zero net source; C->infinity gives
-        p_i->0 and the provider's zero-backpressure source. A zero beta with
-        zero capacity is the zero-removal limit and returns P_eq,i.
-        """
-
-        allowed_pressure = max(1.0, float(allowed_pressure_Pa))  # Pa
-        capacity_kg_s = max(0.0, float(effective_capacity_kg_hr)) / 3600.0
-        has_resolved_mixture_mass = any(
-            float(rate) > 0.0
-            and (
-                (molar_mass := _species_molar_mass_g_mol(
-                    str(species), self.species_formula_registry
-                )) is not None
-                and molar_mass > 0.0
-            )
-            for species, rate in (species_kg_for_M_avg or {}).items()
-        )
-        mixture_molar_mass = _mean_molar_mass_kg_mol(
-            species_kg_for_M_avg,
-            fallback_engagement_recorder=self._record_pipe_m_avg_fallback_engagement,
-            species_formula_registry=self.species_formula_registry,
-        )  # kg/mol — the existing pipe law's vapour-mixture basis
-        molar_capacity = capacity_kg_s / mixture_molar_mass  # mol/s
-        partials: dict[str, float] = {}
-        for species, raw_equilibrium in equilibrium_Pa_by_species.items():
-            equilibrium = max(0.0, float(raw_equilibrium))  # Pa
-            beta = max(
-                0.0,
-                float(beta_kg_s_Pa_by_species.get(species, 0.0)),
-            )  # kg/(s Pa)
-            molar_mass = max(
-                0.0,
-                float(molar_mass_kg_mol_by_species.get(species, 0.0)),
-            )  # kg/mol
-            removal_per_partial = (
-                molar_mass * molar_capacity / allowed_pressure
-            )  # kg/(s Pa)
-            denominator = beta + removal_per_partial
-            partials[str(species)] = (
-                equilibrium
-                if denominator <= 0.0
-                else beta * equilibrium / denominator
-            )  # Pa
-        return partials, mixture_molar_mass, not has_resolved_mixture_mass
 
     def controlled_o2_transport_capacity(
         self,

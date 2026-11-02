@@ -4403,6 +4403,24 @@ def _prepare_sio_campaign_start(
     sim.campaign_mgr.get_temp_target = _sio_twindow_temp_target
 
 
+def _sio_depletion_from_sio2_mol(
+    initial_sio2_mol: float,
+    final_sio2_mol: float,
+) -> tuple[float, float]:
+    """Return SiO-equivalent depleted moles and mass from SiO2 depletion.
+
+    One mole of SiO2 removed from cleaned melt is one mole of SiO-equivalent
+    depletion. The mass is ``mol × MOLAR_MASS['SiO'] / 1000`` kg; a final
+    inventory above the initial inventory contributes zero depletion.
+    """
+    depleted_mol = max(
+        0.0,
+        float(initial_sio2_mol) - float(final_sio2_mol),
+    )  # mol — cleaned-melt SiO2 decrease, clamped at zero
+    mass_kg = depleted_mol * MOLAR_MASS["SiO"] / 1000.0  # mol × g/mol ÷ 1000
+    return depleted_mol, mass_kg
+
+
 def _apply_sio_wall_sweep_controls(
     sim: PyrolysisSimulator,
     *,
@@ -4620,7 +4638,10 @@ def build_sio_yield_report(
     )
 
     final_sio2_mol = float(cleaned_melt.get("SiO2", 0.0))
-    sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
+    sio_evaporated_mol, sio_evolved_kg = _sio_depletion_from_sio2_mol(
+        initial_sio2_mol,
+        final_sio2_mol,
+    )
     si_terminal_mol = float(condensation_train.get("Si", 0.0))
     # Condensed SiO2(g) removes one mole of SiO2-equivalent per mole from the
     # evolved chain, so it belongs in the same terminal ledger projection as
@@ -4652,7 +4673,6 @@ def build_sio_yield_report(
         closure_error_pct = 0.0
 
     sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
-    sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
     reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)

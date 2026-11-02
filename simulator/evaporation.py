@@ -789,6 +789,7 @@ class EvaporationMixin:
         """Solve current evaporation against the existing overhead writer."""
         from simulator.config_flags import bool_feature_flag
         from simulator.overhead import (
+            _mean_molar_mass_kg_mol,
             _species_molar_mass_g_mol,
             solve_quasi_steady_headspace_partials_Pa,
         )
@@ -884,7 +885,6 @@ class EvaporationMixin:
         )
         writer_detail: dict[str, Any] = {}
         participants: dict[str, float] = {}
-        candidate_partials_for_writer_Pa = dict(base_partials_Pa)
         current_effective_capacity = None
 
         def project_inventory_limited_flux(
@@ -925,8 +925,6 @@ class EvaporationMixin:
                 source_partials_Pa[species] = max(
                     0.0, float(partials_Pa.get(species, 0.0))
                 )
-            candidate_partials_for_writer_Pa.clear()
-            candidate_partials_for_writer_Pa.update(partials_Pa)
             return self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
@@ -938,11 +936,8 @@ class EvaporationMixin:
                 ),
             )
 
-        def write_partials(raw_flux: EvaporationFlux) -> Mapping[str, float]:
+        def configure_transport_boundary(inlet_flux: EvaporationFlux) -> None:
             nonlocal current_effective_capacity
-            writer_detail.pop('capacity_carrier_free_fallback', None)
-            committed_flux = project_inventory_limited_flux(raw_flux)
-            inlet_flux = self._subsolidus_transport_inlet_flux(committed_flux)
             effective_capacity = self._controlled_o2_transport_capacity(
                 inlet_flux
             )
@@ -950,17 +945,20 @@ class EvaporationMixin:
             downstream_pressure_bar = self._headspace_downstream_pressure_bar(
                 effective_capacity
             )
-            transport_state = self.overhead_model.estimate_transport_state(
-                inlet_flux,
-                self.melt,
-                p_downstream_bar=downstream_pressure_bar,
-                effective_transport_capacity=effective_capacity,
-            )
+            writer_detail.clear()
+            writer_detail['downstream_pressure_bar'] = downstream_pressure_bar
             if effective_capacity is not None:
                 allowed_pressure_Pa = max(
                     1.0,
                     float(effective_capacity.upstream_pressure_bar) * 1.0e5,
                 )  # Pa — the same allowed upstream pressure used by the writer
+                mixture_molar_mass = _mean_molar_mass_kg_mol(
+                    inlet_flux.species_kg_hr,
+                    fallback_engagement_recorder=(
+                        self.overhead_model._record_pipe_m_avg_fallback_engagement
+                    ),
+                    species_formula_registry=self.species_formula_registry,
+                )  # kg/mol — canonical pipe-mixture mass basis
                 writer_detail.update({
                     'capacity_binding_cause': effective_capacity.binding_cause,
                     'pipe_capacity_kg_hr': effective_capacity.pipe_capacity_kg_hr,
@@ -975,81 +973,25 @@ class EvaporationMixin:
                     'C_kg_s': (
                         effective_capacity.effective_capacity_kg_hr / 3600.0
                     ),
-                    'capacity_molar_mass_basis': (
-                        'species_kg_for_M_avg; held-gas molar mass is undefined'
-                    ),
-                })
-            elif float(transport_state['conductance_kg_s']) <= 0.0:
-                writer_detail['writer_path'] = 'closed_line_allowed_pressure'
-            else:
-                writer_detail['writer_path'] = (
-                    'poiseuille_flux_inversion_with_resolved_downstream_pressure'
-                )
-            writer_detail['downstream_pressure_bar'] = downstream_pressure_bar
-            writer_detail['pipe_capacity_used_pct'] = transport_state[
-                'pipe_capacity_used_pct'
-            ]
-            partials_mbar = self.overhead_model.species_partial_pressures(
-                inlet_flux,
-                transport_state['vapor_pressure_mbar'],
-                self.species_formula_registry,
-            )
-            if effective_capacity is not None:
-                current_candidate = dict(candidate_partials_for_writer_Pa)
-                capacity_partials_Pa, mixture_molar_mass, used_molar_mass_fallback = (
-                    self.overhead_model._controlled_capacity_partials_Pa(
-                        allowed_pressure_Pa=allowed_pressure_Pa,
-                        effective_capacity_kg_hr=(
-                            effective_capacity.effective_capacity_kg_hr
-                        ),
-                        beta_kg_s_Pa_by_species=beta_by_species,
-                        equilibrium_Pa_by_species=participants,
-                        molar_mass_kg_mol_by_species=transport_molar_masses,
-                        species_kg_for_M_avg=inlet_flux.species_kg_hr,
-                    )
-                )
-                writer_detail.update({
                     'capacity_mixture_molar_mass_kg_mol': mixture_molar_mass,
-                    'capacity_molar_mass_fallback_used': (
-                        used_molar_mass_fallback
-                    ),
                 })
-                solved_partials_Pa = dict(current_candidate)
-                solved_partials_Pa.update(capacity_partials_Pa)
-                if sum(solved_partials_Pa.values()) > allowed_pressure_Pa:
-                    # The requested vapour partials leave no room for the
-                    # held gas at P_allowed. Use the existing carrier-free
-                    # Poiseuille inversion for this hour and expose the
-                    # boundary change in its notice.
-                    carrier_free_state = self.overhead_model.estimate_transport_state(
-                        inlet_flux,
-                        self.melt,
-                        p_downstream_bar=downstream_pressure_bar,
-                    )
-                    carrier_free_partials = (
-                        self.overhead_model.species_partial_pressures(
-                            inlet_flux,
-                            carrier_free_state['vapor_pressure_mbar'],
-                            self.species_formula_registry,
-                        )
-                    )
-                    writer_detail['capacity_carrier_free_fallback'] = {
-                        'reason': 'vapour_partials_exceed_allowed_pressure',
-                        'vapour_partial_sum_Pa': sum(solved_partials_Pa.values()),
-                        'capacity_allowed_pressure_Pa': allowed_pressure_Pa,
-                        'writer_path': (
-                            'carrier_free_poiseuille_inversion_after_capacity'
-                        ),
-                    }
-                    return {
-                        species: float(partial_mbar) * 100.0
-                        for species, partial_mbar in carrier_free_partials.items()
-                    }
-                return solved_partials_Pa
-            return {
-                species: float(partial_mbar) * 100.0
-                for species, partial_mbar in partials_mbar.items()
-            }
+            else:
+                allowed_pressure_Pa = max(
+                    1.0,
+                    float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0)
+                    * 100.0,
+                )
+                pipe_conductance_kg_s = self.overhead_model._pipe_conductance(
+                    allowed_pressure_Pa,
+                    float(self.melt.temperature_C),
+                    p_downstream_Pa=downstream_pressure_bar * 1.0e5,
+                    species_kg_for_M_avg=inlet_flux.species_kg_hr,
+                )
+                writer_detail['writer_path'] = (
+                    'closed_line_allowed_pressure'
+                    if pipe_conductance_kg_s <= 0.0
+                    else 'poiseuille_flux_inversion_with_resolved_downstream_pressure'
+                )
 
         # Oxygen stays at its incoming partial. Other species outside the
         # provider's backpressured set are represented by their fixed molar
@@ -1125,7 +1067,7 @@ class EvaporationMixin:
             ) / 3600.0 / max(float(equilibrium_Pa), 1.0e-300)
             for species, equilibrium_Pa in participants.items()
         }
-        candidate_partials = dict(free_source_partials_Pa)
+        seed_partials_Pa = dict(free_source_partials_Pa)
         beta_by_species = dict(free_beta)
         fixed_flows = fixed_molar_flows(free_source_flux)
         pressure_Pa = pressure_guess_Pa
@@ -1135,18 +1077,17 @@ class EvaporationMixin:
         solved = None
         source_below_threshold = False
         for outer_iteration in range(16):
-            current_raw_flux = (
-                free_source_raw_flux
+            current_flux = (
+                free_source_flux
                 if outer_iteration == 0
-                else solved.flux
+                else self._subsolidus_transport_inlet_flux(
+                    project_inventory_limited_flux(solved.flux)
+                )
             )
-            current_flux = self._subsolidus_transport_inlet_flux(
-                project_inventory_limited_flux(current_raw_flux)
-            )
-            write_partials(current_raw_flux)
+            configure_transport_boundary(current_flux)
             beta_by_species = slopes_from_flux(
                 current_flux,
-                candidate_partials,
+                seed_partials_Pa,
                 free_beta,
             )
             fixed_flows = fixed_molar_flows(current_flux)
@@ -1166,7 +1107,7 @@ class EvaporationMixin:
                 downstream_Pa,
                 sum(participants.values())
                 + sum(fixed_partials_Pa.values())
-                + sum(candidate_partials.values())
+                + sum(seed_partials_Pa.values())
                 + 1.0,
             )
             solve_options: dict[str, Any] = {}
@@ -1178,9 +1119,7 @@ class EvaporationMixin:
                 )
                 mixture_mass = max(
                     1.0e-300,
-                    float(writer_detail.get(
-                        'capacity_mixture_molar_mass_kg_mol', 0.04
-                    )),
+                    float(writer_detail['capacity_mixture_molar_mass_kg_mol']),
                 )
                 capacity_molar_flow = (
                     float(current_effective_capacity.effective_capacity_kg_hr)
@@ -1221,7 +1160,7 @@ class EvaporationMixin:
                 float(rate) > 1.0e-12
                 for rate in committed_probe.species_kg_hr.values()
             )
-            candidate_partials = solved.candidate_partials_Pa
+            seed_partials_Pa = solved.partials_Pa
             pressure_Pa = solved.total_pressure_Pa
             pressure_change = abs(pressure_Pa - previous_pressure) / max(
                 pressure_Pa,
@@ -1236,9 +1175,7 @@ class EvaporationMixin:
 
         assert solved is not None
         selected_flux = EvaporationFlux() if source_below_threshold else solved.flux
-        self._solved_headspace_partials_Pa_this_tick = dict(
-            solved.writer_partials_Pa
-        )
+        self._solved_headspace_partials_Pa_this_tick = dict(solved.partials_Pa)
         solved_inlet_flux = self._subsolidus_transport_inlet_flux(
             project_inventory_limited_flux(selected_flux)
         )
@@ -1289,8 +1226,7 @@ class EvaporationMixin:
             'residual_relative_by_species': dict(
                 solved.residual_relative_by_species
             ),
-            'candidate_partials_Pa': dict(solved.candidate_partials_Pa),
-            'writer_partials_Pa': dict(solved.writer_partials_Pa),
+            'partials_Pa': dict(solved.partials_Pa),
             'source_max_kg_hr': max(
                 (
                     float(rate)

@@ -7,6 +7,7 @@ import argparse
 import json
 import sys
 import time
+from collections.abc import Mapping
 from pathlib import Path
 
 from reproduce_b773_evap_oscillation import (
@@ -60,15 +61,51 @@ def main() -> int:
 
     from simulator.evaporation import EvaporationMixin
 
-    original = EvaporationMixin._calculate_evaporation
+    original_feedback = (
+        EvaporationMixin._calculate_evaporation_with_headspace_feedback
+    )
 
-    def lagged_reader(self, equilibrium, *args, **kwargs):
-        # The mutation drops only the hourly solver opt-in, restoring the
-        # original previous-hour partial reader while retaining the writer.
-        kwargs.pop("solve_headspace_feedback", None)
-        return original(self, equilibrium, *args, **kwargs)
+    def lagged_feedback(self, equilibrium, *args, **kwargs):
+        previous_partials_Pa = {
+            str(species): max(0.0, float(partial_mbar)) * 100.0
+            for species, partial_mbar in (
+                getattr(self, "_melt_headspace_composition_mbar", {}) or {}
+            ).items()
+        }
+        instance_calculation = self.__dict__.get(
+            "_calculate_evaporation",
+            _NO_INSTANCE_CALCULATION,
+        )
+        original_calculation = self._calculate_evaporation
 
-    EvaporationMixin._calculate_evaporation = lagged_reader
+        def lagged_calculation(current_equilibrium, *call_args, **call_kwargs):
+            supplied = call_kwargs.get("overhead_partials_override_Pa")
+            if isinstance(supplied, Mapping):
+                # Keep the current pressure override intact; only hold each
+                # participant's partial at its persisted previous-hour value.
+                call_kwargs["overhead_partials_override_Pa"] = {
+                    species: previous_partials_Pa.get(species, 0.0)
+                    for species in supplied
+                }
+            return original_calculation(
+                current_equilibrium,
+                *call_args,
+                **call_kwargs,
+            )
+
+        self._calculate_evaporation = lagged_calculation
+        try:
+            return original_feedback(self, equilibrium, *args, **kwargs)
+        finally:
+            if instance_calculation is _NO_INSTANCE_CALCULATION:
+                del self._calculate_evaporation
+            else:
+                self._calculate_evaporation = instance_calculation
+
+    _NO_INSTANCE_CALCULATION = object()
+    EvaporationMixin._calculate_evaporation_with_headspace_feedback = (
+        lagged_feedback
+    )
     payload = {"reader": "lagged", "cases": []}
     try:
         for repeat in range(1, args.repeat + 1):
@@ -89,7 +126,9 @@ def main() -> int:
                     flush=True,
                 )
     finally:
-        EvaporationMixin._calculate_evaporation = original
+        EvaporationMixin._calculate_evaporation_with_headspace_feedback = (
+            original_feedback
+        )
     failures_by_case = {
         f"{case['feedstock_id']} {case['campaign']} repeat {case['repeat']}": case[
             "acceptance_failures"
@@ -101,8 +140,8 @@ def main() -> int:
         args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         print(f"wrote {args.json}", flush=True)
     print(json.dumps(failures_by_case, sort_keys=True), flush=True)
-    if not any(failures_by_case.values()):
-        print("restored lagged reader unexpectedly passed acceptance A", file=sys.stderr)
+    if failures_by_case and all(failures_by_case.values()):
+        print("lagged temporal partial failed acceptance A in every case", file=sys.stderr)
         return 1
     return 0
 

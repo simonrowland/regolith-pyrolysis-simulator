@@ -31,7 +31,7 @@ _SIO2_KEYS = frozenset({"SiO2", "SiO2_gas"})
 
 def _run_case(case: dict) -> dict:
     from simulator.run_executor import RunExecutor
-    from simulator.runner import PyrolysisRun
+    from simulator.runner import PyrolysisRun, _sio_depletion_from_sio2_mol
     from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
 
     additives = dict(case.get("additives_kg") or {})
@@ -99,14 +99,9 @@ def _run_case(case: dict) -> dict:
     )
     initial_sio2_mol = float(initial_cleaned_melt_mol.get("SiO2", 0.0))
     final_sio2_mol = float(final_cleaned_melt_mol.get("SiO2", 0.0))
-    from simulator.state import MOLAR_MASS
-
-    # Match the runner's SiO-equivalent depletion: one mol of SiO2 lost is
-    # one mol SiO-equivalent; mol × g/mol ÷ 1000 gives kg, and no loss gives 0.
-    sio_evolved_kg = (
-        max(0.0, initial_sio2_mol - final_sio2_mol)
-        * MOLAR_MASS["SiO"]
-        / 1000.0
+    _sio_evaporated_mol, sio_evolved_kg = _sio_depletion_from_sio2_mol(
+        initial_sio2_mol,
+        final_sio2_mol,
     )
     hours = []
     evolved_kg: dict[str, float] = {}
