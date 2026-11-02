@@ -133,6 +133,36 @@ def test_fixed_pressure_residual_uses_nonlinear_committed_source():
     )
 
 
+def test_near_equilibrium_closure_stops_at_binary64_partial_resolution():
+    equilibrium = 8.7805834e-9
+    beta = 4.20421149e-7
+    pressure = 5.71281515e-8
+    molar_flow = 2.86761256e-20
+    calls = 0
+
+    def evaluate(partials, _total_pressure):
+        nonlocal calls
+        calls += 1
+        return _flux(beta * max(0.0, equilibrium - partials["Na"]))
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": equilibrium},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": beta},
+        molar_mass_kg_mol_by_species={"Na": 0.0229898},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda _pressure: molar_flow,
+        pressure_bracket_Pa=(0.0, 1.0),
+        evaluate_flux=evaluate,
+        fixed_pressure_Pa=pressure,
+        fixed_pressure_molar_flow_mol_s=molar_flow,
+    )
+
+    assert solved.converged
+    assert solved.residual_relative <= 1.0e-9
+    assert calls == 1
+
+
 def test_controlled_capacity_uses_shared_partial_solver_at_allowed_pressure():
     # At 200 Pa, a 0.25 mol/s pure 40 g/mol carrier is 36 kg/hr. With
     # beta=2e-6 kg/(s Pa) and P_eq=5 Pa, the hand balance gives p_Na=0.1923077
