@@ -453,6 +453,26 @@ class VapoRockProvider(ChemistryProvider):
                 raw_vapor,
             ) or {}
         )
+        backend_diagnostics = dict(
+            getattr(equilibrium, 'diagnostics', None) or {}
+        )
+        oxide_activity_standard_state = backend_diagnostics.get(
+            'oxide_activity_standard_state'
+        )
+        raw_oxide_activity = dict(
+            backend_diagnostics.get('oxide_activity') or {}
+        )
+        # A partial map would look complete to consumers, so reject it whole.
+        oxide_activity: dict[str, float] = {}
+        for oxide, activity in raw_oxide_activity.items():
+            if not is_finite(activity):
+                oxide_activity = {}
+                break
+            activity_value = float(activity)
+            if activity_value <= 0.0:
+                oxide_activity = {}
+                break
+            oxide_activity[str(oxide)] = activity_value
         vaporock_full_speciation_Pa: dict[str, float] = {}
         rejected_pressure_count = 0
         for species, value in raw_full_speciation.items():
@@ -465,6 +485,19 @@ class VapoRockProvider(ChemistryProvider):
             else:
                 rejected_pressure_count += 1
         vapor_pressures_Pa: dict[str, float] = {}
+        from simulator.melt_backend.vaporock import (
+            _oxide_activity_fields_for_speciation,
+        )
+
+        activity_fields = _oxide_activity_fields_for_speciation(
+            vaporock_full_speciation_Pa,
+            oxide_activity,
+            oxide_activity_standard_state,
+        )
+        oxide_activity = activity_fields.get('oxide_activity')
+        oxide_activity_standard_state = activity_fields.get(
+            'oxide_activity_standard_state'
+        )
         warnings = tuple(
             str(w) for w in (getattr(equilibrium, 'warnings', ()) or ())
         )
@@ -524,7 +557,9 @@ class VapoRockProvider(ChemistryProvider):
             **envelope_fields,
             vapor_pressures_Pa=vapor_pressures_Pa,
             vaporock_full_speciation_Pa=vaporock_full_speciation_Pa,
-            activities={},  # VapoRock has no per-oxide activity surface
+            activities={},  # Legacy species-activity field remains unused.
+            oxide_activity=oxide_activity or None,
+            oxide_activity_standard_state=oxide_activity_standard_state,
             pO2_bar=pO2_bar,
             mode=mode,
             engine_version=engine_version,
