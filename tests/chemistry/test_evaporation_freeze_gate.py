@@ -236,11 +236,38 @@ def _freeze_gate_curve_with_outcome(
         record_gate_curve_provider_outcome,
     )
 
+    curve = _freeze_gate_curve_fixture(sim, curve)
     record_gate_curve_provider_outcome(
         sim,
         outcome,
     )
     return dict(curve)
+
+
+def _freeze_gate_curve_fixture(sim, curve):
+    """Give valid fixture bounds the production builder's endpoint path."""
+    curve = dict(curve)
+    if 'path' in curve:
+        return curve
+    solidus_T_C = sim._optional_float(curve.get('solidus_T_C'))
+    liquidus_T_C = sim._optional_float(curve.get('liquidus_T_C'))
+    if solidus_T_C is None or liquidus_T_C is None:
+        return curve
+    if not (
+        math.isfinite(solidus_T_C)
+        and math.isfinite(liquidus_T_C)
+        and solidus_T_C < liquidus_T_C
+    ):
+        return curve
+    built = sim._freeze_gate_curve_from_bounds(
+        solidus_T_C=solidus_T_C,
+        liquidus_T_C=liquidus_T_C,
+        source=str(curve.get('source') or 'test'),
+        reasons=[],
+    )
+    if built is not None:
+        curve['path'] = built['path']
+    return curve
 
 
 def _configure_kernel_liquidus_authority(sim, monkeypatch):
@@ -982,6 +1009,7 @@ def _install_freeze_gate_curve(
     }
     if path is not None:
         curve['path'] = path
+    curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(
         sim,
         curve,
@@ -4113,6 +4141,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
         }
+        curve = _freeze_gate_curve_fixture(sim, curve)
         return gate_curve_memo_record(curve, None, (), 'live')
 
     monkeypatch.setattr(
@@ -4679,11 +4708,11 @@ def test_aborted_respeciation_preserves_fo2_reference_state(
         sim,
         '_freeze_gate_curve_record',
         lambda: gate_curve_memo_record(
-            {
+            _freeze_gate_curve_fixture(sim, {
                 'source': 'test_real_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1300.0,
-            },
+            }),
             None,
             (),
             'live',
@@ -4817,17 +4846,17 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
         nonlocal curve_calls
         curve_calls += 1
         if curve_calls == 1:
-            curve = {
+            curve = _freeze_gate_curve_fixture(sim, {
                 'source': 'test_invalid_curve',
                 'solidus_T_C': 1800.0,
                 'liquidus_T_C': 1700.0,
-            }
+            })
         else:
-            curve = {
+            curve = _freeze_gate_curve_fixture(sim, {
                 'source': 'test_recovered_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
-            }
+            })
         return gate_curve_memo_record(
             curve,
             None,
@@ -4865,11 +4894,11 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
     valid = sim._melt_redox_liquidus_gate_curve()
 
     assert curve_calls == 2
-    assert valid == {
+    assert valid == _freeze_gate_curve_fixture(sim, {
         'source': 'test_recovered_curve',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1700.0,
-    }
+    })
     assert sim._freeze_gate_liquid_fraction_cache['key'] == key
     assert sim._freeze_gate_liquid_fraction_cache['curve'] == valid
 
@@ -5450,12 +5479,12 @@ def test_core_gate_curve_memo_does_not_keep_r15_vetoed_live_curve(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'unavailable' if veto == 'uncacheable-status' else 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     sticky_reason = (
         'test sticky disposition'
         if veto == 'sticky-disposition'
@@ -5756,12 +5785,12 @@ def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
         _binary_path=binary,
         get_engine_version=lambda: 'fixture-runtime',
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     original_install_provenance = admission_module.install_provenance
     provenance_calls = []
 
@@ -6598,12 +6627,12 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -6644,11 +6673,11 @@ def test_core_gate_curve_memo_rejects_foreign_pid_or_configuration(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'unit-test',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     if foreign_member == 'pid':
@@ -6690,11 +6719,11 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'unit-test',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     if foreign_member == 'pid':
@@ -6943,12 +6972,12 @@ def test_replay_gate_curve_is_not_written_to_core_memo(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -6978,12 +7007,12 @@ def test_replay_gate_curve_is_not_pinned_as_tick_authority(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -7379,11 +7408,11 @@ def test_fallback_diagnostic_log_survives_recovered_last_value(
         if curve_calls == 1:
             raise ProviderUnavailableError('durable diagnostic test failure')
         return gate_curve_memo_record(
-            {
+            _freeze_gate_curve_fixture(sim, {
                 'source': 'test_recovered_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
-            },
+            }),
             None,
             (),
             'live',
