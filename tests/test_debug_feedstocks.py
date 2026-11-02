@@ -396,6 +396,31 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     sim.atom_ledger.assert_balanced()
 
 
+def test_c2a_debug_na2o_run_captures_na_product(monkeypatch):
+    monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _setpoints(),
+        load_visible_feedstocks(),
+        yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text()),
+    )
+    sim.load_batch("debug_pure_na2o", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1650.0
+    sim.step()
+
+    product_na = sim.product_ledger().get("Na", 0.0)
+    captured_na = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Na", 0.0)
+    assert product_na > 0.0
+    assert captured_na > 0.0
+    assert sim.train.stages[4].collected_kg["Na"] > 0.0
+    sim.atom_ledger.assert_balanced()
+
+
 def test_c5_step_noops_when_c5_disabled(monkeypatch):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
     backend = InternalAnalyticalBackend()
