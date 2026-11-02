@@ -15653,6 +15653,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
+        self._solved_headspace_partials_Pa_this_tick = None
         capacity_result = None
         if evaporation_campaign:
             if (
@@ -15888,6 +15889,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.species_formula_registry,
             )
         )
+        solved_headspace_partials_Pa = getattr(
+            self, '_solved_headspace_partials_Pa_this_tick', None
+        )
+        if isinstance(solved_headspace_partials_Pa, Mapping):
+            solved_headspace_partials_mbar = {
+                str(species): max(0.0, float(partial_Pa)) / 100.0
+                for species, partial_Pa in solved_headspace_partials_Pa.items()
+            }
+            self._melt_headspace_composition_mbar.update(
+                solved_headspace_partials_mbar
+            )
+            self.overhead.composition.update(solved_headspace_partials_mbar)
+            self.overhead.pressure_mbar = max(
+                self.overhead.pressure_mbar,
+                sum(solved_headspace_partials_mbar.values()),
+            )
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0

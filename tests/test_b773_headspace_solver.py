@@ -88,6 +88,71 @@ def test_zero_pipe_removal_reaches_equilibrium_with_zero_net_source():
     assert solved.flux.species_kg_hr["Na"] == pytest.approx(0.0)
 
 
+def test_controlled_capacity_closed_form_has_zero_and_large_capacity_limits():
+    model = OverheadGasModel()
+    beta = 1.0e-6  # kg/(s Pa)
+    equilibrium = 10.0  # Pa
+    species_mass = 0.02298976928  # kg/mol — exact existing Na composition mass
+    common = {
+        "allowed_pressure_Pa": 100.0,
+        "beta_kg_s_Pa_by_species": {"Na": beta},
+        "equilibrium_Pa_by_species": {"Na": equilibrium},
+        "molar_mass_kg_mol_by_species": {"Na": species_mass},
+        "species_kg_for_M_avg": {"Na": 1.0},
+    }
+
+    zero_capacity, mixture_mass, used_fallback = (
+        model._controlled_capacity_partials_Pa(
+            effective_capacity_kg_hr=0.0,
+            **common,
+        )
+    )
+    assert not used_fallback
+    assert mixture_mass == pytest.approx(species_mass)
+    assert zero_capacity["Na"] == pytest.approx(equilibrium)
+    assert beta * (equilibrium - zero_capacity["Na"]) == pytest.approx(0.0)
+
+    large_capacity, _, _ = model._controlled_capacity_partials_Pa(
+        effective_capacity_kg_hr=1.0e12,
+        **common,
+    )
+    assert large_capacity["Na"] < equilibrium * 1.0e-8
+    assert beta * (equilibrium - large_capacity["Na"]) == pytest.approx(
+        beta * equilibrium,
+        rel=1.0e-8,
+    )
+
+
+def test_controlled_capacity_closed_form_uses_species_molar_mass_basis():
+    model = OverheadGasModel()
+    beta = 2.0e-6  # kg/(s Pa)
+    equilibrium = 5.0  # Pa
+    capacity_kg_hr = 36.0
+    allowed_pressure = 200.0  # Pa
+    species_mass = 0.02298976928  # kg/mol — exact existing Na composition mass
+    mixture_mass = species_mass
+    molar_capacity = capacity_kg_hr / 3600.0 / mixture_mass
+    removal_per_partial = species_mass * molar_capacity / allowed_pressure
+    expected = beta * equilibrium / (beta + removal_per_partial)
+
+    partials, reported_mixture_mass, used_fallback = (
+        model._controlled_capacity_partials_Pa(
+            allowed_pressure_Pa=allowed_pressure,
+            effective_capacity_kg_hr=capacity_kg_hr,
+            beta_kg_s_Pa_by_species={"Na": beta},
+            equilibrium_Pa_by_species={"Na": equilibrium},
+            molar_mass_kg_mol_by_species={"Na": species_mass},
+            species_kg_for_M_avg={"Na": 1.0},
+        )
+    )
+    assert not used_fallback
+    assert reported_mixture_mass == pytest.approx(mixture_mass)
+    assert partials["Na"] == pytest.approx(expected)
+    assert beta * (equilibrium - partials["Na"]) == pytest.approx(
+        removal_per_partial * partials["Na"]
+    )
+
+
 @pytest.mark.parametrize("beta", [1.0e-8, 1.0e-6, 1.0e-4])
 def test_large_pipe_conductance_approaches_zero_partial_and_free_source(beta):
     equilibrium = 2.0

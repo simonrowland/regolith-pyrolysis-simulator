@@ -813,6 +813,7 @@ class EvaporationMixin:
                 | set(getattr(self, '_melt_headspace_composition_mbar', {}) or {})
             )
         }
+        self._solved_headspace_partials_Pa_this_tick = None
         controls, _molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=base_partials_Pa,
@@ -855,6 +856,7 @@ class EvaporationMixin:
             )
         )
         writer_detail: dict[str, Any] = {}
+        candidate_partials_for_writer_Pa = dict(base_partials_Pa)
 
         def project_inventory_limited_flux(
             raw_flux: EvaporationFlux,
@@ -883,6 +885,13 @@ class EvaporationMixin:
             return projected
 
         def evaluate_flux(partials_Pa: Mapping[str, float]) -> EvaporationFlux:
+            candidate_partials_for_writer_Pa.clear()
+            candidate_partials_for_writer_Pa.update(
+                {
+                    str(species): max(0.0, float(value))
+                    for species, value in partials_Pa.items()
+                }
+            )
             return self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
@@ -890,6 +899,7 @@ class EvaporationMixin:
             )
 
         def write_partials(raw_flux: EvaporationFlux) -> Mapping[str, float]:
+            writer_detail.pop('capacity_carrier_free_fallback', None)
             committed_flux = project_inventory_limited_flux(raw_flux)
             inlet_flux = self._subsolidus_transport_inlet_flux(committed_flux)
             effective_capacity = self._controlled_o2_transport_capacity(
@@ -905,6 +915,10 @@ class EvaporationMixin:
                 effective_transport_capacity=effective_capacity,
             )
             if effective_capacity is not None:
+                allowed_pressure_Pa = max(
+                    1.0,
+                    float(effective_capacity.upstream_pressure_bar) * 1.0e5,
+                )  # Pa — the same allowed upstream pressure used by the writer
                 writer_detail.update({
                     'capacity_binding_cause': effective_capacity.binding_cause,
                     'pipe_capacity_kg_hr': effective_capacity.pipe_capacity_kg_hr,
@@ -913,6 +927,14 @@ class EvaporationMixin:
                     ),
                     'writer_path': (
                         'controlled_capacity_allowed_upstream_pressure'
+                    ),
+                    'capacity_allowed_pressure_Pa': allowed_pressure_Pa,
+                    'P_allowed_Pa': allowed_pressure_Pa,
+                    'C_kg_s': (
+                        effective_capacity.effective_capacity_kg_hr / 3600.0
+                    ),
+                    'capacity_molar_mass_basis': (
+                        'species_kg_for_M_avg; held-gas molar mass is undefined'
                     ),
                 })
             elif float(transport_state['conductance_kg_s']) <= 0.0:
@@ -930,6 +952,105 @@ class EvaporationMixin:
                 transport_state['vapor_pressure_mbar'],
                 self.species_formula_registry,
             )
+            if effective_capacity is not None:
+                current_candidate = dict(candidate_partials_for_writer_Pa)
+                beta_by_species: dict[str, float] = {}
+                for species, equilibrium_Pa in participants.items():
+                    candidate_Pa = max(
+                        0.0,
+                        float(current_candidate.get(species, 0.0)),
+                    )
+                    driving_pressure_Pa = max(
+                        0.0,
+                        float(equilibrium_Pa) - candidate_Pa,
+                    )
+                    rate_kg_s = max(
+                        0.0,
+                        float(committed_flux.species_kg_hr.get(species, 0.0)),
+                    ) / 3600.0
+                    if driving_pressure_Pa > max(
+                        1.0e-14, float(equilibrium_Pa) * 1.0e-14
+                    ):
+                        beta_by_species[species] = (
+                            rate_kg_s / driving_pressure_Pa
+                        )
+                    else:
+                        # At P_eq the committed rate is zero, so recover the
+                        # local series slope with a read-only zero-partial
+                        # probe while keeping all other species at this hour's
+                        # candidate. Inventory and freeze projections are
+                        # reapplied to the probe before using its rate.
+                        probe_partials = dict(current_candidate)
+                        probe_partials[species] = 0.0
+                        probe_flux = project_inventory_limited_flux(
+                            evaluate_flux(probe_partials)
+                        )
+                        candidate_partials_for_writer_Pa.clear()
+                        candidate_partials_for_writer_Pa.update(
+                            current_candidate
+                        )
+                        beta_by_species[species] = (
+                            max(
+                                0.0,
+                                float(
+                                    probe_flux.species_kg_hr.get(species, 0.0)
+                                ),
+                            )
+                            / 3600.0
+                            / max(float(equilibrium_Pa), 1.0e-300)
+                        )
+                capacity_partials_Pa, mixture_molar_mass, used_molar_mass_fallback = (
+                    self.overhead_model._controlled_capacity_partials_Pa(
+                        allowed_pressure_Pa=allowed_pressure_Pa,
+                        effective_capacity_kg_hr=(
+                            effective_capacity.effective_capacity_kg_hr
+                        ),
+                        beta_kg_s_Pa_by_species=beta_by_species,
+                        equilibrium_Pa_by_species=participants,
+                        molar_mass_kg_mol_by_species=_molar_masses,
+                        species_kg_for_M_avg=inlet_flux.species_kg_hr,
+                    )
+                )
+                writer_detail.update({
+                    'capacity_mixture_molar_mass_kg_mol': mixture_molar_mass,
+                    'capacity_molar_mass_fallback_used': (
+                        used_molar_mass_fallback
+                    ),
+                })
+                if sum(capacity_partials_Pa.values()) > allowed_pressure_Pa:
+                    # The requested vapour partials leave no room for the
+                    # held gas at P_allowed. Use the existing carrier-free
+                    # Poiseuille inversion for this hour and expose the
+                    # boundary change in its notice.
+                    carrier_free_state = self.overhead_model.estimate_transport_state(
+                        inlet_flux,
+                        self.melt,
+                        p_downstream_bar=downstream_pressure_bar,
+                    )
+                    carrier_free_partials = (
+                        self.overhead_model.species_partial_pressures(
+                            inlet_flux,
+                            carrier_free_state['vapor_pressure_mbar'],
+                            self.species_formula_registry,
+                        )
+                    )
+                    writer_detail['capacity_carrier_free_fallback'] = {
+                        'reason': 'vapour_partials_exceed_allowed_pressure',
+                        'vapour_partial_sum_Pa': sum(
+                            capacity_partials_Pa.values()
+                        ),
+                        'capacity_allowed_pressure_Pa': allowed_pressure_Pa,
+                        'writer_path': (
+                            'carrier_free_poiseuille_inversion_after_capacity'
+                        ),
+                    }
+                    return {
+                        species: float(partial_mbar) * 100.0
+                        for species, partial_mbar in carrier_free_partials.items()
+                    }
+                solved_partials_Pa = dict(base_partials_Pa)
+                solved_partials_Pa.update(capacity_partials_Pa)
+                return solved_partials_Pa
             return {
                 species: float(partial_mbar) * 100.0
                 for species, partial_mbar in partials_mbar.items()
@@ -972,11 +1093,19 @@ class EvaporationMixin:
             relative_tolerance=1.0e-9,
             max_iterations=80,
         )
-        selected_flux = evaluate_flux({
+        selected_partials_Pa = {
             **fixed_partials_Pa,
             **solved.candidate_partials_Pa,
-        })
-        write_partials(selected_flux)
+        }
+        selected_flux = evaluate_flux(selected_partials_Pa)
+        solved_writer_partials_Pa = write_partials(selected_flux)
+        self._solved_headspace_partials_Pa_this_tick = dict(
+            solved_writer_partials_Pa
+        )
+        # A capacity-path endpoint probe is also a read-only flux evaluation.
+        # Restore the diagnostic to the selected current-hour partials before
+        # publishing it with the committed flux.
+        selected_flux = evaluate_flux(selected_partials_Pa)
         diagnostic = dict(
             getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
         )
