@@ -1,0 +1,159 @@
+source_id: kohsaka-1979-na2o-sio2-emf
+source:
+  citation: Kohsaka, Shoji; Sato, Seichi; Yokokawa, Toshio (1979), “E.m.f. measurements of molten oxide mixtures III. Sodium
+    oxide + silicon dioxide,” Journal of Chemical Thermodynamics 11, 547–551.
+extraction:
+  method: Compare-only column mapping. Table 1 values are EMF in columns 3, 5, 7, 9, 11, and 13; Table 2 values are ΔG, ΔS,
+    and ΔH in columns 2–4.
+tables:
+- page: 3
+  table_index: 1
+  type: activity_coefficient
+  quantity: electromotive_force_as_published
+  unit: mV
+  evidence_class: measured_direct
+  values:
+  - column: 3
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  - column: 5
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  - column: 7
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  - column: 9
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  - column: 11
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  - column: 13
+    species: Na2O
+    quantity: electromotive_force_as_published
+    unit: mV
+    evidence_class: measured_direct
+  render_verified: []
+- page: 3
+  table_index: 2
+  type: gibbs_table
+  quantity: relative_partial_molar_gibbs_energy_as_published
+  unit: kJ/mol
+  evidence_class: measured_reduced
+  values:
+  - column: 2
+    species: Na2O
+    quantity: relative_partial_molar_gibbs_energy_as_published
+    unit: kJ/mol
+    evidence_class: measured_reduced
+  - column: 3
+    species: Na2O
+    quantity: relative_partial_molar_entropy_as_published
+    unit: J/(mol K)
+    evidence_class: measured_reduced
+  - column: 4
+    species: Na2O
+    quantity: partial_molar_enthalpy
+    unit: kJ/mol
+    evidence_class: measured_reduced
+  render_verified:
+  - row: 2
+    column: 2
+    text: −60.00 ± 0.79ᵃ
+  - row: 2
+    column: 3
+    text: 88.7 ± 7.5
+  - row: 2
+    column: 4
+    text: 68.2 ± 10.5
+  - row: 3
+    column: 2
+    text: −47.03 ± 0.46
+  - row: 3
+    column: 3
+    text: 26.4 ± 6.3
+  - row: 3
+    column: 4
+    text: −8.6 ± 9.2
+  - row: 4
+    column: 2
+    text: −41.36 ± 0.04
+  - row: 4
+    column: 3
+    text: 16.7 ± 1.3
+  - row: 4
+    column: 4
+    text: −17.2 ± 1.3
+  - row: 5
+    column: 2
+    text: −31.00 ± 0.21
+  - row: 5
+    column: 3
+    text: 3.8 ± 3.8
+  - row: 5
+    column: 4
+    text: −25.1 ± 5.0
+  - row: 6
+    column: 2
+    text: −25.36 ± 0.21
+  - row: 6
+    column: 3
+    text: 4.6 ± 0.04
+  - row: 6
+    column: 4
+    text: −18.4 ± 0.04
+  - row: 7
+    column: 2
+    text: −20.25 ± 0.13
+  - row: 7
+    column: 3
+    text: −2.5 ± 1.3
+  - row: 7
+    column: 4
+    text: −23.8 ± 2.1
+  - row: 8
+    column: 2
+    text: 0
+  - row: 8
+    column: 3
+    text: 0
+  - row: 8
+    column: 4
+    text: 0
+  - row: 9
+    column: 2
+    text: 25.19 ± 0.38
+  - row: 9
+    column: 3
+    text: 15.1 ± 3.3
+  - row: 9
+    column: 4
+    text: 46.9 ± 5.9
+  - row: 10
+    column: 2
+    text: 40.88 ± 0.59
+  - row: 10
+    column: 3
+    text: −2.1 ± 6.3
+  - row: 10
+    column: 4
+    text: 38.1 ± 8.8
+  - row: 11
+    column: 2
+    text: 47.95 ± 0.29
+  - row: 11
+    column: 3
+    text: −8.8 ± 2.9
+  - row: 11
+    column: 4
+    text: 35.7 ± 4.2
