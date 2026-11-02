@@ -1128,20 +1128,27 @@ def normalized_composition(
             if basis_notice:
                 notice = f"{notice}; {basis_notice}" if notice else basis_notice
             route_name = ("observation_" if use_point_composition else "") + "normalized_" + field
-            routes.append(Waypoint("normalized_composition",
-                {species: n / total for species, n in amounts.items()},
-                route_name,
-                WaypointAuthority.DERIVED, (path,), notice=notice,
-                inference=basis_inference))
-            if field == "printed_composition":
-                printed_basis_exempt = set(basis_exempt)
             # Rank source evidence before normalization makes every output DERIVED.
             # Evidence directness: a printed x_i outranks a printed molar inventory,
             # which outranks a wt%-to-moles derivation (external molar-mass table).
             directness = 2 if as_moles else 0
             if field == "initial_composition":
                 directness = 2 if raw.amount_basis is AmountBasis.MOLE_FRACTION else 1
-            evidence_ranks.append((not bool(located.inference), directness))
+            if field != "printed_composition" or not printed_mass_percent_refused:
+                routes.append(
+                    Waypoint(
+                        "normalized_composition",
+                        {species: n / total for species, n in amounts.items()},
+                        route_name,
+                        WaypointAuthority.DERIVED,
+                        (path,),
+                        notice=notice,
+                        inference=basis_inference,
+                    )
+                )
+                evidence_ranks.append((not bool(located.inference), directness))
+            if field == "printed_composition":
+                printed_basis_exempt = set(basis_exempt)
         except UnknownCompositionRelationError:
             unsupported = True
             missing.append(f"{path} (unknown relation: {located.inference.relation})")

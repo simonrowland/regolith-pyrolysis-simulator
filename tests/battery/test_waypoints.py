@@ -1108,6 +1108,42 @@ def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes()
     assert independent_result.selected.value == independent.state.value.as_map()
 
 
+def test_b704_refused_printed_map_cannot_fall_through_to_engine_route() -> None:
+    base = factories.kems_experiment()
+
+    def experiment_with_printed(components: list[tuple[str, str]]):
+        return replace(
+            base,
+            sample=replace(
+                base.sample,
+                initial_composition=None,
+                printed_composition=factories.located(
+                    {
+                        "amount_basis": AmountBasis.MASS_PERCENT.value,
+                        "components": [[name, amount] for name, amount in components],
+                    }
+                ),
+            ),
+        )
+
+    accepted = normalized_composition(
+        experiment_with_printed([("SiO2", "49.5"), ("MgO", "50"), ("Cl", "0.5")]),
+        _bench(),
+    )
+    assert accepted.selected is not None
+    assert accepted.selected.route == "normalized_printed_composition"
+
+    for components in (
+        [("SiO2", "49.4"), ("MgO", "50"), ("Cl", "0.6")],
+        [("SiO2", "48.4"), ("MgO", "50"), ("Cl", "0.6")],
+    ):
+        refused = normalized_composition(experiment_with_printed(components), _bench())
+        assert refused.selected is None
+        assert refused.routes == ()
+        assert refused.absence is not None
+        assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
 def test_b704_waypoint_guard_normalizes_wt_suffix_before_closure() -> None:
     base = factories.kems_experiment()
     experiment = replace(
