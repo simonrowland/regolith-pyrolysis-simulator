@@ -1996,6 +1996,12 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
+    assert actual["status"] == "ok"
+    assert actual["melt_redox_gate_floor_fallback_engagement"] == {
+        "engaged": False,
+        "total_count": 0,
+        "by_hour": [],
+    }
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate all canonical scenarios via "

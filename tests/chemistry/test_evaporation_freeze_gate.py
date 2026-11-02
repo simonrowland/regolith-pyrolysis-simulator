@@ -2519,18 +2519,100 @@ def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
     )
 
 
-def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+@pytest.mark.parametrize(
+    'curve, malformed_fields',
+    [
+        (
+            {
+                'source': 'test',
+                'liquidus_T_C': 1300.0,
+                'path': ((1000.0, 0.0), (1300.0, 1.0)),
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': 'not-a-temperature',
+                'liquidus_T_C': 1300.0,
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': math.inf,
+                'liquidus_T_C': 1300.0,
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': 1800.0,
+                'liquidus_T_C': 1700.0,
+            },
+            ['solidus_T_C', 'liquidus_T_C'],
+        ),
+    ],
+    ids=(
+        'missing-solidus',
+        'nonnumeric-solidus',
+        'nonfinite-solidus',
+        'inverted-bounds',
+    ),
+)
+def test_malformed_provider_liquidus_curve_refuses_for_current_hour(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    curve,
+    malformed_fields,
 ):
-    """Interpolation KeyError/TypeError/ValueError must not assert solid.
+    """Invalid provider bounds are refused instead of inventing liquid."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    record = gate_curve_memo_record(
+        curve,
+        None,
+        (),
+        'live',
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        lambda **_kwargs: record,
+    )
 
-    FALSIFIABILITY: restore `return 0.0` on the mapping-curve exception
-    path in `_melt_redox_liquid_fraction_factor` and this goes red —
-    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
-    """
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert error.value.reason == 'liquid_fraction_provider_invalid_curve'
+    diagnostic = error.value.diagnostic
+    assert diagnostic['provider'] == sim._liquid_fraction_provider
+    assert diagnostic['malformed_fields'] == malformed_fields
+    assert diagnostic['hour'] == sim.melt.hour
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize(
+    'error',
+    [KeyError('path'), ValueError('invalid path value')],
+    ids=('missing-path-field', 'nonnumeric-path-value'),
+)
+def test_unreadable_mapping_curve_refuses_without_granting_floor(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    error,
+):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -2543,7 +2625,7 @@ def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     )
 
     def unreadable_curve(*_args, **_kwargs):
-        raise KeyError('freeze-gate path')
+        raise error
 
     monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', unreadable_curve)
     monkeypatch.setattr(
@@ -2551,41 +2633,59 @@ def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     )
 
     T_K = 1500.0 + 273.15
-    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
-    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
-    assert diagnostic['status'] == 'invalid'
-    assert diagnostic['source'] == 'none:invalid_liquid_fraction_curve'
-    assert 'freeze-gate path' in diagnostic['reason']
-    assert 'liquidus_status' not in diagnostic
-    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
-        fO2_log=-9.0,
-        T_K=T_K,
-    ) == 12.0
-    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
-    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
-    assert fallback['liquidus_status'] == 'invalid'
-    assert fallback['source'] == 'none:invalid_liquid_fraction_curve'
-    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
-        'invalid'
+    with pytest.raises(EvaporationFluxRefusal) as error_info:
+        sim._melt_redox_liquid_fraction_factor(T_K)
+
+    assert error_info.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert error_info.value.diagnostic['provider'] == (
+        sim._liquid_fraction_provider
     )
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
-        'none:invalid_liquid_fraction_curve'
-    )
+    assert error_info.value.diagnostic['malformed_fields'] == ['path']
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=-9.0,
+            T_K=T_K,
+        )
 
 
-def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+def test_nonfinite_interpolated_liquid_fraction_refuses_without_floor_grant(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
-    """A NaN/Inf interpolated fraction is unusable data, not a solidus.
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=((1000.0, 0.0), (1300.0, 1.0)),
+    )
+    monkeypatch.setattr(
+        sim,
+        '_interpolate_freeze_gate_curve',
+        lambda *_args, **_kwargs: float('nan'),
+    )
 
-    FALSIFIABILITY: restore `return 0.0` on the mapping-curve non-finite
-    path in `_melt_redox_liquid_fraction_factor` and this goes red —
-    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
-    """
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert error.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert error.value.diagnostic['provider'] == sim._liquid_fraction_provider
+    assert error.value.diagnostic['malformed_fields'] == ['liquid_fraction']
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+def test_typeerror_from_liquid_fraction_interpolation_propagates(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -2597,44 +2697,13 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
         path=((1000.0, 0.0), (1300.0, 1.0)),
     )
 
-    monkeypatch.setattr(
-        sim,
-        '_interpolate_freeze_gate_curve',
-        lambda *_args, **_kwargs: float('nan'),
-    )
-    monkeypatch.setattr(
-        sim, '_melt_redox_capacity_mol_per_ln_fO2', lambda **_kwargs: 12.0
-    )
+    def programming_error(*_args, **_kwargs):
+        raise TypeError('interpolation programming error')
 
-    T_K = 1500.0 + 273.15
-    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
-    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
-    assert diagnostic['status'] == 'invalid'
-    assert diagnostic['source'] == 'none:nonfinite_liquid_fraction'
-    assert math.isnan(diagnostic['liquid_fraction'])
-    assert 'liquidus_status' not in diagnostic
-    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
-        fO2_log=-9.0,
-        T_K=T_K,
-    ) == 12.0
-    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
-    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
-    assert fallback['liquidus_status'] == 'invalid'
-    assert fallback['source'] == 'none:nonfinite_liquid_fraction'
-    assert fallback['repair_notice'] == {
-        'kind': 'kress_liquidus_floor_repair',
-        'repaired': 'unusable liquidus bounds or interpolation',
-        'reason': 'non-finite liquid_fraction=nan',
-        'replacement': 'deterministic Kress91 liquidus floor',
-        'floor_T_C': 1200.0,
-    }
-    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
-        'invalid'
-    )
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
-        'none:nonfinite_liquid_fraction'
-    )
+    monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', programming_error)
+
+    with pytest.raises(TypeError, match='interpolation programming error'):
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
 
 
 def test_typed_thermoengine_out_of_domain_is_not_labelled_unavailable(
@@ -4699,9 +4768,17 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
 
     assert sim._freeze_gate_liquid_fraction_curve_memo == {}
 
-    invalid = sim._melt_redox_liquidus_gate_curve()
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        sim._melt_redox_liquidus_gate_curve()
 
-    assert invalid.liquidus_status == 'invalid'
+    assert refusal.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert refusal.value.diagnostic['provider'] == (
+        sim._liquid_fraction_provider
+    )
+    assert refusal.value.diagnostic['malformed_fields'] == [
+        'solidus_T_C',
+        'liquidus_T_C',
+    ]
     assert sim._freeze_gate_liquid_fraction_cache is None
 
     valid = sim._melt_redox_liquidus_gate_curve()
