@@ -185,3 +185,38 @@ def test_binding_c0_pipe_cap_publishes_partials_for_final_committed_flux():
     )
 
     assert snapshot.melt_headspace_composition_mbar == pytest.approx(expected)
+
+
+def test_closed_line_runtime_publishes_equilibrium_partials_with_zero_flux(
+    monkeypatch,
+):
+    sim = _lunar_simulator()
+    monkeypatch.setattr(
+        sim,
+        "_compute_fe_redox_split_diagnostic",
+        lambda: {"ferric_frac": 0.0},
+    )
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_pipe_conductance",
+        lambda *_args, **_kwargs: 0.0,
+    )
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_pipe_molar_flow_mol_s",
+        lambda *_args, **_kwargs: 0.0,
+    )
+
+    snapshot = sim.step()
+
+    assert snapshot.evap_flux.total_kg_hr == 0.0
+    solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
+    assert solver["status"] != "not_converged"
+    equilibrium_partials = solver["candidate_partials_Pa"]
+    assert equilibrium_partials
+    for species, partial_Pa in equilibrium_partials.items():
+        assert snapshot.melt_headspace_composition_mbar[species] * 100.0 == pytest.approx(
+            partial_Pa,
+            rel=1.0e-9,
+            abs=1.0e-14,
+        )

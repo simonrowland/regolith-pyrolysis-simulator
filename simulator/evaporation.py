@@ -1133,6 +1133,7 @@ class EvaporationMixin:
         solver_residual = math.inf
         solver_iterations = 0
         solved = None
+        source_below_threshold = False
         for outer_iteration in range(16):
             current_raw_flux = (
                 free_source_raw_flux
@@ -1216,27 +1217,10 @@ class EvaporationMixin:
                 **solve_options,
             )
             committed_probe = project_inventory_limited_flux(solved.flux)
-            if not any(
+            source_below_threshold = not any(
                 float(rate) > 1.0e-12
                 for rate in committed_probe.species_kg_hr.values()
-            ):
-                diagnostic = dict(
-                    getattr(self, '_last_evaporation_flux_diagnostic', {})
-                    or {}
-                )
-                diagnostic['headspace_solver'] = {
-                    'status': 'source_below_threshold',
-                    'source_max_kg_hr': max(
-                        (
-                            float(rate)
-                            for rate in committed_probe.species_kg_hr.values()
-                        ),
-                        default=0.0,
-                    ),
-                    'oxygen_partial_frozen': True,
-                }
-                self._last_evaporation_flux_diagnostic = diagnostic
-                return EvaporationFlux()
+            )
             candidate_partials = solved.candidate_partials_Pa
             pressure_Pa = solved.total_pressure_Pa
             pressure_change = abs(pressure_Pa - previous_pressure) / max(
@@ -1251,7 +1235,7 @@ class EvaporationMixin:
                 break
 
         assert solved is not None
-        selected_flux = solved.flux
+        selected_flux = EvaporationFlux() if source_below_threshold else solved.flux
         self._solved_headspace_partials_Pa_this_tick = dict(
             solved.writer_partials_Pa
         )
@@ -1287,7 +1271,13 @@ class EvaporationMixin:
                 **writer_detail,
             })
         diagnostic['headspace_solver'] = {
-            'status': 'converged' if solver_converged else 'not_converged',
+            'status': (
+                'source_below_threshold'
+                if source_below_threshold and solver_converged
+                else 'converged'
+                if solver_converged
+                else 'not_converged'
+            ),
             'iterations': solver_iterations,
             'outer_iterations': outer_iteration + 1,
             'total_pressure_Pa': pressure_Pa,
@@ -1301,6 +1291,15 @@ class EvaporationMixin:
             ),
             'candidate_partials_Pa': dict(solved.candidate_partials_Pa),
             'writer_partials_Pa': dict(solved.writer_partials_Pa),
+            'source_max_kg_hr': max(
+                (
+                    float(rate)
+                    for rate in project_inventory_limited_flux(
+                        solved.flux
+                    ).species_kg_hr.values()
+                ),
+                default=0.0,
+            ),
             'fixed_species': sorted(set(fixed_partials_Pa) | set(fixed_flows)),
             'solved_committed_inlet_kg_hr_by_species': dict(
                 solved_inlet_flux.species_kg_hr
