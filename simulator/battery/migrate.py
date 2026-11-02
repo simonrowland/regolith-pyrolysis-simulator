@@ -5986,13 +5986,16 @@ def _located_printed_and_initial(
     )
     source_values = _source_printed_composition_values(wt, closure_context)
     printed_map = {}
+    source_keys = set(source_values)
+    normalized_key_counts = Counter(
+        normalized_name
+        for name in source_values
+        for normalized_name, has_mass_suffix in (_mass_percent_component_key(name),)
+        if has_mass_suffix and _is_engine_oxide_component(normalized_name)
+    )
     normalized_wt = {
         _mass_percent_component_key(name)[0]: amount for name, amount in wt.items()
     }
-    mass_loss_row = (
-        isinstance(closure_context, Mapping)
-        and "mass_loss_pct" in closure_context
-    )
     for name, amount in source_values.items():
         stem, has_mass_suffix = _mass_percent_component_stem(name)
         normalized_name, _ = _mass_percent_component_key(name)
@@ -6000,11 +6003,11 @@ def _located_printed_and_initial(
             name = normalized_name
             amount = normalized_wt[normalized_name]
         if (
-            not mass_loss_row
-            and state.is_value
-            and has_mass_suffix
+            has_mass_suffix
             and stem == normalized_name
             and _is_engine_oxide_component(normalized_name)
+            and normalized_key_counts[normalized_name] == 1
+            and normalized_name not in source_keys
         ):
             name = normalized_name
         printed_map[name] = amount
