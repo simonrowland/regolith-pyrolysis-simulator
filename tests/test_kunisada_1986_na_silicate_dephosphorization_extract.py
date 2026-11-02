@@ -129,7 +129,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert set(migrated) == expected_ids
     assert len(migrated) == 278
     assert len(migrator.result.validation.hard_issues) == 0
-    assert len(migrator.result.validation.issues) == 440
+    assert len(migrator.result.validation.issues) == 634
     assert {issue.reason.value for issue in migrator.result.validation.issues} == {
         "identity_incomplete"
     }
@@ -154,6 +154,10 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         and row.identity.species.phase.value is Phase.L
         for row in migrated.values()
     )
+    experiments = {
+        experiment["experiment_id"]: experiment
+        for experiment in document["experiments"]
+    }
 
     for observation_id, (_formula, source_row) in source_rows.items():
         source_conditions = source_row["point_conditions"]
@@ -186,8 +190,42 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         and row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ]
     assert len(phase_rows) == 202
-    assert all(row.identity.composition.is_value for row in phase_rows)
-    assert all(row.point_conditions["composition"].state.is_value for row in phase_rows)
+    closed_experiment = "kunisada-1986-na2co3-flux-i"
+    expected_closed_rows = {
+        f"{SOURCE_ID}::{observation_id}"
+        for observation_id, (_formula, source_row) in source_rows.items()
+        if source_row.get("experiment") == closed_experiment
+        and source_row.get("values", {}).get("quantity")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    }
+    assert len(expected_closed_rows) == 8
+    assert {
+        row.observation_id
+        for row in phase_rows
+        if row.identity.composition.is_value
+    } == expected_closed_rows
+    for row in phase_rows:
+        source_row = source_rows[row.observation_id.split("::", 1)[1]][1]
+        source_experiment = experiments[source_row["experiment"]]
+        printed = source_experiment["sample"]["printed_composition"]["state"]["value"]
+        printed_components = (
+            printed.get("components", ()) if isinstance(printed, dict) else printed
+        )
+        printed_sum = sum(
+            (Decimal(amount) for _name, amount in printed_components), Decimal("0")
+        )
+        point_composition = row.point_conditions["composition"].state
+        if row.observation_id in expected_closed_rows:
+            assert row.identity.composition.is_value
+            assert point_composition.is_value
+            assert printed_sum == Decimal("95.04")
+        else:
+            assert row.identity.composition.is_unknown
+            assert point_composition.is_unknown
+            reason = row.identity.composition.reason or ""
+            assert "partial analysis" in reason or "accepted kept-sum limit" in reason
+            assert f"{printed_sum} wt%" in reason
+            assert "unsupported component(s)" not in reason
 
     contexts = [
         context
@@ -294,7 +332,11 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         assert row.identity.species.phase.value is Phase.L
         assert row.identity.phase_role.value is phase_role
         assert row.identity.temperature_K.is_value
-        assert row.identity.composition.is_value
+        if observation_id == "kunisada_1986_t1ii_e_equilibrium_P_in_liquid_iron":
+            assert row.identity.composition.is_unknown
+            assert "sum=102.15 wt% is above 102 wt%" in row.identity.composition.reason
+        else:
+            assert row.identity.composition.is_value
         assert row.locator.page == page
         assert row.locator.table == table
         assert row.locator.note is not None or row.locator.table == "2"
@@ -320,10 +362,6 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         row["values"].get("admission_status") == "admitted"
         for row in t1i_rows.values()
     ) == 162
-    experiments = {
-        experiment["experiment_id"]: experiment
-        for experiment in document["experiments"]
-    }
     for observation_id, source_row in t1i_rows.items():
         source_experiment = experiments[source_row["experiment"]]
         migrated_row = migrated[f"{SOURCE_ID}::{observation_id}"]
@@ -334,9 +372,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         )
         if source_row["values"].get("admission_status") == "admitted":
             sample_composition = source_experiment["sample"]["printed_composition"]
-            expected_composition = sample_composition["state"]["value"]
             point_composition = migrated_row.point_conditions["composition"]
-            assert point_composition.state.is_value
             assert point_composition.locator is not None
             assert point_composition.locator.table == "1(I)"
             assert point_composition.locator.note == sample_composition[
@@ -345,14 +381,17 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert source_row["locator"]["row_label"] in (
                 point_composition.locator.note
             )
-            assert migrated_row.identity.composition.is_value
-            actual_composition = dict(
-                migrated_row.identity.composition.value.components
+            expected_sum = sum(
+                (
+                    Decimal(amount)
+                    for _name, amount in sample_composition["state"]["value"].items()
+                ),
+                Decimal("0"),
             )
-            assert set(actual_composition) == set(expected_composition)
-            assert all(
-                actual_composition[component] == Decimal(amount)
-                for component, amount in expected_composition.items()
+            assert point_composition.state.is_unknown
+            assert migrated_row.identity.composition.is_unknown
+            assert f"kept sum={expected_sum} wt% is below 95 wt%" in (
+                point_composition.state.reason or ""
             )
 
     table1_total_iron_rows = [
@@ -367,7 +406,14 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         assert row["values"].get("formula", "Fe") == "Fe"
         migrated_row = migrated[f"{SOURCE_ID}::{row['observation_id']}"]
         assert migrated_row.identity.species.formula == "Fe"
-        assert "T.Fe" in dict(migrated_row.identity.composition.value.components)
+        if row["experiment"] == closed_experiment:
+            assert migrated_row.identity.composition.is_value
+            assert "T.Fe" in dict(migrated_row.identity.composition.value.components)
+        else:
+            assert migrated_row.identity.composition.is_unknown
+            reason = migrated_row.identity.composition.reason or ""
+            assert "partial analysis" in reason or "accepted kept-sum limit" in reason
+            assert "unsupported component(s)" not in reason
 
     table2_total_iron_rows = [
         row
