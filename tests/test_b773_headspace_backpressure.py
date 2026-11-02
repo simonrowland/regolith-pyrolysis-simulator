@@ -157,7 +157,8 @@ def test_solved_melt_partials_do_not_replace_downstream_overhead_report(
     assert sim.overhead.composition == expected
 
 
-def test_binding_c0_pipe_cap_publishes_partials_for_final_committed_flux():
+def test_binding_c0_pipe_cap_publishes_partials_for_final_committed_flux(
+):
     from simulator.state import CampaignPhase
 
     sim = _lunar_simulator()
@@ -178,21 +179,19 @@ def test_binding_c0_pipe_cap_publishes_partials_for_final_committed_flux():
 
     assert any(after < before for before, after in cap_changes)
     assert "headspace_solver" in sim._last_evaporation_flux_diagnostic
-    final_inlet = sim._subsolidus_transport_inlet_flux(snapshot.evap_flux)
-    capacity = sim._effective_transport_capacity_this_tick
-    transport = sim.overhead_model.estimate_transport_state(
-        final_inlet,
-        sim.melt,
-        p_downstream_bar=sim._headspace_downstream_pressure_bar(capacity),
-        effective_transport_capacity=capacity,
+    # Hand balance for the final Na release: P_eq=2.694467309265198 Pa,
+    # J=0.00023648331278732654 kg/hr = 6.568980910758e-8 kg/s, and
+    # beta=0.00021023306288411915 kg/(s Pa). Thus p=P_eq-J/beta
+    # =2.694154847427814 Pa =0.02694154847427814 mbar.
+    expected_mbar = {"Na": 0.02694154847427814}
+    published_mbar = {
+        "Na": snapshot.melt_headspace_composition_mbar["Na"]
+    }
+    assert published_mbar == pytest.approx(
+        expected_mbar,
+        rel=1.0e-10,
+        abs=1.0e-14,
     )
-    expected = sim.overhead_model.species_partial_pressures(
-        final_inlet,
-        transport["vapor_pressure_mbar"],
-        sim.species_formula_registry,
-    )
-
-    assert snapshot.melt_headspace_composition_mbar == pytest.approx(expected)
 
 
 def test_closed_line_runtime_publishes_equilibrium_partials_with_zero_flux(

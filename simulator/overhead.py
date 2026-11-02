@@ -196,6 +196,37 @@ def _headspace_partials_at_pressure_Pa(
     return partials
 
 
+def _headspace_partials_from_committed_flux_Pa(
+    committed_flux_kg_hr: Mapping[str, float],
+    *,
+    equilibrium_Pa: Mapping[str, float],
+    beta_kg_s_Pa_by_species: Mapping[str, float],
+) -> tuple[dict[str, float], tuple[str, ...]]:
+    """Project source partials from the flux that actually committed."""
+    partials: dict[str, float] = {}
+    clamped_species: list[str] = []
+    for species, raw_equilibrium in equilibrium_Pa.items():
+        key = str(species)
+        equilibrium = max(0.0, float(raw_equilibrium))
+        beta = float(beta_kg_s_Pa_by_species[key])
+        committed_kg_s = max(
+            0.0,
+            float(committed_flux_kg_hr.get(key, 0.0)),
+        ) / 3600.0
+        # Premise: the hour's source balance is beta_i*(P_eq,i-p_i)=J_i,
+        # where J_i is the committed (post-cap) source. Rearranging gives
+        # p_i=P_eq,i-J_i/beta_i. J [kg/s] divided by beta [kg/(s Pa)] is Pa.
+        # J=0 returns P_eq; an uncapped J from the solved source returns the
+        # solved partial. A negative result has no physical partial, so clamp
+        # it at zero and return the species as a diagnostic flag.
+        partial = equilibrium - committed_kg_s / beta
+        if partial < 0.0:
+            clamped_species.append(key)
+            partial = 0.0
+        partials[key] = partial
+    return partials, tuple(clamped_species)
+
+
 def solve_quasi_steady_headspace_partials_Pa(
     *,
     equilibrium_Pa: Mapping[str, float],

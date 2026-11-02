@@ -1245,6 +1245,8 @@ class EvaporationMixin:
             'solved_committed_inlet_kg_hr_by_species': dict(
                 solved_inlet_flux.species_kg_hr
             ),
+            'equilibrium_Pa': dict(participants),
+            'beta_kg_s_Pa_by_species': dict(beta_by_species),
             'oxygen_partial_frozen': True,
             'writer_path': dict(writer_detail),
         }

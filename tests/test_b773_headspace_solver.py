@@ -4,6 +4,7 @@ import pytest
 
 from simulator.overhead import (
     OverheadGasModel,
+    _headspace_partials_from_committed_flux_Pa,
     _headspace_partials_at_pressure_Pa,
     solve_quasi_steady_headspace_partials_Pa,
 )
@@ -101,6 +102,17 @@ def test_zero_pipe_removal_reaches_equilibrium_with_zero_net_source():
     assert solved.converged
     assert solved.partials_Pa["Na"] == pytest.approx(equilibrium)
     assert solved.flux.species_kg_hr["Na"] == pytest.approx(0.0)
+
+
+def test_committed_source_partial_clamps_and_flags_negative_pressure():
+    partials, clamped = _headspace_partials_from_committed_flux_Pa(
+        {"Na": 7200.0},
+        equilibrium_Pa={"Na": 1.0},
+        beta_kg_s_Pa_by_species={"Na": 1.0},
+    )
+
+    assert partials == {"Na": 0.0}
+    assert clamped == ("Na",)
 
 
 def test_fixed_pressure_residual_uses_nonlinear_committed_source():

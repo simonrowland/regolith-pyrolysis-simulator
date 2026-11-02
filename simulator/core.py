@@ -15893,6 +15893,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self, '_solved_headspace_partials_Pa_this_tick', None
         )
         if isinstance(solved_headspace_partials_Pa, Mapping):
+            from simulator.overhead import (
+                _headspace_partials_from_committed_flux_Pa,
+            )
+
             evaporation_diagnostic = getattr(
                 self, '_last_evaporation_flux_diagnostic', {}
             ) or {}
@@ -15932,13 +15936,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self._melt_headspace_composition_mbar['O2'] = max(
                         0.0, float(oxygen_partial_Pa)
                     ) / 100.0
-            # C0 and ledger commit filters can change the inlet after the
-            # solve. Keep the owner projection already computed from that
-            # final flux: J_i=G_i*p_i, so p_i=J_i/G_i has units Pa and is the
-            # removal side of beta_i*(P_eq,i-p_i)=G_i*p_i. The closed-line
-            # zero-flow boundary is handled by its equilibrium partials. O2
-            # remains at its declared frozen partial even when a later commit
-            # filter changes the transported inlet.
+            # C0 and ledger commit filters can reduce a solved source after
+            # the probe. Publish its partial from the final committed source
+            # balance; the solve's own partials remain valid when the inlet
+            # was unchanged.
+            if not flux_unchanged:
+                committed_partials_Pa, clamped_species = (
+                    _headspace_partials_from_committed_flux_Pa(
+                        final_inlet,
+                        equilibrium_Pa=solver_diagnostic['equilibrium_Pa'],
+                        beta_kg_s_Pa_by_species=(
+                            solver_diagnostic['beta_kg_s_Pa_by_species']
+                        ),
+                    )
+                )
+                self._melt_headspace_composition_mbar.update({
+                    species: partial_Pa / 100.0
+                    for species, partial_Pa in committed_partials_Pa.items()
+                })
+                if clamped_species:
+                    solver_diagnostic[
+                        'committed_source_partial_clamped_species'
+                    ] = list(clamped_species)
+                    notices = list(
+                        evaporation_diagnostic.get('notice_flags', ()) or ()
+                    )
+                    notices.append({
+                        'code': 'committed_source_partial_clamped_at_zero',
+                        'severity': 'warning',
+                        'species': list(clamped_species),
+                    })
+                    evaporation_diagnostic['notice_flags'] = notices
             if isinstance(solver_diagnostic, dict):
                 solver_diagnostic['published_from_final_committed_inlet'] = (
                     not flux_unchanged
