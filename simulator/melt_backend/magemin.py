@@ -96,7 +96,6 @@ from __future__ import annotations
 import builtins
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from contextlib import contextmanager
-from functools import lru_cache
 import fcntl
 import json
 import math
@@ -4102,24 +4101,23 @@ def project_magemin_diagnostic_composition(
     )
 
 
-@lru_cache(maxsize=128)
 def _projected_engine_liquid_fraction_grid(
-    kept_oxide_amounts: Tuple[Tuple[str, float], ...],
-    dropped_amounts: Tuple[Tuple[str, float], ...],
+    kept_oxide_kg: Mapping[str, float],
     fO2_log: float,
     pressure_bar: float,
-    backend_config_json: str,
+    backend_config: Mapping[str, Any],
 ) -> Tuple[str, Tuple[Tuple[float, float], ...]]:
-    """Run one isolated MAGEMin temperature search for an immutable bulk."""
-    del dropped_amounts  # The key must change when a dropped trace changes.
+    """Run one isolated MAGEMin temperature search for the supplied bulk."""
     backend: Optional[MAGEMinBackend] = None
     try:
-        backend_config = json.loads(backend_config_json)
         backend = MAGEMinBackend()
-        if not backend.initialize(backend_config) or not backend.is_available():
+        if (
+            not backend.initialize(dict(backend_config))
+            or not backend.is_available()
+        ):
             return "unavailable", ()
         result = backend.find_liquidus_solidus(
-            composition_kg=dict(kept_oxide_amounts),
+            composition_kg=dict(kept_oxide_kg),
             fO2_log=fO2_log,
             pressure_bar=pressure_bar,
         )
@@ -4180,13 +4178,7 @@ def projected_engine_liquid_fraction_diagnostic(
         result["total_dropped_mass_fraction"] = (
             projection.dropped_mass_fraction
         )
-        backend_config_json = json.dumps(
-            dict(backend_config),
-            sort_keys=True,
-            separators=(",", ":"),
-            default=str,
-            allow_nan=False,
-        )
+        backend_config = dict(backend_config)
     except MAGEMinDiagnosticProjectionRefusal as exc:
         result["status"] = "projection_refused"
         result["dropped_species_mass_fractions"] = dict(
@@ -4197,21 +4189,12 @@ def projected_engine_liquid_fraction_diagnostic(
     except Exception:
         return result
 
-    kept = tuple(sorted(
-        (str(species), float(mass_kg))
-        for species, mass_kg in projection.kept_oxide_kg.items()
-    ))
-    dropped = tuple(sorted(
-        (str(species), float(mass_kg))
-        for species, mass_kg in projection.dropped_species_mass_kg.items()
-    ))
     try:
         status, samples = _projected_engine_liquid_fraction_grid(
-            kept,
-            dropped,
-            fO2,
-            pressure,
-            backend_config_json,
+            projection.kept_oxide_kg,
+            fO2_log=fO2,
+            pressure_bar=pressure,
+            backend_config=backend_config,
         )
         result["status"] = status
         if status != "ok":
