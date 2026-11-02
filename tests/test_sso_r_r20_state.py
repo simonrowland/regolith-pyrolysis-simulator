@@ -1920,6 +1920,22 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
+    sim._melt_headspace_composition_mbar = {"Ca": 0.025}
+    start_of_hour_headspace = dict(sim._melt_headspace_composition_mbar)
+    ca_boundary_reads = []
+    original_bulk_partial = sim._evaporation_bulk_partial_pressure_pa
+
+    def capture_ca_boundary(species):
+        pressure_Pa = original_bulk_partial(species)
+        if species == "Ca":
+            ca_boundary_reads.append(pressure_Pa)
+        return pressure_Pa
+
+    monkeypatch.setattr(
+        sim,
+        "_evaporation_bulk_partial_pressure_pa",
+        capture_ca_boundary,
+    )
     # C7 shell band (0.01–0.1 mbar) at D=0.12 is transitional (Kn>0.01);
     # enlarge D so Kn is viscous and ledger yields stay authorized — this
     # test covers redox/credit accounting, not transport-domain refusal.
@@ -1929,6 +1945,8 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     before_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
 
     sim._step_c7_ca_aluminothermic()
+    assert ca_boundary_reads == [pytest.approx(2.5)]
+    assert sim._melt_headspace_composition_mbar == start_of_hour_headspace
 
     transition = next(
         transition
@@ -1995,6 +2013,9 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     assert ca_mol > 0.0
     assert ca_after_second_hour == pytest.approx(ca_after_first_hour)
     assert len(sim.atom_ledger.transitions) == transitions_after_first_hour
+    # C7 prices Ca once per campaign; its carried-in boundary has no later
+    # price to oscillate against.
+    assert ca_boundary_reads == [pytest.approx(2.5)]
 
     # This branch stores fO2 as a scalar: with no C7 source term and unchanged
     # Fe inventories, the scalar must remain exactly unchanged. At the b-899
@@ -3283,33 +3304,42 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
 
 
-def test_native_fe_pre_evap_boundary_does_not_create_period_two_source() -> None:
+def test_native_fe_uses_start_map_without_publishing_its_own_vapor(monkeypatch) -> None:
     sim = _make_sim()
     sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
     sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim.melt.temperature_C = 1650.0
+    sim.melt.temperature_C = 1700.0
     sim.melt.campaign_hour = 7
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.oxygen_reservoir.reference_T_K = sim.melt.temperature_C + 273.15
     sim._sync_oxygen_reservoir_mirror()
+    sim.melt.p_total_mbar = 10.25
+    sim._melt_headspace_composition_mbar = {"N2": 10.0, "Fe": 0.25}
+    start_of_hour_headspace = dict(sim._melt_headspace_composition_mbar)
 
-    source_on_by_hour = []
-    for _ in range(3):
-        snapshot = sim.step()
-        partition = (snapshot.fe_redox_split or {}).get(
-            "native_fe_partition", {}
-        )
-        source_on_by_hour.append(
-            float(partition.get("native_fe_vapor_mol", 0.0) or 0.0) > 1.0e-12
-        )
+    boundary = sim._native_fe_partition_diagnostic(1.0)
+    assert boundary["P_bulk_Pa"] == pytest.approx(25.0)
 
-    assert source_on_by_hour[0]
-    stopped = False
-    for source_on in source_on_by_hour:
-        if not source_on:
-            stopped = True
-        elif stopped:
-            pytest.fail("native Fe vapor source restarted after an off hour")
+    routed_vapor_mol = []
+    map_at_native_route = []
+    original_route = sim._route_native_fe_vapor_to_condensation
+
+    def capture_native_fe_route(vapor_mol, **kwargs):
+        routed_vapor_mol.append(float(vapor_mol))
+        map_at_native_route.append(dict(sim._melt_headspace_composition_mbar))
+        return original_route(vapor_mol, **kwargs)
+
+    monkeypatch.setattr(
+        sim,
+        "_route_native_fe_vapor_to_condensation",
+        capture_native_fe_route,
+    )
+    sim.step()
+
+    assert routed_vapor_mol and routed_vapor_mol[0] > 1.0e-12
+    # Native-Fe vapor's missing headspace coupling is tracked separately in
+    # t-1189 chunk 7; its vapor is not published into this map.
+    assert map_at_native_route == [start_of_hour_headspace]
 
 
 def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:

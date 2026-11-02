@@ -593,7 +593,17 @@ def test_ordinary_gas_and_solid_share_one_throughput():
     )
 
 
-def test_joint_release_stays_within_pipe_capacity():
+@pytest.mark.parametrize(
+    ("temperature_C", "expect_release"),
+    [(1000.0 - 273.15, True), (375.0 - 273.15, False)],
+)
+def test_c0_solid_release_participates_in_same_hour_headspace_solve(
+    monkeypatch,
+    temperature_C,
+    expect_release,
+):
+    from simulator import overhead
+
     temperature_K = 1000.0
     alpha = 0.4
     p_eq = 20.0
@@ -606,95 +616,36 @@ def test_joint_release_stays_within_pipe_capacity():
         area_m2=1.0,
     )
     area_m2 = 2.0 / per_m2
-    gas_per_extent = _molar("SO2") + 0.5 * _molar("O2")
-    solid_peak = 2.0 * gas_per_extent
-    admitted = solid_peak
-    throughput = 1.5 * solid_peak
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
         yaml.safe_load((_DATA / "setpoints.yaml").read_text()),
         {"feed": {
-            "label": "joint",
-            # FeO is the melt parent, so the real condensation route can
-            # commit Fe. SO2 and O2 are not in that flux.
-            "composition_wt_pct": {"SiO2": 82.0, "FeO": 10.0, "CaSO4": 8.0},
+            "label": "subsolidus headspace",
+            "composition_wt_pct": {"SiO2": 92.0, "CaSO4": 8.0},
         }},
         yaml.safe_load((_DATA / "vapor_pressures.yaml").read_text()),
     )
     sim.load_batch("feed", mass_kg=1000.0)
-    salt_before = sim.atom_ledger.mol_by_account(SALT_FEED_ACCOUNT)["CaSO4"]
-    priced_temperature_C = temperature_K - 273.15
-    _arm_c0(sim, temperature_C=priced_temperature_C)
-    # The C0 ramp moves temperature this hour. Restore the temperature the
-    # area was priced at after that update so the Hertz-Knudsen extent stays
-    # 2 mol/h.
+    _arm_c0(sim, temperature_C=temperature_C)
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.background_gas_species = "Ar"
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+
     original_update = sim._update_temperature
 
-    def _hold_priced_temperature():
+    def hold_temperature():
         original_update()
-        sim.melt.temperature_C = priced_temperature_C
+        sim.melt.temperature_C = temperature_C
 
-    sim._update_temperature = _hold_priced_temperature
+    sim._update_temperature = hold_temperature
+    real_bakeout = sim._apply_c0_bakeout
+    probe_calls = []
 
-    def _evaporate(
-        _equilibrium,
-        overhead_partials_override_Pa=None,
-        **_kwargs,
-    ):
-        # Stand in for the b-773 current-hour solve. Before the b-1107 fix,
-        # C0 bakeout still ignores this state and reads the persisted map.
-        sim._solved_headspace_partials_Pa_this_tick = {"SO2": 1.0}
-        sim._last_evaporation_flux_diagnostic = {
-            "headspace_solver": {
-                "oxygen_partial_frozen": True,
-                "equilibrium_Pa": {},
-                "beta_kg_s_Pa_by_species": {},
-            },
-        }
-        return EvaporationFlux(
-            species_kg_hr={"Fe": admitted},
-            total_kg_hr=admitted,
-        )
-
-    sim._calculate_evaporation = _evaporate
-    seen = {}
-    headspace_seen = []
-    transport_calls = []
-    real_estimate = sim.overhead_model.estimate_transport_state
-
-    def _estimate(flux, melt, *args, **kwargs):
-        state = real_estimate(flux, melt, *args, **kwargs)
-        transport_calls.append({
-            "species": {
-                str(name): float(rate)
-                for name, rate in flux.species_kg_hr.items()
-                if float(rate) > 0.0
-            },
-            "salt_mol": sim.atom_ledger.mol_by_account(
-                SALT_FEED_ACCOUNT
-            ).get("CaSO4"),
-            "total_kg_hr": float(flux.total_kg_hr),
-            "state": state,
-        })
-        return state
-
-    sim.overhead_model.estimate_transport_state = _estimate
-    real_route = sim._route_to_condensation
-
-    def _route(flux):
-        seen["species"] = set(flux.species_kg_hr)
-        seen["fe_kg_hr"] = flux.species_kg_hr.get("Fe")
-        seen["salt_mol"] = sim.atom_ledger.mol_by_account(
-            SALT_FEED_ACCOUNT
-        ).get("CaSO4")
-        return real_route(flux)
-
-    sim._route_to_condensation = _route
-    original = sim._apply_c0_bakeout
-
-    def _evaluator(**_kwargs):
+    def evaluator(**_kwargs):
         return [{
             "status": "supported",
             "reaction_id": "anhydrite_decomposition",
@@ -704,116 +655,65 @@ def test_joint_release_stays_within_pipe_capacity():
             "stoichiometry": _sulfate_reaction()["stoichiometry"],
         }]
 
-    def _bakeout(**kwargs):
-        headspace_seen.append(kwargs.get("headspace_mbar"))
+    def bakeout(**kwargs):
         sim._volatiles_train_spec = type("Train", (), {
-            "max_throughput_kg_hr": throughput,
+            "max_throughput_kg_hr": 10.0,
         })()
         kwargs["seam_refusal_for"] = lambda _species, _temperature_K: None
-        kwargs["evaluator_loader"] = lambda: _evaluator
+        kwargs["evaluator_loader"] = lambda: evaluator
         kwargs["solid_host_area_m2"] = area_m2
         kwargs["alpha"] = {"SO2": alpha}
-        return original(**kwargs)
+        if kwargs.get("probe_only"):
+            probe_calls.append(dict(kwargs.get("headspace_mbar") or {}))
+        return real_bakeout(**kwargs)
 
-    sim._apply_c0_bakeout = _bakeout
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
-    sim.step()
-    assert headspace_seen == [{"SO2": 0.01}]
-    pump_scale = sim._last_subsolidus_bakeout["pump_scale"]
-    pump_admitted = (
-        sim._last_subsolidus_bakeout["hk_demand_mol_hr_by_species"]["SO2"]
-        * pump_scale
-    )
-    decision = [
-        call for call in transport_calls
-        if set(call["species"]) >= {"Fe", "SO2", "O2"}
-        and call["salt_mol"] == pytest.approx(salt_before)
-    ]
-    assert decision
-    demand_kg_hr = decision[0]["total_kg_hr"]
-    capacity_kg_hr = decision[0]["state"]["pipe_conductance_kg_hr"]
-    assert demand_kg_hr > capacity_kg_hr
-    transport_scale = capacity_kg_hr / demand_kg_hr
-    accepted = pump_admitted * transport_scale
-    fe_kg_hr = admitted * pump_scale * transport_scale
-    so2_kg_hr = accepted * _molar("SO2")
-    o2_kg_hr = accepted * 0.5 * _molar("O2")
-    assert fe_kg_hr + so2_kg_hr + o2_kg_hr == pytest.approx(capacity_kg_hr)
-    assert decision[0]["species"]["Fe"] == pytest.approx(
-        admitted * pump_scale
-    )
-    assert decision[0]["species"]["SO2"] == pytest.approx(
-        pump_admitted * _molar("SO2")
-    )
-    assert decision[0]["species"]["O2"] == pytest.approx(
-        pump_admitted * 0.5 * _molar("O2")
-    )
-    assert seen["fe_kg_hr"] == pytest.approx(fe_kg_hr)
-    assert "SO2" not in seen["species"]
-    assert "O2" not in seen["species"]
-    assert seen["salt_mol"] == pytest.approx(salt_before - accepted)
-    assert salt_before > seen["salt_mol"] > 0.0
-    cap_record = sim._last_subsolidus_bakeout["transport_cap"]
-    released = sim._last_subsolidus_bakeout["released_kg_hr_by_species"]
-    assert released["SO2"].hex() == "0x1.2620a85b4d20fp-11"
-    assert released["O2"].hex() == "0x1.25d7c7b1725f4p-13"
-    assert cap_record["demand_kg_hr"] == pytest.approx(demand_kg_hr)
-    assert cap_record["capacity_kg_hr"] == pytest.approx(capacity_kg_hr)
-    assert cap_record["scale"] == pytest.approx(transport_scale)
-    ordinary = EvaporationFlux(species_kg_hr={"Fe": fe_kg_hr})
-    ordinary.update_totals()
-    combined = EvaporationFlux(species_kg_hr={
-        "Fe": fe_kg_hr,
-        "SO2": so2_kg_hr,
-        "O2": o2_kg_hr,
-    })
-    combined.update_totals()
-    assert combined.total_kg_hr == pytest.approx(capacity_kg_hr)
-    held = sim._effective_transport_capacity_this_tick
-    downstream = sim._headspace_downstream_pressure_bar(held)
-    ordinary_state = real_estimate(
-        ordinary,
-        sim.melt,
-        p_downstream_bar=downstream,
-        effective_transport_capacity=held,
-    )
-    combined_state = real_estimate(
-        combined,
-        sim.melt,
-        p_downstream_bar=downstream,
-        effective_transport_capacity=held,
-    )
-    headspace = sim._melt_headspace_composition_mbar
-    assert set(headspace) >= {"Fe", "SO2", "O2"}
-    assert headspace["SO2"] > 0.0
-    assert headspace["O2"] > 0.0
-    assert sum(headspace.values()) == pytest.approx(
-        combined_state["vapor_pressure_mbar"]
-    )
-    assert combined_state["vapor_pressure_mbar"] != pytest.approx(
-        ordinary_state["vapor_pressure_mbar"]
-    )
-    assert sim.overhead.pipe_conductance_kg_hr == pytest.approx(
-        combined_state["pipe_conductance_kg_hr"]
-    )
-    assert sim.record.snapshots[-1].mass_balance_error_pct == pytest.approx(
-        0.0, abs=5e-12
-    )
-    assert sim._subsolidus_pending_release is None
-    assert sim._last_subsolidus_bakeout["committed"] is True
-    assert sim._subsolidus_bakeout_by_hour[-1]["committed"] is True
+    monkeypatch.setattr(sim, "_apply_c0_bakeout", bakeout)
+    solved_results = []
+    original_solver = overhead.solve_quasi_steady_headspace_partials_Pa
 
-    hourly_release = [released["SO2"]]
-    for _ in range(2):
-        sim.step()
-        hourly_release.append(
-            sim._last_subsolidus_bakeout["released_kg_hr_by_species"].get(
-                "SO2", 0.0
-            )
+    def capture_solve(**kwargs):
+        solved = original_solver(**kwargs)
+        solved_results.append(solved)
+        return solved
+
+    monkeypatch.setattr(
+        overhead,
+        "solve_quasi_steady_headspace_partials_Pa",
+        capture_solve,
+    )
+    snapshot = sim.step()
+    release = dict(
+        sim._last_subsolidus_bakeout.get("released_kg_hr_by_species") or {}
+    )
+
+    assert probe_calls, (
+        "C0 solid release was not evaluated inside the headspace solve; "
+        f"the real path released {release}"
+    )
+    assert solved_results, (
+        "solid gas did not make the same-hour solve run; "
+        f"the real path released {release}"
+    )
+    solved = solved_results[-1]
+    assert solved.converged
+    assert solved.residual_relative_by_species["SO2"] <= 1.0e-9
+    assert solved.partials_Pa["SO2"] >= 0.0
+    if expect_release:
+        assert release["SO2"] > 0.0
+        assert release["O2"] > 0.0
+        assert solved.residual_relative_by_species["O2"] <= 1.0e-9
+        assert solved.flux.species_kg_hr["SO2"] == pytest.approx(
+            release["SO2"], rel=1.0e-9, abs=1.0e-15
         )
-    assert all(rate > 0.0 for rate in hourly_release)
-    assert headspace_seen == [{"SO2": 0.01}] * 3
-
+        assert solved.flux.species_kg_hr["O2"] == pytest.approx(
+            release["O2"], rel=1.0e-9, abs=1.0e-15
+        )
+        assert snapshot.melt_headspace_composition_mbar["SO2"] > 0.0
+        assert snapshot.melt_headspace_composition_mbar["O2"] > 0.0
+    else:
+        assert release == {}
+        assert temperature_C + 273.15 < 400.0
+    assert snapshot.mass_balance_error_pct == pytest.approx(0.0, abs=5e-12)
 
 def test_c0_same_step_pipe_cap_numeric_pin():
     """Pin the production C0 gas cap before sharing its capacity owner."""

@@ -160,10 +160,43 @@ def _bypass_analytic_depletion(sim):
 def test_headspace_partial_pressure_unit_projection():
     from simulator.overhead import headspace_partials_mbar_from_Pa
 
-    assert headspace_partials_mbar_from_Pa({"Fe": 1000.0, "O2": 0.0}) == {
+    # 1 mbar = 100 Pa: 0.05 Pa is 0.0005 mbar and 1 Pa is 0.01 mbar.
+    assert headspace_partials_mbar_from_Pa(
+        {"Fe": 1000.0, "O2": 0.05, "SO2": 1.0}
+    ) == {
         "Fe": 10.0,
-        "O2": 0.0,
+        "O2": 0.0005,
+        "SO2": 0.01,
     }
+
+
+def test_headspace_partial_inputs_keep_current_pa_projection():
+    from simulator.condensation import (
+        _flowing_species_partial_pressures_pa,
+        _segment_species_partial_pressures_pa,
+    )
+    from simulator.subsolidus_bakeout import (
+        gas_partials_Pa_from_headspace_mbar,
+    )
+    from simulator.thermal_train import _peak_partial_pressures_pa
+
+    headspace_mbar = {"O2": 0.0005, "SO2": 0.01}
+    expected_Pa = {"O2": 0.05, "SO2": 1.0}
+    assert gas_partials_Pa_from_headspace_mbar(headspace_mbar) == expected_Pa
+    assert _flowing_species_partial_pressures_pa(
+        {},
+        2.0,
+        reported_partial_pressures_mbar=headspace_mbar,
+    ) == expected_Pa
+    assert _peak_partial_pressures_pa(
+        [{"composition_mbar": headspace_mbar}]
+    ) == expected_Pa
+    assert _segment_species_partial_pressures_pa(
+        expected_Pa,
+        2.0,
+        {"O2": 1.0, "SO2": 1.0},
+        {"segment": {"O2": 1.0, "SO2": 1.0}},
+    )["segment"] == pytest.approx(expected_Pa)
 
 
 def test_overhead_model_does_not_recompute_provider_partition():

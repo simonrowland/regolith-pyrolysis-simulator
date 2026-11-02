@@ -65,6 +65,21 @@ def test_headspace_inventory_projection_numeric_baseline(monkeypatch):
     )
 
 
+def test_headspace_partial_projection_includes_a_second_hand_value():
+    from simulator.overhead import headspace_partials_mbar_from_Pa
+
+    # Premise: 1 mbar = 100 Pa. Algebra: 0.05 Pa / 100 Pa/mbar =
+    # 0.0005 mbar and 1 Pa / 100 Pa/mbar = 0.01 mbar. Units reduce to mbar;
+    # the limiting case 0 Pa remains 0 mbar.
+    assert headspace_partials_mbar_from_Pa(
+        {"O2": 0.05, "SO2": 1.0, "Ar": 0.0}
+    ) == {
+        "O2": 0.0005,
+        "SO2": 0.01,
+        "Ar": 0.0,
+    }
+
+
 def test_lunar_c2a_hot_entry_has_no_empty_hours_or_period_two_species():
     """Keep the old pin in history and assert the live hourly solve stays on."""
     case = _cases("reproduction")[0]
