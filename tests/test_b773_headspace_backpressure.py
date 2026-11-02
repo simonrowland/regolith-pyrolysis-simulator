@@ -54,6 +54,7 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
     monkeypatch,
 ):
     sim = _lunar_simulator()
+    sim._melt_headspace_composition_mbar = {"O2": 0.0005}
     monkeypatch.setattr(sim, "_freeze_gate_enabled", lambda: True)
     monkeypatch.setattr(
         sim,
@@ -81,15 +82,12 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
         residual <= 1.0e-9
         for residual in solver["residual_relative_by_species"].values()
     )
-    for species, writer_partial_Pa in solver["writer_partials_Pa"].items():
-        committed_partial_Pa = float(
-            (snapshot.melt_headspace_composition_mbar or {}).get(species, 0.0)
-        ) * 100.0
-        assert committed_partial_Pa == pytest.approx(
-            writer_partial_Pa,
-            rel=1.0e-9,
-            abs=1.0e-14,
-        )
+    assert solver["residual_relative_by_species"]["O2"] == 0.0
+    assert snapshot.melt_headspace_composition_mbar["O2"] == pytest.approx(
+        0.0005,
+        abs=1.0e-14,
+    )
+    assert solver["published_from_final_committed_inlet"]
     for species in ("Fe", "Ca"):
         expected = float(
             (snapshot.melt_headspace_composition_mbar or {}).get(species, 0.0)

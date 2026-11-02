@@ -334,6 +334,52 @@ def test_scalar_pressure_root_closes_two_species_balance_and_S_is_monotone():
     assert all(left > right for left, right in zip(sums, sums[1:]))
 
 
+def test_fixed_flow_species_and_frozen_oxygen_each_have_residuals():
+    # Hand balance at P=2 Pa: the pipe carries 2e-4 mol/s, giving Na=0.633333
+    # Pa and K=1.266667 Pa. Fixed Ar contributes 0.05 Pa and frozen O2 keeps
+    # its declared 0.05 Pa; the four partials sum to 2 Pa.
+    beta = 1.0e-6
+    equilibrium = {"Na": 1.9, "K": 3.8}
+    molar_mass = {"Na": 0.02, "K": 0.02, "Ar": 0.04, "O2": 0.032}
+    fixed_ar_flow = 5.0e-6
+
+    def evaluate(partials, _total_pressure):
+        flux = EvaporationFlux(
+            species_kg_hr={
+                **{
+                    species: beta * (pressure - partials[species]) * 3600.0
+                    for species, pressure in equilibrium.items()
+                },
+                "Ar": fixed_ar_flow * molar_mass["Ar"] * 3600.0,
+            }
+        )
+        flux.update_totals()
+        return flux
+
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa=equilibrium,
+        fixed_partials_Pa={"O2": 0.05},
+        beta_kg_s_Pa_by_species={"Na": beta, "K": beta},
+        molar_mass_kg_mol_by_species=molar_mass,
+        fixed_molar_flow_mol_s_by_species={"Ar": fixed_ar_flow},
+        molar_flow_mol_s_at_pressure=lambda pressure: 5.0e-5 * pressure**2,
+        pressure_bracket_Pa=(0.0, 6.0),
+        evaluate_flux=evaluate,
+    )
+
+    assert solved.converged
+    assert solved.total_pressure_Pa == pytest.approx(2.0, abs=1.0e-9)
+    assert solved.partials_Pa["Na"] == pytest.approx(0.6333333333, abs=1.0e-9)
+    assert solved.partials_Pa["K"] == pytest.approx(1.2666666667, abs=1.0e-9)
+    assert solved.partials_Pa["Ar"] == pytest.approx(0.05, abs=1.0e-9)
+    assert solved.partials_Pa["O2"] == pytest.approx(0.05, abs=1.0e-12)
+    assert set(solved.residual_relative_by_species) == {"Ar", "K", "Na", "O2"}
+    assert all(
+        residual <= 1.0e-9
+        for residual in solved.residual_relative_by_species.values()
+    )
+
+
 def test_bounded_nonconvergence_returns_best_iterate_and_residual():
     solved = solve_quasi_steady_headspace_partials_Pa(
         equilibrium_Pa={"Na": 2.0},

@@ -15924,11 +15924,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._melt_headspace_composition_mbar.update(
                     solved_headspace_partials_mbar
                 )
+            elif solver_diagnostic.get('oxygen_partial_frozen'):
+                oxygen_partial_Pa = solved_headspace_partials_Pa.get('O2')
+                if oxygen_partial_Pa is not None and math.isfinite(
+                    float(oxygen_partial_Pa)
+                ):
+                    self._melt_headspace_composition_mbar['O2'] = max(
+                        0.0, float(oxygen_partial_Pa)
+                    ) / 100.0
             # C0 and ledger commit filters can change the inlet after the
             # solve. Keep the owner projection already computed from that
             # final flux: J_i=G_i*p_i, so p_i=J_i/G_i has units Pa and is the
             # removal side of beta_i*(P_eq,i-p_i)=G_i*p_i. The closed-line
-            # zero-flow boundary is handled by its equilibrium partials.
+            # zero-flow boundary is handled by its equilibrium partials. O2
+            # remains at its declared frozen partial even when a later commit
+            # filter changes the transported inlet.
             if isinstance(solver_diagnostic, dict):
                 solver_diagnostic['published_from_final_committed_inlet'] = (
                     not flux_unchanged
