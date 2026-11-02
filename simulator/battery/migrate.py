@@ -20509,8 +20509,7 @@ class Migrator:
                                 row_printed_source_values
                                 if row_printed_source_values is not None
                                 else row_printed_values
-                            ),
-                            numeric_values_as="source",
+                            )
                         )
                     )
                     if row_printed_locator is not None

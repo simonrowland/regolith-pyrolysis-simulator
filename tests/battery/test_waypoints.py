@@ -1033,6 +1033,47 @@ def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes()
     assert refused_derived.absence is not None
     assert refused_derived.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
+    valid_derived = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            )
+        ),
+        locator,
+        wt_pct_to_mole_fraction_derivation(
+            {"SiO2": Decimal("60"), "MgO": Decimal("40")}, locator
+        ),
+    )
+    derived_with_refused_sibling = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                initial_composition=valid_derived,
+            ),
+        ),
+        bench,
+    )
+    assert derived_with_refused_sibling.selected is None
+    assert derived_with_refused_sibling.absence is not None
+    assert (
+        derived_with_refused_sibling.absence.reason
+        is GapReason.UNSUPPORTED_PRINT_FORM
+    )
+
+    standalone_derived = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                printed_composition=None,
+                initial_composition=valid_derived,
+            ),
+        ),
+        bench,
+    )
+    assert standalone_derived.selected is not None
+
     independent_result = normalized_composition(
         replace(
             nonclosing,

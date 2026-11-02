@@ -5082,7 +5082,7 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         }
 
 
-def test_hashimoto_20b2_engine_payload_keeps_green_starting_composition(
+def test_hashimoto_20b2_single_oxide_print_keeps_green_engine_gap(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -5106,36 +5106,48 @@ def test_hashimoto_20b2_engine_payload_keeps_green_starting_composition(
             experiment, result.benches[experiment.bench_id], observation
         )
     )
-    expected_green_payload = {
-        "SiO2": 0.3379238246485715,
-        "Al2O3": 0.017760541249646305,
-        "FeO": 0.2794942400441881,
-        "MgO": 0.33896696103658575,
-        "CaO": 0.025854433021008306,
-    }
     assert requests
-    assert all(request.payload is not None for request in requests)
     assert all(
-        request.payload["composition_mol"] == expected_green_payload
+        request.payload is None and request.readiness.status.value == "gap"
         for request in requests
     )
 
 
+def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
+    from simulator.battery.waypoints import normalized_composition
+
+    document = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/ta-badro-2021.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_experiment = next(
+        item for item in document["experiments"]
+        if item["experiment_id"] == "vp-series"
+    )
+    sample = _sample_from_plain(raw_experiment["sample"])
+    experiment = replace(tabulation_experiment(), sample=sample)
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is not None
+    assert waypoint.selected.route == "normalized_initial_composition"
+
+
 @pytest.mark.parametrize(
-    ("source", "row_token", "expected_oxides"),
+    ("source", "row_token", "expected_oxides", "expected_missing"),
     (
         (
             "kems-015-hashimoto-1983.yaml",
             "::T=2073.15:row=b8-(2):",
-            {"SiO2", "Al2O3", "FeO", "MgO", "CaO"},
+            None,
+            ".SiO2_wt_pct",
         ),
         (
             "smythe-brenan-2015-cerium-redox.yaml",
             "row=ds11-c38:",
-            {
-                "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
-                "Na2O", "K2O", "P2O5", "Ce2O3",
-            },
+            None,
+            ".total",
         ),
         (
             "smythe-brenan-2015-cerium-redox.yaml",
@@ -5144,16 +5156,18 @@ def test_hashimoto_20b2_engine_payload_keeps_green_starting_composition(
                 "SiO2", "TiO2", "Al2O3", "MgO", "CaO",
                 "Na2O", "K2O", "P2O5", "Ce2O3",
             },
+            None,
         ),
     ),
 )
-def test_b704_waypoints_use_oxide_only_map_after_row_closure(
+def test_b704_waypoints_preserve_green_suffix_and_total_handling(
     tmp_path: Path,
     source: str,
     row_token: str,
-    expected_oxides: set[str],
+    expected_oxides: set[str] | None,
+    expected_missing: str | None,
 ) -> None:
-    from simulator.battery.waypoints import normalized_composition
+    from simulator.battery.waypoints import GapReason, normalized_composition
 
     result = _migrate_real_extract(tmp_path, source, write=False)
     observation = next(
@@ -5177,6 +5191,15 @@ def test_b704_waypoints_use_oxide_only_map_after_row_closure(
 
     waypoint = normalized_composition(experiment, _bench(), observation)
 
+    if expected_oxides is None:
+        assert waypoint.selected is None
+        assert waypoint.absence is not None
+        assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        assert any(
+            path.endswith(expected_missing)
+            for path in waypoint.absence.missing
+        )
+        return
     assert waypoint.absence is None
     assert waypoint.selected is not None
     assert set(waypoint.selected.value) == expected_oxides
