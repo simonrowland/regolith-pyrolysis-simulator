@@ -3016,26 +3016,23 @@ def test_residue_fallback_refuses_malformed_printed_start_without_aborting(
     assert "missing major oxides: SiO2" in composition.reason
 
 
-def test_mass_percent_printed_provenance_uses_canonical_component_names() -> None:
-    sample = migrate_module._sample_from_plain(
-        {
-            "printed_composition": {
-                "state": {
-                    "tag": "value",
-                    "value": {
-                        "amount_basis": "mass_percent",
-                        "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
-                    },
-                },
-                "locator": {"table": "2", "row": "4"},
-            }
-        }
-    )
+def test_mass_percent_printed_provenance_keeps_noncanonical_source_envelope() -> None:
+    raw = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "amount_basis": "mass_percent",
+                "components": {"SiO2_wt_pct": "60", "AlO1.5": "40"},
+            },
+        },
+        "locator": {"table": "2", "row": "4"},
+    }
+    sample = migrate_module._sample_from_plain({"printed_composition": raw})
     printed = sample.printed_composition
 
     assert printed is not None
     assert printed.state.is_value
-    assert printed.state.value == {"SiO2": "60", "Al2O3": "40"}
+    assert printed.state.value == raw["state"]["value"]
 
 
 def test_vocabulary_printed_composition_restores_aliased_uncertainty_cell() -> None:
@@ -3075,6 +3072,22 @@ def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
             "work", {"table": "2", "nested": {"row": [1, "a"]}},
             ["phase", "composition"], "same", "source", None,
         ),
+        migrate_module.QueueEntry(
+            "work", {"table": "3", "raw": b"x"},
+            ["composition"], "unhashable duplicate", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": bytearray(b"x"), "table": "3"},
+            ["composition"], "unhashable duplicate", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"table": "3", "raw": bytearray(b"y")},
+            ["composition"], "unhashable distinct", "source", None,
+        ),
+        migrate_module.QueueEntry(
+            "work", {"raw": b"y", "table": "3"},
+            ["composition"], "unhashable distinct", "source", None,
+        ),
     ]
     expected = []
     for entry in entries:
@@ -3085,7 +3098,10 @@ def test_queue_deduplication_keeps_list_scan_equality_and_first_order() -> None:
     migrator._resolve_queue_ids()
 
     assert migrator.result.queue == expected
-    assert [entries.index(entry) for entry in migrator.result.queue] == [0, 2, 3]
+    assert [
+        next(index for index, original in enumerate(entries) if original is entry)
+        for entry in migrator.result.queue
+    ] == [0, 2, 3, 4, 6]
 
 
 @pytest.mark.parametrize("surviving_numeric_count", (0, 1, 2))

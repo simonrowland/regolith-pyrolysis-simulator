@@ -1580,6 +1580,13 @@ def _mass_percent_printed_from_plain(
     )
     if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
         return _located_from_plain(payload, lambda value: value)
+    if (
+        _mass_percent_pairs(payload) is not None
+        and any(name not in _COMPOSITION_COMPONENTS for name in raw_components)
+    ):
+        # Green preserves typed envelopes whose printed keys are not canonical
+        # component names. Canonical names are only for the closure decision.
+        return _located_from_plain(payload, lambda value: value)
     locator = (
         _locator_from_plain(payload.get("locator"))
         if isinstance(payload, Mapping)
@@ -25741,9 +25748,9 @@ class Migrator:
                         entry.work_id = exp.work_id
         # Parent-row queue entries can resolve to the same exploded child as a
         # child-local entry. Deduplicate only after observation ids are final.
-        # QueueEntry equality compares these fields directly; recursively
-        # freezing the locator lets the seen-set preserve that equality while
-        # making each lookup constant-time.
+        # QueueEntry equality compares these fields directly. Freeze nested
+        # locator containers for the normal seen-set path; values that remain
+        # unhashable use the equality fallback below.
         def freeze(value: object) -> object:
             if isinstance(value, Mapping):
                 return frozenset(
@@ -25769,11 +25776,24 @@ class Migrator:
 
         unique_entries: list[QueueEntry] = []
         seen_entries: set[tuple[object, ...]] = set()
+        unhashable_entries: list[QueueEntry] = []
         for entry in self.result.queue:
-            key = entry_key(entry)
-            if key not in seen_entries:
-                unique_entries.append(entry)
-                seen_entries.add(key)
+            try:
+                key = entry_key(entry)
+                hash(key)
+            except TypeError:
+                # Preserve dataclass equality when a locator leaf cannot be
+                # represented by a hashable structural key.
+                if entry not in unique_entries:
+                    unique_entries.append(entry)
+                    unhashable_entries.append(entry)
+                continue
+            if key in seen_entries or any(
+                entry == previous for previous in unhashable_entries
+            ):
+                continue
+            unique_entries.append(entry)
+            seen_entries.add(key)
         self.result.queue[:] = unique_entries
 
     def _close_conditional_method_classes(self) -> None:
