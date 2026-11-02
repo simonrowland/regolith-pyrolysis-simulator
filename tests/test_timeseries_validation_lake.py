@@ -61,7 +61,9 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
         0.16188054473371416
     )
     assert reports["DS-010"].status == "validated"
-    assert reports["DS-010"].rows_evaluated == 7
+    # 19a06f067 permits flagged legacy oxide-fit extrapolation below the
+    # validated range, so the existing 1350 K SiO row is now evaluable.
+    assert reports["DS-010"].rows_evaluated == 8
 
     all_items = [item for report in reports.values() for item in report.species]
     assert not any(item.observed_floor_applied for item in all_items)
@@ -100,7 +102,7 @@ def test_validation_lake_reports_dimensionally_honest_comparisons(
         for item in reports["DS-010"].species
         if item.signal_type == "evaporation_flux_molecules_cm2_s"
     ]
-    assert len(direct_flux) == 7
+    assert len(direct_flux) == 8
     assert {item.model_species for item in direct_flux} == {"SiO"}
     assert all(
         item.modeled_value > 0.0 and item.observed_value > 0.0
@@ -144,8 +146,7 @@ def test_markdown_report_contains_summary_and_json_pointer_for_long_skips(
     assert "endpoint rank disagreement" in markdown
     assert "ordering inversions" not in markdown
     assert "| DS-007 | validated | 12 | 0.162 | 1.097 | - | - |" in markdown
-    # 2026-07-21 B1: DS-010 median/max reproduction error re-measured under
-    # the corrected fits (1.392/1.920 -> 1.199/3.309); rank cell unchanged.
-    assert "| DS-010 | validated | 7 | 1.199 | 3.309 | 0.222 |" in markdown
+    # 19a06f067's flagged SiO extension admits the existing 1350 K row.
+    assert "| DS-010 | validated | 8 | 1.031 | 3.309 | 0.160 |" in markdown
     assert "more in JSON" in markdown
     assert "DS-010: fetch-dns-blocked" not in markdown
