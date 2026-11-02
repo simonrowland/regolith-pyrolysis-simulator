@@ -1,0 +1,187 @@
+source_id: doyle-1988-feo-activity-multicomponent-magma
+source:
+  citation: Doyle, C.D. (1988). Prediction of the activity of FeO in multicomponent magma from known values in [SiO2-KAlO2-CaAl2Si2O8]-FeO
+    liquids. Geochimica et Cosmochimica Acta 52, 1827–1834.
+  year: 1988
+extraction:
+  method: Table 1A source-column mapping; see paired full-cell audit.
+  date: '2026-11-02'
+  worker: codex
+review_status: draft
+tables:
+- page: 4
+  table_index: 1
+  type: activity_coefficient
+  quantity: activity
+  evidence_class: measured_reduced
+  unit: dimensionless
+  phase: l
+  published_page: 1830
+  rows: all
+  values:
+  - column: 1
+    species: FeO
+    quantity: activity
+    panel: Fig. 2A
+  - column: 8
+    species: FeO
+    quantity: activity
+    panel: Fig. 2C
+  - column: 2
+    species: SiO2
+    quantity: composition
+    unit: wt%
+  - column: 3
+    species: Al2O3
+    quantity: composition
+    unit: wt%
+  - column: 4
+    species: FeO
+    quantity: composition
+    unit: wt%
+  - column: 5
+    species: CaO
+    quantity: composition
+    unit: wt%
+  - column: 6
+    species: K2O
+    quantity: composition
+    unit: wt%
+  - column: 9
+    species: SiO2
+    quantity: composition
+    unit: wt%
+  - column: 10
+    species: Al2O3
+    quantity: composition
+    unit: wt%
+  - column: 11
+    species: FeO
+    quantity: composition
+    unit: wt%
+  - column: 12
+    species: CaO
+    quantity: composition
+    unit: wt%
+  - column: 13
+    species: K2O
+    quantity: composition
+    unit: wt%
+  conditions:
+  - key: temperature_K
+    state:
+      tag: value
+      value: '1600'
+    locator:
+      page: 4
+      table: 1A
+      note: 1600±2 K in caption
+  - key: fO2_log
+    state:
+      tag: value
+      value: from Table 1B -log10 fO2, signed for migrator
+    locator:
+      page: 5
+      table: 1B
+  - key: total_pressure_Pa
+    state:
+      tag: unknown
+      reason: No total pressure is stated.
+  render_verified:
+  - row: 4
+    column: 12
+  - row: 6
+    column: 8
+  - row: 7
+    column: 10
+  - row: 8
+    column: 11
+  - row: 9
+    column: 5
+  - row: 10
+    column: 8
+  - row: 10
+    column: 9
+  - row: 11
+    column: 8
+  - row: 11
+    column: 9
+  - row: 13
+    column: 2
+  - row: 13
+    column: 4
+  - row: 15
+    column: 9
+  - row: 17
+    column: 4
+  - row: 18
+    column: 13
+  - row: 19
+    column: 2
+  - row: 21
+    column: 5
+  - row: 27
+    column: 3
+  - row: 27
+    column: 9
+  - row: 27
+    column: 11
+  - row: 27
+    column: 12
+  - row: 30
+    column: 10
+  - row: 33
+    column: 9
+  - row: 33
+    column: 10
+  - row: 34
+    column: 11
+  - row: 37
+    column: 9
+  - row: 38
+    column: 10
+  - row: 44
+    column: 3
+  - row: 47
+    column: 1
+  - row: 49
+    column: 2
+  - row: 49
+    column: 8
+  - row: 52
+    column: 11
+  - row: 57
+    column: 9
+  - row: 58
+    column: 4
+  - row: 58
+    column: 9
+  - row: 59
+    column: 10
+  - row: 60
+    column: 4
+  - row: 61
+    column: 2
+  - row: 62
+    column: 10
+  - row: 62
+    column: 12
+  - row: 66
+    column: 2
+  - row: 66
+    column: 9
+  - row: 67
+    column: 2
+  - row: 68
+    column: 11
+  - row: 70
+    column: 6
+  - row: 74
+    column: 2
+  - row: 74
+    column: 12
+  - row: 75
+    column: 11
+  render_note: The 42 MinerU/pdftotext disagreement cells and five footnote-marked aFeO cells listed in render_verified
+    were resolved against page 4; all Table 1A row/column placement was checked on the render. All 48 numeric Table
+    1B cells were checked against page 5 render; Table 1B has no MinerU table block.

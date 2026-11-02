@@ -1,0 +1,39 @@
+# Charles (1967): alkali-silicate activities
+
+Source: Charles, R. J. (1967), “Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions,” *Journal of the American Ceramic Society* 50(12), 631–641. The extract contains the complete printed numerical content of Tables I–III and located context for the paper's standard states, fit equations, explicit free-energy ranges, and undigitized figures.
+
+## Transcription and cell audit
+
+The input order was MinerU table drafts and markdown, then `pdftotext-layout.txt`; the PDF was used only through `pdftoppm` page renders to resolve the table disagreements. The table drafts are `p002-t01`, `p005-t02`, and `p008-t03`, corresponding to printed Tables I, II, and III on PDF pages 2, 5, and 8 (published pages 632, 635, and 638). Each printed table has ten body rows. The page renders confirm the table headings, the row-to-temperature assignments, the SiO2 column meanings, and all three data blocks' five numeric columns.
+
+The MinerU table QA pre-screen found 90% digit agreement for Table I (14 comma flags and 5 mismatches), 30% for Table II (3 comma flags and 35 mismatches), and 96% for Table III (5 comma flags and 2 mismatches). Because the tables were legible in their page renders and both machine reads had cell disagreements, all 150 printed numeric cells were checked against the renders; no OCR redo was needed. [The cell audit](charles-1967-alkali-silicate-activities-cell-audit.csv) records each page, printed table, row, column, printed value, and whether it was render-confirmed or calculated from a pinned printed input. It also records the 29 located context entries: 13 fit equations, ten silica thermochemical inputs, two free-energy statements, three standard-state statements, and the Figure 16 temperature.
+
+Render resolutions that affect the transcription:
+
+- Table I, PDF page 2: the first `Log a2c` cell is `-0.00132`; the OCR text read `-b.00132`. The image also confirms the printed extrapolated compositions `(.322)*` and `(.335)*` and the 1673 K enthalpy cell `.505`.
+- Table II, PDF page 5: a 600 dpi crop at x=490.4–507.5 pt, y=103.1–109.6 pt reads `41.4` directly above `64.8`; `pdftotext` reads `-11.4`. The crop resolves the earlier reversed cell audit. The render confirms all ten rows, including the seven rows missing or mangled in the text layer.
+- Table III, PDF page 8: the 1673 K liquidus composition is `.898`. A 600 dpi render confirmed this printed value; it was not silently corrected to a more plausible composition.
+
+The raw cells remain in their printed forms. The `Log a2c` and `Log gamma2c` fields keep their printed log values and carry both `printed_form_as_published: log10` and `printed_form: log10`, so migration converts them to activities and activity coefficients by base-10 exponentiation. The focused test pins all 30 rows' migrated activities and coefficients to `10**(printed log)` using `Decimal`, along with the enthalpy and X1 cells, and checks the temperature and locator for each row.
+
+## Derivations, conditions, and migration
+
+Charles reports the Table I–III silica activities, silica activity coefficients, and silica partial-molar enthalpies as calculated quantities. Their evidence class is `model_derived`. The stored lineage follows the printed calculation: each activity points to its same-row liquidus composition input; each activity coefficient points to the same-row activity and composition; each partial-molar enthalpy points to its same-row activity coefficient. The relation is recorded from Eqs. (4)–(8) and the table descriptions. The paper's equations and relevant printed thermochemical inputs are retained in the extract context.
+
+Each table prints the alkali-oxide liquidus mole fraction X1. The audit script derives the binary SiO2 mole fraction as `1 - X1` using `Decimal` at full precision so the migrator receives a complete binary composition identity. The extract retains X1 as printed, and the cell audit lists each corresponding computed SiO2 component beside its source row. The paper prints no total pressure or oxygen fugacity for these cryoscopic rows; those conditions remain unknown. It prints temperature in K for every row. The measured/calculated phase is liquid (`l`).
+
+Isolated migration of this extract produced 120 observations: 90 numeric (30 activity, 30 activity-coefficient, and 30 liquidus-composition values), 30 unavailable partial-molar enthalpies, and zero hard issues. All 120 migrated observations have a known quantity and phase; all have the printed row temperature and the binary composition in their identity. No pressure or fO2 value was added. The 30 unavailable values remain present with their printed values in the extract. `Quantity.PARTIAL_MOLAR_ENTHALPY` exists in `simulator/battery/enums.py::Quantity`, but `simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS` has no source-field selector for it, so the current migrator cannot emit these scalar values. This extraction did not change the migrator.
+
+The compare command result is retained in [the compare report](charles-1967-alkali-silicate-activities-compare.txt). It reports 90 mismatches with no matched draft cells because `tools/mineru_table_draft.py::_phase_matches_column` accepts `gas`, `liquid`, and `solid`, but not the required migrator phase token `l`; its phase filter rejects the otherwise row-and-column-located candidates. This tool limitation does not alter the cell transcription: every reported table value was independently checked against the render and is covered by the focused test.
+
+## Standard states and other printed values
+
+The source's reference states are retained verbatim with their locators because they govern the activity values quoted by Inoue and Suito (1982):
+
+- Page 632, Eq. (4): “where the activity a2 is referred to pure liquid silica at the temperature of interest as the standard state (similarly, lithia activity a1 is referred to pure liquid Li2O at the temperature of interest as standard state).”
+- Page 638, Fig. 16 discussion: “The present Na2O activity data (referred to pure liquid Na2O at the temperature of interest as the standard state and calculated in a somewhat indirect fashion from the Na2O-SiO2 phase diagram and volatility and cell potential data)”
+- Page 639, Fig. 20 discussion: “Using Eq. (23) and the K2O modification of Eq. (3), the volatilization results in Fig. 18 may be converted to K2O activity coefficient data referred to a standard state of pure K2O(l).”
+
+The source also prints two numerical free-energy statements in prose. MinerU and `pdftotext` agree on “From 1000° to 1900°K, ΔF_m per mole of lithium metasilicate solution varies between -19 and -16 kcal/mole” (page 633, attributed to reference 19) and “may be approximated by the value of -80 kcal/mole of glass” for potassium disilicate (page 639, attributed to references 32 and 33). They are retained as typed-refused context, not mislabeled as a Gibbs-energy token. The context records the code-set checks at `tools/validate_literature_extracts.py::OBSERVATION_TYPES`, `simulator/battery/migrate.py::TYPE_QUANTITY`, `simulator/battery/migrate.py::QUANTITY_ALIASES`, and `simulator/battery/enums.py::Quantity`. It also retains the fitted equations and the printed silica thermochemical inputs used by the cryoscopic calculation; page 632 constants and heat-capacity expressions were checked against the page render. Figure 16's printed comparison temperature, 1200°C, is retained with its page and figure locator.
+
+No figure-derived values were digitized. All figure-only activity, coefficient, volatility, free-energy, and phase-boundary candidates are individually listed with locators in the extract context: Figures 1–20 on PDF pages 2–9. In particular, Na2O activity in Figure 16 is undigitized and carries the pure-liquid-Na2O standard state; K2O activity coefficients in Figure 20 are undigitized and carry the pure-liquid-K2O standard state.

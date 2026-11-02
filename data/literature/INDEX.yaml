@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 729
-  extracts: 727
+  sources: 732
+  extracts: 730
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 727
+  extracts_without_pdf: 730
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -98,6 +98,7 @@ gaps:
   - cacciatore-zajacz-2026-v-sc-oxybarometer
   - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   - cardiff-2007-vacuum-pyrolysis-gsfc
+  - charles-1967-alkali-silicate-activities
   - charnoz-2023-hydrogen-magma-ocean
   - chatain-2021-nacro2-thermodynamics
   - chaudary-1997-v-redox-binary-silicate
@@ -132,6 +133,8 @@ gaps:
   - distin-1971-ferrous-silicate-melts
   - dohmen-2003-coupled-kinetics
   - dong-2009-cr-v-slag-activities
+  - doyle-1988-feo-activity-multicomponent-magma
+  - doyle-1989-tio2-feo-activity-magma
   - drowart-1960-al2o3-kems
   - ehrt-2008-sn-redox-aluminosilicate
   - engelschion-2020-eac1a-simulant
@@ -6012,6 +6015,64 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: charles-1967-alkali-silicate-activities
+  aliases: []
+  citation: Charles, R. J. (1967). Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions. Journal of the
+    American Ceramic Society, 50(12), 631–641.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/charles-1967-alkali-silicate-activities.yaml
+    review_status: draft
+    rows: 120
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/charles-1967-alkali-silicate-activities/charles-1967-alkali-silicate-activities.pdf
+      present: true
+      sha256: e06036723a8ba830daa18c5fbd480dfc7c919b6b4bf50582dfbc5b4368428153
+      matches_simulator: null
+    sidecar:
+      path: raw/charles-1967-alkali-silicate-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/charles-1967-alkali-silicate-activities
+      exists: true
+      file_count: 59
+    tables:
+      path: tables/charles-1967-alkali-silicate-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/charles-1967-alkali-silicate-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/charles-1967-alkali-silicate-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: charnoz-2023-hydrogen-magma-ocean
   aliases: []
   citation: 'Charnoz, S., Falco, A., Tremblin, P., Sossi, P., Caracas, R. & Lagage, P.-O. (2023), "The
@@ -8005,6 +8066,122 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: doyle-1988-feo-activity-multicomponent-magma
+  aliases: []
+  citation: Doyle, C.D. (1988). Prediction of the activity of FeO in multicomponent magma from known values
+    in [SiO2-KAlO2-CaAl2Si2O8]-FeO liquids. Geochimica et Cosmochimica Acta 52, 1827–1834.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/doyle-1988-feo-activity-multicomponent-magma.yaml
+    review_status: draft
+    rows: 130
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/doyle-1988-feo-activity-multicomponent-magma/doyle-1988-feo-activity-multicomponent-magma.pdf
+      present: true
+      sha256: 12de73961e3369564fba36b3edfd1b0f5a8ed5adee63f055dc4fb42793455ca2
+      matches_simulator: null
+    sidecar:
+      path: raw/doyle-1988-feo-activity-multicomponent-magma/sidecar.yaml
+      present: true
+    text:
+      path: text/doyle-1988-feo-activity-multicomponent-magma
+      exists: true
+      file_count: 22
+    tables:
+      path: tables/doyle-1988-feo-activity-multicomponent-magma
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/doyle-1988-feo-activity-multicomponent-magma.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/doyle-1988-feo-activity-multicomponent-magma.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+- source_id: doyle-1989-tio2-feo-activity-magma
+  aliases: []
+  citation: Doyle, C. D. (1989), Effect of substitution of TiO2 for SiO2 on f(FeO) in magma, Geochimica
+    et Cosmochimica Acta 53, 2631–2638.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml
+    review_status: draft
+    rows: 167
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/doyle-1989-tio2-feo-activity-magma/doyle-1989-tio2-feo-activity-magma.pdf
+      present: true
+      sha256: a5329971de012f487144ecf140e2b41b7c0a538379d677a2aa557549108a0eea
+      matches_simulator: null
+    sidecar:
+      path: raw/doyle-1989-tio2-feo-activity-magma/sidecar.yaml
+      present: true
+    text:
+      path: text/doyle-1989-tio2-feo-activity-magma
+      exists: true
+      file_count: 33
+    tables:
+      path: tables/doyle-1989-tio2-feo-activity-magma
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/doyle-1989-tio2-feo-activity-magma.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/doyle-1989-tio2-feo-activity-magma.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
 - source_id: drowart-1960-al2o3-kems
   aliases: []
   citation: Drowart, J., DeMaria, G., Burns, R. P. & Inghram, M. G. (1960), “Thermodynamics of Al2O3 Using
