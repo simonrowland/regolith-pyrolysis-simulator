@@ -1206,7 +1206,7 @@ class EvaporationMixin:
                 molar_flow_mol_s_at_pressure=pipe_molar_flow,
                 pressure_bracket_Pa=(downstream_Pa, upper_pressure_Pa),
                 evaluate_flux=evaluate_flux,
-                write_partials=write_partials,
+                commit_flux=project_inventory_limited_flux,
                 relative_tolerance=1.0e-9,
                 max_iterations=80,
                 **solve_options,
@@ -1240,7 +1240,7 @@ class EvaporationMixin:
                 previous_pressure,
                 1.0e-300,
             )
-            solver_residual = max(solved.residual_relative, pressure_change)
+            solver_residual = solved.residual_relative
             solver_iterations += solved.iterations
             if solved.converged and pressure_change <= 1.0e-9:
                 solver_converged = True
@@ -1260,8 +1260,8 @@ class EvaporationMixin:
                 'code': 'headspace_partial_solver_not_converged',
                 'severity': 'warning',
                 'residual_relative': solver_residual,
-                'residual_Pa_by_species': dict(
-                    solved.residual_Pa_by_species
+                'residual_kg_s_by_species': dict(
+                    solved.residual_kg_s_by_species
                 ),
             })
             if 'O2' in vapor_pressures:
@@ -1286,8 +1286,11 @@ class EvaporationMixin:
             'total_pressure_Pa': pressure_Pa,
             'pressure_residual_Pa': solved.pressure_residual_Pa,
             'residual_relative': solver_residual,
-            'residual_Pa_by_species': dict(
-                solved.residual_Pa_by_species
+            'residual_kg_s_by_species': dict(
+                solved.residual_kg_s_by_species
+            ),
+            'residual_relative_by_species': dict(
+                solved.residual_relative_by_species
             ),
             'candidate_partials_Pa': dict(solved.candidate_partials_Pa),
             'writer_partials_Pa': dict(solved.writer_partials_Pa),

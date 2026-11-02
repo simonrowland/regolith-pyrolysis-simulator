@@ -75,12 +75,12 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
 
     assert snapshot.evap_flux.total_kg_hr > 0.0
     solver = sim._last_evaporation_flux_diagnostic["headspace_solver"]
-    if solver["status"] == "not_converged":
-        assert any(
-            notice.get("code") == "headspace_partial_solver_not_converged"
-            and notice.get("residual_relative") == solver["residual_relative"]
-            for notice in sim._last_evaporation_flux_diagnostic["notice_flags"]
-        )
+    assert solver["status"] == "converged"
+    assert solver["residual_relative"] <= 1.0e-9
+    assert all(
+        residual <= 1.0e-9
+        for residual in solver["residual_relative_by_species"].values()
+    )
     for species, writer_partial_Pa in solver["writer_partials_Pa"].items():
         committed_partial_Pa = float(
             (snapshot.melt_headspace_composition_mbar or {}).get(species, 0.0)

@@ -133,16 +133,23 @@ def compressible_poiseuille_mass_flow(
 
 @dataclass(frozen=True)
 class QuasiSteadyHeadspaceSolve:
-    candidate_partials_Pa: dict[str, float]
-    writer_partials_Pa: dict[str, float]
+    partials_Pa: dict[str, float]
     flux: EvaporationFlux
-    residual_Pa_by_species: dict[str, float]
+    residual_kg_s_by_species: dict[str, float]
+    residual_relative_by_species: dict[str, float]
     residual_relative: float
     iterations: int
     converged: bool
     total_pressure_Pa: float
     pressure_residual_Pa: float
-    used_carrier_free_fallback: bool
+
+    @property
+    def candidate_partials_Pa(self) -> dict[str, float]:
+        return self.partials_Pa
+
+    @property
+    def writer_partials_Pa(self) -> dict[str, float]:
+        return self.partials_Pa
 
 
 def _headspace_partials_at_pressure_Pa(
@@ -179,7 +186,9 @@ def _headspace_partials_at_pressure_Pa(
         )  # kg/(s Pa) — M_i [kg/mol] × n [mol/s] / P [Pa]
         denominator = beta + removal_per_partial
         partials[key] = (
-            equilibrium * beta / denominator if denominator > 0.0 else 0.0
+            equilibrium * beta / denominator
+            if denominator > 0.0
+            else equilibrium
         )
     if flow <= 0.0:
         for rate in fixed_molar_flow_mol_s_by_species.values():
@@ -205,14 +214,14 @@ def solve_quasi_steady_headspace_partials_Pa(
     molar_flow_mol_s_at_pressure: Callable[[float], float],
     pressure_bracket_Pa: tuple[float, float],
     evaluate_flux: Callable[[Mapping[str, float], float], EvaporationFlux],
-    write_partials: Callable[[EvaporationFlux], Mapping[str, float]],
+    commit_flux: Callable[[EvaporationFlux], EvaporationFlux] | None = None,
     fixed_pressure_Pa: float | None = None,
     fixed_pressure_molar_flow_mol_s: float | None = None,
     carrier_free_molar_flow_mol_s_at_pressure: Callable[[float], float] | None = None,
     relative_tolerance: float = 1.0e-9,
     max_iterations: int = 80,
 ) -> QuasiSteadyHeadspaceSolve:
-    """Close the species balances with one bracketed total-pressure solve.
+    """Close the species balances against the flux that inventory can commit.
 
     Premise: total pressure ``P`` sets molar flow ``n(P)`` from the existing
     pipe law. Carrier-free Poiseuille is ``M_mix*K*(P²-P_d²)`` kg/s, so
@@ -244,7 +253,15 @@ def solve_quasi_steady_headspace_partials_Pa(
     on the fixed-capacity path. For Na,
     ``M*K=1.02563e-7 kg/(s Pa²)`` and
     ``M*K*p²=beta*(P_eq-p)`` gives ``p=1.20745 Pa``; both sides are kg/s,
-    and ``p=0`` recovers the free-source limit.
+    and ``p=0`` recovers the free-source limit. Frozen oxygen stays at its
+    declared incoming partial; this solve does not add an oxygen chemistry
+    root.
+
+    The closed form supplies a fast first candidate. If inventory limiting
+    makes the actual committed flux nonlinear, the solver brackets each
+    participating partial in [0, P_eq] and compares committed source [kg/s]
+    with removal [kg/s]. This safeguarded root is the convergence criterion;
+    an unchanged pressure alone cannot certify closure.
     """
 
     if not math.isfinite(float(relative_tolerance)) or relative_tolerance <= 0.0:
@@ -281,26 +298,215 @@ def solve_quasi_steady_headspace_partials_Pa(
         partials = partials_at(pressure, flow)
         return sum(partials.values()) - pressure, partials
 
-    used_fallback = False
+    committed_flux = commit_flux or (lambda flux: flux)
+
+    def actual_state(
+        candidate: Mapping[str, float], pressure: float, flow: float
+    ):
+        raw_flux = evaluate_flux(candidate, pressure)
+        committed = committed_flux(raw_flux)
+        source_kg_s = {
+            str(species): max(0.0, float(rate)) / 3600.0
+            for species, rate in committed.species_kg_hr.items()
+        }
+        residuals: dict[str, float] = {}
+        relative_by_species: dict[str, float] = {}
+        for species in species_ids:
+            molar_mass = max(
+                0.0,
+                float(molar_mass_kg_mol_by_species.get(species, 0.0)),
+            )
+            removal = (
+                molar_mass * flow / pressure
+                * max(0.0, float(candidate.get(species, 0.0)))
+                if pressure > 0.0
+                else 0.0
+            )
+            source = source_kg_s.get(species, 0.0)
+            residuals[species] = source - removal
+            relative_by_species[species] = abs(source - removal) / max(
+                source, removal, 1.0e-300
+            )
+        for species, raw_rate in fixed_molar_flow_mol_s_by_species.items():
+            key = str(species)
+            molar_mass = max(
+                0.0,
+                float(molar_mass_kg_mol_by_species.get(key, 0.0)),
+            )
+            expected = max(0.0, float(raw_rate)) * molar_mass
+            source = source_kg_s.get(key, 0.0)
+            residuals[key] = source - expected
+            relative_by_species[key] = abs(source - expected) / max(
+                source, expected, 1.0e-300
+            )
+        for species, value in fixed.items():
+            key = str(species)
+            actual = max(0.0, float(candidate.get(key, 0.0)))
+            residuals.setdefault(key, 0.0)
+            relative_by_species[key] = abs(actual - value) / max(
+                actual, value, 1.0e-300
+            )
+        for species in source_kg_s:
+            residuals.setdefault(species, source_kg_s[species])
+            relative_by_species.setdefault(
+                species,
+                0.0 if source_kg_s[species] == 0.0 else 1.0,
+            )
+        return raw_flux, committed, residuals, relative_by_species
+
+    def state_relative(relative_by_species: Mapping[str, float]) -> float:
+        return max(relative_by_species.values(), default=0.0)
+
+    def participant_relative(relative_by_species: Mapping[str, float]) -> float:
+        return max(
+            (relative_by_species.get(species, 0.0) for species in species_ids),
+            default=0.0,
+        )
+
+    def species_roots_at_pressure(
+        pressure: float,
+        flow: float,
+        seed: Mapping[str, float],
+    ):
+        candidate = dict(seed)
+        total_iterations = 0
+
+        def species_residual(species: str, partial: float):
+            trial = dict(candidate)
+            trial[species] = partial
+            _raw, _committed, residuals, relative_by_species = actual_state(
+                trial, pressure, flow
+            )
+            return residuals.get(species, 0.0), relative_by_species.get(
+                species, 0.0
+            )
+
+        for _sweep in range(min(max_iterations, 12)):
+            for species in species_ids:
+                equilibrium = max(0.0, float(equilibrium_Pa[species]))
+                low, high = 0.0, equilibrium
+                low_residual, low_relative = species_residual(species, low)
+                high_residual, high_relative = species_residual(species, high)
+                total_iterations += 2
+                best_partial, best_residual, best_relative = (
+                    (low, low_residual, low_relative)
+                    if low_relative <= high_relative
+                    else (high, high_residual, high_relative)
+                )
+                if low_relative <= relative_tolerance:
+                    candidate[species] = low
+                    continue
+                if high_relative <= relative_tolerance:
+                    candidate[species] = high
+                    continue
+                if low_residual < 0.0 or high_residual > 0.0:
+                    candidate[species] = min(
+                        (low, high), key=lambda value: abs(
+                            species_residual(species, value)[0]
+                        )
+                    )
+                    continue
+                for _iteration in range(max_iterations):
+                    denominator = high_residual - low_residual
+                    trial = (
+                        low - low_residual * (high - low) / denominator
+                        if denominator != 0.0 and math.isfinite(denominator)
+                        else 0.5 * (low + high)
+                    )
+                    width = high - low
+                    if not low + 0.01 * width < trial < high - 0.01 * width:
+                        trial = 0.5 * (low + high)
+                    residual, relative = species_residual(species, trial)
+                    total_iterations += 1
+                    if relative < best_relative:
+                        best_partial, best_residual, best_relative = (
+                            trial, residual, relative
+                        )
+                    if relative <= relative_tolerance:
+                        best_partial, best_residual, best_relative = (
+                            trial, residual, relative
+                        )
+                        break
+                    if residual > 0.0:
+                        low, low_residual = trial, residual
+                        high_residual *= 0.5
+                    else:
+                        high, high_residual = trial, residual
+                        low_residual *= 0.5
+                candidate[species] = best_partial
+            raw, committed, residuals, relative_by_species = actual_state(
+                candidate, pressure, flow
+            )
+            total_iterations += 1
+            if participant_relative(relative_by_species) <= relative_tolerance:
+                return (
+                    candidate, raw, residuals, relative_by_species,
+                    total_iterations,
+                )
+        raw, _committed, residuals, relative_by_species = actual_state(
+            candidate, pressure, flow
+        )
+        total_iterations += 1
+        return candidate, raw, residuals, relative_by_species, total_iterations
+
+    def pressure_root(flow_function):
+        low = lower
+        high = max(upper, lower)
+
+        def residual_at(value: float):
+            flow = max(0.0, float(flow_function(value)))
+            residual, candidate = pressure_sum_residual(value, flow)
+            return residual, candidate, flow
+
+        low_residual, low_partials, low_flow = residual_at(low)
+        if low_residual <= 0.0:
+            return low, low_partials, low_residual, low_flow, 1
+        high_residual, high_partials, high_flow = residual_at(high)
+        for _ in range(64):
+            if high_residual <= 0.0:
+                break
+            high = max(high * 2.0, high + 1.0)
+            high_residual, high_partials, high_flow = residual_at(high)
+        else:
+            return high, high_partials, high_residual, high_flow, 64
+        best = (high, high_partials, high_residual, high_flow)
+        iterations = 0
+        for iterations in range(1, max_iterations + 1):
+            trial = 0.5 * (low + high)
+            residual, candidate, flow = residual_at(trial)
+            if abs(residual) < abs(best[2]):
+                best = (trial, candidate, residual, flow)
+            if abs(residual) <= relative_tolerance * max(
+                trial, sum(candidate.values()), 1.0e-300
+            ):
+                best = (trial, candidate, residual, flow)
+                break
+            if residual > 0.0:
+                low = trial
+            else:
+                high = trial
+        return *best, iterations
+
     pressure = 0.0
-    iteration_count = 0
+    flow = 0.0
     pressure_residual = math.inf
+    iteration_count = 0
     pressure_closed = fixed_pressure_Pa is None
+    used_fallback = False
     if fixed_pressure_Pa is not None:
         pressure = max(0.0, float(fixed_pressure_Pa))
-        flow = max(
-            0.0,
-            float(fixed_pressure_molar_flow_mol_s or 0.0),
-        )
+        flow = max(0.0, float(fixed_pressure_molar_flow_mol_s or 0.0))
         pressure_residual, candidate = pressure_sum_residual(pressure, flow)
+        iteration_count = 1
         if (
             pressure_residual > relative_tolerance * max(pressure, 1.0)
             and carrier_free_molar_flow_mol_s_at_pressure is not None
         ):
             used_fallback = True
             pressure_closed = True
-        else:
-            iteration_count = 1
+    else:
+        candidate = {}
+
     if fixed_pressure_Pa is None or used_fallback:
         flow_function = (
             carrier_free_molar_flow_mol_s_at_pressure
@@ -309,113 +515,101 @@ def solve_quasi_steady_headspace_partials_Pa(
         )
         if flow_function is None:
             raise ValueError("carrier-free pressure fallback has no pipe law")
-        low = lower
-        high = max(upper, lower)
+        pressure, candidate, pressure_residual, flow, iterations = pressure_root(
+            flow_function
+        )
+        iteration_count += iterations
 
-        def residual_at(value: float) -> tuple[float, dict[str, float]]:
-            flow_value = max(0.0, float(flow_function(value)))
-            return pressure_sum_residual(value, flow_value)
-
-        low_residual, low_partials = residual_at(low)
-        if low_residual <= 0.0:
-            pressure = low
-            pressure_residual = low_residual
-            candidate = low_partials
-            iteration_count = 1
-        else:
-            high_residual, high_partials = residual_at(high)
-            for _ in range(64):
-                if high_residual <= 0.0:
-                    break
-                high = max(high * 2.0, high + 1.0)
-                high_residual, high_partials = residual_at(high)
-            else:
-                high_residual = math.inf
-            if high_residual > 0.0:
-                pressure = high
-                pressure_residual = high_residual
-                candidate = high_partials
-                iteration_count = max_iterations
-            else:
-                best_pressure = high
-                best_residual = high_residual
-                best_partials = high_partials
-                for iteration in range(1, max_iterations + 1):
-                    trial = 0.5 * (low + high)
-                    residual, mid_partials = residual_at(trial)
-                    if abs(residual) < abs(best_residual):
-                        best_pressure = trial
-                        best_residual = residual
-                        best_partials = mid_partials
-                    if abs(residual) <= relative_tolerance * max(
-                        trial, sum(mid_partials.values()), 1.0e-300
-                    ):
-                        best_pressure = trial
-                        best_residual = residual
-                        best_partials = mid_partials
-                        break
-                    if residual > 0.0:
-                        low = trial
-                    else:
-                        high = trial
-                pressure = best_pressure
-                pressure_residual = best_residual
-                candidate = best_partials
-                iteration_count = iteration
-
-    flux = evaluate_flux(candidate, pressure)
-    written = {
-        str(species): max(0.0, float(value))
-        for species, value in write_partials(flux).items()
-        if math.isfinite(float(value))
-    }
-    residuals = {
-        species: written.get(species, 0.0) - candidate.get(species, 0.0)
-        for species in species_ids
-    }
-    relative = max(
-        (
-            abs(residuals[species])
-            / max(
-                float(equilibrium_Pa[species]),
-                abs(candidate.get(species, 0.0)),
-                abs(written.get(species, 0.0)),
-                1.0e-300,
-            )
-            for species in species_ids
-        ),
-        default=0.0,
+    raw_flux, committed, residuals, relative_by_species = actual_state(
+        candidate, pressure, flow
     )
-    if fixed_pressure_Pa is None or used_fallback:
+    iteration_count += 1
+    if participant_relative(relative_by_species) > relative_tolerance:
+        candidate, raw_flux, residuals, relative_by_species, root_iterations = (
+            species_roots_at_pressure(pressure, flow, candidate)
+        )
+        iteration_count += root_iterations
+
+    if pressure_closed and participant_relative(relative_by_species) > relative_tolerance:
+        def nonlinear_pressure_residual(value: float):
+            flow_at_value = max(0.0, float(flow_function(value)))
+            seed = partials_at(
+                value,
+                flow_at_value,
+            )
+            solved_at_value = species_roots_at_pressure(
+                value,
+                flow_at_value,
+                seed,
+            )
+            candidate_at_value = solved_at_value[0]
+            return (
+                sum(candidate_at_value.values()) - value,
+                solved_at_value,
+                flow_at_value,
+            )
+
+        low, high = lower, max(upper, lower)
+        low_residual, low_solved, low_flow = nonlinear_pressure_residual(low)
+        high_residual, high_solved, high_flow = nonlinear_pressure_residual(high)
+        iteration_count += low_solved[4] + high_solved[4]
+        for _ in range(64):
+            if high_residual <= 0.0:
+                break
+            high = max(high * 2.0, high + 1.0)
+            high_residual, high_solved, high_flow = nonlinear_pressure_residual(high)
+            iteration_count += high_solved[4]
+        best_pressure, best_solved, best_flow, best_pressure_residual = (
+            (low, low_solved, low_flow, low_residual)
+            if low_residual <= 0.0
+            else (high, high_solved, high_flow, high_residual)
+        )
+        if low_residual > 0.0 and high_residual <= 0.0:
+            for _iteration in range(max_iterations):
+                trial = 0.5 * (low + high)
+                trial_residual, trial_solved, trial_flow = (
+                    nonlinear_pressure_residual(trial)
+                )
+                iteration_count += trial_solved[4]
+                if abs(trial_residual) < abs(best_pressure_residual):
+                    best_pressure, best_solved, best_flow, best_pressure_residual = (
+                        trial, trial_solved, trial_flow, trial_residual
+                    )
+                if abs(trial_residual) <= relative_tolerance * max(
+                    trial,
+                    sum(trial_solved[0].values()),
+                    1.0e-300,
+                ):
+                    best_pressure, best_solved, best_flow, best_pressure_residual = (
+                        trial, trial_solved, trial_flow, trial_residual
+                    )
+                    break
+                if trial_residual > 0.0:
+                    low = trial
+                else:
+                    high = trial
+        pressure = best_pressure
+        candidate, raw_flux, residuals, relative_by_species = best_solved[:4]
+        flow = best_flow
+        pressure_residual = best_pressure_residual
+
+    relative = state_relative(relative_by_species)
+    if pressure_closed:
         relative = max(
             relative,
             abs(pressure_residual)
             / max(pressure, sum(candidate.values()), 1.0e-300),
         )
-    if (
-        pressure_closed
-        and pressure == lower
-        and sum(float(value) for value in equilibrium_Pa.values()) <= lower
-    ):
-        relative = max(
-            (
-                abs(residuals[species])
-                / max(float(equilibrium_Pa[species]), 1.0e-300)
-                for species in species_ids
-            ),
-            default=0.0,
-        )
     return QuasiSteadyHeadspaceSolve(
-        candidate_partials_Pa=candidate,
-        writer_partials_Pa=written,
-        flux=flux,
-        residual_Pa_by_species=residuals,
+        partials_Pa=candidate,
+        flux=raw_flux,
+        residual_kg_s_by_species=residuals,
+        residual_relative_by_species=relative_by_species,
         residual_relative=relative,
         iterations=iteration_count,
         converged=relative <= relative_tolerance,
         total_pressure_Pa=pressure,
         pressure_residual_Pa=pressure_residual,
-        used_carrier_free_fallback=used_fallback,
     )
 
 

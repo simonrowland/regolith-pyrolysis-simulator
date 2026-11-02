@@ -22,7 +22,6 @@ def _single_species_solver(
     *,
     beta,
     equilibrium,
-    writer,
     pipe_K=1.0,
     molar_mass=0.0229898,
     downstream=0.0,
@@ -53,7 +52,6 @@ def _single_species_solver(
         molar_flow_mol_s_at_pressure=molar_flow,
         pressure_bracket_Pa=(downstream, max(equilibrium, downstream) + 1.0),
         evaluate_flux=evaluate,
-        write_partials=writer,
         fixed_pressure_Pa=fixed_pressure,
         fixed_pressure_molar_flow_mol_s=fixed_flow,
         max_iterations=limit,
@@ -70,23 +68,9 @@ def test_carrier_free_pipe_matches_hand_solved_na_partial_and_closes_residual():
     coefficient = 4.46123e-6  # mol/(s Pa²), carrier-free pipe at 1065 °C
     model = OverheadGasModel()
 
-    def writer(flux):
-        pressure_mbar = model._vapor_pressure_mbar_from_flux(
-            flux.total_kg_hr / 3600.0,
-            1065.0,
-            species_kg_for_M_avg=flux.species_kg_hr,
-        )
-        return {
-            species: partial_mbar * 100.0
-            for species, partial_mbar in model.species_partial_pressures(
-                flux, pressure_mbar
-            ).items()
-        }
-
     solved = _single_species_solver(
         beta=beta,
         equilibrium=equilibrium,
-        writer=writer,
         pipe_K=coefficient,
         molar_mass=molar_mass,
         molar_flow_override=lambda pressure: model._pipe_molar_flow_mol_s(
@@ -115,7 +99,6 @@ def test_zero_pipe_removal_reaches_equilibrium_with_zero_net_source():
     solved = _single_species_solver(
         beta=beta,
         equilibrium=equilibrium,
-        writer=lambda _flux: {"Na": equilibrium},
         pipe_K=0.0,
     )
     assert solved.converged
@@ -140,7 +123,6 @@ def test_fixed_pressure_residual_uses_nonlinear_committed_source():
         molar_flow_mol_s_at_pressure=lambda _pressure: 1.0,
         pressure_bracket_Pa=(0.0, 3.0),
         evaluate_flux=evaluate,
-        write_partials=lambda _flux: {"Na": 1.0},
         fixed_pressure_Pa=1.0,
         fixed_pressure_molar_flow_mol_s=1.0,
     )
@@ -225,18 +207,9 @@ def test_large_pipe_conductance_approaches_zero_partial_and_free_source(beta):
     molar_mass = 0.023
     coefficient = 1.0e10
 
-    def writer(flux):
-        rate = flux.total_kg_hr / 3600.0
-        return {
-            "Na": math.sqrt(rate / (molar_mass * coefficient))
-            if rate > 0.0
-            else 0.0
-        }
-
     solved = _single_species_solver(
         beta=beta,
         equilibrium=equilibrium,
-        writer=writer,
         pipe_K=coefficient,
         molar_mass=molar_mass,
     )
@@ -259,14 +232,9 @@ def test_swept_nonzero_downstream_pressure_balances_at_review_value():
         total_pressure - downstream_pressure**2 / total_pressure
     )  # kg/(s Pa)
 
-    def writer(flux):
-        rate = flux.total_kg_hr / 3600.0
-        return {"Na": rate / removal_per_partial if rate > 0.0 else 0.0}
-
     solved = _single_species_solver(
         beta=beta,
         equilibrium=equilibrium,
-        writer=writer,
         pipe_K=coefficient,
         molar_mass=molar_mass,
         downstream=downstream_pressure,
@@ -284,19 +252,10 @@ def test_amplitude_and_empty_hour_are_stable():
     molar_mass = 0.056
     coefficient = 2.0e-6
 
-    def pipe_writer(flux):
-        rate = flux.total_kg_hr / 3600.0
-        return {
-            "Na": math.sqrt(rate / (molar_mass * coefficient))
-            if rate > 0.0
-            else 0.0
-        }
-
     roots = [
         _single_species_solver(
             beta=beta,
             equilibrium=equilibrium,
-            writer=pipe_writer,
             pipe_K=coefficient,
             molar_mass=molar_mass,
         )
@@ -315,7 +274,6 @@ def test_amplitude_and_empty_hour_are_stable():
         molar_flow_mol_s_at_pressure=lambda _pressure: 0.0,
         pressure_bracket_Pa=(0.0, 1.0),
         evaluate_flux=lambda _partials, _pressure: _flux(0.0),
-        write_partials=lambda _flux: {},
     )
     assert empty.converged
     assert empty.flux.total_kg_hr == 0.0
@@ -338,16 +296,6 @@ def test_scalar_pressure_root_closes_two_species_balance_and_S_is_monotone():
         flux.update_totals()
         return flux
 
-    def writer(flux):
-        rates = flux.species_kg_hr
-        moles = {species: rate / 3600.0 / molar_mass for species, rate in rates.items()}
-        total_moles = sum(moles.values())
-        total_pressure = 2.0
-        return {
-            species: rate / total_moles * total_pressure
-            for species, rate in moles.items()
-        }
-
     def molar_flow(pressure):
         return pipe_K * pressure**2
 
@@ -360,7 +308,6 @@ def test_scalar_pressure_root_closes_two_species_balance_and_S_is_monotone():
         molar_flow_mol_s_at_pressure=molar_flow,
         pressure_bracket_Pa=(0.0, 6.0),
         evaluate_flux=evaluate,
-        write_partials=writer,
     )
     assert solved.converged
     assert solved.residual_relative <= 1.0e-9
@@ -388,13 +335,18 @@ def test_scalar_pressure_root_closes_two_species_balance_and_S_is_monotone():
 
 
 def test_bounded_nonconvergence_returns_best_iterate_and_residual():
-    solved = _single_species_solver(
-        beta=1.0e-6,
-        equilibrium=2.0,
-        writer=lambda _flux: {"Na": 1.0},
-        pipe_K=1.0,
-        fixed_pressure=1.0,
-        limit=1,
+    solved = solve_quasi_steady_headspace_partials_Pa(
+        equilibrium_Pa={"Na": 2.0},
+        fixed_partials_Pa={},
+        beta_kg_s_Pa_by_species={"Na": 1.0e-6},
+        molar_mass_kg_mol_by_species={"Na": 0.0229898},
+        fixed_molar_flow_mol_s_by_species={},
+        molar_flow_mol_s_at_pressure=lambda _pressure: 1.0,
+        pressure_bracket_Pa=(0.0, 3.0),
+        evaluate_flux=lambda _partials, _pressure: _flux(1.0),
+        fixed_pressure_Pa=1.0,
+        fixed_pressure_molar_flow_mol_s=1.0,
+        max_iterations=1,
     )
     assert not solved.converged
     assert math.isfinite(solved.candidate_partials_Pa["Na"])
