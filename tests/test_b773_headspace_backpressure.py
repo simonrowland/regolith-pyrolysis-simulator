@@ -29,6 +29,42 @@ def _lunar_simulator():
     return sim
 
 
+def test_headspace_inventory_projection_numeric_baseline(monkeypatch):
+    from simulator import overhead
+
+    sim = _lunar_simulator()
+    committed_probes = []
+    original_solver = overhead.solve_quasi_steady_headspace_partials_Pa
+
+    def capture_committed_probe(**kwargs):
+        original_commit = kwargs["commit_flux"]
+
+        def capture_commit(raw_flux):
+            committed = original_commit(raw_flux)
+            if not committed_probes:
+                committed_probes.append(dict(committed.species_kg_hr))
+            return committed
+
+        kwargs["commit_flux"] = capture_commit
+        return original_solver(**kwargs)
+
+    monkeypatch.setattr(
+        overhead,
+        "solve_quasi_steady_headspace_partials_Pa",
+        capture_committed_probe,
+    )
+    sim.step()
+
+    assert committed_probes
+    # Golden pin from the first committed probe of lunar C2A at 1050 °C;
+    # the value is the current frozen-inventory projection in kg/hr.
+    assert committed_probes[0]["Na"] == pytest.approx(
+        7.955657572410583e-08,
+        rel=1.0e-12,
+        abs=1.0e-20,
+    )
+
+
 def test_lunar_c2a_hot_entry_has_no_empty_hours_or_period_two_species():
     """Keep the old pin in history and assert the live hourly solve stays on."""
     case = _cases("reproduction")[0]
