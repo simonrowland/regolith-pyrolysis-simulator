@@ -402,7 +402,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
         order.append("equilibrium")
         return SimpleNamespace()
 
-    def fake_evaporation(_equilibrium):
+    def fake_evaporation(_equilibrium, **_kwargs):
         order.append("evaporation")
         flux = EvaporationFlux(species_kg_hr={"SiO": 1.0e-6})
         flux.update_totals()
@@ -1242,7 +1242,11 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
         lambda: seen_fO2.append(sim._current_melt_redox_fO2_log())
         or SimpleNamespace(),
     )
-    monkeypatch.setattr(sim, "_calculate_evaporation", lambda _eq: EvaporationFlux())
+    monkeypatch.setattr(
+        sim,
+        "_calculate_evaporation",
+        lambda _eq, **_kwargs: EvaporationFlux(),
+    )
 
     sim.step()
 
