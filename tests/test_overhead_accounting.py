@@ -196,7 +196,7 @@ def test_provider_partition_projection_tracks_changes_on_both_runtime_paths(
     sim.overhead_model._finite_headspace_enabled = finite_headspace_enabled
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda equilibrium: EvaporationFlux()
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: EvaporationFlux()
     _bypass_analytic_depletion(sim)
     partitions = iter(((1.0, 2.0), (4.0, 5.0)))
     force_drain_values = []
@@ -251,7 +251,7 @@ def test_real_provider_partition_changes_across_two_ticks_on_both_paths(
         EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0),
         EvaporationFlux(species_kg_hr={"SiO": 40.0}, total_kg_hr=40.0),
     ))
-    sim._calculate_evaporation = lambda equilibrium: next(fluxes)
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: next(fluxes)
     _bypass_analytic_depletion(sim)
     o2_kg_per_mol = MOLAR_MASS["O2"] / 1000.0
 
@@ -482,7 +482,7 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
 
     sim.step()
@@ -498,7 +498,7 @@ def test_step_force_drain_stores_evaporation_o2_under_provider_authority():
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
     sim.step()
 
@@ -527,7 +527,7 @@ def test_overhead_o2_not_double_counted_across_ticks():
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
     def _terminal_o2_kg():
         return sum(
@@ -707,7 +707,7 @@ def test_step_drains_uncondensed_overhead_vapor_each_tick():
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda equilibrium: flux
+    sim._calculate_evaporation = lambda equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
     sim.step()
     first_terminal = sim.atom_ledger.kg_by_account(
@@ -1717,7 +1717,7 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda _equilibrium: flux
+    sim._calculate_evaporation = lambda _equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
     seen = {}
     real_update = sim.overhead_model.update
@@ -1773,7 +1773,7 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     sim._apply_native_fe_saturation_split = lambda **_kwargs: None
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda _equilibrium: flux
+    sim._calculate_evaporation = lambda _equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
     partial_pressure_registries = []
     real_species_partial_pressures = sim.overhead_model.species_partial_pressures
@@ -1880,7 +1880,7 @@ def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(
     sim._apply_native_fe_saturation_split = lambda **_kwargs: None
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
-    sim._calculate_evaporation = lambda _equilibrium: flux
+    sim._calculate_evaporation = lambda _equilibrium, **_kwargs: flux
     _bypass_analytic_depletion(sim)
 
     cleaned_before = sim.atom_ledger.kg_by_account("process.cleaned_melt")
