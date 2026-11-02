@@ -1099,6 +1099,16 @@ def test_cli_uses_distinct_foreign_tree_and_restores_runner_modules(
         REPO_ROOT / "data/literature/lab_parameter_vocabulary.yaml",
         literature / "lab_parameter_vocabulary.yaml",
     )
+    janaf_tables = literature / "compilations/janaf/tables"
+    janaf_tables.mkdir(parents=True)
+    shutil.copy2(
+        REPO_ROOT / "data/literature/compilations/janaf/tables/Na-013.yaml",
+        janaf_tables / "Na-013.yaml",
+    )
+    shutil.copy2(
+        REPO_ROOT / "data/literature/compilations/janaf/tables/Na-014.yaml",
+        janaf_tables / "Na-014.yaml",
+    )
     (tree / "tools").mkdir(parents=True)
     (tree / "tools/__init__.py").write_text("", encoding="utf-8")
     (tree / "tools/_foreign_tree_marker.py").write_text(
