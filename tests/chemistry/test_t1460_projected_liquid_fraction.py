@@ -54,6 +54,47 @@ def test_projection_reports_exact_fixture_dropped_mass_fractions(
     }
 
 
+def test_snapshot_projection_counts_overlapping_inert_mass_once(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    feed_masses_kg = _fixture_feed_masses_kg(feedstocks_data)
+    overlap_species = next(
+        species
+        for species in sim.inventory.inert_melt_components_kg
+        if species in feed_masses_kg
+    )
+    sim.melt.composition_kg = dict(feed_masses_kg)
+    sim.melt.update_total_mass()
+    sim.inventory.inert_melt_components_kg = {
+        overlap_species: feed_masses_kg[overlap_species],
+    }
+
+    snapshot = sim._make_snapshot()
+    diagnostic_composition = snapshot._magemin_diagnostic_composition_kg
+    assert diagnostic_composition == feed_masses_kg
+
+    total_feed_mass_kg = sum(feed_masses_kg.values())
+    expected_dropped = {
+        species: mass_kg / total_feed_mass_kg
+        for species, mass_kg in sorted(feed_masses_kg.items())
+        if species not in OXIDE_SPECIES
+        or species in _IG_UNSUPPORTED_OXIDES
+    }
+    projection = magemin_module.project_magemin_diagnostic_composition(
+        diagnostic_composition
+    )
+    assert projection.dropped_species_mass_fractions == expected_dropped
+    assert projection.dropped_mass_fraction == sum(expected_dropped.values())
+
+
 def test_projection_refuses_dropped_mass_above_cap_and_all_dropped_input():
     with pytest.raises(
         magemin_module.MAGEMinDiagnosticProjectionRefusal,
@@ -265,7 +306,7 @@ def _run_real_ticks_with_diagnostic(
             for species, mass_kg in sim.inventory.inert_melt_components_kg.items():
                 assert snapshot._magemin_diagnostic_composition_kg[
                     species
-                ] >= mass_kg
+                ] == mass_kg
             gate = snapshot.liquid_fraction_gate["evaporation"]
             assert gate["solidus_T_C"] < 1100.0 < gate["liquidus_T_C"]
             assert gate["liquid_fraction"] > 0.0
