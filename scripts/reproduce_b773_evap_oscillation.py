@@ -13,6 +13,7 @@ import argparse
 import json
 import socket
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +32,7 @@ _SIO2_KEYS = frozenset({"SiO2", "SiO2_gas"})
 def _run_case(case: dict) -> dict:
     from simulator.run_executor import RunExecutor
     from simulator.runner import PyrolysisRun
+    from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
 
     additives = dict(case.get("additives_kg") or {})
     run = PyrolysisRun(
@@ -57,8 +59,21 @@ def _run_case(case: dict) -> dict:
     initial_temperature_C = case.get("initial_temperature_C")
     if initial_temperature_C is not None:
         session.simulator.melt.temperature_C = float(initial_temperature_C)
-    execution = RunExecutor().execute_session(session, hours=int(run.hours))
     sim = session.simulator
+    original_make_snapshot = sim._make_snapshot
+
+    def make_snapshot_with_evaporation_diagnostic(*args, **kwargs):
+        snapshot = original_make_snapshot(*args, **kwargs)
+        snapshot.evaporative_headspace_diagnostic = json.loads(
+            json.dumps(
+                getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+            )
+        )
+        return snapshot
+
+    sim._make_snapshot = make_snapshot_with_evaporation_diagnostic
+    execution = RunExecutor().execute_session(session, hours=int(run.hours))
+    ledger_accounts = sim.atom_ledger.kg_by_account()
     hours = []
     evolved_kg: dict[str, float] = {}
     stage_capture_kg: dict[str, dict[str, float]] = {}
@@ -100,8 +115,26 @@ def _run_case(case: dict) -> dict:
                 "flux_kg_hr": flux,
                 "headspace_partial_mbar": partials,
                 "mass_balance_error_pct": float(snapshot.mass_balance_error_pct),
+                "evaporation_diagnostic": getattr(
+                    snapshot, "evaporative_headspace_diagnostic", {}
+                ),
             }
         )
+    ledger_stage_capture_kg: dict[str, dict[str, float]] = {}
+    for (source_account, stage_number, species), amount_kg in (
+        sim._stage_collection_kg_by_source.items()
+    ):
+        if source_account != "process.condensation_train":
+            continue
+        stage = str(stage_number)
+        bucket = ledger_stage_capture_kg.setdefault(stage, {})
+        bucket[str(species)] = bucket.get(str(species), 0.0) + float(amount_kg)
+    wall_accounts = {
+        account: {str(species): float(kg) for species, kg in values.items()}
+        for account, values in ledger_accounts.items()
+        if account == "process.wall_deposit"
+        or account.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
+    }
     return {
         "feedstock_id": case["feedstock_id"],
         "campaign": case["campaign"],
@@ -114,6 +147,18 @@ def _run_case(case: dict) -> dict:
         "hours": hours,
         "evolved_kg": evolved_kg,
         "stage_capture_kg": stage_capture_kg,
+        "ledger_stage_capture_kg": ledger_stage_capture_kg,
+        "ledger_terminal_offgas_kg": {
+            str(species): float(kg)
+            for species, kg in ledger_accounts.get("terminal.offgas", {}).items()
+        },
+        "ledger_condensation_train_kg": {
+            str(species): float(kg)
+            for species, kg in ledger_accounts.get(
+                "process.condensation_train", {}
+            ).items()
+        },
+        "ledger_wall_deposit_accounts_kg": wall_accounts,
         "wall_deposit_kg": wall_deposit_kg,
         "alternation": _alternation(hours),
     }
@@ -208,6 +253,14 @@ def _cases(which: str) -> list[dict]:
     }
     if which == "reproduction":
         return [lunar, mars]
+    if which == "lunar":
+        return [lunar]
+    if which == "mars":
+        return [mars]
+    if which == "staged":
+        return [staged]
+    if which == "c2b":
+        return [c2b]
     if which == "yields":
         return [lunar, mars, staged, c2b]
     raise SystemExit(f"unknown case set {which!r}")
@@ -238,41 +291,84 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--cases",
-        choices=("reproduction", "yields"),
+        choices=("reproduction", "lunar", "mars", "staged", "c2b", "yields"),
         default="reproduction",
     )
+    parser.add_argument("--repeat", type=int, default=1)
+    parser.add_argument("--omit-sio-first-five-hours", action="store_true")
     parser.add_argument("--json", type=Path, default=None)
     args = parser.parse_args()
+    if args.repeat < 1:
+        parser.error("--repeat must be positive")
+
+    restore_fit = None
+    if args.omit_sio_first_five_hours:
+        from copy import deepcopy
+
+        from simulator.core import PyrolysisSimulator
+
+        original_fit = PyrolysisSimulator._internal_analytical_equilibrium
+
+        def omit_early_sio_fit(self, *fit_args, **fit_kwargs):
+            # Hot-entry C2A's first five realized steps run from 1065 C
+            # through 1125 C. Temporarily make the SiO Antoine intercept
+            # unavailable, exercising the fit's existing typed omission.
+            hot_entry_temperature_C = float(self.melt.temperature_C)
+            if not 1050.0 < hot_entry_temperature_C <= 1125.0:
+                return original_fit(self, *fit_args, **fit_kwargs)
+            original_data = self.vapor_pressures
+            modified_data = deepcopy(original_data)
+            modified_data["oxide_vapors"]["SiO"]["antoine"]["A"] = None
+            self.vapor_pressures = modified_data
+            try:
+                return original_fit(self, *fit_args, **fit_kwargs)
+            finally:
+                self.vapor_pressures = original_data
+
+        PyrolysisSimulator._internal_analytical_equilibrium = omit_early_sio_fit
+        restore_fit = original_fit
 
     payload = {"engines": _engine_note(), "cases": []}
-    for case in _cases(args.cases):
-        label = f"{case['feedstock_id']} {case['campaign']} {case['hours']}h"
-        print(f"start {label}", flush=True)
-        result = _run_case(case)
-        payload["cases"].append(result)
-        alt = result["alternation"]
-        print(
-            f"done {label}: hours={alt['n_hours']} "
-            f"disjoint_flux={len(alt['disjoint_flux_hours'])} "
-            f"disjoint_partial={len(alt['disjoint_partial_hours'])} "
-            f"sio_exactly_one={len(alt['sio_exactly_one_hours'])} "
-            f"status={result['status']}",
-            flush=True,
-        )
-        for row in result["hours"]:
-            flux = ",".join(
-                f"{name}:{rate:.3e}"
-                for name, rate in sorted(row["flux_kg_hr"].items())
-            )
-            partial = ",".join(
-                f"{name}:{value:.3e}"
-                for name, value in sorted(row["headspace_partial_mbar"].items())
-            )
-            print(
-                f"  h{row['hour']:02d} {row['temperature_C']:.1f}C "
-                f"flux[{flux}] partial[{partial}]",
-                flush=True,
-            )
+    try:
+        for repeat in range(1, args.repeat + 1):
+            for case in _cases(args.cases):
+                label = f"{case['feedstock_id']} {case['campaign']} {case['hours']}h"
+                print(f"start {label} repeat={repeat}/{args.repeat}", flush=True)
+                wall_started = time.perf_counter()
+                cpu_started = time.process_time()
+                result = _run_case(case)
+                result["wall_seconds"] = time.perf_counter() - wall_started
+                result["process_cpu_seconds"] = time.process_time() - cpu_started
+                result["repeat"] = repeat
+                payload["cases"].append(result)
+                alt = result["alternation"]
+                print(
+                    f"done {label}: hours={alt['n_hours']} "
+                    f"disjoint_flux={len(alt['disjoint_flux_hours'])} "
+                    f"disjoint_partial={len(alt['disjoint_partial_hours'])} "
+                    f"sio_exactly_one={len(alt['sio_exactly_one_hours'])} "
+                    f"status={result['status']}",
+                    flush=True,
+                )
+                for row in result["hours"]:
+                    flux = ",".join(
+                        f"{name}:{rate:.3e}"
+                        for name, rate in sorted(row["flux_kg_hr"].items())
+                    )
+                    partial = ",".join(
+                        f"{name}:{value:.3e}"
+                        for name, value in sorted(row["headspace_partial_mbar"].items())
+                    )
+                    print(
+                        f"  h{row['hour']:02d} {row['temperature_C']:.1f}C "
+                        f"flux[{flux}] partial[{partial}]",
+                        flush=True,
+                    )
+    finally:
+        if restore_fit is not None:
+            from simulator.core import PyrolysisSimulator
+
+            PyrolysisSimulator._internal_analytical_equilibrium = restore_fit
     if args.json is not None:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
