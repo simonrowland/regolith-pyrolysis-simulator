@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 734
-  extracts: 732
+  sources: 736
+  extracts: 734
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 732
+  extracts_without_pdf: 734
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -98,6 +98,7 @@ gaps:
   - cacciatore-zajacz-2026-v-sc-oxybarometer
   - cacciatore-zajacz-2026-v-sc-oxybarometer-supplement
   - cardiff-2007-vacuum-pyrolysis-gsfc
+  - centolanzi-1966-tektite-vapour-pressure
   - charles-1967-alkali-silicate-activities
   - charnoz-2023-hydrogen-magma-ocean
   - chatain-2021-nacro2-thermodynamics
@@ -516,6 +517,7 @@ gaps:
   - saito-2021-fexo-cao-silica-activity
   - saito-2025-transition-metal-oxide-criteria
   - sakao-sano-1962-oxygen-ni-cr-co-cr
+  - sanders-1977-water-vapour-na-vaporization
   - saridikmen-2009-phosphide-sulphide
   - sato-1976-lunar-fo2-apollo-17
   - sato-hickling-mclane-1973-lunar-fo2
@@ -6017,6 +6019,65 @@ sources:
       last_stage: extracted
       date: '2026-09-12'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: centolanzi-1966-tektite-vapour-pressure
+  aliases: []
+  citation: Centolanzi, Frank J., and Dean R. Chapman (1966), "Vapor Pressure of Tektite Glass and Its
+    Bearing on Tektite Trajectories Determined from Aerodynamic Analysis," Journal of Geophysical Research
+    71(6):1735–1749.
+  doi: 10.1029/jz071i006p01735
+  report_number: null
+  identifier: 10.1029/jz071i006p01735
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/centolanzi-1966-tektite-vapour-pressure/centolanzi-1966-tektite-vapour-pressure.pdf
+      present: true
+      sha256: 636f4b22008c37986b3e0b721ef30538facfd25f4fc0e729afc15ee311f059d1
+      matches_simulator: null
+    sidecar:
+      path: raw/centolanzi-1966-tektite-vapour-pressure/sidecar.yaml
+      present: true
+    text:
+      path: text/centolanzi-1966-tektite-vapour-pressure
+      exists: true
+      file_count: 33
+    tables:
+      path: tables/centolanzi-1966-tektite-vapour-pressure
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/centolanzi-1966-tektite-vapour-pressure.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: ea3e4608a09ecef4d28a1ba0a070b0644b56e56b
 - source_id: charles-1967-alkali-silicate-activities
   aliases: []
   citation: Charles, R. J. (1967). Activities in Li2O-, Na2O-, and K2O-SiO2 Solutions. Journal of the
@@ -30438,6 +30499,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: sanders-1977-water-vapour-na-vaporization
+  aliases: []
+  citation: Sanders, D. M. and Haller, W. K. (1977), "Effect of Water Vapor on Sodium Vaporization from
+    Two Silica-Based Glasses", Journal of the American Ceramic Society 60(3-4), 138-141.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+    review_status: draft
+    rows: 31
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sanders-1977-water-vapour-na-vaporization/sanders-1977-water-vapour-na-vaporization.pdf
+      present: true
+      sha256: 7775bb803aeae983c438f40104523f34ef0dfbd01460d5708b7261a2f8c876f7
+      matches_simulator: null
+    sidecar:
+      path: raw/sanders-1977-water-vapour-na-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/sanders-1977-water-vapour-na-vaporization
+      exists: true
+      file_count: 32
+    tables:
+      path: tables/sanders-1977-water-vapour-na-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sanders-1977-water-vapour-na-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sanders-1977-water-vapour-na-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: ea3e4608a09ecef4d28a1ba0a070b0644b56e56b
 - source_id: saridikmen-2009-phosphide-sulphide
   aliases: []
   citation: Saridikmen, H., Kucukkaragoz, C. S. and Eric, R. H. (2009), “Phosphide and Sulphide Capacities

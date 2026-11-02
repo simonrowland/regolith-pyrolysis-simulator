@@ -1,0 +1,4308 @@
+schema_version: literature_extract.v1
+source_id: sanders-1977-water-vapour-na-vaporization
+source:
+  citation: Sanders, D. M. and Haller, W. K. (1977), "Effect of Water Vapor on Sodium Vaporization from Two Silica-Based Glasses",
+    Journal of the American Ceramic Society 60(3-4), 138-141.
+  year: 1977
+extraction:
+  method: MinerU table cells and pdftotext-layout were transcribed first; the Table I row/column layout and flagged/mismatched
+    cells were checked against PDF page 2, and Eq. (13) was checked against PDF page 3.
+  date: '2026-11-02'
+  worker: w1103sa-sa77
+review_status: draft
+fidelity_samples:
+- species: Na
+  observation_id: sanders_1977_table1_ternary_density_01
+  field: rho_t_as_published
+  value: 4.90 × 10^-9
+  locator:
+    page: 2
+    published_page: 139
+    pdf_page_index: 1
+    table: I
+    row: '1'
+    column: rho_t
+    note: Table I, first ternary measurement pair; PDF page 2 render.
+- species: Na
+  observation_id: sanders_1977_table1_ternary_density_04
+  field: rho_t_as_published
+  value: 3.67 × 10^-8
+  locator:
+    page: 2
+    published_page: 139
+    pdf_page_index: 1
+    table: I
+    row: '4'
+    column: rho_t
+    note: Table I, fourth ternary measurement pair; PDF page 2 render.
+- species: Na
+  observation_id: sanders_1977_table1_binary_density_06
+  field: rho_t_as_published
+  value: 1.16 × 10^-8
+  locator:
+    page: 2
+    published_page: 139
+    pdf_page_index: 1
+    table: I
+    row: '10'
+    column: rho_t
+    note: Table I, sixth binary measurement pair; PDF page 2 render.
+- species: Na2O
+  observation_id: sanders_1977_table1_ternary_k2
+  field: K2_as_published
+  value: 8.8 × 10^-6
+  locator:
+    page: 2
+    published_page: 139
+    pdf_page_index: 1
+    table: I
+    row: ternary parameter K2
+    column: Parameters*
+- species: NaOH
+  observation_id: sanders_1977_quoted_naoh_pressure_1e5_atm
+  field: quoted_pressure_as_published
+  value: P_NaOH in the range 10^-5 atm
+  locator:
+    page: 3
+    published_page: 140
+    pdf_page_index: 2
+    equation: '17'
+    note: Footnote below Eq. (17), PDF page 3 render.
+experiments:
+- experiment_id: sanders_1977_ternary_1570K
+  method: transpiration
+  method_as_printed: A transpiration apparatus was used to measure equilibrium vapor densities over a well-stirred glass melt.
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to this experiment.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not classify the gas-flow regime.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1570'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: 1570 K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mass_percent
+          amount_basis: mass_percent
+          units: wt%
+          components:
+          - - SiO2
+            - '74'
+          - - Na2O
+            - '16'
+          - - CaO
+            - '10'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: 74% SiO2; 16% Na2O; 10% CaO
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The source reports oxygen partial pressure, not oxygen fugacity.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    carrier_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+- experiment_id: sanders_1977_binary_1332K
+  method: transpiration
+  method_as_printed: A transpiration apparatus was used to measure equilibrium vapor densities over a well-stirred glass melt.
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to this experiment.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not classify the gas-flow regime.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1332'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: 1332 K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mass_percent
+          amount_basis: mass_percent
+          units: wt%
+          components:
+          - - SiO2
+            - '75'
+          - - Na2O
+            - '25'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: 75% SiO2; 25% Na2O
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The source reports oxygen partial pressure, not oxygen fugacity.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    carrier_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+- experiment_id: sanders_1977_quoted_NaOH_pressure
+  method: literature
+  method_as_printed: A pressure range from cited JANAF and Ref. 12 data, quoted in a footnote.
+  locator:
+    page: 3
+    published_page: 140
+    pdf_page_index: 2
+    equation: '17'
+    note: Footnote below Eq. (17).
+species:
+  Na:
+    observations:
+    - observation_id: sanders_1977_table1_ternary_density_01
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '1'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 5; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '4.90e-9'
+        rho_t_as_published: 4.90 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '3.5e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '1'
+            column: P_H2O
+          note: Printed as 3.5 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_ternary_density_02
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '2'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 6; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '1.37e-8'
+        rho_t_as_published: 1.37 × 10^-8
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.35e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '2'
+            column: P_H2O
+          note: Printed as 2.35 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_ternary_density_03
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '3'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 7; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '2.14e-8'
+        rho_t_as_published: 2.14 × 10^-8
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '7.32e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_H2O
+          note: Printed as 7.32 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_O2
+            note: The printed 2 × 10^-4 atm cell spans this measurement row.
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_table1_ternary_density_04
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '4'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 8; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '3.67e-8'
+        rho_t_as_published: 3.67 × 10^-8
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.94e-1'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_H2O
+          note: Printed as 2.94 × 10^-1 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_O2
+            note: The printed 2 × 10^-4 atm cell spans this measurement row.
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_table1_binary_density_01
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '1'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 10; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '2.18e-9'
+        rho_t_as_published: 2.18 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '3.5e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '1'
+            column: P_H2O
+          note: Printed as 3.5 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_binary_density_02
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '2'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 11; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '2.47e-9'
+        rho_t_as_published: 2.47 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '4.28e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '2'
+            column: P_H2O
+          note: Printed as 4.28 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_binary_density_03
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '3'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 12; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '4.29e-9'
+        rho_t_as_published: 4.29 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '7.59e-3'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_H2O
+          note: Printed as 7.59 × 10^-3 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_binary_density_04
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '4'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 13; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '5.27e-9'
+        rho_t_as_published: 5.27 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '1.18e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_H2O
+          note: Printed as 1.18 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_O2
+            note: The printed 2 × 10^-4 atm cell spans this measurement row.
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_table1_binary_density_05
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '5'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 14; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '6.35e-9'
+        rho_t_as_published: 6.35 × 10^-9
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.07e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '5'
+            column: P_H2O
+          note: Printed as 2.07 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '5'
+            column: P_O2
+            note: The printed 2 × 10^-4 atm cell spans this measurement row.
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_table1_binary_density_06
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: '6'
+        column: rho_t
+        note: Table I measurement pair; MinerU grid row 15; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        value: '1.16e-8'
+        rho_t_as_published: 1.16 × 10^-8
+        printed_unit_as_published: g/STP ml
+        density_standard_state_as_published: mass of Na present in a milliliter of ideal gas at 273.15 K and 1 atm
+        gas_species_as_published: Na vapor density, rho_t; rho_t = rho_NaOH + rho_Na (Eq. 12)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '8.33e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '6'
+            column: P_H2O
+          note: Printed as 8.33 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '6'
+            column: P_O2
+            note: The printed 2 × 10^-4 atm cell spans this measurement row.
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_eq13_ternary_row_01_p_t
+      experiment: sanders_1977_ternary_1570K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 1 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_ternary_density_01
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_ternary_density_01
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.000004777380430622009569377990430622009569377990430622'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K:
+          value: '1570'
+          locator: &id001
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '3.5e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '1'
+            column: P_H2O
+          note: Printed as 3.5 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_eq13_ternary_row_02_p_t
+      experiment: sanders_1977_ternary_1570K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 2 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_ternary_density_02
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_ternary_density_02
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.00001335716569377990430622009569377990430622009569378'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K:
+          value: '1570'
+          locator: &id002
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.35e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '2'
+            column: P_H2O
+          note: Printed as 2.35 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_eq13_ternary_row_03_p_t
+      experiment: sanders_1977_ternary_1570K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 3 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_ternary_density_03
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_ternary_density_03
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.000020864477799043062200956937799043062200956937799043'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K:
+          value: '1570'
+          locator: &id003
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '7.32e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_H2O
+          note: Printed as 7.32 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_O2
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_eq13_ternary_row_04_p_t
+      experiment: sanders_1977_ternary_1570K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 4 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_ternary_density_04
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_ternary_density_04
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.000035781604449760765550239234449760765550239234449761'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K:
+          value: '1570'
+          locator: &id004
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.94e-1'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_H2O
+          note: Printed as 2.94 × 10^-1 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_O2
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_eq13_binary_row_01_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 1 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_01
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_01
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.0000021254468038277511961722488038277511961722488038277'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id005
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '3.5e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '1'
+            column: P_H2O
+          note: Printed as 3.5 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_eq13_binary_row_02_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 2 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_02
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_02
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.0000024081897272727272727272727272727272727272727272727'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id006
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '4.28e-4'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '2'
+            column: P_H2O
+          note: Printed as 4.28 × 10^-4 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_eq13_binary_row_03_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 3 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_03
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_03
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.0000041826453157894736842105263157894736842105263157895'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id007
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '7.59e-3'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '3'
+            column: P_H2O
+          note: Printed as 7.59 × 10^-3 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_eq13_binary_row_04_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 4 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_04
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_04
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.0000051381214019138755980861244019138755980861244019139'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id008
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '1.18e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_H2O
+          note: Printed as 1.18 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '4'
+            column: P_O2
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_eq13_binary_row_05_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 5 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_05
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_05
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.0000061910950478468899521531100478468899521531100478469'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id009
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '2.07e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '5'
+            column: P_H2O
+          note: Printed as 2.07 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '5'
+            column: P_O2
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_eq13_binary_row_06_p_t
+      experiment: sanders_1977_binary_1332K
+      type: partial_pressure
+      regime: transpiration
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '13'
+        note: Eq. (13) reduced from Table I row 6 density.
+      phase: g
+      units: atm
+      derived_from:
+      - sanders_1977_table1_binary_density_06
+      derivation:
+        relation: P_t = 82.06 × 273.15 × rho_t / 22.99 atm (Eq. 13)
+        inputs:
+        - sanders_1977_table1_binary_density_06
+        output_unit: atm
+        parameters:
+        - - gas_constant_as_printed
+          - state:
+              tag: value
+              value: '82.06'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - standard_temperature_K
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        - - sodium_molar_mass_g_mol_as_printed
+          - state:
+              tag: value
+              value: '22.99'
+            locator:
+              page: 3
+              published_page: 140
+              pdf_page_index: 2
+              equation: '13'
+        note: P_t is the total pressure of species containing Na; it is not the experiment total pressure.
+      values:
+        quantity: total_pressure_of_Na_bearing_vapor_species
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: typed_refusal
+        schema_gap: "No exact quantity token represents total pressure across multiple Na-bearing vapor species. simulator/battery/enums.py::Quantity.P_PARTIAL is species-specific; simulator/battery/migrate.py::QUANTITY_ALIASES maps partial_pressure to p_partial, and simulator/battery/migrate.py::TYPE_QUANTITY has no aggregate-pressure quantity. tools/validate_literature_extracts.py::OBSERVATION_TYPES accepts partial_pressure but defines no aggregate-pressure quantity."
+        pressure_atm: '0.000011309716937799043062200956937799043062200956937799'
+        gas_species_as_published: total pressure of species containing Na (P_t)
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K:
+          value: '1332'
+          locator: &id010
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator: *id010
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: value
+            value: '8.33e-2'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '6'
+            column: P_H2O
+          note: Printed as 8.33 × 10^-2 atm.
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+        P_O2_atm_as_published:
+          state:
+            tag: value
+            value: 2e-4
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: '6'
+            column: P_O2
+          note: Printed as 2 × 10^-4 atm.
+    - observation_id: sanders_1977_table1_ternary_b
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: ternary parameter b
+        column: Parameters*
+        note: MinerU grid row 5, column 4; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: admitted
+        value: '4.28e-9'
+        parameter_as_published: b = 4.28 × 10^-9
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_ternary_density_01
+      - sanders_1977_table1_ternary_density_02
+      - sanders_1977_table1_ternary_density_03
+      - sanders_1977_table1_ternary_density_04
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_ternary_density_01
+        - sanders_1977_table1_ternary_density_02
+        - sanders_1977_table1_ternary_density_03
+        - sanders_1977_table1_ternary_density_04
+        output_unit: g/cm3
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    - observation_id: sanders_1977_table1_ternary_m
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: ternary parameter m
+        column: Parameters*
+        note: MinerU grid row 6, column 4; PDF page 2 render checked.
+      phase: g
+      units: not stated; dimension implied by Eq. (1)
+      values:
+        quantity: least_squares_slope_of_rho_t_vs_sqrt_P_H2O
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        slope_as_published: 6.06 × 10^-8
+        parameter_as_published: m = 6.06 × 10^-8
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+        schema_gap: 'No quantity token represents the slope coefficient m of rho_t = m P_H2O^(1/2) + b. simulator/battery/enums.py::Quantity.DENSITY represents
+          the intercept''s density dimension only; it is not an exact token for a pressure-dependent slope. Code set: simulator/battery/enums.py::Quantity.'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_ternary_density_01
+      - sanders_1977_table1_ternary_density_02
+      - sanders_1977_table1_ternary_density_03
+      - sanders_1977_table1_ternary_density_04
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_ternary_density_01
+        - sanders_1977_table1_ternary_density_02
+        - sanders_1977_table1_ternary_density_03
+        - sanders_1977_table1_ternary_density_04
+        output_unit: not stated; dimension implied by Eq. (1)
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    - observation_id: sanders_1977_table1_ternary_r
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: ternary parameter r
+        column: Parameters*
+        note: MinerU grid row 8, column 4; PDF page 2 render checked.
+      phase: g
+      units: dimensionless
+      values:
+        quantity: correlation_coefficient
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        correlation_coefficient_as_published: '0.999'
+        parameter_as_published: r = 0.999
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+        schema_gap: No correlation-coefficient quantity token exists in the closed simulator/battery/enums.py::Quantity set.
+          The value remains a typed refusal.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_ternary_density_01
+      - sanders_1977_table1_ternary_density_02
+      - sanders_1977_table1_ternary_density_03
+      - sanders_1977_table1_ternary_density_04
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_ternary_density_01
+        - sanders_1977_table1_ternary_density_02
+        - sanders_1977_table1_ternary_density_03
+        - sanders_1977_table1_ternary_density_04
+        output_unit: dimensionless
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    - observation_id: sanders_1977_table1_binary_b
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: binary parameter b
+        column: Parameters*
+        note: MinerU grid row 12, column 4; PDF page 2 render checked.
+      phase: g
+      units: g/cm3
+      values:
+        quantity: density
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: admitted
+        value: '1.51e-9'
+        parameter_as_published: b = 1.51 × 10^-9
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_binary_density_01
+      - sanders_1977_table1_binary_density_02
+      - sanders_1977_table1_binary_density_03
+      - sanders_1977_table1_binary_density_04
+      - sanders_1977_table1_binary_density_05
+      - sanders_1977_table1_binary_density_06
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_binary_density_01
+        - sanders_1977_table1_binary_density_02
+        - sanders_1977_table1_binary_density_03
+        - sanders_1977_table1_binary_density_04
+        - sanders_1977_table1_binary_density_05
+        - sanders_1977_table1_binary_density_06
+        output_unit: g/cm3
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    - observation_id: sanders_1977_table1_binary_m
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: binary parameter m
+        column: Parameters*
+        note: MinerU grid row 13, column 4; PDF page 2 render checked.
+      phase: g
+      units: not stated; dimension implied by Eq. (1)
+      values:
+        quantity: least_squares_slope_of_rho_t_vs_sqrt_P_H2O
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        slope_as_published: 3.47 × 10^-8
+        parameter_as_published: m = 3.47 × 10^-8
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+        schema_gap: 'No quantity token represents the slope coefficient m of rho_t = m P_H2O^(1/2) + b. simulator/battery/enums.py::Quantity.DENSITY represents
+          the intercept''s density dimension only; it is not an exact token for a pressure-dependent slope. Code set: simulator/battery/enums.py::Quantity.'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_binary_density_01
+      - sanders_1977_table1_binary_density_02
+      - sanders_1977_table1_binary_density_03
+      - sanders_1977_table1_binary_density_04
+      - sanders_1977_table1_binary_density_05
+      - sanders_1977_table1_binary_density_06
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_binary_density_01
+        - sanders_1977_table1_binary_density_02
+        - sanders_1977_table1_binary_density_03
+        - sanders_1977_table1_binary_density_04
+        - sanders_1977_table1_binary_density_05
+        - sanders_1977_table1_binary_density_06
+        output_unit: not stated; dimension implied by Eq. (1)
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    - observation_id: sanders_1977_table1_binary_r
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: binary parameter r
+        column: Parameters*
+        note: MinerU grid row 15, column 4; PDF page 2 render checked.
+      phase: g
+      units: dimensionless
+      values:
+        quantity: correlation_coefficient
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        correlation_coefficient_as_published: '0.999'
+        parameter_as_published: r = 0.999
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        fit_equation_as_published: rho_t = m P_H2O^(1/2) + b
+        fit_footnote_as_published: m = intercept of linear least-squares fit of raw data
+        fit_parameter_role_note: Eq. (1) and the Table I caption define m as the coefficient on P_H2O^(1/2); the footnote
+          nevertheless calls m an intercept.
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+        schema_gap: No correlation-coefficient quantity token exists in the closed simulator/battery/enums.py::Quantity set.
+          The value remains a typed refusal.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+      derived_from:
+      - sanders_1977_table1_binary_density_01
+      - sanders_1977_table1_binary_density_02
+      - sanders_1977_table1_binary_density_03
+      - sanders_1977_table1_binary_density_04
+      - sanders_1977_table1_binary_density_05
+      - sanders_1977_table1_binary_density_06
+      derivation:
+        relation: 'Least-squares fit of Table I rho_t against P_H2O^(1/2): rho_t = m P_H2O^(1/2) + b'
+        inputs:
+        - sanders_1977_table1_binary_density_01
+        - sanders_1977_table1_binary_density_02
+        - sanders_1977_table1_binary_density_03
+        - sanders_1977_table1_binary_density_04
+        - sanders_1977_table1_binary_density_05
+        - sanders_1977_table1_binary_density_06
+        output_unit: dimensionless
+        note: Table I reports the fitted parameter; the underlying measured rows are stored as direct-density observations.
+    context:
+    - observation_id: sanders_1977_method_atmosphere_context
+      type: context
+      units: as printed
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+      values:
+        apparatus_as_printed: Transpiration apparatus; recondensing saturation system loaded nitrogen and argon carrier gases
+          with known amounts of water vapor; well-stirred melts; equilibrium measurements.
+        carrier_gases_as_printed:
+        - nitrogen
+        - argon
+        carrier_gas_assignment: The paper does not assign nitrogen or argon to individual Table I rows.
+        oxygen_as_printed: 200 ± 50 ppm O2 throughout the measurements; measured at the equilibrium-chamber exit with a stabilized
+          zirconia-based oxygen meter.
+        dry_gas_water_as_printed: 350 ± 100 ppm H2O in the “dry” gas, measured at the end of the gas train.
+        water_saturation_system_temperature_as_printed: held to ±0.1°C
+        total_pressure_as_printed: 1 atm throughout the present work.
+        gas_volume_measurement_as_printed: Wet-test meter at the end of the gas train.
+        sodium_collection_analysis_as_printed: Sodium compounds condensed in the collection system and were analyzed with
+          an atomic emission spectrometer.
+        measurement_count_as_printed: Average of at least 4 independent measurements of Na vapor density for each water pressure.
+        uncertainty_as_printed: Uncertainty in the mean values is 3 standard deviations; the numerical error-bar widths are
+          not tabulated and are not digitized.
+    - observation_id: sanders_1977_vapor_density_definition_context
+      type: context
+      units: as printed
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+      values:
+        rho_t_as_printed: Na vapor density, rho_t
+        definition_as_printed: Mass of Na which would be present in a milliliter of an ideal gas at 273.15 K and 1 atm.
+        reported_density_units_as_printed: g/STP ml
+        note: This 273.15 K and 1 atm definition is the standard-volume basis of rho_t; experiment total pressure is independently
+          printed as 1 atm.
+    - observation_id: sanders_1977_species_assumptions_and_attributions_context
+      type: context
+      units: as printed
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: III. Results and Discussion
+      values:
+        species_assumed_for_present_vapor_as_printed:
+        - Na
+        - NaOH
+        sodium_density_decomposition_as_printed: rho_t = rho_NaOH + rho_Na (Eq. 12); P_t denotes total pressure of species
+          containing Na (Eq. 13).
+        quoted_species_from_brewer_margrave:
+          species_as_printed:
+          - Na
+          - O2
+          conditions_as_printed: Over a dry melt of Na2O
+          attribution: Brewer and Margrave (Ref. 8)
+          evidence_class: quoted_attributed
+        quoted_species_from_piacente_matousek:
+          species_as_printed:
+          - Na
+          - O2
+          conditions_as_printed: Major species over sodium disilicate glass under vacuum
+          attribution: Piacente and Matousek (Ref. 9)
+          evidence_class: quoted_attributed
+        quoted_or_extrapolated_water_species:
+          species_as_printed:
+          - NaOH
+          - (NaOH)2
+          attribution: Schoonmaker and Porter (Ref. 10)
+          source_statement: The cited work reports significant (NaOH)2 below 800°C; Sanders and Haller extrapolate to the
+            present temperatures and partial pressures and judge NaOH monomer to be the major new vapor species.
+          evidence_class: quoted_attributed
+          author_interpretation_class: author_derived
+        possible_impurity_species_as_printed: NaCl impurity in the starting batch is discussed as a possible source of low-water-region
+          error; it is a hypothesis, not a measured vapor species.
+    - observation_id: sanders_1977_fit_relation_context
+      type: context
+      units: as printed
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        equation: '1'
+      values:
+        equation_1_as_printed: rho_t = m P_H2O^x + b
+        table_caption_fit_as_printed: rho_t = m P_H2O^(1/2) + b
+        fit_method_as_printed: Linear least-squares fit with different x values; maximum correlation coefficient r selected.
+        fit_footnote_as_printed: b = intercept of linear least-squares fit of raw data; m = intercept of linear least-squares
+          fit of raw data; r = correlation coefficient.
+        fit_note: The table footnote calls m an intercept although Eq. (1) and the caption make m the coefficient on P_H2O^(1/2).
+          Both statements are retained.
+        printed_measurement_row_count: 10
+        fit_series:
+        - 4 ternary rows
+        - 6 binary rows
+  Na2O:
+    observations:
+    - observation_id: sanders_1977_table1_ternary_k2
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: ternary parameter K2
+        column: Parameters*
+        note: MinerU grid row 3, column 4; PDF page 2 render checked.
+      phase: l
+      units: not stated
+      values:
+        quantity: linear_equilibrium_constant_k2_as_published
+        method_class: author_derived
+        evidence_class: author_derived
+        admission_status: typed_refusal
+        K2_as_published: 8.8 × 10^-6
+        constant_as_printed: K2 = 8.8 × 10^-6
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        reaction_as_printed: Na2O(l) -> 2 Na(g) + 1/2 O2(g)
+        units_as_published: not stated
+        schema_gap: The printed value is a linear equilibrium constant. The closed quantity enum exposes simulator/battery/enums.py::Quantity.LOG10_K_REACTION,
+          not a linear K quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps reaction_equilibrium_constant to that
+          logarithmic token. The accepted type set is tools/validate_literature_extracts.py::OBSERVATION_TYPES and has no
+          equilibrium_constant type.
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_ternary_k4
+      experiment: sanders_1977_ternary_1570K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: ternary parameter K4
+        column: Parameters*
+        note: MinerU grid row 4, column 4; PDF page 2 render checked.
+      phase: l
+      units: not stated
+      values:
+        quantity: linear_equilibrium_constant_k4_as_published
+        method_class: author_derived
+        evidence_class: author_derived
+        admission_status: typed_refusal
+        K4_as_published: '1.9'
+        constant_as_printed: K4 = 1.9
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        reaction_as_printed: Na2O(l) + H2O(g) -> 2 NaOH(g)
+        units_as_published: not stated
+        schema_gap: The printed value is a linear equilibrium constant. The closed quantity enum exposes simulator/battery/enums.py::Quantity.LOG10_K_REACTION,
+          not a linear K quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps reaction_equilibrium_constant to that
+          logarithmic token. The accepted type set is tools/validate_literature_extracts.py::OBSERVATION_TYPES and has no
+          equilibrium_constant type.
+        composition_as_published: 74% SiO2 + 16% Na2O + 10% CaO, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '74'
+          Na2O: '16'
+          CaO: '10'
+        T_K: '1570'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1570'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1570 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '74'
+              - - Na2O
+                - '16'
+              - - CaO
+                - '10'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 74% SiO2; 16% Na2O; 10% CaO
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_binary_k2
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: binary parameter K2
+        column: Parameters*
+        note: MinerU grid row 10, column 4; PDF page 2 render checked.
+      phase: l
+      units: not stated
+      values:
+        quantity: linear_equilibrium_constant_k2_as_published
+        method_class: author_derived
+        evidence_class: author_derived
+        admission_status: typed_refusal
+        K2_as_published: 5 × 10^-9
+        constant_as_printed: K2 = 5 × 10^-9
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        reaction_as_printed: Na2O(l) -> 2 Na(g) + 1/2 O2(g)
+        units_as_published: not stated
+        schema_gap: The printed value is a linear equilibrium constant. The closed quantity enum exposes simulator/battery/enums.py::Quantity.LOG10_K_REACTION,
+          not a linear K quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps reaction_equilibrium_constant to that
+          logarithmic token. The accepted type set is tools/validate_literature_extracts.py::OBSERVATION_TYPES and has no
+          equilibrium_constant type.
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    - observation_id: sanders_1977_table1_binary_k4
+      experiment: sanders_1977_binary_1332K
+      type: gas_speciation
+      regime: transpiration
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        row: binary parameter K4
+        column: Parameters*
+        note: MinerU grid row 11, column 4; PDF page 2 render checked.
+      phase: l
+      units: not stated
+      values:
+        quantity: linear_equilibrium_constant_k4_as_published
+        method_class: author_derived
+        evidence_class: author_derived
+        admission_status: typed_refusal
+        K4_as_published: '0.14'
+        constant_as_printed: K4 = 0.14
+        parameter_header_as_published: Parameters*
+        printed_marker_suffix: '*'
+        reaction_as_printed: Na2O(l) + H2O(g) -> 2 NaOH(g)
+        units_as_published: not stated
+        schema_gap: The printed value is a linear equilibrium constant. The closed quantity enum exposes simulator/battery/enums.py::Quantity.LOG10_K_REACTION,
+          not a linear K quantity; simulator/battery/migrate.py::QUANTITY_ALIASES maps reaction_equilibrium_constant to that
+          logarithmic token. The accepted type set is tools/validate_literature_extracts.py::OBSERVATION_TYPES and has no
+          equilibrium_constant type.
+        composition_as_published: 75% SiO2 + 25% Na2O, by mass
+        composition_role: datum_state
+        composition_wt_pct:
+          SiO2: '75'
+          Na2O: '25'
+        T_K: '1332'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1332'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 1332 K
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '101325'
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+            note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mass_percent
+              amount_basis: mass_percent
+              units: wt%
+              components:
+              - - SiO2
+                - '75'
+              - - Na2O
+                - '25'
+          locator:
+            page: 2
+            published_page: 139
+            pdf_page_index: 1
+            table: I
+            row: 75% SiO2; 25% Na2O
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source reports oxygen partial pressure, not oxygen fugacity.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        carrier_gas:
+          state:
+            tag: unknown
+            reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+        oxygen_partial_pressure_ppm_as_published:
+          state:
+            tag: value
+            value: 200 ± 50 ppm O2
+          locator:
+            page: 1
+            published_page: 138
+            pdf_page_index: 0
+            section: II. Experimental Procedure
+          note: The measured oxygen concentration is stated to apply throughout the measurements.
+    context:
+    - observation_id: sanders_1977_na2o_standard_state_context
+      type: context
+      units: as printed
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '4'
+      values:
+        activity_definition_as_printed: a_Na2O is the pressure of that component over the solution divided by its pressure
+          over pure liquid Na2O at the same temperature.
+        standard_state_as_printed: Pure liquid Na2O at the same temperature.
+        standard_state_statement_locators:
+        - page: 3
+          published_page: 140
+          pdf_page_index: 2
+          equation: '4'
+        - page: 3
+          published_page: 140
+          pdf_page_index: 2
+          equation: '9'
+        equations_as_printed:
+          eq2: Na2O(g) -> 2 Na(g) + 1/2 O2(g)
+          eq3: K1 = P_Na(g)^2 P_O2(g)^(1/2) / P_Na2O(g)
+          eq5: Na2O(l) -> 2 Na(g) + 1/2 O2(g)
+          eq6: K2 = P°_Na(g)^2 P°_O2(g)^(1/2)
+          eq8: Na2O(g) + H2O(g) -> 2 NaOH(g), with K3
+          eq10: Na2O(l) + H2O(g) -> 2 NaOH(g), with K4
+          eq13: P_t = 82.06 × 273.15 × rho_t / 22.99 atm
+          eq15: P_NaOH^2 = (P_O2^(1/2) K4/K2) P_Na^2 P_H2O
+          eq16: P_Na is calculated from rho_t, K′, and P_H2O^(1/2)
+          eq17: K′ = sqrt(P_O2^(1/2) K4/K2)
+          eq18: a_Na2O = sqrt(974.98 m K4)
+        equilibrium_constant_units: No separate units are printed for K2 or K4; retain the tabulated value and equation.
+    - observation_id: sanders_1977_figure_only_results_context
+      type: context
+      units: as printed
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        figure: '2'
+      values:
+        figure_read_candidates:
+        - figure: '2'
+          page: 2
+          published_page: 139
+          candidates:
+          - rho_t vs P_H2O^(1/2)
+          - Na2O activity vs P_H2O^(1/2)
+          disposition: figure_only; undigitized
+        - figure: '3'
+          page: 3
+          published_page: 140
+          candidates:
+          - P_Na
+          - P_NaOH
+          - their sum vs P_H2O^(1/2)
+          disposition: figure_only; undigitized
+        not_tabulated_or_not_reported:
+        - No numeric species-specific P_Na or P_NaOH values are printed outside figures.
+        - No numeric activity value is printed outside figures.
+        - No flux or vaporization-rate values are tabulated.
+        - No ion intensities are reported.
+        - No potassium-bearing vapor species is reported.
+        calculated_activity_basis_as_printed: Equation (18) estimates a_Na2O from the fitted slope m assuming all Na-containing
+          vapor is NaOH; the plotted activity values are not digitized.
+  NaOH:
+    observations:
+    - observation_id: sanders_1977_quoted_naoh_pressure_1e5_atm
+      experiment: sanders_1977_quoted_NaOH_pressure
+      type: partial_pressure
+      locator:
+        page: 3
+        published_page: 140
+        pdf_page_index: 2
+        equation: '17'
+        note: Footnote below Eq. (17), PDF page 3 render.
+      phase: g
+      units: atm
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        value_as_printed: in the range 10^-5 atm
+        quoted_pressure_as_published: P_NaOH in the range 10^-5 atm
+        reason_not_typed: The source gives only a pressure-range magnitude without endpoints, not a point pressure.
+        attribution: JANAF Thermochemical Tables (Ref. 11); Ref. 12
+        T_K: null
+        composition_as_published: not specified for the quoted pressure
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The cited pressure range is printed without a temperature.
+          locator:
+            page: 3
+            published_page: 140
+            pdf_page_index: 2
+            equation: '17'
+            note: Footnote below Eq. (17), quoted comparison.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The quoted value is a partial pressure; the source does not state the quoted experiment's total pressure.
+          locator:
+            page: 3
+            published_page: 140
+            pdf_page_index: 2
+            equation: '17'
+            note: Footnote below Eq. (17), quoted comparison.
+        composition:
+          state:
+            tag: unknown
+            reason: The cited pressure range is not assigned to a melt composition.
+          locator:
+            page: 3
+            published_page: 140
+            pdf_page_index: 2
+            equation: '17'
+            note: Footnote below Eq. (17), quoted comparison.
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The quoted range is not accompanied by an oxygen fugacity.
+          locator:
+            page: 3
+            published_page: 140
+            pdf_page_index: 2
+            equation: '17'
+            note: Footnote below Eq. (17), quoted comparison.
+        water_partial_pressure_atm_as_published:
+          state:
+            tag: unknown
+            reason: The quoted pressure range is not assigned a water-vapor pressure.
+          locator:
+            page: 3
+            published_page: 140
+            pdf_page_index: 2
+            equation: '17'
+            note: Footnote below Eq. (17), PDF page 3 render.
