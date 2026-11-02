@@ -21,6 +21,10 @@ from simulator.optimize.study import (
     _product_summary_mapping,
 )
 from simulator.runner import _wall_fouling_lifespan_report, _wall_fouling_report
+from simulator.wall_deposit_availability import (
+    WallDepositAvailability,
+    wall_deposit_reported_mass_kg,
+)
 from simulator.state import HourSnapshot, PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX
 from simulator.trace import PhysicsTrace, wall_deposit_by_segment_species_kg
 from simulator.vapour_rail.instrumentation import (
@@ -783,6 +787,44 @@ def test_runner_wall_pressure_refusal_without_recorded_deposit_has_no_totals():
     assert report["campaigns_to_resinter"] is None
     assert report["aggregate_campaigns_to_resinter"] is None
     assert report["nominal_verdict"] is None
+
+
+def test_refused_wall_deposit_mass_uses_one_rule() -> None:
+    """A refused zero is unpublished. A refused positive mass stays visible."""
+
+    refused = WallDepositAvailability(
+        status="refused",
+        refusal={"reason": "wall saturation pressure refusal"},
+    )
+    available = WallDepositAvailability(status="available")
+    assert wall_deposit_reported_mass_kg(0.0, refused) is None
+    assert wall_deposit_reported_mass_kg(0.05, refused) == 0.05
+    assert wall_deposit_reported_mass_kg(0.0, available) == 0.0
+
+    notice = _wall_pressure_refusal_notice()
+    measured_kg = 0.05
+    fouling = _wall_fouling_report(
+        {"Mg": measured_kg},
+        alpha_notice=notice,
+    )
+    authority = wall_deposit_sticking_authority_status(
+        {"hot_wall": {"Mg": measured_kg}},
+        notice,
+    )
+    lifespan = _wall_fouling_lifespan_report(
+        per_campaign_by_segment_species_kg={
+            "hot_wall": {"Mg": measured_kg},
+        },
+        existing_by_segment_species_kg={},
+        authority=authority,
+    )
+
+    assert fouling["wall_deposit_kg_per_campaign"] == pytest.approx(measured_kg)
+    assert lifespan["wall_deposit_kg_per_campaign"] == pytest.approx(measured_kg)
+    assert fouling["campaigns_to_resinter"] is None
+    assert lifespan["campaigns_to_resinter"] is None
+    assert fouling["verdict"] == "non-authoritative"
+    assert lifespan["verdict"] == "non-authoritative"
 
 
 def test_runner_lifespan_report_propagates_empty_deposit_refusal() -> None:

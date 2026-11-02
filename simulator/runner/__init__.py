@@ -101,7 +101,10 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
-from simulator.wall_deposit_availability import wall_deposit_figure_availability
+from simulator.wall_deposit_availability import (
+    wall_deposit_figure_availability,
+    wall_deposit_reported_mass_kg,
+)
 from simulator.liner_life import build_liner_life_run_diagnostic
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     evaluate_vacuum_pyrolysis_comparison,
@@ -4110,6 +4113,10 @@ def _wall_fouling_report(
         authority=authority,
     )
     wall_deposit_unavailable = availability.status == "refused"
+    reported_wall_deposit_kg = wall_deposit_reported_mass_kg(
+        total_wall_load_kg,
+        availability,
+    )
     campaigns_by_segment: dict[str, float | str] = {}
     campaigns_to_resinter: float | str | None
     aggregate_campaigns_to_resinter: float | str | None = "infinite"
@@ -4168,8 +4175,8 @@ def _wall_fouling_report(
         ),
         "wall_deposit_kg_per_campaign": (
             None
-            if wall_deposit_unavailable
-            else _clean_report_float(total_wall_load_kg)
+            if reported_wall_deposit_kg is None
+            else _clean_report_float(reported_wall_deposit_kg)
         ),
         "wall_deposit_basis": "total_wall_load_by_species",
         "resinter_threshold_kg": threshold,
@@ -4242,6 +4249,10 @@ def _wall_fouling_lifespan_report(
         authority=authority,
     )
     refused = availability.status == "refused"
+    reported_wall_deposit_kg = wall_deposit_reported_mass_kg(
+        total_per_campaign,
+        availability,
+    )
     controlling_segment: str | None = None
     threshold = cfg.get("resinter_threshold_kg")
     threshold_kg = None if threshold is None else float(threshold)
@@ -4299,8 +4310,8 @@ def _wall_fouling_lifespan_report(
         "controlling_segment": controlling_segment,
         "wall_deposit_kg_per_campaign": (
             None
-            if refused and total_per_campaign <= 0.0
-            else _clean_report_float(total_per_campaign)
+            if reported_wall_deposit_kg is None
+            else _clean_report_float(reported_wall_deposit_kg)
         ),
         "existing_wall_load_kg_by_segment": {
             key: _clean_report_float(value)

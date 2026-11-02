@@ -24,6 +24,25 @@ class WallDepositAvailability:
             raise ValueError("a refused wall-deposit figure requires a refusal record")
 
 
+def wall_deposit_reported_mass_kg(
+    measured_kg: float,
+    availability: WallDepositAvailability,
+) -> float | None:
+    """Return the measured mass, or None for a refused non-positive figure.
+
+    Premise: a refusal with no positive deposit is not a certified zero.
+    A positive measurement stays visible beside that refusal; the resinter
+    verdict carries the missing authority. Algebra: publish measured_kg
+    unless status is refused and measured_kg <= 0. Unit: kg per campaign,
+    already summed by the caller. Limiting case: a refused empty wall is
+    None; a refused positive deposit is that deposit.
+    """
+
+    if availability.status == "refused" and measured_kg <= 0.0:
+        return None
+    return float(measured_kg)
+
+
 def wall_deposit_figure_availability(
     *,
     has_positive_deposit: bool,
