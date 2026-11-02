@@ -7,6 +7,7 @@ import yaml
 
 from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from tests.literature_extract_test_helpers import assert_wustite_reference_state
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = REPO_ROOT / "data/literature/extracts/doyle-1988-feo-activity-multicomponent-magma.yaml"
@@ -29,16 +30,6 @@ OXIDES = ("SiO2", "Al2O3", "FeO", "CaO", "K2O")
 
 def _table_rows(document):
     return [row for row in document["species"]["FeO"]["observations"] if row["observation_id"].startswith("doyle_1988_activity_p004_t01_")]
-
-
-def _assert_wustite_reference_state(reference_state):
-    assert reference_state is not None and reference_state.is_value
-    standard_state = reference_state.value
-    assert standard_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
-    assert standard_state.endmember.formula == "Fe(1-x)O"
-    assert standard_state.endmember.phase.is_value
-    assert standard_state.endmember.phase.value is Phase.L
-    assert standard_state.component_basis == "Fe(1-x)O"
 
 
 def _assert_every_table1a_cell(document):
@@ -149,6 +140,8 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
     assert set(migrated) == target_ids and len(migrated) == 130
     assert sum(row.value.kind.value == "point" for row in migrated.values()) == 130
     assert sum(row.value.kind.value == "unavailable" for row in migrated.values()) == 0
+    assert len(result.queue) == 130
+    assert all(entry.why == "source does not state method" for entry in result.queue)
     for raw in source_rows:
         row = migrated[raw["observation_id"]]
         assert row.value.point == Decimal(raw["values"]["activity"])
@@ -164,8 +157,9 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
         if "total_pressure_Pa" in row.point_conditions:
             assert row.point_conditions["total_pressure_Pa"].state.is_unknown
         if raw["observation_id"].startswith("doyle_1988_activity_p004"):
+            assert "reference_pressure_bar" not in raw["standard_state"]
             assert raw["values"]["standard_state_as_printed"] == "molten Fe0.947O (COUGHLIN, 1954)"
-            _assert_wustite_reference_state(row.identity.reference_state)
+            assert_wustite_reference_state(row.identity.reference_state)
             assert raw["values"]["standard_state_schema_gap"].startswith("Typed as Fe(1-x)O(l)")
             assert '"molten Fe0.947O (COUGHLIN, 1954)"' in raw["values"]["standard_state_schema_gap"]
             assert raw["values"]["fO2_log_uncertainty"] == FO2_UNCERTAINTY
@@ -189,6 +183,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             assert row.identity.reference_state.value.endmember.phase.is_value
             assert row.identity.reference_state.value.endmember.phase.value is Phase.L
             assert row.identity.reference_state.value.component_basis == "FeO"
+            assert row.identity.reference_state.value.reference_pressure_bar is None
             assert row.point_conditions["T_C"].state.value == Decimal("1380")
             assert row.point_conditions["fO2_log"].state.is_unknown
             assert row.identity.fO2_Pa.is_unknown
@@ -217,4 +212,4 @@ def test_doyle_1988_missing_one_typed_reference_fails_the_pin(tmp_path):
     ]
     assert row.identity.reference_state is None or row.identity.reference_state.is_unknown
     with pytest.raises(AssertionError):
-        _assert_wustite_reference_state(row.identity.reference_state)
+        assert_wustite_reference_state(row.identity.reference_state)

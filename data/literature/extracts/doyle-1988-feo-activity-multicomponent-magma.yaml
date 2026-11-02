@@ -14,8 +14,8 @@ extraction:
     bar because bar/atm differs by 0.0057 dex, below the 0.01 dex printed resolution. The values are kept verbatim
     as printed in fO2_as_printed and signed fO2_log for migration. Table 1A activities are author-reduced using
     Eq. (5), a_FeO = f_O2^0.5 exp(28719.2/T - 5.837). The stated standard state is molten Fe0.947O (Coughlin, 1954);
-    the schema has no exact reference-state token for this nonstoichiometric liquid, so that standard state remains
-    prose and the typed schema gap is recorded. Equations attached as printed: (4) Fe(metal) + 0.5O2(gas) = FeO(liquid);
+    it is typed as Fe(1-x)O(l), with the printed reference kept verbatim in the row notes. Equations attached as printed:
+    (4) Fe(metal) + 0.5O2(gas) = FeO(liquid);
     (3) a_FeO^magma = a_FeO^SKAnF × Fe/(Fe+Mn+Mg+Ca^ex); (5) above; (6) a_FeO^this study/a_FeO^Doyle and Naldrett
     = exp(-1043.9/T + 0.085). The paper prints gamma_FeO = a_FeO/X_FeO but gives no numerical activity coefficients
     or EMF values. The quoted a_FeO=1.93 is attributed to Stull and Prophet (1971), for stoichiometric liquid FeO
@@ -67,7 +67,6 @@ species:
                 reason: non-stoichiometric liquid wüstite has no crystalline polymorph
               charge: {tag: value, value: 0}
             component_basis: Fe(1-x)O
-            reference_pressure_bar: '1.01325'
         inferred: false
       values:
         quantity: activity
