@@ -264,6 +264,13 @@ def _run_real_ticks_with_diagnostic(
             assert sum(snapshot.evap_flux.species_kg_hr.values()) > 0.0
             assert snapshot.oxygen_reservoir["exchange_o2_mol"] != 0.0
             summary = build_per_hour_summary(sim, snapshot)
+            projected = summary["oxygen_reservoir"]["liquid_fraction_gate"].get(
+                "projected_engine_liquid_fraction"
+            )
+            if diagnostic_enabled:
+                assert projected["pressure_bar"] == (
+                    snapshot._magemin_diagnostic_pressure_bar
+                )
             physics.append({
                 "ledger": canonical_json_bytes({
                     "accounts": sim.atom_ledger.mol_by_account(),
@@ -328,7 +335,6 @@ def test_diagnostic_is_neutral_across_three_real_exchange_ticks(
         assert "projected_engine_liquid_fraction" not in off_summary[
             "oxygen_reservoir"]["liquid_fraction_gate"]
         assert on_projected["provider"] == "magemin"
-        assert on_projected["pressure_bar"] == 0.0015
         assert on_tick["ledger"] == off_tick["ledger"]
         assert on_tick["fO2_log"] == off_tick["fO2_log"]
         assert on_tick["oxygen_transfers"] == off_tick["oxygen_transfers"]
