@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 723
-  extracts: 721
+  sources: 725
+  extracts: 723
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 721
+  extracts_without_pdf: 723
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -154,6 +154,7 @@ gaps:
   - fray-schmitt-2009-ch4-1
   - fray-schmitt-2009-co-1
   - fray-schmitt-2009-nh3
+  - frischat-oel-1966-sodium-calcium-silicate-transport
   - fujisawa-1990-cao-al2o3-activities
   - fujisawa-1994-na-sn-carbonate-thermodynamics
   - fuyuki-2007-sio-recombination
@@ -400,6 +401,7 @@ gaps:
   - miao-li-yan-2023-fe-v-spinel-gibbs
   - miki-1999-si-alloy-thermodynamics
   - mogul-2023-pioneer-venus-co2-icarus
+  - moosavi-khoonsari-2015-na-fe-cmas-thesis
   - morey-1964-usgs-pp440l-phase-equilibria
   - morishita-2004-sio2-partial-enthalpy
   - morita-1999-chromium-oxide-activity
@@ -9283,6 +9285,64 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  aliases: []
+  citation: Frischat, G. H. and Oel, H. J. (1966). Transportvorgänge in glasigem und kristallinem Na2O·2CaO·3SiO2.
+    Glastechnische Berichte 39(2), 50–61.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/frischat-oel-1966-sodium-calcium-silicate-transport/frischat-oel-1966-sodium-calcium-silicate-transport.pdf
+      present: true
+      sha256: f83f51c2c796bd7f83a153b1c97440f523e8e7ac00ec5f37616da922ab45e826
+      matches_simulator: null
+    sidecar:
+      path: raw/frischat-oel-1966-sodium-calcium-silicate-transport/sidecar.yaml
+      present: true
+    text:
+      path: text/frischat-oel-1966-sodium-calcium-silicate-transport
+      exists: true
+      file_count: 38
+    tables:
+      path: tables/frischat-oel-1966-sodium-calcium-silicate-transport
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/frischat-oel-1966-sodium-calcium-silicate-transport.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: d4e8782b5c8686466a26591d7d43ca7b0ce92663
 - source_id: fujisawa-1990-cao-al2o3-activities
   aliases: []
   citation: T. Fujisawa, C. Yamauchi, and H. Sakao, "Equilibrium between Molten Iron Alloys and CaO-Al2O3-CaS
@@ -23590,6 +23650,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
+  aliases: []
+  citation: Moosavi-Khoonsari, Elmira (2015). Coupled Thermodynamic Modeling and Experimental Study of
+    Na2O-FeO-Fe2O3-CaO-MgO-Al2O3-SiO2 System. PhD thesis, Department of Mining and Materials Engineering,
+    McGill University, Montreal, July 2015.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml
+    review_status: draft
+    rows: 72
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/moosavi-khoonsari-2015-na-fe-cmas-thesis/moosavi-khoonsari-2015-na-fe-cmas-thesis.pdf
+      present: true
+      sha256: 7d37aeecbd3771e33c1eb8673d4396efeaa34c120d98e41a849c7da57d8b81cb
+      matches_simulator: null
+    sidecar:
+      path: raw/moosavi-khoonsari-2015-na-fe-cmas-thesis/sidecar.yaml
+      present: true
+    text:
+      path: text/moosavi-khoonsari-2015-na-fe-cmas-thesis
+      exists: true
+      file_count: 251
+    tables:
+      path: tables/moosavi-khoonsari-2015-na-fe-cmas-thesis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/moosavi-khoonsari-2015-na-fe-cmas-thesis.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8d1bcd2103dad613a3983cf47ba788adf1acd4e9
 - source_id: morey-1964-usgs-pp440l-phase-equilibria
   aliases: []
   citation: G. W. Morey, Phase-Equilibrium Relations of the Common Rock-Forming Oxides Except Water, Data
