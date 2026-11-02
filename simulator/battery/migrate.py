@@ -1585,13 +1585,11 @@ def _mass_percent_printed_from_plain(
         if isinstance(payload, Mapping)
         else None
     )
-    source_values = {
-        _mass_percent_component_key(name)[0]: amount
-        for name, amount in raw_components.items()
-    }
-    printed_values = {
-        name: source_values.get(name, amount) for name, amount in wt.items()
-    }
+    printed_values = (
+        raw_components
+        if raw_components_are_unique and raw_components
+        else _printed_composition_source_map(payload) or wt
+    )
     return located_value(
         _printed_map_payload(printed_values, numeric_values_as="source"), locator
     )
@@ -4475,7 +4473,8 @@ def _preserve_printed_composition_context(
     closure_context: object,
 ) -> Located[Mapping[str, Any]] | None:
     source_values = _printed_map_payload(
-        _source_printed_composition_values(wt, closure_context)
+        _source_printed_composition_values(wt, closure_context),
+        numeric_values_as="source",
     )
     source_locator = _composition_source_locator(closure_context)
     if printed is None or not printed.state.is_value:
@@ -6004,17 +6003,23 @@ def _located_printed_and_initial(
         closure_context=closure_context or wt,
         declared_component_map=declared_component_map,
     )
-    printed_map = (
-        {
-            str(key): as_decimal(value)
-            for key, value in wt.items()
-            if str(key) not in _COMPOSITION_CONDITION_KEYS
-            and _as_dec_or_none(value) is not None
-        }
-        if state.is_value
-        else _source_printed_composition_values(wt, closure_context)
+    source_values = _source_printed_composition_values(wt, closure_context)
+    printed_map = {}
+    for name, amount in source_values.items():
+        stem, has_mass_suffix = _mass_percent_component_stem(name)
+        normalized_name, _ = _mass_percent_component_key(name)
+        if (
+            not declared_component_map
+            and state.is_value
+            and has_mass_suffix
+            and stem == normalized_name
+            and _is_engine_oxide_component(normalized_name)
+        ):
+            name = normalized_name
+        printed_map[name] = amount
+    printed = located_value(
+        _printed_map_payload(printed_map, numeric_values_as="source"), locator
     )
-    printed = located_value(_printed_map_payload(printed_map), locator)
     if not state.is_value:
         return printed, Located(state, locator=locator)
     conversion_map = _oxide_mass_percent_components(wt)
@@ -14911,6 +14916,12 @@ def _printed_map_is_observation_level(
         in _printed_composition_candidates(
             own_roots, vocabulary, fallback_locator=locator
         )
+    ):
+        return True
+    own_source_map = _printed_composition_source_map(own_values)
+    if (
+        own_source_map is not None
+        and _printed_fingerprint(own_source_map) == target
     ):
         return True
     # Same fallback sample_from_equipment uses (top-level oxide keys or a

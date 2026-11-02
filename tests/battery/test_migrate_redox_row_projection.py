@@ -136,6 +136,19 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
     assert all("fO2_log" in (row.point_conditions or {}) for row in redox_rows)
 
 
+def test_aithala_own_composition_retains_its_printed_map() -> None:
+    result = _migrate(AITHALA)
+    observation = result.observations[
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition"
+    ]
+    printed = observation.point_conditions["printed_composition"]
+
+    assert printed.state.is_value
+    assert printed.locator is not None
+    assert printed.state.value["FeO*"] == "15.01±0.12"
+    assert printed.state.value["SiO2"] == "49.17±0.32"
+
+
 def test_aithala_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
     extract = AITHALA.read_text(encoding="utf-8")
     extract = extract.replace(
