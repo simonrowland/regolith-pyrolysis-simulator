@@ -436,7 +436,18 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
                 notice = curve['gate_provider_refusal']
                 assert curve['source'] == 'kress91_liquid_calibration_floor'
                 assert notice['authority'] == 'extrapolated (lower-rung)'
-                assert notice['provider_diagnostic'] == diagnostics[-1]
+                attempts = diagnostics[-1]['gate_provider_step_down'][
+                    'failed_providers'
+                ]
+                assert attempts[0]['provider'] == 'magemin-shadow'
+                projected_failure = attempts[0]['diagnostic'][
+                    'backend_diagnostics'
+                ]['projected_liquidus_diagnostics']
+                held_failure = notice['provider_diagnostic'][
+                    'backend_diagnostics'
+                ]['projected_liquidus_diagnostics']
+                assert projected_failure['backend_status_reason'] == reason
+                assert held_failure['backend_status_reason'] == reason
                 if reason == 'engine_worker_timeout':
                     assert notice['backend_failure_disposition'] == 'environment'
                     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
