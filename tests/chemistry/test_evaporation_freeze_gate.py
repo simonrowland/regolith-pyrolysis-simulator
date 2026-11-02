@@ -2982,6 +2982,47 @@ def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
     assert sim._last_melt_redox_liquidus_gate_diagnostic['status'] == 'ok'
 
 
+def test_valid_redox_liquidus_curve_diagnostic_keeps_validated_bounds(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'test:valid-redox-bounds',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+    record = gate_curve_memo_record(
+        curve,
+        None,
+        (),
+        'live',
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        lambda **_kwargs: record,
+    )
+
+    resolved_curve = sim._melt_redox_liquidus_gate_curve()
+
+    assert resolved_curve['solidus_T_C'] == pytest.approx(1000.0)
+    assert resolved_curve['liquidus_T_C'] == pytest.approx(1300.0)
+    diagnostic = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert diagnostic['status'] == 'ok'
+    assert diagnostic['solidus_T_C'] == pytest.approx(1000.0)
+    assert diagnostic['liquidus_T_C'] == pytest.approx(1300.0)
+
+
 def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
     monkeypatch,
     vapor_pressure_data,

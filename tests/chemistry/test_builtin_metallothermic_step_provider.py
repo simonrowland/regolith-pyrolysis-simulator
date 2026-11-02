@@ -1183,6 +1183,26 @@ def _prepare_stranded_staged_na_hold(sim, *, configured_temperature_C=1250.0):
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
 
 
+def _install_melt_redox_liquidus_curve_record(sim, monkeypatch, curve):
+    from simulator.reduced_real_determinism import (
+        GateCurveProviderOutcome,
+        gate_curve_memo_record,
+    )
+
+    record = gate_curve_memo_record(
+        curve,
+        None,
+        (),
+        "live",
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_freeze_gate_curve_record",
+        lambda **_kwargs: record,
+    )
+
+
 def _assert_selected_na_fe_yield_argmax(
     diagnostic,
     *,
@@ -1495,7 +1515,7 @@ def test_staged_na_fe_hold_records_malformed_curve_as_unavailable(
         "liquidus_T_C": 1250.0,
         "path": ((1100.0, 0.0), ("bad-temperature", 0.5), (1250.0, 1.0)),
     }
-    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+    _install_melt_redox_liquidus_curve_record(sim, monkeypatch, curve)
 
     sim._recompute_staged_na_fe_hold_setpoint()
 
@@ -1538,7 +1558,7 @@ def test_staged_na_fe_hold_does_not_swallow_interpolation_type_error(
         "liquidus_T_C": 1250.0,
         "path": ((1100.0, 0.0), (1250.0, 1.0)),
     }
-    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+    _install_melt_redox_liquidus_curve_record(sim, monkeypatch, curve)
 
     def programming_error(*_args, **_kwargs):
         raise TypeError("programming error in curve interpolation")
