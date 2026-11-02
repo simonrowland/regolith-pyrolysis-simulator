@@ -15895,6 +15895,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if isinstance(solved_headspace_partials_Pa, Mapping):
             from simulator.overhead import (
                 _headspace_partials_from_committed_flux_Pa,
+                headspace_partials_mbar_from_Pa,
             )
 
             evaporation_diagnostic = getattr(
@@ -15921,10 +15922,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 for species in set(solved_inlet) | set(final_inlet)
             )
             if flux_unchanged:
-                solved_headspace_partials_mbar = {
-                    str(species): max(0.0, float(partial_Pa)) / 100.0
-                    for species, partial_Pa in solved_headspace_partials_Pa.items()
-                }
+                solved_headspace_partials_mbar = (
+                    headspace_partials_mbar_from_Pa(
+                        solved_headspace_partials_Pa
+                    )
+                )
                 self._melt_headspace_composition_mbar.update(
                     solved_headspace_partials_mbar
                 )
@@ -15933,9 +15935,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if oxygen_partial_Pa is not None and math.isfinite(
                     float(oxygen_partial_Pa)
                 ):
-                    self._melt_headspace_composition_mbar['O2'] = max(
-                        0.0, float(oxygen_partial_Pa)
-                    ) / 100.0
+                    self._melt_headspace_composition_mbar.update(
+                        headspace_partials_mbar_from_Pa(
+                            {'O2': float(oxygen_partial_Pa)}
+                        )
+                    )
             # C0 and ledger commit filters can reduce a solved source after
             # the probe. Publish its partial from the final committed source
             # balance; the solve's own partials remain valid when the inlet
@@ -15950,10 +15954,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         ),
                     )
                 )
-                self._melt_headspace_composition_mbar.update({
-                    species: partial_Pa / 100.0
-                    for species, partial_Pa in committed_partials_Pa.items()
-                })
+                self._melt_headspace_composition_mbar.update(
+                    headspace_partials_mbar_from_Pa(committed_partials_Pa)
+                )
                 if clamped_species:
                     solver_diagnostic[
                         'committed_source_partial_clamped_species'

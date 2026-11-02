@@ -106,6 +106,18 @@ def gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
     return 1.8e-5 * (T_K / 300.0) ** 0.7
 
 
+def headspace_partials_mbar_from_Pa(
+    partials_Pa: Mapping[str, float],
+) -> dict[str, float]:
+    """Project nonnegative headspace partial pressures from Pa to mbar."""
+    # Premise: 1 mbar = 100 Pa, so p[mbar] = p[Pa]/100. Unit check:
+    # Pa/(100 Pa/mbar) = mbar. Zero Pa maps to zero mbar.
+    return {
+        str(species): max(0.0, float(partial_Pa)) / 100.0
+        for species, partial_Pa in partials_Pa.items()
+    }
+
+
 def compressible_poiseuille_mass_flow(
     d: float,
     L: float,

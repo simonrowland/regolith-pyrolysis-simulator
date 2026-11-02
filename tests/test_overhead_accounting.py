@@ -157,6 +157,15 @@ def _bypass_analytic_depletion(sim):
     sim.campaign_mgr.check_endpoint = lambda *args, **kwargs: False
 
 
+def test_headspace_partial_pressure_unit_projection():
+    from simulator.overhead import headspace_partials_mbar_from_Pa
+
+    assert headspace_partials_mbar_from_Pa({"Fe": 1000.0, "O2": 0.0}) == {
+        "Fe": 10.0,
+        "O2": 0.0,
+    }
+
+
 def test_overhead_model_does_not_recompute_provider_partition():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
