@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 87937
-records out (observations): 177681
-works: 729
-experiments: 6827
-queue size: 117429
+rows in: 87995
+records out (observations): 177839
+works: 730
+experiments: 6828
+queue size: 117665
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 727
+index sources: 728
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,18 +196,18 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 726 (mismatch) |
-| doi_works | 56 | 393 (mismatch) |
+| citations | 147 | 727 (mismatch) |
+| doi_works | 56 | 394 (mismatch) |
 | no_doi_works | 91 | 336 (mismatch) |
-| admission_statuses | 374 | 29897 (mismatch) |
+| admission_statuses | 374 | 29932 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
-| series | 60 | 1338 (mismatch) |
+| series | 60 | 1358 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
 | formulas | 1625 | 21774 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 14914 (mismatch) |
+| absent_admissions | 3511 | 14937 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2827 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
@@ -19656,6 +19656,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
+| `data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml` | 58 | 158 | 236 |
 | `data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml` | 48 | 48 | 0 |
 | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
 | `data/literature/extracts/sugawara-akaogi-2004-liquid-calorimetry.yaml` | 7 | 10 | 7 |
@@ -19826,8 +19827,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 294910
+advisory issues: 294994
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 294910 |
+| `identity_incomplete` | 294994 |
