@@ -890,6 +890,7 @@ class EvaporationMixin:
         writer_detail: dict[str, Any] = {}
         participants: dict[str, float] = {}
         current_effective_capacity = None
+        probe_diagnostics: dict[int, dict[str, Any]] = {}
 
         def project_inventory_limited_flux(
             raw_flux: EvaporationFlux,
@@ -929,9 +930,10 @@ class EvaporationMixin:
                 source_partials_Pa[species] = max(
                     0.0, float(partials_Pa.get(species, 0.0))
                 )
-            return self._calculate_evaporation(
+            flux = self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
+                record_degraded_path_engagement=False,
                 overhead_partials_override_Pa=source_partials_Pa,
                 overhead_pressure_override_Pa=(
                     total_pressure_Pa
@@ -940,6 +942,49 @@ class EvaporationMixin:
                 ),
                 _resolved_batch_flux_state=resolved_batch_flux_state,
             )
+            probe_diagnostics[id(flux)] = dict(
+                getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
+            )
+            return flux
+
+        def select_probe_diagnostic(flux: EvaporationFlux) -> None:
+            diagnostic = probe_diagnostics.get(id(flux))
+            if diagnostic is None:
+                return
+            self._last_evaporation_flux_diagnostic = diagnostic
+            overlay = diagnostic.get('vapour_batch_flux_overlay', {}) or {}
+            extrapolated_species = (
+                tuple(overlay.get('extrapolated_flux_species', ()) or ())
+                if isinstance(overlay, Mapping)
+                else ()
+            )
+            if extrapolated_species:
+                self._record_degraded_path_engagement(
+                    'vapour_pressure_extrapolation',
+                    count=len(extrapolated_species),
+                )
+            unmeasured_alpha_species = tuple(
+                diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
+            )
+            if unmeasured_alpha_species:
+                engaged_species = set(
+                    getattr(
+                        self,
+                        '_unmeasured_alpha_fallback_species_engaged',
+                        (),
+                    )
+                    or ()
+                )
+                engaged_species.update(
+                    str(species) for species in unmeasured_alpha_species
+                )
+                self._unmeasured_alpha_fallback_species_engaged = tuple(
+                    sorted(engaged_species)
+                )
+                self._record_degraded_path_engagement(
+                    'unmeasured_alpha_evaporation_fallback',
+                    count=len(unmeasured_alpha_species),
+                )
 
         def configure_transport_boundary(inlet_flux: EvaporationFlux) -> None:
             nonlocal current_effective_capacity
@@ -1027,6 +1072,7 @@ class EvaporationMixin:
             if float(free_source_flux.species_kg_hr.get(species, 0.0)) > 1.0e-12
         }
         if not participants:
+            select_probe_diagnostic(free_source_raw_flux)
             return free_source_raw_flux
 
         def fixed_molar_flows(flux: EvaporationFlux) -> dict[str, float]:
@@ -1082,6 +1128,7 @@ class EvaporationMixin:
         solved = None
         source_below_threshold = False
         for outer_iteration in range(16):
+            probe_diagnostics.clear()
             current_flux = (
                 free_source_flux
                 if outer_iteration == 0
@@ -1179,6 +1226,7 @@ class EvaporationMixin:
                 break
 
         assert solved is not None
+        select_probe_diagnostic(solved.flux)
         selected_flux = EvaporationFlux() if source_below_threshold else solved.flux
         self._solved_headspace_partials_Pa_this_tick = dict(solved.partials_Pa)
         solved_inlet_flux = self._subsolidus_transport_inlet_flux(
@@ -1326,6 +1374,7 @@ class EvaporationMixin:
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
         overhead_pressure_override_Pa: float | None = None,
         solve_headspace_feedback: bool = False,
+        record_degraded_path_engagement: bool = True,
         _resolved_batch_flux_state: tuple[
             dict[str, float],
             dict[str, Any],
@@ -1470,7 +1519,7 @@ class EvaporationMixin:
         extrapolated_flux_species = tuple(
             flux_overlay_report.get('extrapolated_flux_species', ()) or ()
         )
-        if extrapolated_flux_species:
+        if extrapolated_flux_species and record_degraded_path_engagement:
             self._record_degraded_path_engagement(
                 'vapour_pressure_extrapolation',
                 count=len(extrapolated_flux_species),
@@ -1882,7 +1931,7 @@ class EvaporationMixin:
         unmeasured_alpha_species = tuple(
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
         )
-        if unmeasured_alpha_species:
+        if unmeasured_alpha_species and record_degraded_path_engagement:
             engaged_species = set(
                 getattr(
                     self,

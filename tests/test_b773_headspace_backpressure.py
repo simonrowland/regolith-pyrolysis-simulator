@@ -108,6 +108,115 @@ def test_committed_headspace_is_the_state_read_by_fe_and_ca_consumers(
         )
 
 
+def test_headspace_probe_diagnostic_and_engagement_follow_selected_flux(
+    monkeypatch,
+):
+    from simulator import overhead
+
+    sim = _lunar_simulator()
+    base_partials = {}
+    original_bulk_partial = sim._evaporation_bulk_partial_pressure_pa
+
+    def capture_base_partial(species):
+        value = original_bulk_partial(species)
+        base_partials[str(species)] = float(value)
+        return value
+
+    monkeypatch.setattr(
+        sim,
+        "_evaporation_bulk_partial_pressure_pa",
+        capture_base_partial,
+    )
+    original_resolve = sim._resolve_evaporation_batch_flux_state
+
+    def mark_extrapolated_species(*args, **kwargs):
+        state = list(original_resolve(*args, **kwargs))
+        report = dict(state[1])
+        report["extrapolated_flux_species"] = ("Na",)
+        state[1] = report
+        return tuple(state)
+
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_batch_flux_state",
+        mark_extrapolated_species,
+    )
+    from simulator.overhead import QuasiSteadyHeadspaceSolve
+
+    def select_first_probe(**kwargs):
+        pressure = kwargs.get("fixed_pressure_Pa")
+        if pressure is None:
+            pressure = max(
+                sum(base_partials.values()),
+                float(sim.melt.p_total_mbar) * 100.0,
+                1.0,
+            )
+        first_partials = {
+            species: 0.5 * float(value)
+            for species, value in kwargs["equilibrium_Pa"].items()
+        }
+        later_partials = {
+            species: 0.25 * float(value)
+            for species, value in kwargs["equilibrium_Pa"].items()
+        }
+        first_flux = kwargs["evaluate_flux"](first_partials, pressure)
+        kwargs["evaluate_flux"](later_partials, pressure)
+        return QuasiSteadyHeadspaceSolve(
+            partials_Pa=first_partials,
+            flux=first_flux,
+            residual_kg_s_by_species={},
+            residual_relative_by_species={},
+            residual_relative=0.0,
+            iterations=2,
+            converged=True,
+            total_pressure_Pa=float(pressure),
+            pressure_residual_Pa=0.0,
+        )
+
+    monkeypatch.setattr(
+        overhead,
+        "solve_quasi_steady_headspace_partials_Pa",
+        select_first_probe,
+    )
+    original_calculate = sim._calculate_evaporation
+    probes = []
+
+    def mark_probe_diagnostic(equilibrium, **kwargs):
+        flux = original_calculate(equilibrium, **kwargs)
+        if kwargs.get("overhead_partials_override_Pa") is None:
+            return flux
+        partials = dict(kwargs.get("overhead_partials_override_Pa") or {})
+        diagnostic = dict(sim._last_evaporation_flux_diagnostic or {})
+        diagnostic["probe_partials_Pa"] = partials
+        sim._last_evaporation_flux_diagnostic = diagnostic
+        probes.append((partials, dict(flux.species_kg_hr)))
+        return flux
+
+    monkeypatch.setattr(sim, "_calculate_evaporation", mark_probe_diagnostic)
+    sim.step()
+
+    assert len(probes) > 1
+    selected_partials = sim._last_evaporation_flux_diagnostic[
+        "probe_partials_Pa"
+    ]
+    assert "Na" in selected_partials, (
+        sorted(selected_partials),
+        sorted(sim._solved_headspace_partials_Pa_this_tick),
+        len(probes),
+        [partials.get("Na") for partials, _flux in probes],
+    )
+    assert selected_partials["Na"] == pytest.approx(
+        sim._solved_headspace_partials_Pa_this_tick["Na"],
+        rel=1.0e-12,
+        abs=1.0e-14,
+    )
+    engagement = sim._degraded_path_engagement_summary()[
+        "vapour_pressure_extrapolation"
+    ]
+    assert engagement["total_count"] == 1
+    assert engagement["by_hour"][-1]["count"] == 1
+
+
 def test_runtime_ar_n2_cover_keeps_held_total_pressure_in_gas_film(monkeypatch):
     sim = _lunar_simulator()
     sim.melt.p_total_mbar = 100.0
