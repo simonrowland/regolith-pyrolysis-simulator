@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import Phase, Polymorph, ReferenceStateConvention, ValueKind
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
 
@@ -50,6 +50,26 @@ TABLE_HEADERS = {
     "IV": ("NNa2O", "NCaO", "NNa+", "calculated by Eq. [8]", "experimental interpolated"),
 }
 TABLES = {"I": TABLE_I, "II": TABLE_II, "III": TABLE_III, "IV": TABLE_IV}
+NA2O_LIQUID_STANDARD_STATE = {
+    "convention": "raoultian_pure_endmember",
+    "component_basis": "Na2O",
+    "endmember": {
+        "formula": "Na2O",
+        "phase": {"tag": "value", "value": "l"},
+        "polymorph": {"tag": "not_applicable", "reason": "not crystal"},
+        "charge": {"tag": "value", "value": 0},
+    },
+}
+SIO2_TRIDYMITE_STANDARD_STATE = {
+    "convention": "raoultian_pure_endmember",
+    "component_basis": "SiO2",
+    "endmember": {
+        "formula": "SiO2",
+        "phase": {"tag": "value", "value": "cr"},
+        "polymorph": {"tag": "value", "value": "tridymite"},
+        "charge": {"tag": "value", "value": 0},
+    },
+}
 
 
 def _observations(document: dict) -> dict[str, dict]:
@@ -93,6 +113,99 @@ def _assert_migrated_conditions(
     assert identity.fO2_Pa.is_value
     assert identity.fO2_Pa.value == Decimal("21278.25")
     assert identity.total_pressure_Pa is None or identity.total_pressure_Pa.is_unknown
+
+
+def _assert_mapped_numeric_activity_points(document: dict, points: dict[str, object]) -> None:
+    expected = {
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c": {
+            "formula": "Na2O",
+            "phase": Phase.L,
+            "composition": {"Na2O": "0.244", "SiO2": "0.756"},
+            "printed_partial": {"Na2O": "0.244"},
+            "temperature_C": "1050",
+            "standard_state": NA2O_LIQUID_STANDARD_STATE,
+            "standard_state_as_printed": (
+                "The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure."
+            ),
+            "standard_state_locator": {
+                "page": 2,
+                "pdf_page_index": 1,
+                "published_page": 608,
+                "section": "Thermodynamic Considerations",
+            },
+        },
+        "neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c": {
+            "formula": "Na2O",
+            "phase": Phase.L,
+            "composition": {"Na2O": "0.393", "SiO2": "0.607"},
+            "printed_partial": {"Na2O": "0.393"},
+            "temperature_C": "1050",
+            "standard_state": NA2O_LIQUID_STANDARD_STATE,
+            "standard_state_as_printed": (
+                "The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure."
+            ),
+            "standard_state_locator": {
+                "page": 2,
+                "pdf_page_index": 1,
+                "published_page": 608,
+                "section": "Thermodynamic Considerations",
+            },
+        },
+        "neudorf_elliott_1980_sio2_activity_na_binary_at_1070c": {
+            "formula": "SiO2",
+            "phase": Phase.CR,
+            "polymorph": Polymorph.TRIDYMITE,
+            "composition": {"Na2O": "0.35", "SiO2": "0.65"},
+            "printed_partial": {"SiO2": "0.65"},
+            "temperature_C": "1070",
+            "standard_state": SIO2_TRIDYMITE_STANDARD_STATE,
+            "standard_state_as_printed": "The activity of SiO2 is relative to tridymite.",
+            "standard_state_locator": None,
+        },
+    }
+    source_rows = _observations(document)
+    for observation_id, pin in expected.items():
+        source = source_rows[observation_id]
+        source_values = source["values"]
+        assert source["standard_state"] == pin["standard_state"]
+        assert source["standard_state_as_printed"] == pin["standard_state_as_printed"]
+        if pin["standard_state_locator"] is None:
+            assert source["standard_state_locator"] == source["locator"]
+        else:
+            assert source["standard_state_locator"] == pin["standard_state_locator"]
+        assert source_values["T_C"] == pin["temperature_C"]
+        assert "binary Na2O-SiO2 system" in source_values["composition_as_published"]
+
+        conditions = source["point_conditions"]
+        assert conditions["temperature_C"]["state"]["tag"] == "value"
+        assert conditions["temperature_C"]["locator"]
+        composition = conditions["composition"]
+        assert composition["state"]["value"]["basis"] == "binary_complement_mole_fraction"
+        assert composition["state"]["value"]["amount_basis"] == "mole_fraction"
+        assert dict(composition["state"]["value"]["components"]) == pin["composition"]
+        assert composition["locator"]
+        inference = composition["inference"]
+        assert inference["relation"] == "binary per abstract, complement"
+        partial_formula, partial_amount = next(iter(pin["printed_partial"].items()))
+        partial = inference["parameters"][0][1]
+        assert inference["parameters"][0][0] == f"X_{partial_formula}"
+        assert partial["state"]["value"] == partial_amount
+        assert partial["locator"] == composition["locator"]
+
+        identity = points[observation_id].identity
+        assert identity.composition.is_value
+        assert identity.composition.value.as_map() == {
+            formula: Decimal(amount) for formula, amount in pin["composition"].items()
+        }
+        reference_state = identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        endmember = reference_state.value.endmember
+        assert endmember.formula == pin["formula"]
+        assert endmember.phase.is_value and endmember.phase.value is pin["phase"]
+        if "polymorph" in pin:
+            assert endmember.polymorph.is_value
+            assert endmember.polymorph.value is pin["polymorph"]
 
 
 def _assert_extracted_table_cells(document: dict) -> None:
@@ -261,6 +374,21 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
     abstract_25 = points["neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c"]
     abstract_40 = points["neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c"]
     silica_activity = points["neudorf_elliott_1980_sio2_activity_na_binary_at_1070c"]
+    _assert_mapped_numeric_activity_points(document, points)
+
+    mutated_composition = copy.deepcopy(document)
+    _observations(mutated_composition)[
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c"
+    ]["point_conditions"]["composition"]["state"]["value"]["components"][1][1] = "0.755"
+    with pytest.raises(AssertionError):
+        _assert_mapped_numeric_activity_points(mutated_composition, points)
+    mutated_reference_state = copy.deepcopy(document)
+    _observations(mutated_reference_state)[
+        "neudorf_elliott_1980_sio2_activity_na_binary_at_1070c"
+    ]["standard_state"] = "pure solid upper cristobalite"
+    with pytest.raises(AssertionError):
+        _assert_mapped_numeric_activity_points(mutated_reference_state, points)
+
     silica_source = _observations(document)["neudorf_elliott_1980_sio2_activity_na_binary_at_1070c"]
     assert silica_source["values"]["method_class"] == "measured_reduced"
     assert silica_source["values"]["evidence_class"] == "measured_reduced"
@@ -273,7 +401,11 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
         "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c"
     ]
     abstract_25_composition = abstract_25_source["point_conditions"]["composition"]
-    assert abstract_25_composition["state"]["value"]["components"] == [["Na2O", "0.244"]]
+    assert abstract_25_composition["state"]["value"]["components"] == [
+        ["Na2O", "0.244"],
+        ["SiO2", "0.756"],
+    ]
+    assert abstract_25_composition["inference"]["parameters"][0][1]["state"]["value"] == "0.244"
     assert abstract_25_composition["locator"] == {
         "page": 3,
         "pdf_page_index": 2,
@@ -284,9 +416,21 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
     assert "Table I prints 34.4 m/o" in abstract_25_source["values"][
         "composition_discrepancy_note"
     ]
-    _assert_migrated_conditions(abstract_25, temperature_K="1323.15", composition={"Na2O": "0.244"})
-    _assert_migrated_conditions(abstract_40, temperature_K="1323.15", composition={"Na2O": "0.393"})
-    _assert_migrated_conditions(silica_activity, temperature_K="1343.15", composition={"SiO2": "0.65"})
+    _assert_migrated_conditions(
+        abstract_25,
+        temperature_K="1323.15",
+        composition={"Na2O": "0.244", "SiO2": "0.756"},
+    )
+    _assert_migrated_conditions(
+        abstract_40,
+        temperature_K="1323.15",
+        composition={"Na2O": "0.393", "SiO2": "0.607"},
+    )
+    _assert_migrated_conditions(
+        silica_activity,
+        temperature_K="1343.15",
+        composition={"Na2O": "0.35", "SiO2": "0.65"},
+    )
 
     for index, table_row in enumerate(TABLE_I, start=1):
         _assert_migrated_conditions(
