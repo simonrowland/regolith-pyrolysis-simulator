@@ -131,6 +131,230 @@ def compressible_poiseuille_mass_flow(
     return numerator / denominator
 
 
+@dataclass(frozen=True)
+class QuasiSteadyHeadspaceSolve:
+    candidate_partials_Pa: dict[str, float]
+    writer_partials_Pa: dict[str, float]
+    flux: EvaporationFlux
+    residual_Pa_by_species: dict[str, float]
+    residual_relative: float
+    iterations: int
+    converged: bool
+
+
+def solve_quasi_steady_headspace_partials_Pa(
+    *,
+    equilibrium_Pa: Mapping[str, float],
+    fixed_partials_Pa: Mapping[str, float],
+    initial_partials_Pa: Mapping[str, float],
+    evaluate_flux: Callable[[Mapping[str, float]], EvaporationFlux],
+    write_partials: Callable[[EvaporationFlux], Mapping[str, float]],
+    relative_tolerance: float = 1.0e-9,
+    max_iterations: int = 80,
+) -> QuasiSteadyHeadspaceSolve:
+    """Solve the current-hour flux and the existing overhead writer together.
+
+    The flux evaluator is the existing read-only EVAPORATION_FLUX route;
+    ``write_partials`` is the current transport writer. Thus each path keeps
+    its own existing pressure-from-flux rule. Without an effective capacity,
+    ``estimate_transport_state`` inverts the shared Poiseuille mass-flow
+    function with the resolved downstream pressure, then
+    ``species_partial_pressures`` projects molar fractions onto that pressure.
+    A declared effective capacity uses the existing allowed upstream
+    pressure; a zero-forward-conductance closed line uses the existing allowed
+    pressure as well. A PN2/Ar sweep without a declared capacity uses the same
+    inverse pipe law and its existing pressure floor. No sweep rate, blower
+    head, or choke default is introduced here. Oxygen remains fixed at its
+    incoming value while the other partials are solved; no oxygen root is
+    implied by this operation.
+
+    Premise: inside one hour, each participating species' kinetic rate is
+    priced at the partial pressure for that same hour, and its headspace
+    residence is short relative to the hour. The coupled equations are
+    ``J_i = provider(P_eq,i, p_i)`` and ``p_i = writer_i(J)``. The writer map
+    is antitone in the backpressured partials, so direct substitution can
+    alternate. For one species, ``writer(J(p)) - p`` is strictly decreasing;
+    bracket its zero on ``[0, P_eq]`` and bisect. For several species, move
+    along the residual only when a backtracked trial reduces its largest
+    relative component, retaining the best evaluated point if the bounded
+    search stalls.
+
+    Unit check: every candidate and writer partial is Pa, each residual is
+    Pa, and dividing by ``max(P_eq, |p|, |writer(p)|)`` makes the stopping
+    residual dimensionless. The zero-removal limit is ``J=0`` at ``p=P_eq``;
+    increasing pipe removal drives ``p`` toward zero and the provider's
+    zero-backpressure rate. That rate is the free-Langmuir rate only when the
+    existing provider has no gas-film resistance. For the carrier-free Na
+    check, ``M K = 1.02563e-7 kg/(s Pa²)`` and
+    ``M K p² = β(P_eq-p)``; rearranging gives
+    ``p = (-β + sqrt(β² + 4 M K β P_eq))/(2 M K) = 1.20745 Pa``. Both sides
+    of the balance are kg/s, and substituting ``p=0`` recovers the
+    free-source limit.
+    """
+
+    if not math.isfinite(float(relative_tolerance)) or relative_tolerance <= 0.0:
+        raise ValueError("relative_tolerance must be finite and positive")
+    if max_iterations < 1:
+        raise ValueError("max_iterations must be positive")
+
+    bounds: dict[str, float] = {}
+    for species, raw_bound in equilibrium_Pa.items():
+        try:
+            bound = float(raw_bound)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(bound) and bound > 0.0:
+            bounds[str(species)] = bound
+    species_ids = tuple(sorted(bounds))
+    fixed: dict[str, float] = {}
+    for species, raw_value in fixed_partials_Pa.items():
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            fixed[str(species)] = max(0.0, value)
+
+    def evaluate(candidate: Mapping[str, float], iteration: int):
+        full_partials = dict(fixed)
+        full_partials.update(candidate)
+        flux = evaluate_flux(full_partials)
+        written = {
+            str(species): max(0.0, float(value))
+            for species, value in write_partials(flux).items()
+            if math.isfinite(float(value))
+        }
+        residuals = {
+            species: written.get(species, 0.0) - candidate[species]
+            for species in species_ids
+        }
+        relative = max(
+            (
+                abs(residuals[species])
+                / max(
+                    bounds[species],
+                    abs(candidate[species]),
+                    abs(written.get(species, 0.0)),
+                    1.0e-300,
+                )
+                for species in species_ids
+            ),
+            default=0.0,
+        )
+        return flux, written, residuals, relative, iteration, dict(candidate)
+
+    candidate = {
+        species: min(
+            bounds[species],
+            max(0.0, float(initial_partials_Pa.get(species, 0.0) or 0.0)),
+        )
+        for species in species_ids
+    }
+    if not species_ids:
+        flux, written, residuals, relative, _, _ = evaluate({}, 1)
+        return QuasiSteadyHeadspaceSolve(
+            candidate_partials_Pa={},
+            writer_partials_Pa=written,
+            flux=flux,
+            residual_Pa_by_species=residuals,
+            residual_relative=relative,
+            iterations=1,
+            converged=True,
+        )
+
+    best = evaluate(candidate, 1)
+    if len(species_ids) == 1:
+        species = species_ids[0]
+        low = {species: 0.0}
+        high = {species: bounds[species]}
+        low_eval = evaluate(low, 2)
+        high_eval = evaluate(high, 3)
+        if low_eval[3] < best[3]:
+            best = low_eval
+        if high_eval[3] < best[3]:
+            best = high_eval
+        if best[3] <= relative_tolerance:
+            return QuasiSteadyHeadspaceSolve(
+                candidate_partials_Pa=best[5],
+                writer_partials_Pa=best[1],
+                flux=best[0],
+                residual_Pa_by_species=best[2],
+                residual_relative=best[3],
+                iterations=best[4],
+                converged=True,
+            )
+        if low_eval[2][species] >= 0.0 and high_eval[2][species] <= 0.0:
+            for iteration in range(4, max_iterations + 1):
+                mid = {species: 0.5 * (low[species] + high[species])}
+                current = evaluate(mid, iteration)
+                if current[3] < best[3]:
+                    best = current
+                if current[3] <= relative_tolerance:
+                    best = current
+                    break
+                if current[2][species] > 0.0:
+                    low, low_eval = mid, current
+                else:
+                    high, high_eval = mid, current
+                if high[species] == low[species]:
+                    break
+            return QuasiSteadyHeadspaceSolve(
+                candidate_partials_Pa=best[5],
+                writer_partials_Pa=best[1],
+                flux=best[0],
+                residual_Pa_by_species=best[2],
+                residual_relative=best[3],
+                iterations=best[4],
+                converged=best[3] <= relative_tolerance,
+            )
+
+    # Antitone vector map: an undamped update changes sign on the next
+    # evaluation. Backtracking makes progress conditional on reducing the
+    # dimensionless residual and preserves the best point if no trial does.
+    current = best
+    for iteration in range(2, max_iterations + 1):
+        alpha = 1.0
+        accepted = None
+        while alpha >= 2.0**-20:
+            trial = {
+                species: min(
+                    bounds[species],
+                    max(
+                        0.0,
+                        candidate[species]
+                        + alpha * current[2][species],
+                    ),
+                )
+                for species in species_ids
+            }
+            if trial == candidate:
+                alpha *= 0.5
+                continue
+            trial_eval = evaluate(trial, iteration)
+            if trial_eval[3] < best[3]:
+                best = trial_eval
+            if trial_eval[3] < current[3]:
+                accepted = (trial, trial_eval)
+                break
+            alpha *= 0.5
+        if accepted is None:
+            break
+        candidate, current = accepted
+        if current[3] <= relative_tolerance:
+            best = current
+            break
+
+    return QuasiSteadyHeadspaceSolve(
+        candidate_partials_Pa=best[5],
+        writer_partials_Pa=best[1],
+        flux=best[0],
+        residual_Pa_by_species=best[2],
+        residual_relative=best[3],
+        iterations=best[4],
+        converged=best[3] <= relative_tolerance,
+    )
+
+
 DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
 DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
     'fe_stage1': 4.0,
