@@ -8010,12 +8010,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         pressure_source = 'melt.p_total_mbar'
         if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = sum(
+            from simulator.overhead import headspace_partials_Pa_from_mbar
+
+            carried_partials_Pa = headspace_partials_Pa_from_mbar(
+                self._melt_headspace_composition_mbar
+            )
+            overhead_pressure_pa = sum(
                 max(0.0, float(value))
-                for value in self._melt_headspace_composition_mbar.values()
+                for value in carried_partials_Pa.values()
             )
             pressure_source = '_melt_headspace_composition_mbar'
-        overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
+        else:
+            overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
         # Native Fe is partitioned in _step_one_hour before ordinary
         # evaporation. At this point the carried-in headspace is the gas
         # boundary the source sees; the later same-hour flux has not formed.

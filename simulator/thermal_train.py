@@ -1293,16 +1293,25 @@ def condensation_stage_windows_K(setpoints: Mapping[str, Any]) -> dict[str, tupl
 def _peak_partial_pressures_pa(
     overhead_state_series: Sequence[Mapping[str, Any]],
 ) -> dict[str, float]:
+    from simulator.overhead import headspace_partials_Pa_from_mbar
+
     peaks: dict[str, float] = {}
     for state in overhead_state_series:
         composition = state.get("composition_mbar", {})
         if not isinstance(composition, Mapping):
             continue
+        partials_mbar: dict[str, float] = {}
         for species, value in composition.items():
             try:
-                pressure = _finite_nonnegative(value, f"{species} partial pressure mbar") * 100.0
+                partials_mbar[str(species)] = _finite_nonnegative(
+                    value,
+                    f"{species} partial pressure mbar",
+                )
             except (TypeError, ValueError):
                 continue
+        for species, pressure in headspace_partials_Pa_from_mbar(
+            partials_mbar
+        ).items():
             peaks[str(species)] = max(peaks.get(str(species), 0.0), pressure)
     return peaks
 

@@ -6377,7 +6377,7 @@ def _flowing_species_partial_pressures_pa(
     # single-species Na or K at 10 mbar has p_i<=1000 Pa, below P_sat at a
     # 1500 C wall, so that wall cannot collect either alkali by condensation.
     if reported_partial_pressures_mbar is not None:
-        partial_pressures_pa: dict[str, float] = {}
+        reported_partials_mbar: dict[str, float] = {}
         for species, partial_pressure_mbar in reported_partial_pressures_mbar.items():
             if not is_declared_real_scalar(
                 partial_pressure_mbar,
@@ -6386,9 +6386,14 @@ def _flowing_species_partial_pressures_pa(
                 raise ValueError(
                     f'reported partial pressure for {species!r} must be numeric'
                 )
-            partial_pressures_pa[str(species)] = (
-                float(partial_pressure_mbar) * 100.0
+            reported_partials_mbar[str(species)] = float(
+                partial_pressure_mbar
             )
+        from simulator.overhead import headspace_partials_Pa_from_mbar
+
+        partial_pressures_pa = headspace_partials_Pa_from_mbar(
+            reported_partials_mbar
+        )
     else:
         molar_flow_by_species: dict[str, float] = {}
         for species, raw_rate_kg_hr in species_kg_hr.items():
@@ -6492,13 +6497,14 @@ def _segment_species_partial_pressures_pa(
     # ratio, so units cancel before the final Pa multiplication. This preserves
     # p_i<=P_total and makes upstream capture reduce downstream supersaturation;
     # Na/K remain non-depositing on a 1500 C wall even at the 10 mbar ceiling.
+    from simulator.overhead import headspace_partials_mbar_from_Pa
+
     inlet_partials = _flowing_species_partial_pressures_pa(
         {},
         total_pressure_pa,
-        reported_partial_pressures_mbar={
-            species: float(partial_pressure_pa) / 100.0
-            for species, partial_pressure_pa in inlet_partial_pressures_pa.items()
-        },
+        reported_partial_pressures_mbar=(
+            headspace_partials_mbar_from_Pa(inlet_partial_pressures_pa)
+        ),
     )
     pressure_pa = float(total_pressure_pa)
     if pressure_pa == 0.0:
@@ -6573,10 +6579,9 @@ def _segment_species_partial_pressures_pa(
         by_segment[segment] = _flowing_species_partial_pressures_pa(
             {},
             pressure_pa,
-            reported_partial_pressures_mbar={
-                species: partial_pressure_pa / 100.0
-                for species, partial_pressure_pa in local_partials.items()
-            },
+            reported_partial_pressures_mbar=(
+                headspace_partials_mbar_from_Pa(local_partials)
+            ),
         )
     return by_segment
 

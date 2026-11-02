@@ -776,9 +776,12 @@ class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
 
-        melt_headspace_partials_mbar = getattr(
-            self, '_melt_headspace_composition_mbar', {}) or {}
-        return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
+        from simulator.overhead import headspace_partials_Pa_from_mbar
+
+        melt_headspace_partials_Pa = headspace_partials_Pa_from_mbar(
+            getattr(self, '_melt_headspace_composition_mbar', {}) or {}
+        )
+        return float(melt_headspace_partials_Pa.get(species, 0.0))
 
     def _calculate_evaporation_with_headspace_feedback(
         self,

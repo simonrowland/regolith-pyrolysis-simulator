@@ -199,13 +199,21 @@ def gas_partials_Pa_from_headspace_mbar(
     headspace_mbar: Mapping[str, Any] | None,
 ) -> dict[str, float]:
     """Keep only finite positive partials. mbar × 100 = Pa. No invented fill."""
+    from simulator.overhead import headspace_partials_Pa_from_mbar
+
     pressures: dict[str, float] = {}
-    for species, mbar in dict(headspace_mbar or {}).items():
-        if isinstance(mbar, bool) or not isinstance(mbar, (int, float)):
+    declared_partials = dict(headspace_mbar or {})
+    numeric_partials = {
+        str(species): mbar
+        for species, mbar in declared_partials.items()
+        if not isinstance(mbar, bool) and isinstance(mbar, (int, float))
+    }
+    for species, pa in headspace_partials_Pa_from_mbar(
+        numeric_partials
+    ).items():
+        if not math.isfinite(pa) or pa <= 0.0:
             continue
-        pa = float(mbar) * 100.0
-        if math.isfinite(pa) and pa > 0.0:
-            pressures[str(species)] = pa
+        pressures[species] = pa
     return pressures
 
 

@@ -118,6 +118,18 @@ def headspace_partials_mbar_from_Pa(
     }
 
 
+def headspace_partials_Pa_from_mbar(
+    partials_mbar: Mapping[str, float],
+) -> dict[str, float]:
+    """Convert headspace partial pressures from mbar to Pa."""
+    # Premise: 1 mbar = 100 Pa. Algebra: p[Pa] = p[mbar] * 100 Pa/mbar.
+    # Units reduce to Pa; zero mbar maps to zero Pa.
+    return {
+        str(species): float(partial_mbar) * 100.0
+        for species, partial_mbar in partials_mbar.items()
+    }
+
+
 def compressible_poiseuille_mass_flow(
     d: float,
     L: float,
