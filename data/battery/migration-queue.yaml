@@ -245149,6 +245149,52 @@ entries:
       note: Pure-liquid Na2O capacity, as printed.; printed_cell=3.44
 - work_id: 10.2355/isijinternational1966.22.514
   source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
+  why: 'source reference state not printed: not printed'
+  axes:
+  - reference_state
+  observations:
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_callow_xsio2_050
+    locator:
+      page: 3
+      paragraph: Na2O activity comparison
+      note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=1.1e-7
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_callow_xsio2_067
+    locator:
+      page: 3
+      paragraph: Na2O activity comparison
+      note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=6.6e-9
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_050
+    locator:
+      page: 3
+      paragraph: Na2O activity comparison
+      note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.6e-6
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_067
+    locator:
+      page: 3
+      paragraph: Na2O activity comparison
+      note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.7e-8
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_callow_xsio2_050
+    locator:
+      page: 3
+      paragraph: SiO2 activity reports
+      note: SiO2(l) activity reported by Callow and quoted by Inoue and Suito.; printed_cell=.13
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_callow_xsio2_067
+    locator:
+      page: 3
+      paragraph: SiO2 activity reports
+      note: SiO2(l) activity reported by Callow and quoted by Inoue and Suito.; printed_cell=.6
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_charles_xsio2_050
+    locator:
+      page: 3
+      paragraph: SiO2 activity reports
+      note: SiO2(l) activity reported by Charles and quoted by Inoue and Suito.; printed_cell=.009
+  - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_charles_xsio2_067
+    locator:
+      page: 3
+      paragraph: SiO2 activity reports
+      note: SiO2(l) activity reported by Charles and quoted by Inoue and Suito.; printed_cell=.38
+- work_id: 10.2355/isijinternational1966.22.514
+  source: data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml
   why: unsupported quantity 'log_sodium_vapor_pressure_difference_as_published'
   axes:
   - quantity
@@ -256270,6 +256316,14 @@ entries:
   axes:
   - method
   observations:
+  - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound
+    locator:
+      page: 7
+      published_page: 1771
+      pdf_page_index: 6
+      figure: '11'
+      section: 4.4.4
+      note: The prose gives the bound for the displayed Figure 11 composition range; no point was read from a contour.
   - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05
     locator:
       page: 2
@@ -563870,6 +563924,446 @@ entries:
     locator:
       note: extract-level typed absence
       source_path: data/literature/extracts/colson-colson-1995-chromium-dimer-lpsc.yaml
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: declared quantity is unknown; unsupported quantity 'appearance_potential_as_published'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_sio_appearance_potential_prose_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      section: Results
+      note: Paragraph following Table II; the prose gives a separate SiO appearance potential.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_23_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 23, appearance-potential cell.; row=23
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_24_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 24, appearance-potential cell.; row=24
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_25_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 25, appearance-potential cell.; row=25
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_26_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 26, appearance-potential cell.; row=26
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_39_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 39, appearance-potential cell.; row=39
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_44_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 44, appearance-potential cell.; row=44
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_50_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 50, appearance-potential cell.; row=50
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_51_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 51, appearance-potential cell.; row=51
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_52_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 52, appearance-potential cell.; row=52
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_56_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 56, appearance-potential cell.; row=56
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_78_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 78, appearance-potential cell.; row=78
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: 'no mapped ion_intensity field selected; source fields: quantity, method_class, admission_status, status, refusal_reason,
+    schema_gap, ion_as_printed, ion_mass_to_charge_as_printed, species_assignment_as_printed, ion_intensity_as_printed, qualifier_as_printed'
+  axes:
+  - value
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23_row_1780_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 23 ion-intensity cell.; row=1780
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24_row_1420_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 24 ion-intensity cell.; row=1420
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24_row_1780_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 24 ion-intensity cell.; row=1780
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25_row_1830_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 25 ion-intensity cell.; row=1830
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26_row_1980_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 26 ion-intensity cell.; row=1980
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39_row_1880_upper_limit_typed_refusal
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I, m/e 39 ion-intensity cell.; row=1880
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50_row_1900_upper_limit_typed_refusal
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I, m/e 50 ion-intensity cell.; row=1900
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56_row_2150_upper_limit_typed_refusal
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I, m/e 56 ion-intensity cell.; row=2150
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: qualifier ratio does not name a reference_state
+  axes:
+  - reference_state
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_mass80_to_mass78_ion_intensity_ratio
+    locator:
+      page: 13
+      published_page: 535
+      pdf_page_index: 12
+      section: Results
+      note: Reported average I+80/I+78 ratio; individual ratios at the three temperatures are not printed.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1210, 1780]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_23::T=1210:row=1210:h=45083ab5eca0
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 23 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1210, 1830]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_25::T=1210:row=1210:h=919dca9227ae
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 25 column; point locators identify each printed temperature row.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_78::T=1210:row=1210:h=2936abd56365
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 78 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1210, 1880]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_39::T=1210:row=1210:h=0bc9bab77d6c
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 39 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1210, 1900]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_50::T=1210:row=1210:h=827fa5e1d7ff
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 50 column; point locators identify each printed temperature row.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_51::T=1210:row=1210:h=d36244d1f17c
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 51 column; point locators identify each printed temperature row.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_52::T=1210:row=1210:h=b05c00193548
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 52 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1210, 1980]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_26::T=1210:row=1210:h=bee0c912a075
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 26 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1280, 1780]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_24::T=1280:row=1280:h=2288d816c0f1
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 24 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1550, 1840]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_mass80_to_mass78_ion_intensity_ratio
+    locator:
+      page: 13
+      published_page: 535
+      pdf_page_index: 12
+      section: Results
+      note: Reported average I+80/I+78 ratio; individual ratios at the three temperatures are not printed.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1560, 1710]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_40::T=1560:row=1560:h=9eb674417c75
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 40 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1660, 1780]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_27::T=1660:row=1660:h=9b2ce032f4ff
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 27 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1830, 2330]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_44::T=1830:row=1830:h=45dff4e5b974
+    locator:
+      page: 7
+      published_page: 529
+      pdf_page_index: 6
+      table: I
+      note: Table I m/e 44 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1880, 2150]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_56::T=1880:row=1880:h=fd21d18c847d
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 56 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: source T_range_K [1880, 2330]; no midpoint invented
+  axes:
+  - temperature_K
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_45::T=1880:row=1880:h=89e8b7e88ea8
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 45 column; point locators identify each printed temperature row.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table1_mq_46::T=1880:row=1880:h=23da42dd9783
+    locator:
+      page: 8
+      published_page: 530
+      pdf_page_index: 7
+      table: I
+      note: Table I m/e 46 column; point locators identify each printed temperature row.
+- work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source: data/literature/extracts/de-maria-1969-rend-lincei.yaml
+  why: unsupported quantity 'appearance_potential_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_results_sio_appearance_potential_prose_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      section: Results
+      note: Paragraph following Table II; the prose gives a separate SiO appearance potential.
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_23_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 23, appearance-potential cell.; row=23
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_24_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 24, appearance-potential cell.; row=24
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_25_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 25, appearance-potential cell.; row=25
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_26_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 26, appearance-potential cell.; row=26
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_39_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 39, appearance-potential cell.; row=39
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_44_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 44, appearance-potential cell.; row=44
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_50_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 50, appearance-potential cell.; row=50
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_51_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 51, appearance-potential cell.; row=51
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_52_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 52, appearance-potential cell.; row=52
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_56_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 56, appearance-potential cell.; row=56
+  - observation_id: de-maria-1969-rend-lincei::de_maria_1969_table2_mq_78_appearance_potential_typed_refusal
+    locator:
+      page: 12
+      published_page: 534
+      pdf_page_index: 11
+      table: II
+      note: Table II, m/e 78, appearance-potential cell.; row=78
 - work_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95
   source: data/literature/extracts/fray-schmitt-2009-nh3.yaml
   why: absent method_class

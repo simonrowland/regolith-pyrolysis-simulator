@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 87637
-records out (observations): 177271
-works: 724
-experiments: 6766
-queue size: 117097
+rows in: 87677
+records out (observations): 177421
+works: 725
+experiments: 6768
+queue size: 117155
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 722
+index sources: 723
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,20 +196,20 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 721 (mismatch) |
+| citations | 147 | 722 (mismatch) |
 | doi_works | 56 | 392 (mismatch) |
-| no_doi_works | 91 | 332 (mismatch) |
-| admission_statuses | 374 | 29617 (mismatch) |
+| no_doi_works | 91 | 333 (mismatch) |
+| admission_statuses | 374 | 29637 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1338 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 21699 (mismatch) |
+| formulas | 1625 | 21702 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 14894 (mismatch) |
+| absent_admissions | 3511 | 14914 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2811 (mismatch) |
+| range_only_T | 3125 | 2827 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
 | missing_phases | 237 | 1357 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -19057,7 +19057,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/banya-2004-sulphide-capacity-cao-al2o3.yaml` | 2 | 2 | 1 |
 | `data/literature/extracts/banya-chiba-hikosaka-1980-feto-binary-solid-iron.yaml` | 207 | 138 | 207 |
-| `data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml` | 45 | 45 | 45 |
+| `data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml` | 46 | 46 | 46 |
 | `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 |
@@ -19129,6 +19129,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/day-2020-trinitite-volatility.yaml` | 6 | 33 | 6 |
 | `data/literature/extracts/de-abreu-2024-li2o-sio2-thermochemistry.yaml` | 26 | 26 | 26 |
+| `data/literature/extracts/de-maria-1969-rend-lincei.yaml` | 39 | 149 | 49 |
 | `data/literature/extracts/decapitani-kirschen-1998-excess-function.yaml` | 90 | 90 | 0 |
 | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` | 3 | 3 | 9 |
 | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` | 10 | 30 | 60 |
@@ -19192,7 +19193,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/inada-2026-forsterite-h2-h2o.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml` | 446 | 446 | 17 |
-| `data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml` | 267 | 267 | 68 |
+| `data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml` | 267 | 267 | 76 |
 | `data/literature/extracts/inoue-suito-1982-vanadium-mgo-saturated-slag.yaml` | 549 | 549 | 0 |
 | `data/literature/extracts/itoh-1985-beta-alumina-na2o-emf.yaml` | 9 | 9 | 9 |
 | `data/literature/extracts/itoh-1989-zno-solid-zinc-silicate.yaml` | 67 | 67 | 67 |
@@ -19821,8 +19822,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 294551
+advisory issues: 294705
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 294551 |
+| `identity_incomplete` | 294705 |
