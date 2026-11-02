@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 732
-- Extracts (`literature_extract.v1`): 730
+- Sources: 733
+- Extracts (`literature_extract.v1`): 731
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 730
+- Extracts with no PDF: 731
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -145,6 +145,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `doyle-1989-tio2-feo-activity-magma` | Doyle, C. D. (1989), Effect of substitution of TiO2 for SiO2 on f(FeO) in magma, Geochimica et Cosmochimica Acta 53, 2631–2638. |  | ABSENT, `` | `raw/doyle-1989-tio2-feo-activity-magma/doyle-1989-tio2-feo-activity-magma.pdf` (present, a5329971); `text/doyle-1989-tio2-feo-activity-magma/` (33 files, exists); `tables/doyle-1989-tio2-feo-activity-magma/` (0 files, ABSENT) | `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` (167 rows, draft) | `ledger/doyle-1989-tio2-feo-activity-magma.yaml`: — (—) |
 | `drowart-1960-al2o3-kems` | Drowart, J., DeMaria, G., Burns, R. P. & Inghram, M. G. (1960), “Thermodynamics of Al2O3 Using a Mass Spectrometer,” Journal of Chemical Physics 32, 1366–1373. | 10.1063/1.1730923 | ABSENT, `` | `raw/drowart-1960-al2o3-kems/drowart-1960-al2o3-kems.pdf` (present, 71aaca0c); `text/drowart-1960-al2o3-kems/` (22 files, exists); `tables/drowart-1960-al2o3-kems/` (0 files, ABSENT) | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` (10 rows, draft) | `ledger/drowart-1960-al2o3-kems.yaml`: — (—) |
 | `ehrt-2008-sn-redox-aluminosilicate` | Ehrt, D. (2008). Redox behaviour of Sn4+/Sn2+ in alkali free aluminosilicate glasses and melts. Physics and Chemistry of Glasses: European Journal of Glass Science and Technology Part B, 49(2), 68–72. |  | ABSENT, `` | `raw/ehrt-2008-sn-redox-aluminosilicate/ehrt-2008-sn-redox-aluminosilicate.pdf` (present, 54012c7e); `text/ehrt-2008-sn-redox-aluminosilicate/` (14 files, exists); `tables/ehrt-2008-sn-redox-aluminosilicate/` (0 files, ABSENT) | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` (8 rows, draft) | `ledger/ehrt-2008-sn-redox-aluminosilicate.yaml`: — (—) |
+| `eliezer-howald-1978-potassium-silicate-vapor-pressure` | Eliezer, N., Howald, R. A., Marinkovic, M., and Eliezer, I. (1978). Vapor Pressure Measurements, Thermodynamic Parameters, and Phase Diagram for the System Potassium Oxide-Silicon Oxide at High Temperatures. The Journal of Physical Chemistry 82(9), 1021–1026. |  | ABSENT, `` | `raw/eliezer-howald-1978-potassium-silicate-vapor-pressure/eliezer-howald-1978-potassium-silicate-vapor-pressure.pdf` (present, 5e37949b); `text/eliezer-howald-1978-potassium-silicate-vapor-pressure/` (29 files, exists); `tables/eliezer-howald-1978-potassium-silicate-vapor-pressure/` (0 files, ABSENT) | `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` (17 rows, draft) | `ledger/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml`: — (—) |
 | `engelschion-2020-eac1a-simulant` | Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. & Sperl, M. (2020), "EAC-1A: A novel large-volume lunar regolith simulant", Scientific Reports 10:5473, DOI 10.1038/s41598-020-62312-4. | 10.1038/s41598-020-62312-4 | ABSENT, `` | `raw/engelschion-2020-eac1a-simulant/engelschion-2020-eac1a-simulant.pdf` (present, 7dbfc4c4); `text/engelschion-2020-eac1a-simulant/` (18 files, exists); `tables/engelschion-2020-eac1a-simulant/` (0 files, ABSENT) | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` (2 rows, draft) | `ledger/engelschion-2020-eac1a-simulant.yaml`: decoded (2026-09-06) |
 | `evans-2009-sulfur-mn-ni-w-xanes` | Evans KA, O’Neill HStC, Mavrogenes JA, Keller NS, Jang LY, Lee JF (2009). XANES evidence for sulphur speciation in Mn-, Ni- and W-bearing silicate melts. Geochimica et Cosmochimica Acta 73(22), 6847–6867. | 10.1016/j.gca.2009.08.013 | ABSENT, `` | `raw/evans-2009-sulfur-mn-ni-w-xanes/evans-2009-sulfur-mn-ni-w-xanes.pdf` (present, cbec654d); `text/evans-2009-sulfur-mn-ni-w-xanes/` (13 files, exists); `tables/evans-2009-sulfur-mn-ni-w-xanes/` (0 files, ABSENT) | `data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml` (24 rows, draft) | `ledger/evans-2009-sulfur-mn-ni-w-xanes.yaml`: — (—) |
 | `ewing-1963-sodium-potassium-properties` | Ewing C.T. et al. (1963) High temperature properties of sodium and potassium. DTIC AD0405673. |  | ABSENT, `` | `raw/ewing-1963-sodium-potassium-properties/ewing-1963-sodium-potassium-properties.pdf` (ABSENT, ); `text/ewing-1963-sodium-potassium-properties/` (0 files, ABSENT); `tables/ewing-1963-sodium-potassium-properties/` (0 files, ABSENT) | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` (1 rows, draft) | `ledger/ewing-1963-sodium-potassium-properties.yaml`: — (—) |
@@ -884,6 +885,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `doyle-1989-tio2-feo-activity-magma`
 - `drowart-1960-al2o3-kems`
 - `ehrt-2008-sn-redox-aluminosilicate`
+- `eliezer-howald-1978-potassium-silicate-vapor-pressure`
 - `engelschion-2020-eac1a-simulant`
 - `evans-2009-sulfur-mn-ni-w-xanes`
 - `ewing-1963-sodium-potassium-properties`
