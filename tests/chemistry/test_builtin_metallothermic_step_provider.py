@@ -1501,7 +1501,12 @@ def test_staged_na_fe_hold_records_malformed_curve_as_unavailable(
 
     diagnostic = sim._last_c3_na_hold_adjustment
     assert diagnostic["status"] == "unavailable"
-    assert diagnostic["reason"] == "liquid_fraction_provider_invalid_curve"
+    assert diagnostic["reason"] == (
+        "liquid_fraction_provider_invalid_curve:path"
+    )
+    assert diagnostic["typed_refusal_reason"] == (
+        "liquid_fraction_provider_invalid_curve"
+    )
     assert diagnostic["malformed_fields"] == ["path"]
     assert diagnostic["provider"] == sim._liquid_fraction_provider
     assert diagnostic["configured_temperature_C"] == pytest.approx(1250.0)
