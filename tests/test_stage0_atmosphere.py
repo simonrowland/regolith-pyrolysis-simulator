@@ -535,7 +535,7 @@ def test_c0_cached_replay_forecast_preserves_live_sulfur_and_authority_state():
     assert sim._backend_authoritative is True
 
 
-def test_c0_comet_missing_alkali_inventory_does_not_predict_zero_loss():
+def test_c0_comet_uses_its_declared_sodium_inventory_for_exit_prediction():
     feedstocks = yaml.safe_load(
         (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
     )
@@ -544,6 +544,27 @@ def test_c0_comet_missing_alkali_inventory_does_not_predict_zero_loss():
     sim.start_campaign(CampaignPhase.C0)
 
     prediction = sim.campaign_mgr.c0_exit_prediction
+    assert prediction["prediction_status"] == "ok"
+    assert prediction["Na_plus_K_feed_mass_kg"] > 0.0
+    assert prediction["T_exit_C"] is not None
+    assert prediction["M_C0_gas_kg"] > 0.0
+
+
+def test_c0_comet_without_declared_alkalis_refuses_exit_prediction():
+    feedstocks = yaml.safe_load(
+        (Path(__file__).parent.parent / "data" / "feedstocks.yaml").read_text()
+    )
+    comet = feedstocks["comet_nucleus"]
+    composition = dict(comet["composition_wt_pct"])
+    composition["SiO2"] += composition.pop("Na2O")
+    comet["composition_wt_pct"] = composition
+
+    sim = _sim(feedstocks)
+    sim.load_batch("comet_nucleus", 1000.0)
+    sim.start_campaign(CampaignPhase.C0)
+
+    prediction = sim.campaign_mgr.c0_exit_prediction
+
     assert prediction["prediction_status"] == (
         "unavailable_no_initial_NaK_inventory"
     )
