@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 87749
-records out (observations): 177493
-works: 727
-experiments: 6795
-queue size: 117156
+rows in: 87937
+records out (observations): 177681
+works: 729
+experiments: 6827
+queue size: 117429
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 725
+index sources: 727
 hard issues: 1687
 
 ## Unavailable input work census
@@ -196,10 +196,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 724 (mismatch) |
-| doi_works | 56 | 392 (mismatch) |
-| no_doi_works | 91 | 335 (mismatch) |
-| admission_statuses | 374 | 29709 (mismatch) |
+| citations | 147 | 726 (mismatch) |
+| doi_works | 56 | 393 (mismatch) |
+| no_doi_works | 91 | 336 (mismatch) |
+| admission_statuses | 374 | 29897 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1338 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -19327,6 +19327,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kirschen-1999-si-ti-al-miscibility.yaml` | 51 | 51 | 8 |
 | `data/literature/extracts/kirschen-decapitani-1999-liquid-miscibility.yaml` | 576 | 576 | 110 |
 | `data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml` | 14 | 827 | 22 |
+| `data/literature/extracts/kohsaka-1979-na2o-sio2-emf.yaml` | 95 | 95 | 180 |
 | `data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml` | 25 | 25 | 64 |
 | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
 | `data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml` | 0 | 0 | 1 |
@@ -19495,6 +19496,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ref-032-zr.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-052-k-o-gas.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-052-na-o-gas.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/rego-1985-na2o-sio2-transpiration.yaml` | 93 | 93 | 93 |
 | `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` | 85 | 85 | 0 |
 | `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 51 |
 | `data/literature/extracts/renggli-2022-te-evaporation.yaml` | 1 | 36 | 1 |
@@ -19824,8 +19826,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 294849
+advisory issues: 294910
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 294849 |
+| `identity_incomplete` | 294910 |

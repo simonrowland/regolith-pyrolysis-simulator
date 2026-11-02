@@ -1,0 +1,209 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 17c2b2c21f3c55e4a2dc401c4e648ce7a603c7504bb5636c86171cb06d19112b
+  citation: Kohsaka, Shoji; Sato, Seichi; Yokokawa, Toshio (1979), “E.m.f. measurements of molten oxide mixtures III. Sodium
+    oxide + silicon dioxide,” Journal of Chemical Thermodynamics 11, 547–551.
+  source_ids:
+  - kohsaka-1979-na2o-sio2-emf
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:kohsaka-1979-na2o-sio2-emf
+      role: pdf
+      path: raw/kohsaka-1979-na2o-sio2-emf/kohsaka-1979-na2o-sio2-emf.pdf
+      sha256:
+        tag: value
+        value: f2b94695d87c4068877ad2a319e5b77cf9b4a0836d38be2f7070ff67740d9c74
+    - asset_id: pdftotext:kohsaka-1979-na2o-sio2-emf
+      role: pdftotext
+      path: text/kohsaka-1979-na2o-sio2-emf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kohsaka-1979-na2o-sio2-emf
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 17c2b2c21f3c55e4a2dc401c4e648ce7a603c7504bb5636c86171cb06d19112b::experiment::kohsaka_1979_na2o_sio2_concentration_cell
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        published_page: 549
+        pdf_page_index: 2
+        table: '1'
+        note: Composition varies by Table 1 group and is recorded on every observation.
+    form:
+      state:
+        tag: value
+        value: molten Na₂O–SiO₂ melt
+      locator:
+        page: 2
+        published_page: 548
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: Samples are described as melts.
+    container:
+      state:
+        tag: value
+        value: platinum crucibles
+      locator:
+        page: 2
+        published_page: 548
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: The two melt containers were platinum crucibles.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 548
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: Temperature varies across the printed Table 1 readings; see row-level conditions.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 548
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: Measurement total pressure is not reported; occasional vacuum is pretreatment only.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 17c2b2c21f3c55e4a2dc401c4e648ce7a603c7504bb5636c86171cb06d19112b
+  locator:
+    page: 2
+    published_page: 548
+    pdf_page_index: 1
+    section: 2. Experimental
+    note: Concentration-cell measurements described in the Experimental section.; row=1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: The two containers were platinum crucibles situated side by side; each had a small compartment. The melt flowed
+          through a 1 mm diameter hole between the main chamber and side compartment. A semicircular alumina bar wetted by
+          the melt functioned as the liquid junction; a platinum electrode wire was dipped into the melt in the main body
+          of each crucible.
+      locator:
+        page: 2
+        published_page: 548
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: Apparatus description as printed.
+context:
+- observation_id: kohsaka_1979_cell_and_reference_definition
+  type: context_only
+  locator:
+    page: 1
+    published_page: 547
+    pdf_page_index: 0
+    row: 1
+    section: 2. Experimental
+    note: Cell expression and Eq. (1).
+  units: as printed; mixed cell notation and apparatus context
+  values:
+    cell_as_printed: O₂(Pt)|0.4Na₂O·0.6SiO₂|Na₂O+SiO₂|O₂(Pt)
+    reference_electrode_as_printed: O₂(Pt)
+    reference_electrode_position_as_printed: O₂(Pt) at both ends of the printed concentration cell.
+    reference_melt_as_printed: reference melt {0.4Na₂O·0.6SiO₂}
+    standard_state_as_printed: a(Na₂O) and a°(Na₂O) are the activities of Na₂O in the sample melt and the reference melt {0.4Na₂O·0.6SiO₂},
+      respectively.
+    activity_standard_state_basis_note: The activity is referred to the printed reference melt; the paper does not state a
+      pure-liquid Na₂O standard state.
+    measurement_relation_as_printed: E = −(RT/2F) ln{a(Na₂O)/a°(Na₂O)}
+    equation_number: '1'
+    assumption_as_printed: The transference number of Na⁺ is assumed to be nearly unity.
+    cell_description_as_printed: The two containers were platinum crucibles situated side by side; each had a small compartment.
+      The melt flowed through a 1 mm diameter hole between the main chamber and side compartment. A semicircular alumina bar
+      wetted by the melt functioned as the liquid junction; a platinum electrode wire was dipped into the melt in the main
+      body of each crucible.
+    temperature_control_as_printed: Temperature was kept constant within ±2 K.
+    equilibrium_criterion_as_printed: The electrode reaction was considered in equilibrium when e.m.f. stayed constant within
+      ±0.5 mV for 1 to 2 h.
+    sample_preparation_as_printed: Silicic anhydride was heated at 1300 K; desired mixtures were melted in platinum crucibles
+      and kept at 1500 K for 24 h to expel residual CO₂.
+    pressure_absence_note: Occasional vacuum is reported only for pretreatment; the measurement pressure is not stated.
+    activity_output_note: No numeric absolute Na₂O activity or activity ratio is tabulated. Do not calculate activity from
+      the EMF cells in this extract.
+    equation_locator:
+      page: 1
+      published_page: 547
+      pdf_page_index: 0
+      row: 1
+      section: 2. Experimental
+      note: Equation (1) and cell notation.
+    apparatus_locator:
+      page: 2
+      published_page: 548
+      pdf_page_index: 1
+      row: 1
+      section: 2. Experimental
+      note: Platinum crucibles, side compartments, 1 mm hole, alumina liquid junction, Pt wire.
+    standard_state_locator:
+      page: 2
+      published_page: 548
+      pdf_page_index: 1
+      row: 1
+      section: 2. Experimental
+      note: Reference melt identified in the sentence defining a(Na₂O) and a°(Na₂O).
+  context_id: kohsaka-1979-na2o-sio2-emf::context::kohsaka_1979_cell_and_reference_definition
+  work_id: 17c2b2c21f3c55e4a2dc401c4e648ce7a603c7504bb5636c86171cb06d19112b
+  source_id: kohsaka-1979-na2o-sio2-emf
+  species: Na2O
+- observation_id: kohsaka_1979_prose_activity_ratio_statement
+  type: context_only
+  locator:
+    page: 4
+    published_page: 550
+    pdf_page_index: 3
+    row: 1
+    section: 3. Results and discussion
+    note: 'Results and discussion: prose statement following Figure 2.'
+  units: kJ/mol and dimensionless activity ratio as printed
+  values:
+    printed_statement_as_published: 80 kJ mol⁻¹ in ΔG(Na₂O) at 1450 K corresponds to 10³ in activity ratio.
+    gibbs_energy_span_as_printed: 80 kJ mol⁻¹
+    temperature_as_printed: 1450 K
+    activity_ratio_as_printed: 10³
+    composition_interval_as_printed: relatively narrow composition width; endpoints not stated in this sentence
+    schema_gap: This is a prose activity-ratio statement, not a composition-resolved activity measurement; the quantity has
+      no relative-activity-ratio token in simulator/battery/enums.py::Quantity. It is retained as located context and is not
+      scored.
+  context_id: kohsaka-1979-na2o-sio2-emf::context::kohsaka_1979_prose_activity_ratio_statement
+  work_id: 17c2b2c21f3c55e4a2dc401c4e648ce7a603c7504bb5636c86171cb06d19112b
+  source_id: kohsaka-1979-na2o-sio2-emf
+  species: Na2O
