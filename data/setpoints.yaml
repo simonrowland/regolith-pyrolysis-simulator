@@ -2049,7 +2049,6 @@ chemistry_kernel:
   # Mn measurements cannot silently execute production evaporation with α=1.0.
   # V1e-followon (task #36) is the post-0.5.0 work to either measure α or refine
   # the placeholder policy.
-  allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
     # J=M_i*k_L,i*Delta-C and Delta-p=H_i*Delta-C imply
     # k_m,i=M_i*k_L,i/H_i [s/m], R_m,i=H_i/(M_i*k_L,i) [m/s]. Runtime has
