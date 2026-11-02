@@ -919,18 +919,18 @@ def test_ellingham_zero_kelvin_row_is_a_typed_out_of_range_refusal() -> None:
     )
 
 
-def test_ellingham_primary_refit_to_2600k_stays_scored() -> None:
-    """Na ellingham_fit_range_K is (1100, 2600); 2500 K is in-range."""
+def test_ellingham_primary_refit_through_3000k_stays_scored() -> None:
+    """The Na primary refit uses liquid rows through 3000 K."""
 
     low, high = ellingham_fit_range_K("Na")
-    assert (low, high) == (1100.0, 2600.0)
+    assert (low, high) == (1100.0, 3000.0)
     hot = KeyedTablePoint(
         compilation_id="janaf",
         record_id="Na-014",
         formula="Na2O",
         phase="l",
         phase_kind=PHASE_LIQUID,
-        T_K=2500.0,
+        T_K=2900.0,
         delta_fG_kJ_mol=-50.0,
         log10_Kf=None,
         log10_Kf_as_published=None,

@@ -176,7 +176,7 @@ def test_c5_provider_faraday_throughput_at_limited_current():
 def test_na_shuttle_janaf_feo_crossover_is_below_practical_c3_temperature():
     provider = BuiltinMetallothermicStepProvider
     crossover_C = provider._crossover_temperature_C("Na", "Fe")
-    assert crossover_C == pytest.approx(1181.5, abs=0.1)
+    assert crossover_C == pytest.approx(1183.6715578613794, abs=0.1)
     assert crossover_C < 1200.0
 
 
