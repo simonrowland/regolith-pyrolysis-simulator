@@ -182,7 +182,10 @@ def derive_compositions(document: dict) -> int:
         }
         values["admission_status"] = "admitted"
         if quantity in {"activity", "activity_coefficient"}:
-            values.pop("printed_form", None)
+            # The printed cells are log10(a) and log10(gamma). printed_form tells the migrator to store
+            # 10**x (simulator/battery/migrate.py::_printed_scalar_selection); without it the log itself
+            # migrates as the activity (ror-chne P0, ror-chdy P1). Keep both fields.
+            values["printed_form"] = "log10"
             values["printed_form_as_published"] = "log10"
             observation["standard_state"] = "pure liquid SiO2"
         generated[oxide][composition_id] = composition_rows[key]

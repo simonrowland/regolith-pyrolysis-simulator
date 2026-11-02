@@ -316,3 +316,23 @@ def test_all_rendered_cells_migrate_with_exact_conditions_and_mutation_guard() -
         (9, 639), (9, 639),
     ]
     assert all("numeric_points" not in item for item in candidates)
+
+
+def test_compose_script_is_idempotent_on_the_committed_extract(tmp_path: Path) -> None:
+    """Re-running the committed composition script must not change the extract.
+
+    The extract names compose.py as the method that derives its binary compositions. An earlier
+    version popped ``printed_form`` from the 60 log10 activity / activity-coefficient rows, so a
+    re-run silently turned the migrated activities back into the printed logs (ror-chne P0,
+    ror-chdy P1). Running it on a copy must leave every leaf identical.
+    """
+    import subprocess
+    import sys
+
+    script = ROOT / "data/literature/extracts/audits/charles-1967-alkali-silicate-activities-compose.py"
+    copy = tmp_path / "charles.yaml"
+    copy.write_bytes(EXTRACT.read_bytes())
+    subprocess.run([sys.executable, str(script), str(copy)], check=True, cwd=ROOT, capture_output=True)
+    before = yaml.safe_load(EXTRACT.read_text())
+    after = yaml.safe_load(copy.read_text())
+    assert after == before
