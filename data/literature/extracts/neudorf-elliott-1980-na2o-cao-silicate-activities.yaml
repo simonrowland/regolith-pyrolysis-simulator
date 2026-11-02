@@ -124,6 +124,20 @@ species:
       phase: l
       standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
         pressure.
+      standard_state:
+        convention: raoultian_pure_endmember
+        component_basis: Na2O
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
       standard_state_locator: &id004
         page: 2
         pdf_page_index: 1
@@ -168,17 +182,31 @@ species:
           state:
             tag: value
             value:
-              basis: printed_partial_mole_fraction
+              basis: binary_complement_mole_fraction
               amount_basis: mole_fraction
               components:
               - - Na2O
                 - '0.244'
-          locator:
+              - - SiO2
+                - '0.756'
+          locator: &id023
             page: 3
             pdf_page_index: 2
             published_page: 609
             section: Results and Discussion
             note: Results text maps 25 w/o Na2O to 24.4 m/o Na2O.
+          inference:
+            relation: 'binary per abstract, complement'
+            inputs:
+            - printed partial mole fraction
+            parameters:
+            - - X_Na2O
+              - state:
+                  tag: value
+                  value: '0.244'
+                locator: *id023
+            output_unit: mole_fraction
+            references: []
         fO2_Pa: *id002
         total_pressure_Pa: *id003
       attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
@@ -195,6 +223,20 @@ species:
       phase: l
       standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
         pressure.
+      standard_state:
+        convention: raoultian_pure_endmember
+        component_basis: Na2O
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
       standard_state_locator: *id004
       units: dimensionless
       values:
@@ -224,17 +266,31 @@ species:
           state:
             tag: value
             value:
-              basis: printed_partial_mole_fraction
+              basis: binary_complement_mole_fraction
               amount_basis: mole_fraction
               components:
               - - Na2O
                 - '0.393'
-          locator:
+              - - SiO2
+                - '0.607'
+          locator: &id024
             page: 5
             pdf_page_index: 4
             published_page: 611
             table: I
             note: Table I row at 40 w/o Na2O prints 39.3 m/o Na2O.
+          inference:
+            relation: 'binary per abstract, complement'
+            inputs:
+            - printed partial mole fraction
+            parameters:
+            - - X_Na2O
+              - state:
+                  tag: value
+                  value: '0.393'
+                locator: *id024
+            output_unit: mole_fraction
+            references: []
         fO2_Pa: *id002
         total_pressure_Pa: *id003
       attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
@@ -1655,6 +1711,20 @@ species:
       phase: l
       units: dimensionless
       standard_state_as_printed: The activity of SiO2 is relative to tridymite.
+      standard_state:
+        convention: raoultian_pure_endmember
+        component_basis: SiO2
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: tridymite
+          charge:
+            tag: value
+            value: 0
       standard_state_locator: *id021
       attribution: Neudorf and Elliott (1980), PDF page 6, Results and Discussion.
       derived_from:
@@ -1689,12 +1759,26 @@ species:
           state:
             tag: value
             value:
-              basis: printed_partial_mole_fraction
+              basis: binary_complement_mole_fraction
               amount_basis: mole_fraction
               components:
+              - - Na2O
+                - '0.35'
               - - SiO2
                 - '0.65'
           locator: *id021
+          inference:
+            relation: 'binary per abstract, complement'
+            inputs:
+            - printed partial mole fraction
+            parameters:
+            - - X_SiO2
+              - state:
+                  tag: value
+                  value: '0.65'
+                locator: *id021
+            output_unit: mole_fraction
+            references: []
         fO2_Pa:
           state:
             tag: value
