@@ -592,6 +592,28 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     assert "alpha_s_extrapolation_warning" not in in_eval
 
 
+def test_fe_scalar_alpha_record_reports_source_extrapolation_notice():
+    value_ref = f"{condensation.STICKING_VALUE_REF_PREFIX}Fe.value"
+    record = condensation._alpha_record(
+        species="Fe",
+        entry={"value_ref": value_ref},
+        source=value_ref,
+        T_K=1523.15,
+    )
+    notice = record["alpha_s_extrapolation_notice"]
+
+    assert record["alpha_s"].hex() == float(0.02).hex()
+    assert record["value_ref"] == value_ref
+    assert notice["certified_band_K"] == [1700.0, 1800.0]
+    assert notice["distance_below_band_K"] == pytest.approx(176.85)
+    assert notice["source_fit"]["source_id"] == "kems-007-costa-2015"
+    assert notice["source_fit"]["source"] == record["source"]
+    assert record["material_source"] == value_ref
+    assert notice["authority_level"] == "extrapolated"
+    assert record["alpha_s_physical_bound_engaged"] is False
+    assert notice["bound_engaged"] is False
+
+
 def test_fe_alpha_s_range_travels_through_stage_provenance():
     stage = CondensationStage(
         stage_number=1,
