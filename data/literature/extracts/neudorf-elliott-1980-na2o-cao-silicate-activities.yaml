@@ -1,0 +1,1735 @@
+schema_version: literature_extract.v1
+source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+source:
+  citation: Neudorf, D. A. and Elliott, J. F. (1980), ‘Thermodynamic Properties of Na2O-SiO2-CaO Melts
+    at 1000 to 1100 °C’, Metallurgical Transactions B 11B, 607–614 (December 1980).
+  year: 1980
+  corpus_asset: raw/neudorf-elliott-1980-na2o-cao-silicate-activities/neudorf-elliott-1980-na2o-cao-silicate-activities.pdf
+extraction:
+  method: Transcribed from MinerU table blocks and pdftotext-layout; all table layouts were checked against
+    page renders. Positive Table IV log cells are preserved as typed refusals under the controller ruling.
+    Plot points are not digitized.
+  date: '2026-11-02'
+  worker: w1102ne-ne80
+review_status: draft
+skipped_empty_or_dash:
+  total: 4
+  tables:
+  - page: 5
+    table: II
+    count: 3
+    note: The fourth body row has no left-hand T, K; C; or D cell.
+  - page: 7
+    table: IV
+    count: 1
+    note: The calculated activity cell is an em dash for NNa2O = 0.35 and NCaO = 0.00.
+fidelity_samples:
+- species: Na2O
+  observation_id: neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c
+  field: log10_activity_as_published
+  value: '-10.2'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 607
+    section: Abstract
+    note: Abstract endpoint at 25 wt pct Na2O.
+- species: Na2O
+  observation_id: neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+  field: A_cell_as_printed
+  value: -7,650 ± 350
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 611
+    table: I
+    note: Table I row 1 A cell; render confirms thousands comma and ±.
+- species: Na2O
+  observation_id: neudorf_elliott_1980_table2_na2o_fit_row1
+  field: C_as_printed
+  value: '5.923'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 611
+    table: II
+    note: Table II left row 1 C cell.
+- species: Na2O
+  observation_id: neudorf_elliott_1980_table3_row2_mixing_properties
+  field: partial_HM_Na2O_kJ_per_mol_as_printed
+  value: '-160.6'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 611
+    table: III
+    note: Table III composition 29.4 m/o row; negative sign verified on render.
+- species: Na2O
+  observation_id: neudorf_elliott_1980_table4_row4_interpolated_log_a_star_na2o
+  field: log_a_star_as_printed
+  value: '9.14'
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 613
+    table: IV
+    note: Table IV row NNa2O 0.29; positive sign verified on render.
+experiments:
+- experiment_id: neudorf_elliott_1980_cell_emf
+  method: emf_cell
+  method_as_printed: Concentration-type galvanic cell with sodium beta-alumina electrolyte; reversible
+    emf of a Na2O-WO3 reference melt and Na2O-SiO2 or Na2O-CaO-SiO2 melt is used to calculate Na2O activity.
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 607
+    section: Thermodynamic Considerations
+  conditions:
+    fO2_Pa: &id002
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 607
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the
+          migrator.
+    total_pressure_Pa: &id003
+      state:
+        tag: unknown
+        reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 607
+        section: Thermodynamic Considerations
+    temperature_range_C_as_printed:
+    - '1000'
+    - '1100'
+species:
+  Na2O:
+    observations:
+    - observation_id: neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator: &id001
+        page: 1
+        pdf_page_index: 0
+        published_page: 607
+        section: Abstract
+        note: approximately −10.2 at 25 wt pct Na2O
+      phase: l
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+        pressure.
+      standard_state_locator: &id004
+        page: 2
+        pdf_page_index: 1
+        published_page: 608
+        section: Thermodynamic Considerations
+      units: dimensionless
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        activity: '-10.2'
+        printed_form: log10
+        log10_activity_as_published: '-10.2'
+        approximate: true
+        T_C: '1050'
+        temperature_as_published: 1050 °C
+        composition_as_published: 25 wt pct Na2O in the binary Na2O-SiO2 system
+        corresponding_table_composition_as_printed: 25 w/o Na2O; 34.4 m/o Na2O in Table I
+        composition_discrepancy_note: For the 25 w/o row Table I prints 34.4 m/o while the abstract, results
+          prose, and Table III give 24.4 m/o.
+        method_as_printed: Activities of Na2O were calculated from the reversible emf of the cell.
+        oxygen_partial_pressure: &id005
+          value: '0.21'
+          units: atm
+          quote: O2(g, 0.21 atm)
+          locator: &id022
+            page: 1
+            pdf_page_index: 0
+            published_page: 607
+            section: Thermodynamic Considerations
+            note: The cell diagram prints O2(g, 0.21 atm) on both sides.
+        attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id001
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.344'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row at 25 w/o Na2O prints 34.4 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+    - observation_id: neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator: &id006
+        page: 1
+        pdf_page_index: 0
+        published_page: 607
+        section: Abstract
+        note: approximately −8.3 at 40 wt pct Na2O
+      phase: l
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+        pressure.
+      standard_state_locator: *id004
+      units: dimensionless
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        activity: '-8.3'
+        printed_form: log10
+        log10_activity_as_published: '-8.3'
+        approximate: true
+        T_C: '1050'
+        temperature_as_published: 1050 °C
+        composition_as_published: 40 wt pct Na2O in the binary Na2O-SiO2 system
+        corresponding_table_composition_as_printed: 40 w/o Na2O; 39.3 m/o Na2O in Table I
+        composition_discrepancy_note: ''
+        method_as_printed: Activities of Na2O were calculated from the reversible emf of the cell.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id006
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.393'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row at 40 w/o Na2O prints 39.3 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
+    - observation_id: neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: I
+        note: 'row 1: 25 w/o Na2O'
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = A / T + B
+        A_as_printed: -7,650
+        A_standard_deviation_as_printed: '350'
+        A_cell_as_printed: -7,650 ± 350
+        A_unit_as_printed: K
+        B_as_printed: '-4.37'
+        B_standard_deviation_as_printed: '0.27'
+        B_cell_as_printed: -4.37 ± 0.27
+        B_unit_as_printed: dimensionless
+        melt_composition_wt_percent_as_printed: '25'
+        melt_composition_mole_percent_as_printed: '34.4'
+        melt_composition_as_printed: 25 w/o Na2O; 34.4 m/o Na2O
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      point_conditions:
+        temperature_C: &id007
+          state:
+            tag: unknown
+            reason: The printed fit is a function of T across the study range; this row has no single
+              point temperature.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I reports coefficients for log aNa2O = A/T + B.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.344'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row 1 prints 34.4 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+    - observation_id: neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: I
+        note: 'row 2: 30 w/o Na2O'
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = A / T + B
+        A_as_printed: -8,390
+        A_standard_deviation_as_printed: '210'
+        A_cell_as_printed: -8,390 ± 210
+        A_unit_as_printed: K
+        B_as_printed: '-3.31'
+        B_standard_deviation_as_printed: '0.16'
+        B_cell_as_printed: -3.31 ± 0.16
+        B_unit_as_printed: dimensionless
+        melt_composition_wt_percent_as_printed: '30'
+        melt_composition_mole_percent_as_printed: '29.4'
+        melt_composition_as_printed: 30 w/o Na2O; 29.4 m/o Na2O
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      point_conditions:
+        temperature_C: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.294'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row 2 prints 29.4 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+    - observation_id: neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: I
+        note: 'row 3: 35 w/o Na2O'
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = A / T + B
+        A_as_printed: -6,830
+        A_standard_deviation_as_printed: '210'
+        A_cell_as_printed: -6,830 ± 210
+        A_unit_as_printed: K
+        B_as_printed: '-3.80'
+        B_standard_deviation_as_printed: '0.16'
+        B_cell_as_printed: -3.80 ± 0.16
+        B_unit_as_printed: dimensionless
+        melt_composition_wt_percent_as_printed: '35'
+        melt_composition_mole_percent_as_printed: '34.3'
+        melt_composition_as_printed: 35 w/o Na2O; 34.3 m/o Na2O
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      point_conditions:
+        temperature_C: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.343'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row 3 prints 34.3 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+    - observation_id: neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: I
+        note: 'row 4: 40 w/o Na2O'
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = A / T + B
+        A_as_printed: -6,140
+        A_standard_deviation_as_printed: '610'
+        A_cell_as_printed: -6,140 ± 610
+        A_unit_as_printed: K
+        B_as_printed: '-3.67'
+        B_standard_deviation_as_printed: '0.46'
+        B_cell_as_printed: -3.67 ± 0.46
+        B_unit_as_printed: dimensionless
+        melt_composition_wt_percent_as_printed: '40'
+        melt_composition_mole_percent_as_printed: '39.3'
+        melt_composition_as_printed: 40 w/o Na2O; 39.3 m/o Na2O
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+      point_conditions:
+        temperature_C: *id007
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.393'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: I
+            note: Table I row 4 prints 39.3 m/o Na2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
+    - observation_id: neudorf_elliott_1980_table2_na2o_fit_row1
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: left-hand equation row 1; T = 1273 K
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = C × R* + D
+        R_definition_as_printed: R = NNa2O / NSiO2
+        temperature_K_as_printed: '1273'
+        T_K: '1273'
+        C_as_printed: '5.923'
+        D_as_printed: '-12.31'
+        quantity: log_activity_composition_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1273'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II left row 1 T, K.
+        composition: &id008
+          state:
+            tag: unknown
+            reason: The printed log aNa2O equation spans composition R; the row has no single melt composition.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: The left-hand Table II equation is a relation over R = NNa2O/NSiO2.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table2_na2o_fit_row2
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: left-hand equation row 2; T = 1323 K
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = C × R* + D
+        R_definition_as_printed: R = NNa2O / NSiO2
+        temperature_K_as_printed: '1323'
+        T_K: '1323'
+        C_as_printed: '5.748'
+        D_as_printed: '-12.01'
+        quantity: log_activity_composition_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1323'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II left row 2 T, K.
+        composition: *id008
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table2_na2o_fit_row3
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: left-hand equation row 3; T = 1373 K
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aNa2O = C × R* + D
+        R_definition_as_printed: R = NNa2O / NSiO2
+        temperature_K_as_printed: '1373'
+        T_K: '1373'
+        C_as_printed: '5.592'
+        D_as_printed: '-11.74'
+        quantity: log_activity_composition_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
+          pressure.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1373'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II left row 3 T, K.
+        composition: *id008
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table4_row1_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 1; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '8.82'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.35'
+        NCaO_as_printed: '0.00'
+        NNa_plus_as_printed: '1.00'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: &id009
+          state:
+            tag: value
+            value: '1070'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV caption gives 1070 °C.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.35'
+              - - CaO
+                - '0.00'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 1 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row2_calculated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 2; calculated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '8.93'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: By Eq. [8]¹ as printed in the Table IV header
+        NNa2O_as_printed: '0.33'
+        NCaO_as_printed: '0.02'
+        NNa_plus_as_printed: '0.971'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: &id010
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.33'
+              - - CaO
+                - '0.02'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 2 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row2_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 2; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '8.89'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.33'
+        NCaO_as_printed: '0.02'
+        NNa_plus_as_printed: '0.971'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: *id010
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row3_calculated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 3; calculated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.05'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: By Eq. [8]¹ as printed in the Table IV header
+        NNa2O_as_printed: '0.31'
+        NCaO_as_printed: '0.04'
+        NNa_plus_as_printed: '0.939'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: &id011
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.31'
+              - - CaO
+                - '0.04'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 3 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row3_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 3; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.00'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.31'
+        NCaO_as_printed: '0.04'
+        NNa_plus_as_printed: '0.939'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: *id011
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row4_calculated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 4; calculated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.16'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: By Eq. [8]¹ as printed in the Table IV header
+        NNa2O_as_printed: '0.29'
+        NCaO_as_printed: '0.06'
+        NNa_plus_as_printed: '0.906'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: &id012
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.29'
+              - - CaO
+                - '0.06'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 4 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row4_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 4; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.14'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.29'
+        NCaO_as_printed: '0.06'
+        NNa_plus_as_printed: '0.906'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: *id012
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row5_calculated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 5; calculated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.29'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: By Eq. [8]¹ as printed in the Table IV header
+        NNa2O_as_printed: '0.27'
+        NCaO_as_printed: '0.08'
+        NNa_plus_as_printed: '0.871'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: &id013
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.27'
+              - - CaO
+                - '0.08'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 5 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row5_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 5; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.27'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.27'
+        NCaO_as_printed: '0.08'
+        NNa_plus_as_printed: '0.871'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: *id013
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row6_calculated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 6; calculated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.41'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: By Eq. [8]¹ as printed in the Table IV header
+        NNa2O_as_printed: '0.25'
+        NCaO_as_printed: '0.10'
+        NNa_plus_as_printed: '0.833'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: &id014
+          state:
+            tag: value
+            value:
+              basis: printed_partial_ternary_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.25'
+              - - CaO
+                - '0.10'
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            note: Table IV row 6 prints NNa2O and NCaO.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table4_row6_interpolated_log_a_star_na2o
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 613
+        table: IV
+        note: row 6; interpolated log a*Na2O
+      phase: l
+      units: dimensionless
+      values:
+        log_a_star_as_printed: '9.41'
+        printed_log_form_as_published: log a*Na2O
+        column_as_printed: Interpolated (†) as printed in the Table IV footnote
+        NNa2O_as_printed: '0.25'
+        NCaO_as_printed: '0.10'
+        NNa_plus_as_printed: '0.833'
+        table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
+        quantity: activity
+        method_class: model_derived
+        evidence_class: model_derived
+        admission_status: typed_refusal
+        refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
+          those figure-only values are intentionally undigitized, so no parent observation rows are stored.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C: *id009
+        composition: *id014
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      method_class: model_derived
+    - observation_id: neudorf_elliott_1980_table3_row1_mixing_properties
+      type: gibbs_table
+      experiment: neudorf_elliott_1980_cell_emf
+      locator: &id015
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: III
+        note: Table III data row 1; composition 24.4 m/o Na2O.
+      phase: l
+      units: 'Partial energies: kJ/mol; partial entropies: J/mol K; integral energies: kJ/mol; integral
+        entropy: J/mol K, as printed.'
+      values:
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        temperature_C_as_printed: '1050'
+        composition_system_as_printed: binary Na2O-SiO2 melts
+        column_headers_as_printed: &id016
+        - Composition, m/o Na2O
+        - -GM(i), kJ/mol Na2O
+        - -GM(i), kJ/mol SiO2
+        - HM(i), kJ/mol Na2O
+        - HM(i), kJ/mol SiO2
+        - SM(i), J/mol K Na2O
+        - SM(i), J/mol K SiO2
+        - -GM, kJ/mol
+        - -HM, kJ/mol
+        - SM, J/mol K
+        schema_gap: This table row combines partial Gibbs energy, enthalpy, and entropy for both components
+          with integral Gibbs energy, enthalpy, and entropy for the melt; no single exact quantity token
+          represents the printed row. Quantity.PARTIAL_MOLAR_ENTHALPY covers only one subset of the row.
+          The individual Gibbs and entropy mixing quantities have no exact tokens; Quantity.DELTA_FG and
+          Quantity.DELTA_FH are formation quantities, and Quantity.S is not a partial-molar entropy token.
+          See simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY, simulator/battery/enums.py::Quantity.DELTA_FG,
+          simulator/battery/enums.py::Quantity.DELTA_FH, simulator/battery/enums.py::Quantity.S, simulator/battery/migrate.py::QUANTITY_ALIASES,
+          and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        note: Table III numeric cells are retained as printed context and are not migrated as any formation-energy,
+          enthalpy, or entropy quantity.
+        quantity: partial_and_integral_mixing_thermodynamic_properties_as_printed
+        evidence_class: measured_reduced
+        composition_mole_percent_as_printed: '24.4'
+        minus_partial_GM_Na2O_kJ_per_mol_as_printed: '257.2'
+        minus_partial_GM_SiO2_kJ_per_mol_as_printed: '2.39'
+        partial_HM_Na2O_kJ_per_mol_as_printed: '-146.5'
+        partial_HM_SiO2_kJ_per_mol_as_printed: '13.3'
+        partial_SM_Na2O_J_per_mol_K_as_printed: '83.7'
+        partial_SM_SiO2_J_per_mol_K_as_printed: '11.9'
+        minus_integral_GM_kJ_per_mol_as_printed: '64.6'
+        minus_integral_HM_kJ_per_mol_as_printed: '25.7'
+        integral_SM_J_per_mol_K_as_printed: '24.4'
+        table_composition_as_printed: 24.4 m/o Na2O
+        derived_from:
+        - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_sio2_fit_row1
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id015
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.244'
+          locator: *id015
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table III.
+    - observation_id: neudorf_elliott_1980_table3_row2_mixing_properties
+      type: gibbs_table
+      experiment: neudorf_elliott_1980_cell_emf
+      locator: &id017
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: III
+        note: Table III data row 2; composition 29.4 m/o Na2O.
+      phase: l
+      units: 'Partial energies: kJ/mol; partial entropies: J/mol K; integral energies: kJ/mol; integral
+        entropy: J/mol K, as printed.'
+      values:
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        temperature_C_as_printed: '1050'
+        composition_system_as_printed: binary Na2O-SiO2 melts
+        column_headers_as_printed: *id016
+        schema_gap: This table row combines partial Gibbs energy, enthalpy, and entropy for both components
+          with integral Gibbs energy, enthalpy, and entropy for the melt; no single exact quantity token
+          represents the printed row. Quantity.PARTIAL_MOLAR_ENTHALPY covers only one subset of the row.
+          The individual Gibbs and entropy mixing quantities have no exact tokens; Quantity.DELTA_FG and
+          Quantity.DELTA_FH are formation quantities, and Quantity.S is not a partial-molar entropy token.
+          See simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY, simulator/battery/enums.py::Quantity.DELTA_FG,
+          simulator/battery/enums.py::Quantity.DELTA_FH, simulator/battery/enums.py::Quantity.S, simulator/battery/migrate.py::QUANTITY_ALIASES,
+          and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        note: Table III numeric cells are retained as printed context and are not migrated as any formation-energy,
+          enthalpy, or entropy quantity.
+        quantity: partial_and_integral_mixing_thermodynamic_properties_as_printed
+        evidence_class: measured_reduced
+        composition_mole_percent_as_printed: '29.4'
+        minus_partial_GM_Na2O_kJ_per_mol_as_printed: '244.5'
+        minus_partial_GM_SiO2_kJ_per_mol_as_printed: '7.42'
+        partial_HM_Na2O_kJ_per_mol_as_printed: '-160.6'
+        partial_HM_SiO2_kJ_per_mol_as_printed: '10.2'
+        partial_SM_Na2O_J_per_mol_K_as_printed: '63.4'
+        partial_SM_SiO2_J_per_mol_K_as_printed: '13.3'
+        minus_integral_GM_kJ_per_mol_as_printed: '77.1'
+        minus_integral_HM_kJ_per_mol_as_printed: '40.0'
+        integral_SM_J_per_mol_K_as_printed: '28.5'
+        table_composition_as_printed: 29.4 m/o Na2O
+        derived_from:
+        - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_sio2_fit_row2
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id017
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.294'
+          locator: *id017
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table III.
+    - observation_id: neudorf_elliott_1980_table3_row3_mixing_properties
+      type: gibbs_table
+      experiment: neudorf_elliott_1980_cell_emf
+      locator: &id018
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: III
+        note: Table III data row 3; composition 34.3 m/o Na2O.
+      phase: l
+      units: 'Partial energies: kJ/mol; partial entropies: J/mol K; integral energies: kJ/mol; integral
+        entropy: J/mol K, as printed.'
+      values:
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        temperature_C_as_printed: '1050'
+        composition_system_as_printed: binary Na2O-SiO2 melts
+        column_headers_as_printed: *id016
+        schema_gap: This table row combines partial Gibbs energy, enthalpy, and entropy for both components
+          with integral Gibbs energy, enthalpy, and entropy for the melt; no single exact quantity token
+          represents the printed row. Quantity.PARTIAL_MOLAR_ENTHALPY covers only one subset of the row.
+          The individual Gibbs and entropy mixing quantities have no exact tokens; Quantity.DELTA_FG and
+          Quantity.DELTA_FH are formation quantities, and Quantity.S is not a partial-molar entropy token.
+          See simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY, simulator/battery/enums.py::Quantity.DELTA_FG,
+          simulator/battery/enums.py::Quantity.DELTA_FH, simulator/battery/enums.py::Quantity.S, simulator/battery/migrate.py::QUANTITY_ALIASES,
+          and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        note: Table III numeric cells are retained as printed context and are not migrated as any formation-energy,
+          enthalpy, or entropy quantity.
+        quantity: partial_and_integral_mixing_thermodynamic_properties_as_printed
+        evidence_class: measured_reduced
+        composition_mole_percent_as_printed: '34.3'
+        minus_partial_GM_Na2O_kJ_per_mol_as_printed: '227.1'
+        minus_partial_GM_SiO2_kJ_per_mol_as_printed: '14.67'
+        partial_HM_Na2O_kJ_per_mol_as_printed: '-130.8'
+        partial_HM_SiO2_kJ_per_mol_as_printed: '4.66'
+        partial_SM_Na2O_J_per_mol_K_as_printed: '72.8'
+        partial_SM_SiO2_J_per_mol_K_as_printed: '14.6'
+        minus_integral_GM_kJ_per_mol_as_printed: '87.5'
+        minus_integral_HM_kJ_per_mol_as_printed: '41.8'
+        integral_SM_J_per_mol_K_as_printed: '34.6'
+        table_composition_as_printed: 34.3 m/o Na2O
+        derived_from:
+        - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_sio2_fit_row3
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.343'
+          locator: *id018
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table III.
+    - observation_id: neudorf_elliott_1980_table3_row4_mixing_properties
+      type: gibbs_table
+      experiment: neudorf_elliott_1980_cell_emf
+      locator: &id019
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: III
+        note: Table III data row 4; composition 39.3 m/o Na2O.
+      phase: l
+      units: 'Partial energies: kJ/mol; partial entropies: J/mol K; integral energies: kJ/mol; integral
+        entropy: J/mol K, as printed.'
+      values:
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        temperature_C_as_printed: '1050'
+        composition_system_as_printed: binary Na2O-SiO2 melts
+        column_headers_as_printed: *id016
+        schema_gap: This table row combines partial Gibbs energy, enthalpy, and entropy for both components
+          with integral Gibbs energy, enthalpy, and entropy for the melt; no single exact quantity token
+          represents the printed row. Quantity.PARTIAL_MOLAR_ENTHALPY covers only one subset of the row.
+          The individual Gibbs and entropy mixing quantities have no exact tokens; Quantity.DELTA_FG and
+          Quantity.DELTA_FH are formation quantities, and Quantity.S is not a partial-molar entropy token.
+          See simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY, simulator/battery/enums.py::Quantity.DELTA_FG,
+          simulator/battery/enums.py::Quantity.DELTA_FH, simulator/battery/enums.py::Quantity.S, simulator/battery/migrate.py::QUANTITY_ALIASES,
+          and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        note: Table III numeric cells are retained as printed context and are not migrated as any formation-energy,
+          enthalpy, or entropy quantity.
+        quantity: partial_and_integral_mixing_thermodynamic_properties_as_printed
+        evidence_class: measured_reduced
+        composition_mole_percent_as_printed: '39.3'
+        minus_partial_GM_Na2O_kJ_per_mol_as_printed: '210.6'
+        minus_partial_GM_SiO2_kJ_per_mol_as_printed: '25.34'
+        partial_HM_Na2O_kJ_per_mol_as_printed: '-117.6'
+        partial_HM_SiO2_kJ_per_mol_as_printed: '-3.48'
+        partial_SM_Na2O_J_per_mol_K_as_printed: '70.3'
+        partial_SM_SiO2_J_per_mol_K_as_printed: '16.5'
+        minus_integral_GM_kJ_per_mol_as_printed: '98.1'
+        minus_integral_HM_kJ_per_mol_as_printed: '48.3'
+        integral_SM_J_per_mol_K_as_printed: '37.6'
+        table_composition_as_printed: 39.3 m/o Na2O
+        derived_from:
+        - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_sio2_fit_row4
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1050'
+          locator: *id019
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.393'
+          locator: *id019
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table III.
+    context:
+    - observation_id: neudorf_elliott_1980_method_and_reference_states
+      type: context
+      locator: *id004
+      units: As printed; temperatures °C or K and pressure atm where stated.
+      values:
+        cell_relation_as_printed: ΔG3 = −2FE = RT ln(aNa2O,tung / aNa2O,sil) [4]
+        method_as_printed: Activities of Na2O were calculated from the reversible emf of the cell.
+        cell_gas_as_printed: O2(g, 0.21 atm) is printed on both sides of the cell diagram.
+        Na2O_standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at
+          1 atm pressure.
+        Na2O_standard_state_locator: *id004
+        SiO2_standard_state_as_printed: Standard states are pure, liquid Na2O and pure, solid tridymite.
+        SiO2_standard_state_locator:
+          page: 1
+          pdf_page_index: 0
+          published_page: 607
+          section: Abstract
+        Table_II_SiO2_standard_state_as_printed: Tridymite is the Standard State.
+        Table_II_standard_state_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 611
+          table: II
+        Table_IV_star_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+        Table_IV_star_footnote_locator:
+          page: 7
+          pdf_page_index: 6
+          published_page: 613
+          table: IV
+        reference_melt_equations_attributed_as_printed: Lin and Elliott [23]
+        reference_melt_GM_equation_as_printed: GM(Na2O), (tung) = -95.10 - 347.2 NWO3 (kJ) [5]
+        reference_melt_GM_conditions_as_printed: 1200 K and 0.53 ≤ NWO3 ≤ 0.8
+        reference_melt_HM_equation_as_printed: HM(Na2O), (tung) = -709.8 + 262.57/NWO3 (kJ) [6]
+        reference_melt_HM_conditions_as_printed: 0.53 < NWO3 < 0.8 and 1113 < T, K < 1230
+        reference_melt_relation_locator: *id004
+        emf_values_as_printed: No numerical cell emf is tabulated; measured potentials are used in Eq.
+          [4].
+        vapor_values_as_printed: No vapor-pressure values are reported.
+  SiO2:
+    observations:
+    - observation_id: neudorf_elliott_1980_table2_sio2_fit_row1
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: right-hand equation row 1; NNa2O = 0.244
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aSiO2 = A / T + B
+        NNa2O_as_printed: '0.244'
+        A_as_printed: '695'
+        A_unit_as_printed: K
+        B_as_printed: '-0.620'
+        B_unit_as_printed: dimensionless
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: Tridymite is the Standard State.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K: &id020
+          state:
+            tag: unknown
+            reason: The printed fit is a function of T; this composition row has no single point temperature.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: The right-hand Table II equation is log aSiO2 = A/T + B.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.244'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II right row 1 prints NNa2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table2_sio2_fit_row2
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: right-hand equation row 2; NNa2O = 0.294
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aSiO2 = A / T + B
+        NNa2O_as_printed: '0.294'
+        A_as_printed: '530'
+        A_unit_as_printed: K
+        B_as_printed: '-0.694'
+        B_unit_as_printed: dimensionless
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: Tridymite is the Standard State.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.294'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II right row 2 prints NNa2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table2_sio2_fit_row3
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: right-hand equation row 3; NNa2O = 0.343
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aSiO2 = A / T + B
+        NNa2O_as_printed: '0.343'
+        A_as_printed: '243'
+        A_unit_as_printed: K
+        B_as_printed: '-0.763'
+        B_unit_as_printed: dimensionless
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: Tridymite is the Standard State.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.343'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II right row 3 prints NNa2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_table2_sio2_fit_row4
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 611
+        table: II
+        note: right-hand equation row 4; NNa2O = 0.393
+      phase: l
+      units: dimensionless
+      values:
+        fit_equation_as_printed: log aSiO2 = A / T + B
+        NNa2O_as_printed: '0.393'
+        A_as_printed: '-182'
+        A_unit_as_printed: K
+        B_as_printed: '-0.863'
+        B_unit_as_printed: dimensionless
+        T_range_C_as_reported_for_binary_data:
+        - '1000'
+        - '1100'
+        quantity: log_activity_temperature_fit_as_published
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        standard_state_as_printed: Tridymite is the Standard State.
+        schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
+          is a scalar; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is parsed as log10 gamma = A + B/T
+          by simulator/battery/migrate.py::_printed_scalar_selection, not log a = A/T + B or log a = C*R
+          + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        oxygen_partial_pressure: *id005
+        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+      point_conditions:
+        temperature_K: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - Na2O
+                - '0.393'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            table: II
+            note: Table II right row 4 prints NNa2O.
+        fO2_Pa: *id002
+        total_pressure_Pa: *id003
+      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
+    - observation_id: neudorf_elliott_1980_sio2_activity_na_binary_at_1070c
+      experiment: neudorf_elliott_1980_cell_emf
+      type: activity_coefficient
+      regime: emf_cell
+      locator: &id021
+        page: 6
+        pdf_page_index: 5
+        published_page: 612
+        section: Na2O-CaO-SiO2 System
+        note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+      phase: l
+      units: dimensionless
+      standard_state_as_printed: The activity of SiO2 is relative to tridymite.
+      standard_state_locator: *id021
+      attribution: Neudorf and Elliott (1980), PDF page 6, Results and Discussion.
+      derived_from:
+      - neudorf_elliott_1980_table2_sio2_fit_row3
+      - neudorf_elliott_1980_table2_sio2_fit_row4
+      derivation:
+        relation: The authors calculate the silica activity using Gibbs-Duhem equation [8] and interpolate the Table II log aSiO2 fit at NSiO2 = 0.65.
+        inputs:
+        - neudorf_elliott_1980_table2_sio2_fit_row3
+        - neudorf_elliott_1980_table2_sio2_fit_row4
+        output_unit: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        attribution: Neudorf and Elliott (1980), PDF page 6, Results and Discussion.
+        activity: '0.24'
+        value_as_printed: approximately 0.24
+        approximate: true
+        T_C: '1070'
+        composition_as_published: NSiO2 = 0.65 in the binary Na2O-SiO2 system
+        derivation_as_printed: Calculated using Gibbs-Duhem equation [8] and the Table II silica-activity fit, interpolated at NSiO2 = 0.65.
+        oxygen_partial_pressure: *id005
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1070'
+          locator: *id021
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_partial_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.65'
+          locator: *id021
+        fO2_Pa:
+          state:
+            tag: value
+            value: '21278.25'
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state the total pressure for this activity.
+          locator: *id021
+    context:
+    - observation_id: neudorf_elliott_1980_sio2_activity_cao_binary_reference
+      type: context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 612
+        section: Na2O-CaO-SiO2 System
+      units: dimensionless activity; temperature °C; composition mole fraction.
+      values:
+        activity_as_printed: roughly 1.56
+        temperature_as_printed: 1070 °C
+        composition_as_printed: CaO-SiO2 binary at NSiO2 = 0.65
+        reference_state_as_printed: relative to tridymite
+        method_class: quoted_attributed
+        attribution: Rein and Chipman [25] activity data at 1550 and 1600 °C; Neudorf and Elliott extrapolate
+          to 1070 °C.
+        note: This quoted estimate is an input mentioned in the prose; it is not a sodium activity observation.

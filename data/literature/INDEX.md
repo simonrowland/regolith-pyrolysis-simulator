@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 727
-- Extracts (`literature_extract.v1`): 725
+- Sources: 728
+- Extracts (`literature_extract.v1`): 726
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 725
+- Extracts with no PDF: 726
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -437,6 +437,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `nbs-1981-tn270-8-alkali-thermochemistry` | Wagman, D. D., Evans, W. H., Parker, V. B., Schumm, R. H. & Nuttall, R. L. (1981), Selected Values of Chemical Thermodynamic Properties: Compounds of Uranium, Protactinium, Thorium, Actinium, and the Alkali Metals, NBS Technical Note 270-8. |  | ABSENT, `` | `raw/nbs-1981-tn270-8-alkali-thermochemistry/nbs-1981-tn270-8-alkali-thermochemistry.pdf` (present, 2ba4a03d); `text/nbs-1981-tn270-8-alkali-thermochemistry/` (180 files, exists); `tables/nbs-1981-tn270-8-alkali-thermochemistry/` (0 files, ABSENT) | `data/literature/extracts/nbs-1981-tn270-8-alkali-thermochemistry.yaml` (51 rows, draft) | `ledger/nbs-1981-tn270-8-alkali-thermochemistry.yaml`: — (—) |
 | `nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization` | E. Nekhoroshev, M. Shevchenko, Siyu Cheng, D. Shishin, E. Jak (2024), Thermodynamic re-optimization of the CaO-SiO2 system integrated with experimental phase equilibria studies, Ceramics International 50(18B), 33686-33702. | 10.1016/j.ceramint.2024.06.187 | ABSENT, `` | `raw/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.pdf` (present, ee4a3e49); `text/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization/` (1 files, exists); `tables/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization/` (0 files, ABSENT) | `data/literature/extracts/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.yaml` (45 rows, draft) | `ledger/nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization.yaml`: — (—) |
 | `neubert-2025-vanadium-slag-evaporation` | Neubert, L., Tinkova, N., Volkova, O., Shyrokykh, T., and Seetharaman, S. (2025). Extraction of Vanadium from CaO–SiO2–MgO–Al2O3 Slags Based on Vaporization of Vanadium Pentoxide. Steel Research International 96, 2300681. | 10.1002/srin.202300681 | ABSENT, `` | `raw/neubert-2025-vanadium-slag-evaporation/neubert-2025-vanadium-slag-evaporation.pdf` (present, ea7e6b14); `text/neubert-2025-vanadium-slag-evaporation/` (29 files, exists); `tables/neubert-2025-vanadium-slag-evaporation/` (0 files, ABSENT) | `data/literature/extracts/neubert-2025-vanadium-slag-evaporation.yaml` (148 rows, draft, private_path) | `ledger/neubert-2025-vanadium-slag-evaporation.yaml`: — (—) |
+| `neudorf-elliott-1980-na2o-cao-silicate-activities` | Neudorf, D. A. and Elliott, J. F. (1980), ‘Thermodynamic Properties of Na2O-SiO2-CaO Melts at 1000 to 1100 °C’, Metallurgical Transactions B 11B, 607–614 (December 1980). |  | ABSENT, `` | `raw/neudorf-elliott-1980-na2o-cao-silicate-activities/neudorf-elliott-1980-na2o-cao-silicate-activities.pdf` (present, 451300e8); `text/neudorf-elliott-1980-na2o-cao-silicate-activities/` (33 files, exists); `tables/neudorf-elliott-1980-na2o-cao-silicate-activities/` (0 files, ABSENT) | `data/literature/extracts/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml` (29 rows, draft) | `ledger/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml`: — (—) |
 | `neuman-2026-levitation-k-isotopes` | Neuman, M., Macris, C. A., Holzheid, A., Lodders, K., Fegley, B., Chen, H., and Wang, K. (2026). Moderately Volatile Elemental Depletion and Potassium Isotope Fractionation during Evaporation in Laser-Heating Aerodynamic-Levitation Experiments. Geochimica et Cosmochimica Acta, 418, 50–64. | 10.1016/j.gca.2026.02.020 | ABSENT, `` | `raw/neuman-2026-levitation-k-isotopes/neuman-2026-levitation-k-isotopes.pdf` (present, 02e602b3); `text/neuman-2026-levitation-k-isotopes/` (1 files, exists); `tables/neuman-2026-levitation-k-isotopes/` (2 files, exists) | `data/literature/extracts/neuman-2026-levitation-k-isotopes.yaml` (80 rows, draft, private_path) | `ledger/neuman-2026-levitation-k-isotopes.yaml`: — (—) |
 | `niggli-1913-silica-alkali-carbonate-equilibria` | Paul Niggli (1913). The phenomena of equilibria between silica and the alkali carbonates. Journal of the American Chemical Society 35(11): 1693–1727. | 10.1021/ja02200a004 | ABSENT, `` | `raw/niggli-1913-silica-alkali-carbonate-equilibria/niggli-1913-silica-alkali-carbonate-equilibria.pdf` (present, 34f8a5bc); `text/niggli-1913-silica-alkali-carbonate-equilibria/` (42 files, exists); `tables/niggli-1913-silica-alkali-carbonate-equilibria/` (0 files, ABSENT) | `data/literature/extracts/niggli-1913-silica-alkali-carbonate-equilibria.yaml` (10 rows, draft) | `ledger/niggli-1913-silica-alkali-carbonate-equilibria.yaml`: — (—) |
 | `nist-janaf-4th` | Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, 4th Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998) | 10.18434/T42S31 | ABSENT, `` | `raw/nist-janaf-4th/nist-janaf-4th.pdf` (ABSENT, ); `text/nist-janaf-4th/` (0 files, ABSENT); `raw/janaf-nist-txt/` (1655 files, exists) | — | `ledger/nist-janaf-4th.yaml`: — (—) |
@@ -1171,6 +1172,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `nbs-1981-tn270-8-alkali-thermochemistry`
 - `nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization`
 - `neubert-2025-vanadium-slag-evaporation`
+- `neudorf-elliott-1980-na2o-cao-silicate-activities`
 - `neuman-2026-levitation-k-isotopes`
 - `niggli-1913-silica-alkali-carbonate-equilibria`
 - `nist-srd69-p4`

@@ -1,0 +1,154 @@
+source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+tables:
+- page: 5
+  table_index: 1
+  printed_locator:
+    page: 5
+    published_page: 611
+    table: I
+  printed_row_count: 4
+  numeric_cell_count: 16
+  printed_conditions: 1000–1100 °C; Na2O composition in each row
+  method_class: quoted_attributed
+  disposition: Four A/T + B log-activity fit rows; stored typed-refused because no exact quantity token represents this printed fit.
+  values:
+  - column: 1
+    species: Na2O
+    quantity: reported_weight_percent_composition
+    unit: '%'
+  - column: 2
+    species: Na2O
+    quantity: reported_mole_percent_composition
+    unit: '%'
+  - column: 3
+    species: Na2O
+    quantity: printed_log_activity_temperature_fit_A
+    unit: K
+  - column: 4
+    species: Na2O
+    quantity: printed_log_activity_temperature_fit_B
+    unit: dimensionless
+  cell_audit: All numeric cells are independently listed in the cell-audit CSV; MinerU and pdftotext agree, and page 5 render confirms row/column assignment.
+- page: 5
+  table_index: 2
+  printed_locator:
+    page: 5
+    published_page: 611
+    table: II
+  printed_row_count: 4
+  numeric_cell_count: 21
+  printed_conditions: Left fit rows at 1273, 1323, and 1373 K; right fit rows at NNa2O 0.244, 0.294, 0.343, and 0.393.
+  method_class: quoted_attributed
+  disposition: Two printed log-activity fit equations; coefficient rows stored typed-refused because no exact quantity token represents either printed fit.
+  values:
+  - column: 1
+    species: Na2O
+    quantity: printed_fit_temperature
+    unit: K
+  - column: 2
+    species: Na2O
+    quantity: printed_log_activity_composition_fit_C
+    unit: dimensionless
+  - column: 3
+    species: Na2O
+    quantity: printed_log_activity_composition_fit_D
+    unit: dimensionless
+  - column: 4
+    species: SiO2
+    quantity: reported_NNa2O_composition
+    unit: mole_fraction
+  - column: 5
+    species: SiO2
+    quantity: printed_log_activity_temperature_fit_A
+    unit: K
+  - column: 6
+    species: SiO2
+    quantity: printed_log_activity_temperature_fit_B
+    unit: dimensionless
+  cell_audit: All numeric cells are independently listed in the cell-audit CSV; MinerU and pdftotext agree, and page 5 render confirms row/column assignment.
+- page: 5
+  table_index: 3
+  printed_locator:
+    page: 5
+    published_page: 611
+    table: III
+  printed_row_count: 4
+  numeric_cell_count: 40
+  printed_conditions: 1050 °C; binary Na2O-SiO2 composition printed in each row.
+  method_class: measured_reduced
+  disposition: Each mixed-property row is stored as a quantity-unknown observation; its printed fit inputs are the corresponding Table I weight-percent row, Table II left row at 1323 K, and Table II right row at the same printed composition. Table I's first-row mole-percent conflict is preserved.
+  values:
+  - column: 1
+    species: Na2O
+    quantity: reported_mole_percent_composition
+    unit: '%'
+  - column: 2
+    species: Na2O
+    quantity: printed_negative_partial_mixing_Gibbs_energy
+    unit: kJ/mol
+  - column: 3
+    species: SiO2
+    quantity: printed_negative_partial_mixing_Gibbs_energy
+    unit: kJ/mol
+  - column: 4
+    species: Na2O
+    quantity: printed_partial_mixing_enthalpy
+    unit: kJ/mol
+  - column: 5
+    species: SiO2
+    quantity: printed_partial_mixing_enthalpy
+    unit: kJ/mol
+  - column: 6
+    species: Na2O
+    quantity: printed_partial_mixing_entropy
+    unit: J/(mol K)
+  - column: 7
+    species: SiO2
+    quantity: printed_partial_mixing_entropy
+    unit: J/(mol K)
+  - column: 8
+    species: Na2O-SiO2
+    quantity: printed_negative_integral_mixing_Gibbs_energy
+    unit: kJ/mol
+  - column: 9
+    species: Na2O-SiO2
+    quantity: printed_negative_integral_mixing_enthalpy
+    unit: kJ/mol
+  - column: 10
+    species: Na2O-SiO2
+    quantity: printed_integral_mixing_entropy
+    unit: J/(mol K)
+  cell_audit: All numeric cells are independently listed in the cell-audit CSV; MinerU and pdftotext agree, and page 5 render confirms row/column assignment.
+- page: 7
+  table_index: 4
+  printed_locator:
+    page: 7
+    published_page: 613
+    table: IV
+  printed_row_count: 6
+  numeric_cell_count: 29
+  printed_conditions: 1070 °C; NNa2O, NCaO, and NNa+ are printed by row.
+  method_class: model_derived
+  disposition: Calculated and interpolated positive log a*Na2O cells are split into separate typed refusals under the sign ruling; their input activity data are figure-only and not digitized.
+  values:
+  - column: 1
+    species: Na2O
+    quantity: reported_NNa2O_composition
+    unit: mole_fraction
+  - column: 2
+    species: CaO
+    quantity: reported_NCaO_composition
+    unit: mole_fraction
+  - column: 3
+    species: Na+
+    quantity: reported_NNa_plus
+    unit: mole_fraction
+  - column: 4
+    species: Na2O
+    quantity: activity
+    unit: dimensionless
+  - column: 5
+    species: Na2O
+    quantity: activity
+    unit: dimensionless
+  cell_audit: The first calculated cell is an em dash and is excluded from the numeric-cell count. Every other numeric cell is in the cell-audit CSV; page 7 render confirms the positive signs, row/column layout, and printed asterisk footnote.
