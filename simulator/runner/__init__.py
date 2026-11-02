@@ -2620,7 +2620,7 @@ def _projected_engine_liquid_fraction_for_snapshot(
         temperature_C=snapshot.temperature_C,
         fO2_log=snapshot.oxygen_reservoir.get("melt_intrinsic_fO2_log"),
         pressure_bar=pressure_bar,
-        backend_config=copy.deepcopy(getattr(backend, "_config", {}) or {}),
+        backend_config=getattr(backend, "_config", {}) or {},
     )
 
 

@@ -4190,14 +4190,13 @@ def projected_engine_liquid_fraction_diagnostic(
         result["temperature_C"] = temperature
         result["pressure_bar"] = pressure
         result["fO2_log"] = fO2
-        projection = project_magemin_diagnostic_composition(dict(composition_kg))
-        result["dropped_species_mass_fractions"] = dict(
-            projection.dropped_species_mass_fractions
+    except Exception:
+        return result
+
+    try:
+        projection = project_magemin_diagnostic_composition(
+            dict(composition_kg)
         )
-        result["total_dropped_mass_fraction"] = (
-            projection.dropped_mass_fraction
-        )
-        backend_config = dict(backend_config)
     except MAGEMinDiagnosticProjectionRefusal as exc:
         result["status"] = "projection_refused"
         result["dropped_species_mass_fractions"] = dict(
@@ -4206,6 +4205,17 @@ def projected_engine_liquid_fraction_diagnostic(
         result["total_dropped_mass_fraction"] = exc.total_dropped_fraction
         return result
     except Exception:
+        result["status"] = "diagnostic_failed"
+        return result
+
+    result["dropped_species_mass_fractions"] = dict(
+        projection.dropped_species_mass_fractions
+    )
+    result["total_dropped_mass_fraction"] = projection.dropped_mass_fraction
+    try:
+        backend_config = dict(backend_config)
+    except Exception:
+        result["status"] = "diagnostic_failed"
         return result
 
     try:
