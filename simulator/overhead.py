@@ -494,6 +494,8 @@ def solve_quasi_steady_headspace_partials_Pa(
                 if not low < trial < high:
                     trial = 0.5 * (low + high)
                 next_candidate[species] = trial
+            if next_candidate == candidate:
+                break
             candidate = next_candidate
             if _iteration + 1 < max_iterations:
                 current_state = actual_state(candidate, pressure, flow)
