@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 738
-- Extracts (`literature_extract.v1`): 736
+- Sources: 739
+- Extracts (`literature_extract.v1`): 737
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 736
+- Extracts with no PDF: 737
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -516,6 +516,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `richter-et-al-2007` | Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005 | 10.1016/j.gca.2007.09.005 | ABSENT, `` | `raw/kems-010-richter-2007/kems-010-richter-2007.pdf` (present, b4155d8a); `text/richter-et-al-2007/` (0 files, ABSENT); `tables/richter-et-al-2007/` (0 files, ABSENT) | `data/literature/extracts/richter-et-al-2007.yaml` (2 rows, draft) | `ledger/richter-et-al-2007.yaml`: extracted (2026-09-06) |
 | `robie-hemingway-wilson-1980-usgs-of-80-908` | Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report 80-908. |  | ABSENT, `` | `raw/robie-hemingway-wilson-1980-usgs-of-80-908/robie-hemingway-wilson-1980-usgs-of-80-908.pdf` (present, e10f5c8e); `text/robie-hemingway-wilson-1980-usgs-of-80-908/` (32 files, exists); `tables/robie-hemingway-wilson-1980-usgs-of-80-908/` (28 files, exists) | `data/literature/extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml` (7 rows, draft) | `ledger/robie-hemingway-wilson-1980-usgs-of-80-908.yaml`: extracted (2026-10-03) |
 | `robinot-2025-promes-review` | Robinot, J., Rodat, S., Abanades, S., Paillet, A. & Cowley, A. (2025), "Review of in-situ oxygen extraction from lunar regolith with focus on solar thermal and laser vacuum pyrolysis", Acta Astronautica 234:242–259, DOI 10.1016/j.actaastro.2025.05.008. HAL hal-05061241, CC BY-NC-ND 4.0. | 10.1016/j.actaastro.2025.05.008 | ABSENT, `` | `raw/robinot-2025-promes-review/robinot-2025-promes-review.pdf` (present, 13dd75d4); `text/robinot-2025-promes-review/` (46 files, exists); `tables/robinot-2025-promes-review/` (10 files, exists) | `data/literature/extracts/robinot-2025-promes-review.yaml` (29 rows, draft) | `ledger/robinot-2025-promes-review.yaml`: acquired_2 (2026-09-06) |
+| `roeder-1974-iron-activity-olivine-basaltic-liquids` | Roeder, P. L. (1974), “Activity of Iron and Olivine Solubility in Basaltic Liquids”, Earth and Planetary Science Letters 23, 397–410. |  | ABSENT, `` | `raw/roeder-1974-iron-activity-olivine-basaltic-liquids/roeder-1974-iron-activity-olivine-basaltic-liquids.pdf` (present, 1d9a8ca9); `text/roeder-1974-iron-activity-olivine-basaltic-liquids/` (32 files, exists); `tables/roeder-1974-iron-activity-olivine-basaltic-liquids/` (0 files, ABSENT) | `data/literature/extracts/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml` (90 rows, draft) | `ledger/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml`: — (—) |
 | `romero-serrano-1999-binary-ternary-silicates` | Romero-Serrano, A. & Pelton, A. D. (1999). Thermodynamic Analysis of Binary and Ternary Silicate Systems by a Structural Model. ISIJ International, 39(5), 399–408. |  | ABSENT, `` | `raw/romero-serrano-1999-binary-ternary-silicates/romero-serrano-1999-binary-ternary-silicates.pdf` (present, 9dc21535); `text/romero-serrano-1999-binary-ternary-silicates/` (63 files, exists); `tables/romero-serrano-1999-binary-ternary-silicates/` (0 files, ABSENT) | `data/literature/extracts/romero-serrano-1999-binary-ternary-silicates.yaml` (4 rows, draft) | `ledger/romero-serrano-1999-binary-ternary-silicates.yaml`: acquired (2026-10-04) |
 | `rusiecka-2026-chlorine-data` | Rusiecka, M. K. (2026). Data for Chlorine (Cl) and hydrogen chloride (HCl) solubility in hydrous silicate melts: implications for volcanic gas composition. University of Oxford Research Archive dataset. DOI 10.5287/ora-o8rnwkjr0. | 10.5287/ora-o8rnwkjr0 | ABSENT, `` | `raw/rusiecka-2026-chlorine-data/rusiecka-2026-chlorine-data.pdf` (ABSENT, ); `text/rusiecka-2026-chlorine-data/` (0 files, ABSENT); `tables/rusiecka-2026-chlorine-data/` (0 files, ABSENT) | `data/literature/extracts/rusiecka-2026-chlorine-data.yaml` (1911 rows, draft, private_path) | `ledger/rusiecka-2026-chlorine-data.yaml`: — (—) |
 | `rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts` | Rusiecka, M. K. & Wood, B. J. (2025), "Chlorine and NaCl in hydrous basaltic melts", Geochimica et Cosmochimica Acta 393:208-218, DOI 10.1016/j.gca.2025.01.020 | 10.1016/j.gca.2025.01.020 | ABSENT, `` | `raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf` (present, e2c1d300); `text/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/` (45 files, exists); `tables/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/` (0 files, ABSENT) | `data/literature/extracts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml` (11 rows, draft, private_path) | `ledger/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.yaml`: decoded (2026-09-06) |
@@ -1260,6 +1261,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `richter-et-al-2007`
 - `robie-hemingway-wilson-1980-usgs-of-80-908`
 - `robinot-2025-promes-review`
+- `roeder-1974-iron-activity-olivine-basaltic-liquids`
 - `romero-serrano-1999-binary-ternary-silicates`
 - `rusiecka-2026-chlorine-data`
 - `rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts`

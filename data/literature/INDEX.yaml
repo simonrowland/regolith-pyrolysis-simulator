@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 738
-  extracts: 736
+  sources: 739
+  extracts: 737
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 736
+  extracts_without_pdf: 737
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -507,6 +507,7 @@ gaps:
   - richter-et-al-2007
   - robie-hemingway-wilson-1980-usgs-of-80-908
   - robinot-2025-promes-review
+  - roeder-1974-iron-activity-olivine-basaltic-liquids
   - romero-serrano-1999-binary-ternary-silicates
   - rusiecka-2026-chlorine-data
   - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
@@ -29916,6 +29917,64 @@ sources:
       last_stage: acquired_2
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  aliases: []
+  citation: Roeder, P. L. (1974), “Activity of Iron and Olivine Solubility in Basaltic Liquids”, Earth
+    and Planetary Science Letters 23, 397–410.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml
+    review_status: draft
+    rows: 90
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/roeder-1974-iron-activity-olivine-basaltic-liquids/roeder-1974-iron-activity-olivine-basaltic-liquids.pdf
+      present: true
+      sha256: 1d9a8ca96994bbbf8bc3f91f4574080f91ae733dafe2dd8227203738d8d61c19
+      matches_simulator: null
+    sidecar:
+      path: raw/roeder-1974-iron-activity-olivine-basaltic-liquids/sidecar.yaml
+      present: true
+    text:
+      path: text/roeder-1974-iron-activity-olivine-basaltic-liquids
+      exists: true
+      file_count: 32
+    tables:
+      path: tables/roeder-1974-iron-activity-olivine-basaltic-liquids
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 8935c18298cc693945d95bf99f3f896beb867c50
 - source_id: romero-serrano-1999-binary-ternary-silicates
   aliases: []
   citation: Romero-Serrano, A. & Pelton, A. D. (1999). Thermodynamic Analysis of Binary and Ternary Silicate
