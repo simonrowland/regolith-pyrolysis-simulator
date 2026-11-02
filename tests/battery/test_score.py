@@ -8956,11 +8956,16 @@ def test_subsolidus_notice_covers_psat_and_sio_rails(
     quantity: Quantity, formula: str, expected_rail: Rail
 ) -> None:
     experiment, reference = _vapour_over_sample_form("solid")
-    identity = reference.identity
-    species = replace(identity.species, formula=formula)
+    if quantity is Quantity.P_SAT:
+        identity = F.psat_identity(formula, T_K=Decimal("2100"))
+    else:
+        identity = replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula=formula),
+        )
     reference = replace(
         reference,
-        identity=replace(identity, quantity=quantity, species=species),
+        identity=identity,
     )
 
     residual, calls = _score_sample_phase_vapour(
