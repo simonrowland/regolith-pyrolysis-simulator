@@ -638,6 +638,35 @@ def test_fe_alpha_s_range_travels_through_stage_provenance():
     ]
 
 
+def test_scalar_fe_alpha_extrapolation_survives_stage_provenance():
+    temperature_K = 1600.0
+    temperature_C = temperature_K - condensation.CELSIUS_TO_KELVIN_OFFSET
+    stage = CondensationStage(
+        stage_number=1,
+        label="Fe scalar below source range",
+        temp_range_C=(temperature_C, temperature_C),
+        target_species=["Fe"],
+    )
+    value_ref = f"{condensation.STICKING_VALUE_REF_PREFIX}Fe.value"
+    materials = {
+        "stages": {
+            "1": {"alpha_s_by_species": {"Fe": {"value_ref": value_ref}}}
+        }
+    }
+
+    record = condensation._stage_alpha_record(stage, "Fe", materials)
+
+    assert record["alpha_s"].hex() == float(0.02).hex()
+    assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
+    assert record["alpha_s_domain_status"] == "extrapolated"
+    assert record["alpha_s_extrapolated"] is True
+    assert record["output_status"] == "status_bearing"
+    assert "Fe alpha_s scalar coefficient extrapolated" in record[
+        "alpha_s_extrapolation_warning"
+    ]
+    assert record["stage_number"] == 1
+
+
 def test_fe_tachibana_alpha_domain_and_bounded_extrapolation_provenance():
     value_ref = {"value_ref": condensation.STICKING_FE_CONDENSATION_VALUE_REF}
     in_band_temperature_K = 1523.15
