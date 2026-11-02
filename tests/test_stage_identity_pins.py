@@ -1,5 +1,6 @@
 """Golden pins for the three stage-identity consumers."""
 
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -109,6 +110,17 @@ def test_stage_identity_empty_key_uses_independent_identity_key(
     )
 
     assert stage_key_for_stage(stage) == expected_key
+
+
+def test_stage_key_for_stage_preserves_non_string_explicit_key():
+    explicit_key = Path("stage_4b_k_trap")
+    stage = SimpleNamespace(
+        stage_number=4,
+        sub_order=1,
+        stage_key=explicit_key,
+    )
+
+    assert stage_key_for_stage(stage) == explicit_key
 
 
 def test_runner_stage_identity_output_pin_for_shipped_roster():

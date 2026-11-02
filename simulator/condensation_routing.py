@@ -65,7 +65,7 @@ def stage_key_for_stage(
 
     explicit_key = getattr(stage, 'stage_key', '') or ''
     if explicit_key:
-        return str(explicit_key)
+        return explicit_key
     if identity_key:
         return identity_key
     if include_collector_fallback:
