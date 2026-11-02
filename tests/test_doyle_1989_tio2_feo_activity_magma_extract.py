@@ -10,7 +10,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tools.validate_literature_extracts import validate_extract_document
@@ -217,6 +223,16 @@ def _setpoint_id(activity: str) -> str:
     return f"doyle_1989_table1b_setpoint_{activity.replace('.', '')}"
 
 
+def _assert_wustite_reference_state(reference_state) -> None:
+    assert reference_state is not None and reference_state.is_value
+    standard_state = reference_state.value
+    assert standard_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert standard_state.endmember.formula == "Fe(1-x)O"
+    assert standard_state.endmember.phase.is_value
+    assert standard_state.endmember.phase.value is Phase.L
+    assert standard_state.component_basis == "Fe(1-x)O"
+
+
 def _assert_source_matches_every_render_pin(document: dict) -> None:
     species = document["species"]["FeO"]
     observations = species["observations"]
@@ -259,7 +275,13 @@ def _assert_source_matches_every_render_pin(document: dict) -> None:
         assert values["temperature_as_printed"] == "1600±2 K"
         assert values["temperature_uncertainty_K"] == "2"
         assert values["standard_state_as_printed"] == "molten Fe0.947O"
-        assert values["standard_state_schema_gap"].endswith("simulator/battery/enums.py::ReferenceStateConvention.")
+        assert values["standard_state_schema_gap"].startswith("Typed as Fe(1-x)O(l)")
+        assert '"molten Fe0.947O"' in values["standard_state_schema_gap"]
+        typed_state = source["standard_state"]["state"]["value"]
+        assert typed_state["convention"] == "raoultian_pure_endmember"
+        assert typed_state["endmember"]["formula"] == "Fe(1-x)O"
+        assert typed_state["endmember"]["phase"] == {"tag": "value", "value": "l"}
+        assert typed_state["component_basis"] == "Fe(1-x)O"
         assert values["method_class"] == values["evidence_class"] == "measured_reduced"
         assert source["phase"] == "l"
 
@@ -380,7 +402,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert result.validation.hard_issues == ()
     assert not result.registry_issues
     assert len(result.observations) == 167
-    assert len(result.queue) == 334
+    assert len(result.queue) == 167
 
     observations = result.observations
     assert set(observations) == {
@@ -392,7 +414,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert all(row.identity.species.formula == "FeO" for row in observations.values())
     assert all(row.identity.species.phase.value is Phase.L for row in observations.values())
     assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in observations.values())
-    assert all(row.identity.reference_state is None or row.identity.reference_state.is_unknown for row in observations.values())
+    assert all(row.identity.reference_state is not None and row.identity.reference_state.is_value for row in observations.values())
     assert all(row.identity.total_pressure_Pa.is_unknown for row in observations.values())
     assert all(row.identity.composition.is_value for row in observations.values())
     assert all(row.identity.temperature_K.value == Decimal("1600") for row in observations.values())
@@ -400,7 +422,6 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert not [row for row in observations.values() if row.identity.species.phase.is_unknown]
     assert not [row for row in observations.values() if row.value.point is None]
     assert Counter(entry.why for entry in result.queue) == Counter({
-        "source standard_state is not typed: molten Fe0.947O": 167,
         "source does not state method": 167,
     })
 
@@ -445,9 +466,8 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         assert identity.composition.value == expected_composition
         assert migrated.point_conditions["composition"].state.value == expected_composition
         assert migrated.point_conditions["composition"].locator.page == 4
-        assert identity.reference_state.is_unknown
-        assert source["standard_state"] == "molten Fe0.947O"
-        assert "ReferenceStateConvention" in source["values"]["standard_state_schema_gap"]
+        _assert_wustite_reference_state(identity.reference_state)
+        assert source["standard_state"]["state"]["value"]["endmember"]["formula"] == "Fe(1-x)O"
 
     # Render-backed locators from both printed tables reach migrated values.
     first = observations[f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r01"]
@@ -462,3 +482,19 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert (last.value.point, last.locator.page, last.locator.table) == (
         Decimal("0.50"), 4, "1A"
     )
+
+
+def test_missing_one_typed_reference_fails_the_pin(tmp_path: Path) -> None:
+    document = _document()
+    mutated = document["species"]["FeO"]["observations"][1]
+    mutated.pop("standard_state")
+    path = tmp_path / EXTRACT.name
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    row = migrator.result.observations[f"{SOURCE_ID}::{mutated['observation_id']}"]
+    assert row.identity.reference_state is None or row.identity.reference_state.is_unknown
+    with pytest.raises(AssertionError):
+        _assert_wustite_reference_state(row.identity.reference_state)
