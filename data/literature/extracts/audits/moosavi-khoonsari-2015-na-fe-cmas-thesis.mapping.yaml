@@ -2,8 +2,8 @@ source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
 input_order:
 - 'MinerU markdown/content_list: inspected; no table blocks for Table 7.1 or Table 7.2.'
 - 'pdftotext-layout: exact born-digital text used for all cell values and row labels.'
-- 'PDF renders: rendered physical pages 186-188 and checked the full cell grid; pages 62, 174, 176, 180, 181 for
-  prose method/quench locators; page 70 for Figure 4.1.'
+- 'PDF renders: rendered physical pages 179 and 186-188; checked the full cell grid on 186-188 and reviewed prose/method
+  locators on pages 62, 174, 176, 179-181; page 70 for Figure 4.1.'
 tables:
 - table: '7.1'
   caption: Experimental results of the Na2O-Fe2O3-Al2O3 system in air.
@@ -104,14 +104,19 @@ method_and_quench_locators:
 - page: 176
   section: 7.3.2
   render_check: air-run quench crystals are explicitly counted as glass in phase composition analysis
+- page: 179
+  section: 7.3.2
+  render_check: For NAF6-1, NAF7-1, and NAF7-2, EPMA area mapping included quench crystals; analyzed liquid compositions
+    matched starting compositions, and the source says quench crystals did not influence the analysis.
 - page: 180
   section: 7.4.1
   render_check: sealed low-carbon Fe capsule, external argon purge, 1473 K/12 h pretreatment, target 1673/1573 K
     for 1 h, water quench
 - page: 181
   section: 7.4.2
-  render_check: metal droplets confirm Fe saturation; Fe-rich quench crystals observed in glass; source does not
-    say these were included in EPMA glass analyses
+  render_check: metal droplets confirm Fe saturation and Fe-rich quench crystals are observed in glass. Page 179
+    reports crystal-inclusive area mapping for NAF6-1, NAF7-1, and NAF7-2; the source does not state whether crystals
+    were included for other Table 7.2 samples.
 schema_gaps:
 - row_count: 45
   kind: measured crystalline phase compositions

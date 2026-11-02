@@ -108,6 +108,41 @@ def test_render_pins_reject_an_extract_cell_mutation() -> None:
         _assert_render_pins(mutated)
 
 
+def test_naf7_quench_area_mapping_recovery_is_pinned() -> None:
+    document = _document()
+    table72_experiments = [
+        experiment for experiment in document["experiments"]
+        if experiment["experiment_id"].startswith("mk15_t72_")
+    ]
+    assert len(table72_experiments) == 11
+    for experiment in table72_experiments:
+        note = experiment["quench_statement"]["note"]
+        assert all(sample in note for sample in ("NAF6-1", "NAF7-1", "NAF7-2"))
+        assert "EPMA area mapping of liquid pools including quench crystals" in note
+        assert "analyzed liquid compositions equal to the starting compositions" in note
+        assert "did not influence that analysis" in note
+        assert "does not state whether quench crystals were included" in note
+        assert "other Table 7.2 samples" in note
+        assert "physical page 179, published page 150" in note
+
+    glass_rows = [
+        row for row in _source_rows(document).values()
+        if row.get("type") == "equilibrium_phase_composition"
+        and row.get("values", {}).get("sample_id_as_published") in {"NAf7-1", "NAf7-2"}
+    ]
+    assert len(glass_rows) == 12
+    for row in glass_rows:
+        statement = row["values"]["quench_statement"]
+        assert statement["preservation"] == "asserted_altered"
+        text = statement["text"]
+        assert "Physical quench crystals composed of Fe-rich phases" in text
+        assert all(sample in text for sample in ("NAF6-1", "NAF7-1", "NAF7-2"))
+        assert "Separately, page 179 (published page 150)" in text
+        assert "EPMA area mapping including quench crystals" in text
+        assert "analyzed liquid compositions equal to the starting compositions" in text
+        assert "did not influence that analysis" in text
+
+
 def test_isolated_migration_preserves_values_conditions_and_unknown_pressure_axes() -> None:
     document = _document()
     source_rows = _source_rows(document)
@@ -144,12 +179,18 @@ def test_isolated_migration_preserves_values_conditions_and_unknown_pressure_axe
         assert observation.identity.phase_role.is_value
         assert observation.identity.phase_role.value is PhaseRole.GLASS
 
-        for axis in ("temperature_K", "composition"):
+        expected_conditions = {
+            "temperature_K": Decimal(row["T_K"]),
+            "duration_h": Decimal(row["point_conditions"]["duration_h"]["state"]["value"]),
+        }
+        for axis in ("temperature_K", "duration_h", "composition"):
             condition = observation.point_conditions[axis]
             assert condition.state.is_value
             assert condition.locator is not None
             assert condition.locator.page == row["locator"]["page"]
             assert condition.locator.table == row["locator"]["table"]
+            if axis in expected_conditions:
+                assert condition.state.value == expected_conditions[axis]
 
         for axis in ("fO2_Pa", "total_pressure_Pa"):
             assert not getattr(observation.identity, axis).is_value
