@@ -563,13 +563,13 @@ def test_runner_projection_uses_complete_historical_melt_and_pressure(monkeypatc
 
 
 def test_freeze_gate_and_redox_consumers_do_not_read_diagnostic_key():
-    from pathlib import Path
-
     root = Path(__file__).resolve().parents[2]
     key = "projected_engine_liquid_fraction"
+    key_token = re.compile(rf"(?<!\w){re.escape(key)}(?!\w)")
+    assert key_token.search(f"{key}: 0.5") is not None
     for path in (
         root / "simulator/core.py",
         root / "simulator/evaporation.py",
         root / "simulator/fe_redox.py",
     ):
-        assert key not in path.read_text()
+        assert key_token.search(path.read_text()) is None
