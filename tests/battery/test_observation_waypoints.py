@@ -148,6 +148,13 @@ def test_hashimoto_real_residue_row_reaches_consumer_inputs():
 
     assert waypoint.selected is not None
     assert waypoint.selected.route == "observation_normalized_printed_composition"
+    assert waypoint.selected.value == {
+        "SiO2": Decimal("0.3650189512432688043918944611"),
+        "Al2O3": Decimal("0.01964442915113316876403722593"),
+        "FeO": Decimal("0.2180350237827254408598102512"),
+        "MgO": Decimal("0.3663861823354948612056442728"),
+        "CaO": Decimal("0.03091541348737772477861378927"),
+    }
 
 
 @pytest.mark.parametrize(

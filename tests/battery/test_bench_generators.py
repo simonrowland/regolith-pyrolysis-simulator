@@ -161,6 +161,19 @@ def test_lpi_trace_sulfur_is_excluded_from_engine_point_composition():
     assert normalized is not None
     assert "S" not in normalized.value
     assert "SO3" not in normalized.value
+    assert normalized.value == {
+        "SiO2": Decimal("0.4482179563822329719411890738"),
+        "TiO2": Decimal("0.06198483717310117768844669253"),
+        "Al2O3": Decimal("0.08520184745324768904604932940"),
+        "Cr2O3": Decimal("0.001260807500710294509781235738"),
+        "FeO": Decimal("0.1363876711001578529321725113"),
+        "MnO": Decimal("0.001800931385365283375364425907"),
+        "MgO": Decimal("0.1229854768329683614376478292"),
+        "CaO": Decimal("0.1360065465485117312513237041"),
+        "Na2O": Decimal("0.004843918023047031788070297471"),
+        "K2O": Decimal("0.001084999714845602663994452366"),
+        "P2O5": Decimal("0.0002250078858120033659604482770"),
+    }
 
     engine_wt, _exempt, _notice, _feot = _engine_printed_oxides(printed.state.value)
     assert engine_wt is not None

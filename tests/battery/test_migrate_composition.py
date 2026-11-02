@@ -5254,6 +5254,17 @@ def test_b704_waypoints_preserve_green_suffix_and_total_handling(
             },
         ),
         (
+            "kems-015-hashimoto-1983.yaml",
+            "table3_residue_composition_series::T=2273.15:row=20b2:",
+            {
+                "SiO2": Decimal("0.3704143841895679608300598825"),
+                "Al2O3": Decimal("0.02211082773740152264158571330"),
+                "FeO": Decimal("0.1550779101975305617296293917"),
+                "MgO": Decimal("0.4162731149967589246044486619"),
+                "CaO": Decimal("0.03612376287874103019427635068"),
+            },
+        ),
+        (
             "stolyarova-1995-cao-alumina-kems.yaml",
             "stolyarova_1995_ca_partial_pressure_table2::T=1933",
             {"CaO": Decimal("0.143"), "Al2O3": Decimal("0.857")},

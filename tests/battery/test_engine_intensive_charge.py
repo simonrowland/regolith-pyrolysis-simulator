@@ -254,6 +254,42 @@ def test_printed_mole_fraction_precedes_wt_derivation():
         assert result.payload["composition_mol"] == {"MgO": 0.25, "SiO2": 0.75}
 
 
+def test_real_printed_mole_fraction_stays_unchanged_at_waypoint():
+    from simulator.battery.migrate import REPO_ROOT
+    from simulator.battery.waypoints import normalized_composition
+
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/nakano-hashimoto-2020-bubbles-to-chondrites-i.yaml"
+    )
+    migrator = f.migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.1186/s40645-020-00354-0::experiment::allende-laser-boiling"
+    ]
+    waypoint = normalized_composition(
+        experiment, migrator.result.benches[experiment.bench_id]
+    )
+
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert waypoint.selected is not None
+    assert waypoint.selected.route == "normalized_initial_composition"
+    assert waypoint.selected.value == {
+        "NaO0.5": D("0.0084"),
+        "MgO": D("0.3519"),
+        "AlO1.5": D("0.0340"),
+        "SiO2": D("0.3282"),
+        "KO0.5": D("0.0004"),
+        "CaO": D("0.0247"),
+        "TiO2": D("0.0010"),
+        "CrO1.5": D("0.0039"),
+        "MnO": D("0.0015"),
+        "FeO": D("0.2460"),
+    }
+
+
 @pytest.mark.parametrize("extra", [{"LOI": D(20)}, {"Total": D(100)}])
 def test_printed_species_dropped_by_sibling_refuses(extra):
     experiment, bench, observation = case()
