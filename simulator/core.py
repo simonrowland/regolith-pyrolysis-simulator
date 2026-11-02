@@ -15719,7 +15719,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     for species, status in (
                         live_effective_flux.alpha_authority_status_by_species.items()
                     )
-                    if species in evap_flux.species_kg_hr
                 }
                 evap_flux.carrier_authority_by_species = copy.deepcopy(
                     live_effective_flux.carrier_authority_by_species

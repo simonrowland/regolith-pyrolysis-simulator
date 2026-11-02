@@ -1029,9 +1029,8 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # 1600 C to 1400 C. b-773's same-hour headspace solve and film floor move
     # the non-phosphorus flux from 0.06423670196107581 to
     # 0.0020785039480261808 kg/hr.
-    # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
-    # threshold here, so it is absent from snapshot flux/status and is a
-    # legitimate no-flux carrier for this pin.
+    # Ti's rate is below the 1e-12 kg/hr reporting floor, but its evaluated
+    # analytical authority remains part of the snapshot status set.
     ceiling_flux_species = {"Ca", "CaO_gas", "TiO", "TiO2_gas"}
     from tests.studio_pin_support import capacity_pin_values
 
@@ -1170,7 +1169,20 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    post_scale_subfloor_species = sum(
+        1
+        for rate in demand_species.values()
+        if 0.0 < float(rate) * float(cap_record["scale"])
+        <= _NONTRIVIAL_FLUX_KG_HR
+    )
+    # Premise: the cap scales each species, then the live flux map drops rates
+    # at/below the per-species floor. Algebra: at most n omitted rates times
+    # the floor can separate the aggregate from capacity. Units are
+    # species × kg/hr = kg/hr; with no omitted species, the allowance is zero.
+    cap_floor_tolerance_kg_hr = (
+        post_scale_subfloor_species * _NONTRIVIAL_FLUX_KG_HR
+    )
+    assert abs(released_kg_hr - capacity_kg_hr) <= cap_floor_tolerance_kg_hr
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
@@ -1321,14 +1333,19 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
 
     reasons = [transition.reason for transition in sim.atom_ledger.transitions]
     reason_set = set(reasons)
-    for required in (
+    required_transitions = [
         "evaporate_Ca",
         "evaporate_CaO_gas",
-        "evaporate_Ti",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
         "condense_Ca",
-    ):
+    ]
+    # The evaluated Ti authority remains in the status map above even when
+    # depletion places its rate below the committed-flux floor; no debit
+    # transition is expected for a rate omitted at that floor.
+    if snapshot.evap_flux.species_kg_hr.get("Ti", 0.0) > _NONTRIVIAL_FLUX_KG_HR:
+        required_transitions.append("evaporate_Ti")
+    for required in required_transitions:
         assert required in reason_set, required
     assert {
         "condense_SiO",

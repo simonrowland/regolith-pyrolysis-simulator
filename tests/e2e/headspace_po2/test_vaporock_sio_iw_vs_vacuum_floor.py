@@ -104,7 +104,9 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# b-773 Studio-3 same-hour headspace solve: 0.2090602025512069 →
+# 0.20368313127868715 decade; the measured finite/IW ratio is the output pin.
+EXPECTED_SIO_DECADE_DRIFT = 0.20368313127868715
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

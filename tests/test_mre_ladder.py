@@ -928,7 +928,11 @@ def test_non_mre_step_clears_prior_c5_ellingham_ladder_diagnostic(monkeypatch):
         lambda *_args, **_kwargs: None,
     )
     monkeypatch.setattr(sim, "_get_equilibrium", lambda: SimpleNamespace())
-    monkeypatch.setattr(sim, "_calculate_evaporation", lambda _eq: EvaporationFlux())
+    monkeypatch.setattr(
+        sim,
+        "_calculate_evaporation",
+        lambda _eq, **_kwargs: EvaporationFlux(),
+    )
     monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
     monkeypatch.setattr(sim, "_update_melt_composition", lambda _flux: None)
     monkeypatch.setattr(

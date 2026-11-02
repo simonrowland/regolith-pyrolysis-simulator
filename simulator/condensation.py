@@ -2952,6 +2952,7 @@ class CondensationModel:
             VAPOUR_CARRIER_AUTHORITY_PROVEN_ZERO,
             VAPOUR_CARRIER_AUTHORITY_REFUSED,
             VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
+            merge_vapour_carrier_extrapolation_notices,
             merge_vapour_carrier_lineage,
             vapour_carrier_authority_severity,
             vapour_carrier_authority_status,
@@ -3528,6 +3529,13 @@ class CondensationModel:
                 ):
                     wall_carrier_authority_by_species[str(species)] = (
                         copy.deepcopy(dict(prior_record))
+                    )
+                elif isinstance(current_record, Mapping):
+                    wall_carrier_authority_by_species[str(species)] = (
+                        merge_vapour_carrier_extrapolation_notices(
+                            current_record,
+                            prior_record,
+                        )
                     )
         sticking_notice['vapour_carrier_authority_required'] = True
         sticking_notice['vapour_carrier_authority_by_species'] = (

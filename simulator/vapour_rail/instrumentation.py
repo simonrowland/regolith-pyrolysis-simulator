@@ -109,6 +109,34 @@ def merge_vapour_carrier_lineage(
     return list(merged)
 
 
+def merge_vapour_carrier_extrapolation_notices(
+    selected_record: Mapping[str, Any],
+    *source_records: Any,
+    include_all_notices: bool = False,
+) -> dict[str, Any]:
+    """Carry extrapolation evidence onto the carrier record selected by authority."""
+
+    merged_record = copy.deepcopy(dict(selected_record))
+    extra = merged_record.get("extra")
+    merged_extra = copy.deepcopy(dict(extra)) if isinstance(extra, Mapping) else {}
+    notices: list[dict[str, Any]] = []
+    for carrier in (selected_record, *source_records):
+        carrier_extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
+        if not isinstance(carrier_extra, Mapping):
+            continue
+        candidates = [carrier_extra.get("extrapolation_notice")]
+        candidates.extend(carrier_extra.get("extrapolation_notices", ()))
+        for notice in candidates:
+            if isinstance(notice, Mapping) and notice not in notices:
+                notices.append(copy.deepcopy(dict(notice)))
+    if notices:
+        merged_extra.setdefault("extrapolation_notice", notices[0])
+        if include_all_notices:
+            merged_extra["extrapolation_notices"] = notices
+        merged_record["extra"] = merged_extra
+    return merged_record
+
+
 def vapour_carrier_authority_status(
     record: Any,
     *,

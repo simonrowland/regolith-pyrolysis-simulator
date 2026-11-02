@@ -4562,13 +4562,9 @@ class EvaporationMixin:
         )
         smoothed = EvaporationFlux(
             species_kg_hr=effective_rates,
-            alpha_authority_status_by_species={
-                species: status
-                for species, status in (
-                    evap_flux.alpha_authority_status_by_species.items()
-                )
-                if float(effective_rates.get(species, 0.0)) > 1.0e-12
-            },
+            alpha_authority_status_by_species=dict(
+                evap_flux.alpha_authority_status_by_species
+            ),
             # Canonical serialized answers are treated as immutable evidence;
             # depletion changes rates only and can safely share the records.
             carrier_authority_by_species=(
@@ -4892,13 +4888,9 @@ class EvaporationMixin:
 
         committed_flux = EvaporationFlux(
             species_kg_hr=committed_species_kg_hr,
-            alpha_authority_status_by_species={
-                species: status
-                for species, status in (
-                    evap_flux.alpha_authority_status_by_species.items()
-                )
-                if species in committed_species_kg_hr
-            },
+            alpha_authority_status_by_species=dict(
+                evap_flux.alpha_authority_status_by_species
+            ),
             # Preserve the exact-key audit union even when a refused/proven-zero
             # carrier has no committed mass. Hour snapshots must retain why it
             # did not debit, not only the subset that produced kg/hr.
@@ -4911,13 +4903,9 @@ class EvaporationMixin:
 
         residual_flux = EvaporationFlux(
             species_kg_hr=residual_species_kg_hr,
-            alpha_authority_status_by_species={
-                species: status
-                for species, status in (
-                    evap_flux.alpha_authority_status_by_species.items()
-                )
-                if float(residual_species_kg_hr.get(species, 0.0)) > 1.0e-12
-            },
+            alpha_authority_status_by_species=dict(
+                evap_flux.alpha_authority_status_by_species
+            ),
             carrier_authority_by_species=(
                 evap_flux.carrier_authority_by_species
             ),

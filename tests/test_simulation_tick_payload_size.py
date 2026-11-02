@@ -517,6 +517,7 @@ def test_simulation_tick_payload_does_not_grow_with_hour_count(monkeypatch):
         }
         assert all(
             "hour" in event_summary
+            and "evap_plane_selectivity" not in event_summary
             and carrier_fields.isdisjoint(event_summary)
             and (
                 "redox_source_breakdown" not in event_summary

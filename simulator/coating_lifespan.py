@@ -34,6 +34,7 @@ from simulator.wall_deposit_availability import (
     wall_deposit_refusal_events,
 )
 from simulator.vapour_rail.instrumentation import (
+    merge_vapour_carrier_extrapolation_notices,
     merge_vapour_carrier_lineage,
     vapour_carrier_authority_severity,
     vapour_carrier_authority_status,
@@ -368,20 +369,14 @@ def _merged_wall_deposit_sticking_authority(
                         > vapour_carrier_authority_severity(current_status)
                     ):
                         carriers_by_species[species_key] = record
-                    notices: list[dict[str, Any]] = []
-                    for carrier in (current, record):
-                        extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
-                        if not isinstance(extra, Mapping):
-                            continue
-                        candidates = [extra.get("extrapolation_notice")]
-                        candidates.extend(extra.get("extrapolation_notices", ()))
-                        for notice in candidates:
-                            if isinstance(notice, Mapping) and notice not in notices:
-                                notices.append(_plain_authority_mapping(notice))
-                    if notices:
-                        extra = carriers_by_species[species_key].setdefault("extra", {})
-                        extra.setdefault("extrapolation_notice", notices[0])
-                        extra["extrapolation_notices"] = notices
+                    carriers_by_species[species_key] = (
+                        merge_vapour_carrier_extrapolation_notices(
+                            carriers_by_species[species_key],
+                            current,
+                            record,
+                            include_all_notices=True,
+                        )
+                    )
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

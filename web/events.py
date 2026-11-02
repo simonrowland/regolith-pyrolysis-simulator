@@ -706,6 +706,7 @@ _PER_HOUR_DETAIL_FIELDS = (
     'condensation_refusals_by_species',
     'vapour_batch_summary',
     'vapour_batch_flux_overlay',
+    'evap_plane_selectivity',
 )
 _PER_HOUR_CARRIER_MAP_FIELDS = (
     'condensation_train_kg',

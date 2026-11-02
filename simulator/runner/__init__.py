@@ -4299,7 +4299,7 @@ def _wall_fouling_lifespan_report(
         "controlling_segment": controlling_segment,
         "wall_deposit_kg_per_campaign": (
             None
-            if refused
+            if refused and total_per_campaign <= 0.0
             else _clean_report_float(total_per_campaign)
         ),
         "existing_wall_load_kg_by_segment": {

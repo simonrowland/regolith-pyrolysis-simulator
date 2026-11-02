@@ -6829,7 +6829,9 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
-    assert rows[0]["lifespan_cost_status"] == "wall_deposit_unavailable"
+    # The measured wall deposit is available (zero); only the material's
+    # resinter threshold is unset for this profile.
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
 
 
 def test_constrained_max_nullable_lifespan_persists_and_round_trips(
