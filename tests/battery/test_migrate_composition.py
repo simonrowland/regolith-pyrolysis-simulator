@@ -5108,8 +5108,18 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         }
 
 
-def test_hashimoto_20b2_single_oxide_print_keeps_green_engine_gap(
-    tmp_path: Path,
+@pytest.mark.parametrize(
+    ("observation_token", "temperature_C"),
+    (
+        (
+            "hashimoto_1983_table3_sio2_residue_series_quoted::T=1973.15:row=c5-(1)",
+            1700.0,
+        ),
+        ("hashimoto_1983_table3_cao_residue_series_quoted__run_20b2", 2000.0),
+    ),
+)
+def test_hashimoto_single_oxide_observations_keep_green_starting_composition(
+    tmp_path: Path, observation_token: str, temperature_C: float
 ) -> None:
     result = _migrate_real_extract(
         tmp_path, "kems-015-hashimoto-1983.yaml", write=False
@@ -5117,22 +5127,31 @@ def test_hashimoto_20b2_single_oxide_print_keeps_green_engine_gap(
     observation = next(
         row
         for row in result.observations.values()
-        if (
-            "hashimoto_1983_table3_cao_residue_series_quoted__run_20b2"
-            in row.observation_id
-        )
+        if observation_token in row.observation_id
     )
     experiment = result.experiments[observation.experiment_id]
-    requests = engine_point_requests(
-        collect_consumer_inputs(
-            experiment, result.benches[experiment.bench_id], observation
-        )
+    inputs = collect_consumer_inputs(
+        experiment, result.benches[experiment.bench_id], observation
     )
+    waypoint = inputs.waypoints["normalized_composition"].selected
+    assert waypoint is not None
+    assert waypoint.route == "normalized_printed_composition"
+    assert waypoint.inputs == ("experiment.sample.printed_composition",)
+
+    requests = engine_point_requests(inputs)
     assert requests
-    assert all(
-        request.payload is None and request.readiness.status.value == "gap"
-        for request in requests
-    )
+    expected_composition = {
+        "SiO2": 0.3379238246485715,
+        "Al2O3": 0.017760541249646305,
+        "FeO": 0.27949424004418816,
+        "MgO": 0.33896696103658575,
+        "CaO": 0.02585443302100831,
+    }
+    for request in requests:
+        assert request.readiness.status.value == "ready"
+        assert request.payload is not None
+        assert request.payload["temperature_C"] == temperature_C
+        assert request.payload["composition_mol"] == expected_composition
 
 
 def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:

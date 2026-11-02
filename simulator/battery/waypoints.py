@@ -867,6 +867,29 @@ def normalized_composition(
     if observation is not None and observation.experiment_id != experiment.experiment_id:
         raise ValueError("Observation belongs to a different experiment")
     point = (observation.point_conditions or {}) if observation else {}
+    point_printed = point.get("printed_composition")
+    point_printed_map = (
+        point_printed.state.value
+        if isinstance(point_printed, Located) and point_printed.state.is_value
+        else None
+    )
+    point_printed_pairs = _printed_component_pairs(point_printed_map)
+    # A component-result row is an observable, not a bulk composition claim.
+    # Use the sample charge as green did; the closure guard then checks that
+    # actual engine input rather than the single measured oxide.
+    single_component_observation = (
+        observation is not None
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula is not None
+        and point_printed_pairs is not None
+        and len(point_printed_pairs) == 1
+        and point_printed_pairs[0][0] == observation.identity.species.formula
+        and (
+            _located_present(experiment.sample.printed_composition)
+            or _located_present(experiment.sample.initial_composition)
+        )
+    )
     routes = []
     evidence_ranks = []
     absent = []
@@ -878,9 +901,18 @@ def normalized_composition(
     printed_basis_exempt: set[str] = set()
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
-        located = point.get(key) if key in point else getattr(experiment.sample, field)
-        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
-                if key in point else f"experiment.sample.{field}")
+        use_sample_composition = single_component_observation and key in point
+        use_point_composition = key in point and not use_sample_composition
+        located = (
+            getattr(experiment.sample, field)
+            if use_sample_composition or key not in point
+            else point[key]
+        )
+        path = (
+            f"experiment.sample.{field}"
+            if not use_point_composition
+            else f"observation[{observation.observation_id}].point_conditions.{key}"
+        )
         if (
             field == "initial_composition"
             and key in point
@@ -1093,7 +1125,7 @@ def normalized_composition(
                 )
             if basis_notice:
                 notice = f"{notice}; {basis_notice}" if notice else basis_notice
-            route_name = ("observation_" if key in point else "") + "normalized_" + field
+            route_name = ("observation_" if use_point_composition else "") + "normalized_" + field
             routes.append(Waypoint("normalized_composition",
                 {species: n / total for species, n in amounts.items()},
                 route_name,
