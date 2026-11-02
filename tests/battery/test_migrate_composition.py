@@ -5185,6 +5185,81 @@ def test_b704_waypoints_use_oxide_only_map_after_row_closure(
     )
 
 
+@pytest.mark.parametrize(
+    ("source", "row_token", "expected"),
+    (
+        (
+            "burnham-2015-europium-redox.yaml",
+            "burnham_2015_eu_glasses_ad_1400_fm10p5::T=1673.15",
+            {
+                "SiO2": Decimal("0.5049458537553273702862355504"),
+                "Al2O3": Decimal("0.08953938926861110222912129391"),
+                "MgO": Decimal("0.1530185996607377811606459628"),
+                "CaO": Decimal("0.2524961573153237463239971925"),
+            },
+        ),
+        (
+            "kress-carmichael-1991-iron-redox-calibration.yaml",
+            "kc91_fe3_t5_B27::T=1710.15",
+            {
+                "SiO2": Decimal("0.5547006776234626671942286320"),
+                "TiO2": Decimal("0.01554763773103709860256304398"),
+                "Al2O3": Decimal("0.08984819686101508537518088141"),
+                "Fe2O3": Decimal("0.03945861816145157104309105154"),
+                "FeO": Decimal("0.03144116729029423686753613422"),
+                "MnO": Decimal("0.001582846840746962967156111479"),
+                "MgO": Decimal("0.1120910690156758058306665901"),
+                "CaO": Decimal("0.1254376460586280468178866150"),
+                "Na2O": Decimal("0.02855988945220116658624516449"),
+                "K2O": Decimal("0.001332250965487358715445775200"),
+            },
+        ),
+        (
+            "cacciatore-zajacz-2026-v-sc-oxybarometer.yaml",
+            "cacciatore-zajacz-2026-v-sc-oxybarometer_e7_0_ii_sb_a_glass_sio2",
+            {
+                "SiO2": Decimal("0.5237582458997467157482953345"),
+                "TiO2": Decimal("0.007008385449743635387759676297"),
+                "Al2O3": Decimal("0.09759370232179106209878110540"),
+                "MnO": Decimal("0.001753431783019619387703747408"),
+                "MgO": Decimal("0.1481341018774051528806595342"),
+                "CaO": Decimal("0.1131220758010614130892965607"),
+                "P2O5": Decimal("0.0008762931927754530146293270149"),
+                "Na2O": Decimal("0.02608939345180641525337614298"),
+                "K2O": Decimal("0.004621674859555161565835116089"),
+                "FeO": Decimal("0.07704269536309537157366345464"),
+            },
+        ),
+        (
+            "stolyarova-1995-cao-alumina-kems.yaml",
+            "stolyarova_1995_ca_partial_pressure_table2::T=1933",
+            {"CaO": Decimal("0.143"), "Al2O3": Decimal("0.857")},
+        ),
+    ),
+)
+def test_b704_waypoint_guard_keeps_green_composition_for_real_rows(
+    tmp_path: Path,
+    source: str,
+    row_token: str,
+    expected: dict[str, Decimal],
+) -> None:
+    from simulator.battery.waypoints import normalized_composition
+
+    result = _migrate_real_extract(tmp_path, source, write=False)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row_token in row.observation_id
+    )
+    experiment = result.experiments[observation.experiment_id]
+
+    waypoint = normalized_composition(experiment, _bench(), observation)
+
+    assert waypoint.absence is None
+    assert waypoint.selected is not None
+    assert waypoint.selected.value == expected
+
+
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
     result = _migrate_real_extract(
         tmp_path,

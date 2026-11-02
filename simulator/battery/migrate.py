@@ -20478,6 +20478,7 @@ class Migrator:
                 }
             row_printed_values = row_sample.printed_composition.state.value
             row_printed_fingerprint = _printed_fingerprint(row_printed_values)
+            row_printed_source_values = None
             row_printed_locator = row_sample.printed_composition.locator
             for source_values, source_fallback in (
                 (values, locator),
@@ -20491,20 +20492,25 @@ class Migrator:
                     and _printed_fingerprint(candidate_values)
                     == row_printed_fingerprint
                 ):
+                    row_printed_source_values = candidate_values
                     if row_printed_locator is None:
                         row_printed_locator = _composition_source_locator(
                             source_values, fallback=source_fallback
                         )
                     break
-            # Keep the payload from the shared sample reader. Its normalized
-            # printed values are the established provenance representation;
-            # source maps above only confirm identity and supply a locator.
+            # When the matching source field is available, keep its cells as
+            # printed; the normalized sample-reader map is only the fallback.
             row_printed_composition = replace(
                 row_sample.printed_composition,
                 state=(
                     State.of(
                         _printed_map_payload(
-                            row_printed_values, numeric_values_as="source"
+                            (
+                                row_printed_source_values
+                                if row_printed_source_values is not None
+                                else row_printed_values
+                            ),
+                            numeric_values_as="source",
                         )
                     )
                     if row_printed_locator is not None

@@ -10,13 +10,9 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
-    _PRINTED_COMPOSITION_TOTAL_KEYS,
     _classify_composition_cell,
     _is_engine_oxide_component,
-    _is_composition_condition_key,
     _knudsen_effusion_chamber_background_not_for_identity,
-    _mass_percent_component_key,
-    _volatile_closure_component,
     _wt_percent_conversion_or_refusal,
 )
 from simulator.battery.records import (
@@ -432,65 +428,6 @@ def charge_moles_by_species(
     dropped: list[str] = []
     mass = _value(experiment.sample.mass_kg)
     composition = experiment.sample.initial_composition
-    printed = experiment.sample.printed_composition
-    printed_raw = (
-        _printed_composition_map(printed.state.value)
-        if printed is not None and printed.state.is_value
-        else None
-    )
-    printed_basis = (
-        _amount_basis_token(printed.state.value)
-        if printed is not None and printed.state.is_value
-        else None
-    )
-    printed_is_mass_percent = printed_basis in (
-        None,
-        AmountBasis.MASS_PERCENT.value,
-    )
-    printed_route_usable = False
-    printed_charge_route_usable = False
-    numeric_printed: dict[str, Decimal] = {}
-    if mass is not None and isinstance(printed_raw, Mapping):
-        malformed = False
-        for key, item in printed_raw.items():
-            kind, amount = _classify_composition_cell(item)
-            if kind == "malformed":
-                malformed = True
-                break
-            if kind == "number" and amount is not None:
-                numeric_printed[str(key)] = amount
-        if not malformed and numeric_printed:
-            if not printed_is_mass_percent:
-                printed_route_usable = True
-                printed_charge_route_usable = True
-            else:
-                _converted, refusal = _wt_percent_conversion_or_refusal(
-                    numeric_printed,
-                    closure_context=printed_raw,
-                    declared_component_map=printed_raw,
-                )
-                if refusal is not None:
-                    # A large unsupported label refuses the mixture, while
-                    # the printed masses of its recognized species remain
-                    # usable as individual charge waypoints.
-                    printed_charge_route_usable = (
-                        "contains unsupported component(s) above" in refusal
-                    )
-                else:
-                    engine_printed = {
-                        name: value
-                        for name, value in printed_raw.items()
-                        if str(name).strip().casefold()
-                        not in _PRINTED_COMPOSITION_TOTAL_KEYS
-                        and not _is_composition_condition_key(str(name))
-                    }
-                    try:
-                        _engine_printed_oxides(engine_printed)
-                    except _EnginePrintRefused:
-                        pass
-                    else:
-                        printed_route_usable = True
-                        printed_charge_route_usable = True
     if composition is not None and composition.state.is_value:
         comp = composition.state.value
         if comp.amount_basis is AmountBasis.MOL_INVENTORY:
@@ -508,16 +445,7 @@ def charge_moles_by_species(
                     bool(composition.inference),
                     2,
                 )
-        elif (
-            mass is not None
-            and comp.amount_basis is AmountBasis.MOLE_FRACTION
-            and not (
-                composition.inference is not None
-                and composition.inference.relation == "wt_pct_to_mole_fraction"
-                and printed_raw is not None
-                and not printed_route_usable
-            )
-        ):
+        elif mass is not None and comp.amount_basis is AmountBasis.MOLE_FRACTION:
             masses = [(species, _molar_mass_kg_mol(species), fraction) for species, fraction in comp.components]
             if all(item[1] is not None for item in masses):
                 mean_molar_mass = sum(
@@ -544,43 +472,56 @@ def charge_moles_by_species(
                                 bool(composition.inference),
                                 0,
                             )
+    printed = experiment.sample.printed_composition
     if (
         mass is not None
         and printed is not None
         and printed.state.is_value
-        and printed_charge_route_usable
     ):
-        for species, wt_pct in numeric_printed.items():
-            molar_mass = _molar_mass_kg_mol(species)
-            if molar_mass is None:
-                # The print names a species no route can charge; the
-                # reduced set must not be scored as the whole charge.
-                dropped.append(species)
-                continue
-            species_mass = _multiply(
-                mass, Value.point_of(wt_pct / Decimal(100))
-            )
-            value = (
-                None
-                if species_mass is None
-                else _divide(species_mass, Value.point_of(molar_mass))
-            )
-            if value is not None:
-                # Premise: w_i is printed wt% and m_i=m*w_i/100.
-                # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
-                # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
-                ranked(
-                    species,
-                    Waypoint(
-                        f"charge_moles_by_species.{species}",
-                        value,
-                        "mass_times_printed_wt_percent",
-                        WaypointAuthority.DERIVED,
-                        ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
-                    ),
-                    bool(printed.inference),
-                    1,
+        raw = _printed_composition_map(printed.state.value)
+        if isinstance(raw, Mapping):
+            numeric = {}
+            for key, item in raw.items():
+                if isinstance(item, Mapping):
+                    continue
+                try:
+                    numeric[str(key)] = as_decimal(item)
+                except (ValueError, TypeError, ArithmeticError):
+                    # A printed composition may be a categorical Value payload
+                    # (e.g. {kind: categorical, categorical: 'Fe-Mn or Fe-Sn'});
+                    # non-numeric leaves carry no wt% and route nothing.
+                    continue
+            for species, wt_pct in numeric.items():
+                molar_mass = _molar_mass_kg_mol(species)
+                if molar_mass is None:
+                    # The print names a species no route can charge; the
+                    # reduced set must not be scored as the whole charge.
+                    dropped.append(species)
+                    continue
+                species_mass = _multiply(
+                    mass, Value.point_of(wt_pct / Decimal(100))
                 )
+                value = (
+                    None
+                    if species_mass is None
+                    else _divide(species_mass, Value.point_of(molar_mass))
+                )
+                if value is not None:
+                    # Premise: w_i is printed wt% and m_i=m*w_i/100.
+                    # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
+                    # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
+                    ranked(
+                        species,
+                        Waypoint(
+                            f"charge_moles_by_species.{species}",
+                            value,
+                            "mass_times_printed_wt_percent",
+                            WaypointAuthority.DERIVED,
+                            ("experiment.sample.mass_kg", "experiment.sample.printed_composition"),
+                        ),
+                        bool(printed.inference),
+                        1,
+                    )
     results = {
         species: _result(
             f"charge_moles_by_species.{species}",
@@ -673,6 +614,80 @@ def _printed_component_pairs(raw: object) -> list[tuple[str, object]] | None:
             return None
         pairs.append((str(key), value))
     return pairs or None
+
+
+def _mass_percent_closure_refusal(
+    wt: Mapping[str, Decimal],
+    declared_map: Mapping[str, object],
+    source_map: object,
+    point_conditions: Mapping[str, object],
+) -> str | None:
+    row_conditions: dict[str, object] = {}
+    for name, value in point_conditions.items():
+        if isinstance(value, Located):
+            if not value.state.is_value or value.inference is not None:
+                continue
+            value = value.state.value
+        row_conditions[str(name)] = value
+    closure_context = {
+        "printed_composition": source_map,
+        "point_conditions": row_conditions,
+    }
+    _converted, refusal = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared_map,
+    )
+    return refusal
+
+
+def _printed_mass_percent_closure_refusal(
+    raw: object, point_conditions: Mapping[str, object]
+) -> str | None:
+    pairs = _printed_component_pairs(raw)
+    if pairs is None:
+        return None
+    declared_map = dict(pairs)
+    wt: dict[str, Decimal] = {}
+    for name, value in pairs:
+        kind, amount = _classify_composition_cell(value)
+        if kind == "number" and amount is not None:
+            wt[name] = amount
+    return _mass_percent_closure_refusal(
+        wt, declared_map, raw, point_conditions
+    )
+
+
+def _derived_mass_percent_closure_refusal(
+    located: Located[Composition], point_conditions: Mapping[str, object]
+) -> str | None:
+    if (
+        located.inference is None
+        or located.inference.relation != "wt_pct_to_mole_fraction"
+    ):
+        return None
+    declared_map: dict[str, object] = {}
+    wt: dict[str, Decimal] = {}
+    for parameter_name, parameter in located.inference.parameters:
+        name = str(parameter_name)
+        if not name.startswith("original_") or not name.endswith("_wt_pct"):
+            continue
+        component = name[len("original_") : -len("_wt_pct")]
+        if isinstance(parameter, Located):
+            raw_value = (
+                parameter.state.value
+                if parameter.state.is_value
+                else None
+            )
+        else:
+            raw_value = parameter
+        declared_map[component] = raw_value
+        kind, amount = _classify_composition_cell(raw_value)
+        if kind == "number" and amount is not None:
+            wt[component] = amount
+    return _mass_percent_closure_refusal(
+        wt, declared_map, declared_map, point_conditions
+    )
 
 
 def _parse_component_amounts(
@@ -844,36 +859,6 @@ def normalized_composition(
     if observation is not None and observation.experiment_id != experiment.experiment_id:
         raise ValueError("Observation belongs to a different experiment")
     point = (observation.point_conditions or {}) if observation else {}
-    residue_component_cell = False
-    if (
-        observation is not None
-        and observation.identity.quantity is not None
-        and observation.identity.quantity.is_value
-        and observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and observation.identity.species is not None
-    ):
-        point_composition = point.get("composition")
-        has_typed_point_composition = (
-            isinstance(point_composition, Located)
-            and point_composition.state.is_value
-            and isinstance(point_composition.state.value, Composition)
-        )
-        printed_point = point.get("printed_composition")
-        point_pairs = (
-            _printed_component_pairs(printed_point.state.value)
-            if isinstance(printed_point, Located) and printed_point.state.is_value
-            else None
-        )
-        if point_pairs is not None and len(point_pairs) == 1:
-            point_species, _amount = point_pairs[0]
-            point_species, _has_mass_suffix = _mass_percent_component_key(
-                point_species
-            )
-            residue_component_cell = (
-                not has_typed_point_composition
-                and point_species == observation.identity.species.formula
-                and _is_engine_oxide_component(point_species)
-            )
     routes = []
     evidence_ranks = []
     absent = []
@@ -882,19 +867,14 @@ def normalized_composition(
     printed_species: set[str] | None = None
     printed_path = None
     printed_basis_exempt: set[str] = set()
-    rejected_printed_mass = False
     for field, key in (("printed_composition", "printed_composition"),
                        ("initial_composition", "composition")):
-        use_point = key in point and not residue_component_cell
-        located = point.get(key) if use_point else getattr(experiment.sample, field)
-        path = (
-            f"observation[{observation.observation_id}].point_conditions.{key}"
-            if use_point
-            else f"experiment.sample.{field}"
-        )
+        located = point.get(key) if key in point else getattr(experiment.sample, field)
+        path = (f"observation[{observation.observation_id}].point_conditions.{key}"
+                if key in point else f"experiment.sample.{field}")
         if (
             field == "initial_composition"
-            and use_point
+            and key in point
             and located is not None
             and (
                 not located.state.is_value
@@ -915,41 +895,20 @@ def normalized_composition(
             absent.append(path)
             continue
         raw = located.state.value
-        if (
-            field == "initial_composition"
-            and rejected_printed_mass
-            and isinstance(raw, Composition)
-            and located.inference is not None
-            and located.inference.relation == "wt_pct_to_mole_fraction"
-        ):
-            # A second derived mass-percent route is usable only when its own
-            # typed original-weight parameters prove closure. Prose inputs
-            # alone cannot establish the printed total.
-            inferred_wt: dict[str, Decimal] = {}
-            inputs_available = True
-            for parameter_name, parameter in located.inference.parameters:
-                name = str(parameter_name)
-                if not name.startswith("original_") or not name.endswith("_wt_pct"):
+        if field == "printed_composition" and isinstance(raw, Mapping):
+            basis = _amount_basis_token(raw)
+            if (
+                basis in (None, AmountBasis.MASS_PERCENT.value)
+                and not (basis is None and "components" in raw)
+            ):
+                refusal = _printed_mass_percent_closure_refusal(raw, point)
+                if refusal is not None:
+                    unsupported = True
+                    missing.append(path)
                     continue
-                component = name[len("original_") : -len("_wt_pct")]
-                if not component or component in inferred_wt or not parameter.state.is_value:
-                    inputs_available = False
-                    break
-                kind, amount = _classify_composition_cell(parameter.state.value)
-                if kind != "number" or amount is None:
-                    inputs_available = False
-                    break
-                inferred_wt[component] = amount
-            if not inputs_available or not inferred_wt:
-                unsupported = True
-                missing.append(path)
-                continue
-            _, inference_refusal = _wt_percent_conversion_or_refusal(
-                inferred_wt,
-                closure_context=inferred_wt,
-                declared_component_map=inferred_wt,
-            )
-            if inference_refusal is not None:
+        if field == "initial_composition" and isinstance(raw, Composition):
+            refusal = _derived_mass_percent_closure_refusal(located, point)
+            if refusal is not None:
                 unsupported = True
                 missing.append(path)
                 continue
@@ -960,11 +919,8 @@ def normalized_composition(
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
-        notice_inference = located.inference
-        notice_locator = located.locator
         refused_components: tuple[str, ...] = ()
         as_moles = False
-        mass_percent_conversion: Composition | None = None
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
             if isinstance(components, Mapping):
@@ -1005,128 +961,22 @@ def normalized_composition(
                 # Unknown basis, mol_inventory, or components with no basis.
                 raw = None
             else:
-                mass_percent_map: Mapping[str, object] | None = None
-                if basis == AmountBasis.MASS_PERCENT.value:
-                    pairs = _typed_component_pairs(raw)
-                    if (
-                        pairs is not None
-                        and len({name for name, _value in pairs}) == len(pairs)
-                    ):
-                        mass_percent_map = dict(pairs)
-                elif basis is None and isinstance(raw, Mapping):
-                    mass_percent_map = raw
-                if mass_percent_map is not None:
-                    engine_map: dict[str, object] = {}
-                    duplicate_names: set[str] = set()
-                    for species, printed_amount in mass_percent_map.items():
-                        name, _has_mass_suffix = _mass_percent_component_key(
-                            str(species)
-                        )
-                        volatile = _volatile_closure_component(name)
-                        if (
-                            name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
-                            or _is_composition_condition_key(name)
-                            or (volatile is not None and volatile[0] == "H2O")
-                        ):
-                            continue
-                        if name in engine_map:
-                            duplicate_names.add(name)
-                        else:
-                            engine_map[name] = printed_amount
-                    printed_species = set(engine_map) | duplicate_names
-                    printed_path = path
-
-                    # The shared b-704 owner decides whether the printed mass
-                    # map closes before this waypoint can emit engine ratios.
-                    # Classify cells first so malformed/non-finite source values
-                    # remain in the declared map for typed refusal.
-                    closure_wt: dict[str, Decimal] = {}
-                    for species, printed_amount in mass_percent_map.items():
-                        kind, amount = _classify_composition_cell(printed_amount)
-                        if kind == "number" and amount is not None:
-                            closure_wt[str(species)] = amount
-                    closure_context = raw
-                    if key in point:
-                        row_volatiles: dict[str, Decimal] = {}
-                        for name, condition_value in point.items():
-                            if _volatile_closure_component(str(name)) is None:
-                                continue
-                            if isinstance(condition_value, Located):
-                                if (
-                                    not condition_value.state.is_value
-                                    or condition_value.inference is not None
-                                ):
-                                    continue
-                                condition_value = condition_value.state.value
-                            kind, amount = _classify_composition_cell(condition_value)
-                            if kind == "number" and amount is not None:
-                                row_volatiles[str(name)] = amount
-                        if row_volatiles:
-                            closure_context = {
-                                "printed_composition": raw,
-                                **row_volatiles,
-                            }
-                    converted, closure_refusal = _wt_percent_conversion_or_refusal(
-                        closure_wt,
-                        closure_context=closure_context,
-                        declared_component_map=mass_percent_map,
-                    )
-                    if closure_refusal is not None:
-                        rejected_printed_mass = True
-                        raw = None
-                    elif duplicate_names:
-                        refused_components = tuple(sorted(duplicate_names))
-                        raw = None
+                try:
+                    engine_oxides = _engine_printed_oxides(raw)
+                except _EnginePrintRefused as exc:
+                    refused_components = exc.components
+                    raw = None
+                else:
+                    if engine_oxides is not None:
+                        raw, basis_exempt, basis_notice, feot_amount = engine_oxides
+                        if feot_amount is not None:
+                            basis_inference = _feot_derivation(feot_amount, located.locator)
+                        if printed_species is None:
+                            pairs = _printed_component_pairs(located.state.value)
+                            printed_species = {name for name, _value in pairs} if pairs else set()
+                            printed_path = path
                     else:
-                        mass_percent_conversion = converted
-                        raw = engine_map
-                if raw is not None:
-                    try:
-                        engine_oxides = _engine_printed_oxides(raw)
-                    except _EnginePrintRefused as exc:
-                        refused_components = exc.components
-                        raw = None
-                    else:
-                        if engine_oxides is not None:
-                            raw, basis_exempt, basis_notice, feot_amount = engine_oxides
-                            if feot_amount is not None:
-                                basis_inference = _feot_derivation(feot_amount, located.locator)
-                            if printed_species is None:
-                                pairs = _printed_component_pairs(located.state.value)
-                                printed_species = {name for name, _value in pairs} if pairs else set()
-                                printed_path = path
-                        else:
-                            raw = _printed_composition_map(raw)
-                    if raw is not None and mass_percent_conversion is not None:
-                        # Closure includes every printed mass; the engine map
-                        # keeps only the species accepted by _engine_printed_oxides.
-                        engine_oxide_species = set(raw)
-                        converted_map = mass_percent_conversion.as_map()
-                        raw = {
-                            species: amount
-                            for species, amount in converted_map.items()
-                            if species in engine_oxide_species
-                        }
-                        as_moles = True
-                        candidate = (
-                            point.get("composition")
-                            if key in point
-                            else experiment.sample.initial_composition
-                        )
-                        if (
-                            isinstance(candidate, Located)
-                            and candidate.state.is_value
-                            and isinstance(candidate.state.value, Composition)
-                            and candidate.inference is not None
-                            and candidate.inference.relation == "wt_pct_to_mole_fraction"
-                            and candidate.state.value.as_map()
-                            == mass_percent_conversion.as_map()
-                        ):
-                            # The printed map supplies the b-704 closure check;
-                            # reuse its matching typed derivation for the green
-                            # conversion arithmetic and calculation notice.
-                            notice_inference = candidate.inference
-                            notice_locator = candidate.locator
+                        raw = _printed_composition_map(raw)
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
@@ -1165,8 +1015,8 @@ def normalized_composition(
             # n_i/sum(n_j) is dimensionless and invariant under n -> k*n, k>0.
             # A one-mole reference charge preserves ratios at specified T/P/fO2.
             notice = None
-            if notice_inference is not None:
-                locator = notice_locator
+            if located.inference is not None:
+                locator = located.locator
                 locator_text = str(locator) if locator is not None else "source locator unavailable"
                 origins = {
                     "wt_pct_to_mole_fraction":
@@ -1176,7 +1026,7 @@ def normalized_composition(
                     "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
                         "measured composition",
                 }
-                relation = notice_inference.relation
+                relation = located.inference.relation
                 origin = origins.get(relation)
                 if origin is None:
                     # Plante-style source note: X is printed and Y is its
@@ -1209,7 +1059,7 @@ def normalized_composition(
                 notice = (
                     f"calculated from {origin}; "
                     f"relation={relation}; "
-                    f"inputs={' | '.join(notice_inference.inputs)}; locator={locator_text}"
+                    f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
                 )
             if basis_notice:
                 notice = f"{notice}; {basis_notice}" if notice else basis_notice

@@ -6,8 +6,10 @@ from decimal import Decimal
 import pytest
 
 from simulator.battery.migrate import (
+    _wt_percent_conversion_or_refusal,
     _wt_percent_conversion_state,
     wt_pct_to_mole_fraction,
+    wt_pct_to_mole_fraction_derivation,
 )
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, FO2Channel, MethodToken, ValueKind
@@ -939,6 +941,110 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
     assert "observation_normalized_initial_composition" in {
         route.route for route in result.routes
     }
+
+
+def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes() -> None:
+    experiment = factories.kems_experiment()
+    bench = _bench()
+    oxides = {"SiO2": Decimal("54.90"), "MgO": Decimal("40.00")}
+    hydrous = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [[name, str(amount)] for name, amount in oxides.items()],
+                }
+            ),
+        ),
+    )
+    observation = replace(
+        factories.observation(
+            "hydrous-row",
+            experiment.experiment_id,
+            factories.o2_identity(),
+            1,
+        ),
+        point_conditions={"H2O": factories.located(Decimal("5.00"))},
+    )
+    accepted = normalized_composition(hydrous, bench, observation)
+    assert accepted.selected is not None
+    expected, refusal = _wt_percent_conversion_or_refusal(
+        oxides,
+        closure_context={"point_conditions": {"H2O": "5.00"}},
+        declared_component_map=oxides,
+    )
+    assert refusal is None and expected is not None
+    assert accepted.selected.value == expected.as_map()
+
+    nonclosing = replace(
+        hydrous,
+        sample=replace(
+            hydrous.sample,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                }
+            ),
+        ),
+    )
+    refused = normalized_composition(nonclosing, bench)
+    assert refused.selected is None
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+    locator = factories.loc()
+    independent = Located(
+        factories.State.of(
+            Composition(
+                "independent",
+                (("SiO2", Decimal("0.75")), ("MgO", Decimal("0.25"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        locator,
+    )
+    derived_from_nonclosing = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            )
+        ),
+        locator,
+        wt_pct_to_mole_fraction_derivation(
+            {"SiO2": Decimal("45"), "MgO": Decimal("45")}, locator
+        ),
+    )
+    refused_derived = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                printed_composition=None,
+                initial_composition=derived_from_nonclosing,
+            ),
+        ),
+        bench,
+    )
+    assert refused_derived.selected is None
+    assert refused_derived.absence is not None
+    assert refused_derived.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+    independent_result = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                initial_composition=independent,
+            ),
+        ),
+        bench,
+    )
+    assert independent_result.selected is not None
+    assert independent_result.selected.value == independent.state.value.as_map()
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:
