@@ -8,7 +8,6 @@ import multiprocessing as mp
 import os
 import time
 from dataclasses import dataclass, replace
-from functools import lru_cache
 import inspect
 from pathlib import Path
 from queue import Empty
@@ -27,15 +26,17 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.backends import requires_stage0_subprocess
-from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
 from simulator.optimize.objective import (
     ObjectiveValue,
     canonical_objective_metric,
     objective_metric_aliases,
 )
-from simulator.optimize.pool import resolve_eval_timeout_seconds
+from simulator.optimize.pool import (
+    _default_feedstocks,
+    _task_stage0_subprocess_required,
+    resolve_eval_timeout_seconds,
+)
 from simulator.optimize.result_trust import (
     ResultTrustCarriers,
     collect_result_trust_carriers,
@@ -346,6 +347,73 @@ def _run_eval_batch(
     outcomes: dict[tuple[str, int], EvalOutcome] = {}
     pending = {(task.tier, task.index): task for task in tasks}
     started: dict[tuple[str, int], float] = {}
+
+    def record_message(message: Mapping[str, Any]) -> bool:
+        key = (message["tier"], int(message["index"]))
+        task = pending.get(key)
+        if task is None:
+            return False
+        if message["kind"] == "started":
+            started[key] = time.monotonic()
+        elif message["kind"] == "done":
+            pending.pop(key, None)
+            started.pop(key, None)
+            elapsed_s = float(message["elapsed_s"])
+            if elapsed_s >= timeout_s:
+                outcomes[key] = (
+                    None,
+                    _drop(
+                        task.index,
+                        task.tier,
+                        task.candidate_id,
+                        "timeout",
+                        "per-eval timeout",
+                    ),
+                )
+                return True
+            outcomes[key] = _payload_outcome(message["payload"])
+        return False
+
+    def drain_result_queue() -> bool:
+        timed_out = False
+        while True:
+            try:
+                message = result_queue.get_nowait()
+            except Empty:
+                return timed_out
+            timed_out = record_message(message) or timed_out
+
+    def join_workers_while_draining() -> bool:
+        timed_out = False
+        grace_deadline = time.monotonic() + 1.0
+        while time.monotonic() < grace_deadline and any(
+            worker.is_alive() for worker in workers
+        ):
+            timed_out = drain_result_queue() or timed_out
+            for worker in workers:
+                if worker.is_alive():
+                    worker.join(timeout=0.01)
+            timed_out = drain_result_queue() or timed_out
+
+        alive = [worker for worker in workers if worker.is_alive()]
+        if alive:
+            # A terminated multiprocessing.Queue writer can leave a partial frame.
+            # Once a worker must be killed, abandon the queue and time out any
+            # pending task whose complete result was not drained above.
+            for worker in alive:
+                worker.terminate()
+            for worker in alive:
+                worker.join(timeout=1.0)
+            for worker in alive:
+                if worker.is_alive() and hasattr(worker, "kill"):
+                    worker.kill()
+                    worker.join(timeout=1.0)
+            return timed_out
+
+        # A normally exited process has flushed its queue feeder, so this last
+        # drain is safe and captures messages that arrived during the last join.
+        return drain_result_queue() or timed_out
+
     try:
         for worker in workers:
             worker.start()
@@ -357,29 +425,29 @@ def _run_eval_batch(
             try:
                 message = result_queue.get(timeout=0.05)
             except Empty:
-                message = None
-            if message is not None:
-                key = (message["tier"], int(message["index"]))
-                if key in pending:
-                    if message["kind"] == "started":
-                        started[key] = time.monotonic()
-                    elif message["kind"] == "done":
-                        outcomes[key] = _payload_outcome(message["payload"])
-                        pending.pop(key, None)
-                        started.pop(key, None)
+                timed_out = False
+            else:
+                timed_out = record_message(message)
+            timed_out = drain_result_queue() or timed_out
             now = time.monotonic()
             expired = [
                 key for key, start in started.items() if key in pending and now - start >= timeout_s
             ]
-            if expired:
+            if timed_out or expired:
+                # Drain while workers finish flushing their queue messages. If a
+                # worker must be terminated, its queue may be corrupt, so never
+                # read it again; only tasks without a drained result time out.
+                timed_out = join_workers_while_draining() or timed_out
+                expired = [key for key in expired if key in pending]
                 for key in expired:
-                    task = pending.pop(key)
+                    task = pending.pop(key, None)
+                    if task is None:
+                        continue
                     started.pop(key, None)
                     outcomes[key] = (
                         None,
                         _drop(task.index, task.tier, task.candidate_id, "timeout", "per-eval timeout"),
                     )
-                _terminate_workers(workers)
                 for key, task in list(pending.items()):
                     outcomes[key] = (
                         None,
@@ -393,16 +461,7 @@ def _run_eval_batch(
                     )
                 pending.clear()
             elif not any(worker.is_alive() for worker in workers):
-                while True:
-                    try:
-                        message = result_queue.get_nowait()
-                    except Empty:
-                        break
-                    key = (message["tier"], int(message["index"]))
-                    if key in pending and message["kind"] == "done":
-                        outcomes[key] = _payload_outcome(message["payload"])
-                        pending.pop(key, None)
-                        started.pop(key, None)
+                timed_out = drain_result_queue() or timed_out
                 for key, task in list(pending.items()):
                     outcomes[key] = (
                         None,
@@ -410,8 +469,12 @@ def _run_eval_batch(
                             task.index,
                             task.tier,
                             task.candidate_id,
-                            "engine_bug",
-                            "fidelity worker pool exited without result",
+                            "timeout" if timed_out else "engine_bug",
+                            (
+                                "fidelity pool aborted after per-eval timeout"
+                                if timed_out
+                                else "fidelity worker pool exited without result"
+                            ),
                         ),
                     )
                 pending.clear()
@@ -432,13 +495,16 @@ def _fidelity_worker_loop(
         task = task_queue.get()
         if task is None:
             return
+        started_at = time.monotonic()
         result_queue.put({"kind": "started", "tier": task.tier, "index": task.index})
+        payload = _evaluate_fidelity_task(task)
         result_queue.put(
             {
                 "kind": "done",
                 "tier": task.tier,
                 "index": task.index,
-                "payload": _evaluate_fidelity_task(task),
+                "elapsed_s": time.monotonic() - started_at,
+                "payload": payload,
             }
         )
 
@@ -492,15 +558,23 @@ def _queue_safe_run_reference(result: ScoredResult) -> Any | None:
 
 
 def _call_evaluate_fn(task: _FidelityTask) -> ScoredResult:
-    from simulator.optimize.worker_runtime import get_worker_runtime
+    from simulator.optimize.worker_runtime import (
+        get_worker_runtime,
+        warm_workers_enabled,
+    )
 
+    worker_runtime = None
+    if warm_workers_enabled():
+        worker_runtime = get_worker_runtime(
+            feedstock_id=task.feedstock_id,
+            stage0_subprocess_required=_task_stage0_subprocess_required(
+                task.feedstock_id
+            ),
+        )
     call_kwargs: dict[str, Any] = {
         "profile": dict(task.profile),
         "candidate_id": task.candidate_id,
-        "worker_runtime": get_worker_runtime(
-            feedstock_id=task.feedstock_id,
-            stage0_subprocess_required=_task_stage0_subprocess_required(task),
-        ),
+        "worker_runtime": worker_runtime,
     }
     call_kwargs.update(dict(task.kwargs))
     signature = inspect.signature(task.fn)
@@ -540,9 +614,8 @@ def _initialize_fidelity_worker(
         warm_worker_runtime(warm_runtime)
         return
     feedstocks = _default_feedstocks()
-    subprocess_required = warm_runtime.stage0_subprocess_required or requires_stage0_subprocess(
-        warm_runtime.feedstock_id,
-        feedstocks,
+    subprocess_required = warm_runtime.stage0_subprocess_required or (
+        _task_stage0_subprocess_required(warm_runtime.feedstock_id)
     )
     warm_worker_runtime(
         warm_runtime.backend_name,
@@ -567,21 +640,14 @@ def _warm_runtime_spec(tasks: Sequence[_FidelityTask]) -> _FidelityWarmRuntimeSp
     if name in {"auto", "cached-real"}:
         return None
     feedstock_id = next(iter(feedstocks))
-    subprocess_required = any(_task_stage0_subprocess_required(task) for task in tasks)
+    subprocess_required = any(
+        _task_stage0_subprocess_required(task.feedstock_id) for task in tasks
+    )
     return _FidelityWarmRuntimeSpec(
         backend_name=name,
         feedstock_id=feedstock_id,
         stage0_subprocess_required=subprocess_required,
     )
-
-
-def _task_stage0_subprocess_required(task: _FidelityTask) -> bool:
-    return requires_stage0_subprocess(task.feedstock_id, _default_feedstocks())
-
-
-@lru_cache(maxsize=1)
-def _default_feedstocks() -> Mapping[str, Any]:
-    return load_config_bundle(DEFAULT_DATA_DIR).feedstocks
 
 
 def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
@@ -807,12 +873,6 @@ def _start_method() -> str:
     if "spawn" in methods:
         return "spawn"
     return methods[0]
-
-
-def _terminate_workers(workers: Sequence[Any]) -> None:
-    for worker in workers:
-        if worker.is_alive():
-            worker.terminate()
 
 
 def _join_or_stop_workers(workers: Sequence[Any]) -> None:

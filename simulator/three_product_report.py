@@ -71,8 +71,8 @@ from simulator.accounting.queries import (
 )
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
-    STAGE_KEY_BY_IDENTITY,
     accepted_species_for_stage_key,
+    stage_key_for_stage,
 )
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
@@ -769,14 +769,11 @@ def _metal_product_accounting(sim, *, products):
         try:
             stage = stages[int(raw_stage_index)]
             amount = float(raw_mass)
-            stage_number = int(getattr(stage, 'stage_number', raw_stage_index))
-            stage_identity = (
-                stage_number,
-                int(getattr(stage, 'sub_order', 0)),
-            )
-            stage_key = str(
-                getattr(stage, 'stage_key', '')
-                or STAGE_KEY_BY_IDENTITY.get(stage_identity, '')
+            stage_key = stage_key_for_stage(
+                stage,
+                fallback_stage_number=int(raw_stage_index),
+                falsey_sub_order_is_zero=False,
+                include_collector_fallback=False,
             )
         except (IndexError, TypeError, ValueError):
             continue
@@ -1123,14 +1120,11 @@ def product_story_extracted_projection(
             try:
                 stage_idx = int(raw_stage_index)
                 stage = sim.train.stages[stage_idx]
-                stage_number = int(getattr(stage, 'stage_number', stage_idx))
-                stage_identity = (
-                    stage_number,
-                    int(getattr(stage, 'sub_order', 0)),
-                )
-                stage_key = str(
-                    getattr(stage, 'stage_key', '')
-                    or STAGE_KEY_BY_IDENTITY.get(stage_identity, '')
+                stage_key = stage_key_for_stage(
+                    stage,
+                    fallback_stage_number=stage_idx,
+                    falsey_sub_order_is_zero=False,
+                    include_collector_fallback=False,
                 )
             except (AttributeError, IndexError, TypeError, ValueError):
                 continue
