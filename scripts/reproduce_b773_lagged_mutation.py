@@ -3,10 +3,17 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
+import time
+from pathlib import Path
 
-from reproduce_b773_evap_oscillation import _cases, _run_case
+from reproduce_b773_evap_oscillation import (
+    _NONZERO_KG_HR,
+    _cases,
+    _run_case,
+)
 
 
 def _acceptance_failures(result: dict) -> list[str]:
@@ -38,6 +45,19 @@ def _acceptance_failures(result: dict) -> list[str]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--cases",
+        choices=("lunar", "yields"),
+        default="yields",
+        help="campaign set to run with the lagged reader restored",
+    )
+    parser.add_argument("--repeat", type=int, default=1)
+    parser.add_argument("--json", type=Path, default=None)
+    args = parser.parse_args()
+    if args.repeat < 1:
+        parser.error("--repeat must be positive")
+
     from simulator.evaporation import EvaporationMixin
 
     original = EvaporationMixin._calculate_evaporation
@@ -49,21 +69,37 @@ def main() -> int:
         return original(self, equilibrium, *args, **kwargs)
 
     EvaporationMixin._calculate_evaporation = lagged_reader
-    failures_by_case = {}
+    payload = {"reader": "lagged", "cases": []}
     try:
-        for case in _cases("yields"):
-            label = f"{case['feedstock_id']} {case['campaign']}"
-            print(f"start {label}", flush=True)
-            result = _run_case(case)
-            failures = _acceptance_failures(result)
-            failures_by_case[label] = failures
-            print(
-                f"done {label}: empty={sum(not row['flux_kg_hr'] for row in result['hours'])} "
-                f"gate_failures={failures}",
-                flush=True,
-            )
+        for repeat in range(1, args.repeat + 1):
+            for case in _cases(args.cases):
+                label = f"{case['feedstock_id']} {case['campaign']}"
+                print(f"start {label} repeat={repeat}/{args.repeat}", flush=True)
+                wall_started = time.perf_counter()
+                cpu_started = time.process_time()
+                result = _run_case(case)
+                result["wall_seconds"] = time.perf_counter() - wall_started
+                result["process_cpu_seconds"] = time.process_time() - cpu_started
+                result["repeat"] = repeat
+                result["acceptance_failures"] = _acceptance_failures(result)
+                payload["cases"].append(result)
+                print(
+                    f"done {label}: empty={sum(not row['flux_kg_hr'] for row in result['hours'])} "
+                    f"gate_failures={result['acceptance_failures']}",
+                    flush=True,
+                )
     finally:
         EvaporationMixin._calculate_evaporation = original
+    failures_by_case = {
+        f"{case['feedstock_id']} {case['campaign']} repeat {case['repeat']}": case[
+            "acceptance_failures"
+        ]
+        for case in payload["cases"]
+    }
+    if args.json is not None:
+        args.json.parent.mkdir(parents=True, exist_ok=True)
+        args.json.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        print(f"wrote {args.json}", flush=True)
     print(json.dumps(failures_by_case, sort_keys=True), flush=True)
     if not any(failures_by_case.values()):
         print("restored lagged reader unexpectedly passed acceptance A", file=sys.stderr)
