@@ -1,0 +1,76 @@
+source_id: sanders-1977-water-vapour-na-vaporization
+tables:
+- page: 2
+  table_index: 1
+  printed_table: I
+  caption: Raw Vapor Density Data for Two Glasses Having Similar Silica Contents
+  type: gas_speciation
+  quantity: density
+  evidence_class: measured_direct
+  unit: g/cm3 (canonical for printed g/STP ml)
+  phase: g
+  per: measurement row
+  rows: 10
+  row_predicate: Ten measurement pairs (four ternary, six binary); compositions and grouped conditions are in column 1, water pressures in column 2, rho_t in column 3, and heterogeneous fit parameters in column 4. Fit cells are individually typed in the extract.
+  values:
+  - column: 3
+    species: Na
+    phase: g
+    evidence_class: measured_direct
+    unit: g/cm3
+    quantity: density
+  conditions:
+    composition_column: 1
+    water_partial_pressure_column: 2
+    temperature_and_oxygen_rows: printed grouped conditions in column 1
+    total_pressure_statement: 1 atm throughout, page 1
+  render_verified:
+  - {row: 3, column: 1, text: '74% SiO2'}
+  - {row: 3, column: 4, text: 'K2 = 8.8 × 10^-6'}
+  - {row: 4, column: 1, text: '16% Na2O'}
+  - {row: 4, column: 4, text: 'K4 = 1.9'}
+  - {row: 5, column: 1, text: '10% CaO'}
+  - {row: 5, column: 2, text: '3.5 × 10^-4'}
+  - {row: 5, column: 3, text: '4.90 × 10^-9'}
+  - {row: 5, column: 4, text: 'b = 4.28 × 10^-9'}
+  - {row: 6, column: 1, text: '1570 K'}
+  - {row: 6, column: 2, text: '2.35 × 10^-2'}
+  - {row: 6, column: 3, text: '1.37 × 10^-8'}
+  - {row: 6, column: 4, text: 'm = 6.06 × 10^-8'}
+  - {row: 7, column: 1, text: 'P_O2 = 2 × 10^-4 atm'}
+  - {row: 7, column: 2, text: '7.32 × 10^-2'}
+  - {row: 7, column: 3, text: '2.14 × 10^-8'}
+  - {row: 8, column: 2, text: '2.94 × 10^-1'}
+  - {row: 8, column: 3, text: '3.67 × 10^-8'}
+  - {row: 8, column: 4, text: 'r = 0.999'}
+  - {row: 10, column: 1, text: '75% SiO2'}
+  - {row: 10, column: 2, text: '3.5 × 10^-4'}
+  - {row: 10, column: 3, text: '2.18 × 10^-9'}
+  - {row: 10, column: 4, text: 'K2 = 5 × 10^-9'}
+  - {row: 11, column: 1, text: '25% Na2O'}
+  - {row: 11, column: 2, text: '4.28 × 10^-4'}
+  - {row: 11, column: 3, text: '2.47 × 10^-9'}
+  - {row: 11, column: 4, text: 'K4 = 0.14'}
+  - {row: 12, column: 1, text: '1332 K'}
+  - {row: 12, column: 2, text: '7.59 × 10^-3'}
+  - {row: 12, column: 3, text: '4.29 × 10^-9'}
+  - {row: 12, column: 4, text: 'b = 1.51 × 10^-9'}
+  - {row: 13, column: 1, text: 'P_O2 = 2 × 10^-4 atm'}
+  - {row: 13, column: 2, text: '1.18 × 10^-2'}
+  - {row: 13, column: 3, text: '5.27 × 10^-9'}
+  - {row: 13, column: 4, text: 'm = 3.47 × 10^-8'}
+  - {row: 14, column: 2, text: '2.07 × 10^-2'}
+  - {row: 14, column: 3, text: '6.35 × 10^-9'}
+  - {row: 15, column: 2, text: '8.33 × 10^-2'}
+  - {row: 15, column: 3, text: '1.16 × 10^-8'}
+  - {row: 15, column: 4, text: 'r = 0.999'}
+render_checks:
+- page: 2
+  reason: All 39 numeric condition, composition, measurement, and fit cells were checked against the page render. MinerU table QA reported numeric_agreement 0.943, six numeric-mismatch flags, and 33 LaTeX flags; the draft also places the first composition and K2/K4 cells in header rows. The complete cell-by-cell resolution is in the companion cells CSV.
+- page: 3
+  reason: Eq. (13), the quoted P_NaOH range, and their locators were checked against the page render.
+- page: 1
+  reason: The experimental-method statements for 1 atm total pressure, oxygen concentration, carrier gases, and the standard-volume definition were checked against the page render.
+footnote_marker:
+  printed: '*'
+  applies_to: Parameters* header; retained on every K2, K4, b, m and r parameter record.
