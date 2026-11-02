@@ -23,6 +23,9 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.melt_backend.magemin import (
+    _MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES,
+)
 from simulator.state import OXIDE_SPECIES
 
 from simulator.chemistry.kernel import (
@@ -79,7 +82,9 @@ PROPERTY_THRESHOLD_TABLE: dict[str, PropertyThreshold] = {
 
 EFFECT_TABLE_VERSION = "2026-06-14-refine2-newcompute-v3"
 PHASE_PRESENCE_FLOOR_FRACTION = 0.001
-MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES = ("CoO", "MnO", "NiO", "P2O5")
+MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES = (
+    _MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES
+)
 _MAGEMIN_BULK_SUM_DATABASES = frozenset({"ig", "igad"})
 _VERDICT_B_HARD_FAIL_BACKEND_STATUSES = frozenset(
     {"unavailable", "out_of_domain", "not_converged"}

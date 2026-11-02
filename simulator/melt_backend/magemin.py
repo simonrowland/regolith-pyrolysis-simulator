@@ -3999,6 +3999,23 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             self._warnings.append(message)
 
 
+def _projected_oxide_drops_for_database(database: str) -> Tuple[str, ...]:
+    """Ask the MAGEMin bulk projection owner which feed oxides it drops."""
+    probe = {species: 1.0 for species in OXIDE_SPECIES}
+    projection = MAGEMinBackend()._build_db_bulk_projection(
+        probe,
+        database=database,
+    )
+    return projection.dropped_components
+
+
+_MAGEMIN_IG_DROPPED_OXIDES = _projected_oxide_drops_for_database("ig")
+_MAGEMIN_IGAD_DROPPED_OXIDES = _projected_oxide_drops_for_database("igad")
+_MAGEMIN_IG_IGAD_BULK_SUM_DROPPED_OXIDES = tuple(sorted(
+    set(_MAGEMIN_IG_DROPPED_OXIDES) | set(_MAGEMIN_IGAD_DROPPED_OXIDES)
+))
+
+
 @dataclass(frozen=True)
 class _MAGEMinDiagnosticProjection:
     kept_oxide_kg: Mapping[str, float]
@@ -4050,8 +4067,7 @@ def project_magemin_diagnostic_composition(
             total_dropped_fraction=0.0,
         )
 
-    unsupported_ig_oxides = {"MnO", "P2O5", "NiO", "CoO"}
-    kept_basis = set(OXIDE_SPECIES) - unsupported_ig_oxides
+    kept_basis = set(OXIDE_SPECIES) - set(_MAGEMIN_IG_DROPPED_OXIDES)
     kept = {
         species: mass_kg
         for species, mass_kg in sorted(masses.items())
