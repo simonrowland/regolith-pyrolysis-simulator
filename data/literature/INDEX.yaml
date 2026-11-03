@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 752
-  extracts: 750
+  sources: 753
+  extracts: 751
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 750
+  extracts_without_pdf: 751
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -734,6 +734,7 @@ gaps:
   - volovetsky-2010-granitoid-iron-redox
   - wadhwa-2008-redox-small-bodies
   - wang-2001-solar-melt-evaporation-residues
+  - wang-2009-cr-slag-kems-original
   - wang-2017-cao-sio2-vox-tables-s1-s32
   - wang-2017-sodium-stannate-formation-emf
   - wetzel-gail-2013-sio-arrhenius
@@ -43213,6 +43214,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: wang-2009-cr-slag-kems-original
+  aliases: []
+  citation: Wang L.J., Stolyarova V.L., Lopatin S.I., and Seetharaman S. (2009), “High-temperature mass
+    spectrometric study of the vaporization processes in the system CaO-MgO-Al2O3-Cr2O3-FeO-SiO2,” Rapid
+    Communications in Mass Spectrometry 23:2233–2239.
+  doi: 10.1002/rcm.4127
+  report_number: null
+  identifier: 10.1002/rcm.4127
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wang-2009-cr-slag-kems-original.yaml
+    review_status: draft
+    rows: 80
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wang-2009-cr-slag-kems-original/wang-2009-cr-slag-kems-original.pdf
+      present: true
+      sha256: 65b596ed33120a31e509644d8b87a2b39ce7f98f1d11517ddded8f2b0376fbab
+      matches_simulator: null
+    sidecar:
+      path: raw/wang-2009-cr-slag-kems-original/sidecar.yaml
+      present: true
+    text:
+      path: text/wang-2009-cr-slag-kems-original
+      exists: true
+      file_count: 36
+    tables:
+      path: tables/wang-2009-cr-slag-kems-original
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wang-2009-cr-slag-kems-original.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wang-2009-cr-slag-kems-original.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: wang-2017-cao-sio2-vox-tables-s1-s32
   aliases: []
   citation: Wang D, Shu Q, Yan B, Wu L, Wang J, Dong Y (2017). Thermodynamics of the CaO–SiO2–VOx system

@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 752
-- Extracts (`literature_extract.v1`): 750
+- Sources: 753
+- Extracts (`literature_extract.v1`): 751
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 750
+- Extracts with no PDF: 751
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -743,6 +743,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `volovetsky-2010-granitoid-iron-redox` | Volovetsky, M. V., Rusakov, V. S., Lukanin, O. A. & Kargaltsev, A. A. (2010), “Study of oxygen fugacity influence on redox state of iron in granitoidic melts”, Journal of Physics: Conference Series 217, 012050. | 10.1088/1742-6596/217/1/012050 | ABSENT, `` | `raw/volovetsky-2010-granitoid-iron-redox/volovetsky-2010-granitoid-iron-redox.pdf` (present, 3e2ed583); `text/volovetsky-2010-granitoid-iron-redox/` (1 files, exists); `tables/volovetsky-2010-granitoid-iron-redox/` (0 files, ABSENT) | `data/literature/extracts/volovetsky-2010-granitoid-iron-redox.yaml` (22 rows, draft) | `ledger/volovetsky-2010-granitoid-iron-redox.yaml`: — (—) |
 | `wadhwa-2008-redox-small-bodies` | Wadhwa M. (2008). Redox Conditions on Small Bodies, the Moon and Mars. Reviews in Mineralogy and Geochemistry68:493–510, chapter17. | 10.2138/rmg.2008.68.17 | ABSENT, `` | `raw/wadhwa-2008-redox-small-bodies/wadhwa-2008-redox-small-bodies.pdf` (present, 65e45d04); `text/wadhwa-2008-redox-small-bodies/` (11 files, exists); `tables/wadhwa-2008-redox-small-bodies/` (0 files, ABSENT) | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` (1 rows, draft) | `ledger/wadhwa-2008-redox-small-bodies.yaml`: — (—) |
 | `wang-2001-solar-melt-evaporation-residues` | Wang, J., Davis, A. M., Clayton, R. N., Mayeda, T. K., & Hashimoto, A. (2001). Chemical and isotopic fractionation during the evaporation of the FeO-MgO-SiO2-CaO-Al2O3-TiO2 rare earth element melt system. Geochimica et Cosmochimica Acta, 65(3), 479–494. | 10.1016/S0016-7037(00)00529-9 | ABSENT, `` | `raw/wang-2001-solar-melt-evaporation-residues/wang-2001-solar-melt-evaporation-residues.pdf` (present, 2d3ff08c); `text/wang-2001-solar-melt-evaporation-residues/` (2 files, exists); `tables/wang-2001-solar-melt-evaporation-residues/` (0 files, ABSENT) | `data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml` (38 rows, draft) | `ledger/wang-2001-solar-melt-evaporation-residues.yaml`: — (—) |
+| `wang-2009-cr-slag-kems-original` | Wang L.J., Stolyarova V.L., Lopatin S.I., and Seetharaman S. (2009), “High-temperature mass spectrometric study of the vaporization processes in the system CaO-MgO-Al2O3-Cr2O3-FeO-SiO2,” Rapid Communications in Mass Spectrometry 23:2233–2239. | 10.1002/rcm.4127 | ABSENT, `` | `raw/wang-2009-cr-slag-kems-original/wang-2009-cr-slag-kems-original.pdf` (present, 65b596ed); `text/wang-2009-cr-slag-kems-original/` (36 files, exists); `tables/wang-2009-cr-slag-kems-original/` (0 files, ABSENT) | `data/literature/extracts/wang-2009-cr-slag-kems-original.yaml` (80 rows, draft) | `ledger/wang-2009-cr-slag-kems-original.yaml`: — (—) |
 | `wang-2017-cao-sio2-vox-tables-s1-s32` | Wang D, Shu Q, Yan B, Wu L, Wang J, Dong Y (2017). Thermodynamics of the CaO–SiO2–VOx system at 1873 K under the oxygen partial pressure of 6.9×10−11 atm. Journal of the American Ceramic Society 100(10), 4912–4927. Supporting Information Tables S1–S32. | 10.1111/jace.15016 | ABSENT, `` | `raw/wang-2017-cao-sio2-vox-tables-s1-s32/wang-2017-cao-sio2-vox-tables-s1-s32.pdf` (ABSENT, ); `text/wang-2017-cao-sio2-vox-tables-s1-s32/` (0 files, ABSENT); `tables/wang-2017-cao-sio2-vox-tables-s1-s32/` (0 files, ABSENT) | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` (516 rows, draft) | `ledger/wang-2017-cao-sio2-vox-tables-s1-s32.yaml`: — (—) |
 | `wang-2017-sodium-stannate-formation-emf` | Wang Z-M, Xie H-W, Zhang Y, Zhai Y-C (2017). Formation free energy of sodium stannate measured using beta-beta''-Al2O3 ceramic electrolyte. Rare Metals 36(11), 905-911. Online 9 May 2016. | 10.1007/s12598-016-0717-4 | ABSENT, `` | `raw/wang-2017-sodium-stannate-formation-emf/wang-2017-sodium-stannate-formation-emf.pdf` (ABSENT, ); `text/wang-2017-sodium-stannate-formation-emf/` (1 files, exists); `tables/wang-2017-sodium-stannate-formation-emf/` (0 files, ABSENT) | `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` (1 rows, draft) | `ledger/wang-2017-sodium-stannate-formation-emf.yaml`: — (—) |
 | `wetzel-gail-2013-sio-arrhenius` | Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803 | 10.1051/0004-6361/201220803 | ABSENT, `` | `raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf` (present, e4cfdd95); `text/wetzel-gail-2013-sio-arrhenius/` (0 files, ABSENT); `tables/wetzel-gail-2013-sio-arrhenius/` (0 files, ABSENT) | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` (1 rows, draft, private_path) | `ledger/wetzel-gail-2013-sio-arrhenius.yaml`: extracted (2026-09-06) |
@@ -1501,6 +1502,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `volovetsky-2010-granitoid-iron-redox`
 - `wadhwa-2008-redox-small-bodies`
 - `wang-2001-solar-melt-evaporation-residues`
+- `wang-2009-cr-slag-kems-original`
 - `wang-2017-cao-sio2-vox-tables-s1-s32`
 - `wang-2017-sodium-stannate-formation-emf`
 - `wetzel-gail-2013-sio-arrhenius`
