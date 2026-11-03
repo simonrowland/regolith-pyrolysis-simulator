@@ -1038,9 +1038,16 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
+    # 5a7121241, brought in by bef9af1e7 (last old first-parent: 4b6555249),
+    # executes flagged broad-proxy alphas instead of the unmeasured fallback
+    # of 1. At this 1400 C step CrO and AlO equilibrium pressure, activity,
+    # and pO2 are unchanged. The executed alphas are the declared proxies:
+    # CrO 0.9 and AlO 0.3. Series flux is J = dP / (r_interface + r_gas),
+    # with r_interface = 1/(alpha * k_HK) and r_gas independent of alpha
+    # (engines/builtin/evaporation_flux.py), so the rates do not scale by
+    # those alpha ratios. Saturation and melt mass move with the two rates.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423670196107581, rel=1e-12, abs=1e-12
+        0.06423669542196676, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1068,15 +1075,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
-        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # Same proxy-alpha step as the non-phosphorus pin above. Hour and
+        # temperature stay on the d-252 1 mbar Ar, 200 C/h ramp.
         (
             1,
             1400.0,
-            0.06423670196107581,
-            2.4701307994323103,
-            998.7072055554551,
+            0.06423669542196676,
+            2.4701307118784706,
+            998.7072055627636,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
