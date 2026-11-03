@@ -6307,9 +6307,9 @@ def _fe_redox_material(
     Kress mol fractions are ``_fe_redox_kress_basis``. OpenIMCC does not
     call that helper. A MELTS pot is this weight map, not the Kress basis.
     d-323 and the echo guard run once the composition is present and before
-    that weight map is built. A rewrite collapses the iron split to FeO_T
-    on the weight map. FeO_T is not a species formula, so it is not written
-    back into the mole-fraction Composition.
+    that weight map is built. A rewrite passes the FeO_T total under FeO.
+    The literal key FeO_T is not a species formula and is not put on the
+    map. The number is not written back into the mole-fraction Composition.
     """
 
     temperature = temperature_of(identity) or _printed_condition_decimal(
@@ -6371,6 +6371,7 @@ def _fe_redox_material(
                 evidence_reason=rewrite.evidence_reason,
                 quote=rewrite.quote,
                 excluded=excluded,
+                iron_passed_as="FeO" if excluded else None,
             )
     return _FeRedoxMaterial(
         temperature=temperature,

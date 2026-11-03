@@ -69,12 +69,12 @@ SINGLE_LIQUID_MASS_FRACTION = 1.0 - 1e-6
 _FEO_MASS_TIMES_TWO = Decimal("143.69")
 _FE2O3_MASS = Decimal("159.69")
 
-_STARTING_NOTE = (
+_STARTING_PHRASE = (
     "starting material",
     "starting composition",
-    "batched",
-    "nominal",
 )
+# Word boundaries. "unbatched" and "nominally" are not a printed start.
+_STARTING_WORD = re.compile(r"\b(?:batched|nominal)\b", re.IGNORECASE)
 _ANALYSIS_NOTE = ("final slag", "product glass")
 _ANALYSIS_WORD = re.compile(r"\banalys[ez]ed\b", re.IGNORECASE)
 
@@ -83,14 +83,18 @@ _GLASS_ONLY = re.compile(
     r"remained entirely liquid",
     re.IGNORECASE,
 )
-_QUENCH_CRYSTAL = re.compile(r"quench(?:ed|ing)?[-\s]+crystals?", re.IGNORECASE)
+# Quench crystals are not crystals at the run temperature. Both word orders.
+_QUENCH_CRYSTAL = re.compile(
+    r"quench(?:ed|ing)?[-\s]+crystals?|crystals?\s+formed\s+on\s+quench",
+    re.IGNORECASE,
+)
 _ANALYZED_QUENCH_IS_LIQUID = re.compile(
     r"analy[sz]ed quench is the liquid",
     re.IGNORECASE,
 )
 _SAMPLED = re.compile(r"\bsampled\b", re.IGNORECASE)
 _FROM_THE_LIQUID = re.compile(
-    r"\bpt\b\s+loop|platinum loop|from the liquid",
+    r"\bpt[-\s]+loop|platinum loop|from the liquid",
     re.IGNORECASE,
 )
 _CRYSTAL_BEARING = re.compile(
@@ -165,7 +169,7 @@ def phase_map_provenance(
     note = ""
     if map_locator is not None and map_locator.note:
         note = map_locator.note.casefold()
-    if any(token in note for token in _STARTING_NOTE):
+    if any(token in note for token in _STARTING_PHRASE) or _STARTING_WORD.search(note):
         return PRINTED_STARTING_BULK
     if any(token in note for token in _ANALYSIS_NOTE) or _ANALYSIS_WORD.search(note):
         return SCORED_PHASE_ANALYSIS
@@ -374,8 +378,10 @@ def printed_single_melt_evidence(
     """Crystal-bearing wins unless the only crystals are quench crystals.
 
     Glass-only, sampled-from-the-liquid, and quench-glass are the positive
-    classes. 'during crystallization' is not crystal-bearing. A phase label
-    of glass is not evidence: the caller does not pass it.
+    classes. 'during crystallization' is not crystal-bearing. Quench
+    crystals, including 'crystals formed on quench', are not crystals at
+    the run temperature. A phase label of glass is not evidence: the
+    caller does not pass it. Pt-loop with a hyphen is sampled-from-the-liquid.
     """
 
     blobs = [(label, text) for label, text in texts if text.strip()]
@@ -385,9 +391,7 @@ def printed_single_melt_evidence(
         if match is not None:
             return MeltEvidence("crystalline", quote=f"{label}: {_clip(text)}")
     for label, text in blobs:
-        if _ANALYZED_QUENCH_IS_LIQUID.search(text) or (
-            _QUENCH_CRYSTAL.search(text) and re.search(r"\bglass\b", text, re.IGNORECASE)
-        ):
+        if _ANALYZED_QUENCH_IS_LIQUID.search(text) or _QUENCH_CRYSTAL.search(text):
             return MeltEvidence(
                 "positive_quench",
                 notice_reason="single_melt_evidence_quench_glass",
@@ -523,38 +527,41 @@ def analysed_melt_weight_map(
 ) -> tuple[dict[str, float], tuple[str, ...]]:
     """Engine wt% for a d-323 rewrite. Remainder is not renormalized.
 
-    Redox collapses FeO and Fe2O3 into FeO_T and drops the split. Any other
-    total-iron key is removed so the engine sees one iron number. A non-redox
-    row drops the scored formula when it is present.
+    Redox collapses the split to the FeO_T total and passes that number
+    under FeO. FeO_T is not a species formula: composition_kg_and_mol
+    rejects the underscore. A lone total-iron key is renamed to FeO and
+    is not scaled again. A non-redox row drops the scored formula.
     """
 
     out = {str(name): float(amount) for name, amount in weights.items()}
     excluded: list[str] = []
     if redox:
-        had_split = "FeO" in out or "Fe2O3" in out
         feo = Decimal(str(out.pop("FeO"))) if "FeO" in out else None
         fe2o3 = Decimal(str(out.pop("Fe2O3"))) if "Fe2O3" in out else None
         if feo is not None:
             excluded.append("FeO")
         if fe2o3 is not None:
             excluded.append("Fe2O3")
-        if had_split:
-            for key in list(out):
-                if key in _TOTAL_IRON_KEYS:
-                    excluded.append(key)
-                    del out[key]
-            out["FeO_T"] = float(
+        carried: Decimal | None = None
+        for key in ("FeO_T", "FeOT", "FeOt", "FeO*"):
+            if key not in out:
+                continue
+            carried = Decimal(str(out.pop(key)))
+            excluded.append(key)
+            break
+        for key in list(out):
+            if key in _TOTAL_IRON_KEYS:
+                excluded.append(key)
+                del out[key]
+        if feo is not None or fe2o3 is not None:
+            out["FeO"] = float(
                 feo_t_weight_percent(
                     feo if feo is not None else Decimal("0"),
                     fe2o3 if fe2o3 is not None else Decimal("0"),
                 )
             )
-        elif "FeO_T" not in out:
-            for key in ("FeOT", "FeOt", "FeO*"):
-                if key in out:
-                    out["FeO_T"] = out.pop(key)
-                    excluded.append(key)
-                    break
+        elif carried is not None:
+            out["FeO"] = float(carried)
         return out, tuple(excluded)
     if formula and formula in out:
         del out[formula]
@@ -569,6 +576,7 @@ def input_rewrite_notices(
     evidence_reason: str | None,
     quote: str | None,
     excluded: Sequence[str],
+    iron_passed_as: str | None = None,
 ) -> tuple[Notice, ...]:
     notices: list[Notice] = []
     if evidence_reason:
@@ -582,11 +590,14 @@ def input_rewrite_notices(
             )
         )
     named = ",".join(excluded) if excluded else "none"
+    reason = f"input_composition_from_analysed_melt: excluded={named}"
+    if iron_passed_as:
+        reason = f"{reason}; FeO_T_passed_as={iron_passed_as}"
     notices.append(
         Notice(
             kind=NoticeKind.INPUT_OMITTED,
             affected_quantities=(quantity,),
-            reason=f"input_composition_from_analysed_melt: excluded={named}",
+            reason=reason,
             origin=origin,
             dropped=tuple(excluded) if excluded else None,
         )
@@ -612,22 +623,35 @@ def single_phase_printed_bulk_policy(
 ) -> SinglePhaseBulkPolicy | None:
     """The one d-325 hook.
 
-    100% liquid is liquid_fraction >= 1 - 1e-6. None does not mean a single
-    liquid, so the row is scored as it was. Case 1 (crystals predicted) returns
-    None. Case 3 returns the crystalline notice and does not refuse.
+    100% liquid is liquid_fraction >= 1 - 1e-6, and only a reported fraction
+    says that. A missing or non-numeric fraction from the caller is unknown.
+    Unknown does not score a printed bulk whose assemblage is unstated or
+    whose evidence is positive: that refusal is
+    single_phase_bulk_identity_assemblage_unstated. A run that already prints
+    crystals still scores, and the single-liquid notice is not attached,
+    because both the crystal prediction and the crystalline-experiment case
+    score. Case 1 (fraction below the threshold) returns None.
     """
 
     if provenance not in _PRINTED_BULK_TOKENS:
         return None
     if quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
         return None
+    fraction: float | None
     if liquid_fraction is None:
-        return None
-    try:
-        fraction = float(liquid_fraction)
-    except (TypeError, ValueError):
-        return None
-    if fraction != fraction or fraction < SINGLE_LIQUID_MASS_FRACTION:  # NaN, or crystals
+        fraction = None
+    else:
+        try:
+            fraction = float(liquid_fraction)
+        except (TypeError, ValueError):
+            fraction = None
+    if fraction is None or fraction != fraction:
+        if evidence.crystalline:
+            return None
+        return SinglePhaseBulkPolicy(
+            refusal=RefusalReason.SINGLE_PHASE_BULK_IDENTITY_ASSEMBLAGE_UNSTATED
+        )
+    if fraction < SINGLE_LIQUID_MASS_FRACTION:
         return None
     if evidence.crystalline:
         return SinglePhaseBulkPolicy(
