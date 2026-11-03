@@ -7076,6 +7076,7 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
 _SC456_SOURCE_IDS = (
     "banya-hino-takezoe-1985-na-fe-silicate-redox",
     "gca-366-210-berry-2024",
+    "yakovlev-2024-cai-vaporization",
 )
 
 
