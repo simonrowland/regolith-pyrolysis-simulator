@@ -3435,7 +3435,7 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: MgAl2O4
@@ -3906,8 +3906,37 @@ species:
             note: first marker centre pixel=(1885, 719), activity=0.21656; independent repeat pixel=(1881, 724), activity=0.21617; Al2O3 x-axis=21.3933 mol%; read_uncertainty_dex=0.00039203 dex
             panel: A
         ordinate_as_printed: a_i
-        attribution: Yakovlev and Shornikov (2024); calculated from Eqs. (1)–(3) using oxide activities and cited
-          pure-compound activity sources.
+        attribution: Yakovlev and Shornikov (2024), this work; calculated using Lewis relations.
+        model: Lewis relations (Lewis and Randall, 1923), equations (1)–(3).
+        derivation:
+          relation: >-
+            Lewis relations (equations (1)–(3)) calculate the spinel, akermanite, and gehlenite
+            activities from residual-melt oxide activities and the corresponding pure-compound melt
+            activities.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              figure: '2'
+              panel: B
+          method:
+            state:
+              tag: value
+              value: Lewis relations calculate compound activities from residual-melt oxide activities.
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              section: Lewis relations for compound activities
+              equation: '(1)–(3)'
+          references:
+          - Lewis and Randall (1923)
+          - Shornikov and Yakovlev (2022)
+          - Shornikov et al. (1996)
+          - Bale et al. (2016)
+          - Shornikov (2017)
       uncertainty:
         digitization:
           read_uncertainty: 0.00046218
@@ -3937,7 +3966,7 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: Ca2MgSi2O7
@@ -4408,8 +4437,37 @@ species:
             note: first marker centre pixel=(1885, 1449), activity=0.05414; independent repeat pixel=(1882, 1453), activity=0.05387; Al2O3 x-axis=21.3933 mol%; read_uncertainty_dex=0.0010595 dex
             panel: A
         ordinate_as_printed: a_i
-        attribution: Yakovlev and Shornikov (2024); calculated from Eqs. (1)–(3) using oxide activities and cited
-          pure-compound activity sources.
+        attribution: Yakovlev and Shornikov (2024), this work; calculated using Lewis relations.
+        model: Lewis relations (Lewis and Randall, 1923), equations (1)–(3).
+        derivation:
+          relation: >-
+            Lewis relations (equations (1)–(3)) calculate the spinel, akermanite, and gehlenite
+            activities from residual-melt oxide activities and the corresponding pure-compound melt
+            activities.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              figure: '2'
+              panel: B
+          method:
+            state:
+              tag: value
+              value: Lewis relations calculate compound activities from residual-melt oxide activities.
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              section: Lewis relations for compound activities
+              equation: '(1)–(3)'
+          references:
+          - Lewis and Randall (1923)
+          - Shornikov and Yakovlev (2022)
+          - Shornikov et al. (1996)
+          - Bale et al. (2016)
+          - Shornikov (2017)
       uncertainty:
         digitization:
           read_uncertainty: 0.0015626
@@ -4439,7 +4497,7 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: Ca2Al2SiO7
@@ -4910,8 +4968,37 @@ species:
             note: first marker centre pixel=(1885, 858), activity=0.09307; independent repeat pixel=(1883, 863), activity=0.09274; Al2O3 x-axis=21.3933 mol%; read_uncertainty_dex=0.00076986 dex
             panel: A
         ordinate_as_printed: a_i
-        attribution: Yakovlev and Shornikov (2024); calculated from Eqs. (1)–(3) using oxide activities and cited
-          pure-compound activity sources.
+        attribution: Yakovlev and Shornikov (2024), this work; calculated using Lewis relations.
+        model: Lewis relations (Lewis and Randall, 1923), equations (1)–(3).
+        derivation:
+          relation: >-
+            Lewis relations (equations (1)–(3)) calculate the spinel, akermanite, and gehlenite
+            activities from residual-melt oxide activities and the corresponding pure-compound melt
+            activities.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              figure: '2'
+              panel: B
+          method:
+            state:
+              tag: value
+              value: Lewis relations calculate compound activities from residual-melt oxide activities.
+            locator:
+              page: 4
+              published_page: 32
+              pdf_page_index: 3
+              section: Lewis relations for compound activities
+              equation: '(1)–(3)'
+          references:
+          - Lewis and Randall (1923)
+          - Shornikov and Yakovlev (2022)
+          - Shornikov et al. (1996)
+          - Bale et al. (2016)
+          - Shornikov (2017)
       uncertainty:
         digitization:
           read_uncertainty: 0.0015796
