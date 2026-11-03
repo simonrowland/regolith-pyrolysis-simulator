@@ -17920,6 +17920,120 @@ def test_bare_log_convention_pins_existing_iw_window() -> None:
     assert rejection_notice is None
 
 
+def test_bare_log_accepts_printed_air_atmosphere() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"), Decimal("1600"), printed_atmospheres=("air",)
+    )
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("20892.96130854039483122233736")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=-0.6731" in decision.notice_reason
+    assert "matched atm frame" in decision.notice_reason
+
+
+def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("0.00"),
+        Decimal("1600"),
+        printed_atmospheres=("pure O2 at 1 atm",),
+        total_pressure_pa=Decimal("101325"),
+    )
+    assert decision.state.is_value
+    assert decision.state.value == Decimal("100000")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=+0.0057" in decision.notice_reason
+    assert "matched atm frame" in decision.notice_reason
+
+
+def test_bare_log_mismatch_is_refused_and_noticed() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"), Decimal("1600"), printed_atmospheres=("air",)
+    )
+    assert decision.state.is_unknown
+    assert len(decision.notices) == 1
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
+
+
+def test_bare_log_without_printed_atmosphere_stays_frame_ambiguous() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(Decimal("-0.30"), Decimal("1600"))
+    assert decision.state.is_unknown
+    assert decision.state.reason == (
+        "fO2 reference scale not printed (absolute vs buffer-relative)"
+    )
+    assert decision.notices == ()
+
+
+def test_bare_log_above_total_pressure_ceiling_is_refused() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("0.01"),
+        Decimal("1600"),
+        printed_atmospheres=("pure O2",),
+        total_pressure_pa=Decimal("101325"),
+    )
+    assert decision.state.is_unknown
+    assert "total-pressure pO2 ceiling" in decision.state.reason
+
+
+def test_kc89_printed_air_admits_48_rows_and_keeps_four_reducing_rows(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import NoticeKind
+
+    source_id = "kress-carmichael-1989-lime-iron-silicate-redox"
+    result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+    rows = [row for row in result.observations.values() if row.source_id == source_id]
+    bare = [
+        row
+        for row in rows
+        if row.point_conditions
+        and "fO2_log" in row.point_conditions
+        and row.point_conditions["fO2_log"].state.is_value
+    ]
+
+    def table1_run_id(row) -> str:
+        return row.observation_id.split("::", 1)[1].split("_")[2]
+
+    air = [
+        row
+        for row in bare
+        if row.point_conditions["fO2_log"].state.value == Decimal("-0.68")
+    ]
+    assert len({table1_run_id(row) for row in air}) == 48
+    assert all(row.identity.fO2_Pa.is_value for row in air)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in row.notices
+        )
+        for row in air
+    )
+
+    reducing = [row for row in bare if row not in air]
+    assert {table1_run_id(row) for row in reducing} == {"93A", "98B", "99A", "101A"}
+    assert all(row.identity.fO2_Pa.is_value for row in reducing)
+    assert all(
+        not any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in row.notices
+        )
+        for row in reducing
+    )
+
+
 def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
     tmp_path: Path,
 ) -> None:
