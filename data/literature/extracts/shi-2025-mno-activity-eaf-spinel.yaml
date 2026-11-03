@@ -12,8 +12,9 @@ extraction:
   date: '2026-11-03'
   worker: w1103cw3-sh25
   review_status: draft
-  note: Figure 2 values are not digitized. The prose maximum precipitation ratio is retained as a typed refusal because
-    no exact precipitation-ratio quantity token exists.
+  note: Figure 2 values are not digitized. The prose maximum precipitation ratio is typed-refused because no exact
+    quantity token exists. The 28 Table 4 Matrix values remain printed as mol% and typed-refused under t-1600 until
+    the migrator scales equilibrium_phase_composition percent units.
 fidelity_samples:
 - path: species.Al2O3.observations[shi2025_table3_row_1_al2o3_activity].values.points[0].value
   value: '0.3691'
@@ -1099,7 +1100,7 @@ species:
         table_row_number: 3
         table_column_number: 9
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -1184,14 +1185,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mn
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '4.989'
         component_amount_as_published: 4.989 mol%
         component_as_published: Mn
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_mn
@@ -1211,7 +1214,7 @@ species:
         table_row_number: 5
         table_column_number: 9
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -1296,14 +1299,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mn
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '3.996'
         component_amount_as_published: 3.996 mol%
         component_as_published: Mn
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_mn
@@ -1323,7 +1328,7 @@ species:
         table_row_number: 7
         table_column_number: 9
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -1408,14 +1413,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mn
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '2.610'
         component_amount_as_published: 2.610 mol%
         component_as_published: Mn
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_mn
@@ -1435,7 +1442,7 @@ species:
         table_row_number: 9
         table_column_number: 9
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -1520,14 +1527,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mn
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '1.970'
         component_amount_as_published: 1.970 mol%
         component_as_published: Mn
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table6_row_1_x_mn_measurement
@@ -2209,7 +2218,7 @@ species:
         table_row_number: 3
         table_column_number: 3
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2294,14 +2303,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: O
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '51.93'
         component_amount_as_published: 51.93 mol%
         component_as_published: O
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_o
@@ -2321,7 +2332,7 @@ species:
         table_row_number: 5
         table_column_number: 3
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2406,14 +2417,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: O
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '51.58'
         component_amount_as_published: 51.58 mol%
         component_as_published: O
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_o
@@ -2433,7 +2446,7 @@ species:
         table_row_number: 7
         table_column_number: 3
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2518,14 +2531,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: O
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '53.66'
         component_amount_as_published: 53.66 mol%
         component_as_published: O
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_o
@@ -2545,7 +2560,7 @@ species:
         table_row_number: 9
         table_column_number: 3
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2630,14 +2645,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: O
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '53.08'
         component_amount_as_published: 53.08 mol%
         component_as_published: O
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
   Ca:
@@ -2659,7 +2676,7 @@ species:
         table_row_number: 3
         table_column_number: 4
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2744,14 +2761,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Ca
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '12.00'
         component_amount_as_published: 12.00 mol%
         component_as_published: Ca
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_ca
@@ -2771,7 +2790,7 @@ species:
         table_row_number: 5
         table_column_number: 4
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2856,14 +2875,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Ca
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '12.06'
         component_amount_as_published: 12.06 mol%
         component_as_published: Ca
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_ca
@@ -2883,7 +2904,7 @@ species:
         table_row_number: 7
         table_column_number: 4
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -2968,14 +2989,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Ca
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '11.83'
         component_amount_as_published: 11.83 mol%
         component_as_published: Ca
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_ca
@@ -2995,7 +3018,7 @@ species:
         table_row_number: 9
         table_column_number: 4
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3080,14 +3103,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Ca
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '11.68'
         component_amount_as_published: 11.68 mol%
         component_as_published: Ca
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
   Si:
@@ -3109,7 +3134,7 @@ species:
         table_row_number: 3
         table_column_number: 5
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3194,14 +3219,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Si
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '14.84'
         component_amount_as_published: 14.84 mol%
         component_as_published: Si
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_si
@@ -3221,7 +3248,7 @@ species:
         table_row_number: 5
         table_column_number: 5
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3306,14 +3333,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Si
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '14.44'
         component_amount_as_published: 14.44 mol%
         component_as_published: Si
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_si
@@ -3333,7 +3362,7 @@ species:
         table_row_number: 7
         table_column_number: 5
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3418,14 +3447,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Si
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '14.36'
         component_amount_as_published: 14.36 mol%
         component_as_published: Si
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_si
@@ -3445,7 +3476,7 @@ species:
         table_row_number: 9
         table_column_number: 5
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3530,14 +3561,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Si
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '13.96'
         component_amount_as_published: 13.96 mol%
         component_as_published: Si
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
   Al:
@@ -3559,7 +3592,7 @@ species:
         table_row_number: 3
         table_column_number: 6
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3644,14 +3677,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '12.02'
         component_amount_as_published: 12.02 mol%
         component_as_published: Al
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_al
@@ -3671,7 +3706,7 @@ species:
         table_row_number: 5
         table_column_number: 6
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3756,14 +3791,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '14.29'
         component_amount_as_published: 14.29 mol%
         component_as_published: Al
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_al
@@ -3783,7 +3820,7 @@ species:
         table_row_number: 7
         table_column_number: 6
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3868,14 +3905,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '14.48'
         component_amount_as_published: 14.48 mol%
         component_as_published: Al
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_al
@@ -3895,7 +3934,7 @@ species:
         table_row_number: 9
         table_column_number: 6
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -3980,14 +4019,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Al
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '18.06'
         component_amount_as_published: 18.06 mol%
         component_as_published: Al
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
   Mg:
@@ -4009,7 +4050,7 @@ species:
         table_row_number: 3
         table_column_number: 7
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4094,14 +4135,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mg
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '2.544'
         component_amount_as_published: 2.544 mol%
         component_as_published: Mg
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_mg
@@ -4121,7 +4164,7 @@ species:
         table_row_number: 5
         table_column_number: 7
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4206,14 +4249,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mg
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '0.8600'
         component_amount_as_published: 0.8600 mol%
         component_as_published: Mg
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_mg
@@ -4233,7 +4278,7 @@ species:
         table_row_number: 7
         table_column_number: 7
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4318,14 +4363,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mg
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '0.3770'
         component_amount_as_published: 0.3770 mol%
         component_as_published: Mg
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_mg
@@ -4345,7 +4392,7 @@ species:
         table_row_number: 9
         table_column_number: 7
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4430,14 +4477,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Mg
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '0.07800'
         component_amount_as_published: 0.07800 mol%
         component_as_published: Mg
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
   Fe:
@@ -4459,7 +4508,7 @@ species:
         table_row_number: 3
         table_column_number: 8
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4544,14 +4593,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Fe
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '1.686'
         component_amount_as_published: 1.686 mol%
         component_as_published: Fe
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_2_matrix_fe
@@ -4571,7 +4622,7 @@ species:
         table_row_number: 5
         table_column_number: 8
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4656,14 +4707,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Fe
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '2.846'
         component_amount_as_published: 2.846 mol%
         component_as_published: Fe
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_3_matrix_fe
@@ -4683,7 +4736,7 @@ species:
         table_row_number: 7
         table_column_number: 8
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4768,14 +4821,16 @@ species:
         quantity: equilibrium_phase_composition
         formula: Fe
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '2.681'
         component_amount_as_published: 2.681 mol%
         component_as_published: Fe
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only
     - observation_id: shi2025_table4_row_4_matrix_fe
@@ -4795,7 +4850,7 @@ species:
         table_row_number: 9
         table_column_number: 8
       phase: glass
-      units: '%'
+      units: mol%
       point_conditions:
         temperature_K:
           state:
@@ -4880,13 +4935,15 @@ species:
         quantity: equilibrium_phase_composition
         formula: Fe
         phase_label: glass
-        basis: mole_fraction
+        basis: mole_percent
         T_K: '1673'
         component_amount: '1.170'
         component_amount_as_published: 1.170 mol%
         component_as_published: Fe
         method_class: measured_direct
         evidence_class: measured_direct
-        admission_status: admitted
+        admission_status: typed_refusal
+        refusal_reason: 't-1600: equilibrium_phase_composition mol% units are not yet scaled by the migrator; retain
+          the printed values without migrating them as fractions.'
         method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
         composition_role: initial_charge_only

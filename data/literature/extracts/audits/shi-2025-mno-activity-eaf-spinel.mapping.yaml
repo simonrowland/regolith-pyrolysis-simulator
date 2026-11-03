@@ -55,7 +55,7 @@ tables:
   table_key: p004-t04
   type: composition_series
   quantity: equilibrium_phase_composition
-  unit: '%'
+  unit: mol%
   evidence_class: measured_direct
   values:
   - column: 3
@@ -79,7 +79,9 @@ tables:
   - column: 9
     species: Mn
     phase: glass
-  typed_refusal: Four Spinel phase rows retained in context; PhaseRole has no solid role.
+  typed_refusal: 28 Matrix composition observations retain the printed mol% values but remain unavailable until t-1600
+    fixes equilibrium_phase_composition percent scaling. Four Spinel phase rows remain context because PhaseRole has
+    no solid role.
   render_checked: all 8 phase rows and all component cells; QA flagged fused-looking decimals, which were confirmed
     exactly in the render
 - page: 5
