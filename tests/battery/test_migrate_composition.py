@@ -1760,6 +1760,68 @@ def test_activity_row_without_numeric_point_keeps_explicit_point_composition(
     assert mutated_row.point_conditions["composition"].locator.table == "1"
 
 
+def test_exploded_activity_child_keeps_mass_percent_closure_refusal(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "point_conditions": {
+                            "composition": {
+                                "state": {
+                                    "tag": "value",
+                                    "value": {
+                                        "basis": "printed_oxides",
+                                        "amount_basis": "mass_percent",
+                                        "components": [
+                                            ["SiO2", "55"],
+                                            ["MgO", "48"],
+                                        ],
+                                    },
+                                },
+                                "locator": {"table": "2", "page": 3},
+                            }
+                        },
+                    }
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "exploded", extract), write=False)
+    children = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    ]
+    assert len(children) == 1
+    child = children[0]
+
+    assert child.identity.composition is not None
+    assert child.identity.composition.is_unknown
+    assert child.identity.composition.reason.startswith(
+        "mass-percent composition is not usable:"
+    )
+    assert "sum=103 wt% is above 102 wt%" in child.identity.composition.reason
+    assert child.identity.composition.reason != "no composition mapped from source"
+    condition = child.point_conditions["composition"]
+    assert condition.state == child.identity.composition
+    assert condition.locator is not None
+    assert condition.locator.table == "2"
+    assert condition.locator.page == 3
+
+
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
     tmp_path: Path,
 ) -> None:

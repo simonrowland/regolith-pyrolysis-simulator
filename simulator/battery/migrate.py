@@ -7574,6 +7574,23 @@ def _located_explicit_point_composition(
     return located
 
 
+def _located_mass_percent_composition_refusal(
+    located: object,
+) -> State[Any] | None:
+    if not isinstance(located, Located) or located.locator is None:
+        return None
+    state = located.state
+    if (
+        isinstance(state, State)
+        and state.is_unknown
+        and (state.reason or "").startswith(
+            "mass-percent composition is not usable:"
+        )
+    ):
+        return state
+    return None
+
+
 def _source_standard_state_phase(raw: object, phase: str) -> str | None:
     text = " ".join(str(raw).split())
     match = re.search(
@@ -20821,17 +20838,13 @@ class Migrator:
             (point_conditions or {}).get("composition")
         )
         explicit_composition_condition = (point_conditions or {}).get("composition")
+        explicit_composition_refusal = _located_mass_percent_composition_refusal(
+            explicit_composition_condition
+        )
         if explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
-        elif (
-            isinstance(explicit_composition_condition, Located)
-            and explicit_composition_condition.locator is not None
-            and explicit_composition_condition.state.is_unknown
-            and (explicit_composition_condition.state.reason or "").startswith(
-                "mass-percent composition is not usable:"
-            )
-        ):
-            ident_kwargs["composition"] = explicit_composition_condition.state
+        elif explicit_composition_refusal is not None:
+            ident_kwargs["composition"] = explicit_composition_refusal
         elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
@@ -23990,7 +24003,12 @@ class Migrator:
             }
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
-            if (
+            mass_percent_refusal = (
+                _located_mass_percent_composition_refusal(located_composition)
+            )
+            if mass_percent_refusal is not None:
+                identity = replace(identity, composition=mass_percent_refusal)
+            elif (
                 isinstance(located_composition, Located)
                 and located_composition.state.is_value
             ):
