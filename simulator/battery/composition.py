@@ -330,9 +330,11 @@ class ElementMassFractionRedox:
     refusal: str | None
     redox_kind: str
     notices: tuple[ElementWtNotice, ...]
-    # FeO_T oxide grams per 100 g of the printed analysis, after Pt and any
-    # excluded Cl. None when the row has no cation relabel.
-    oxide_mass_g_per_100g: Decimal | None = None
+    # Grams of the assemblage the engine charge normalizes, per 100 g of the
+    # printed analysis, after Pt and any excluded Cl. Ferric split: FeO_T
+    # grams plus the in-range excess oxygen. FeO_T charge: FeO_T grams.
+    # None when the row has no cation relabel.
+    charge_mass_g_per_100g: Decimal | None = None
 
 
 def canonical_element_symbol(name: str) -> str:
@@ -776,7 +778,7 @@ def element_mass_fraction_redox(
         redox_kind = "conditions"
         split = None
 
-    oxide_mass = sum(
+    feo_t_mass = sum(
         (moles * _formula_molar_mass(name) for name, moles in formula_moles.items()),
         Decimal(0),
     )
@@ -791,7 +793,9 @@ def element_mass_fraction_redox(
         refusal=refusal,
         redox_kind=redox_kind,
         notices=tuple(notices),
-        oxide_mass_g_per_100g=oxide_mass,
+        charge_mass_g_per_100g=_normalized_charge_mass(
+            feo_t_mass, excess=excess, redox_kind=redox_kind
+        ),
     )
 
 
@@ -836,36 +840,57 @@ def _ferric_split_wt_percent(
     return tuple((name, Decimal(100) * mass / total) for name, mass in masses)
 
 
+def _normalized_charge_mass(
+    feo_t_mass: Decimal,
+    *,
+    excess: Decimal | None,
+    redox_kind: str,
+) -> Decimal:
+    """Grams of the assemblage the engine charge normalizes.
+
+    Premise: the engine charge and the printed analysis describe the same
+    100 g. The phase is that charge renormalized to 100 wt%, so the printed
+    element wt% is the phase wt% times this mass over 100.
+
+    Algebra: a ferric split replaces each FeO with FeO + Fe2O3. Fe2O3 is
+    two FeO plus one oxygen, and n_Fe3+ = 2 * excess, so the added mass is
+    excess * M_O. m_ferric = m_FeO_T + excess * M_O. A FeO_T charge
+    (conditions, all-ferrous, no iron) carries no extra oxygen, so its
+    mass stays m_FeO_T. Units: g per 100 g of the printed analysis, after
+    Pt and any excluded Cl.
+
+    Worked echo: 50 g SiO2 + 50 g Fe2O3 is a closed 100 g analysis whose
+    excess is n_Fe/2. The ferric charge mass is that 100 g, and an echo
+    of the charge returns the printed silicon. The same analysis scored
+    as oxygen_excess sends SiO2 + FeO; scaling by the FeO_T mass returns
+    the same printed silicon, and adding the excess oxygen onto that
+    charge would not. 90 g SiO2 + 9 g FeO + 1 g Pt has no excess, so both
+    masses are the 99 g of oxide.
+    """
+
+    if redox_kind == "ferric_fraction" and excess is not None:
+        return feo_t_mass + excess * _atomic_weight("O")
+    return feo_t_mass
+
+
 def element_wt_percent_on_printed_analysis(
     oxide_wt_percent: Mapping[str, object],
     element: str,
     *,
-    oxide_mass_g_per_100g: Decimal,
+    charge_mass_g_per_100g: Decimal,
 ) -> Decimal | None:
-    """Element wt% on the printed 100 g analysis after Pt and excluded Cl.
+    """Element wt% on the printed analysis, from a renormalized engine phase.
 
-    Premise: a printed element wt% is grams of that element per 100 g of the
-    analysis. That 100 g includes capsule Pt and any Cl the engine does not
-    take. The engine phase is the remaining FeO_T oxide mass renormalized
-    to 100 wt%. Comparing those two numbers directly shifts every element
-    by the excluded mass.
-
-    Algebra: w_printed = w_phase * (m_oxide / 100), where m_oxide is the
-    FeO_T oxide mass in grams per 100 g of the printed analysis after those
-    exclusions, and w_phase is the element wt% of the renormalized phase.
-    Units: (g / 100 g phase) * (g oxide / 100 g analysis) / (g / 100 g)
-    = g / 100 g analysis.
-
-    Scale check: 90 g SiO2 + 9 g FeO + 1 g Pt has m_oxide = 99. The echoed
-    phase is SiO2 90/99*100 and FeO 9/99*100. Silicon in that phase, times
-    99/100, is the printed silicon wt%. The residual against the printed
-    analysis is 0.
+    ``charge_mass_g_per_100g`` is :func:`_normalized_charge_mass`: the grams
+    of the assemblage that was normalized, not a second oxygen count.
+    w_printed = w_phase * (m_charge / 100). Units: (g / 100 g phase) *
+    (g charge / 100 g analysis) / (g / 100 g) = g / 100 g analysis.
     """
 
     phase = element_wt_percent_of_oxide_phase(oxide_wt_percent, element)
     if phase is None:
         return None
-    return phase * oxide_mass_g_per_100g / Decimal(100)
+    return phase * charge_mass_g_per_100g / Decimal(100)
 
 
 def element_wt_percent_of_oxide_phase(
