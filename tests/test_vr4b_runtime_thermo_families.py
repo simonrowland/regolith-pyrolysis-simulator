@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+import simulator.vapour_rail.catalog as catalog_module
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.condensation import _species_has_antoine_data
@@ -889,6 +890,12 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
         T_K, source_activity=1.0, pO2_bar=pO2_bar
     ).pressure_pa
 
+    # Golden pin for the production catalog values before changing extract
+    # observation lookup. These values come from the production resolver above.
+    assert p_ti == pytest.approx(3.6754340343045294e-10, rel=1.0e-12)
+    assert p_tio == pytest.approx(6.789654564587365e-05, rel=1.0e-12)
+    assert p_tio2 == pytest.approx(0.01484330043874638, rel=1.0e-12)
+
     # Premise: all three rows share the same liquid-TiO2 base, which cancels.
     # Gas exchange gives TiO/Ti=K1*fO2^0.5 and TiO2/Ti=K2*fO2.
     # Unit check: pressure ratios, K, and fO2/P° are dimensionless. Sanity:
@@ -1032,6 +1039,32 @@ def test_production_extract_reference_fails_closed_on_unknown_observation() -> N
     )
     with pytest.raises(CatalogCompileError, match="must resolve exactly once"):
         compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+def test_extract_observation_lookup_fails_closed_on_duplicate_ids(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    extract = {
+        "source_id": "synthetic-source",
+        "species": {
+            "A": {
+                "observations": [
+                    {"observation_id": "same-id"},
+                    {"observation_id": "same-id"},
+                ]
+            }
+        },
+    }
+    monkeypatch.setattr(
+        catalog_module, "_load_thermo_extract", lambda source_id, *, field: extract
+    )
+    monkeypatch.setattr(catalog_module, "_THERMO_OBSERVATION_CACHE", {})
+
+    with pytest.raises(CatalogCompileError, match="found 2"):
+        catalog_module._thermo_extract_observation(
+            {"source_id": "synthetic-source", "observation_id": "same-id"},
+            field="synthetic reference",
+        )
 
 
 # ---------------------------------------------------------------------------
