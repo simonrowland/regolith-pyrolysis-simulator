@@ -437,6 +437,35 @@ def vaporock_temperature_in_domain(temperature_K: float) -> bool:
     )
 
 
+def vaporock_temperature_notice(
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Return the VapoRock validation-band notice for an out-of-band T."""
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(temperature) or vaporock_temperature_in_domain(
+        temperature
+    ):
+        return None
+    warning = (
+        f'temperature {temperature:g} K outside certified band '
+        f'[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K'
+    )
+    return {
+        'kind': COMMISSIONING_NOTICE_KIND,
+        'reason': CONSTRAINT_TEMPERATURE_RANGE,
+        'authority': PUBLISHED_AUTHORITY_OUTSIDE,
+        'certified_band': {
+            'temperature_K': [VAPOROCK_T_MIN_K, VAPOROCK_T_MAX_K],
+        },
+        'failed_constraints': (CONSTRAINT_TEMPERATURE_RANGE,),
+        'warnings': (warning,),
+        'temperature_K': temperature,
+    }
+
+
 _RUNTIME_TABLE = parse_engine_commissioning_file(DEFAULT_COMMISSIONING_PATH)
 
 
@@ -589,4 +618,5 @@ __all__ = (
     'parse_engine_commissioning',
     'parse_engine_commissioning_file',
     'vaporock_temperature_in_domain',
+    'vaporock_temperature_notice',
 )
