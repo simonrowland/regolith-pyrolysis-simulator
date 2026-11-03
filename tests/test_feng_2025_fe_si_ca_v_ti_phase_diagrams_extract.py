@@ -184,7 +184,10 @@ def test_feng_all_typed_rows_migrate_with_sample_conditions_and_species() -> Non
             dict(zip(COMPONENTS, map(Decimal, printed_charge)))
         )
         assert row.identity.composition.is_value
-        assert row.identity.composition.value == expected_charge
+        # t-1617 / d-323: Table 2's located "starting charge" remains an
+        # engine input, rather than being stamped as the analyzed phase.
+        assert row.identity.composition.value.components == expected_charge.components
+        assert row.identity.composition.value.input_provenance == "printed_starting_bulk"
         assert composition.state.value == expected_charge
         assert row.uncertainty.value is None or row.uncertainty.value != 0
         assert all(notice.kind.value != "source_value_outside_physical_range" for notice in row.notices)
