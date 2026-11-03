@@ -1586,13 +1586,13 @@ def _fake_system_module(log10_bar_by_species, *, track=None):
 
 
 def test_domain_helpers_pin_vaporock_certified_band_1350_to_1950_K():
+    from engines.engine_commissioning import vaporock_temperature_in_domain
     from simulator.melt_backend.vaporock import (
         VAPOROCK_T_MAX_K,
         VAPOROCK_T_MIN_K,
         temperature_C_to_K,
         vaporock_liquid_fraction_admitted,
         vaporock_sum_pressure_sane,
-        vaporock_temperature_in_domain,
     )
 
     assert VAPOROCK_T_MIN_K == 1350.0
