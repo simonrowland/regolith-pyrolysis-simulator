@@ -15,6 +15,33 @@ extraction:
   worker: w1103cw1-wg09
   provenance_path: data/literature/extracts/audits/wang-2009-cr-slag-kems-original.audit.md
 review_status: draft
+provenance:
+  comparison_method:
+    kind: ratio
+    equation: Eqn. (21)
+    signal: ion_current_ratio
+    reference: pure_solid_Cr2O3
+    reference_activity: 1
+    evidence:
+      page: 3
+      published_page: 2235
+      pdf_page_index: 2
+      quote: The Cr2O3 activities are calculated from the ratio of ion-current intensities over slag and pure Cr2O3 using Eqn. (21).
+  common_knudsen_cell_constant:
+    cancels: true
+    evidence:
+      page: 3
+      published_page: 2235
+      pdf_page_index: 2
+      quote: One tungsten block contains two tungsten cells, one for slag and one for pure Cr2O3, with an area ratio of 1:100.
+  melt_reference_pairing:
+    kind: same_effective_setup
+    cells: double_effusion_cells
+    evidence:
+      page: 3
+      published_page: 2235
+      pdf_page_index: 2
+      quote: One tungsten block contains two tungsten cells, one for slag and one for pure Cr2O3, with an area ratio of 1:100.
 fidelity_samples:
 - path: species.CrO.observations[wang_2009_table4_cro_sample_01_temperature_fit].values.A_as_printed
   value: '-36066.0'
@@ -134,25 +161,6 @@ benches:
         pdf_page_index: 2
         section: Experimental
         note: Relative error of temperature definition, 0.1–0.2%.
-  temperature_calibration:
-    method:
-      state:
-        tag: value
-        value: Installation calibrated using the vapor pressure of gold as the standard, recommended by IUPAC.
-      locator:
-        page: 4
-        published_page: 2236
-        pdf_page_index: 3
-        section: Experimental
-    pressure_reference_substance:
-      state:
-        tag: value
-        value: gold vapor
-      locator:
-        page: 4
-        published_page: 2236
-        pdf_page_index: 3
-        section: Experimental
   ionization:
     electron_energy_eV:
       state:
@@ -202,6 +210,13 @@ experiments:
   method: knudsen_effusion
   locator: *id001
   apparatus:
+    calibration:
+      method:
+        state: {tag: value, value: 'Installation calibrated using the vapor pressure of gold as the standard, recommended by IUPAC.'}
+        locator: {page: 4, published_page: 2236, pdf_page_index: 3, section: Experimental, equation: '23'}
+      reference_substance:
+        state: {tag: value, value: gold vapor}
+        locator: {page: 4, published_page: 2236, pdf_page_index: 3, section: Experimental, equation: '23'}
     geometry:
       orifice_diameter_m: *id002
   pressure_environment:
@@ -367,8 +382,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -533,8 +553,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -699,8 +724,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -865,8 +895,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1031,8 +1066,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1197,8 +1237,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1363,8 +1408,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1529,8 +1579,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1695,8 +1750,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -1861,8 +1921,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2027,8 +2092,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2193,8 +2263,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2359,8 +2434,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2525,8 +2605,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2691,8 +2776,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -2857,8 +2947,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -3023,8 +3118,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -3189,8 +3289,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -3355,8 +3460,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -3521,8 +3631,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO partial-pressure temperature dependency.
         gas_species: CrO
         formula: CrO
@@ -3689,8 +3804,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -3855,8 +3975,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4021,8 +4146,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4187,8 +4317,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4353,8 +4488,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4519,8 +4659,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4685,8 +4830,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -4851,8 +5001,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5017,8 +5172,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5183,8 +5343,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5349,8 +5514,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5515,8 +5685,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5681,8 +5856,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -5847,8 +6027,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6013,8 +6198,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6179,8 +6369,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6345,8 +6540,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6511,8 +6711,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6677,8 +6882,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -6843,8 +7053,13 @@ species:
           binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells
           are retained as typed-refused coefficient records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 4; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (22) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '22'}
         candidate_quantity_as_printed: Coefficients A and B in the CrO2 partial-pressure temperature dependency.
         gas_species: CrO2
         formula: CrO2
@@ -7011,8 +7226,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -7166,8 +7386,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -7192,7 +7417,6 @@ species:
             table_row_number: 2
             table_column_number: 5
             note: Table 5 sample 1, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -7265,7 +7489,6 @@ species:
             table_row_number: 2
             table_column_number: 6
             note: Table 5 sample 1, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -7433,8 +7656,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -7588,8 +7816,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -7614,7 +7847,6 @@ species:
             table_row_number: 3
             table_column_number: 5
             note: Table 5 sample 2, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -7687,7 +7919,6 @@ species:
             table_row_number: 3
             table_column_number: 6
             note: Table 5 sample 2, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -7855,8 +8086,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -8010,8 +8246,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -8036,7 +8277,6 @@ species:
             table_row_number: 4
             table_column_number: 5
             note: Table 5 sample 3, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -8109,7 +8349,6 @@ species:
             table_row_number: 4
             table_column_number: 6
             note: Table 5 sample 3, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -8277,8 +8516,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -8432,8 +8676,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -8458,7 +8707,6 @@ species:
             table_row_number: 5
             table_column_number: 5
             note: Table 5 sample 4, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -8531,7 +8779,6 @@ species:
             table_row_number: 5
             table_column_number: 6
             note: Table 5 sample 4, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -8699,8 +8946,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -8854,8 +9106,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -8880,7 +9137,6 @@ species:
             table_row_number: 6
             table_column_number: 5
             note: Table 5 sample 5, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -8953,7 +9209,6 @@ species:
             table_row_number: 6
             table_column_number: 6
             note: Table 5 sample 5, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -9121,8 +9376,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -9276,8 +9536,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -9302,7 +9567,6 @@ species:
             table_row_number: 7
             table_column_number: 5
             note: Table 5 sample 6, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -9375,7 +9639,6 @@ species:
             table_row_number: 7
             table_column_number: 6
             note: Table 5 sample 6, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -9543,8 +9806,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -9698,8 +9966,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -9724,7 +9997,6 @@ species:
             table_row_number: 8
             table_column_number: 5
             note: Table 5 sample 7, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -9797,7 +10069,6 @@ species:
             table_row_number: 8
             table_column_number: 6
             note: Table 5 sample 7, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -9965,8 +10236,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -10120,8 +10396,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -10146,7 +10427,6 @@ species:
             table_row_number: 9
             table_column_number: 5
             note: Table 5 sample 8, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -10219,7 +10499,6 @@ species:
             table_row_number: 9
             table_column_number: 6
             note: Table 5 sample 8, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -10387,8 +10666,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -10542,8 +10826,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -10568,7 +10857,6 @@ species:
             table_row_number: 10
             table_column_number: 5
             note: Table 5 sample 9, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -10641,7 +10929,6 @@ species:
             table_row_number: 10
             table_column_number: 6
             note: Table 5 sample 9, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -10809,8 +11096,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -10964,8 +11256,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -10990,7 +11287,6 @@ species:
             table_row_number: 11
             table_column_number: 5
             note: Table 5 sample 10, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -11063,7 +11359,6 @@ species:
             table_row_number: 11
             table_column_number: 6
             note: Table 5 sample 10, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -11231,8 +11526,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -11386,8 +11686,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -11412,7 +11717,6 @@ species:
             table_row_number: 12
             table_column_number: 5
             note: Table 5 sample 11, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -11485,7 +11789,6 @@ species:
             table_row_number: 12
             table_column_number: 6
             note: Table 5 sample 11, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -11653,8 +11956,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -11808,8 +12116,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -11834,7 +12147,6 @@ species:
             table_row_number: 13
             table_column_number: 5
             note: Table 5 sample 12, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -11907,7 +12219,6 @@ species:
             table_row_number: 13
             table_column_number: 6
             note: Table 5 sample 12, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -12075,8 +12386,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -12230,8 +12546,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -12256,7 +12577,6 @@ species:
             table_row_number: 14
             table_column_number: 5
             note: Table 5 sample 13, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -12329,7 +12649,6 @@ species:
             table_row_number: 14
             table_column_number: 6
             note: Table 5 sample 13, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -12497,8 +12816,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -12652,8 +12976,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -12678,7 +13007,6 @@ species:
             table_row_number: 15
             table_column_number: 5
             note: Table 5 sample 14, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -12751,7 +13079,6 @@ species:
             table_row_number: 15
             table_column_number: 6
             note: Table 5 sample 14, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -12919,8 +13246,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -13074,8 +13406,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -13100,7 +13437,6 @@ species:
             table_row_number: 16
             table_column_number: 5
             note: Table 5 sample 15, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -13173,7 +13509,6 @@ species:
             table_row_number: 16
             table_column_number: 6
             note: Table 5 sample 15, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -13341,8 +13676,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -13496,8 +13836,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -13522,7 +13867,6 @@ species:
             table_row_number: 17
             table_column_number: 5
             note: Table 5 sample 16, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -13595,7 +13939,6 @@ species:
             table_row_number: 17
             table_column_number: 6
             note: Table 5 sample 16, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -13763,8 +14106,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -13918,8 +14266,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -13944,7 +14297,6 @@ species:
             table_row_number: 18
             table_column_number: 5
             note: Table 5 sample 17, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -14017,7 +14369,6 @@ species:
             table_row_number: 18
             table_column_number: 6
             note: Table 5 sample 17, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -14185,8 +14536,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -14340,8 +14696,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -14366,7 +14727,6 @@ species:
             table_row_number: 19
             table_column_number: 5
             note: Table 5 sample 18, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -14439,7 +14799,6 @@ species:
             table_row_number: 19
             table_column_number: 6
             note: Table 5 sample 18, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -14607,8 +14966,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -14762,8 +15126,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -14788,7 +15157,6 @@ species:
             table_row_number: 20
             table_column_number: 5
             note: Table 5 sample 19, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -14861,7 +15229,6 @@ species:
             table_row_number: 20
             table_column_number: 6
             note: Table 5 sample 19, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -15029,8 +15396,13 @@ species:
           ::TYPE_QUANTITY have no exact log-activity temperature-fit coefficient token. The coefficients are retained
           as typed-refused records.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; source reports coefficients for the present KEMS study.
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         candidate_quantity_as_printed: Coefficients A and B in the Cr2O3 activity temperature dependency.
         method: Cr2O3 activities calculated from ion-current ratios by Eqn. (21); temperature-dependency coefficients
           reported in Table 5.
@@ -15184,8 +15556,13 @@ species:
             note: Fit range printed in the table caption; no row-specific point temperature.
       values:
         quantity: activity
-        method_class: quoted_attributed
-        attribution: Wang et al. (2009), Table 5; author-reported activities calculated using Eqn. (21).
+        method_class: measured_reduced
+        derivation:
+          relation: 'Reduction by Eqn. (21) as reported in this paper.'
+          inputs: []
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 2235, pdf_page_index: 2, equation: '21'}
         method: Activity from the ratio of CrO+ and CrO2+ ion-current intensities over slag and pure solid Cr2O3,
           Eqn. (21).
         reported_accuracy_as_printed: about 10%; no per-point uncertainty or confidence level stated
@@ -15210,7 +15587,6 @@ species:
             table_row_number: 21
             table_column_number: 5
             note: Table 5 sample 20, activity at T=1950 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:
@@ -15283,7 +15659,6 @@ species:
             table_row_number: 21
             table_column_number: 6
             note: Table 5 sample 20, activity at T=2035 K.
-            phase: null
           point_conditions:
             temperature_K:
               state:

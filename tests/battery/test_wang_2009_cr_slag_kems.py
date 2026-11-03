@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 import re
 import subprocess
@@ -10,7 +11,16 @@ import subprocess
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    MEASURED_EVIDENCE,
+    Phase,
+    Quantity,
+    RefusalReason,
+    ValueKind,
+)
+from simulator.battery.records import State
+from simulator.battery.validity import run_validity_gates
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -45,6 +55,38 @@ def _by_id(extract: dict, species: str, observation_id: str) -> dict:
         row
         for row in extract["species"][species]["observations"]
         if row["observation_id"] == observation_id
+    )
+
+
+def _assert_source_rows_are_measured_reduced(extract: dict) -> None:
+    rows = [
+        row
+        for species in extract["species"].values()
+        for row in species["observations"]
+    ]
+    assert len(rows) == 80
+    assert all(row["values"]["method_class"] == "measured_reduced" for row in rows)
+    assert all("attribution" not in row["values"] for row in rows)
+    for row in rows:
+        equation = "22" if "table4_" in row["observation_id"] else "21"
+        derivation = row["values"]["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["raw_inputs"]["locator"]["equation"] == equation
+
+
+def _assert_activity_evidence_is_measured(observations: list) -> None:
+    activities = [
+        observation
+        for observation in observations
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activities) == 40
+    assert all(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value in MEASURED_EVIDENCE
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        for observation in activities
     )
 
 
@@ -120,6 +162,7 @@ def test_render_pins_and_printed_table_row_counts() -> None:
         pytest.skip(f"source PDF is absent: {SOURCE}")
 
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_source_rows_are_measured_reduced(extract)
     assert len(extract["species"]["CrO"]["observations"]) == 20
     assert len(extract["species"]["CrO2"]["observations"]) == 20
     assert len(extract["species"]["Cr2O3"]["observations"]) == 40
@@ -137,12 +180,28 @@ def test_render_pins_and_printed_table_row_counts() -> None:
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated, page2, page4, page5)
 
+    # Mutation proof: a quoted-attributed row fails the evidence-class pin.
+    mutated = deepcopy(extract)
+    mutated["species"]["CrO"]["observations"][0]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_source_rows_are_measured_reduced(mutated)
+
 
 def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients() -> None:
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     migrator = migrate_one_extract(ROOT, EXTRACT)
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
+    experiment = next(iter(migrator.result.experiments.values()))
+    assert experiment.apparatus is not None
+    assert experiment.apparatus.calibration is not None
+    assert experiment.apparatus.calibration["method"].state.is_value
+    assert experiment.apparatus.calibration["method"].locator.page == 4
+    assert experiment.apparatus.calibration["method"].locator.equation == "23"
+    assert experiment.apparatus.calibration["reference_substance"].state.value == "gold vapor"
+    assert experiment.apparatus.calibration["reference_substance"].locator.equation == "23"
 
     rows = [
         observation
@@ -194,6 +253,7 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
         observation for observation in rows if observation.identity.quantity.is_value
     ]
     assert len(activities) == 40
+    _assert_activity_evidence_is_measured(rows)
     for observation in activities:
         identity = observation.identity
         assert identity.quantity.value is Quantity.ACTIVITY
@@ -210,6 +270,39 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
         assert reference.value.endmember.formula == "Cr2O3"
         assert reference.value.endmember.phase.is_value
         assert reference.value.endmember.phase.value is Phase.CR
+
+    # The comparison provenance and located gold standard let the measured
+    # activity reach the apparatus and calibration gates while regime stays unknown.
+    sample_1_1950 = next(
+        observation
+        for observation in activities
+        if "wang_2009_table5_cr2o3_sample_01_activities_at_1950_2035_k::T=1950:"
+        in observation.observation_id
+    )
+    outcome = run_validity_gates(experiment, sample_1_1950)
+    check_by_name = {check.name: check for check in outcome.checks}
+    assert check_by_name["comparison_method_cell_constant_cancels"].passed
+    assert check_by_name["kems_calibration"].passed
+    assert outcome.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert outcome.primary_check == "in_cell_partial_pressure_sum"
+    assert any(
+        not check.passed and check.name == "in_cell_partial_pressure_sum"
+        for check in outcome.checks
+    )
+
+    # Mutation proof: a migrated activity relabelled quoted-attributed fails
+    # the measured-evidence pin used to guard validity-gate applicability.
+    mutated_activity = replace(
+        sample_1_1950,
+        evidence=replace(
+            sample_1_1950.evidence,
+            class_=State.of(EvidenceClass.QUOTED_ATTRIBUTED),
+        ),
+    )
+    mutated_activities = list(activities)
+    mutated_activities[mutated_activities.index(sample_1_1950)] = mutated_activity
+    with pytest.raises(AssertionError):
+        _assert_activity_evidence_is_measured(mutated_activities)
 
     first_three = sorted(activities, key=lambda row: row.observation_id)[:3]
     assert len(first_three) == 3
