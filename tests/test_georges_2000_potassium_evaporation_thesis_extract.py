@@ -7,8 +7,12 @@ from decimal import Decimal
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT, convert_pressure_to_pa
+from simulator.battery.enums import MethodToken, Quantity, ValueKind
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    convert_pressure_to_pa,
+    wt_pct_to_mole_fraction,
+)
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 from tests.helpers.pdf_text import pdftotext_page_text
@@ -32,6 +36,15 @@ ANNEX_III_GRID = {
     "CMS2": {"MgO": "9.70", "Al2O3": "0.01", "SiO2": "47.65", "K2O": "2.08", "CaO": "39.24"},
     "CMS3": {"MgO": "9.38", "Al2O3": "0.02", "SiO2": "52.23", "K2O": "4.38", "CaO": "33.72"},
     "CMS4": {"MgO": "9.17", "Al2O3": "0.02", "SiO2": "55.01", "K2O": "7.44", "CaO": "27.31"},
+}
+# Annex III's separate ion-probe K2O column is used when the electron probe was
+# below its detection limit; row 13 is one such printed sample.
+ANNEX_III_ION_PROBE_SAMPLE = {
+    "MgO": "5.49",
+    "Al2O3": "10.92",
+    "SiO2": "36.47",
+    "K2O": "0.19",
+    "CaO": "46.00",
 }
 
 
@@ -133,6 +146,48 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
         Quantity.P_PARTIAL: 8,
     }
 
+    composition_rows = [
+        row
+        for row in observations
+        if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(composition_rows) == 602
+    missing_composition = [
+        row.observation_id
+        for row in composition_rows
+        if row.identity.composition is None or not row.identity.composition.is_value
+    ]
+    assert missing_composition == []
+
+    migrated_by_id = {row.observation_id: row for row in observations}
+    for row_ids, expected_wt_pct in (
+        (
+            [
+                f"{SID}::georges_2000_annex_iii_r003_{formula.casefold()}"
+                for formula in COMPONENTS
+            ],
+            ANNEX_III_GRID["CS"],
+        ),
+        (
+            [
+                f"{SID}::georges_2000_annex_iii_r013_{formula.casefold()}"
+                for formula in COMPONENTS
+            ],
+            ANNEX_III_ION_PROBE_SAMPLE,
+        ),
+    ):
+        expected_composition = wt_pct_to_mole_fraction(
+            {formula: Decimal(amount) for formula, amount in expected_wt_pct.items()}
+        )
+        for observation_id in row_ids:
+            row = migrated_by_id[observation_id]
+            assert row.identity.composition.value == expected_composition
+            composition_condition = row.point_conditions["composition"]
+            assert composition_condition.state.is_value
+            assert composition_condition.locator is not None
+            assert composition_condition.locator.page == 209
+            assert composition_condition.locator.table == "Annexe III"
+
     migrated = Counter()
     for observation in observations:
         quantity = observation.identity.quantity.value
@@ -158,6 +213,14 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
     assert len(pressure_rows) == 8
     assert pressure_rows[0].value.point == Decimal("99.602475")
     assert all(row.identity.species.formula == "K" for row in pressure_rows)
+    for row in pressure_rows:
+        experiment = result.experiments[row.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.TGA
+        assert experiment.locator is not None
+        assert experiment.locator.page == 43
+        assert experiment.locator.published_page == 27
+        assert experiment.locator.section == "II.2.1"
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
     _assert_no_chapter_reprints_in_annexe_ii(document)
 
