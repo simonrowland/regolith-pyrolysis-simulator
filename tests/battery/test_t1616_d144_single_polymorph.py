@@ -17,6 +17,7 @@ from simulator.battery.enums import (
     Authority,
     Engine,
     EvidenceClass,
+    ExecutionState,
     NoticeKind,
     Phase,
     Polymorph,
@@ -25,8 +26,10 @@ from simulator.battery.enums import (
     ResidualStatus,
 )
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.records import State
+from simulator.battery.records import Execution, State
 from simulator.battery.score import (
+    ENGINE_CHANNELS,
+    EnginePrediction,
     ScoreContext,
     compile_residual,
     fusion_comparison_reference,
@@ -352,3 +355,111 @@ def test_d144_converts_kume_cao_and_mgo_and_refuses_the_other_solids(
     assert not any(
         notice.reason == "single_polymorph_identity_d144" for notice in kept.notices
     )
+
+
+def test_magemin_mgo_activity_refuses_uncertified_native_standard_state(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path / "kume", "kume-2000-cao-activities.yaml")
+    mgo = next(
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.endswith(
+            "::kume_2000_table4_sample_305_mgo_activity"
+        )
+    )
+    assert mgo.value.point == Decimal("0.327")
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=migrated.observations,
+        benches=migrated.benches,
+    )
+
+    for engine, expected_dex in (
+        (Engine.INTERNAL_ANALYTICAL, Decimal("-0.56")),
+        (Engine.OPENIMCC, Decimal("-0.63")),
+    ):
+        residual, _candidate = compile_residual(mgo, engine, context=context)
+        assert residual.numeric is not None
+        assert residual.numeric.value.quantize(Decimal("0.01")) == expected_dex
+
+    stolyarova = _migrate_real_extract(
+        tmp_path / "stolyarova", "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    silica = next(
+        observation
+        for observation in stolyarova.observations.values()
+        if "stolyarova_1996_table3_sio2_activity_column_5_1933k"
+        in observation.observation_id
+        and observation.value.point is not None
+        and observation.value.point > 0
+    )
+    silica_comparison = fusion_comparison_reference(
+        silica, engine=Engine.MAGEMIN
+    )
+    silica_prediction = EnginePrediction(
+        engine=Engine.MAGEMIN,
+        channel=ENGINE_CHANNELS[Engine.MAGEMIN],
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:native SiO2 activity",
+        ),
+        value=silica_comparison.value.point,
+        unit="dimensionless",
+        authority=Authority.CERTIFIED,
+        identity=silica_comparison.identity,
+    )
+    silica_context = ScoreContext(
+        works=stolyarova.works,
+        experiments=stolyarova.experiments,
+        observations=stolyarova.observations,
+        benches=stolyarova.benches,
+    )
+    silica_residual, _candidate = compile_residual(
+        silica,
+        Engine.MAGEMIN,
+        context=silica_context,
+        prediction=silica_prediction,
+    )
+    assert silica_residual.numeric is not None
+    assert silica_residual.numeric.value == 0
+
+    magemin_comparison = fusion_comparison_reference(mgo, engine=Engine.MAGEMIN)
+    magemin_prediction = EnginePrediction(
+        engine=Engine.MAGEMIN,
+        channel=ENGINE_CHANNELS[Engine.MAGEMIN],
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:native MgO activity",
+        ),
+        value=magemin_comparison.value.point,
+        unit="dimensionless",
+        authority=Authority.CERTIFIED,
+        identity=magemin_comparison.identity,
+    )
+    magemin_residual, _candidate = compile_residual(
+        mgo,
+        Engine.MAGEMIN,
+        context=context,
+        prediction=magemin_prediction,
+    )
+    assert magemin_residual.status is ResidualStatus.REFUSED
+    assert magemin_residual.numeric is None
+    assert magemin_residual.refusal is not None
+    assert magemin_residual.refusal.reason.value == (
+        "engine_activity_standard_state_uncertified"
+    )
+    assert magemin_residual.refusal.detail["reason"] == (
+        "engine_activity_standard_state_uncertified"
+    )
+    refusal_notice = next(
+        notice
+        for notice in magemin_residual.notices
+        if notice.reason == "engine_activity_standard_state_uncertified"
+    )
+    assert "engines/magemin/domain.py:28-30" in refusal_notice.band
+    assert "simulator/melt_backend/magemin.py:3502-3516" in refusal_notice.band
+    assert "b-1123" in refusal_notice.band
