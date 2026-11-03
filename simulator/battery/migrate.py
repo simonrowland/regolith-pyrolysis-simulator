@@ -18386,6 +18386,10 @@ def compilation_source_basis(
 
 
 _AMBIENT_PRESSURE_TOTAL_PA = Decimal("101325")
+# The band is an input uncertainty on total pressure. Quantities whose model
+# value depends on absolute P through the kinetic series resistance carry it;
+# equilibrium condensed-phase quantities, where P enters only through V dP,
+# get no band.
 _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES = (
     MELT_ACTIVITY_QUANTITIES
     | PHASE_COMPOSITION_QUANTITIES
@@ -18393,13 +18397,11 @@ _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES = (
     | frozenset(
         {
             Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
-            Quantity.CONDENSATE_COMPOSITION,
             Quantity.DENSITY,
             Quantity.ELECTRICAL_CONDUCTIVITY,
             Quantity.FE3_FE2_RATIO,
             Quantity.LIQUIDUS_COMPOSITION,
             Quantity.PARTIAL_MOLAR_ENTHALPY,
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
             Quantity.TRANSITION_TEMPERATURE,
             Quantity.VALENCE_RATIO,
             Quantity.VISCOSITY,
@@ -18408,11 +18410,11 @@ _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES = (
 )
 _ABSOLUTE_PRESSURE_QUANTITIES = (
     KINETIC_YIELD_QUANTITIES
-    - {Quantity.CONDENSATE_COMPOSITION}
     | {
         Quantity.FUGACITY,
         Quantity.MASS_LOSS_AREAL_DENSITY,
         Quantity.P_PARTIAL,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
         Quantity.WALL_DEPOSIT_AREAL_RATE,
     }
 )
