@@ -798,9 +798,7 @@ species:
       phase_as_published: glass
       units: wt%
       quench_statement: &id002
-        text: Melts were sampled at high temperature with a Pt loop quenched into ice-water before and
-          after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision
-          of bulk-composition analyses to about 0.7 wt% absolute. The analyzed quench is the liquid composition.
+        text: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
         preservation: not_stated
         quench_direction: not_stated
         locator:
@@ -1030,29 +1028,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '46.87'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '28.78'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '25.60'
-              - - Na2O
-                - '0.00'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -1060,7 +1037,8 @@ species:
             table: '3'
             row: 0011-0014 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -1320,29 +1298,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '46.45'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '2.03'
-              - - Fe2O3
-                - '26.08'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '24.81'
-              - - Na2O
-                - '0.00'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -1350,7 +1307,8 @@ species:
             table: '3'
             row: 0021-0025 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -1610,29 +1568,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '39.61'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '11.94'
-              - - Fe2O3
-                - '23.65'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '22.18'
-              - - Na2O
-                - '0.00'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -1640,7 +1577,8 @@ species:
             table: '3'
             row: 021-023 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -1900,29 +1838,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '38.67'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '18.11'
-              - - Fe2O3
-                - '22.84'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '20.96'
-              - - Na2O
-                - '0.00'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -1930,7 +1847,8 @@ species:
             table: '3'
             row: 031-036 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -2190,29 +2108,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '37.41'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '21.14'
-              - - Fe2O3
-                - '21.65'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '20.31'
-              - - Na2O
-                - '0.00'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -2220,7 +2117,8 @@ species:
             table: '3'
             row: 041 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -2480,29 +2378,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '66.69'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '22.58'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '10.57'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -2510,7 +2387,8 @@ species:
             table: '3'
             row: 051-056 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -2770,29 +2648,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '65.31'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.01'
-              - - Fe2O3
-                - '22.26'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '10.47'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -2800,7 +2657,8 @@ species:
             table: '3'
             row: 081-086 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -3060,29 +2918,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '32.80'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '37.70'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '29.50'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -3090,7 +2927,8 @@ species:
             table: '3'
             row: 091-0910 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -3350,29 +3188,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '32.62'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.52'
-              - - Fe2O3
-                - '37.55'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '27.48'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -3380,7 +3197,8 @@ species:
             table: '3'
             row: 101-107 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -3640,29 +3458,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '32.80'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '37.70'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '29.50'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -3670,7 +3467,8 @@ species:
             table: '3'
             row: 111-117 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -3930,29 +3728,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '32.44'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '1.15'
-              - - Fe2O3
-                - '36.90'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '27.46'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -3960,7 +3737,8 @@ species:
             table: '3'
             row: 121-126 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -4220,29 +3998,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '51.18'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '21.60'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '27.22'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -4250,7 +4007,8 @@ species:
             table: '3'
             row: 131-137 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -4510,29 +4268,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '47.82'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '22.74'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '28.11'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -4540,7 +4277,8 @@ species:
             table: '3'
             row: 141-147 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -4800,29 +4538,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '51.18'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.00'
-              - - Fe2O3
-                - '21.60'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '27.22'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -4830,7 +4547,8 @@ species:
             table: '3'
             row: 151-157 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -5090,29 +4808,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '49.16'
-              - - TiO2
-                - '0.00'
-              - - Al2O3
-                - '0.16'
-              - - Fe2O3
-                - '22.79'
-              - - MnO
-                - '0.00'
-              - - MgO
-                - '0.00'
-              - - CaO
-                - '0.00'
-              - - Na2O
-                - '27.69'
-              - - K2O
-                - '0.00'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -5120,7 +4817,8 @@ species:
             table: '3'
             row: 161-167 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -5381,16 +5079,16 @@ species:
         composition:
           state:
             tag: unknown
-            reason: Table 3 prints MnO as N.A. in the initial bulk composition; no complete run composition is
-              available without assuming a value.
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 85
             table: '3'
             row: 171-174 initial
-            column: MnO
-            note: The initial bulk composition is incomplete as printed; N.A. is not converted to zero.
+            column: oxide composition
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -5650,29 +5348,8 @@ species:
               3.
         composition:
           state:
-            tag: value
-            value:
-              basis: oxide wt% as printed in Table 3
-              amount_basis: mass_percent
-              components:
-              - - SiO2
-                - '43.46'
-              - - TiO2
-                - '2.66'
-              - - Al2O3
-                - '17.98'
-              - - Fe2O3
-                - '19.99'
-              - - MnO
-                - '0.15'
-              - - MgO
-                - '5.04'
-              - - CaO
-                - '8.45'
-              - - Na2O
-                - '2.35'
-              - - K2O
-                - '0.59'
+            tag: unknown
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
@@ -5680,7 +5357,8 @@ species:
             table: '3'
             row: 181-182 initial
             column: oxide composition
-            note: Table 3 identifies the initial row as the bulk composition before the paired final sample.
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -5941,16 +5619,16 @@ species:
         composition:
           state:
             tag: unknown
-            reason: Table 3 prints MnO as N.A. in the initial bulk composition; no complete run composition is
-              available without assuming a value.
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 85
             table: '3'
             row: 201-206 initial
-            column: MnO
-            note: The initial bulk composition is incomplete as printed; N.A. is not converted to zero.
+            column: oxide composition
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -6211,16 +5889,16 @@ species:
         composition:
           state:
             tag: unknown
-            reason: Table 3 prints MnO as N.A. in the initial bulk composition; no complete run composition is
-              available without assuming a value.
+            reason: input_is_same_run_analysed_melt
           locator:
             page: 4
             pdf_page_index: 3
             published_page: 85
             table: '3'
             row: 211-213 initial
-            column: MnO
-            note: The initial bulk composition is incomplete as printed; N.A. is not converted to zero.
+            column: oxide composition
+            note: The Table 3 initial composition is the analyzed melt of this same run, not an independent run composition.
+          units: wt%
       values:
         phase_label: melt
         basis: wt_percent
@@ -6258,10 +5936,7 @@ species:
       phase_as_published: glass
       units: wt%
       quench_statement: &id041
-        text: Thirty-three additional Pt-loop drop-quench experiments. Ferrous iron by colorimetric wet
-          chemistry (Wilson 1960) corrected for ferric interference (Lange and Carmichael 1989). Fe2O3
-          was estimated by subtracting FeO from total iron. Micron-scale quench crystals reduced precision
-          to about 0.7 wt% absolute.
+        text: "In order to account for the effect of Al2O3 contamination in NAFS and CAFS experiments, and the high iron contents considered in the natural compositions, 33 additional Pt-loop drop-quench experiments were performed on compositions and conditions spanning those explored in the ultrasonic experiments."
         preservation: not_stated
         quench_direction: not_stated
         locator:
@@ -12972,6 +12647,272 @@ species:
         numeric_points: none
         digitisation: deferred to a figure pass
         attribution: Kress and Carmichael (1991)
+    - observation_id: kc91_t3_0011_0014_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_0011_0014
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 0011_0014; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_0021_0025_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_0021_0025
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 0021_0025; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_021_023_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_021_023
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 021_023; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_031_036_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_031_036
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 031_036; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_041_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_041
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 041; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_051_056_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_051_056
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 051_056; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_081_086_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_081_086
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 081_086; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_091_0910_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_091_0910
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 091_0910; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_101_107_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_101_107
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 101_107; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_111_117_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_111_117
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 111_117; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_121_126_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_121_126
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 121_126; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_131_137_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_131_137
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 131_137; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_141_147_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_141_147
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 141_147; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_151_157_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_151_157
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 151_157; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_161_167_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_161_167
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 161_167; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_171_174_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_171_174
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 171_174; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_181_182_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_181_182
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 181_182; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_201_206_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_201_206
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 201_206; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
+    - observation_id: kc91_t3_211_213_phase_assemblage_evidence
+      type: phase_assemblage_evidence
+      experiment: kc91_t3_211_213
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Ultrasonic measurements
+        note: Table 3 ultrasonic set 211_213; the general Pt-loop quench-crystal sentence does not identify individual products.
+      units: as printed
+      values:
+        evidence_type: sampled-from-liquid
+        run_products_as_printed: "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses to about 0.7 wt% absolute."
+
   TiO2:
     observations:
     - observation_id: kc91_t3_0011_0014_initial_TiO2
