@@ -65,6 +65,7 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
         assert len({item["experiment"] for item in actual_rows}) == 1
         sample = experiments[sample_id]["sample"]
         assert sample["component_values_as_printed"] == expected_values
+        assert sample["component_basis"] == "element_wt_percent"
         assert sample["system_as_printed"] == row["system"]
         assert sample["sample_id_note"].startswith("Local table-row key")
         assert sample["unreported_component"] == "Fe balance is not reported and was not calculated."
@@ -74,10 +75,22 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert item["values"]["basis"] == "wt_percent"
             assert item["values"]["phase_label"] == "metal"
             assert item["values"]["component_amount_as_published"] == item["values"]["component_amount"]
+            point_conditions = item["values"]["point_conditions"]
+            printed_composition = point_conditions["printed_composition"]
+            assert printed_composition["state"]["tag"] == "value"
+            assert printed_composition["state"]["value"] == {
+                "basis": "element_wt_percent",
+                "values": expected_values,
+            }
+            assert printed_composition["locator"]["page"] == 3
+            assert printed_composition["locator"]["table"] == row["table"]
+            assert printed_composition["locator"]["record"] == item["locator"]["row_label"]
             expected_ids.add(item["observation_id"])
 
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     assert result.queue == []
+    assert result.validation is not None
+    assert result.validation.hard_issues == (), result.validation.hard_issues
     migrated_by_id = {item.observation_id.split("::")[-1]: item for item in result.observations.values()}
     migrated_components = [
         item for item in result.observations.values()
@@ -91,6 +104,8 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
     assert expected_ids <= set(migrated_by_id)
     for row in fixture_rows:
         sample_id = row["sample_id"]
+        expected_components = ("V", "Mo", "Ni", "C") if row["table"] == "1" else ("V", "C")
+        expected_values = {component: row[component] for component in expected_components}
         for item in source_rows[sample_id]:
             migrated = migrated_by_id[item["observation_id"]]
             formula = item["values"]["formula"]
@@ -104,6 +119,19 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert migrated.identity.temperature_K.value == Decimal(row["T_K"])
             assert _condition_amount(migrated, "temperature_K") == Decimal(row["T_K"])
             assert _condition_amount(migrated, "gas_mix") == "Ar"
+            printed_composition = migrated.point_conditions["printed_composition"]
+            assert printed_composition.state.is_value
+            assert printed_composition.state.value == {
+                "basis": "element_wt_percent",
+                "values": expected_values,
+            }
+            assert printed_composition.locator.page == 3
+            assert printed_composition.locator.table == row["table"]
+            assert printed_composition.locator.record == item["locator"]["row_label"]
+            unavailable_composition = migrated.point_conditions["composition"]
+            assert unavailable_composition.state.is_unknown
+            assert "Fe balance is unreported" in unavailable_composition.state.reason
+            assert migrated.identity.composition is None or migrated.identity.composition.is_unknown
             assert migrated.identity.fO2_Pa.is_unknown
             assert migrated.notices == ()
 
