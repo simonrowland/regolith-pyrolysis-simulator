@@ -3323,13 +3323,19 @@ def test_invalid_recipe_local_furnace_field_is_rejected(
 
 
 def test_in_window_c2a_run_captures_na_product() -> None:
+    profile = _c2a_window_profile(1400.0, 1450.0, 18)
+    profile["seed_recipes"][0]["patch"]["campaigns"][
+        "C2A_continuous"
+    ].pop("duration_h")
+    profile["run"]["hours"] = 10
     _, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
         "internal-analytical",
-        _c2a_window_profile(1400.0, 1450.0, 18),
+        profile,
         RecipeSchema(),
     )
+    assert run_config.hours < 18
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign=run_config.campaign,
@@ -3346,6 +3352,11 @@ def test_in_window_c2a_run_captures_na_product() -> None:
 
     assert result["status"] == "ok"
     assert session.simulator.product_ledger()["Na"] > 0.0
+    in_window_hours = sum(
+        1400.0 <= float(summary["T_C"]) <= 1450.0
+        for summary in session.per_hour_summaries()
+    )
+    assert in_window_hours >= 1
 
 
 def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure() -> None:
