@@ -2479,12 +2479,21 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: &liu23_acr_model_derivation
+          relation: "aCr is calculated in this study using the chromium-in-copper activity coefficient reported by Kobayashi et al. [27]."
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 5, published_page: 317, pdf_page_index: 4, section: '3.3. Activity of Chromium Oxide in Slags', table: '3'}
+          method:
+            state: {tag: value, value: "aCr calculated according to the Kobayashi equation [27] using the chromium-in-copper activity coefficient."}
+            locator: {page: 5, published_page: 317, pdf_page_index: 4, section: '3.3. Activity of Chromium Oxide in Slags', table: '3'}
+          references:
+            - "Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]"
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '1'}}
           points:
@@ -2496,12 +2505,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '2'}}
           points:
@@ -2513,12 +2522,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '3'}}
           points:
@@ -2530,12 +2539,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-8', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '4'}}
           points:
@@ -2547,12 +2556,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '2.55e-9', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '5'}}
           points:
@@ -2564,12 +2573,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '6'}}
           points:
@@ -2581,12 +2590,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '7'}}
           points:
@@ -2598,12 +2607,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '1.60e-10', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '8'}}
           points:
@@ -2615,12 +2624,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '9'}}
           points:
@@ -2632,12 +2641,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '10'}}
           points:
@@ -2649,12 +2658,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '6.38e-12', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '11'}}
           points:
@@ -2666,12 +2675,12 @@ species:
         standard_state: {convention: raoultian_pure_endmember, endmember: {formula: Cr, phase: cr, polymorph: {tag: unknown, reason: 'the source specifies Cr(s) but not its crystal polymorph'}}, component_basis: Cr}
         regime: quench_equilibration
         units: dimensionless
+        derivation: *liu23_acr_model_derivation
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: admitted
-          attribution: Liu, Li and Kobayashi (2023), Table 3; aCr calculated using the chromium-in-copper activity coefficient reported by Kobayashi et al. (1995), ref. 27.
           T_K: '1823'
           oxygen_partial_pressure: {value: '2.55e-13', units: atm, locator: {page: 5, published_page: 317, pdf_page_index: 4, table: '3', row: '12'}}
           points:
@@ -3124,11 +3133,44 @@ species:
         standard_state: No canonical endmember is stated for variable-stoichiometry CrOx; source definition is Eq. (15).
         regime: quench_equilibration
         units: dimensionless
+        derived_from: &liu23_crox_inputs
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row01
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row01
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row02
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row02
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row03
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row03
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row04
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row04
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row05
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row05
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row06
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row06
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row07
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row07
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row08
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row08
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row09
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row09
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row10
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row10
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row11
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row11
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro15_row12
+          - liu-2023-chromium-oxide-activity::liu23_t3_a_cro_row12
+        derivation:
+          relation: "aCrOx is calculated using Eq. (15) with the row-matched aCrO1.5 and aCrO activities and Table 2 slag analyses."
+          inputs: *liu23_crox_inputs
+          output_unit: dimensionless
+          method:
+            state: {tag: value, value: "Eq. (15) calculation of the mixed CrOx activity from the CrO1.5 and CrO activities and their mole fractions."}
+            locator: {page: 5, published_page: 317, pdf_page_index: 4, section: '3.3. Activity of Chromium Oxide in Slags', equation: '15', table: '3'}
+          references:
+            - "No external input reference is cited for Eq. (15); its inputs are the present study's Table 2 analyses and Table 3 activity rows."
         values:
           quantity: activity
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
-          attribution: Liu, Li and Kobayashi (2023), Table 3; values calculated using Eq. (15) and the Table 2 slag analyses.
+          method_class: model_derived
+          evidence_class: model_derived
           admission_status: typed_refusal
           refusal_reason: CrOx is variable-stoichiometry and has no canonical species identity in this schema.
           T_K: '1823'
