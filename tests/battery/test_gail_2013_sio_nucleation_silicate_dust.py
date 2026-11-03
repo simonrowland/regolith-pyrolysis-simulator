@@ -2,7 +2,7 @@
 
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, StateTag, ValueKind
+from simulator.battery.enums import EvidenceClass, Phase, Quantity, StateTag, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tools.validate_literature_extracts import validate_extract_file
 from tests.battery.factories import migrate_one_extract
@@ -13,6 +13,15 @@ RATE_REFUSALS = {
     "gail_2013_nuth_donn_smoke_onset_rate_range",
     "gail_2013_nuth_donn_average_rate_as_printed",
     "gail_2013_sio_nucleation_rate_fit_eq16",
+}
+FIGURE_ONLY = {
+    "gail_2013_figure_2_vaporisation_coefficient",
+    "gail_2013_figure_3_vapor_pressure",
+}
+PRESSURE_FITS = {
+    "gail_2013_sio_vapor_pressure_fit_eq4",
+    "gail_2013_ferguson_nuth_vapor_pressure_eq6",
+    "gail_2013_schick_vapor_pressure_eq7",
 }
 
 
@@ -28,17 +37,78 @@ def test_gail_sio_extract_migrates_with_pinned_printed_values_and_conditions() -
         row["observation_id"]: row for row in block["observations"]
     }
 
+    alpha_fit = source_observations["gail_2013_sio_vaporisation_coefficient_fit_eq3"]
+    assert alpha_fit["type"] == "alpha"
+    assert alpha_fit["locator"]["page"] == 3
+    assert alpha_fit["locator"]["equation"] == "3"
+    assert alpha_fit["T_range_K"] == [1275, 1525]
+    assert alpha_fit["values"]["equation_as_printed"] == (
+        "α(T) = α0 exp(−T0/T)"
+    )
+    assert alpha_fit["values"]["alpha0_as_printed"] == "0.521 ± 0.156"
+    assert alpha_fit["values"]["T0_as_printed"] == "3 686 ± 428"
+    assert alpha_fit["values"]["orifice_diameters_as_printed"] == (
+        "0.50 mm and 0.79 mm"
+    )
+    assert alpha_fit["derivation"]["raw_inputs"]["state"] == {
+        "tag": "value",
+        "value": "not_printed",
+    }
+    assert alpha_fit["derivation"]["raw_inputs"]["locator"]["figure"] == "2"
+
     pressure_fit = source_observations["gail_2013_sio_vapor_pressure_fit_eq4"]
     assert pressure_fit["locator"]["page"] == 3
     assert pressure_fit["locator"]["equation"] == "4"
+    assert pressure_fit["T_range_K"] == [1275, 1525]
     assert pressure_fit["values"]["equation_as_printed"] == (
         "P = exp(−T_v/T + S_v)"
     )
+    assert pressure_fit["values"]["method_class"] == "measured_reduced"
     assert pressure_fit["values"]["coefficients_as_printed"] == {
         "T_v": "49 520 ± 1 400 K",
         "S_v": "32.52 ± 0.97",
     }
+    assert pressure_fit["uncertainty"]["coefficients_as_printed"] == (
+        "T_v = 49 520 ± 1 400 K; S_v = 32.52 ± 0.97"
+    )
+    assert pressure_fit["derivation"]["raw_inputs"]["state"] == {
+        "tag": "value",
+        "value": "not_printed",
+    }
+    assert pressure_fit["derivation"]["raw_inputs"]["locator"]["figure"] == "3"
+    assert pressure_fit["values"]["reservoir"]["tag"] == "unknown"
+    assert pressure_fit["values"]["reservoir"]["reason"] == (
+        "The paper prints solid silicon monoxide (solid SiO), but Phase.CR would "
+        "assert crystalline SiO; no phase token represents solid without that assertion."
+    )
+    assert pressure_fit["values"]["reservoir"]["locator"] == {
+        "page": 3,
+        "equation": "4",
+    }
     assert pressure_fit["units"] == "dyn cm−2"
+
+    ferguson_nuth_fit = source_observations[
+        "gail_2013_ferguson_nuth_vapor_pressure_eq6"
+    ]
+    assert ferguson_nuth_fit["locator"]["page"] == 4
+    assert ferguson_nuth_fit["values"]["method_class"] == "quoted_attributed"
+    assert ferguson_nuth_fit["values"]["coefficients_as_printed"] == {
+        "T_v": "40 850 ± 1 270 K",
+        "S_v": "32.93 ± 0.90",
+    }
+    schick_fit = source_observations["gail_2013_schick_vapor_pressure_eq7"]
+    assert schick_fit["locator"]["page"] == 4
+    assert schick_fit["values"]["method_class"] == "quoted_attributed"
+    assert schick_fit["values"]["equation_as_printed"] == (
+        "pvap = exp(26.66 − 25670/T)"
+    )
+
+    assert set(source_observations) >= FIGURE_ONLY
+    for figure_id in FIGURE_ONLY:
+        figure = source_observations[figure_id]
+        assert figure["type"] in {"alpha", "psat_series"}
+        assert figure["values"]["method_class"] == "figure_only"
+        assert figure["values"]["digitisation"] == "deferred to a figure pass"
 
     onset = source_observations["gail_2013_nuth_donn_smoke_onset_rate_range"]
     assert onset["locator"]["page"] == 4
@@ -91,7 +161,7 @@ def test_gail_sio_extract_migrates_with_pinned_printed_values_and_conditions() -
         for row in result.observations.values()
     }
     assert set(observations) == set(source_observations)
-    assert len(observations) == 4
+    assert len(observations) == 9
     assert all(row.value.kind is ValueKind.UNAVAILABLE for row in observations.values())
     assert {
         key
@@ -105,22 +175,59 @@ def test_gail_sio_extract_migrates_with_pinned_printed_values_and_conditions() -
     )
 
     for key, row in observations.items():
+        if key in FIGURE_ONLY:
+            continue
         assert row.point_conditions is not None
         temperature = row.point_conditions["temperature_K"]
         assert temperature.state.tag is StateTag.UNKNOWN
         assert temperature.locator.page == row.locator.page
         assert "total_pressure_Pa" not in row.point_conditions
         assert row.point_conditions["fO2_Pa"].state.tag is StateTag.UNKNOWN
-        if key not in RATE_REFUSALS:
+        if key in PRESSURE_FITS:
             assert row.identity.total_pressure_Pa.tag is StateTag.NOT_APPLICABLE
             assert row.identity.fO2_Pa.tag is StateTag.NOT_APPLICABLE
             assert row.identity.temperature_K.is_unknown
             assert row.identity.quantity.is_value
             assert row.identity.quantity.value is Quantity.P_SAT
+        elif key == "gail_2013_sio_vaporisation_coefficient_fit_eq3":
+            assert row.identity.quantity.is_value
+            assert row.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+
+    alpha_observation = observations[
+        "gail_2013_sio_vaporisation_coefficient_fit_eq3"
+    ]
+    assert alpha_observation.evidence.class_.is_value
+    assert alpha_observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert alpha_observation.derivation is not None
+    assert alpha_observation.derivation.has_located_unprinted_raw_inputs
+    assert alpha_observation.derivation.raw_inputs is not None
+    assert alpha_observation.derivation.raw_inputs.state.value.value == "not_printed"
+    assert alpha_observation.derivation.raw_inputs.locator.figure == "2"
+    pressure_observation = observations["gail_2013_sio_vapor_pressure_fit_eq4"]
+    assert pressure_observation.evidence.class_.is_value
+    assert pressure_observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert pressure_observation.derivation is not None
+    assert pressure_observation.derivation.has_located_unprinted_raw_inputs
+    assert pressure_observation.derivation.raw_inputs is not None
+    assert pressure_observation.derivation.raw_inputs.state.value.value == "not_printed"
+    assert pressure_observation.derivation.raw_inputs.locator.figure == "3"
+    for comparison_id in PRESSURE_FITS - {"gail_2013_sio_vapor_pressure_fit_eq4"}:
+        comparison = observations[comparison_id]
+        assert comparison.evidence.class_.is_value
+        assert comparison.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert comparison.identity.quantity.is_value
+        assert comparison.identity.quantity.value is Quantity.P_SAT
+
+    assert pressure_observation.identity.reservoir is not None
+    assert pressure_observation.identity.reservoir.is_unknown
+    assert "solid silicon monoxide" in pressure_observation.identity.reservoir.reason
+    assert "Phase.CR would assert crystalline SiO" in pressure_observation.identity.reservoir.reason
+    assert "no reservoir mapped from source" not in pressure_observation.identity.reservoir.reason
 
     assert all(
         row["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
-        for row in source_observations.values()
+        for key, row in source_observations.items()
+        if key not in FIGURE_ONLY
     )
 
     assert len(result.context_by_work) == 1
