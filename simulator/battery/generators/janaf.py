@@ -84,7 +84,6 @@ from simulator.reference_data.janaf_fusion import (
     _complete_fusion_overlap_nodes,
     _checked_fusion_table_rows,
     _fusion_gibbs_difference_from_points,
-    _fusion_missing_gibbs_temperatures,
     _fusion_table_points,
     _interpolate_formation_gibbs,
     _interpolate_table_points,
