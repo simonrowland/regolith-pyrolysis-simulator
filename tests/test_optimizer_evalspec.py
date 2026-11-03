@@ -3329,7 +3329,7 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     profile["seed_recipes"][0]["patch"]["campaigns"][
         "C2A_continuous"
     ].pop("duration_h")
-    profile["run"]["hours"] = 10
+    profile["run"]["hours"] = 4
     _, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
@@ -3354,13 +3354,22 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     result = run._run_session(session)
 
     assert result["status"] == "ok"
-    assert session.simulator.product_ledger()["Na"] > 0.0
     assert _cached_alpha_s_evaluation.cache_info().hits > 0
-    in_window_hours = sum(
-        1400.0 <= float(summary["T_C"]) <= 1450.0
-        for summary in session.per_hour_summaries()
+    per_hour = session.per_hour_summaries()
+    below_window = [summary for summary in per_hour if float(summary["T_C"]) < 1400.0]
+    assert below_window
+    na_before_window_kg = float(
+        below_window[-1]["product_ledger_kg_at_hour"].get("Na", 0.0)
     )
-    assert in_window_hours >= 1
+    na_at_end_kg = float(
+        per_hour[-1]["product_ledger_kg_at_hour"].get("Na", 0.0)
+    )
+    assert na_at_end_kg - na_before_window_kg > 0.0
+
+    in_window_hours = sum(
+        1400.0 <= float(summary["T_C"]) <= 1450.0 for summary in per_hour
+    )
+    assert in_window_hours >= 2
 
 
 def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure() -> None:

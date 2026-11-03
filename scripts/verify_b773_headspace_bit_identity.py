@@ -102,9 +102,27 @@ def main() -> int:
         print(f"headspace_partials_sha256={partials_digest}")
         print(f"headspace_partial_hours={len(partials)}")
         return 0
-    assert products_digest == EXPECTED_PRODUCT_LEDGER_SHA256
-    assert partials_digest == EXPECTED_HEADSPACE_PARTIALS_SHA256
-    assert len(partials) == EXPECTED_HEADSPACE_PARTIAL_HOURS
+    if products_digest != EXPECTED_PRODUCT_LEDGER_SHA256:
+        print(
+            "product ledger digest mismatch: "
+            f"expected {EXPECTED_PRODUCT_LEDGER_SHA256}, got {products_digest}",
+            file=sys.stderr,
+        )
+        return 1
+    if partials_digest != EXPECTED_HEADSPACE_PARTIALS_SHA256:
+        print(
+            "headspace partials digest mismatch: "
+            f"expected {EXPECTED_HEADSPACE_PARTIALS_SHA256}, got {partials_digest}",
+            file=sys.stderr,
+        )
+        return 1
+    if len(partials) != EXPECTED_HEADSPACE_PARTIAL_HOURS:
+        print(
+            "headspace partial hour count mismatch: "
+            f"expected {EXPECTED_HEADSPACE_PARTIAL_HOURS}, got {len(partials)}",
+            file=sys.stderr,
+        )
+        return 1
     print(f"BIT_IDENTICAL product_ledger_sha256={products_digest}")
     print(f"BIT_IDENTICAL headspace_partials_sha256={partials_digest}")
     print(f"headspace_partial_hours={len(partials)}")
