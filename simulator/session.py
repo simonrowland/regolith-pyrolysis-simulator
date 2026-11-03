@@ -79,12 +79,7 @@ def _canonical_runtime_campaign_overrides(
     canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
         {str(campaign): dict(fields) for campaign, fields in source.items()}
     )
-    for campaign, fields in canonical.items():
-        if "carrier_gas" in fields:
-            CampaignManager._refuse_unknown_override_fields(
-                campaign,
-                {"carrier_gas": fields["carrier_gas"]},
-            )
+    CampaignManager.validate_runtime_campaign_overrides(canonical)
     return canonical
 
 

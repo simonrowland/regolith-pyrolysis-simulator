@@ -152,6 +152,16 @@ class CampaignSetpointMissingRefusal(ValueError):
         )
 
 
+def _runtime_pressure_override_refusal(
+    reason_code: str,
+    path: str,
+    detail: str,
+) -> ValueError:
+    error = ValueError(f'{reason_code}: {path} {detail}')
+    error.reason_code = reason_code
+    return error
+
+
 class CampaignHoldTargetRefusal(ValueError):
     """Typed refusal for a provided C6 hold target or temperature that is
     not a finite real.
@@ -800,6 +810,38 @@ class CampaignManager:
         canonical = cls._canonicalize_runtime_carrier_overrides(overrides)
         for campaign_name, fields in canonical.items():
             cls._refuse_unknown_override_fields(str(campaign_name), fields)
+            cls._validate_runtime_pressure_overrides(campaign_name, fields)
+
+    @classmethod
+    def _validate_runtime_pressure_overrides(
+        cls,
+        campaign_name: str,
+        fields: Mapping[str, object],
+    ) -> None:
+        # The 5–15 mbar band belongs to recipe search bounds, not runtime physics.
+        for field_name in ('p_total_mbar', 'pO2_mbar'):
+            if field_name not in fields:
+                continue
+            raw_value = fields[field_name]
+            path = f'runtime_campaign_overrides.{campaign_name}.{field_name}'
+            reason_prefix = f'runtime_campaign_{field_name}'
+            if not is_declared_real_scalar(raw_value):
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_not_numeric', path, 'must be numeric'
+                )
+            value = float(raw_value)
+            if not math.isfinite(value):
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_nonfinite', path, 'must be finite'
+                )
+            if field_name == 'p_total_mbar' and value <= 0.0:
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_nonpositive', path, 'must be > 0'
+                )
+            if field_name == 'pO2_mbar' and value < 0.0:
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_negative', path, 'must be >= 0'
+                )
 
     @classmethod
     def _refuse_unknown_override_fields(
@@ -1880,14 +1922,9 @@ class CampaignManager:
 
         # Apply runtime overrides (total pressure, pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
+        self._validate_runtime_pressure_overrides(campaign.name, ovr)
         if 'p_total_mbar' in ovr:
-            raw_override_pressure = ovr['p_total_mbar']
-            if not is_declared_real_scalar(
-                raw_override_pressure,
-                allow_numeric_str=True,
-            ):
-                raise ValueError("campaign p_total_mbar override must be numeric")
-            melt.p_total_mbar = float(raw_override_pressure)
+            melt.p_total_mbar = float(ovr['p_total_mbar'])
         if 'pO2_mbar' in ovr:
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
@@ -1909,15 +1946,8 @@ class CampaignManager:
             # active-path fix.  ``pO2_mbar == 0`` leaves atmosphere
             # alone (operator clearing the setpoint, NOT requesting
             # controlled-O2).
-            raw_override_pO2 = ovr['pO2_mbar']
-            if not is_declared_real_scalar(
-                raw_override_pO2,
-                allow_numeric_str=True,
-            ):
-                raise ValueError("C2A pO2_mbar override must be numeric")
-            override_pO2 = float(raw_override_pO2)
+            override_pO2 = float(ovr['pO2_mbar'])
             melt.pO2_mbar = override_pO2
-            melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
             if override_pO2 > 0.0:
                 melt.atmosphere = Atmosphere.CONTROLLED_O2
         self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)

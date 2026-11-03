@@ -3867,9 +3867,13 @@ def _profile_thermal_window_schedule(
     ):
         if recipe_patch is not None and any(
             ("campaigns", campaign, field) in recipe_patch.values
+            and _finite_float_or_none(
+                recipe_patch.values[("campaigns", campaign, field)]
+            ) is not None
             for field in profile_fields
         ):
             continue
+        # [5, 5] is a degenerate interval, still a bound rather than a scalar.
         for field in profile_fields:
             value = _campaign_setting(profile_run, campaign, field)
             if value is None and seed_patch is not None:

@@ -5611,16 +5611,20 @@ def _parse_runtime_campaign_overrides_json(
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise RunnerError(f"{flag_name} must decode to an object")
-    parsed: dict[str, dict[str, float]] = {}
+    parsed: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise RunnerError(
                 f"{flag_name}[{campaign!r}] must decode to an object"
             )
-        parsed[str(campaign)] = {
-            str(field): float(value)
-            for field, value in fields.items()
-        }
+        parsed[str(campaign)] = {}
+        for field, value in fields.items():
+            field_name = str(field)
+            parsed[str(campaign)][field_name] = (
+                value
+                if field_name in {"p_total_mbar", "pO2_mbar"}
+                else float(value)
+            )
     return parsed
 
 

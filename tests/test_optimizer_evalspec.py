@@ -2404,6 +2404,103 @@ def test_c2a_thermal_window_seed_pressure_reaches_configure_campaign() -> None:
     assert sim.melt.p_total_mbar == pytest.approx(5.0)
 
 
+def test_c2a_scalar_pressure_patch_beats_thermal_window_seed() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 6.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): 12.0}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(12.0)
+
+
+def test_c2a_interval_pressure_patch_keeps_thermal_window_seed_scalar() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 6.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): [5.0, 15.0]}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(6.0)
+
+
+def test_c2a_degenerate_interval_is_not_a_scalar_pressure_patch() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 7.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): [5.0, 5.0]}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(7.0)
+
+
+def test_c2a_thermal_window_seed_pressure_outside_recipe_band_is_refused() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 3.0
+
+    with pytest.raises(ProfileValidationError):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
 def test_c2b_thermal_window_seed_po2_reaches_configure_campaign() -> None:
     profile = _campaign_window_profile("C2B", 1320.0, 1480.0, 17)
     profile["seed_recipes"][0]["patch"]["campaigns"]["C2B"][
@@ -3916,13 +4013,18 @@ def _campaign_window_profile(
     }
 
 
-def _force_builtin_run_from_config(run_config) -> PyrolysisRun:
+def _force_builtin_run_from_config(
+    run_config,
+    *,
+    setpoints_patch: dict[str, object] | None = None,
+) -> PyrolysisRun:
     return PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign=run_config.campaign,
         hours=run_config.hours,
         mass_kg=run_config.mass_kg,
         backend_name=run_config.backend_name,
+        setpoints_patch=setpoints_patch or {},
         runtime_campaign_overrides=run_config.runtime_campaign_overrides,
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,
