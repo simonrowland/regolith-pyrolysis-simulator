@@ -666,6 +666,22 @@ def _signal_name(returncode: int) -> str:
         return f'signal {-int(returncode)}'
 
 
+def _crash_stderr_tail(stderr: str | None) -> str:
+    """Last 4000 characters of a signal-death stderr.
+
+    The isolated-worker crash cell calls this helper. A second slice
+    would split the bound.
+    """
+    if not stderr:
+        return ''
+    return stderr[-4000:]
+
+
+def _regolith_diagnostics_root() -> Path:
+    """Temp directory that already holds the engine diagnostic logs."""
+    return Path(tempfile.gettempdir(), 'regolith-pyrolysis-simulator')
+
+
 def _alphamelts_backend_failure_detail(reason_code: str,
                                        detail: str | None = None) -> str:
     message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
@@ -1293,10 +1309,9 @@ class _MELTSBackendSupport(MeltBackend):
             self._engine_version = None
             self._preload_petthermotools_payload(self._pet_module)
             if self._pet_warm_enabled:
-                diagnostic_path = Path(
-                    tempfile.gettempdir(),
-                    'regolith-pyrolysis-simulator',
-                    'petthermotools-diagnostics.log',
+                diagnostic_path = (
+                    _regolith_diagnostics_root()
+                    / 'petthermotools-diagnostics.log'
                 )
                 self._pet_worker = WarmEngineWorker(
                     name='PetThermoTools native operation',
