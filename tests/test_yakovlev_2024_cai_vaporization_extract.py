@@ -8,9 +8,32 @@ from tests.battery.factories import migrate_one_extract
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/yakovlev-2024-cai-vaporization.yaml"
 EXPECTED = {
-    "yakovlev_2024_fig3a_mgal2o4_figure_only": "MgAl2O4",
-    "yakovlev_2024_fig3a_ca2mgsi2o7_figure_only": "Ca2MgSi2O7",
-    "yakovlev_2024_fig3a_ca2al2sio7_figure_only": "Ca2Al2SiO7",
+    "yakovlev_2024_fig3a_mgal2o4_figure_only": (
+        "MgAl2O4",
+        "Lewis relation (1)",
+        [
+            "yakovlev_2024_fig2b_mgo_figure_only",
+            "yakovlev_2024_fig2b_al2o3_figure_only",
+        ],
+    ),
+    "yakovlev_2024_fig3a_ca2mgsi2o7_figure_only": (
+        "Ca2MgSi2O7",
+        "Lewis relation (2)",
+        [
+            "yakovlev_2024_fig2b_cao_figure_only",
+            "yakovlev_2024_fig2b_mgo_figure_only",
+            "yakovlev_2024_fig2b_sio2_figure_only",
+        ],
+    ),
+    "yakovlev_2024_fig3a_ca2al2sio7_figure_only": (
+        "Ca2Al2SiO7",
+        "Lewis relation (3)",
+        [
+            "yakovlev_2024_fig2b_cao_figure_only",
+            "yakovlev_2024_fig2b_al2o3_figure_only",
+            "yakovlev_2024_fig2b_sio2_figure_only",
+        ],
+    ),
 }
 
 
@@ -23,23 +46,19 @@ def test_yakovlev_2024_fig3a_compound_activities_are_model_derived() -> None:
     }
 
     assert set(EXPECTED) <= observations.keys()
-    for observation_id, formula in EXPECTED.items():
+    for observation_id, (formula, relation, inputs) in EXPECTED.items():
         values = observations[observation_id]["values"]
         assert values["species_formula"] == formula
         assert values["method_class"] == "model_derived"
         assert values["model"] == "Lewis relations (Lewis and Randall, 1923), equations (1)–(3)."
-        assert values["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-        assert values["derivation"]["raw_inputs"]["locator"]["panel"] == "B"
-        assert values["derivation"]["method"]["locator"]["page"] == 4
-        assert values["derivation"]["method"]["locator"]["section"] == "Lewis relations for compound activities"
-        assert values["derivation"]["method"]["locator"]["equation"] == "(1)–(3)"
-        assert values["derivation"]["references"] == [
-            "Lewis and Randall (1923)",
-            "Shornikov and Yakovlev (2022)",
-            "Shornikov et al. (1996)",
-            "Bale et al. (2016)",
-            "Shornikov (2017)",
-        ]
+        assert values["derived_from"] == inputs
+        assert values["derivation"]["inputs"] == inputs
+        derivation = values["derivation"]["relation"]
+        assert relation in derivation
+        assert "not reproduced in this paper" in derivation
+        assert "Shornikov et al. (1996)" in derivation
+        assert "Bale et al. (2016) (FactSage)" in derivation
+        assert "Shornikov (2017)" in derivation
 
 
 def test_yakovlev_2024_isolated_migration_preserves_point_conditions() -> None:

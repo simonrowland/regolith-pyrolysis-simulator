@@ -13,7 +13,7 @@ SOURCE_ID = "yakovlev-2024-cai-vaporization"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
 
 
-def test_yakovlev_2024_authored_fig3a_activities_migrate_as_reductions() -> None:
+def test_yakovlev_2024_authored_fig3a_activities_migrate_as_model_derived() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert validate_extract_document(document, path=EXTRACT) == []
 
@@ -54,7 +54,7 @@ def test_yakovlev_2024_authored_fig3a_activities_migrate_as_reductions() -> None
             if observation["observation_id"] == observation_id
         )
         values = source["values"]
-        assert values["method_class"] == "measured_reduced"
+        assert values["method_class"] == "model_derived"
         assert values["derived_from"] == inputs
         assert values["derivation"]["inputs"] == inputs
         assert "not reproduced in this paper" in values["derivation"]["relation"]
@@ -64,7 +64,7 @@ def test_yakovlev_2024_authored_fig3a_activities_migrate_as_reductions() -> None
         "points:h=e3d2be7417ab"
     )
     mg_point = result.observations[mg_point_id]
-    assert mg_point.evidence.class_.value == "measured_reduced"
+    assert mg_point.evidence.class_.value == "model_derived"
     assert mg_point.derivation is not None
     assert any("fig2b_mgo_figure_only" in item for item in mg_point.derived_from)
     assert any("fig2b_al2o3_figure_only" in item for item in mg_point.derived_from)
