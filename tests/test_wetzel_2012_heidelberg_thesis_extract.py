@@ -26,8 +26,21 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     assert len(table_rows) == 2
     assert [row["locator"]["row"] for row in table_rows] == ["ΔH1400K", "ΔH298K"]
 
+    experiments = raw["experiments"]
+    assert len(experiments) == 3
+    for experiment in experiments:
+        sample = experiment["sample"]
+        assert sample["material"] == "amorphous SiO powder"
+        assert sample["form"]["state"]["value"] == "condensed_solid"
+        assert sample["initial_composition"]["state"]["value"]["basis"] == "nominal_pure_substance"
+        assert sample["initial_composition"]["state"]["value"]["components"] == [["SiO", "1"]]
+        assert sample["purity"]["value"] == 99.99
+        assert sample["purity"]["printed_form"] == "99,99% mass purity"
+        assert sample["purity"]["note"] == "The remaining 0.01% impurity is unspecified and not modelled."
+
     # Render pins: Equation 2.25 on PDF p. 34.
     alpha = rows[ALPHA_ID]
+    assert alpha["experiment"] == "wetzel_sio_measurement_series"
     alpha_coefficients = alpha["values"]["coefficients"]
     assert alpha["locator"]["page"] == 34
     assert alpha["locator"]["equation"] == "2.25"
@@ -40,6 +53,7 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
 
     # Render pins: Equation 2.26 and Table 2.2 on PDF p. 36.
     pressure = rows[PRESSURE_ID]
+    assert pressure["experiment"] == "wetzel_sio_measurement_series"
     pressure_coefficients = pressure["values"]["coefficients"]
     assert pressure["locator"]["page"] == 36
     assert pressure["locator"]["equation"] == "2.26"
@@ -138,10 +152,14 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     assert migrated_by_source_id[PRESSURE_ID].evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     assert migrated_by_source_id[DH1400_ID].evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     assert migrated_by_source_id[DH298_ID].evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    alpha_composition = migrated_by_source_id[ALPHA_ID].identity.composition
+    assert alpha_composition is not None and alpha_composition.is_value
+    assert alpha_composition.value.components == (("SiO", Decimal("1")),)
     pressure_reservoir = migrated_by_source_id[PRESSURE_ID].identity.reservoir
     assert pressure_reservoir is not None and pressure_reservoir.is_value
     assert pressure_reservoir.value.formula == "SiO"
-    assert pressure_reservoir.value.phase is Phase.CR
+    assert pressure_reservoir.value.phase.is_value
+    assert pressure_reservoir.value.phase.value is Phase.CR
 
     unavailable_count = sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated)
     assert unavailable_count == 4
