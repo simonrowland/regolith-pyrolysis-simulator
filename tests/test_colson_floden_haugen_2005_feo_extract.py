@@ -151,7 +151,7 @@ def _assert_render_transcription(document: dict) -> None:
         assert values["composition_as_published"]["trace_FeO_addition_as_printed"].startswith("0.1–0.3 wt%")
         if sample == "Diop":
             assert values["marker_as_printed"] == "b"
-            assert values["source_attribution"] == "Value calculated from measurements of Colson et al. (1990)."
+            assert observation["source_attribution"] == "Value calculated from measurements of Colson et al. (1990)."
             assert "T_C" not in observation
         else:
             temperature = observation["point_conditions"]["T_C"]
