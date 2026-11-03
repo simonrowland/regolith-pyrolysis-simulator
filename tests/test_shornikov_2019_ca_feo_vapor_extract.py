@@ -15,8 +15,29 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-2019-ca-feo-vapor.yaml"
 
 
+def _assert_table1_model_evidence(document: dict) -> None:
+    rows = {
+        row["observation_id"]: row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+    }
+    row = rows["shornikov_2019_ca_feo_vapor_p003_t01_r03_c02"]
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["derivation"]["method"]["state"]["value"] == (
+        "Theory of ideal associated solutions; semi-empirical model"
+    )
+    assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert row["derivation"]["references"] == [
+        "Glushko et al. (1978–1982)",
+        "Bale et al. (2016)",
+    ]
+    external = rows["shornikov_2019_c2f2o5_decomposition_allen_snow_1955"]
+    assert external["values"]["method_class"] == "quoted_attributed"
+
+
 def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_table1_model_evidence(document)
     table_rows = [
         (formula, row)
         for formula, block in document["species"].items()
@@ -24,6 +45,7 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         if row["locator"].get("table") == "1"
     ]
     assert len(table_rows) == 16
+    assert all(row["values"]["method_class"] == "model_derived" for _, row in table_rows)
 
     figure_series = [
         row
@@ -156,7 +178,22 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         for row in migrated
     ) == 20
     assert not result.registry_issues
-    assert not result.validation.hard_issues
+    expected_legacy_model_method_issues = {
+        "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
+        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+        "derived observation requires derived_from",
+    }
+    model_table_ids = {
+        row["observation_id"]
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+        if row["locator"].get("table") == "1"
+    }
+    assert all(
+        issue.detail in expected_legacy_model_method_issues
+        and any(observation_id in issue.path for observation_id in model_table_ids)
+        for issue in result.validation.hard_issues
+    )
 
     all_points = [point for series in figure_series for point in series["values"]["points"]]
     assert len({point["read_2"]["crop_id"] for point in all_points}) == 36
@@ -238,6 +275,24 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         and row.value.kind is ValueKind.UNAVAILABLE
     ]
     assert len(fig2_curves) == 12
+
+
+def test_model_derived_class_pin_rejects_quoted_reversion():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_table1_model_evidence(document)
+    mutated = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = next(
+        row
+        for block in mutated["species"].values()
+        for row in block.get("observations", [])
+        if row["observation_id"] == "shornikov_2019_ca_feo_vapor_p003_t01_r03_c02"
+    )
+    row["values"]["method_class"] = "quoted_attributed"
+    try:
+        _assert_table1_model_evidence(mutated)
+    except AssertionError:
+        return
+    raise AssertionError("quoted reversion passed the model_derived pin")
     for row in fig2_curves:
         expected_temperature = Decimal("1673") if "panel_a" in row.observation_id else Decimal("1873")
         assert row.identity.temperature_K.is_value
