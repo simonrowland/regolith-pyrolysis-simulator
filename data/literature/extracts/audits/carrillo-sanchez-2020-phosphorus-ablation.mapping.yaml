@@ -3,6 +3,8 @@ source:
   citation: Carrillo-Sánchez et al. (2020), Injection of meteoric phosphorus into planetary atmospheres.
   doi: 10.1016/j.pss.2020.104926
   year: 2020
+# Columns 7–8 of the P rows are bulk cosmic-dust mass context; the percentages are
+# CABMOD-ZoDy ablation-efficiency context and are not phosphorus-influx data cells.
 extraction:
   method: MinerU Table 3 draft plus pdftotext concordance; row and column assignment checked on the page 13 render. Parenthetical ablation percentages and the three ± uncertainties were hand-separated after render review because the table tool does not split them.
   date: '2026-11-03'
@@ -35,16 +37,6 @@ tables:
     unit: t d-1
   - species_column: 2
     value_column: 6
-    quantity: planetary_phosphorus_mass_influx_rate
-    evidence_class: quoted_attributed
-    unit: t d-1
-  - species_column: 2
-    value_column: 7
-    quantity: planetary_phosphorus_mass_influx_rate
-    evidence_class: quoted_attributed
-    unit: t d-1
-  - species_column: 2
-    value_column: 8
     quantity: planetary_phosphorus_mass_influx_rate
     evidence_class: quoted_attributed
     unit: t d-1

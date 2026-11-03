@@ -21,8 +21,11 @@ evidence_policy:
     result stated in text is the PO peak-temperature interval for Allende particles with radius above 19 μm. No numerical
     MASI mass-loss series or post-ablation residue P content is tabulated in the article; the profile data are plotted and
     were not digitized.
-  model_generator: Table 3 reports CABMOD and Zodiacal Cloud Model (ZoDy) planetary outputs. Their model inputs are not stored
-    in this extraction, so Table 3 output rows use quoted_attributed under d-110 and remain separate from the MASI result.
+  model_generator: >-
+    Table 3 reports CABMOD-ZoDy global phosphorus fluxes and planetary ablation efficiencies. The 48 P/PO/PO2
+    flux cells remain quoted_attributed typed refusals under d-110 because model inputs are not stored. The twelve
+    parenthetical phosphorus-ablation efficiencies and six total cosmic-dust mass rates are model_derived context;
+    they are not furnace pyrolysis yields or elemental-P influx comparison points.
   missing_values: The article gives a linear temperature-ramp form but no numerical heating rate. It states about 15 Pa in
     N2 for MASI, but gives no experimental fO2. Table 3 does not print an experimental temperature, total pressure, fO2, or
     per-row composition for its integrated planetary model outputs.
@@ -56,14 +59,6 @@ fidelity_samples:
     table: '3'
     row: 15
     column: 6
-- path: species.P.observations[carrillo_sanchez_2020_table3_venus_htc_p_ablation_fraction].values.mass_yield_percent
-  value: '98'
-  locator:
-    page: 13
-    pdf_page_index: 12
-    table: '3'
-    row: 15
-    column: 5
 - path: species.PO.observations[carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um].values.T_K
   value:
     kind: interval
@@ -131,25 +126,6 @@ species:
           column_as_printed: Total P
           table_row_number: 2
           table_column_number: 6
-          locator:
-            page: 13
-            table: '3'
-            row: Earth P
-        - value: '8.2'
-          value_as_printed: '8.2'
-          column_as_printed: Total ablated
-          table_row_number: 2
-          table_column_number: 7
-          locator:
-            page: 13
-            table: '3'
-            row: Earth P
-        - value: '28.0'
-          uncertainty_as_printed: ± 8.1
-          value_as_printed: 28.0 ± 8.1
-          column_as_printed: Total influx
-          table_row_number: 2
-          table_column_number: 8
           locator:
             page: 13
             table: '3'
@@ -279,206 +255,6 @@ species:
             page: 13
             table: '3'
             row: Earth Total
-    - observation_id: carrillo_sanchez_2020_table3_earth_jfc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Earth Total continuation
-        column: 3
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Earth
-        dust_source_as_printed: JFC-Planck
-        yield_basis_as_printed: fraction of phosphorus that ablates from the JFC-Planck dust source
-        table_row_number: 6
-        table_column_number: 3
-        mass_yield_percent: '25'
-        value_as_printed: (25%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_earth_ast_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Earth Total continuation
-        column: 4
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Earth
-        dust_source_as_printed: AST
-        yield_basis_as_printed: fraction of phosphorus that ablates from the AST dust source
-        table_row_number: 6
-        table_column_number: 4
-        mass_yield_percent: '57'
-        value_as_printed: (57%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_earth_htc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Earth Total continuation
-        column: 5
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Earth
-        dust_source_as_printed: HTC
-        yield_basis_as_printed: fraction of phosphorus that ablates from the HTC dust source
-        table_row_number: 6
-        table_column_number: 5
-        mass_yield_percent: '96'
-        value_as_printed: (96%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_earth_total_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Earth Total
-        column: 6
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Earth
-        dust_source_as_printed: Total P
-        yield_basis_as_printed: fraction of total phosphorus input that ablates
-        table_row_number: 5
-        table_column_number: 6
-        mass_yield_percent: '41'
-        value_as_printed: (41%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
     - observation_id: carrillo_sanchez_2020_table3_mars_p_mass_influx
       type: gas_speciation
       locator:
@@ -533,25 +309,6 @@ species:
           column_as_printed: Total P
           table_row_number: 7
           table_column_number: 6
-          locator:
-            page: 13
-            table: '3'
-            row: Mars P
-        - value: '0.65'
-          value_as_printed: '0.65'
-          column_as_printed: Total ablated
-          table_row_number: 7
-          table_column_number: 7
-          locator:
-            page: 13
-            table: '3'
-            row: Mars P
-        - value: '2.1'
-          uncertainty_as_printed: ± 1.2
-          value_as_printed: 2.1 ± 1.2
-          column_as_printed: Total influx
-          table_row_number: 7
-          table_column_number: 8
           locator:
             page: 13
             table: '3'
@@ -739,25 +496,6 @@ species:
             page: 13
             table: '3'
             row: Venus P
-        - value: '12.7'
-          value_as_printed: '12.7'
-          column_as_printed: Total ablated
-          table_row_number: 12
-          table_column_number: 7
-          locator:
-            page: 13
-            table: '3'
-            row: Venus P
-        - value: '31.0'
-          uncertainty_as_printed: ± 17.7
-          value_as_printed: 31.0 ± 17.7
-          column_as_printed: Total influx
-          table_row_number: 12
-          table_column_number: 8
-          locator:
-            page: 13
-            table: '3'
-            row: Venus P
       point_conditions:
         temperature_K:
           state:
@@ -883,406 +621,153 @@ species:
             page: 13
             table: '3'
             row: Venus Total
-    - observation_id: carrillo_sanchez_2020_table3_venus_jfc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Venus Total
-        column: 3
-      phase: gas
+    context:
+    - observation_id: carrillo_sanchez_2020_table3_phosphorus_ablation_efficiencies
+      type: model_result_record
+      locator: {page: 13, table: '3'}
       units: '%'
       values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Venus
-        dust_source_as_printed: JFC-Planck
-        yield_basis_as_printed: fraction of phosphorus that ablates from the JFC-Planck dust source
-        table_row_number: 15
-        table_column_number: 3
-        mass_yield_percent: '36'
-        value_as_printed: (36%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_venus_ast_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Venus Total continuation
-        column: 4
-      phase: gas
-      units: '%'
+        quantity_as_printed: fraction of phosphorus that ablates from each dust source
+        method_class: model_derived
+        evidence_class: model_derived
+        method:
+          name: CABMOD-ZoDy
+          method_locator:
+            page: 11
+            section: 3.4
+            section_as_printed: Determining the phosphorus mass influx at Earth, Mars and Venus
+          result_locator: {page: 13, table: '3'}
+        admission_status: context_only
+        reason: >-
+          A planetary model ablation efficiency is not a furnace pyrolysis yield and is not a
+          comparison point.
+        percentages:
+        - planet_as_printed: Earth
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(25%)'
+          table_row_number: 6
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 3}
+        - planet_as_printed: Earth
+          dust_source_as_printed: AST
+          value_as_printed: '(57%)'
+          table_row_number: 6
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 4}
+        - planet_as_printed: Earth
+          dust_source_as_printed: HTC
+          value_as_printed: '(96%)'
+          table_row_number: 6
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Earth continuation', column: 5}
+        - planet_as_printed: Earth
+          dust_source_as_printed: Total P
+          value_as_printed: '(41%)'
+          table_row_number: 5
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Earth Total', column: 6}
+        - planet_as_printed: Mars
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(11%)'
+          table_row_number: 11
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 3}
+        - planet_as_printed: Mars
+          dust_source_as_printed: AST
+          value_as_printed: '(3%)'
+          table_row_number: 11
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 4}
+        - planet_as_printed: Mars
+          dust_source_as_printed: HTC
+          value_as_printed: '(93%)'
+          table_row_number: 11
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 5}
+        - planet_as_printed: Mars
+          dust_source_as_printed: Total P
+          value_as_printed: '(38%)'
+          table_row_number: 11
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Mars continuation', column: 6}
+        - planet_as_printed: Venus
+          dust_source_as_printed: JFC-Planck
+          value_as_printed: '(36%)'
+          table_row_number: 15
+          table_column_number: 3
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 3}
+        - planet_as_printed: Venus
+          dust_source_as_printed: AST
+          value_as_printed: '(67%)'
+          table_row_number: 16
+          table_column_number: 4
+          locator: {page: 13, table: '3', row: 'Venus continuation', column: 4}
+        - planet_as_printed: Venus
+          dust_source_as_printed: HTC
+          value_as_printed: '(98%)'
+          table_row_number: 15
+          table_column_number: 5
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 5}
+        - planet_as_printed: Venus
+          dust_source_as_printed: Total P
+          value_as_printed: '(53%)'
+          table_row_number: 15
+          table_column_number: 6
+          locator: {page: 13, table: '3', row: 'Venus Total', column: 6}
+    - observation_id: carrillo_sanchez_2020_table3_bulk_cosmic_dust_mass_rates
+      type: model_result_record
+      locator: {page: 13, table: '3'}
+      units: t d-1
       values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Venus
-        dust_source_as_printed: AST
-        yield_basis_as_printed: fraction of phosphorus that ablates from the AST dust source
-        table_row_number: 16
-        table_column_number: 4
-        mass_yield_percent: '67'
-        value_as_printed: (67%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_venus_htc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Venus Total
-        column: 5
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Venus
-        dust_source_as_printed: HTC
-        yield_basis_as_printed: fraction of phosphorus that ablates from the HTC dust source
-        table_row_number: 15
-        table_column_number: 5
-        mass_yield_percent: '98'
-        value_as_printed: (98%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_venus_total_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Venus Total
-        column: 6
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Venus
-        dust_source_as_printed: Total P
-        yield_basis_as_printed: fraction of total phosphorus input that ablates
-        table_row_number: 15
-        table_column_number: 6
-        mass_yield_percent: '53'
-        value_as_printed: (53%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_mars_jfc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Mars Total continuation
-        column: 3
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Mars
-        dust_source_as_printed: JFC-Planck
-        yield_basis_as_printed: fraction of phosphorus that ablates from the JFC-Planck dust source
-        table_row_number: 11
-        table_column_number: 3
-        mass_yield_percent: '11'
-        value_as_printed: (11%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_mars_ast_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Mars Total continuation
-        column: 4
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Mars
-        dust_source_as_printed: AST
-        yield_basis_as_printed: fraction of phosphorus that ablates from the AST dust source
-        table_row_number: 11
-        table_column_number: 4
-        mass_yield_percent: '3'
-        value_as_printed: (3%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_mars_htc_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Mars Total continuation
-        column: 5
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Mars
-        dust_source_as_printed: HTC
-        yield_basis_as_printed: fraction of phosphorus that ablates from the HTC dust source
-        table_row_number: 11
-        table_column_number: 5
-        mass_yield_percent: '93'
-        value_as_printed: (93%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-    - observation_id: carrillo_sanchez_2020_table3_mars_total_p_ablation_fraction
-      type: mass_loss
-      locator:
-        page: 13
-        table: '3'
-        row: Mars Total continuation
-        column: 6
-      phase: gas
-      units: '%'
-      values:
-        quantity: yield_fraction
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Carrillo-Sánchez et al. (2020), CABMOD-ZoDy model output; model input distributions not stored here.
-        planet_as_printed: Mars
-        dust_source_as_printed: Total P
-        yield_basis_as_printed: fraction of total phosphorus input that ablates
-        table_row_number: 11
-        table_column_number: 6
-        mass_yield_percent: '38'
-        value_as_printed: (38%)
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: No experimental temperature is printed for this integrated planetary model output.
-          locator:
-            page: 13
-            table: '3'
-        total_pressure_Pa:
-          state:
-            tag: unknown
-            reason: No experiment total pressure or planetary pressure is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        fO2_log:
-          state:
-            tag: unknown
-            reason: No numeric fO2 is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
-        composition:
-          state:
-            tag: unknown
-            reason: No numeric dust composition is printed in this table row.
-          locator:
-            page: 13
-            table: '3'
+        quantity_as_printed: total cosmic-dust mass ablated and total cosmic-dust mass influx
+        species_as_printed: bulk cosmic dust, not elemental phosphorus
+        method_class: model_derived
+        evidence_class: model_derived
+        method:
+          name: CABMOD-ZoDy
+          method_locator:
+            page: 11
+            section: 3.4
+            section_as_printed: Determining the phosphorus mass influx at Earth, Mars and Venus
+          result_locator: {page: 13, table: '3'}
+        reason: These are bulk cosmic-dust mass rates, not elemental phosphorus influx.
+        rates:
+        - planet_as_printed: Earth
+          table_row_number: 2
+          total_ablated:
+            value_as_printed: '8.2'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Earth P', column: 7}
+          total_influx:
+            value_as_printed: '28.0 ± 8.1'
+            uncertainty_as_printed: '± 8.1'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Earth P', column: 8}
+        - planet_as_printed: Mars
+          table_row_number: 7
+          total_ablated:
+            value_as_printed: '0.65'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Mars P', column: 7}
+          total_influx:
+            value_as_printed: '2.1 ± 1.2'
+            uncertainty_as_printed: '± 1.2'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Mars P', column: 8}
+        - planet_as_printed: Venus
+          table_row_number: 12
+          total_ablated:
+            value_as_printed: '12.7'
+            table_column_number: 7
+            locator: {page: 13, table: '3', row: 'Venus P', column: 7}
+          total_influx:
+            value_as_printed: '31.0 ± 17.7'
+            uncertainty_as_printed: '± 17.7'
+            confidence_level: not stated
+            table_column_number: 8
+            locator: {page: 13, table: '3', row: 'Venus P', column: 8}
   PO:
     observations:
     - observation_id: carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um
