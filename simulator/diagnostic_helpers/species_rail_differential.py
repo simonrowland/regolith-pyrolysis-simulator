@@ -110,8 +110,10 @@ UNAVAILABLE_CHANNELS = ("vaporock", "thermoengine", "melts")
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 
 # JANAF printed p° = 0.1 MPa = 1 bar = 1e5 Pa. B689 p° = 1 atm.
-# Na NBP 1156 K and Mg NBP 1363 K are the brief's 1-bar sanity rows
-# (NIST Mg T_b = 1363.15 K). P_sat(T_b) = 1 bar by definition.
+# Na NBP 1156 K and Mg NBP 1363 K are the brief's sanity rows
+# (NIST Mg T_b = 1363.15 K). Sodium's saturation pressure is the
+# Browning-Potter function in engines/builtin/sodium_saturation.py,
+# which is about 1.01 bar at 1156 K, not an identity P = 1 bar.
 JANAF_STANDARD_PRESSURE_PA = 1.0e5
 B689_STANDARD_PRESSURE_PA = 101325.0
 NA_NBP_K = 1156.0
@@ -1082,16 +1084,28 @@ def _legacy_species_row(species_id: str) -> Mapping[str, Any]:
 
 
 def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | None:
-    """P_sat in Pa from the catalog's pure_component_antoine sidecar.
+    """P_sat in Pa from the pure-component row.
 
-    Premise: log10(P/Pa) = A − B/(T+C). Na's A already includes +5 from the
-    NIST bar equation (yaml: log10(P/bar)=2.46077−…, converted to Pa by A+5).
-    Algebra: P_Pa = 10**(A − B/(T+C)).
+    Sodium is the Browning-Potter owner in engines/builtin/sodium_saturation.py.
+    Other metals still use the catalog pure_component_antoine sidecar:
+    log10(P/Pa) = A − B/(T+C), so P_Pa = 10**(A − B/(T+C)).
     Unit check: A is log10(Pa); B and C are kelvin; T+C is kelvin.
-    Sanity: Na 1156 K → 8.461e4 Pa (log10(P/1e5)=−0.073); Mg 1363 K →
-    1.033e5 Pa (log10(P/1e5)=+0.014). Both within 0.1 dex of the 1-bar NBP.
+    Sanity: Mg 1363 K → 1.033e5 Pa (log10(P/1e5)=+0.014), within 0.1 dex
+    of the 1-bar NBP. Sodium's 1156 K check lives with that owner.
     """
 
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+
+    block = sodium_saturation_block(row)
+    if block is not None:
+        try:
+            return sodium_saturation_pressure(block, T_K).pressure_pa
+        except SodiumSaturationError:
+            return None
     pca = row.get("pure_component_antoine")
     if not isinstance(pca, Mapping):
         return None
@@ -1120,8 +1134,9 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
     1 bar) and Mg 5.22e-13 Pa at 1363 K (−17.28 dex). That is the wrong
     quantity, not a Pa/bar slip on metal P_sat (the leftover 0.82 dex on
     Na is Pref continuation 250 K below its band; Mg is Pref_GF, not a
-    denormal). The catalog ``pure_component_antoine`` sidecar is metal
-    P_sat in Pa. Use it when present; otherwise only a compiled
+    denormal). Sodium's metal P_sat is ``pure_component_saturation``.
+    Other metals use the ``pure_component_antoine`` sidecar. Use that
+    pressure when present; otherwise only a compiled
     PURE_COMPONENT_SATURATION_PRESSURE evaluator; otherwise rail_row_absent.
     """
 
@@ -1169,10 +1184,14 @@ def _pick_condensed_psat(
 
 def _sidecar_valid_range_K(species_id: str) -> tuple[float, float] | None:
     row = _legacy_species_row(species_id)
-    pca = row.get("pure_component_antoine")
-    if not isinstance(pca, Mapping):
-        return None
-    vr = pca.get("valid_range_K")
+    saturation = row.get("pure_component_saturation")
+    if isinstance(saturation, Mapping):
+        vr = saturation.get("certified_range_K")
+    else:
+        pca = row.get("pure_component_antoine")
+        if not isinstance(pca, Mapping):
+            return None
+        vr = pca.get("valid_range_K")
     if not isinstance(vr, Sequence) or isinstance(vr, (str, bytes)) or len(vr) != 2:
         return None
     low, high = float(vr[0]), float(vr[1])

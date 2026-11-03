@@ -1376,8 +1376,10 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     mg_P = _evaluate_rail_pressure_Pa("Mg", MG_NBP_K)
     assert isinstance(na_P, float)
     assert isinstance(mg_P, float)
-    # Melt Pref is ~0.15 Pa (Na) / 5e-13 Pa (Mg); sidecar is ~1 bar.
-    assert na_P == pytest.approx(84612.0, rel=0.02)
+    # Melt Pref is ~0.15 Pa (Na) / 5e-13 Pa (Mg). Browning-Potter at
+    # 1156 K is about 1.01 bar, not the retired Antoine 0.85 bar.
+    ln_p_mpa = 11.9463 - 12633.73 / NA_NBP_K - 0.4672 * math.log(NA_NBP_K)
+    assert na_P == pytest.approx(1.0e6 * math.exp(ln_p_mpa), rel=1e-9)
     assert mg_P == pytest.approx(103271.0, rel=0.02)
     assert abs(math.log10(na_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
     assert abs(math.log10(mg_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1

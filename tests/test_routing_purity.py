@@ -343,14 +343,15 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
     _, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert 'Na#wall:523.15' not in route.antoine_extrapolations
     assert 'K#wall:313.15' not in route.antoine_extrapolations
-    assert tuple(na_record['valid_range_K']) == (924.0, 1118.0)
+    assert tuple(na_record['valid_range_K']) == (864.0, 2499.0)
     assert tuple(k_record['valid_range_K']) == (679.4, 1033.0)
     for record in (na_record, k_record):
         assert record['authority_level'] == 'extrapolated'
         assert record['reason'] == 'wall_saturation_pressure_out_of_validated_range'
         assert record['status'] == 'extrapolated'
     warnings = ' '.join(route.antoine_extrapolation_warnings)
-    assert 'valid_range_K [924, 1118] at 523.15 K' in warnings
+    assert 'valid_range_K [864, 2499] at 523.15 K' in warnings
+    assert '24%' in warnings
     assert 'valid_range_K [679.4, 1033] at 313.15 K' in warnings
 
 

@@ -69,24 +69,34 @@ pure-component pressure into the effective pressure over the actual melt.
 
 ### §2.1 Pure-component reference
 
-Each volatile species carries an Antoine fit for its pure-component saturation pressure:
+Potassium, calcium, aluminium, and the other pure-component species still carry an Antoine fit:
 
 ```
 log10(P_Pa) = A − B / (T_K + C)
 ```
 
-The coefficients are NIST Chemistry WebBook fits keyed to the original primary measurement, converted
-to pascals. For example, the sodium fit
-(`A = 7.46077, B = 1873.728, C = −416.372`, valid 924–1118 K) traces to Rodebush & Walters 1930
-(*J. Am. Chem. Soc.* 52(7):2654–2665, [doi:10.1021/ja01370a011](https://doi.org/10.1021/ja01370a011))
-via the WebBook Antoine table; potassium traces to Fiock & Rodebush 1926
+Those coefficients are NIST Chemistry WebBook fits keyed to the original primary measurement, converted
+to pascals. Potassium traces to Fiock & Rodebush 1926
 ([doi:10.1021/ja01421a006](https://doi.org/10.1021/ja01421a006)), calcium to Hartmann & Schneider 1929
 ([doi:10.1002/zaac.19291800129](https://doi.org/10.1002/zaac.19291800129)), and aluminium to the Stull
 1947 compilation ([doi:10.1021/ie50448a022](https://doi.org/10.1021/ie50448a022)). These are the
-`pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
+`pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and potassium's pure reference) and their fits are
 CITED — traceable to a primary measurement on the basis the reference used.
+
+Sodium's pure-component saturation pressure is not an Antoine row. It is the Browning–Potter liquid
+equation, Fink & Leibowitz, ANL/RE-95/2 (1995) §1.2 Eq. (1):
+
+```
+ln(P/MPa) = 11.9463 − 12633.73/T − 0.4672 ln T
+```
+
+certified on 864–2499 K. Below the melting point 370.98 K the same liquid pressure is corrected by the
+handbook fusion enthalpy, 2598 J/mol. Outside the certified band the equation is evaluated and flagged.
+The Rodebush & Walters Antoine row is retired as a runtime source. This curve is the wall saturation
+pressure. It is not the melt evolution pressure: the live melt rail remains the liquid-NaO₀.₅
+standard-reaction term.
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:2385 — Antoine row selection -->
-<!-- impl: §2.1 -> data/vapor_pressures.yaml families.metals_na_family.physical_properties.species.Na.pure_component_antoine:807 — pure Antoine data -->
+<!-- impl: §2.1 -> engines/builtin/sodium_saturation.py sodium_saturation_pressure:85 — pure sodium saturation -->
 
 Iron is a documented exception. The WebBook carries no simple high-temperature elemental Antoine row
 for iron, so the iron pure-component pressure is a constant-enthalpy Clausius–Clapeyron form anchored at
@@ -109,7 +119,8 @@ only. Silicon monoxide no longer uses the pseudo path either: as of the vapor pa
 SiO is a `standard_reaction_term` with a composition-independent JANAF/ThermoEngine reaction block
 and mass-action pO₂ scaling. Potassium also uses a `standard_reaction_term` on the same L&H basis.
 Where a usable `pure_component_antoine` sidecar exists, the runtime selector prefers it over any
-inactive pseudo fallback. The VapoRock target itself comes from Wolf et al. 2023 (REF-044; *ApJ* 947:64,
+inactive pseudo fallback. Sodium's pure saturation is the Browning–Potter block
+`pure_component_saturation`, not that sidecar and not the melt reaction term. The VapoRock target itself comes from Wolf et al. 2023 (REF-044; *ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:2759 — pseudo guard -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml families.oxide_vapors_sio_family.physical_properties.species.SiO.reaction:4655 — SiO standard reaction term (replaces pseudo backsolve; 3a85f59) -->

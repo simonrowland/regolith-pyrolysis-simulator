@@ -282,27 +282,32 @@ values:
     status: active
 
   - id: Na_pure_antoine
-    quantity: "Pure liquid sodium vapor-pressure Antoine coefficients."
-    value: {A: 7.46077, B: 1873.728, C: -416.372}
-    units: "log10(P_Pa) = A - B/(T_K + C)"
+    quantity: "Pure sodium saturation pressure, Browning-Potter liquid equation."
+    value:
+      equation: browning_potter
+      ln_p_mpa: {a: 11.9463, b: 12633.73, c: 0.4672}
+      fusion_enthalpy_J_per_mol: 2598.0
+      melting_temperature_K: 370.98
+    units: "ln(P/MPa) = a - b/T_K - c ln(T_K); below T_m, ln(P_s/P_l) = -(dH_fus/R)(1/T - 1/T_m)"
     tier: CITED
-    basis: "Pure liquid Na metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    basis: "Liquid sodium in equilibrium with its vapor. Solid branch is that liquid pressure corrected by the handbook fusion enthalpy."
     range:
-      T_K: [924, 1118]
-      recipe_1773_2173K: strong extrapolation
-      measured_vs_extrapolated: extrapolated
-    uncertainty: "NIST fit to Rodebush & Walters data; no explicit uncertainty bar in the row; historical vapor-pressure uncertainty order few percent."
+      T_K: [864, 2499]
+      recipe_1773_2173K: inside certified band
+      measured_vs_extrapolated: certified on 864-2499 K; predict-and-flag outside, including the solid branch
+    uncertainty: "Fink Table 1.2-2: 3% on 864-1500 K; 6-4% on 600-864 K; 25-9% on 400-600 K. Fink section 1.2: 24% versus the LMFBR equation at 400 K. Fusion enthalpy is the Table 1.1-4 jump 4752-2154 = 2598 J/mol."
     chosen:
-      ref: REF-041
-      locus: "JACS 52(7):2654-2665; NIST WebBook Antoine table, 924-1118 K sodium row."
-      url: "https://doi.org/10.1021/ja01370a011"
-      why: "Primary source row used by NIST for the exact Antoine coefficients currently in the data file."
+      ref: "ANL/RE-95/2"
+      locus: "Fink and Leibowitz, ANL/RE-95/2 (1995), section 1.2 equation (1) and Table 1.1-4."
+      url: "https://inis.iaea.org/records/1ga2v-1dw87/files/27004412.pdf"
+      why: "Handbook equation certified through the melt-temperature band. The retired Rodebush Antoine row was fit only on 924-1118 K and is about 2.9 times low at 1723 K."
     alternatives:
-      - ref: "later sodium vapor-pressure evaluations"
-        lacks: "do not reproduce the exact NIST Antoine row embedded in the simulator"
+      - ref: REF-041
+        lacks: "Rodebush and Walters Antoine row, 924-1118 K, retired as a runtime source"
     code_sites:
-      - "data/vapor_pressures.yaml:60 (metals.Na.pure_component_antoine)"
-    note: "Known follow-up: data/vapor_pressures.yaml:60 inline source still says REF-002; registry REF-041 is intentional Rodebush & Walters/NIST sodium row provenance."
+      - "data/vapor_pressures.yaml (metals.Na.pure_component_saturation)"
+      - "engines/builtin/sodium_saturation.py sodium_saturation_pressure"
+    note: "One runtime owner. The melt NaO0.5 standard-reaction term is a different quantity and is not this curve."
     status: active
 
   - id: K_pure_antoine

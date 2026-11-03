@@ -1222,15 +1222,19 @@ def test_cro2_wall_condensation_has_no_pure_component_proxy(
     assert wall_coeff == {}
 
 
-def test_sodium_pure_component_fit_rejects_nonphysical_pole_branch(
+def test_sodium_saturation_replaces_the_retired_antoine_pole(
     vapor_pressure_data,
 ):
-    row = vapor_pressure_data["metals"]["Na"]
-    pure = row["pure_component_antoine"]
+    from engines.builtin.sodium_saturation import sodium_saturation_pressure
 
-    assert 400.0 + pure["C"] < 0.0
-    assert vapor_pressure_module._pure_segment_usable(pure, 400.0) is False
-    assert vapor_pressure_module._pure_segment_usable(pure, 924.0) is True
+    row = vapor_pressure_data["metals"]["Na"]
+    assert "pure_component_antoine" not in row
+    for temperature_K in (313.15, 400.0):
+        result = sodium_saturation_pressure(
+            row["pure_component_saturation"], temperature_K
+        )
+        assert math.isfinite(result.pressure_pa) and result.pressure_pa > 0.0
+        assert result.authority == "extrapolated"
 
 
 def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch):
@@ -1243,20 +1247,20 @@ def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch)
         projected.append(value)
         return original_isfinite(value)
 
-    monkeypatch.setattr(vapor_pressure_module.math, "isfinite", capture_isfinite)
+    # The retired Na Antoine pole is a flagged Browning-Potter pressure.
+    # Do not put that call under the isfinite patch: the wall selector no
+    # longer evaluates a sodium Antoine row.
+    from engines.builtin.sodium_saturation import sodium_saturation_pressure
 
-    # Wall selection uses Na's published pure-component sidecar immediately
-    # above its documented T + C pole.
     na = vapor_pressure_data["metals"]["Na"]
     pole_adjacent_K = math.nextafter(416.372, math.inf)
-    wall_coeff, wall_block = (
-        vapor_pressure_module.wall_condensation_antoine_coefficients(
-            na, temperature_K=pole_adjacent_K
-        )
+    saturation = sodium_saturation_pressure(
+        na["pure_component_saturation"], pole_adjacent_K
     )
-    assert wall_coeff is na["pure_component_antoine"]
-    assert wall_block == "pure_component_antoine"
-    assert projected[-1].hex() == "-0x1.d46e978d4fdf2p+54"
+    assert math.isfinite(saturation.pressure_pa) and saturation.pressure_pa > 0.0
+    assert saturation.authority == "extrapolated"
+
+    monkeypatch.setattr(vapor_pressure_module.math, "isfinite", capture_isfinite)
 
     # Runtime selection uses the source-tabulated Mg pure-component fit.
     mg = vapor_pressure_data["metals"]["Mg"]

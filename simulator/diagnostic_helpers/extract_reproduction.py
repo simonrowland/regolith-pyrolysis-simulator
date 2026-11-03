@@ -1803,10 +1803,10 @@ def _invert_antoine_temperature_K(
     Units: catalog A/B/C are the Pa/K Antoine convention (NIST bar fits
     converted by A += 5); P enters in Pa; T returns in K.
 
-    Sanity: Na sidecar A=7.46077, B=1873.728, C=-416.372 at 101325 Pa
-    inverts to 1179.584731 K, a short extrapolation past the 924–1118 K
-    certified window toward the NIST 1156 K NBP (same identity the
-    dew-point test covers at rel=0.05).
+    Sanity: the potassium sidecar at 101325 Pa lands on its normal
+    boiling point inside the certified window. Sodium does not use this
+    inversion; its boiling point is the root of the Browning-Potter
+    equation in engines/builtin/sodium_saturation.py, about 1154.7 K.
     """
 
     try:
@@ -1859,8 +1859,9 @@ def _pure_component_catalog_row(
         if not isinstance(group, Mapping):
             continue
         row = group.get(species)
-        if isinstance(row, Mapping) and isinstance(
-            row.get("pure_component_antoine"), Mapping
+        if isinstance(row, Mapping) and (
+            isinstance(row.get("pure_component_antoine"), Mapping)
+            or isinstance(row.get("pure_component_saturation"), Mapping)
         ):
             return str(family), row
     return None, None
@@ -2001,28 +2002,54 @@ def _evaluate_transition_point(
     family, row = _pure_component_catalog_row(obs.species_id, vp_data)
     if row is None:
         return _refuse("no_pure_component_saturation_curve")
-    coeff = row.get("pure_component_antoine")
-    if not isinstance(coeff, Mapping) or "A" not in coeff or "B" not in coeff:
-        return _refuse("no_pure_component_saturation_curve")
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_block,
+        sodium_saturation_temperature_K,
+    )
 
-    runtime["catalog_family"] = family
-    runtime["antoine_source"] = coeff.get("source")
-    runtime["antoine_source_certification"] = coeff.get("source_certification")
-    runtime["antoine_provenance_class"] = coeff.get("provenance_class")
-    valid_range = coeff.get("valid_range_K")
-    if (
-        isinstance(valid_range, (list, tuple))
-        and len(valid_range) == 2
-    ):
+    saturation_block = sodium_saturation_block(row)
+    if saturation_block is not None:
+        runtime["catalog_family"] = family
+        runtime["engine_path"] = "pure_component_saturation_nbp_inversion"
+        runtime["saturation_source"] = saturation_block.get("source")
+        certified = saturation_block.get("certified_range_K")
+        if isinstance(certified, (list, tuple)) and len(certified) == 2:
+            try:
+                runtime["antoine_valid_range_K"] = [
+                    float(certified[0]),
+                    float(certified[1]),
+                ]
+            except (TypeError, ValueError):
+                runtime["antoine_valid_range_K"] = list(certified)
         try:
-            runtime["antoine_valid_range_K"] = [
-                float(valid_range[0]),
-                float(valid_range[1]),
-            ]
-        except (TypeError, ValueError):
-            runtime["antoine_valid_range_K"] = list(valid_range)
+            actual_T = sodium_saturation_temperature_K(saturation_block, target_pa)
+        except SodiumSaturationError as exc:
+            return _refuse(str(exc))
+        invert_reason = None
+    else:
+        coeff = row.get("pure_component_antoine")
+        if not isinstance(coeff, Mapping) or "A" not in coeff or "B" not in coeff:
+            return _refuse("no_pure_component_saturation_curve")
 
-    actual_T, invert_reason = _invert_antoine_temperature_K(coeff, target_pa)
+        runtime["catalog_family"] = family
+        runtime["antoine_source"] = coeff.get("source")
+        runtime["antoine_source_certification"] = coeff.get("source_certification")
+        runtime["antoine_provenance_class"] = coeff.get("provenance_class")
+        valid_range = coeff.get("valid_range_K")
+        if (
+            isinstance(valid_range, (list, tuple))
+            and len(valid_range) == 2
+        ):
+            try:
+                runtime["antoine_valid_range_K"] = [
+                    float(valid_range[0]),
+                    float(valid_range[1]),
+                ]
+            except (TypeError, ValueError):
+                runtime["antoine_valid_range_K"] = list(valid_range)
+
+        actual_T, invert_reason = _invert_antoine_temperature_K(coeff, target_pa)
     if actual_T is None:
         return _refuse(invert_reason or "antoine_inversion_failed")
 
