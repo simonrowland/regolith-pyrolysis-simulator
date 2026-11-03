@@ -169,6 +169,7 @@ def test_feng_all_typed_rows_migrate_with_sample_conditions_and_species() -> Non
         assert row.identity.species.phase.value is Phase.L
         assert row.identity.phase_role.value is PhaseRole.SLAG
         assert row.identity.temperature_K.is_value
+        assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.value == Decimal("1.01325e-5")
         assert row.point_conditions["pO2_Pa"].state.value == Decimal("1.01325e-5")
         assert row.point_conditions["temperature_K"].state.value == row.identity.temperature_K.value
@@ -198,3 +199,30 @@ def test_feng_all_typed_rows_migrate_with_sample_conditions_and_species() -> Non
     assert by_id["feng2025_t3_s01_liquid_feo"].identity.temperature_K.value == Decimal("1673.15")
     assert by_id["feng2025_t4_s20_liquid_tio2"].identity.temperature_K.value == Decimal("1473.15")
     assert by_id["feng2025_fig8_liquid_v_v-3"].value.point == Decimal("1.84")
+
+
+def test_feng_total_pressure_unknown_is_located_for_named_rows() -> None:
+    migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    migrator.finalize()
+    by_id = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+    }
+    named_rows = {
+        "feng2025_t3_s01_liquid_feo": "feng-t3-equilibration",
+        "feng2025_t4_s20_liquid_tio2": "feng-t4-equilibration",
+        "feng2025_fig8_liquid_v_v-3": "feng-v-series-equilibration",
+    }
+
+    for row_id, experiment_suffix in named_rows.items():
+        observation = by_id[row_id]
+        assert observation.identity.total_pressure_Pa.is_unknown
+        assert observation.experiment_id.endswith(f"::{experiment_suffix}")
+        experiment = migrator.result.experiments[observation.experiment_id]
+        total_pressure = experiment.pressure_environment.total_pressure_Pa
+        assert total_pressure.state.is_unknown
+        assert total_pressure.state.reason == (
+            "not_printed: the experimental procedure does not state the total furnace pressure."
+        )
+        assert total_pressure.locator.page == 3
+        assert total_pressure.locator.published_page == 1852
