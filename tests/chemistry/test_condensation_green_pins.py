@@ -121,6 +121,12 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
             digest_serialized.encode()
         ).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
+    # t-1604 rebaselined these kg from the production route after stage D_AB
+    # moved to the film temperature T_film = (T_gas,in + T_wall) / 2.
+    # lunar_24h and c2a_staged inlets are unchanged; captured kg fell and the
+    # terminal rose by the same amount. full_lunar inlets, and its Fe wall
+    # deposit, move only because that long run's evaporation follows the
+    # changed capture. The wall-deposit diffusivity temperature is unchanged.
     expected = json.loads(PINS.read_text())[name]
     for species in SPECIES:
         if species not in expected:

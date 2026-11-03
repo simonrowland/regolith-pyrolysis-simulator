@@ -621,6 +621,18 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     assert engagement["total_count"] >= 0
     assert engagement["engaged"] == (engagement["total_count"] > 0)
 
+    # Rebaselined 2026-11-03 for t-1604. Stage D_AB is evaluated at
+    # T_film = (T_gas,in + T_wall) / 2. The 24 h campaign and temperature
+    # schedule is unchanged. Shuttle inventory, the capture consequence:
+    # Na 0.007737103985195461 -> 0.003984164029366855 kg,
+    # K 0.00037914086313704933 -> 0.0001666916220602682 kg.
+    # Against a same-seat producer run of HEAD condensation.py
+    # (sha256 a2fefbda3e1af48dc12b298ca020263d0bdce8d898d5b05cdc76e33874af7830)
+    # the film-temperature payload changes 880 leaves and adds or drops
+    # 103 leaves, all downstream of that capture. The committed pin
+    # 5beb9b8a... is the studio-3 golden at 5a1129ddc, 106 commits before
+    # HEAD, so this seat does not reproduce it before the film-temperature
+    # change either.
     # Rebaselined 2026-10-28 for t-1452: the run-level engine-binding admission notice gains `governs` and states its scope
     # (cross-process cache replay and capture only); leaf diff vs 407e2f7b... is exactly those 2 notice leaves, no other value.
     # Rebaselined 2026-10-26 for b-813 and b-1028; sha256 c4756d389c417613353a48b60da4d33d5a163390c6592300eb3e4a4b0d546532.
@@ -633,7 +645,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "5beb9b8adc1ba407046586cd4591c9a0c0196c3187741642476cbacb4a0042cd"
+        "49095a82b73284bb6275ef85e6f0a210adc62bcee71c0c40301fc09eefbecf24"
     )
 
 
