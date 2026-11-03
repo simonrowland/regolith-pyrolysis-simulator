@@ -34,7 +34,8 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
         if not math.isfinite(n) or n < 0.0:
             return None
         # Raises UnparseableCompositionComponent when parse_formula and
-        # JANAF both fail. Decimal subscripts take the JANAF mass.
+        # JANAF both fail. A decimal subscript parses in parse_formula,
+        # so its mass is those atoms.
         mass = n * oxide_molar_mass_g_mol(oxide)
         if not math.isfinite(mass) or mass < 0.0:
             return None
