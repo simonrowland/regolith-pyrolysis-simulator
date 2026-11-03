@@ -218,11 +218,11 @@ def test_gail_sio_extract_migrates_with_pinned_printed_values_and_conditions() -
         assert comparison.identity.quantity.is_value
         assert comparison.identity.quantity.value is Quantity.P_SAT
 
-    assert pressure_observation.identity.reservoir is not None
-    assert pressure_observation.identity.reservoir.is_unknown
-    assert "solid silicon monoxide" in pressure_observation.identity.reservoir.reason
-    assert "Phase.CR would assert crystalline SiO" in pressure_observation.identity.reservoir.reason
-    assert "no reservoir mapped from source" not in pressure_observation.identity.reservoir.reason
+    reservoir = pressure_observation.identity.reservoir
+    assert reservoir is not None
+    assert reservoir.is_unknown
+    assert reservoir.value is None
+    # t-1601 explains the generic P_SAT reason; UNKNOWN assigns neither Phase.CR nor Phase.GLASS.
 
     assert all(
         row["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
