@@ -7071,3 +7071,17 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
     )
     with pytest.raises(AssertionError):
         assert_migration(mutated)
+
+
+_SC456_SOURCE_IDS = ("banya-hino-takezoe-1985-na-fe-silicate-redox",)
+
+
+@pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
+def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
+    """Keep each SC-456 source independently migratable after evidence relabels."""
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
