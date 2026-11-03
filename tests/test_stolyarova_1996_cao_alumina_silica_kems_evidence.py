@@ -127,16 +127,54 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         if "stolyarova_1996_table2_pO" in observation_id
     }
     assert len(baseline_oxygen) == len(oxygen_rows) == 55
+    lineage_detail = "derived observation requires derived_from"
     before_issues = baseline.validation.hard_issues
+    lineage_issues = [issue for issue in before_issues if issue.detail == lineage_detail]
+    derivation_issues = [
+        issue
+        for issue in before_issues
+        if issue.detail.startswith("invalid derivation annotation:")
+    ]
+    assert len(before_issues) == 58
+    assert len(lineage_issues) == 55
+    assert all(
+        issue.reason is RefusalReason.CONDITIONAL_FIELD
+        and issue.detail == lineage_detail
+        and issue.path.startswith("observation[")
+        and issue.path.endswith("].derived_from")
+        for issue in lineage_issues
+    )
+    assert {
+        issue.path.removesuffix(".derived_from")[12:-1]
+        for issue in lineage_issues
+    } == set(baseline_oxygen)
+    expected_derivation_paths = {
+        f"observations.stolyarova-1996-cao-alumina-silica-kems::{observation_id}.values.derivation"
+        for observation_id in (
+            "stolyarova_1996_table2_pO_1933k",
+            "stolyarova_1996_table2_pO_prime_1933k",
+            "stolyarova_1996_table2_pO_double_prime_1933k",
+        )
+    }
+    assert len(derivation_issues) == 3
+    assert {issue.path for issue in derivation_issues} == expected_derivation_paths
+    assert all(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and issue.detail
+        == (
+            "invalid derivation annotation: Derivation.inputs is required unless "
+            "raw_inputs is located not_printed"
+        )
+        for issue in derivation_issues
+    )
+    assert len(lineage_issues) + len(derivation_issues) == len(before_issues)
     baseline_reduced = {
         observation_id: observation
         for observation_id, observation in baseline.observations.items()
         if observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     }
-    assert before_issues
     assert len(baseline_reduced) == 55
-    assert any("stolyarova_1996_table2_pO" in issue.path for issue in before_issues)
     assert set(oxygen_rows) == set(baseline_oxygen)
     assert {
         observation_id: to_plain(observation.value)
