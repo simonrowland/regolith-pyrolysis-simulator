@@ -9,7 +9,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity
+from simulator.battery.enums import (
+    EvidenceClass,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+)
 from simulator.battery.migrate import convert_temperature_to_k, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tests.battery.test_migrate import _migrate_real_extract
@@ -101,7 +106,19 @@ def _assert_source_cells_match_audit(document: dict, audit: dict[int, dict[str, 
             assert obs["values"]["method_class"] == "measured_reduced"
             assert obs["values"]["evidence_class"] == "measured_reduced"
             assert obs["phase"] == "l"
-            assert obs["standard_state"] == STANDARD_STATE
+            standard_state = obs["standard_state"]
+            reference = standard_state["state"]["value"]
+            assert standard_state["state"]["tag"] == "value"
+            assert reference["convention"] == "raoultian_pure_endmember"
+            assert reference["endmember"]["formula"] == "Fe(1-x)O"
+            assert reference["endmember"]["phase"] == {
+                "tag": "value",
+                "value": "l",
+            }
+            assert reference["component_basis"] == "Fe(1-x)O"
+            assert standard_state["inferred"] is True
+            assert standard_state["locator"]["page"] == 9
+            assert standard_state["locator"]["published_page"] == 405
             assert obs["values"]["standard_state_as_printed"] == STANDARD_STATE
             assert obs["locator"]["page"] == source_row["page"]
             assert obs["locator"]["published_page"] == source_row["published_page"]
@@ -125,6 +142,11 @@ def _assert_source_cells_match_audit(document: dict, audit: dict[int, dict[str, 
                 assert condition["locator"]["table"] == "1"
                 assert f"row {source_row['label']}" in condition["locator"]["note"]
                 assert f"column {expected_column}" in condition["locator"]["note"]
+
+            saturation = conditions["iron_saturation"]
+            assert saturation["state"] == {"tag": "value", "value": "iron-saturated"}
+            assert saturation["locator"]["page"] == 1
+            assert saturation["locator"]["published_page"] == 397
 
             fo2 = conditions["fO2_log"]
             assert fo2["units"] == "log10(atm)"
@@ -238,9 +260,17 @@ def _assert_migrated_cells_match_audit(result, audit: dict[int, dict[str, object
 
             assert row.identity.total_pressure_Pa.is_unknown
             assert "total_pressure_Pa" not in row.point_conditions
-            assert row.identity.reference_state.is_unknown
-            assert row.identity.reference_state.reason
-
+            assert row.identity.reference_state.is_value
+            reference_state = row.identity.reference_state.value
+            assert reference_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            assert reference_state.endmember.formula == "Fe(1-x)O"
+            assert reference_state.endmember.phase.is_value
+            assert reference_state.endmember.phase.value is Phase.L
+            assert reference_state.component_basis == "Fe(1-x)O"
+            saturation = row.point_conditions["iron_saturation"]
+            assert saturation.state.is_value
+            assert saturation.state.value == "iron-saturated"
+            assert saturation.locator.page == 1
             composition = row.point_conditions["composition"]
             if cells["MnO"] is None:
                 assert composition.state.is_unknown
@@ -302,6 +332,40 @@ def test_render_audit_binds_every_table1_value_and_condition_with_mutation_check
     with pytest.raises(AssertionError, match="run_23_activity_coefficient"):
         _assert_migrated_cells_match_audit(mutated_result, audit)
 
+    mutated_reference = copy.deepcopy(document)
+    reference_row = next(
+        row
+        for row in mutated_reference["species"]["FeO"]["observations"]
+        if row["observation_id"] == _observation_id(23, "activity")
+    )
+    reference_row["standard_state"]["state"]["value"]["component_basis"] = "FeO"
+    mutated_reference_result = _migrate_real_extract(
+        tmp_path / "mutated-reference",
+        EXTRACT.name,
+        write=False,
+        extract_doc=mutated_reference,
+    )
+    with pytest.raises(AssertionError):
+        _assert_migrated_cells_match_audit(mutated_reference_result, audit)
+
+    mutated_saturation = copy.deepcopy(document)
+    saturation_row = next(
+        row
+        for row in mutated_saturation["species"]["FeO"]["observations"]
+        if row["observation_id"] == _observation_id(23, "activity")
+    )
+    saturation_row["point_conditions"]["iron_saturation"]["state"]["value"] = (
+        "not iron-saturated"
+    )
+    mutated_saturation_result = _migrate_real_extract(
+        tmp_path / "mutated-saturation",
+        EXTRACT.name,
+        write=False,
+        extract_doc=mutated_saturation,
+    )
+    with pytest.raises(AssertionError):
+        _assert_migrated_cells_match_audit(mutated_saturation_result, audit)
+
     assert len(document["species"]["FeO"]["observations"]) == 90
     assert all(
         row.identity.quantity.is_value
@@ -316,4 +380,5 @@ def test_render_audit_binds_every_table1_value_and_condition_with_mutation_check
         assert row.identity.temperature_K.is_value
         assert row.identity.fO2_Pa.is_value
         assert row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.reference_state.is_unknown
+        assert row.identity.reference_state.is_value
+        assert row.identity.reference_state.value.endmember.formula == "Fe(1-x)O"
