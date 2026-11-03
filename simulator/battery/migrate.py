@@ -20820,8 +20820,18 @@ class Migrator:
         explicit_composition = _located_explicit_point_composition(
             (point_conditions or {}).get("composition")
         )
+        explicit_composition_condition = (point_conditions or {}).get("composition")
         if explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
+        elif (
+            isinstance(explicit_composition_condition, Located)
+            and explicit_composition_condition.locator is not None
+            and explicit_composition_condition.state.is_unknown
+            and (explicit_composition_condition.state.reason or "").startswith(
+                "mass-percent composition is not usable:"
+            )
+        ):
+            ident_kwargs["composition"] = explicit_composition_condition.state
         elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
