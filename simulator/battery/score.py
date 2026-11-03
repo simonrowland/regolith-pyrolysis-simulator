@@ -13257,7 +13257,12 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
-        if predictor is predict_with_engine:
+        # The built-in defaults are None. Pass the sibling map only when this
+        # row resolved one, so a double standing in for predict_with_engine
+        # keeps the handles/experiment contract on a non-phase row (0a7918296).
+        if predictor is predict_with_engine and (
+            phase_siblings is not None or phase_sibling_refusal is not None
+        ):
             predictor_kwargs["phase_siblings"] = phase_siblings
             predictor_kwargs["phase_sibling_refusal"] = phase_sibling_refusal
         prediction = predictor(
