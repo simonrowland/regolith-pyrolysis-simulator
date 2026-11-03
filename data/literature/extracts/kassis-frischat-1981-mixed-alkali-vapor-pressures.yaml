@@ -118,17 +118,31 @@ species:
           column_header: '1150 °C'
           table_row_number: 2
           table_column_number: 2
+        derivation:
+          relation: >-
+            The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the
+            authors' measured evaporation data using Eqs. (19)–(20) and
+            (23)–(26), PDF page 7 (printed page 95).
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 8
+              published_page: 96
+              figure: '8a, 8b, 9a, 9b'
+              note: >-
+                Figures 8a–b and 9a–b show the calculated Na and Rb partial
+                pressures as curves; the row-wise numeric inputs are not
+                printed as table values.
         phase: gas
         units: dimensionless
         values:
           quantity: Rb partial-pressure ratio between two melt compositions
-          method_class: quoted_attributed
-          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class: measured_reduced
           method_class_reason: >-
-            The authors calculate this ratio from their partial-pressure
-            series using the printed pressure relations. Those individual
-            numeric points occur only in Figures 8 and 9 and are not stored;
-            under d-110 this row is quoted_attributed, not direct measurement.
+            The authors reduce their measured evaporation data to this ratio
+            using the printed pressure relations; the numerical inputs are
+            available only as figure curves and are not stored.
           admission_status: unavailable
           unavailable_reason: no exact quantity token for a partial-pressure ratio
           schema_gap: >-
@@ -214,17 +228,31 @@ species:
           column_header: '1200 °C'
           table_row_number: 2
           table_column_number: 3
+        derivation:
+          relation: >-
+            The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the
+            authors' measured evaporation data using Eqs. (19)–(20) and
+            (23)–(26), PDF page 7 (printed page 95).
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 8
+              published_page: 96
+              figure: '8a, 8b, 9a, 9b'
+              note: >-
+                Figures 8a–b and 9a–b show the calculated Na and Rb partial
+                pressures as curves; the row-wise numeric inputs are not
+                printed as table values.
         phase: gas
         units: dimensionless
         values:
           quantity: Rb partial-pressure ratio between two melt compositions
-          method_class: quoted_attributed
-          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class: measured_reduced
           method_class_reason: >-
-            The authors calculate this ratio from their partial-pressure
-            series using the printed pressure relations. Those individual
-            numeric points occur only in Figures 8 and 9 and are not stored;
-            under d-110 this row is quoted_attributed, not direct measurement.
+            The authors reduce their measured evaporation data to this ratio
+            using the printed pressure relations; the numerical inputs are
+            available only as figure curves and are not stored.
           admission_status: unavailable
           unavailable_reason: no exact quantity token for a partial-pressure ratio
           schema_gap: >-
@@ -310,17 +338,31 @@ species:
           column_header: '1250 °C'
           table_row_number: 2
           table_column_number: 4
+        derivation:
+          relation: >-
+            The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the
+            authors' measured evaporation data using Eqs. (19)–(20) and
+            (23)–(26), PDF page 7 (printed page 95).
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 8
+              published_page: 96
+              figure: '8a, 8b, 9a, 9b'
+              note: >-
+                Figures 8a–b and 9a–b show the calculated Na and Rb partial
+                pressures as curves; the row-wise numeric inputs are not
+                printed as table values.
         phase: gas
         units: dimensionless
         values:
           quantity: Rb partial-pressure ratio between two melt compositions
-          method_class: quoted_attributed
-          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class: measured_reduced
           method_class_reason: >-
-            The authors calculate this ratio from their partial-pressure
-            series using the printed pressure relations. Those individual
-            numeric points occur only in Figures 8 and 9 and are not stored;
-            under d-110 this row is quoted_attributed, not direct measurement.
+            The authors reduce their measured evaporation data to this ratio
+            using the printed pressure relations; the numerical inputs are
+            available only as figure curves and are not stored.
           admission_status: unavailable
           unavailable_reason: no exact quantity token for a partial-pressure ratio
           schema_gap: >-
@@ -406,17 +448,31 @@ species:
           column_header: '1300 °C'
           table_row_number: 2
           table_column_number: 5
+        derivation:
+          relation: >-
+            The reported pγRb(0.3) / pγRb(0.5) ratio is calculated from the
+            authors' measured evaporation data using Eqs. (19)–(20) and
+            (23)–(26), PDF page 7 (printed page 95).
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 8
+              published_page: 96
+              figure: '8a, 8b, 9a, 9b'
+              note: >-
+                Figures 8a–b and 9a–b show the calculated Na and Rb partial
+                pressures as curves; the row-wise numeric inputs are not
+                printed as table values.
         phase: gas
         units: dimensionless
         values:
           quantity: Rb partial-pressure ratio between two melt compositions
-          method_class: quoted_attributed
-          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class: measured_reduced
           method_class_reason: >-
-            The authors calculate this ratio from their partial-pressure
-            series using the printed pressure relations. Those individual
-            numeric points occur only in Figures 8 and 9 and are not stored;
-            under d-110 this row is quoted_attributed, not direct measurement.
+            The authors reduce their measured evaporation data to this ratio
+            using the printed pressure relations; the numerical inputs are
+            available only as figure curves and are not stored.
           admission_status: unavailable
           unavailable_reason: no exact quantity token for a partial-pressure ratio
           schema_gap: >-

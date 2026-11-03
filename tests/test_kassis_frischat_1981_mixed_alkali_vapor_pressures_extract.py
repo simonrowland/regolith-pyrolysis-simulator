@@ -54,6 +54,18 @@ def _assert_rendered_values_and_count(document: dict) -> None:
         assert observation["values"]["value"] == printed_value
         assert observation["values"]["T_C"] == str(temperature)
         assert observation["values"].get("schema_gap")
+        assert observation["values"]["method_class"] == "measured_reduced"
+        assert "attribution" not in observation["values"]
+        derivation = observation["derivation"]
+        assert "Eqs. (19)–(20) and (23)–(26)" in derivation["relation"]
+        assert derivation["output_unit"] == "dimensionless"
+        assert derivation["raw_inputs"]["state"] == {
+            "tag": "value",
+            "value": "not_printed",
+        }
+        assert derivation["raw_inputs"]["locator"]["page"] == 8
+        assert derivation["raw_inputs"]["locator"]["published_page"] == 96
+        assert derivation["raw_inputs"]["locator"]["figure"] == "8a, 8b, 9a, 9b"
         assert observation["experiment"] == "mixed_alkali_pressure_ratio_series"
 
     numerator = rows[next(iter(OBSERVATION_IDS))]["values"][
@@ -97,6 +109,13 @@ def test_render_pins_cover_table3_ratio_and_table1_compositions() -> None:
     ]["values"]["value"] = "0,45"
     with pytest.raises(AssertionError):
         _assert_rendered_values_and_count(mutated)
+
+    mutated_class = deepcopy(document)
+    _table3_rows(mutated_class)[
+        "kassis_frischat_1981_table3_rb_pressure_ratio_1150c"
+    ]["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_rendered_values_and_count(mutated_class)
 
 
 def test_isolated_migration_keeps_conditions_and_exact_schema_refusal() -> None:

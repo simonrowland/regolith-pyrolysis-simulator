@@ -98,17 +98,23 @@ observation type with a descriptive non-token `values.quantity`, and are typed
 refused as unavailable. The focused test asserts that these are exactly the four
 quantity-unknown rows and that phase remains known as gas.
 
-The authors compute the reported ratio from their calculated partial-pressure
-series using their printed pressure relations (Eqs. 23–26 on PDF page 7). Those
-individual numeric series
-are figure-only and are not stored as parent rows, so the table values are
-`quoted_attributed` under d-110; they are not labeled as direct measurements.
-The pressure-ratio values are dimensionless as printed. The table's Rb
-intensity-ratio row is not a partial pressure and is not included.
+The authors reduce their measured evaporation data to the reported ratio using
+the printed partial-pressure relations (Eqs. (19)–(20) and (23)–(26), PDF page 7,
+printed page 95), so the rows are `measured_reduced`. The numeric partial-pressure
+inputs appear only as curves in Figures 8a–b and 9a–b (PDF page 8, printed page
+96) and are not stored as parent rows. Each observation records these raw inputs
+as `not_printed` at that figure locator; the paper itself is not a derivation
+input. The values are dimensionless as printed.
+The table's Rb intensity-ratio row is not a partial pressure and is not included.
 
 ## Relation to the other Kassis and Frischat source
 
 This extract is the Glastechnische Berichte mixed-alkali paper, repository DOI
 10.34657/17394. It is distinct from
 `kassis-frischat-1981-silicate-glass-vapour` (Journal of the American Ceramic
-Society). No rows from that source are duplicated.
+Society). Tabelle 4's end-member values at γ_Rb = 0 (ΔH_Ver 316 kJ mol⁻¹,
+ΔS_Ver 102 J K⁻¹) and γ_Rb = 1 (ΔH_Ver 328 kJ mol⁻¹, ΔS_Ver 122 J K⁻¹), with
+the footnote pressure `p = 1,013·10^5 Pa`, are already stored in the JACS
+extract's context rows `kassis_1981_total_pressure_thermochemistry` and
+`kassis_1981_total_pressure_thermochemistry_rb`. They are an end-member overlap
+between the two papers; no rows from that source are duplicated here.
