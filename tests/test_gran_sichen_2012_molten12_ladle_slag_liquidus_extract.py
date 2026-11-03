@@ -207,6 +207,19 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
         if observation["locator"]["table"] == "1"
     }
     assert len(table1_assemblages) == 100
+    expected_printed_assemblages = {
+        "gran_2012_sample_010": "L, 2CS",
+        "gran_2012_sample_011": "L, 2CS",
+        "gran_2012_sample_014": "L,2CS",
+        "gran_2012_sample_015": "L, 2CS",
+        "gran_2012_sample_071": "L,M, MA",
+        "gran_2012_sample_098": "L,M,MA",
+        "gran_2012_sample_100": "L,M, C",
+    }
+    assert {
+        sample_id: table1_assemblages[sample_id][0]
+        for sample_id in expected_printed_assemblages
+    } == expected_printed_assemblages
     for observation in source_observations.values():
         run_composition = observation["point_conditions"]["composition"]
         assert run_composition["state"] == {
