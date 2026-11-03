@@ -47,13 +47,17 @@ Key physics:
     single-exponential capture balance exactly.
     Walls and stages remove vapor in physical order; every capture stays
     at its location and the remainder goes to terminal offgas.
+    Designation does not decide capture. Each stage applies the same
+    saturation law to every condensable species that reaches it. A
+    species with no saturation model at that temperature stays a typed
+    pass-through. Off-design mass is that stage's impurity. Product
+    routing stays the designated-stage registry.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
     Default Stage 1 wall is 1150°C; Stage 3 is 900-1200°C
-    (``CondensationTrain.create_default``). Stage 2 is the Cr/CrO2/Mn
-    harvester and isolates non-Cr species
-    (``_cr_stage_isolation_blocks``); SiO's designated destination is
-    Stage 3, not Stage 2.
+    (``CondensationTrain.create_default``). Whether vapor lands on a
+    stage is the wall saturation pressure on that band, not a species
+    allow-list. SiO's designated product stage remains Stage 3.
     This module does not model Fe melting, a sump, a chevron droplet
     separator, or a radiation-gap thermal break.
     A Stage-1 wall at or above 1100°C keeps SiO off the Fe tap. The
@@ -136,14 +140,11 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
 )
 from simulator.condensation_routing import (
-    DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
-    NA_COLLECTOR_STAGE_KEY,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
     designated_stage_number,
-    is_designated_for_stage,
     species_accepted_on_stage,
     stage_key_for_stage,
 )
@@ -2078,6 +2079,11 @@ class CondensationRouteResult:
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     retained_in_source_by_species: Dict[str, float] = field(default_factory=dict)
     condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    # Visit identity (stage_number, sub_order) -> species kg. The public
+    # stage-number map above is the sum. Stage 4 and the K trap share a
+    # number, so the sum cannot say which surface condensed the vapor.
+    capture_kg_by_stage_identity: Dict[tuple[int, int], Dict[str, float]] = field(
+        default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
     wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = field(
         default_factory=dict)
@@ -3233,6 +3239,7 @@ class CondensationModel:
         remaining_by_species = {}
         retained_in_source_by_species: Dict[str, float] = {}
         condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
+        capture_kg_by_stage_identity: Dict[tuple[int, int], Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
         wall_deposit_fraction_by_species: Dict[str, float] = {}
@@ -3463,7 +3470,7 @@ class CondensationModel:
             # can consume the supply; a clean stage cannot hide missing alpha.
             alpha_surface = _stage_alpha_surface_key(stage)
             for species, route in stage_route_by_species.items():
-                if flowing_rates.get(species, 0.0) <= 1e-15 or _stage_isolation_blocks(stage, species):
+                if flowing_rates.get(species, 0.0) <= 1e-15:
                     continue
                 record = _stage_alpha_record(stage, species, self.materials)
                 _required_record_alpha_s(record, species=species, site='stage_deposition')
@@ -3523,7 +3530,7 @@ class CondensationModel:
             reactive_stage_capture_kg: dict[str, float] = {}
             for species, route in stage_route_by_species.items():
                 supply = flowing_rates.get(species, 0.0)
-                if supply <= 1e-15 or _stage_isolation_blocks(stage, species):
+                if supply <= 1e-15:
                     continue
                 alpha_record = route['stage_alpha_records_by_stage'][alpha_surface]
                 reaction = None
@@ -3597,11 +3604,13 @@ class CondensationModel:
                         reaction['transport_uptake_mol'] = deposit / molar_mass
                         reactive_stage_capture_kg[species] = deposit
                         continue
-                    route['hkl_condensed_by_stage'][stage.stage_number] = deposit
+                    # Stage 4 and the K trap share a public stage number.
+                    # A stage-number key overwrites the earlier surface, and
+                    # designation then books both captures onto one product.
+                    identity = (int(stage.stage_number), int(stage.sub_order))
+                    route['hkl_condensed_by_stage'][identity] = deposit
                     if not species_accepted_on_stage(stage, species):
-                        route.setdefault('impurity_stage_numbers', set()).add(
-                            stage.stage_number,
-                        )
+                        route.setdefault('impurity_identities', set()).add(identity)
                     stage_removed[species] = deposit
             if reactive_stage_capture_kg:
                 demand_mol = math.fsum(
@@ -3625,7 +3634,14 @@ class CondensationModel:
                     reaction = reactive_alkali[species]
                     uptake_mol = reaction['transport_uptake_mol'] * uptake_scale
                     reactive_kg = transport_kg * uptake_scale
-                    stage_route_by_species[species]['reactive_kg'] += reactive_kg
+                    stage_route = stage_route_by_species[species]
+                    stage_route['reactive_kg'] += reactive_kg
+                    # Same visit identity as an HKL deposit. Stage 3 is the
+                    # only reactive sink, and it shares no second sub-order.
+                    stage_route['reactive_capture_identity'] = (
+                        int(stage.stage_number),
+                        int(stage.sub_order),
+                    )
                     reaction.update(
                         uptake_mol=uptake_mol,
                         oxygen_debit_mol=uptake_mol / 4.0,
@@ -3791,8 +3807,21 @@ class CondensationModel:
                 # Alkali reaction is a distinct Stage-3 impurity sink. Keep it
                 # in the common collection projection so ledger accounting has
                 # one owner, while its chemistry remains in reactive_alkali.
-                condensed_by_stage_species.setdefault(3, {})[species] = reactive_kg
-                impurity_by_stage_species.setdefault(3, {})[species] = reactive_kg
+                stage_bucket = condensed_by_stage_species.setdefault(3, {})
+                stage_bucket[species] = stage_bucket.get(species, 0.0) + reactive_kg
+                impurity_bucket = impurity_by_stage_species.setdefault(3, {})
+                impurity_bucket[species] = (
+                    impurity_bucket.get(species, 0.0) + reactive_kg
+                )
+                reactive_identity = stage_route.get(
+                    'reactive_capture_identity', (3, 0),
+                )
+                identity_bucket = capture_kg_by_stage_identity.setdefault(
+                    reactive_identity, {},
+                )
+                identity_bucket[species] = (
+                    identity_bucket.get(species, 0.0) + reactive_kg
+                )
 
             if wall_hkl_kg > 1e-15:
                 wall_deposit_by_species[species] = wall_hkl_kg
@@ -3807,11 +3836,24 @@ class CondensationModel:
                         active_pipe_segments,
                     )
                 )
-            impurity_stages = stage_route.get('impurity_stage_numbers', ())
-            for stage_number, deposit in hkl_condensed_by_stage.items():
-                condensed_by_stage_species.setdefault(stage_number, {})[species] = deposit
-                if stage_number in impurity_stages:
-                    impurity_by_stage_species.setdefault(stage_number, {})[species] = deposit
+            impurity_identities = stage_route.get('impurity_identities', ())
+            for identity, deposit in hkl_condensed_by_stage.items():
+                stage_number = int(identity[0])
+                stage_bucket = condensed_by_stage_species.setdefault(stage_number, {})
+                stage_bucket[species] = stage_bucket.get(species, 0.0) + deposit
+                if identity in impurity_identities:
+                    impurity_bucket = impurity_by_stage_species.setdefault(
+                        stage_number, {},
+                    )
+                    impurity_bucket[species] = (
+                        impurity_bucket.get(species, 0.0) + deposit
+                    )
+                identity_bucket = capture_kg_by_stage_identity.setdefault(
+                    identity, {},
+                )
+                identity_bucket[species] = (
+                    identity_bucket.get(species, 0.0) + deposit
+                )
             remaining_by_species[species] = flowing_rates[species]
 
         from simulator.diagnostics import (
@@ -4187,6 +4229,9 @@ class CondensationModel:
             ),
             condensed_by_stage_species=copy.deepcopy(
                 condensed_by_stage_species
+            ),
+            capture_kg_by_stage_identity=copy.deepcopy(
+                capture_kg_by_stage_identity
             ),
             wall_deposit_by_species=copy.deepcopy(wall_deposit_by_species),
             wall_deposit_by_segment_species=copy.deepcopy(
@@ -8102,39 +8147,6 @@ def _stage_alpha_surface_key(stage: CondensationStage) -> str:
     if int(stage.sub_order) != 0 and getattr(stage, 'stage_key', ''):
         return str(stage.stage_key)
     return f'stage_{int(stage.stage_number)}'
-
-
-def _cold_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    """Own taps on the cold alkali stages only. Not applied to stage 1.
-
-    The Na collector rejects K. The K trap accepts only species designated
-    to that key. Mg and every other species stage 4 captures stay on stage 4.
-    """
-
-    key = getattr(stage, 'stage_key', '') or ''
-    designated = DESIGNATED_STAGE.get(species)
-    if key == NA_COLLECTOR_STAGE_KEY:
-        return designated == K_TRAP_STAGE_KEY
-    if key == K_TRAP_STAGE_KEY:
-        return designated != K_TRAP_STAGE_KEY
-    return False
-
-
-def _stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    return (
-        _cr_stage_isolation_blocks(stage, species)
-        or _cold_stage_isolation_blocks(stage, species)
-    )
-
-
-def _cr_stage_isolation_blocks(stage: CondensationStage, species: str) -> bool:
-    chromium_stage = 'CrO2' in stage.target_species
-    designated_stage = designated_stage_number(species)
-    if chromium_stage:
-        return not is_designated_for_stage(species, stage.stage_number)
-    if designated_stage == 2:
-        return True
-    return False
 
 
 def _allocate_total_by_weights(

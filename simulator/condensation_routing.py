@@ -310,10 +310,13 @@ def stage_list_index_for_destination(train: object, destination: str | None) -> 
 
 
 def collection_stage_index(train: object, stage_number: int, species: str) -> int | None:
-    """List index that should receive a capture keyed by public stage number.
+    """List index for a capture known only by public stage number.
 
-    When two stages share a number, a species designated to one of their
-    keys lands on that stage. Every other species lands on sub_order 0.
+    Production routes carry capture_kg_by_stage_identity and book with
+    stage_index_for_visit_identity. This remains the designation fallback
+    for a stage-number total: a species designated to one of the keys
+    that share the number lands there; every other species lands on
+    sub_order 0.
     """
 
     stages = getattr(train, 'stages', ())
@@ -335,6 +338,21 @@ def collection_stage_index(train: object, stage_number: int, species: str) -> in
         if int(getattr(stages[index], 'sub_order', 0) or 0) == 0:
             return index
     return matches[0]
+
+
+def stage_index_for_visit_identity(
+    train: object, stage_number: int, sub_order: int,
+) -> int | None:
+    """List index of the stage with this (stage_number, sub_order) identity."""
+
+    stages = getattr(train, 'stages', ())
+    for index, stage in enumerate(stages):
+        if (
+            int(stage.stage_number) == int(stage_number)
+            and int(getattr(stage, 'sub_order', 0) or 0) == int(sub_order)
+        ):
+            return index
+    return None
 
 
 def product_destination(recipe: str, species: str) -> str | None:

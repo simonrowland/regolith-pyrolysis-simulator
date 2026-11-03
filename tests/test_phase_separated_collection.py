@@ -95,16 +95,14 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 def test_diverted_alkali_sio_numeric_pin():
     """Pin the merged bypass route while the silica cartridge is isolated.
 
-    Cause: stage D_AB is evaluated at T_film = (T_gas,in + T_wall) / 2.
-    This model leaves gas_temperature_C at the 1500 C wall default, so
-    Stage 4's film is below the old bulk-gas diffusivity temperature.
-    Production route() stage-4 kg, old then new: SiO 0.9986994551767132
-    to 0.9649098291677289, Na 0.0006999999999980907 to
-    0.0006937176899052765, K 9.999996447226044e-05 to
-    9.999996255610596e-05. Terminal remainder, old then new: SiO stays 0,
-    Na 0 to 1.2660217650805803e-17, K 3.877722869009954e-17 to
-    1.5580120859887416e-15. The uncaptured mass is still collected on the
-    colder downstream stages; the hex strings are that production output.
+    The Na collector (identity (4, 0)) still has the film-temperature
+    capture: SiO 0x1.ee08a93fba8b2p-1 and Na 0x1.6bb536538edccp-11.
+    Those hexes were the whole stage-number 4 total while the K trap
+    accepted only its designated species. The trap now applies the same
+    saturation law, so the SiO and Na that used to pass it condense at
+    (4, 1). K is supersaturated at 250 C, so the collector takes part of
+    it and the trap takes the rest. Stage number 4 is the sum. The hex
+    strings are that production route().
     """
     model = _model("divert", hard_gate=False)
     result = model.route(
@@ -112,15 +110,29 @@ def test_diverted_alkali_sio_numeric_pin():
         MeltState(temperature_C=1650, pO2_mbar=1e-5),
     )
     assert 3 not in result.condensed_by_stage_species
-    assert {sp: kg.hex() for sp, kg in result.condensed_by_stage_species[4].items()} == {
+
+    def hexes(bucket):
+        return {sp: kg.hex() for sp, kg in bucket.items()}
+
+    assert hexes(result.capture_kg_by_stage_identity[(4, 0)]) == {
         "SiO": "0x1.ee08a93fba8b2p-1",
         "Na": "0x1.6bb536538edccp-11",
-        "K": "0x1.a36e2466e2f83p-14",
+        "K": "0x1.37fba2863fc46p-14",
     }
-    assert {sp: kg.hex() for sp, kg in result.remaining_by_species.items()} == {
+    assert hexes(result.capture_kg_by_stage_identity[(4, 1)]) == {
+        "SiO": "0x1.1f756c04573f3p-5",
+        "Na": "0x1.a59943bbb4c41p-18",
+        "K": "0x1.adca24840d987p-16",
+    }
+    assert hexes(result.condensed_by_stage_species[4]) == {
+        "SiO": "0x1.ffffffffffff1p-1",
+        "Na": "0x1.6f0068db06465p-11",
+        "K": "0x1.a36e2ba7432a8p-14",
+    }
+    assert hexes(result.remaining_by_species) == {
         "SiO": "0x0.0p+0",
-        "Na": "0x1.d314600000000p-57",
-        "K": "0x1.c111003818000p-50",
+        "Na": "0x1.618e0c0000000p-70",
+        "K": "0x1.53eb7af400000p-63",
     }
 
 

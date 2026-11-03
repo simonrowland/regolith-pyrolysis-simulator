@@ -11,6 +11,7 @@ from simulator.condensation import (
     stage_purity_report,
     stage_visit_key,
 )
+from simulator.accounting.queries import CONDENSATION_TRAIN_ACCOUNT
 from simulator.condensation_routing import (
     DESIGNATED_STAGE,
     K_TRAP_STAGE_KEY,
@@ -19,7 +20,14 @@ from simulator.condensation_routing import (
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
     product_stage_number,
+    stage_index_for_visit_identity,
     target_species_for_stage_number,
+)
+from simulator.evaporation import EvaporationMixin
+from simulator.extraction import ExtractionMixin
+from simulator.three_product_report import (
+    _metal_product_accounting,
+    _product_stage_accepts_species,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
@@ -232,9 +240,14 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
 def test_default_k_route_allocation_numeric_pin():
     """Pin the production band-integrated route, not a calibration target.
 
-    The c679673f5/85fedcb8e capture changes integrate each collector's
-    temperature band and saturation thresholds; the old midpoint pin had
-    more K reaching stage 6 and less captured at stage 5.
+    K at 1 mbar is supersaturated on the 250 C Na collector. That surface
+    uses the same capture law as the 40 C trap, so most of the kilogram
+    condenses there and is impurity of the Na/Mg stage. The trap keeps
+    the remainder. Stage number 4 is the sum of those two identities.
+    The previous pin (stage 4 = 0.9999661577804508, all of it the trap)
+    was the designated-species skip: the collector refused K, so the
+    trap was the first surface that could capture it and more of the
+    tail reached stages 5 and 6.
     """
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
@@ -252,15 +265,22 @@ def test_default_k_route_allocation_numeric_pin():
         MeltState(temperature_C=1650.0),
     )
     assert route.condensed_by_stage_species == {
-        4: {'K': 0.9999661577804508},
-        5: {'K': 3.344749012837271e-05},
-        6: {'K': 3.947289899573387e-07},
+        4: {'K': 0.9999999705550642},
+        5: {'K': 2.9101495551411142e-08},
+        6: {'K': 3.434399382784235e-10},
     }
-    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
+    assert route.capture_kg_by_stage_identity[(4, 0)] == {
+        'K': 0.9169775631320057,
+    }
+    assert route.capture_kg_by_stage_identity[(4, 1)] == {
+        'K': 0.0830224074230584,
+    }
+    assert route.remaining_by_species == {'K': 3.7485254416350975e-16}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        5: {'K': 3.344749012837271e-05},
-        6: {'K': 3.947289899573387e-07},
+        4: {'K': 0.9169775631320057},
+        5: {'K': 2.9101495551411142e-08},
+        6: {'K': 3.434399382784235e-10},
     }
 
 
@@ -337,8 +357,15 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
 
     assert route.condensed_by_stage_species[4]['Na'] > 0.0
     assert route.condensed_by_stage_species[4]['K'] > 0.0
-    assert 'Na' not in route.impurity_by_stage_species.get(4, {})
-    assert 'K' not in route.impurity_by_stage_species.get(4, {})
+    # Stage number 4 is two surfaces. Impurity is the off-design surface
+    # only: Na on the K trap, K on the Na collector when that wall captures.
+    na_trap = route.capture_kg_by_stage_identity[(4, 1)]['Na']
+    assert na_trap > 0.0
+    assert route.impurity_by_stage_species[4]['Na'] == pytest.approx(na_trap)
+    k_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('K', 0.0)
+    assert route.impurity_by_stage_species.get(4, {}).get('K', 0.0) == pytest.approx(
+        k_collector
+    )
     _, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     _, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert 'Na#wall:523.15' not in route.antoine_extrapolations
@@ -374,3 +401,127 @@ def test_k_moves_to_its_trap_and_other_stage_4_destinations_stay():
     assert trap.temp_range_C == (40.0, 40.0)
     assert na.target_species == ['Na', 'Mg']
     assert trap.target_species == ['K']
+
+
+def test_na_at_the_k_trap_is_a_contaminant_and_mass_closes():
+    """Na that reaches the 40 C trap condenses there.
+
+    Designation still names the Na collector as Na's product stage and
+    the trap as K's. The trap's Na is that stage's impurity, and the
+    product owner does not count it as Na product or as K product.
+    """
+
+    train = CondensationTrain.create_default()
+    model = CondensationModel(train)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=2.0,
+        species_partial_pressures_mbar={'Na': 1.0, 'K': 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    inlet = {'Na': 1.0, 'K': 1.0}
+    route = model.route(
+        EvaporationFlux(species_kg_hr=inlet, total_kg_hr=2.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    na_trap = route.capture_kg_by_stage_identity[(4, 1)]['Na']
+    na_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('Na', 0.0)
+    assert na_trap > 0.0
+    assert route.condensed_by_stage_species[4]['Na'] == pytest.approx(
+        na_collector + na_trap
+    )
+    assert route.impurity_by_stage_species[4]['Na'] == pytest.approx(na_trap)
+    k_trap = route.capture_kg_by_stage_identity.get((4, 1), {}).get('K', 0.0)
+    k_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('K', 0.0)
+    assert route.impurity_by_stage_species.get(4, {}).get('K', 0.0) == pytest.approx(
+        k_collector
+    )
+
+    for species, mass in inlet.items():
+        closed = (
+            route.condensed_for_species(species)
+            + route.wall_deposit_by_species.get(species, 0.0)
+            + route.remaining_by_species[species]
+        )
+        assert closed == pytest.approx(mass)
+        identity_sum = sum(
+            bucket.get(species, 0.0)
+            for bucket in route.capture_kg_by_stage_identity.values()
+        )
+        assert identity_sum == pytest.approx(route.condensed_for_species(species))
+
+    assert DESIGNATED_STAGE['Na'] == NA_COLLECTOR_STAGE_KEY
+    assert DESIGNATED_STAGE['K'] == K_TRAP_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['MRE']['Na'] == NA_COLLECTOR_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['MRE']['K'] == K_TRAP_STAGE_KEY
+    assert not _product_stage_accepts_species('Na', K_TRAP_STAGE_KEY)
+    assert _product_stage_accepts_species('Na', NA_COLLECTOR_STAGE_KEY)
+    assert _product_stage_accepts_species('K', K_TRAP_STAGE_KEY)
+    assert not _product_stage_accepts_species('K', NA_COLLECTOR_STAGE_KEY)
+
+    host = SimpleNamespace(
+        train=train,
+        _last_condensed_by_stage_species_delta={},
+        _last_impurity_delta={},
+        _stage_collection_kg_by_source={},
+    )
+    host._record_stage_collection_source = (
+        ExtractionMixin._record_stage_collection_source.__get__(host)
+    )
+    for species in inlet:
+        EvaporationMixin._project_condensed_stage_collection(
+            host, route, species, route.condensed_for_species(species),
+        )
+
+    collector_index = stage_index_for_visit_identity(train, 4, 0)
+    trap_index = stage_index_for_visit_identity(train, 4, 1)
+    source = host._stage_collection_kg_by_source
+    assert source[(CONDENSATION_TRAIN_ACCOUNT, trap_index, 'Na')] == pytest.approx(
+        na_trap
+    )
+    assert source[(CONDENSATION_TRAIN_ACCOUNT, collector_index, 'Na')] == pytest.approx(
+        na_collector
+    )
+    assert host._last_impurity_delta[(4, 'Na')] == pytest.approx(na_trap)
+    assert host._last_condensed_by_stage_species_delta[(4, 'Na')] == pytest.approx(
+        na_collector + na_trap
+    )
+
+    purity = stage_purity_report(train)
+    trap_purity = purity[K_TRAP_STAGE_KEY]
+    collector_purity = purity[NA_COLLECTOR_STAGE_KEY]
+    assert trap_purity['impurity_species_kg']['Na'] == pytest.approx(na_trap)
+    assert 'Na' not in trap_purity['designated_species_kg']
+    assert collector_purity['designated_species_kg'].get('Na', 0.0) == pytest.approx(
+        na_collector
+    )
+    assert 'Na' not in collector_purity['impurity_species_kg']
+    assert collector_purity['impurity_species_kg'].get('K', 0.0) == pytest.approx(
+        k_collector
+    )
+    assert trap_purity['designated_species_kg'].get('K', 0.0) == pytest.approx(k_trap)
+    assert 'K' not in trap_purity['impurity_species_kg']
+
+    def account_kg(account):
+        if account != CONDENSATION_TRAIN_ACCOUNT:
+            return {}
+        totals = {}
+        for stage in train.stages:
+            for name, kg in stage.collected_kg.items():
+                if kg > 0.0:
+                    totals[name] = totals.get(name, 0.0) + kg
+        return totals
+
+    sim = SimpleNamespace(
+        train=train,
+        _stage_collection_kg_by_source=source,
+        atom_ledger=SimpleNamespace(project_account_kg=account_kg),
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(metal_alloy_kg={}),
+        ),
+    )
+    accounting = _metal_product_accounting(sim, products={})
+    assert accounting['species_kg'].get('Na', 0.0) == pytest.approx(na_collector)
+    assert accounting['species_kg'].get('K', 0.0) == pytest.approx(k_trap)
