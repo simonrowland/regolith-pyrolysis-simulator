@@ -71,6 +71,25 @@ def _elements_of_component(
     return frozenset(element for element, _count in parsed)
 
 
+def is_printed_total_iron_alias(
+    name: str,
+    oxide_aliases: Mapping[str, str],
+) -> bool:
+    """True for a printed total-iron label, not the ferrous endmember FeO.
+
+    The alias map sends the total-iron spellings to ``FeO_total``. A
+    trailing ``*`` is the same strip ``_elements_of_component`` uses, so
+    ``FeO*`` is that label. ``FeO`` itself stays the endmember.
+    """
+
+    raw = str(name).strip()
+    key = raw[:-1] if raw.endswith("*") else raw
+    canonical = oxide_aliases.get(key.lower())
+    if canonical == "FeO_total":
+        return True
+    return raw.endswith("*") and canonical == "FeO"
+
+
 def _is_multivalent_component(
     name: str,
     oxide_aliases: Mapping[str, str],

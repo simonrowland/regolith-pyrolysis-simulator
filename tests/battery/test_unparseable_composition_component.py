@@ -37,8 +37,8 @@ from simulator.battery.score import (
     score_store,
 )
 from simulator.battery.validate import _term_composition
+from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 from simulator.diagnostic_helpers.binary_pot_battery import composition_kg_and_mol
-from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
 from tests.battery.factories import (
     activity_identity,
     migrate_one_extract,

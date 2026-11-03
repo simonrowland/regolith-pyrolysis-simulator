@@ -3924,7 +3924,7 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 
     if mass_formula in MOLAR_MASS:
         return as_decimal(str(MOLAR_MASS[mass_formula]))
-    from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     return as_decimal(str(oxide_molar_mass_g_mol(mass_formula)))
 

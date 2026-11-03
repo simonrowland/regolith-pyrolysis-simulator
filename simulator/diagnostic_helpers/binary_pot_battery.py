@@ -732,9 +732,7 @@ def composition_kg_and_mol(
     Sanity: 50 wt% SiO2 on 1 kg → 0.5 kg → 8.322 mol (M=60.083).
     """
 
-    from simulator.diagnostic_helpers.binary_pot_scoring import (
-        oxide_molar_mass_g_mol,
-    )
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     kg: dict[str, float] = {}
     mol: dict[str, float] = {}

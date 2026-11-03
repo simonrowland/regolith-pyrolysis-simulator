@@ -26,7 +26,7 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
     Sanity: equal moles of SiO2 (60.084) and MgO (40.304) → ~59.9/40.1 wt%.
     """
 
-    from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     masses: dict[str, float] = {}
     for oxide, amount in composition.components:

@@ -563,9 +563,7 @@ def _feed_oxygen_kg(
     )
     from simulator.accounting.exceptions import UnparseableCompositionComponent
     from simulator.accounting.formulas import atoms_parse_formula_else_janaf
-    from simulator.diagnostic_helpers.binary_pot_scoring import (
-        oxide_molar_mass_g_mol,
-    )
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     oxygen_fraction = 0.0
     for species, raw_wt_pct in composition.items():

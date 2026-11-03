@@ -434,6 +434,17 @@ def _weight_percent(
             comp = state.value
     if comp is None:
         return None
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+    from simulator.melt_backend.base import is_printed_total_iron_alias
+
+    # Total-iron aliases are a missing-fO2 refusal, not an unparseable
+    # component. No partial weights: a mass would let tier 4 fill.
+    if any(
+        _positive_finite(amount)
+        and is_printed_total_iron_alias(str(name), MELTS_OXIDE_ALIASES)
+        for name, amount in comp.components
+    ):
+        return None
     from simulator.accounting.exceptions import (
         UnparseableCompositionComponent,
         UnknownSpeciesError,

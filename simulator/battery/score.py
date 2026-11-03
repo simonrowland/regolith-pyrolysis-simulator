@@ -6397,9 +6397,7 @@ def _oxide_element_inventory(
 
     from simulator.accounting.exceptions import UnparseableCompositionComponent
     from simulator.accounting.formulas import atoms_parse_formula_else_janaf
-    from simulator.diagnostic_helpers.binary_pot_scoring import (
-        oxide_molar_mass_g_mol,
-    )
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
     for oxide, amount in amounts.items():
