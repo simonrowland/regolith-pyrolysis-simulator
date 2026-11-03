@@ -892,9 +892,9 @@ def test_production_ti_carrier_ratios_reproduce_cea_exchange_algebra() -> None:
 
     # Golden pin for the production catalog values before changing extract
     # observation lookup. These values come from the production resolver above.
-    assert p_ti == pytest.approx(3.6754340343045294e-10, rel=1.0e-12)
-    assert p_tio == pytest.approx(6.789654564587365e-05, rel=1.0e-12)
-    assert p_tio2 == pytest.approx(0.01484330043874638, rel=1.0e-12)
+    assert p_ti.hex() == "0x1.941e455b0fceap-32"
+    assert p_tio.hex() == "0x1.1cc75c5b1a007p-14"
+    assert p_tio2.hex() == "0x1.e662a0f97cb42p-7"
 
     # Premise: all three rows share the same liquid-TiO2 base, which cancels.
     # Gas exchange gives TiO/Ti=K1*fO2^0.5 and TiO2/Ti=K2*fO2.
