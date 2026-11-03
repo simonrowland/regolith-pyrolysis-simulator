@@ -4733,6 +4733,12 @@ def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> Non
         ("condensed_solid", composition, Quantity.P_SAT, Phase.CR),
         (None, composition, Quantity.P_SAT, None),
         ("condensed_solid", composition, Quantity.EVAPORATION_RATE, None),
+        (
+            "condensed_solid",
+            composition,
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+            Phase.CR,
+        ),
         ("condensed_solid", mixed_composition, Quantity.P_SAT, None),
         ("condensed_solid", mismatched_composition, Quantity.P_SAT, None),
         (

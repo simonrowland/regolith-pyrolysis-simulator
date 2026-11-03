@@ -130,6 +130,7 @@ from simulator.battery.identity import (
     _uncompared_axes_for,
     identity_equal,
     profile_for,
+    quantity_token,
 )
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
@@ -181,6 +182,7 @@ from simulator.battery.records import (
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
+    phase_token,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
@@ -6348,6 +6350,305 @@ def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
     return False
 
 
+# A printed J_exp/J_vac (or J_exp/J_max) whose denominator is the theoretical
+# maximum Hertz-Knudsen rate is evaporation_coefficient_alpha. The source may
+# still call that ratio a condensation coefficient; that word stays
+# source_term_as_printed and is not a contradiction. Film growth is not this ratio.
+HK_RATIO_ALPHA_DEFINITION = "j_exp_over_hk_maximum"
+ALPHA_GAS_SYSTEM_H2 = "H2"
+ALPHA_GAS_SYSTEM_VACUUM = "vacuum"
+_HK_RATIO_GAS_SYSTEMS = frozenset({ALPHA_GAS_SYSTEM_H2, ALPHA_GAS_SYSTEM_VACUUM})
+_CONDENSATION_NOT_EVAPORATION_ALPHA = (
+    "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
+)
+_FILM_GROWTH_RE = re.compile(
+    r"film growth|growth coefficient|growth/condensation",
+    re.IGNORECASE,
+)
+_CONDENSATION_WORD_RE = re.compile(
+    r"\bcondensation\b|alpha\(cond\)|α\(cond\)",
+    re.IGNORECASE,
+)
+_HK_NUMERATOR_RE = re.compile(r"j[\s_\-]*exp", re.IGNORECASE)
+_HK_DENOMINATOR_RE = re.compile(r"j[\s_\-]*(?:vac|max|hk)\b", re.IGNORECASE)
+_HK_MAXIMUM_RATE_RE = re.compile(
+    r"maximum evaporation rate|theoretical maximum|hertz[\s\-]*knudsen",
+    re.IGNORECASE,
+)
+_HK_DIVISION_RE = re.compile(r"divid\w+\s+.*\bby\b|/", re.IGNORECASE | re.DOTALL)
+_H2_RUN_GAS_RE = re.compile(r"(?<![a-z0-9])(?:h2|hydrogen)(?![a-z0-9])", re.IGNORECASE)
+_VACUUM_RUN_GAS_RE = re.compile(
+    r"(?<![a-z0-9])(?:vacuum|in vacuo)(?![a-z0-9])",
+    re.IGNORECASE,
+)
+
+
+def _printed_definition_text(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> str:
+    parts: list[str] = []
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        for key in ("definition_as_printed", "ratio_as_printed"):
+            raw = src.get(key)
+            if isinstance(raw, str) and raw.strip():
+                parts.append(raw.strip())
+    return "\n".join(parts)
+
+
+def printed_hk_evaporation_ratio(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None = None,
+) -> bool:
+    """True when the source prints J_exp over the maximum Hertz-Knudsen rate.
+
+    Both the ratio (experimental evaporation rate over J_vac, J_max, or J_hk)
+    and a statement that the denominator is that theoretical maximum are
+    required. A bare condensation coefficient is false. gas_system_as_printed
+    is not read: it names the chemical system, not this ratio.
+    """
+
+    text = _printed_definition_text(values, row)
+    if not text or _FILM_GROWTH_RE.search(text):
+        return False
+    return bool(
+        _HK_NUMERATOR_RE.search(text)
+        and _HK_DENOMINATOR_RE.search(text)
+        and _HK_DIVISION_RE.search(text)
+        and _HK_MAXIMUM_RATE_RE.search(text)
+    )
+
+
+def _alpha_condensation_contradiction(
+    blob: str,
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> str | None:
+    """Refusal for a condensation or film-growth coefficient, or None.
+
+    One owner for the alias contradiction and the arrhenius corroboration.
+    The Hertz-Knudsen ratio exception does not cover film growth.
+    """
+
+    if _FILM_GROWTH_RE.search(blob):
+        return _CONDENSATION_NOT_EVAPORATION_ALPHA
+    if _CONDENSATION_WORD_RE.search(blob) and not printed_hk_evaporation_ratio(
+        values, row
+    ):
+        return _CONDENSATION_NOT_EVAPORATION_ALPHA
+    return None
+
+
+def _gas_text_from_state_value(value: object) -> str | None:
+    if isinstance(value, str):
+        text = value.strip()
+        return text or None
+    if isinstance(value, Value):
+        if value.kind is ValueKind.POINT and value.point is not None:
+            return str(value.point).strip() or None
+        return None
+    if isinstance(value, Mapping):
+        point = value.get("point")
+        if point not in (None, ""):
+            return str(point).strip() or None
+    return None
+
+
+def _condition_point_text(raw: object) -> str | None:
+    if isinstance(raw, str):
+        text = raw.strip()
+        return text or None
+    if isinstance(raw, Located):
+        if not raw.state.is_value:
+            return None
+        return _gas_text_from_state_value(raw.state.value)
+    if not isinstance(raw, Mapping):
+        return None
+    state = raw.get("state")
+    if isinstance(state, State):
+        if not state.is_value:
+            return None
+        return _gas_text_from_state_value(state.value)
+    if isinstance(state, Mapping):
+        if str(state.get("tag") or "value") != "value":
+            return None
+        return _gas_text_from_state_value(state.get("value"))
+    return _gas_text_from_state_value(raw)
+
+
+def classify_alpha_run_gas(text: str | None) -> str | None:
+    """H2 or vacuum from one run-condition string. None when it says neither or both."""
+
+    if not text:
+        return None
+    token = " ".join(str(text).replace("_", " ").split())
+    h2 = _H2_RUN_GAS_RE.search(token) is not None
+    vacuum = _VACUUM_RUN_GAS_RE.search(token) is not None
+    if h2 == vacuum:
+        return None
+    return ALPHA_GAS_SYSTEM_H2 if h2 else ALPHA_GAS_SYSTEM_VACUUM
+
+
+def _iter_run_gas_texts(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> Iterator[str]:
+    """Run condition only. gas_system_as_printed is the system name, not the gas."""
+
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        printed = src.get("pressure_as_printed")
+        if isinstance(printed, str) and printed.strip():
+            yield printed.strip()
+        mix = _condition_point_text(src.get("gas_mix"))
+        if mix:
+            yield mix
+        conditions = src.get("point_conditions")
+        if isinstance(conditions, Mapping):
+            mix = _condition_point_text(conditions.get("gas_mix"))
+            if mix:
+                yield mix
+
+
+def printed_alpha_run_gas_system(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None = None,
+) -> str | None:
+    """vacuum or H2 when every classified run condition agrees. Else None."""
+
+    found = {
+        gas
+        for text in _iter_run_gas_texts(values, row)
+        if (gas := classify_alpha_run_gas(text)) is not None
+    }
+    if len(found) != 1:
+        return None
+    return next(iter(found))
+
+
+def _with_hk_ratio_alpha_labels(
+    provenance: Mapping[str, Any] | None,
+    *,
+    quantity: Quantity | None,
+    values: Mapping[str, Any] | None,
+    obs: Mapping[str, Any] | None,
+    species: Species | None,
+) -> Mapping[str, Any] | None:
+    """Carry the printed term and the family key the leave-one-out pool reads.
+
+    melt_family is ``phase:formula:gas_system``. Phase and gas are in the key
+    so a crystal row does not string-match a melt row, and H2 does not
+    string-match vacuum. Labels are written only for the printed HK ratio.
+    """
+
+    if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA or species is None:
+        return provenance
+    if not printed_hk_evaporation_ratio(values, obs):
+        return provenance
+    phase = phase_token(species)
+    formula = str(species.formula or "")
+    if phase is None or not formula:
+        return provenance
+    selected = dict(provenance or {})
+    term = None
+    for src in (values, obs):
+        if isinstance(src, Mapping):
+            raw_term = src.get("source_term_as_printed")
+            if isinstance(raw_term, str) and raw_term.strip():
+                term = raw_term
+                break
+    if term is not None:
+        selected["source_term_as_printed"] = term
+    selected["alpha_definition"] = HK_RATIO_ALPHA_DEFINITION
+    gas = printed_alpha_run_gas_system(values, obs)
+    if gas is None:
+        selected.pop("gas_system", None)
+        selected.pop("melt_family", None)
+        return selected
+    selected["gas_system"] = gas
+    selected["melt_family"] = f"{phase.value}:{formula}:{gas}"
+    return selected
+
+
+def evaporation_alpha_family_key(
+    observation: Observation,
+) -> tuple[str, str, str] | None:
+    """(phase, formula, gas_system) for one evaporation coefficient.
+
+    gas_system is the provenance label when the HK ratio wrote one, else a
+    vacuum or H2 gas_mix on the row. There is no species-only fallback: a
+    missing phase or gas leaves the row out of every pool.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    if quantity_token(identity) is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        return None
+    species = identity.species
+    if species is None:
+        return None
+    phase = phase_token(species)
+    formula = str(species.formula or "")
+    if phase is None or not formula:
+        return None
+    gas = None
+    provenance = observation.provenance
+    if isinstance(provenance, Mapping):
+        recorded = provenance.get("gas_system")
+        if recorded in _HK_RATIO_GAS_SYSTEMS:
+            gas = str(recorded)
+    if gas is None:
+        conditions = observation.point_conditions
+        if isinstance(conditions, Mapping):
+            gas = classify_alpha_run_gas(
+                _condition_point_text(conditions.get("gas_mix"))
+            )
+    if gas not in _HK_RATIO_GAS_SYSTEMS:
+        return None
+    return (phase.value, formula, gas)
+
+
+def evaporation_alpha_pool_members(
+    observations: Iterable[Observation],
+) -> dict[tuple[str, str, str], frozenset[str]]:
+    """Observation ids in each (phase, formula, gas_system) pool."""
+
+    pools: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    for observation in observations:
+        key = evaporation_alpha_family_key(observation)
+        if key is None:
+            continue
+        pools[key].add(observation.observation_id)
+    return {key: frozenset(ids) for key, ids in pools.items()}
+
+
+def evaporation_alpha_loo_member_ids(
+    observations: Iterable[Observation],
+    query: Observation,
+) -> frozenset[str]:
+    """Other sources in the query's family. Empty when the query has no family.
+
+    Leave-one-out drops the query's source_id. It does not fall back to every
+    row of the same formula, so crystal and H2 rows stay out of a melt or
+    vacuum consensus keyed on a different family.
+    """
+
+    key = evaporation_alpha_family_key(query)
+    if key is None:
+        return frozenset()
+    return frozenset(
+        observation.observation_id
+        for observation in observations
+        if evaporation_alpha_family_key(observation) == key
+        and observation.source_id != query.source_id
+        and observation.observation_id != query.observation_id
+    )
+
+
 def _quantity_contradiction(
     candidate: Quantity,
     obs_type: str | None,
@@ -6396,12 +6697,9 @@ def _quantity_contradiction(
             r"relative volatil|relative evaporation coefficient", blob
         ):
             return "source names Olette relative volatility, not an HKL/Langmuir alpha"
-        if re.search(
-            r"\bcondensation\b|film growth|growth coefficient|growth/condensation|"
-            r"alpha\(cond\)|α\(cond\)",
-            blob,
-        ):
-            return "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
+        condensation = _alpha_condensation_contradiction(blob, values, row)
+        if condensation:
+            return condensation
         amount = _alpha_numeric(values)
         if amount is not None and not (Decimal("0") < amount <= Decimal("1")):
             return (
@@ -6524,10 +6822,7 @@ def _quantity_corroborated(
         form = values.get("alpha_form")
         if isinstance(form, Mapping) and str(form.get("type") or "").lower() == "arrhenius":
             blob = _row_text_blob(None, values, units, row)
-            if re.search(
-                r"\bcondensation\b|film growth|growth coefficient|growth/condensation",
-                blob,
-            ):
+            if _alpha_condensation_contradiction(blob, values, row):
                 return False
             return True
         return False
@@ -16353,12 +16648,13 @@ class Migrator:
         """Lift printed experiment conditions into an observation identity.
 
         An observation may omit conditions that its declared experiment records
-        once. Pressure inherits only an exact experiment-scope value; a static
-        p_sat row gets a pure reservoir when the sample's printed form and
-        single-component composition agree. Point-scoped effusion phases are
-        resolved here from their own source rows. The C–CO route is resolved
-        through the same guarded waypoint used by consumers, with derived
-        pressure provenance retained.
+        once. Pressure inherits only an exact experiment-scope value. A p_sat
+        or evaporation_coefficient_alpha row gets a pure reservoir when the
+        sample's printed form and single-component composition agree.
+        Point-scoped effusion phases are resolved here from their own source
+        rows, and only for p_sat. The C–CO route is resolved through the same
+        guarded waypoint used by consumers, with derived pressure provenance
+        retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -16380,8 +16676,15 @@ class Migrator:
             if method is not None and method.is_value
             else experiment.method
         )
+        # p_sat and evaporation_coefficient_alpha share this fill. A flux
+        # or evaporation rate does not: it is kinetic, and an unstated
+        # condensed phase cannot supply its reservoir.
+        pure_condensed_reservoir = quantity in {
+            Quantity.P_SAT,
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        }
         if (
-            quantity is Quantity.P_SAT
+            pure_condensed_reservoir
             and species_formula is not None
             and effective_method.is_value
             and effective_method.value
@@ -16390,11 +16693,6 @@ class Migrator:
                 MethodToken.KNUDSEN_EFFUSION,
             }
         ):
-            # Knudsen effusion qualifies only for a reported pressure: the
-            # orifice is sized so the cell remains near equilibrium with the
-            # condensed sample, and p_sat reports that equilibrium pressure.
-            # A flux/evaporation rate is kinetic, and an unstated condensed
-            # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
                 sample.form.state.value
@@ -16461,7 +16759,8 @@ class Migrator:
                     source_values.get("method_class") or ""
                 ).strip().casefold()
                 point_effusion_psat = (
-                    effective_method.is_value
+                    quantity is Quantity.P_SAT
+                    and effective_method.is_value
                     and effective_method.value is MethodToken.KNUDSEN_EFFUSION
                     and method_class == "measured_tabulated"
                     and gas_formula == species_formula
@@ -20253,6 +20552,14 @@ class Migrator:
                     parameters=(),
                     output_unit="dimensionless",
                 )
+        if isinstance(identity, Identity):
+            observation_provenance = _with_hk_ratio_alpha_labels(
+                observation_provenance,
+                quantity=q_token,
+                values=values if isinstance(values, Mapping) else None,
+                obs=obs if isinstance(obs, Mapping) else None,
+                species=identity.species,
+            )
         observation = Observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
