@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 749
-  extracts: 747
+  sources: 750
+  extracts: 748
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 747
+  extracts_without_pdf: 748
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -670,6 +670,7 @@ gaps:
   - street-2010-thermal-properties-simulants
   - su-2024-lunar-volatiles-thesis
   - sublimation-kinetics-2023-minerals
+  - sugawara-2011-sodium-silicate-fusion-mixing
   - sugawara-2013-soda-lime-melt-na2o-activity
   - sugawara-2024-na-silicate-molybdate-miscibility
   - sugawara-akaogi-2003-ni-co-fusion
@@ -39463,6 +39464,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  aliases: []
+  citation: Sugawara, T.; Shinoya, K.; Yoshida, S.; Matsuoka, J. (2011). Thermodynamic mixing properties
+    of liquids in the system Na2O-SiO2. Journal of Non-Crystalline Solids 357, 1390–1398.
+  doi: 10.1016/j.jnoncrysol.2010.09.064
+  report_number: null
+  identifier: 10.1016/j.jnoncrysol.2010.09.064
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+    review_status: draft
+    rows: 32
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/sugawara-2011-sodium-silicate-fusion-mixing/sugawara-2011-sodium-silicate-fusion-mixing.pdf
+      present: true
+      sha256: 8252574c473bd69a4558f704027aecddb4882871d66281e47495a43f133a2ad5
+      matches_simulator: null
+    sidecar:
+      path: raw/sugawara-2011-sodium-silicate-fusion-mixing/sidecar.yaml
+      present: true
+    text:
+      path: text/sugawara-2011-sodium-silicate-fusion-mixing
+      exists: true
+      file_count: 63
+    tables:
+      path: tables/sugawara-2011-sodium-silicate-fusion-mixing
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: sugawara-2013-soda-lime-melt-na2o-activity
   aliases: []
   citation: Sugawara, T.; Seto, M.; Kato, M.; Yoshida, S.; Matsuoka, J.; Miura, Y. (2013). Na2O activity

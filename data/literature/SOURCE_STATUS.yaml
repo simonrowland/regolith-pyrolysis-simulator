@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2291
+  sources: 2292
   by_stage:
     located: 209
     inbox: 1266
-    in_progress: 226
+    in_progress: 227
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -33826,6 +33826,16 @@ sources:
     - raw/sugawara-2004-liquid-calorimetry/SOURCE.md
     - raw/sugawara-2004-liquid-calorimetry/sugawara-2004-liquid-calorimetry.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
