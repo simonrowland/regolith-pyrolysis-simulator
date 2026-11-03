@@ -60,6 +60,36 @@ def _ambient_pressure_result(
             "locator": {"page": 4, "table": "1"},
             "values": partial_values,
         }
+    elif quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        observation = {
+            "observation_id": "residue",
+            "experiment": "open",
+            "type": "residue_component_composition",
+            "phase": "glass",
+            "units": "wt%",
+            "locator": {"page": 4, "table": "1"},
+            "values": {
+                "quantity": "residue_component_composition",
+                "method_class": "measured_direct",
+                "FeO_wt_pct": "12.59",
+                "T_C": "1199",
+            },
+        }
+    elif quantity is Quantity.CONDENSATE_COMPOSITION:
+        observation = {
+            "observation_id": "condensate",
+            "experiment": "open",
+            "type": "condensate_composition",
+            "phase": "cr",
+            "units": "mol%",
+            "locator": {"page": 4, "table": "1"},
+            "values": {
+                "quantity": "condensate_composition",
+                "method_class": "measured_direct",
+                "component_mole_fractions": {"Na": "0.5", "K": "0.5"},
+                "T_K": 1200,
+            },
+        }
     else:
         observation = {
             "observation_id": "transition",
@@ -154,6 +184,37 @@ def test_ambient_pressure_condensed_quantity_kinds_have_no_band(
 
     assert band is None
     assert "no band assigned" in reason
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [Quantity.CONDENSATE_COMPOSITION, Quantity.RESIDUE_COMPONENT_COMPOSITION],
+)
+def test_ambient_pressure_kinetic_composition_kinds_have_absolute_band(
+    quantity: Quantity,
+) -> None:
+    band, _reason = _ambient_pressure_band_for(
+        quantity,
+        species_formula="Na",
+        experiment=F.kems_experiment(),
+    )
+
+    assert band == "-0.10/+0.01 dex"
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [Quantity.CONDENSATE_COMPOSITION, Quantity.RESIDUE_COMPONENT_COMPOSITION],
+)
+def test_ambient_filled_kinetic_composition_row_carries_absolute_band(
+    tmp_path, quantity: Quantity
+) -> None:
+    _migrator, observation = _ambient_pressure_result(tmp_path, quantity=quantity)
+
+    assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+    notice, = observation.notices
+    assert notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+    assert notice.band == "-0.10/+0.01 dex"
 
 
 def test_ambient_pressure_co2_co_p_o2_has_no_band() -> None:
