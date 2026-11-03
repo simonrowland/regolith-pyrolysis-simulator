@@ -11533,6 +11533,14 @@ def _phase_component_percent_selection(
     if unit_kind is None:
         return None
     basis = str(payload.get("basis") or "").strip()
+    if (
+        unit_kind == "unknown_percent"
+        and normalized_unit == "%"
+        and basis == "wt_percent"
+    ):
+        # A bare percent sign is ambiguous by itself, but the declared wt_percent
+        # basis makes it the existing mass-percent scale rather than an unknown unit.
+        unit_kind = "mass_percent"
     if unit_kind == "mole_fraction":
         if basis != "mole_fraction":
             return _unavailable_selection(
