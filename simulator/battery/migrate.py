@@ -460,6 +460,31 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     return PHASE_MAP.get(token)
 
 
+# A form token condensed_solid is Phase.CR. A sample the source prints as
+# amorphous is not that crystal, and Phase.GLASS is not a stand-in for it.
+_AMORPHOUS_SOLID_RE = re.compile(r"\bamorphous\b", re.IGNORECASE)
+_AMORPHOUS_CRYSTAL_RESERVOIR_REASON = (
+    "source prints an amorphous solid; Phase.CR would assert a crystal"
+)
+
+
+def _sample_prints_amorphous_solid(sample: object) -> bool:
+    """True when the sample's material text says the solid is amorphous."""
+
+    if not isinstance(sample, Mapping):
+        return False
+    raw = sample.get("material")
+    if isinstance(raw, Mapping):
+        state = raw.get("state")
+        if isinstance(state, Mapping) and isinstance(state.get("value"), str):
+            raw = state.get("value")
+        elif isinstance(raw.get("value"), str):
+            raw = raw.get("value")
+    if not isinstance(raw, str):
+        return False
+    return _AMORPHOUS_SOLID_RE.search(raw) is not None
+
+
 _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
     # Reviewed KEMS sample descriptions and states. These are exact labels;
     # words embedded in mixed or temperature-dependent descriptions stay unknown.
@@ -7043,14 +7068,27 @@ def _alpha_condensation_contradiction(
     """Refusal for a condensation or film-growth coefficient, or None.
 
     One owner for the alias contradiction and the arrhenius corroboration.
-    The Hertz-Knudsen ratio exception does not cover film growth.
+    The locator blob, source_term_as_printed, and definition_as_printed are
+    all refusal inputs. Film growth refuses even when the definition also
+    prints the Hertz-Knudsen ratio. A condensation word is rescued only when
+    that printed definition passes ``printed_hk_evaporation_ratio``.
     """
 
-    if _FILM_GROWTH_RE.search(blob):
+    printed_parts: list[str] = []
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        for key in ("source_term_as_printed", "definition_as_printed"):
+            raw = src.get(key)
+            if isinstance(raw, str) and raw.strip():
+                printed_parts.append(raw.strip())
+    printed = "\n".join(printed_parts)
+    if _FILM_GROWTH_RE.search(blob) or _FILM_GROWTH_RE.search(printed):
         return _CONDENSATION_NOT_EVAPORATION_ALPHA
-    if _CONDENSATION_WORD_RE.search(blob) and not printed_hk_evaporation_ratio(
-        values, row
-    ):
+    names_condensation = bool(_CONDENSATION_WORD_RE.search(blob)) or bool(
+        _CONDENSATION_WORD_RE.search(printed)
+    )
+    if names_condensation and not printed_hk_evaporation_ratio(values, row):
         return _CONDENSATION_NOT_EVAPORATION_ALPHA
     return None
 
@@ -16777,6 +16815,10 @@ class Migrator:
         self._oxygen_pressure_conflict: set[str] = set()
         self._initial_composition_conflicts: set[str] = set()
         self._registry_printed_composition_experiments: set[str] = set()
+        # Experiment ids whose sample material prints an amorphous solid.
+        # Sample has no material field; the word is read here, while the
+        # extract mapping is still intact, and consulted by the reservoir fill.
+        self._amorphous_printed_sample_experiments: set[str] = set()
         # b-718 ROR: exploded children whose printed map is their own row's
         # (not the parent observation's). A row-local map describes that row
         # (often an evaporation residue), so it never promotes to the sample.
@@ -17297,7 +17339,9 @@ class Migrator:
         An observation may omit conditions that its declared experiment records
         once. Pressure inherits only an exact experiment-scope value. A p_sat
         or evaporation_coefficient_alpha row gets a pure reservoir when the
-        sample's printed form and single-component composition agree.
+        sample's printed form and single-component composition agree. A sample
+        printed as amorphous stays typed-unknown: Phase.CR would assert a
+        crystal, and Phase.GLASS is not a substitute.
         Point-scoped effusion phases are resolved here from their own source
         rows, and only for p_sat. The C–CO route is resolved through the same
         guarded waypoint used by consumers, with derived pressure provenance
@@ -17451,13 +17495,27 @@ class Migrator:
                 in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
                 and pure_sample
             ):
-                known["reservoir"] = State.of(
-                    make_species(species_formula, sample_phase)
-                )
-                provenance.append(
-                    "identity.reservoir=experiment.sample.form and pure "
-                    "initial_composition (printed sample)"
-                )
+                # condensed_solid maps to Phase.CR. An amorphous print must
+                # not take that phase, and must not be rewritten as glass.
+                if (
+                    sample_phase is Phase.CR
+                    and experiment_id in self._amorphous_printed_sample_experiments
+                ):
+                    known["reservoir"] = State.unknown(
+                        _AMORPHOUS_CRYSTAL_RESERVOIR_REASON
+                    )
+                    provenance.append(
+                        "identity.reservoir remains unknown: "
+                        + _AMORPHOUS_CRYSTAL_RESERVOIR_REASON
+                    )
+                else:
+                    known["reservoir"] = State.of(
+                        make_species(species_formula, sample_phase)
+                    )
+                    provenance.append(
+                        "identity.reservoir=experiment.sample.form and pure "
+                        "initial_composition (printed sample)"
+                    )
 
         existing_pressure = existing.get("total_pressure_Pa")
         pressure_can_fill = "total_pressure_Pa" not in existing
@@ -17935,6 +17993,10 @@ class Migrator:
                 is not None
             ):
                 self._registry_printed_composition_experiments.add(
+                    experiment.experiment_id
+                )
+            if _sample_prints_amorphous_solid(payload.get("sample")):
+                self._amorphous_printed_sample_experiments.add(
                     experiment.experiment_id
                 )
             self.result.experiments[experiment.experiment_id] = experiment
