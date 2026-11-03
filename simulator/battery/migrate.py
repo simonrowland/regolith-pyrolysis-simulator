@@ -4477,10 +4477,9 @@ def _resolve_named_material_citation(
         oxides = _feedstock_oxide_wt_pct_table().get(feedstock_id)
         if oxides is None:
             return None
-        # Not an observation id. Corpus validation flags derived_from parents
-        # that do not resolve; a same-extract observation id does resolve.
-        # The feedstock token is the composition record the ruling asks for
-        # when the paper does not print the oxides itself.
+        # Composition-record token for Derivation.references. Not an
+        # Observation.derived_from parent: that field is value ancestry,
+        # and corpus validation rejects a feedstock id that does not resolve.
         return dict(oxides), f"feedstock:{feedstock_id}"
     return None
 
@@ -20154,10 +20153,10 @@ class Migrator:
                 "composition": mixture_binding.located,
             }
             ident_kwargs["composition"] = mixture_binding.located.state
-            if mixture_binding.parents:
-                derived_from = tuple(
-                    dict.fromkeys((*(derived_from or ()), *mixture_binding.parents))
-                )
+            # Parents stay on the composition derivation (references and
+            # composition_records=). Observation.derived_from is value
+            # ancestry: a cited composition record is a different quantity,
+            # and a feedstock token does not resolve.
             if mixture_binding.lot_reason is not None:
                 named_material_lot = (
                     mixture_binding.lot_reason,
