@@ -26,10 +26,28 @@ EXTRACT = (
 EXPECTED_COMPOSITION = {"MgO": Decimal("0.5"), "Al2O3": Decimal("0.5")}
 
 _MODEL_DERIVED_INPUTS = {
-    14: "K10(T)",
-    15: "K11(T)",
-    16: "K12(T)",
-    17: "K13(T)",
+    14: (
+        "K10(T)",
+        (
+            "shornikov_2017_table2_mgo_partial_pressure",
+            "shornikov_2017_table2_mg_partial_pressure",
+        ),
+    ),
+    15: (
+        "K11(T)",
+        (
+            "shornikov_2017_table2_alo_partial_pressure",
+            "shornikov_2017_table2_al_partial_pressure",
+        ),
+    ),
+    16: (
+        "K12(T)",
+        (
+            "shornikov_2017_table2_al2o_partial_pressure",
+            "shornikov_2017_table2_al_partial_pressure",
+        ),
+    ),
+    17: ("K13(T)", ("shornikov_2017_table2_o2_partial_pressure",)),
 }
 def _observations(document: dict) -> list[dict]:
     return [
@@ -41,7 +59,7 @@ def _observations(document: dict) -> list[dict]:
 
 def _assert_model_derived_lineage(document: dict) -> None:
     observations = _observations(document)
-    for equation, constant in _MODEL_DERIVED_INPUTS.items():
+    for equation, (constant, parents) in _MODEL_DERIVED_INPUTS.items():
         row = next(
             item
             for item in observations
@@ -53,13 +71,12 @@ def _assert_model_derived_lineage(document: dict) -> None:
         assert values["equation_as_printed"] == f"({equation})"
         assert values["thermochemical_data_reference_as_printed"] == "[10]"
         assert "attribution" not in values
-        assert constant in row["derivation"]["relation"]
-        assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
-        raw_locator = row["derivation"]["raw_inputs"]["locator"]
-        assert raw_locator["page"] == 3
-        assert raw_locator["section"] == (
-            "Thermodynamic equilibrium calculations (prose before Table 3)"
-        )
+        relation = row["derivation"]["relation"]
+        assert constant in relation
+        assert "not printed in the method prose (p. 12" in relation
+        assert "raw_inputs" not in row["derivation"]
+        assert row["derived_from"] == list(parents)
+        assert row["derivation"]["inputs"] == list(parents)
         method = row["derivation"]["method"]
         assert method["state"]["value"] == "thermochemical equilibrium calculation"
         assert method["locator"]["page"] == 3
@@ -67,7 +84,6 @@ def _assert_model_derived_lineage(document: dict) -> None:
             "Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]"
         ]
         assert "equilibrium constants" in values["note"]
-        assert "derived_from" not in row
         assert len(values["points"]) == (10 if equation == 16 else 12)
 
 
@@ -106,6 +122,24 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
             if item["observation_id"] == row["observation_id"]
         )
         mutated_row["derivation"]["references"][0] = "unlisted data source"
+        with pytest.raises(AssertionError):
+            _assert_model_derived_lineage(mutated)
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["derived_from"][0] = "unrelated-observation"
+        with pytest.raises(AssertionError):
+            _assert_model_derived_lineage(mutated)
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["derivation"]["inputs"][0] = "unrelated-observation"
         with pytest.raises(AssertionError):
             _assert_model_derived_lineage(mutated)
     eq8_9 = next(
