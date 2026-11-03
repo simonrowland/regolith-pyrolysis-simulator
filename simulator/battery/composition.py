@@ -330,6 +330,9 @@ class ElementMassFractionRedox:
     refusal: str | None
     redox_kind: str
     notices: tuple[ElementWtNotice, ...]
+    # FeO_T oxide grams per 100 g of the printed analysis, after Pt and any
+    # excluded Cl. None when the row has no cation relabel.
+    oxide_mass_g_per_100g: Decimal | None = None
 
 
 def canonical_element_symbol(name: str) -> str:
@@ -766,10 +769,17 @@ def element_mass_fraction_redox(
         )
         split = _ferric_split_wt_percent(formula_moles, n_fe, fe3)
 
-    if _is_circular_observable(observable) and oxide_moles:
+    # A set refusal stays a refusal. Circularity selects fO2 only inside the
+    # Fe2+–Fe3+ span; it must not turn an out-of-range or missing-O row into
+    # an engine charge. t-1609: refusal stays a refusal
+    if refusal is None and _is_circular_observable(observable) and oxide_moles:
         redox_kind = "conditions"
         split = None
 
+    oxide_mass = sum(
+        (moles * _formula_molar_mass(name) for name, moles in formula_moles.items()),
+        Decimal(0),
+    )
     return ElementMassFractionRedox(
         printed_wt_percent=tuple(printed),
         oxide_mole_fractions=oxide_moles,
@@ -781,6 +791,7 @@ def element_mass_fraction_redox(
         refusal=refusal,
         redox_kind=redox_kind,
         notices=tuple(notices),
+        oxide_mass_g_per_100g=oxide_mass,
     )
 
 
@@ -823,6 +834,38 @@ def _ferric_split_wt_percent(
         masses.append((_OXIDE_FE2O3, n_fe2o3 * _formula_molar_mass(_OXIDE_FE2O3)))
     total = sum((mass for _name, mass in masses), Decimal(0))
     return tuple((name, Decimal(100) * mass / total) for name, mass in masses)
+
+
+def element_wt_percent_on_printed_analysis(
+    oxide_wt_percent: Mapping[str, object],
+    element: str,
+    *,
+    oxide_mass_g_per_100g: Decimal,
+) -> Decimal | None:
+    """Element wt% on the printed 100 g analysis after Pt and excluded Cl.
+
+    Premise: a printed element wt% is grams of that element per 100 g of the
+    analysis. That 100 g includes capsule Pt and any Cl the engine does not
+    take. The engine phase is the remaining FeO_T oxide mass renormalized
+    to 100 wt%. Comparing those two numbers directly shifts every element
+    by the excluded mass.
+
+    Algebra: w_printed = w_phase * (m_oxide / 100), where m_oxide is the
+    FeO_T oxide mass in grams per 100 g of the printed analysis after those
+    exclusions, and w_phase is the element wt% of the renormalized phase.
+    Units: (g / 100 g phase) * (g oxide / 100 g analysis) / (g / 100 g)
+    = g / 100 g analysis.
+
+    Scale check: 90 g SiO2 + 9 g FeO + 1 g Pt has m_oxide = 99. The echoed
+    phase is SiO2 90/99*100 and FeO 9/99*100. Silicon in that phase, times
+    99/100, is the printed silicon wt%. The residual against the printed
+    analysis is 0.
+    """
+
+    phase = element_wt_percent_of_oxide_phase(oxide_wt_percent, element)
+    if phase is None:
+        return None
+    return phase * oxide_mass_g_per_100g / Decimal(100)
 
 
 def element_wt_percent_of_oxide_phase(

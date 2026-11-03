@@ -180,7 +180,7 @@ from simulator.battery.composition import (
     chloride_component_symbol,
     composition_wt_pct,
     element_mass_fraction_redox,
-    element_wt_percent_of_oxide_phase,
+    element_wt_percent_on_printed_analysis,
     excluded_component_notice_reason,
     partition_engine_components,
     phase_ppm_mass_as_wt_percent,
@@ -8630,6 +8630,9 @@ def _circular_measured_oxygen_redox(
         observable=quantity_token(identity),
         chloride_components=_engine_bulk_component_names(engine),
     )
+    engine_refusal = _element_redox_engine_refusal(decision)
+    if engine_refusal is not None:
+        return engine_refusal
     if (
         decision.redox_kind == "ferric_fraction"
         or decision.ferric_split_wt_percent is not None
@@ -8719,24 +8722,10 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
-    if decision.redox_kind == "refusal":
-        if (
-            decision.refusal
-            == RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE.value
-        ):
-            reason = RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE
-        elif decision.refusal == "measured_oxygen_not_printed":
-            reason = RefusalReason.IDENTITY_INCOMPLETE
-        else:
-            reason = RefusalReason.INVALID_IDENTITY
-        return refused(
-            reason,
-            {
-                "reason": decision.refusal or reason.value,
-                "detail": decision.refusal or "",
-            },
-            notices=notices,
-        )
+    engine_refusal = _element_redox_engine_refusal(decision)
+    if engine_refusal is not None:
+        reason, detail = engine_refusal
+        return refused(reason, detail, notices=notices)
 
     temperature = temperature_of(identity)
     if temperature is None or not temperature.is_finite() or temperature <= 0:
@@ -8837,7 +8826,16 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
-    amount = _element_amount_in_phase(symbol, phase_map)
+    oxide_mass = decision.oxide_mass_g_per_100g
+    if oxide_mass is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "oxide_mass"},
+            notices=notices,
+        )
+    amount = _element_amount_in_phase(
+        symbol, phase_map, oxide_mass_g_per_100g=oxide_mass
+    )
     if amount is None or not amount.is_finite() or amount <= 0:
         return refused(
             RefusalReason.UNSUPPORTED,
@@ -8848,14 +8846,6 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
-    notices = notices + (
-        Notice(
-            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-            affected_quantities=(quantity,),
-            reason="element_wt_percent_comparison_denominator_is_oxide_phase",
-            origin=observation.observation_id,
-        ),
-    )
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -8887,13 +8877,47 @@ def _feo_t_wt_percent(decision: object) -> tuple[tuple[str, float], ...]:
     return tuple(weights.items())
 
 
-def _element_amount_in_phase(symbol: str, phase_map: Mapping[str, float]) -> Decimal | None:
+def _element_redox_engine_refusal(
+    decision: object,
+) -> tuple[RefusalReason, dict[str, object]] | None:
+    """Map an owner refusal onto the engine refusal. A conditions row is not one.
+
+    The owner keeps ``redox_kind`` as ``refusal`` when oxygen is missing or
+    outside the Fe2+–Fe3+ span. Circularity does not override that. This
+    function does not recompute the excess.
+    """
+
+    if getattr(decision, "redox_kind", None) != "refusal":
+        return None
+    token = getattr(decision, "refusal", None)
+    if token == RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE.value:
+        reason = RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE
+    elif token == "measured_oxygen_not_printed":
+        reason = RefusalReason.IDENTITY_INCOMPLETE
+    else:
+        reason = RefusalReason.INVALID_IDENTITY
+    return (
+        reason,
+        {"reason": token or reason.value, "detail": token or ""},
+    )
+
+
+def _element_amount_in_phase(
+    symbol: str,
+    phase_map: Mapping[str, float],
+    *,
+    oxide_mass_g_per_100g: Decimal,
+) -> Decimal | None:
     if symbol == "Cl":
         for name, amount in phase_map.items():
             if chloride_component_symbol(str(name)) and amount:
                 return Decimal(str(amount))
         return None
-    return element_wt_percent_of_oxide_phase(phase_map, symbol)
+    return element_wt_percent_on_printed_analysis(
+        phase_map,
+        symbol,
+        oxide_mass_g_per_100g=oxide_mass_g_per_100g,
+    )
 
 
 def _predict_phase_row(

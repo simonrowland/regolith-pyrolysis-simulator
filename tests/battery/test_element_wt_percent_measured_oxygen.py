@@ -683,7 +683,12 @@ def test_in_range_score_sends_the_ferric_split_and_not_fo2(monkeypatch) -> None:
     )
     prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
     assert prediction.execution.state is ExecutionState.PRODUCED
-    assert prediction.value == Decimal(100) * M_SI / M_SIO2
+    # The fake phase is pure SiO2. Printed-basis Si is that phase's Si
+    # scaled by the FeO_T oxide mass of the printed analysis (1 mol SiO2
+    # + 1 mol FeO). Pt and Cl are already out of that mass.
+    oxide_mass = M_SIO2 + M_FEO
+    phase_si = Decimal("100") * M_SI / M_SIO2
+    assert prediction.value == phase_si * oxide_mass / Decimal("100")
     assert len(calls) == 1
     call = calls[0]
     assert call["fO2_log"] is None
@@ -700,7 +705,7 @@ def test_in_range_score_sends_the_ferric_split_and_not_fo2(monkeypatch) -> None:
     for name, amount in expected.items():
         assert call["composition_kg"][name] == pytest.approx(amount)
     reasons = {notice.reason for notice in prediction.notices}
-    assert "element_wt_percent_comparison_denominator_is_oxide_phase" in reasons
+    assert "element_wt_percent_comparison_denominator_is_oxide_phase" not in reasons
     assert "redox_from_measured_oxygen_fe_only_assumption" in reasons
 
 
@@ -730,6 +735,151 @@ def test_outside_range_does_not_call_the_engine(monkeypatch) -> None:
         is RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE
     )
     assert prediction.value is None
+
+
+def _circular_refusal(monkeypatch, elements, mode: str):
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", _hook(calls)
+    )
+
+    def kress(**_kwargs):
+        calls.append({"kress": True})
+        return {"ratio": 0.2}
+
+    monkeypatch.setattr("simulator.fe_redox.kress91_split", kress)
+    if mode == "oxygen_excess":
+        identity = _phase_identity("Si", fO2_Pa=Decimal("10"))
+        engine = Engine.ALPHAMELTS
+        observation = F.observation(
+            "o-excess-refused",
+            "run-1400",
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        )
+        observation = replace(
+            observation,
+            derivation=Derivation(
+                relation="oxygen_excess",
+                inputs=("pdf-1",),
+                parameters=(),
+                output_unit="mol/100g",
+            ),
+        )
+    elif mode == "fe3_fe2_ratio":
+        identity = _phase_identity(
+            "Fe",
+            quantity=Quantity.FE3_FE2_RATIO,
+            subtype=None,
+            fO2_Pa=Decimal("10"),
+        )
+        engine = Engine.INTERNAL_ANALYTICAL
+        observation = F.observation(
+            "fe-ratio-refused",
+            "run-1400",
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        )
+    else:
+        raise AssertionError(mode)
+    observation = _with_elements(observation, elements, fe3=None)
+    prediction = predict_with_engine(engine, observation)
+    return prediction, calls
+
+
+@pytest.mark.parametrize("mode", ["oxygen_excess", "fe3_fe2_ratio"])
+def test_out_of_range_circular_row_does_not_call_the_engine(monkeypatch, mode) -> None:
+    high = dict(HAND)
+    high["O"] = "59.99625"
+    prediction, calls = _circular_refusal(monkeypatch, high, mode)
+    assert calls == []
+    assert prediction.value is None
+    assert (
+        prediction.refusal_reason
+        is RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE
+    )
+
+
+@pytest.mark.parametrize("mode", ["oxygen_excess", "fe3_fe2_ratio"])
+def test_missing_oxygen_circular_row_does_not_call_the_engine(monkeypatch, mode) -> None:
+    elements = {key: value for key, value in HAND.items() if key != "O"}
+    prediction, calls = _circular_refusal(monkeypatch, elements, mode)
+    assert calls == []
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == "measured_oxygen_not_printed"
+
+
+def test_platinum_exclusion_echo_matches_the_printed_silicon(monkeypatch) -> None:
+    """90 g SiO2 + 9 g FeO + 1 g Pt. An echo of that silicate residuals to 0.
+
+    Printed silicon is the element mass in the original 100 g. The engine
+    phase is the 99 g of oxide renormalized to 100 wt%. Those are different
+    denominators; the scored number has to come back onto the printed one.
+    """
+
+    w_si = Decimal(90) * M_SI / M_SIO2
+    w_fe = Decimal(9) * M_FE / M_FEO
+    w_o = Decimal(90) * (2 * M_O) / M_SIO2 + Decimal(9) * M_O / M_FEO
+    elements = {
+        "Si": format(w_si, "f"),
+        "Fe": format(w_fe, "f"),
+        "O": format(w_o, "f"),
+        "Pt": "1",
+    }
+    calls: list[dict] = []
+
+    def echo(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+        redox_mode=None,
+    ):
+        calls.append({"composition_kg": dict(composition_kg)})
+        total = sum(composition_kg.values())
+        phase = {
+            name: 100.0 * amount / total
+            for name, amount in composition_kg.items()
+            if amount
+        }
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": phase},
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", echo
+    )
+    observation = _with_elements(
+        F.observation(
+            "si-echo",
+            "run-echo",
+            _phase_identity("Si"),
+            w_si,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        elements,
+        fe3=Decimal(0),
+    )
+    prediction = predict_with_engine(Engine.THERMOENGINE, observation)
+    assert len(calls) == 1
+    assert prediction.refusal_reason is None
+    assert prediction.value is not None
+    assert abs(prediction.value - w_si) < Decimal("1e-9")
+    unscaled = (Decimal(90) / Decimal(99)) * Decimal(100) * M_SI / M_SIO2
+    assert abs(unscaled - w_si) > Decimal("0.4")
+    assert "element_wt_percent_comparison_denominator_is_oxide_phase" not in {
+        notice.reason for notice in prediction.notices
+    }
 
 
 def test_platinum_and_chlorine_rows_are_refused_before_the_engine(monkeypatch) -> None:
