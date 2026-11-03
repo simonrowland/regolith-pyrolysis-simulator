@@ -175,6 +175,11 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
         row["imcc_activity"] is not None
         for row in shadow["activities_by_oxide"].values()
     )
+    for oxide in ("CaO", "MgO"):
+        row = shadow["activities_by_oxide"][oxide]
+        assert row["constant_gamma_status"] == "ok"
+        assert row["constant_gamma_activity"] is not None
+        assert "constant_gamma_detail" not in row
 
 
 def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) -> None:
