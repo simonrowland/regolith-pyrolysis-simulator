@@ -22,6 +22,10 @@ CELL_AUDIT = (
     / "data/literature/extracts/audits"
     / f"{SOURCE_ID}.cell-audit.csv"
 )
+FLUX_ADDITION_SENTENCE = (
+    "30 g of the flux was put and melted in the holder made of iron, and added on to the alloy melt by means of "
+    "melting the bottom of the holder."
+)
 
 
 RENDER_PINS = {
@@ -118,6 +122,13 @@ def _assert_quench_equilibration_method(document: dict) -> None:
     assert methods["method_detail_as_printed"].startswith(
         "“The experiment was carried out in a Tammann furnace"
     )
+    assert FLUX_ADDITION_SENTENCE in methods["method_detail_as_printed"]
+    assert methods["method_detail_as_printed"].index(FLUX_ADDITION_SENTENCE) > methods[
+        "method_detail_as_printed"
+    ].index("After the temperature of the melt was measured")
+    assert methods["method_detail_as_printed"].index(FLUX_ADDITION_SENTENCE) < methods[
+        "method_detail_as_printed"
+    ].index("After then, the melt was picked up")
 
 
 def test_tables_match_render_samples_and_complete_cell_audit() -> None:
@@ -271,6 +282,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert methods["method_detail_as_printed"].startswith(
         "“The experiment was carried out in a Tammann furnace"
     )
+    assert FLUX_ADDITION_SENTENCE in methods["method_detail_as_printed"]
     assert context_rows["kunisada_1986_experimental_methods"]["locator"]["section"] == (
         "II. Experimental Method"
     )
