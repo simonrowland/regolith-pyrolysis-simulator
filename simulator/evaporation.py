@@ -787,6 +787,24 @@ class EvaporationMixin:
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
     ) -> EvaporationFlux:
         """Solve current evaporation against the existing overhead writer."""
+        # Probe reuse is valid only while this hour's ledger and catalog stay
+        # fixed. Clear it on every exit so a later hour cannot read it.
+        self._headspace_probe_reuse = {}
+        try:
+            return self._solve_evaporation_with_headspace_feedback(
+                equilibrium,
+                gate_authority=gate_authority,
+            )
+        finally:
+            self._headspace_probe_reuse = None
+
+    def _solve_evaporation_with_headspace_feedback(
+        self,
+        equilibrium: Any,
+        *,
+        gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+    ) -> EvaporationFlux:
+        """Probe the quasi-steady headspace root for one hour."""
         from simulator.config_flags import bool_feature_flag
         from simulator.overhead import (
             _mean_molar_mass_kg_mol,
@@ -1455,7 +1473,21 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             effective_pressure_source,
         ) = resolved_batch_flux_state
-        batch_report = serialize_vapour_batch(vapour_batch)
+        # The hour solves many partials against one batch. Serialization is a
+        # pure function of that batch, so the first probe's report is reused.
+        reuse = getattr(self, "_headspace_probe_reuse", None)
+        batch_key = id(vapour_batch)
+        if (
+            isinstance(reuse, dict)
+            and reuse.get("batch_key") == batch_key
+            and "batch_report" in reuse
+        ):
+            batch_report = reuse["batch_report"]
+        else:
+            batch_report = serialize_vapour_batch(vapour_batch)
+            if isinstance(reuse, dict):
+                reuse["batch_key"] = batch_key
+                reuse["batch_report"] = batch_report
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
             if isinstance(channels, Mapping):
@@ -3965,6 +3997,24 @@ class EvaporationMixin:
             return None
         return parsed
 
+    def _headspace_reuse_or_load(self, key: str, loader):
+        """Return a catalog load cached for the current headspace solve.
+
+        Alpha, its envelope, and the HKL transport set are pure functions of
+        the vapor-pressure payload. A solve evaluates that payload once per
+        partial probe. The cache is the dict installed by
+        ``_calculate_evaporation_with_headspace_feedback`` and is absent
+        outside that solve, so a later mutation of the payload is visible.
+        """
+
+        reuse = getattr(self, "_headspace_probe_reuse", None)
+        if isinstance(reuse, dict) and key in reuse:
+            return reuse[key]
+        loaded = loader(self.vapor_pressures)
+        if isinstance(reuse, dict):
+            reuse[key] = loaded
+        return loaded
+
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,
     ) -> tuple[dict, dict, dict]:
@@ -3984,6 +4034,21 @@ class EvaporationMixin:
         validation error to the module's typed terminal physics refusal before
         it can escape the evaporation boundary.
         """
+
+        # One headspace solve holds the ledger and this pressure map fixed.
+        # The caller copies the map on every probe, so identity would miss.
+        # The key is the copied contents. Rebuilding stoich on every partial
+        # repeats the same validation. The cache lives only on
+        # ``_headspace_probe_reuse``, which the feedback solver clears.
+        reuse = getattr(self, "_headspace_probe_reuse", None)
+        aux_key = (
+            tuple(vapor_pressures.items()),
+            id(self.atom_ledger),
+        )
+        if isinstance(reuse, dict):
+            cached_aux = reuse.get("aux")
+            if cached_aux is not None and cached_aux[0] == aux_key:
+                return cached_aux[1]
 
         molar_masses_kg_mol: dict[str, float] = {}
         stoich_by_species: dict[str, dict] = {}
@@ -4043,7 +4108,10 @@ class EvaporationMixin:
                 )
             available_oxide_kg[species] = ledger_oxide_kg
 
-        return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
+        aux_maps = (molar_masses_kg_mol, stoich_by_species, available_oxide_kg)
+        if isinstance(reuse, dict):
+            reuse["aux"] = (aux_key, aux_maps)
+        return aux_maps
 
     def _evaporation_overhead_total_pressure_Pa(
         self,
@@ -4430,13 +4498,20 @@ class EvaporationMixin:
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
             'alpha': _measured_alpha_control_view(
-                _load_evaporation_alpha_by_species(self.vapor_pressures)
+                self._headspace_reuse_or_load(
+                    "alpha_loaded",
+                    _load_evaporation_alpha_by_species,
+                )
             ),
-            'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
-                self.vapor_pressures
+            'alpha_envelope': self._headspace_reuse_or_load(
+                "alpha_envelope",
+                _load_evaporation_alpha_envelope_by_species,
             ),
             'hkl_upper_bound_transport_species': (
-                _load_hkl_upper_bound_transport_species(self.vapor_pressures)
+                self._headspace_reuse_or_load(
+                    "hkl_upper_bound",
+                    _load_hkl_upper_bound_transport_species,
+                )
             ),
             'allow_unmeasured_alpha_fallback': kernel_config.get(
                 'allow_unmeasured_alpha_fallback', False
