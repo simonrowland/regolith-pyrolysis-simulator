@@ -22,7 +22,7 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.identity import Identity
-from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery.records import Composition, Notice, Species, State, Value
 from simulator.battery import score as battery_score
 from simulator.battery.score import predict_with_engine
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -256,19 +256,130 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
 
 
 @pytest.mark.parametrize(
-    ("formula", "notice_reason", "temperature_K"),
+    ("formula", "temperature_K", "expected_notices"),
     [
-        ("MnO", "gamma_reference_state_solid_unconverted", Decimal("1473.15")),
-        ("K2O", "gamma_reference_state_unprinted", Decimal("1500")),
-        ("Al2O3", "gamma_reference_state_unverified", Decimal("1473.15")),
-        ("Cr2O3", None, Decimal("1473.15")),
-        ("P2O5", "gamma_reference_state_unverified", Decimal("1873")),
+        (
+            "MnO",
+            Decimal("1473.15"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="fo2_tier=4; route=intrinsic_melt_fO2; borrowed",
+                        origin="fo2_ladder",
+                        band="borrowed fO2: intrinsic_melt_fO2",
+                        authority=Authority.BRIDGE,
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "gamma_reference_state_solid_unconverted (reason: "
+                            "JANAF manifest lists only elemental Mn-001 through "
+                            "Mn-006; no MnO(cr)/MnO(l) fusion chord "
+                            "(data/literature/compilations/janaf/manifest.yaml:"
+                            "28177-28444))"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    ),
+                }
+            ),
+        ),
+        (
+            "K2O",
+            Decimal("1500"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="gamma_reference_state_unprinted",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                }
+            ),
+        ),
+        (
+            "Al2O3",
+            Decimal("1473.15"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="gamma_reference_state_unverified",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                }
+            ),
+        ),
+        (
+            "P2O5",
+            Decimal("1873"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="gamma_reference_state_unverified",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                }
+            ),
+        ),
+        (
+            "CaO",
+            Decimal("1873"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="melt_oxide_activity has no certified evidence tier",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                }
+            ),
+        ),
+        (
+            "MgO",
+            Decimal("1873"),
+            frozenset(
+                {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="melt_oxide_activity has no certified evidence tier",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                }
+            ),
+        ),
     ],
 )
 def test_internal_analytical_row_uses_gamma_reference_notice(
     formula: str,
-    notice_reason: str | None,
     temperature_K: Decimal,
+    expected_notices: frozenset[Notice],
 ) -> None:
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.5"), (formula, "0.5")),
@@ -290,16 +401,7 @@ def test_internal_analytical_row_uses_gamma_reference_notice(
         isolated=False,
     )
     assert prediction.execution.state is ExecutionState.PRODUCED
-    if notice_reason is None:
-        assert not any(
-            notice.reason.startswith("gamma_reference_state_")
-            for notice in prediction.notices
-        )
-    else:
-        assert any(
-            notice_reason in notice.reason
-            for notice in prediction.notices
-        )
+    assert frozenset(prediction.notices) == expected_notices
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
