@@ -7078,6 +7078,7 @@ _SC456_SOURCE_IDS = (
     "gca-366-210-berry-2024",
     "yakovlev-2024-cai-vaporization",
     "yamaguchi-1984-na2o-activity-sodium-beta-alumina",
+    "johnston-1965-sodium-disilicate-redox",
 )
 
 

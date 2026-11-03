@@ -426,11 +426,54 @@ species:
       rail: redox
       values:
         quantity: apparent_enthalpy_of_reduction
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: typed_refusal
         reason: fit_inputs_for_Fe_are_not_stored_in_this_extract
-        attribution: Johnston (1965) reports the apparent reduction enthalpy; underlying Fe equilibrium data are not included in Table I.
-        points: [{column_as_printed: 'Apparent ΔH (kcal)', value: 110, value_as_published: '110', method_class: quoted_attributed, point_conditions: &johnston_t2_fe_apparent_delta_h_conditions {T_C: {state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, atmosphere: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, fO2_Pa: {state: {tag: unknown, reason: no_numeric_pO2_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}, composition: {state: {tag: unknown, reason: not_printed_for_fit_summary}, locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}}}}]
+        attribution: Johnston (1965), this work; Table II apparent enthalpy derived from the temperature-dependent equilibrium data.
+        derivation:
+          relation: >-
+            Apparent reduction enthalpy from the temperature dependence of the logarithm
+            of the equilibrium constant, assuming oxygen-ion activity is independent of temperature.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 189
+              figure: '5'
+              section: Temperature dependence measurements
+          method:
+            state:
+              tag: value
+              value: >-
+                Temperature-dependence analysis of log equilibrium constant versus reciprocal temperature;
+                assumes oxygen-ion activity is independent of temperature.
+            locator:
+              page: 6
+              pdf_page_index: 5
+              published_page: 189
+              section: Temperature dependence measurements
+        points:
+        - column_as_printed: 'Apparent ΔH (kcal)'
+          value: 110
+          value_as_published: '110'
+          method_class: measured_reduced
+          point_conditions: &johnston_t2_fe_apparent_delta_h_conditions
+            T_C:
+              state: {tag: unknown, reason: fitted_temperature_dependence_no_single_T}
+              locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
+            atmosphere:
+              state: {tag: unknown, reason: not_printed_for_fit_summary}
+              locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
+            fO2_Pa:
+              state: {tag: unknown, reason: no_numeric_pO2_printed}
+              locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_printed}
+              locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
+            composition:
+              state: {tag: unknown, reason: not_printed_for_fit_summary}
+              locator: {page: 6, pdf_page_index: 5, published_page: 189, table: 'II', row: 3}
       point_conditions: *johnston_t2_fe_apparent_delta_h_conditions
   Sb:
     observations:
