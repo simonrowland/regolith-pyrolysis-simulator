@@ -432,7 +432,12 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     _PINNED_CRO_OFFGAS_KG = 0.0
     # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
     # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
+    # b-773 same-hour headspace moves this pin again. Merge-base 4e3a09d90 still
+    # measures 9.216286881528129e-06 (old pin, relative 5.6e-9). Production
+    # ffec48bd3, bit-identical under the series replay, measures the value below.
+    # CrO offgas stays 0. This assert sits after the rump pin, so the studio
+    # gate's rump failure never reached it.
+    _PINNED_CR_OFFGAS_EQ_KG = 1.3910804129064562e-05
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -449,7 +454,24 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
     # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280300206015765, rel=1e-9)
+    # b-773 same-hour headspace (ffec48bd3). Laptop rerun of this scenario, same
+    # driver: merge-base 4e3a09d90 rump Cr2O3 is 3.328030021021514 kg (the pin
+    # above, relative 1.3e-10). ffec48bd3 and the series-replay tree give
+    # 3.32326700463754 kg, the studio-3 value.
+    # Premise: the ledger conserves Cr. Cr kg on an account is that account's
+    # Cr atom-moles times 51.9961e-3 kg/mol. This run holds Cr in three
+    # accounts only. CrO and CrO2 evaporation credits are 0 on both trees.
+    # Algebra, production minus merge-base, kg Cr:
+    #   cleaned_melt (Cr2O3)     -0.003258893081913072
+    #   condensation_train       +0.003254198508361478
+    #   terminal.offgas          +0.000004694573548742623
+    #   sum                      -2.9e-15
+    # so the rump loss equals the condensation gain plus the offgas gain.
+    # Unit check: each term is kg Cr; the inventory is 2.45976880180282 kg.
+    # Limiting case: an unchanged evaporation leaves every delta at 0.
+    # The metal ingot takes +0.002242077843184 kg of that Cr. The rest leaves
+    # as CrO3 (product CrO3 +0.001955425653990 kg species).
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.32326700463754, rel=1e-9)
     assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
