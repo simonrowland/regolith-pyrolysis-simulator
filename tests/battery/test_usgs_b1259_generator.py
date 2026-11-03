@@ -38,13 +38,13 @@ B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 # t-1620 generator census: decimal subscripts stay within one formula;
 # malformed trailing-dot formulas refuse instead of losing empty segments.
 B1259_RAW = 29809
-B1259_STORED = 15048
-B1259_REFUSED = 2831
+B1259_STORED = 14961
+B1259_REFUSED = 2918
 B1259_EXCLUDED = 11930
 B1259_RECORD_COUNT = 549
-B1259_RECORDS_STORING_NOTHING = 82
+B1259_RECORDS_STORING_NOTHING = 84
 B1259_EMPTY_FORMULA_UNRESOLVED_298K = 60
-B1259_EMPTY_FORMULA_UNRESOLVED_HT = 17
+B1259_EMPTY_FORMULA_UNRESOLVED_HT = 19
 B1259_EMPTY_METADATA_TABLES = 3
 B1259_EMPTY_ALL_CELLS_REFUSED_OR_EXCLUDED = 2
 B1259_MERGED_PROPOSED = 4
@@ -55,10 +55,10 @@ B1259_MERGED_EXCLUDED = 0
 B1259_UNGUARDED_MERGED_STORED = 2
 B1259_IDENTITY_10X = 118
 B1259_IDENTITY_1X_10X = 27
-B1259_FORMULA_UNRESOLVED_HT = 17
+B1259_FORMULA_UNRESOLVED_HT = 19
 B1259_FORMULA_UNRESOLVED_298K_ROWS = 60
 # Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
-B1259_STORE_STORED = 14738
+B1259_STORE_STORED = 14651
 SILVER_298K = "b1259-298k-0001-silver"
 AG_ION_298K = "b1259-298k-0002-ag-aqueous-ion"
 AL_ION_298K = "b1259-298k-0004-al-aqueous-ion"
@@ -634,6 +634,46 @@ def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
     assert "Ammonia" not in {
         obs.identity.species.formula for obs in generated.observations
     }
+
+
+def test_name_index_replacement_must_match_printed_formula_weight() -> None:
+    for record_id, formula, formula_mass, formula_weight, refused in (
+        (
+            "b1259-ht-0185-merwinite",
+            "Ca3Mg(Si04)2",
+            Decimal("369.219"),
+            Decimal("328.719"),
+            73,
+        ),
+        (
+            "b1259-ht-0146-salammoniac",
+            "NH4C1",
+            Decimal("30.050"),
+            Decimal("53.491"),
+            25,
+        ),
+    ):
+        record = _load(record_id)
+        resolution = generator._resolve_formula(record)
+        generated = generator.generate_record(record)
+
+        calculated_mass = generator._formula_mass(formula)
+        assert calculated_mass is not None
+        assert abs(calculated_mass - formula_mass) < Decimal("0.001")
+        assert abs(formula_mass - formula_weight) > Decimal("0.01")
+        assert resolution.formula is None
+        assert resolution.reason is not None
+        assert generator.FORMULA_UNRESOLVED_REASON_PREFIX in resolution.reason
+        assert formula in resolution.reason
+        assert generated.observations == ()
+        assert generated.report["cell_accounting"]["stored"] == 0
+        assert generated.report["cell_accounting"]["refused"] == refused
+
+    for record_id, formula in (
+        ("b1259-ht-0128-perovskite", "CaTiO3"),
+        ("b1259-ht-0162-nitrobarite", "BaNO3"),
+    ):
+        assert generator._resolve_formula(_load(record_id)).formula == formula
 
 
 def test_sibling_and_ocr_formulas_are_page_grounded() -> None:

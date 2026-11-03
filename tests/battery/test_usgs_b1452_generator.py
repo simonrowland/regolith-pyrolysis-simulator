@@ -39,11 +39,11 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
-# t-1620 generator census: the printed decimal oxygen subscripts on terbium oxides parse.
+# t-1620 parses the terbium decimals; blank-FW formula-line entropies are excluded.
 B1452_RAW = 55707
-B1452_STORED = 15231
+B1452_STORED = 15229
 B1452_REFUSED = 19642
-B1452_EXCLUDED = 20834
+B1452_EXCLUDED = 20836
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
 B1452_MERGED_REFUSED = 15
@@ -60,7 +60,7 @@ SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 47
 B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
 # Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
-B1452_STORE_STORED = 15226
+B1452_STORE_STORED = 15224
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -289,6 +289,32 @@ def test_298k_next_line_formula_is_page_grounded() -> None:
         generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
     )
     assert stored == []
+
+
+def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
+    generated = _generation(TABLE_298K)
+    observations = [
+        observation
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.S
+        and observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+    ]
+
+    assert {
+        (observation.identity.species.formula, observation.value.point)
+        for observation in observations
+    } == {
+        ("TbO1.714", Decimal("80.75")),
+        ("TbO1.812", Decimal("81.17")),
+    }
+    excluded = [
+        row
+        for row in generated.report["exclusions"]
+        if row["column"] == "entropy_s298"
+        and row["as_published"] == "4.20"
+        and "blank-formula-weight terbium formula line" in row["reason"]
+    ]
+    assert len(excluded) == 2
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:

@@ -1291,6 +1291,22 @@ def _resolve_formula(record: Mapping[str, Any]) -> FormulaResolution:
         ]
         if matching:
             candidates = matching
+        elif (
+            candidates
+            and "." in str(consulted.get("formula_as_published") or "")
+            and local.consulted.get("printed_parsed") is None
+        ):
+            # The t-1620 dot grammar transition made these printed formulas
+            # unparseable; preserve pre-existing non-dot OCR fallbacks.
+            consulted["printed_mass_mismatch"] = [
+                {
+                    "formula": formula,
+                    "source": source,
+                    "mass": str(_formula_mass(formula)),
+                }
+                for formula, source, _charge in candidates
+            ]
+            candidates = []
     unique = {formula for formula, _source, _charge in candidates}
     if len(unique) == 1:
         formula = next(iter(unique))
