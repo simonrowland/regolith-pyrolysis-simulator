@@ -187,6 +187,15 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
         "Fe0.947O",
         "FeO1.33",
         "SiO1.5C0.5",
+        # Fractional digits that also read as an integer adduct count stay
+        # on one species. A part with one element, or no element, is not
+        # an adduct (Fe1|17Si3|13O8, Ca1|5SiO3, Fe2|3O4, FeO1|5, SiO1|5C0|5).
+        "Fe1.17Si3.13O8",
+        "Na1.2Fe1.3Si3O8",
+        "Mg1.8Fe1.2SiO4",
+        "Ca1.5SiO3",
+        "Mg1.5SiO4",
+        "Fe2.3O4",
     )
     for formula in decimals:
         atoms = _atoms(formula)
@@ -200,6 +209,13 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     assert _atoms("FeO1.5") != _atoms("Fe2O3")
     assert _atoms("Fe0.947O") == {"Fe": 0.947, "O": 1.0}
     assert _atoms("AlO1.5") != _atoms("Al2O3")
+    assert _atoms("Fe1.17Si3.13O8") == {"Fe": 1.17, "Si": 3.13, "O": 8.0}
+    assert _atoms("Na1.2Fe1.3Si3O8") == {"Na": 1.2, "Fe": 1.3, "Si": 3.0, "O": 8.0}
+    assert _atoms("Mg1.8Fe1.2SiO4") == {"Mg": 1.8, "Fe": 1.2, "Si": 1.0, "O": 4.0}
+    assert _atoms("Ca1.5SiO3") == {"Ca": 1.5, "Si": 1.0, "O": 3.0}
+    assert _atoms("Mg1.5SiO4") == {"Mg": 1.5, "Si": 1.0, "O": 4.0}
+    assert _atoms("Fe2.3O4") == {"Fe": 2.3, "O": 4.0}
+    assert _atoms("SiO1.5C0.5") == {"Si": 1.0, "O": 1.5, "C": 0.5}
 
     five_waters = {"Cu": 1.0, "S": 1.0, "O": 9.0, "H": 10.0}
     assert _atoms("CuSO4·5H2O") == five_waters
@@ -209,6 +225,7 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     assert janaf_dot.get("H") == 2.0
     assert _atoms("3Al2O3.2SiO2") == {"Al": 6.0, "O": 13.0, "Si": 2.0}
     assert _atoms("Na2O.SiO2") == {"Na": 2.0, "O": 3.0, "Si": 1.0}
+    assert _atoms("Na2O.2SiO2") == {"Na": 2.0, "O": 5.0, "Si": 2.0}
     assert _atoms("K2O.2SiO2") == {"K": 2.0, "O": 5.0, "Si": 2.0}
     # Kaolinite hand count: Al2O3 + 2 SiO2 + 2 H2O. A chain of digit-flanked
     # adducts, not one decimal coefficient (that reading is Al 2, Si 1, O 6.4).
