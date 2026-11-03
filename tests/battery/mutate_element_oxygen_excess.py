@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Break the t-1609 oxygen-demand divisor and require the excess tests to fail.
+"""Break two t-1609 pins and require the covering tests to fail.
 
-The production line charges z_i/2 oxygen atoms per cation. This script rewrites
-that divisor to z_i/1, runs the hand-arithmetic excess tests, and restores the
-source. A green pytest means the tests are not pinned to the formula.
+The oxygen-demand line charges z_i/2. Rewriting that divisor to z_i/1 must
+turn the hand-arithmetic excess tests red. The circularity guard leaves a
+set refusal as a refusal. Deleting that guard so the override wins must turn
+the out-of-range and missing-oxygen engine-call tests red.
+
+The interpreter is this process. Scratch and library paths come from the
+environment. The source is restored after each mutation.
 """
 
 from __future__ import annotations
@@ -15,57 +19,52 @@ from pathlib import Path
 
 SEAT = Path(__file__).resolve().parents[2]
 SOURCE = SEAT / "simulator" / "battery" / "composition.py"
-MARKER = (
+DEMAND_MARKER = (
     "oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(2)"
     "  # t-1609: z_i / 2"
 )
-BROKEN = (
+DEMAND_BROKEN = (
     "oxygen_demand += cation_moles * Decimal(row.valence) / Decimal(1)"
     "  # t-1609: z_i / 2"
 )
-PYTEST = (
-    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python"
-)
-# The scale-check test uses atomic weights only. It is not a mutation target.
-SELECT = (
+DEMAND_SELECT = (
     "hand_example_relabels or extra_oxygen_mass_fraction "
     "or boundaries_are_all_ferrous or below_zero_and_above "
     "or titanium_manganese"
+)
+REFUSAL_MARKER = (
+    "if refusal is None and _is_circular_observable(observable) and oxide_moles:"
+)
+REFUSAL_BROKEN = (
+    "if _is_circular_observable(observable) and oxide_moles:"
+)
+REFUSAL_SELECT = (
+    "out_of_range_circular_row_does_not_call_the_engine "
+    "or missing_oxygen_circular_row_does_not_call_the_engine"
 )
 
 
 def _env() -> dict[str, str]:
     env = os.environ.copy()
-    scratch = "/private/tmp/claude-501/main-review/w1103t1609"
-    env.update(
-        {
-            "DYLD_FALLBACK_LIBRARY_PATH": "/Users/simonrowland/lib",
-            "MPLCONFIGDIR": "/private/tmp/claude-501/main-review/mplcache",
-            "OMPI_MCA_orte_tmpdir_base": f"{scratch}/ompi",
-            "PRTE_MCA_prte_tmpdir_base": f"{scratch}/ompi",
-            "TMPDIR": f"{scratch}/tmp",
-            "PYTHONPATH": str(SEAT),
-            "PYTHONDONTWRITEBYTECODE": "1",
-        }
-    )
+    env["PYTHONPATH"] = str(SEAT)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
     return env
 
 
-def main() -> int:
-    original = SOURCE.read_text(encoding="utf-8")
-    count = original.count(MARKER)
+def _mutate(original: str, marker: str, broken: str, select: str, label: str) -> str:
+    count = original.count(marker)
     if count != 1:
-        print(f"marker count is {count}, expected 1", file=sys.stderr)
-        return 2
-    mutated = original.replace(MARKER, BROKEN, 1)
-    if mutated == original or BROKEN not in mutated:
-        print("replacement did not change the demand line", file=sys.stderr)
-        return 2
+        print(f"{label}: marker count is {count}, expected 1", file=sys.stderr)
+        return "marker"
+    mutated = original.replace(marker, broken, 1)
+    if mutated == original or broken not in mutated:
+        print(f"{label}: replacement did not change the source", file=sys.stderr)
+        return "marker"
     SOURCE.write_text(mutated, encoding="utf-8")
     try:
         completed = subprocess.run(
             [
-                PYTEST,
+                sys.executable,
                 "-m",
                 "pytest",
                 "-q",
@@ -75,7 +74,7 @@ def main() -> int:
                 "no:cacheprovider",
                 "tests/battery/test_element_wt_percent_measured_oxygen.py",
                 "-k",
-                SELECT,
+                select,
             ],
             cwd=SEAT,
             env=_env(),
@@ -87,21 +86,34 @@ def main() -> int:
     finally:
         SOURCE.write_text(original, encoding="utf-8")
     restored = SOURCE.read_text(encoding="utf-8")
-    if restored != original or BROKEN in restored or restored.count(MARKER) != 1:
-        print("source was not restored", file=sys.stderr)
-        return 2
+    if restored != original or broken in restored or restored.count(marker) != 1:
+        print(f"{label}: source was not restored", file=sys.stderr)
+        return "restore"
     sys.stdout.write(completed.stdout)
     sys.stderr.write(completed.stderr)
     if completed.returncode == 0 or "FAILED" not in completed.stdout + completed.stderr:
         print(
-            "mutation left the excess tests green; the pin does not cover z_i/2",
+            f"{label}: mutation left the tests green; the pin does not cover it",
             file=sys.stderr,
         )
-        return 1
+        return "green"
     print(
-        f"mutation failed the excess tests (pytest exit {completed.returncode}) "
+        f"{label}: mutation failed the tests (pytest exit {completed.returncode}) "
         "and the source was restored"
     )
+    return "red"
+
+
+def main() -> int:
+    original = SOURCE.read_text(encoding="utf-8")
+    demand = _mutate(original, DEMAND_MARKER, DEMAND_BROKEN, DEMAND_SELECT, "z_i/2")
+    if demand != "red":
+        return 1 if demand == "green" else 2
+    refusal = _mutate(
+        original, REFUSAL_MARKER, REFUSAL_BROKEN, REFUSAL_SELECT, "refusal override"
+    )
+    if refusal != "red":
+        return 1 if refusal == "green" else 2
     return 0
 
 
