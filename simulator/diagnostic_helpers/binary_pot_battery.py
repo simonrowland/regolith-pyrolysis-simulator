@@ -2124,6 +2124,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
     start_logp = -6.0
     start_cell = None
     starting_refusal_counts: dict[str, int] = {}
+    starting_grid_had_engine_crash = False
     # -6 is an arbitrary interior seed, not a domain boundary: refusing that
     # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
     # it first, then walk outward by 1 dex, preferring the higher side at each
@@ -2137,6 +2138,8 @@ def _solve_vapor_engine_cell_oxygen_balance(
         try:
             start_cell = cell_at_po2(10.0**candidate_logp)
         except _OxygenBalanceEngineTrialRefusal as exc:
+            if exc.reason_code == REFUSAL_ENGINE_CRASH:
+                starting_grid_had_engine_crash = True
             guard_reason = exc.reason_code
             engine_reason = getattr(exc.cell, "engine_reason", None)
             if engine_reason:
@@ -2153,8 +2156,12 @@ def _solve_vapor_engine_cell_oxygen_balance(
             f"{reason}: {count}"
             for reason, count in sorted(starting_refusal_counts.items())
         )
+        # For a wholly refused start grid, any recorded crash wins over mixed
+        # refusals; without a crash, the refused grid is a silicate-window refusal.
         raise _OxygenBalanceRefusal(
-            "oxygen_balance_no_admitted_bracket",
+            "oxygen_balance_no_admitted_bracket:engine_domain_crash"
+            if starting_grid_had_engine_crash
+            else "oxygen_balance_no_admitted_bracket:silicate_window_refusal",
             "no admitted starting cell in log10(pO2/bar) range [-30, 0]; "
             f"last_admitted_pO2_bar=none; starting-cell guard refusals: {refusal_counts}",
         )
@@ -2282,8 +2289,14 @@ def _solve_vapor_engine_cell_oxygen_balance(
                         if last_refused_trial is None
                         else f"{last_refused_trial[0]:g}"
                     )
+                    refusal_cause = (
+                        "silicate_window_refusal"
+                        if exc.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
+                        and "silicate_window" in exc.backend_status_reason
+                        else "engine_domain_crash"
+                    )
                     raise _OxygenBalanceRefusal(
-                        "oxygen_balance_no_admitted_bracket",
+                        f"oxygen_balance_no_admitted_bracket:{refusal_cause}",
                         "engine refused a trial while checking an admitted bracket; "
                         f"last_admitted_pO2_bar={last_admitted_po2_bar!r}; "
                         f"guard at pO2={refused_po2} bar: "
@@ -2308,7 +2321,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
                 else f"{last_admitted_po2_bar:g} bar"
             )
             raise _OxygenBalanceRefusal(
-                "oxygen_balance_no_admitted_bracket",
+                "oxygen_balance_no_admitted_bracket:same_sign_residual",
                 "no sign-changing bracket was found in the admitted pO2 window "
                 "reachable from the chosen start; "
                 f"start_pO2_bar={10.0**activity_anchor_logp:g}; "
