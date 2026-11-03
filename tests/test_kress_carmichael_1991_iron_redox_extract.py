@@ -26,16 +26,36 @@ EXTRACT = ROOT / (
     "kress-carmichael-1991-iron-redox-calibration.yaml"
 )
 SOURCE_ID = "kress-carmichael-1991-iron-redox-calibration"
-TABLE3_SAMPLED_TEXT = (
-    "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. "
-    "Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses "
-    "to about 0.7 wt% absolute."
+TABLE3_QUENCH_TEXT = (
+    "Melts were sampled at high temperature with a Pt loop quenched into ice-water "
+    "before, and after each set."
+)
+TABLE3_QUENCH_CRYSTALS_TEXT = (
+    "Micron-scale quench crystals in many of the Pt-loop samples reduced the precision "
+    "of bulk-composition analyses to about 0.7 wt% absolute."
 )
 TABLE4_METHOD_TEXT = (
-    "In order to account for the effect of Al2O3 contamination in NAFS and CAFS experiments, and the high iron "
+    "In order to account for the effect of Al2O3 contamination in the NAFS and CAFS experiments, and the high iron "
     "contents considered in the natural compositions, 33 additional Pt-loop drop-quench experiments were "
     "performed on compositions and conditions spanning those explored in the ultrasonic experiments."
 )
+TABLE4_COMPOSITION_UNKNOWN_REASON = (
+    'Table 4 caption: "Temperatures and compositions for quench experiments (wt%)"; '
+    "no starting/bulk composition is printed for run Q01."
+)
+TABLE4_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 4 caption states "Temperatures and compositions for quench experiments (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
+)
+TABLE5_COMPOSITION_UNKNOWN_REASON = (
+    'Table 5 caption: "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "no starting/bulk composition is printed for run B27."
+)
+TABLE5_COMPOSITION_UNKNOWN_NOTE = (
+    'The Table 5 caption states "Re-analysis of experiments from Kress and Carmichael (1988) (wt%)"; '
+    "it does not report a starting/bulk composition for the run."
+)
+TABLE5_QUENCH_UNKNOWN_REASON = "no_run_specific_quench_statement_printed"
 TABLE3_OXIDES = (
     "SiO2",
     "TiO2",
@@ -305,7 +325,11 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     final = observations["kc91_t3_0011_0014_final_SiO2"]
     assert initial["phase_as_published"] == "glass"
     assert final["phase_as_published"] == "glass"
-    assert initial["quench_statement"]["text"] == TABLE3_SAMPLED_TEXT
+    assert initial["quench_statement"]["text"] == TABLE3_QUENCH_TEXT
+    assert initial["quench_statement"]["locator"]["page"] == 2
+    assert initial["quench_statement"]["locator"]["pdf_page_index"] == 1
+    assert initial["quench_statement"]["locator"]["published_page"] == 83
+    assert initial["quench_statement"]["locator"]["section"] == "Ultrasonic measurements"
     assert initial["point_conditions"]["composition"]["state"]["tag"] == "unknown"
     assert "not reused as run composition" in initial["point_conditions"]["composition"]["state"]["reason"]
     assert initial["point_conditions"]["fO2_log"]["state"]["reason"] == (
@@ -315,6 +339,10 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
         "Measurements were performed in air, between 945 and 1530 °C, "
         "at frequencies between 2 and 10 mHz."
     )
+    air_method_locator = initial["point_conditions"]["method_detail_as_printed"]["locator"]
+    assert air_method_locator["page"] == 2
+    assert air_method_locator["pdf_page_index"] == 1
+    assert air_method_locator["published_page"] == 83
     assert initial["values"]["T_C"]["value"] == "1260"
     assert initial["values"]["T_C"]["locator"]["row"] == "0012"
     assert final["values"]["T_C"]["value"] == "1260"
@@ -340,14 +368,30 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
 
     table4 = observations["kc91_t4_Q01_SiO2"]["point_conditions"]
     assert table4["composition"]["state"]["tag"] == "unknown"
-    assert "no starting/bulk composition" in table4["composition"]["state"]["reason"]
+    assert table4["composition"]["state"]["reason"] == TABLE4_COMPOSITION_UNKNOWN_REASON
+    assert table4["composition"]["locator"]["note"] == TABLE4_COMPOSITION_UNKNOWN_NOTE
     assert table4["fO2_log"]["state"]["tag"] == "unknown"
     assert "neither a numeric fO2 nor a method" in table4["fO2_log"]["state"]["reason"]
     assert "air" not in table4["fO2_log"]["state"]["reason"].casefold()
-    assert observations["kc91_t4_Q01_SiO2"]["quench_statement"]["text"] == TABLE4_METHOD_TEXT
+    table4_observation = observations["kc91_t4_Q01_SiO2"]
+    assert table4_observation["quench_statement"]["text"] == TABLE4_METHOD_TEXT
+    assert table4_observation["quench_statement"]["locator"]["page"] == 3
+    assert table4_observation["quench_statement"]["locator"]["pdf_page_index"] == 2
+    assert table4_observation["quench_statement"]["locator"]["published_page"] == 84
 
-    table5 = observations["kc91_t5_B27_SiO2"]["point_conditions"]
+    table5_observation = observations["kc91_t5_B27_SiO2"]
+    table5_quench = table5_observation["quench_statement"]
+    assert table5_quench["state"] == {
+        "tag": "unknown",
+        "reason": TABLE5_QUENCH_UNKNOWN_REASON,
+    }
+    assert table5_quench["locator"]["page"] == 4
+    assert table5_quench["locator"]["pdf_page_index"] == 3
+    assert table5_quench["locator"]["published_page"] == 85
+    table5 = table5_observation["point_conditions"]
     assert table5["composition"]["state"]["tag"] == "unknown"
+    assert table5["composition"]["state"]["reason"] == TABLE5_COMPOSITION_UNKNOWN_REASON
+    assert table5["composition"]["locator"]["note"] == TABLE5_COMPOSITION_UNKNOWN_NOTE
     assert table5["fO2_log"]["state"]["tag"] == "value"
     assert table5["fO2_log"]["state"]["value"] == "-0.68"
     assert table5["fO2_log"]["locator"]["table"] == "5"
@@ -386,9 +430,11 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     }
     for note in assemblage_notes:
         assert note["values"]["evidence_type"] == "sampled-from-liquid"
-        assert note["values"]["run_products_as_printed"] == TABLE3_SAMPLED_TEXT
-        assert note["locator"]["page"] == 3
-        assert note["locator"]["published_page"] == 84
+        assert note["values"]["run_products_as_printed"] == TABLE3_QUENCH_CRYSTALS_TEXT
+        assert note["locator"]["page"] == 2
+        assert note["locator"]["pdf_page_index"] == 1
+        assert note["locator"]["published_page"] == 83
+        assert note["locator"]["section"] == "Ultrasonic measurements"
     assert all(note["experiment"].startswith("kc91_t3_") for note in assemblage_notes)
 
 
@@ -573,7 +619,14 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
             assert all(record.identity.total_pressure_Pa.is_not_applicable for record in migrated)
 
         if "quench_statement" in observation:
-            assert observation["quench_statement"]["preservation"] == "not_stated"
+            statement = observation["quench_statement"]
+            if "state" in statement:
+                assert statement["state"] == {
+                    "tag": "unknown",
+                    "reason": TABLE5_QUENCH_UNKNOWN_REASON,
+                }
+            else:
+                assert statement["preservation"] == "not_stated"
 
     quantities = Counter(
         record.identity.quantity.value for record in records.values()
