@@ -1,0 +1,1670 @@
+schema_version: literature_extract.v1
+source_id: tachibana-takigawa-2014-forsterite-condensation
+source:
+  citation: >-
+    Tachibana S. and Takigawa A. (2014), Experimental Studies on Dust Formation
+    in Space, PoS(LCDU2013)046, 10 pages.
+  doi: 10.22323/1.207.0046
+  year: 2014
+  sha256: bb0b1d64bc106cc48dedffa9c3fe6675126ad66b14da3df1435b079e3e454529
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription checked against the PDF page
+    renders. Every number below is a number printed in the paper's own prose
+    or in a figure caption or as an axis tick or run label. Text inside
+    reproduced figures from Tachibana et al. 2011, Takigawa et al. 2009, and
+    Takigawa and Tachibana 2012 was not copied as a measurement of this paper.
+    No data marker was digitised. Figures 10 and 11 were left as figure
+    records because both-axis tick calibration of the symbol coordinates was
+    not completed.
+  date: "2026-11-02"
+  worker: w1103ta-tt14
+review_status: draft
+fidelity_samples:
+  - path: species.Mg2SiO4.observations[tt2014_fo_alpha_c_1275].values.alpha_low_as_printed
+    value: "0.006"
+    note: Section 4.4 printed lower bound of the forsterite condensation coefficient
+    locator:
+      published_page: 8
+      pdf_page_index: 7
+      section: "4.4"
+  - path: species.Mg2SiO4.observations[tt2014_fo_alpha_c_1275].values.alpha_high_as_printed
+    value: "0.09"
+    note: Section 4.4 printed upper bound of the forsterite condensation coefficient
+    locator:
+      published_page: 8
+      pdf_page_index: 7
+      section: "4.4"
+  - path: species.Mg2SiO4.observations[tt2014_fo_S_1160].values.supersaturation_high_as_printed
+    value: "8000"
+    note: Section 4.3 upper end of the 1160 K supersaturation estimate
+    locator:
+      published_page: 8
+      pdf_page_index: 7
+      section: "4.3"
+  - path: species.Mg2SiO4.observations[tt2014_fo_fig10_run12_S].values.supersaturation_as_printed
+    value: "13-62"
+    note: Figure 10 printed S label for run 12
+    locator:
+      published_page: 9
+      pdf_page_index: 8
+      figure: "10"
+  - path: species.Mg2SiO4.observations[tt2014_fo_alpha_e_0p03_1426].values.alpha
+    value: "0.03"
+    note: Figure 11 caption printed evaporation coefficient used as the comparison line
+    locator:
+      published_page: 9
+      pdf_page_index: 8
+      figure: "11"
+experiments:
+  - experiment_id: tt2014_forsterite_condensation
+    method:
+      state:
+        tag: unknown
+        reason: >-
+          Infrared vacuum-furnace condensation from a forsterite vapour in
+          flowing H2-H2O has no matching experiment-method token.
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: "4.1"
+    method_as_printed: >-
+      Silica-glass tube furnace, continuously evacuated, with an Ir-crucible
+      forsterite gas source and a Pt-mesh substrate 15-25 mm from the source.
+    locator:
+      published_page: 6
+      pdf_page_index: 5
+      section: "4.1"
+  - experiment_id: tt2014_forsterite_evaporation_review
+    method:
+      state:
+        tag: unknown
+        reason: >-
+          The forsterite evaporation coefficients are quoted from earlier
+          papers. This review does not print a method token for those runs.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: "3"
+    method_as_printed: >-
+      Evaporation of forsterite in vacuum and in low-pressure hydrogen gas,
+      as reviewed from references 8, 10, and 11.
+    locator:
+      published_page: 5
+      pdf_page_index: 4
+      section: "3"
+  - experiment_id: tt2014_iron_condensation_review
+    method:
+      state:
+        tag: unknown
+        reason: >-
+          The metallic-iron condensation furnace is quoted from reference 7.
+          This review does not print a method token for that apparatus.
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: "2"
+    method_as_printed: >-
+      Metallic iron pellet inside an alumina tube, evaporated onto an alumina
+      disk in a cooler region of the furnace.
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: "2"
+species:
+  Mg2SiO4:
+    observations:
+      - observation_id: tt2014_fo_alpha_c_1275
+        type: alpha
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.4"
+        T_K: 1275
+        phase: cr
+        units: dimensionless
+        uncertainty:
+          note: >-
+            Section 4.1 prints a substrate-temperature fluctuation of plus or
+            minus 5-10 K. Section 4.4 says the coefficient estimate has a
+            large uncertainty because S is uncertain.
+        values:
+          quantity: condensation_coefficient
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No condensation_coefficient quantity exists. The printed term is
+            the condensation coefficient alpha_c. evaporation_coefficient_alpha
+            is a different coefficient and is not used for this row.
+            wall_deposit_mass is not used because the paper prints no
+            deposited mass in kg.
+          method_class: author_estimate
+          alpha_low_as_printed: "0.006"
+          alpha_high_as_printed: "0.09"
+          interval_as_printed_section_4_4: "0.006–0.09"
+          interval_as_printed_abstract: "0.09–0.006"
+          interval_as_printed_summary: "0.09–0.006"
+          substrate_as_printed: Pt mesh
+          pH2_Pa_as_printed: "5.6"
+          statement_as_printed: >-
+            The ranges of alpha_c are estimated to be 0.006-0.09. The abstract
+            and the summary print the same bounds as 0.09-0.006.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.4"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.4"
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: {kind: point, point: "5.5", approximate: true}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+          H2O_over_H2:
+            state: {tag: value, value: "0.015"}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+      - observation_id: tt2014_fo_S_1320
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.3"
+        T_K: 1320
+        phase: cr
+        units: supersaturation ratio as printed
+        uncertainty:
+          note: >-
+            Section 4.1 prints a substrate-temperature fluctuation of plus or
+            minus 5-10 K. The supersaturation estimate includes the unprinted
+            amount of gas condensed on the silica wall.
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. The printed term is the
+            supersaturation ratio S. wall_deposit_mass is not used because
+            no deposited mass in kg is printed.
+          method_class: author_estimate
+          supersaturation_low_as_printed: "1"
+          supersaturation_high_as_printed: "5"
+          supersaturation_as_printed: "1–5"
+          supercooling_low_K_as_printed: "0"
+          supercooling_high_K_as_printed: "50"
+          supercooling_as_printed: "0-50 K"
+          condensate_observed: false
+          no_condensate_as_printed: >-
+            No condensate was found at 1320 K. The text also says the vapour
+            may have been unsaturated (S approximately 1).
+          saturation_clause_as_printed: "S ≈1"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1320"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "1", interval_high: "5"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supercooling_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "0", interval_high: "50"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: {kind: point, point: "5.5", approximate: true}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+          H2O_over_H2:
+            state: {tag: value, value: "0.015"}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+      - observation_id: tt2014_fo_S_1275
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.3"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed
+        uncertainty:
+          note: >-
+            Section 4.1 prints a substrate-temperature fluctuation of plus or
+            minus 5-10 K.
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. The printed term is the
+            supersaturation ratio S.
+          method_class: author_estimate
+          supersaturation_low_as_printed: "7"
+          supersaturation_high_as_printed: "190"
+          supersaturation_as_printed: "7–190"
+          summary_supersaturation_as_printed: "7-190"
+          supercooling_low_K_as_printed: "40"
+          supercooling_high_K_as_printed: "150"
+          supercooling_as_printed: "40–150 K"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "7", interval_high: "190"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supercooling_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "40", interval_high: "150"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: {kind: point, point: "5.5", approximate: true}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+          H2O_over_H2:
+            state: {tag: value, value: "0.015"}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+      - observation_id: tt2014_fo_S_1160
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.3"
+        T_K: 1160
+        phase: cr
+        units: supersaturation ratio as printed
+        uncertainty:
+          note: >-
+            Section 4.1 prints a substrate-temperature fluctuation of plus or
+            minus 5-10 K.
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. The printed term is the
+            supersaturation ratio S.
+          method_class: author_estimate
+          supersaturation_low_as_printed: "800"
+          supersaturation_high_as_printed: "8000"
+          supersaturation_as_printed: "800–8000"
+          summary_supersaturation_as_printed: "800-8000"
+          supercooling_low_K_as_printed: "160"
+          supercooling_high_K_as_printed: "230"
+          supercooling_as_printed: "160–230 K"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1160"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "800", interval_high: "8000"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supercooling_K:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "160", interval_high: "230"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          total_pressure_Pa:
+            state:
+              tag: value
+              value: {kind: point, point: "5.5", approximate: true}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+          H2O_over_H2:
+            state: {tag: value, value: "0.015"}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+      - observation_id: tt2014_fo_fig10_run12_S
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed on the figure
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. This row is the S label
+            printed on Figure 10 for run 12. The flux-symbol coordinates were
+            not read.
+          method_class: figure_only
+          run_as_printed: "12"
+          supersaturation_as_printed: "13-62"
+          supersaturation_low_as_printed: "13"
+          supersaturation_high_as_printed: "62"
+          pH2_Pa_as_printed: "5.6"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "13", interval_high: "62"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          run_number:
+            state: {tag: value, value: "12"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+      - observation_id: tt2014_fo_fig10_run13_S
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed on the figure
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. This row is the S label
+            printed on Figure 10 for run 13. The flux-symbol coordinates were
+            not read.
+          method_class: figure_only
+          run_as_printed: "13"
+          supersaturation_as_printed: "12-56"
+          supersaturation_low_as_printed: "12"
+          supersaturation_high_as_printed: "56"
+          pH2_Pa_as_printed: "5.6"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "12", interval_high: "56"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          run_number:
+            state: {tag: value, value: "13"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+      - observation_id: tt2014_fo_fig10_run14_S
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed on the figure
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. This row is the S label
+            printed on Figure 10 for run 14. The flux-symbol coordinates were
+            not read.
+          method_class: figure_only
+          run_as_printed: "14"
+          supersaturation_as_printed: "14-66"
+          supersaturation_low_as_printed: "14"
+          supersaturation_high_as_printed: "66"
+          pH2_Pa_as_printed: "5.6"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "14", interval_high: "66"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          run_number:
+            state: {tag: value, value: "14"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+      - observation_id: tt2014_fo_fig10_run15_S
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed on the figure
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. This row is the S label
+            printed on Figure 10 for run 15. The flux-symbol coordinates were
+            not read.
+          method_class: figure_only
+          run_as_printed: "15"
+          supersaturation_as_printed: "18-89"
+          supersaturation_low_as_printed: "18"
+          supersaturation_high_as_printed: "89"
+          pH2_Pa_as_printed: "5.6"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "18", interval_high: "89"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          run_number:
+            state: {tag: value, value: "15"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+      - observation_id: tt2014_fo_fig10_run16_S
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        T_K: 1275
+        phase: cr
+        units: supersaturation ratio as printed on the figure
+        values:
+          quantity: supersaturation
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No supersaturation quantity exists. This row is the S label
+            printed on Figure 10 for run 16. The flux-symbol coordinates were
+            not read.
+          method_class: figure_only
+          run_as_printed: "16"
+          supersaturation_as_printed: "39-188"
+          supersaturation_low_as_printed: "39"
+          supersaturation_high_as_printed: "188"
+          pH2_Pa_as_printed: "5.6"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          pH2_Pa:
+            state: {tag: value, value: "5.6"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "39", interval_high: "188"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+          run_number:
+            state: {tag: value, value: "16"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "10"
+      - observation_id: tt2014_fo_thickness_1160
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          section: "4.2"
+        T_K: 1160
+        phase: cr
+        units: nm
+        values:
+          quantity: condensate_film_thickness
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No thickness quantity exists. The printed term is condensate
+            thickness in nm. wall_deposit_mass is kilograms and is not used
+            because no deposited mass is printed.
+          method_class: measured_direct
+          thickness_as_printed: "~30-150 nm"
+          thickness_low_nm_as_printed: "30"
+          thickness_high_nm_as_printed: "150"
+          duration_h_as_printed: "93"
+          duration_link_as_printed: >-
+            Section 4.1 says the FIB sections were of condensates obtained at
+            1160 K for 93 hours. Section 4.2 gives the thickness of that
+            FIB section.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1160"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+          duration_h:
+            state: {tag: value, value: "93"}
+            locator:
+              published_page: 6
+              pdf_page_index: 5
+              section: "4.1"
+          thickness_nm:
+            state:
+              tag: value
+              value:
+                kind: interval
+                interval_low: "30"
+                interval_high: "150"
+                approximate: true
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+      - observation_id: tt2014_fo_grain_size_1160
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          section: "4.2"
+        T_K: 1160
+        phase: cr
+        units: µm as printed
+        values:
+          quantity: condensate_grain_size
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No grain-size quantity exists. The printed term is condensate
+            size. wall_deposit_mass is not used because no mass is printed.
+          method_class: measured_direct
+          size_as_printed: "sub-micron to 1 µm"
+          duration_statement_as_printed: irrespective of experimental duration
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1160"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+          duration_h:
+            state:
+              tag: unknown
+              reason: >-
+                The size sentence says the size was irrespective of
+                experimental duration. It does not print one duration.
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+          grain_size:
+            state: {tag: value, value: "sub-micron to 1 µm"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+      - observation_id: tt2014_fo_grain_size_1275_over_40h
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          section: "4.2"
+        T_K: 1275
+        phase: cr
+        units: µm as printed
+        values:
+          quantity: condensate_grain_size
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No grain-size quantity exists. The printed term is several
+            micron-sized flat regions. No single micrometre number is printed
+            in this sentence.
+          method_class: measured_direct
+          size_as_printed: several micron-sized flat regions
+          duration_as_printed: ">40 hours"
+          micrograph_duration_h_as_printed: "115"
+          micrograph_as_printed: Figure 8 right panel at 1275 K for 115 hours
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+          duration_h:
+            state:
+              tag: value
+              value: {kind: bound, bound_operator: ">", bound_value: "40"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+          micrograph_duration_h:
+            state: {tag: value, value: "115"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              figure: "8"
+          grain_size:
+            state: {tag: value, value: "several micron-sized flat regions"}
+            locator:
+              published_page: 7
+              pdf_page_index: 6
+              section: "4.2"
+      - observation_id: tt2014_fo_grain_size_1275_ten_um
+        type: rate_series
+        experiment: tt2014_forsterite_condensation
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.3"
+        T_K: 1275
+        phase: cr
+        units: µm as printed
+        values:
+          quantity: condensate_grain_size
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No grain-size quantity exists. The printed term is several to
+            ten µm. The word several is not a number, so no interval was
+            invented.
+          method_class: measured_direct
+          size_as_printed: "several to ten µm"
+          supersaturation_as_printed: "7–190"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1275"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          supersaturation:
+            state:
+              tag: value
+              value: {kind: interval, interval_low: "7", interval_high: "190"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+          grain_size:
+            state: {tag: value, value: "several to ten µm"}
+            locator:
+              published_page: 8
+              pdf_page_index: 7
+              section: "4.3"
+      - observation_id: tt2014_fo_alpha_e_range
+        type: alpha
+        experiment: tt2014_forsterite_evaporation_review
+        locator:
+          published_page: 5
+          pdf_page_index: 4
+          section: "3"
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: review_compilation
+          attribution: "Takigawa et al. 2009 [8]; Yamada et al. 2006 [10]; Ozawa et al. 2012 [11]"
+          alpha_range:
+            - "0.02"
+            - "0.1"
+          interval_as_printed_page_5: "0.1-0.02"
+          interval_as_printed_abstract: "0.1–0.02"
+          interval_as_printed_summary: "0.1 to 0.02"
+          studied_evaporation_range_as_printed: "2073–1153 K"
+          hydrogen_pressure_as_printed: wide ranges of hydrogen pressure
+          orientation_dependence_as_printed: >-
+            depending on temperature, hydrogen gas pressure, and
+            crystallographic orientations
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                Page 5 says the coefficient ranges from 0.1-0.02 in wide
+                ranges of temperature and hydrogen pressure. It does not print
+                one temperature. The 2073-1153 K sentence is the studied
+                evaporation range, not the bounds of this coefficient.
+            locator:
+              published_page: 5
+              pdf_page_index: 4
+              section: "3"
+          hydrogen_pressure_Pa:
+            state:
+              tag: unknown
+              reason: >-
+                Page 5 says wide ranges of hydrogen pressure and does not
+                print one pressure for this coefficient.
+            locator:
+              published_page: 5
+              pdf_page_index: 4
+              section: "3"
+      - observation_id: tt2014_fo_alpha_e_0p03_1426
+        type: alpha
+        experiment: tt2014_forsterite_evaporation_review
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "11"
+        T_K: 1426
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: quoted_attributed
+          attribution: "Figure 11 caption, comparison line"
+          alpha: "0.03"
+          alpha_as_printed: "0.03"
+          temperature_K_as_printed: "1426"
+          pH2_Pa_as_printed: "2"
+          kept_separate_from_as_printed: >-
+            Figure 10 and section 4.4 print an evaporation flux drawn with
+            alpha_e of 0.03. Those sentences do not state the coefficient at
+            1426 K. They are not this row.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1426"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "11"
+          pH2_Pa:
+            state: {tag: value, value: "2"}
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              figure: "11"
+    context:
+      - observation_id: tt2014_fo_apparatus
+        type: method
+        locator:
+          published_page: 6
+          pdf_page_index: 5
+          section: "4.1"
+        units: as printed
+        values:
+          quantity_as_printed: condensation furnace and gas conditions
+          furnace_as_printed: infrared vacuum furnace
+          tube_length_as_printed: "~300 mm"
+          tube_diameter_as_printed: "38 mm"
+          tube_material_as_printed: silica glass
+          evacuation_as_printed: continuously evacuated
+          sweep_gas_as_printed: H2 and H2O flowed to keep the pressure constant
+          gas_source_as_printed: synthetic forsterite powder in an Ir crucible
+          substrate_as_printed: Pt mesh
+          substrate_distance_as_printed: "15-25 mm from the gas source"
+          thermocouple_as_printed: type-R
+          total_pressure_as_printed: "~5.5 Pa (5.5x10-5 bar)"
+          substrate_temperatures_K_as_printed:
+            - "1320"
+            - "1275"
+            - "1160"
+          substrate_temperature_fluctuation_as_printed: "±5-10 K"
+          H2O_over_H2_as_printed: "0.015"
+          H2O_over_H2_versus_solar_as_printed: "~15 times larger than the solar ratio"
+          SiO_over_H2_versus_solar_as_printed: "~0.7-3 % of the solar ratio"
+          SiO_over_H2_basis_as_printed: weight loss rate of the gas-source forsterite
+          duration_range_as_printed: "6 to 237 hours"
+          system_as_printed: Mg2SiO4-H2-H2O
+          mean_free_path_as_printed: less than 1 mm
+          wall_sink_as_printed: >-
+            The silica glass tube may have acted as a sink because of
+            condensation onto the wall.
+          instruments_as_printed:
+            - "FE-SEM JEOL JSM 7000F"
+            - "EDS Oxford X-MaxN 150"
+            - "EBSD HKL CHANNEL 5"
+            - "FTIR JASCO FT/IR-4200"
+            - "TEM JEM-2100F"
+            - "FIB FEI Quanta 200 3DS"
+          pressures_not_collapsed_as_printed: >-
+            Section 4.1 prints a total pressure of about 5.5 Pa. The abstract,
+            section 4.4, and Figure 10 print a hydrogen pressure of 5.6 Pa.
+            Both numbers are kept.
+      - observation_id: tt2014_fo_condensate_character
+        type: characterization
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          section: "4.2"
+        units: as printed
+        values:
+          quantity_as_printed: condensate identity
+          composition_as_printed: consistent with stoichiometric forsterite
+          composition_table_as_printed: none
+          ebsd_as_printed: crystalline forsterite with various orientations
+          saed_as_printed: indexed to forsterite with different orientations
+          form_as_printed: thin film of polycrystalline forsterite
+          infrared_as_printed: clear 10-µm absorption
+          infrared_method_as_printed: >-
+            Direct FTIR of the platinum mesh with condensates and no
+            dispersion medium.
+          no_condensate_temperature_K_as_printed: "1320"
+      - observation_id: tt2014_fo_coefficient_definition
+        type: review_statement
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          equation: "2.1"
+        units: dimensionless
+        values:
+          quantity_as_printed: Hertz-Knudsen coefficient bounds
+          bounds_as_printed: "0 to 1"
+          equation_as_printed: >-
+            Equation 2.1 is the Hertz-Knudsen flux. The equation image was
+            not retyped as a numeric evaluation. alpha_c and alpha_e range
+            from 0 to 1.
+          supersaturation_definition_as_printed: >-
+            Section 4.3 defines S as the incoming SiO flux divided by the
+            ideal forsterite evaporation flux at the substrate temperature
+            with pSiO = 0 and alpha_e = 1 in equation 2.1.
+      - observation_id: tt2014_fo_studied_evaporation_range
+        type: review_statement
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          section: "3"
+        units: K
+        values:
+          quantity_as_printed: temperature range of earlier forsterite evaporation studies
+          range_as_printed: "2073–1153 K"
+          atmosphere_as_printed: vacuum and low-pressure hydrogen gas
+          congruent_as_printed: Forsterite evaporates congruently
+          references_as_printed: "[8, 10, 11]"
+      - observation_id: tt2014_fo_fig10_evaporation_flux
+        type: review_statement
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        units: as printed
+        values:
+          quantity_as_printed: evaporation flux drawn with alpha_e of 0.03
+          statement_as_printed: >-
+            The expected evaporation flux of forsterite at 1275 K (dashed
+            line) with alpha_e of 0.03.
+          flux_temperature_K_as_printed: "1275"
+          alpha_e_as_printed: "0.03"
+          coefficient_temperature_as_printed: >-
+            Not printed. This caption states the flux at 1275 K. It does not
+            state alpha_e at 1275 K.
+          citation_as_printed: "[8]"
+          method_class: quoted_attributed
+          attribution: "Takigawa et al. 2009 [8]"
+      - observation_id: tt2014_fo_s44_flux_compared_in_fig11
+        type: review_statement
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.4"
+        units: as printed
+        values:
+          quantity_as_printed: evaporation flux compared in Figure 11
+          statement_as_printed: >-
+            An evaporation flux of forsterite at the substrate temperature
+            with alpha_e of 0.03 (dashed line) is compared in Figure 11.
+          flux_temperature_K_as_printed: "1275"
+          flux_temperature_role_as_printed: >-
+            1275 K is the substrate temperature of the flux in this paragraph.
+            It is not a printed temperature of alpha_e.
+          alpha_e_as_printed: "0.03"
+          coefficient_temperature_as_printed: >-
+            Not printed. Section 4.4 uses alpha_e of 0.03 to draw the flux.
+            It does not state alpha_e at 1275 K.
+          compared_in_as_printed: "Fig. 11"
+          citation_as_printed: "[10]"
+          method_class: quoted_attributed
+          attribution: "Yamada et al. 2006 [10]"
+      - observation_id: tt2014_fo_disk_fraction
+        type: review_statement
+        locator:
+          published_page: 5
+          pdf_page_index: 4
+          figure: "7"
+        units: as printed
+        values:
+          quantity_as_printed: quoted disk fraction from reference 12
+          fraction_as_printed: "~25%"
+          temperature_threshold_as_printed: ">1600 K"
+          object_as_printed: HD100546
+          method_class: quoted_attributed
+          attribution: "Takigawa and Tachibana 2012 [12]"
+      - observation_id: tt2014_fo_disk_supersaturation_implication
+        type: review_statement
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.3"
+        units: as printed
+        values:
+          quantity_as_printed: author implication for protoplanetary-disk aggregates
+          high_supersaturation_as_printed: ">1000"
+          high_supersaturation_product_as_printed: aggregates of sub-micron sized fine particles
+          low_supersaturation_as_printed: "<100"
+          low_supersaturation_product_as_printed: aggregates containing micron-sized grains
+          method_class: author_estimate
+      - observation_id: tt2014_fo_fig5
+        type: figure_record
+        locator:
+          published_page: 5
+          pdf_page_index: 4
+          figure: "5"
+        units: as printed
+        values:
+          quantity_as_printed: evaporation rate versus hydrogen pressure
+          caption: >-
+            Evaporation rates of forsterite along three crystallographic axes
+            plotted as a function of hydrogen pressure (from reference [8]).
+            Evaporation rates in vacuum are also plotted at 10^-4 Pa. Open
+            circles, squares, and triangles represent the rates along the a-,
+            b-, and c-axes, respectively. The evaporation rates with alpha_e
+            of 0.1 and 0.01 are shown as solid and dotted curves for
+            comparison.
+          axes_as_printed:
+            x: "hydrogen pressure, P_H2 [Pa], logarithmic"
+            y: "evaporation rate [m/sec], logarithmic"
+            vacuum_plotted_at_Pa: "10^-4"
+          panels_C_as_printed:
+            - "1657"
+            - "1535"
+            - "1327"
+            - "1153"
+          vacuum_pressure_Pa_as_printed: "10^-4"
+          comparison_alpha_e_as_printed:
+            - "0.1"
+            - "0.01"
+          series:
+            - label: open circles, a-axis
+              marker_as_printed: open circles
+              marker_count: 0
+            - label: open squares, b-axis
+              marker_as_printed: open squares
+              marker_count: 0
+            - label: open triangles, c-axis
+              marker_as_printed: open triangles
+              marker_count: 0
+            - label: solid curve, alpha_e of 0.1
+              marker_as_printed: solid curve
+              marker_count: 0
+            - label: dotted curve, alpha_e of 0.01
+              marker_as_printed: dotted curve
+              marker_count: 0
+          digitisation: >-
+            Not digitised. Axis titles and the caption's 10^-4 Pa vacuum
+            position are recorded. Decade tick labels and data-marker
+            coordinates were not read.
+          source_figure_as_printed: modified from reference [8]
+      - observation_id: tt2014_fo_fig6
+        type: figure_record
+        locator:
+          published_page: 5
+          pdf_page_index: 4
+          figure: "6"
+        units: as printed
+        values:
+          quantity_as_printed: mass absorption coefficient versus wavelength
+          caption: >-
+            Mass absorption coefficients of forsterite at 100 K with limited
+            distributions of ellipsoids (LDE1, LDE2, and LDE3) with that of
+            CDE (continuous distribution of ellipsoids) (from reference [12]).
+            LDE1 and LDE2 represent ensembles of shapes possibly formed by
+            evaporation at >1600 K and at <1600 K, respectively. Disk-like
+            forsterite grains flattened to the c-axis and disk flattened to
+            the b-axis dominate in LDE1 and LDE2, respectively. Forsterite
+            grains elongated along the c-axis dominate in LDE3.
+          temperature_K_as_printed: "100"
+          axes_as_printed:
+            x: "wavelength (µm)"
+            y: "MAC (cm^2/g)"
+          series:
+            - label: CDE
+              marker_as_printed: continuous spectrum
+              marker_count: 0
+            - label: LDE1
+              marker_as_printed: continuous spectrum
+              marker_count: 0
+            - label: LDE2
+              marker_as_printed: continuous spectrum
+              marker_count: 0
+            - label: LDE3
+              marker_as_printed: continuous spectrum
+              marker_count: 0
+          digitisation: >-
+            Not digitised. The spectra are continuous traces. No peak
+            coordinate was read from the plot.
+          source_figure_as_printed: from reference [12]
+      - observation_id: tt2014_fo_fig7
+        type: figure_record
+        locator:
+          published_page: 6
+          pdf_page_index: 5
+          figure: "7"
+        units: as printed
+        values:
+          quantity_as_printed: composite mass absorption coefficient versus HD100546
+          caption: >-
+            Comparison of the mass absorption coefficient of forsterite of the
+            composite spectrum of 75% of CDE and 25% of LDE1 (100 K) with the
+            spectrum of the protoplanetary disk HD100546 (from reference [12]).
+            The DHS spectrum and the laboratory spectrum of forsterite are also
+            shown. The vertical axis is arbitrary.
+          mixing_as_printed: "75% CDE and 25% LDE1"
+          temperature_K_as_printed: "100"
+          vertical_axis_as_printed: arbitrary
+          axes_as_printed:
+            x: wavelength, unit printed on the reproduced figure as µm
+            y: arbitrary
+          series:
+            - label: 75% CDE and 25% LDE1
+              marker_as_printed: composite spectrum
+              marker_count: 0
+            - label: HD100546
+              marker_as_printed: observed spectrum
+              marker_count: 0
+            - label: DHS
+              marker_as_printed: calculated spectrum
+              marker_count: 0
+            - label: laboratory forsterite
+              marker_as_printed: laboratory spectrum
+              marker_count: 0
+          digitisation: not digitised; the vertical axis is printed as arbitrary
+          source_figure_as_printed: from reference [12]
+      - observation_id: tt2014_fo_fig8
+        type: figure_record
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          figure: "8"
+        units: as photographed
+        values:
+          quantity_as_printed: electron images of forsterite condensates
+          caption: >-
+            Condensates of forsterite at 1160 K for 93 hours (left) and at
+            1275 K for 115 hours (right). Scale bars are 1 µm.
+          left_temperature_K_as_printed: "1160"
+          left_duration_h_as_printed: "93"
+          right_temperature_K_as_printed: "1275"
+          right_duration_h_as_printed: "115"
+          scale_bar_as_printed: "1 µm"
+          axes_as_printed:
+            x: not applicable
+            y: not applicable
+          series:
+            - label: left, 1160 K for 93 hours
+              marker_as_printed: micrograph
+              marker_count: 0
+            - label: right, 1275 K for 115 hours
+              marker_as_printed: micrograph
+              marker_count: 0
+          digitisation: not digitised; the panels are micrographs
+      - observation_id: tt2014_fo_fig9
+        type: figure_record
+        locator:
+          published_page: 7
+          pdf_page_index: 6
+          figure: "9"
+        units: as printed
+        values:
+          quantity_as_printed: infrared absorbance of the condensate
+          caption: >-
+            An infrared absorbance of condensates formed at 1275 K for 115
+            hours (upper spectrum) compared with that of crystalline forsterite
+            (lower spectrum). The vertical unit is arbitrary. The FTIR analysis
+            was made directly for a platinum mesh with condensates without any
+            dispersion into medium.
+          temperature_K_as_printed: "1275"
+          duration_h_as_printed: "115"
+          vertical_unit_as_printed: arbitrary
+          axes_as_printed:
+            x: "wavelength (µm)"
+            x_tick_labels: ["8", "10", "12", "14", "16", "18", "20", "22", "24"]
+            y: arbitrary
+          series:
+            - label: upper, condensates at 1275 K for 115 hours
+              marker_as_printed: absorbance spectrum
+              marker_count: 0
+            - label: lower, crystalline forsterite
+              marker_as_printed: reference spectrum
+              marker_count: 0
+          digitisation: not digitised; the vertical unit is printed as arbitrary
+      - observation_id: tt2014_fo_fig10
+        type: figure_record
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        units: "mol cm^-2 s^-1"
+        values:
+          quantity_as_printed: condensed flux versus run number
+          caption: >-
+            Condensed fluxes of forsterite on Pt-mesh substrates for five runs
+            at 1275 K and pH2 of 5.6 Pa (closed symbols). The ranges of
+            incoming fluxes of SiO onto the surface of substrates evaluated
+            from the weight losses of gas-source forsterite (vertical solid
+            lines) and the expected evaporation flux of forsterite at 1275 K
+            (dashed line) with alpha_e of 0.03 [8] are also plotted. The
+            ranges of S are also shown.
+          citation_as_printed: "[8]"
+          temperature_K_as_printed: "1275"
+          pH2_Pa_as_printed: "5.6"
+          axes_as_printed:
+            x: "Run #"
+            x_tick_labels: ["12", "13", "14", "15", "16"]
+            y: "Flux [mol cm^-2 s^-1]"
+            y_tick_labels:
+              - "10^-9"
+              - "10^-10"
+              - "10^-11"
+              - "10^-12"
+              - "10^-13"
+              - "10^-14"
+          printed_S_labels:
+            - {run: "12", S: "13-62"}
+            - {run: "13", S: "12-56"}
+            - {run: "14", S: "14-66"}
+            - {run: "15", S: "18-89"}
+            - {run: "16", S: "39-188"}
+          series:
+            - label: closed symbols, condensed flux
+              marker_as_printed: closed symbols
+              marker_count: 5
+            - label: incoming SiO flux ranges
+              marker_as_printed: vertical solid lines
+              marker_count: 5
+            - label: evaporation flux at 1275 K with alpha_e of 0.03
+              marker_as_printed: dashed line
+              marker_count: 1
+          digitisation: >-
+            Not digitised. The run numbers and the S labels are printed text.
+            The closed-symbol and vertical-line coordinates were not converted
+            because a tick calibration that locked both the logarithmic flux
+            axis and the symbol centroids was not completed. No flux value was
+            invented.
+      - observation_id: tt2014_fo_fig11
+        type: figure_record
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "11"
+        units: dimensionless
+        values:
+          quantity_as_printed: condensation-coefficient ranges versus run number
+          caption: >-
+            The ranges of alpha_c evaluated for runs at 1275 K and pH2 of
+            5.6 Pa. The alpha_e of 0.03 at 1426 K and pH2 of 2 Pa is also
+            shown for comparison (dashed horizontal line).
+          temperature_K_as_printed: "1275"
+          pH2_Pa_as_printed: "5.6"
+          comparison_alpha_e_as_printed: "0.03"
+          comparison_temperature_K_as_printed: "1426"
+          comparison_pH2_Pa_as_printed: "2"
+          text_range_as_printed: "0.006–0.09"
+          axes_as_printed:
+            x: "Run #"
+            x_tick_labels: ["12", "13", "14", "15", "16"]
+            y: alpha
+            y_tick_labels: ["1", "0.1", "0.01"]
+          series:
+            - label: alpha_c range for each run
+              marker_as_printed: vertical range bar
+              marker_count: 5
+            - label: alpha_e of 0.03 at 1426 K
+              marker_as_printed: dashed horizontal line
+              marker_count: 1
+          digitisation: >-
+            Not digitised. Per-run range-bar coordinates were not read. The
+            only numeric coefficient range printed in the text is 0.006-0.09,
+            and that range is the observation tt2014_fo_alpha_c_1275.
+  Fe:
+    observations:
+      - observation_id: tt2014_fe_alpha_e_vacuum
+        type: alpha
+        experiment: tt2014_iron_condensation_review
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          equation: "2.1"
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: evaporation_coefficient_alpha
+          method_class: quoted_attributed
+          attribution: "Tachibana et al. 2011 [7]"
+          alpha_as_printed: close to unity
+          page_4_as_printed: close to unity
+          summary_as_printed: close to unity
+          abstract_phrase_as_printed: "αc≈αe≈1"
+          pFe_as_printed: "0"
+          vacuum_as_printed: vacuum
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                The vacuum evaporation-coefficient sentence does not print one
+                temperature.
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              equation: "2.1"
+          pFe_Pa:
+            state: {tag: value, value: "0"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              equation: "2.1"
+      - observation_id: tt2014_fe_alpha_c_vacuum_summary
+        type: alpha
+        experiment: tt2014_iron_condensation_review
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          section: "5"
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No condensation_coefficient quantity exists. The summary says the
+            condensation coefficient of metallic iron in vacuum is close to
+            unity. That phrase was not stored as evaporation_coefficient_alpha
+            and was not converted to the number 1.
+          method_class: review_compilation
+          attribution: "Tachibana et al. 2011 [7], as summarised here"
+          alpha_as_printed: close to unity
+          abstract_phrase_as_printed: "αc≈αe≈1"
+          vacuum_as_printed: vacuum
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: >-
+                The summary does not print one temperature for the vacuum
+                condensation coefficient.
+            locator:
+              published_page: 9
+              pdf_page_index: 8
+              section: "5"
+      - observation_id: tt2014_fe_alpha_c_1235
+        type: alpha
+        experiment: tt2014_iron_condensation_review
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          section: "2"
+        T_K: 1235
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No condensation_coefficient quantity exists. The printed term is
+            alpha_c of unity for metallic iron at this substrate temperature.
+          method_class: quoted_attributed
+          attribution: "Tachibana et al. 2011 [7]"
+          alpha_as_printed: unity
+          ideal_case_as_printed: "αc=αe=1"
+          substrate_as_printed: alumina disk
+          supersaturation_as_printed: "S is larger than 10"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1235"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              section: "2"
+          supersaturation_ratio:
+            state:
+              tag: value
+              value: {kind: bound, bound_operator: ">", bound_value: "10"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              section: "2"
+      - observation_id: tt2014_fe_alpha_c_1340
+        type: alpha
+        experiment: tt2014_iron_condensation_review
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          section: "2"
+        T_K: 1340
+        phase: cr
+        units: dimensionless
+        values:
+          quantity: condensation_coefficient
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No condensation_coefficient quantity exists. The printed term is
+            alpha_c of unity for metallic iron at the substrate temperature
+            printed in the text.
+          method_class: quoted_attributed
+          attribution: "Tachibana et al. 2011 [7]"
+          alpha_as_printed: unity
+          ideal_case_as_printed: "αc=αe=1"
+          text_substrate_temperature_K_as_printed: "1340"
+          figure_4_caption_substrate_temperature_K_as_printed: "1337"
+          temperatures_not_reconciled_as_printed: >-
+            Section 2 prints 1340 K. The Figure 4 caption prints 1337 K for
+            the open symbols. Both are kept.
+          substrate_as_printed: alumina disk
+          supersaturation_as_printed: "S is larger than 10"
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: "1340"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              section: "2"
+          figure_4_caption_temperature_K:
+            state: {tag: value, value: "1337"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              figure: "4"
+          supersaturation_ratio:
+            state:
+              tag: value
+              value: {kind: bound, bound_operator: ">", bound_value: "10"}
+            locator:
+              published_page: 4
+              pdf_page_index: 3
+              section: "2"
+    context:
+      - observation_id: tt2014_fe_fig1
+        type: figure_record
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          figure: "1"
+        units: as printed on the schematic
+        values:
+          quantity_as_printed: schematic of the metallic-iron condensation furnace
+          caption: >-
+            Schematic illustration of experimental setup for condensation of
+            metallic iron (modified from reference [7]).
+          labels_as_printed:
+            - "alumina substrate (3-10 mm diameter)"
+            - "Mo plate (3 x 2 cm)"
+            - "Mo heat shields"
+            - "alumina crucible (~50 mm)"
+            - "Fe metal pellet (3-6 mm diameter, ~5 mm thickness)"
+            - "graphite rod"
+            - "thermocouple"
+            - "W-mesh heater (7 cm diameter and 10 cm thickness)"
+          axes_as_printed:
+            x: not applicable
+            y: not applicable
+          series:
+            - label: schematic
+              marker_as_printed: no data marker
+              marker_count: 0
+          digitisation: not digitised; the figure is a schematic
+          source_figure_as_printed: modified from reference [7]
+      - observation_id: tt2014_fe_fig2
+        type: figure_record
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          figure: "2"
+        units: as photographed
+        values:
+          quantity_as_printed: cross section of condensed metallic iron
+          caption: >-
+            Secondary electron image of the cross section of metallic iron
+            condensed at 1235 K for 48 hours (modified from reference [7]).
+          temperature_K_as_printed: "1235"
+          duration_h_as_printed: "48"
+          scale_bar_as_printed: "10 µm"
+          image_labels_as_printed:
+            - epoxy
+            - metallic iron
+            - substrate
+          axes_as_printed:
+            x: not applicable
+            y: not applicable
+          series:
+            - label: cross-section micrograph
+              marker_as_printed: micrograph
+              marker_count: 0
+          digitisation: not digitised; the figure is a micrograph
+          source_figure_as_printed: modified from reference [7]
+      - observation_id: tt2014_fe_fig3
+        type: figure_record
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          figure: "3"
+        units: "g and hour"
+        values:
+          quantity_as_printed: weight change of the iron source and the substrate
+          caption: >-
+            Weight loss of metallic iron (gas source) due to evaporation at
+            1630 K and weight gain of the substrate (1235 K) due to
+            condensation of metallic iron (from reference [7]).
+          body_as_printed: >-
+            The weight loss of the gas source and the weight gain of the
+            substrate varied linearly with time.
+          source_temperature_K_as_printed: "1630"
+          substrate_temperature_K_as_printed: "1235"
+          axes_as_printed:
+            x: hour
+            x_tick_labels: ["0", "10", "20", "30", "40", "50", "60"]
+            y: "weight change (g)"
+            y_tick_labels:
+              - "0.005"
+              - "0"
+              - "-0.005"
+              - "-0.01"
+              - "-0.015"
+              - "-0.02"
+              - "-0.025"
+              - "-0.03"
+              - "-0.035"
+          annotations_as_printed:
+            - "T_sub = 1235 K"
+            - "T_source = 1630 K"
+          series:
+            - label: substrate weight gain
+              marker_as_printed: filled diamonds
+              marker_count: 0
+            - label: source weight loss
+              marker_as_printed: open squares
+              marker_count: 0
+          digitisation: >-
+            Not digitised. The point coordinates are not printed. Axis ticks
+            and the two temperature annotations are recorded as labels.
+          source_figure_as_printed: from reference [7]
+      - observation_id: tt2014_fe_fig4
+        type: figure_record
+        locator:
+          published_page: 4
+          pdf_page_index: 3
+          figure: "4"
+        units: dimensionless ratio versus supersaturation ratio
+        values:
+          quantity_as_printed: normalised metallic-iron condensation flux versus supersaturation
+          caption: >-
+            Condensation flux (Jcond) of metallic iron, normalized to the
+            ideal evaporation rate (Jidevap(0)), plotted against the
+            supersaturation ratio, S (from reference [7]). Solid and open
+            symbols represent the fluxes obtained at the substrate temperatures
+            of 1235 and 1337 K, respectively. Temperatures shown with symbols
+            (Tgas) represent temperatures of iron gas. The ideal condensation
+            flux (alpha_c = alpha_e = 1) is shown as a solid line, and the
+            fluxes with different values of alpha_c are also shown (dashed
+            lines).
+          body_calls_this_plot_as_printed: Figure 3
+          body_substrate_temperatures_K_as_printed:
+            - "1235"
+            - "1340"
+          caption_substrate_temperatures_K_as_printed:
+            - "1235"
+            - "1337"
+          temperatures_not_reconciled_as_printed: >-
+            The body prints 1340 K and the caption prints 1337 K. Both are
+            kept.
+          tgas_labels_K_as_printed: ["1510", "1580", "1630", "1680"]
+          tgas_pairing_as_printed: >-
+            Some Tgas labels sit beside more than one point. No label was
+            paired to a supersaturation.
+          ideal_line_as_printed: "alpha_c = alpha_e = 1"
+          dashed_alpha_as_printed: ["0.8", "0.6", "0.4", "0.2"]
+          axes_as_printed:
+            x: "Supersaturation ratio, S (=p/p^eq)"
+            x_tick_labels: ["0", "5", "10", "15", "20", "25", "30", "35", "40"]
+            y: "Jcond / Jidevap(0)"
+            y_tick_labels: ["0", "10", "20", "30", "40", "50"]
+          series:
+            - label: solid symbols at 1235 K
+              marker_as_printed: solid symbols
+              marker_count: 0
+            - label: open symbols at 1337 K
+              marker_as_printed: open symbols
+              marker_count: 0
+            - label: ideal line
+              marker_as_printed: solid line
+              marker_count: 0
+            - label: dashed alpha lines
+              marker_as_printed: dashed lines
+              marker_count: 0
+          digitisation: >-
+            Not digitised. Symbol coordinates were not read. Tgas labels were
+            not paired to points.
+          source_figure_as_printed: from reference [7]

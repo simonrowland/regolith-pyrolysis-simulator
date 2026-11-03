@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 746
-  extracts: 744
+  sources: 747
+  extracts: 745
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 744
+  extracts_without_pdf: 745
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -688,6 +688,7 @@ gaps:
   - ta-shirai-2000-lpsc
   - ta-yamanaka-1997-metsoc
   - tachibana-2002-enstatite-evaporation-kinetics
+  - tachibana-takigawa-2014-forsterite-condensation
   - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   - takeda-1986-liquid-copper-soda-slag
   - takeda-1990-sn-slag-matertrans
@@ -40518,6 +40519,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: tachibana-takigawa-2014-forsterite-condensation
+  aliases: []
+  citation: Tachibana S. and Takigawa A. (2014), Experimental Studies on Dust Formation in Space, PoS(LCDU2013)046,
+    10 pages.
+  doi: 10.22323/1.207.0046
+  report_number: null
+  identifier: 10.22323/1.207.0046
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tachibana-takigawa-2014-forsterite-condensation/tachibana-takigawa-2014-forsterite-condensation.pdf
+      present: true
+      sha256: bb0b1d64bc106cc48dedffa9c3fe6675126ad66b14da3df1435b079e3e454529
+      matches_simulator: null
+    sidecar:
+      path: raw/tachibana-takigawa-2014-forsterite-condensation/sidecar.yaml
+      present: true
+    text:
+      path: text/tachibana-takigawa-2014-forsterite-condensation
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/tachibana-takigawa-2014-forsterite-condensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tachibana-takigawa-2014-forsterite-condensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tachibana-takigawa-2014-forsterite-condensation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   aliases: []
   citation: Tachibana, S. & Tsuchiyama, A. (1998), "Evaporation Behavior of Forsterite Dust in the Primordial

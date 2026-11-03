@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 746
-- Extracts (`literature_extract.v1`): 744
+- Sources: 747
+- Extracts (`literature_extract.v1`): 745
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 744
+- Extracts with no PDF: 745
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -697,6 +697,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `ta-shirai-2000-lpsc` | Shirai, T., Tachibana, S. & Tsuchiyama, A. (2000), "Evaporation rates of Na from Na2O-SiO2 melt at 1 atm", Lunar and Planetary Science XXXI, abstract 1610. |  | ABSENT, `` | `raw/ta-shirai-2000-lpsc/ta-shirai-2000-lpsc.pdf` (present, c156af42); `text/ta-shirai-2000-lpsc/` (19 files, exists); `tables/ta-shirai-2000-lpsc/` (0 files, ABSENT) | `data/literature/extracts/ta-shirai-2000-lpsc.yaml` (19 rows, draft) | `ledger/ta-shirai-2000-lpsc.yaml`: decoded (2026-09-06) |
 | `ta-yamanaka-1997-metsoc` | Yamanaka, A. & Tsuchiyama, A. (1997), "Evaporation experiments of Na from a Na2O-SiO2 melt by thermogravimetry: Measurement of evaporation coefficients", 60th Annual Meteoritical Society Meeting, abstract 5122. |  | ABSENT, `` | `raw/ta-yamanaka-1997-metsoc/ta-yamanaka-1997-metsoc.pdf` (present, b0ea5696); `text/ta-yamanaka-1997-metsoc/` (17 files, exists); `tables/ta-yamanaka-1997-metsoc/` (0 files, ABSENT) | `data/literature/extracts/ta-yamanaka-1997-metsoc.yaml` (5 rows, draft) | `ledger/ta-yamanaka-1997-metsoc.yaml`: decoded (2026-09-06) |
 | `tachibana-2002-enstatite-evaporation-kinetics` | Tachibana, S., Tsuchiyama, A., and Nagahara, H. (2002), "Experimental study of incongruent evaporation kinetics of enstatite in vacuum and in hydrogen gas", Geochimica et Cosmochimica Acta 66(4):713–728. | 10.1016/S0016-7037(01)00797-9 | ABSENT, `` | `raw/tachibana-2002-enstatite-evaporation-kinetics/tachibana-2002-enstatite-evaporation-kinetics.pdf` (present, e5336582); `text/tachibana-2002-enstatite-evaporation-kinetics/` (1 files, exists); `tables/tachibana-2002-enstatite-evaporation-kinetics/` (0 files, ABSENT) | `data/literature/extracts/tachibana-2002-enstatite-evaporation-kinetics.yaml` (6 rows, draft) | `ledger/tachibana-2002-enstatite-evaporation-kinetics.yaml`: — (—) |
+| `tachibana-takigawa-2014-forsterite-condensation` | Tachibana S. and Takigawa A. (2014), Experimental Studies on Dust Formation in Space, PoS(LCDU2013)046, 10 pages. | 10.22323/1.207.0046 | ABSENT, `` | `raw/tachibana-takigawa-2014-forsterite-condensation/tachibana-takigawa-2014-forsterite-condensation.pdf` (present, bb0b1d64); `text/tachibana-takigawa-2014-forsterite-condensation/` (1 files, exists); `tables/tachibana-takigawa-2014-forsterite-condensation/` (0 files, ABSENT) | `data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml` (19 rows, draft) | `ledger/tachibana-takigawa-2014-forsterite-condensation.yaml`: — (—) |
 | `tachibana-tsuchiyama-1998-forsterite-dust-lpsc` | Tachibana, S. & Tsuchiyama, A. (1998), "Evaporation Behavior of Forsterite Dust in the Primordial Solar Nebula", Lunar and Planetary Science XXIX, abstract 1538. |  | ABSENT, `` | `raw/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.pdf` (present, dc6516ac); `text/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/` (11 files, exists); `tables/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/` (0 files, ABSENT) | `data/literature/extracts/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml` (6 rows, draft) | `ledger/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml`: decoded (2026-09-06) |
 | `takeda-1986-liquid-copper-soda-slag` | Takeda, Y., Riveros, G., Park, Y.-J., and Yazawa, A. (1986). Equilibria between Liquid Copper and Soda Slag. Transactions of the Japan Institute of Metals, 27(8), 608–615. | 10.2320/matertrans1960.27.608 | ABSENT, `` | `raw/takeda-1986-liquid-copper-soda-slag/takeda-1986-liquid-copper-soda-slag.pdf` (present, e3923119); `text/takeda-1986-liquid-copper-soda-slag/` (17 files, exists); `tables/takeda-1986-liquid-copper-soda-slag/` (0 files, ABSENT) | `data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml` (1 rows, draft) | `ledger/takeda-1986-liquid-copper-soda-slag.yaml`: — (—) |
 | `takeda-1990-sn-slag-matertrans` | Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and FeOx-CaO-SiO2 slag”, Materials Transactions JIM 31(9), 793–801. | 10.2320/matertrans1989.31.793 | ABSENT, `` | `raw/takeda-1990-sn-slag-matertrans/takeda-1990-sn-slag-matertrans.pdf` (ABSENT, ); `text/takeda-1990-sn-slag-matertrans/` (40 files, exists); `tables/takeda-1990-sn-slag-matertrans/` (8 files, exists) | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` (13 rows, draft) | `ledger/takeda-1990-sn-slag-matertrans.yaml`: extracted (2026-10-05) |
@@ -1449,6 +1450,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ta-shirai-2000-lpsc`
 - `ta-yamanaka-1997-metsoc`
 - `tachibana-2002-enstatite-evaporation-kinetics`
+- `tachibana-takigawa-2014-forsterite-condensation`
 - `tachibana-tsuchiyama-1998-forsterite-dust-lpsc`
 - `takeda-1986-liquid-copper-soda-slag`
 - `takeda-1990-sn-slag-matertrans`
