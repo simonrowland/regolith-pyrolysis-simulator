@@ -3435,11 +3435,23 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: MgAl2O4
         axis: linear_activity
+        derived_from:
+        - yakovlev_2024_fig2b_mgo_figure_only
+        - yakovlev_2024_fig2b_al2o3_figure_only
+        derivation:
+          relation: >-
+            The authors calculate the MgAl2O4 activity from the residual-melt MgO and Al2O3 activities
+            with Lewis relation (1), then plot it in Fig. 3A. The pure-compound reference activity values
+            are cited but not reproduced in this paper.
+          output_unit: dimensionless
+          inputs:
+          - yakovlev_2024_fig2b_mgo_figure_only
+          - yakovlev_2024_fig2b_al2o3_figure_only
         points:
         - activity: 0.24
           Al2O3_mol_pct_as_read: 17.46
@@ -3937,11 +3949,25 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: Ca2MgSi2O7
         axis: linear_activity
+        derived_from:
+        - yakovlev_2024_fig2b_cao_figure_only
+        - yakovlev_2024_fig2b_mgo_figure_only
+        - yakovlev_2024_fig2b_sio2_figure_only
+        derivation:
+          relation: >-
+            The authors calculate the Ca2MgSi2O7 activity from the residual-melt CaO, MgO, and SiO2
+            activities with Lewis relation (2), then plot it in Fig. 3A. The pure-compound reference activity values
+            are cited but not reproduced in this paper.
+          output_unit: dimensionless
+          inputs:
+          - yakovlev_2024_fig2b_cao_figure_only
+          - yakovlev_2024_fig2b_mgo_figure_only
+          - yakovlev_2024_fig2b_sio2_figure_only
         points:
         - activity: 0.048
           Al2O3_mol_pct_as_read: 17.46
@@ -4439,11 +4465,25 @@ species:
       units: dimensionless
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: figure_only
         digitized_from_figure: true
         species_formula: Ca2Al2SiO7
         axis: linear_activity
+        derived_from:
+        - yakovlev_2024_fig2b_cao_figure_only
+        - yakovlev_2024_fig2b_al2o3_figure_only
+        - yakovlev_2024_fig2b_sio2_figure_only
+        derivation:
+          relation: >-
+            The authors calculate the Ca2Al2SiO7 activity from the residual-melt CaO, Al2O3, and SiO2
+            activities with Lewis relation (3), then plot it in Fig. 3A. The pure-compound reference activity values
+            are cited but not reproduced in this paper.
+          output_unit: dimensionless
+          inputs:
+          - yakovlev_2024_fig2b_cao_figure_only
+          - yakovlev_2024_fig2b_al2o3_figure_only
+          - yakovlev_2024_fig2b_sio2_figure_only
         points:
         - activity: 0.053
           Al2O3_mol_pct_as_read: 17.46
