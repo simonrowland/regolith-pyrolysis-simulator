@@ -7,8 +7,9 @@ source:
   doi: 10.1016/j.gca.2010.11.028
   provenance_path: raw/mathieu-2011-na2o-cms-solubility/mathieu-2011-na2o-cms-solubility.pdf
   note: Table 6 has 29 CMS glass rows, 3 NCS rows, and the End-member-NS2 source row. Five CMS rows and
-    all three NCS rows repeat experiments in the Mathieu (2009) sodium-solubility thesis and are not admitted
-    again here. The NS2 source row is a calibration reference, not a CMS melt.
+    all three NCS rows are the same experiments already represented in the Mathieu (2009) sodium-solubility
+    thesis. The 2011 Eq. (9)/(15) corrections differ from the thesis results, but these experiments are
+    not admitted again here. The NS2 source row is a calibration reference, not a CMS melt.
 extraction:
   method: Transcribed from the born-digital pdftotext and MinerU table drafts. Table 5 row/column layout
     checked against the page 10 render; Table 6 layout checked against page 11. Table 6 CMS31 Na2O wt%
@@ -19,9 +20,11 @@ extraction:
     wt% as the single composition value; the equivalent mol% is retained as a source-value string rather
     than a converted unit twin. Gamma is stored as a dimensionless coefficient normalized from the printed
     γ×10^6 column; the printed cell and scale are retained. All Table 6 parenthetical uncertainties are
-    2 SD. The corrected Table 6 values use Eqs. (9) and (15); since the Table 3–4 calibration inputs are
-    not separately stored as scoreable observations, the authors' calculated outputs use quoted_attributed
-    evidence per d-110. The source's direct quench statement is preserved, but it does not assert glass
+    2 SD. The Table 6 values are the authors' own measurement reductions. Normalized Na2O values are
+    measured_reduced from Table 5 EPMA by Eq. (9); gamma values are measured_reduced using Table 6 mol%
+    and Table 4 source activity by Eq. (15). The printed inputs are located in each derivation but are not
+    parent observations.
+    The source's direct quench statement is preserved, but it does not assert glass
     preservation. The paper reports total pressure only for preparation, not during the run; the 1 atm
     in Fig. 9(a) is for the Na-free comparison and is not assigned to Fig. 9(b) CMS data. Figure-only
     solubility/activity curves are noted as digitization candidates and are not sampled.
@@ -160,7 +163,19 @@ species:
           row: CMS8
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS9 / CMS8 / Gl
+              note: "Table 5 row ACMS9 / CMS8 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS9
@@ -184,12 +199,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id011
         temperature_K: *id003
         fO2_Pa: *id004
@@ -237,7 +246,20 @@ species:
         verbatim: 0.13 × 10^-6 (two standard deviations)
         locator: *id009
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS8
+              column: Na2O (mol%)
+              note: "Table 6 row CMS8 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS9
@@ -258,11 +280,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id011
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms9_na2o_wt_percent
@@ -292,7 +309,19 @@ species:
           row: CMS9
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS10 / CMS9 / Gl
+              note: "Table 5 row ACMS10 / CMS9 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -316,12 +345,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id014
         temperature_K: *id003
         fO2_Pa: *id004
@@ -369,7 +392,20 @@ species:
         verbatim: 0.07 × 10^-6 (two standard deviations)
         locator: *id012
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS9
+              column: Na2O (mol%)
+              note: "Table 6 row CMS9 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -390,11 +426,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id014
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms10_na2o_wt_percent
@@ -424,7 +455,19 @@ species:
           row: CMS10
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS10 / CMS10 / Gl
+              note: "Table 5 row ACMS10 / CMS10 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -448,12 +491,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id017
         temperature_K: *id003
         fO2_Pa: *id004
@@ -501,7 +538,20 @@ species:
         verbatim: 0.04 × 10^-6 (two standard deviations)
         locator: *id015
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS10
+              column: Na2O (mol%)
+              note: "Table 6 row CMS10 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -522,11 +572,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id017
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms12_na2o_wt_percent
@@ -556,7 +601,19 @@ species:
           row: CMS12
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS10 / CMS12 / Gl
+              note: "Table 5 row ACMS10 / CMS12 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -580,12 +637,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id020
         temperature_K: *id003
         fO2_Pa: *id004
@@ -633,7 +684,20 @@ species:
         verbatim: 0.06 × 10^-6 (two standard deviations)
         locator: *id018
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS12
+              column: Na2O (mol%)
+              note: "Table 6 row CMS12 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -654,11 +718,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id020
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms13_na2o_wt_percent
@@ -688,7 +747,19 @@ species:
           row: CMS13
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS10 / CMS13 / Gl
+              note: "Table 5 row ACMS10 / CMS13 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -712,12 +783,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id023
         temperature_K: *id003
         fO2_Pa: *id004
@@ -765,7 +830,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id021
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS13
+              column: Na2O (mol%)
+              note: "Table 6 row CMS13 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS10
@@ -786,11 +864,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id023
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms3_na2o_wt_percent
@@ -820,7 +893,19 @@ species:
           row: CMS3
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS11 / CMS3 / Gl
+              note: "Table 5 row ACMS11 / CMS3 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -844,12 +929,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id026
         temperature_K: *id003
         fO2_Pa: *id004
@@ -897,7 +976,20 @@ species:
         verbatim: 0.02 × 10^-6 (two standard deviations)
         locator: *id024
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS3
+              column: Na2O (mol%)
+              note: "Table 6 row CMS3 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -918,11 +1010,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id026
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms17_na2o_wt_percent
@@ -952,7 +1039,19 @@ species:
           row: CMS17
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS11 / CMS17 / Gl
+              note: "Table 5 row ACMS11 / CMS17 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -976,12 +1075,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id029
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1029,7 +1122,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id027
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS17
+              column: Na2O (mol%)
+              note: "Table 6 row CMS17 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1050,11 +1156,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id029
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms18_na2o_wt_percent
@@ -1084,7 +1185,19 @@ species:
           row: CMS18
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS11 / CMS18 / Gl
+              note: "Table 5 row ACMS11 / CMS18 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1108,12 +1221,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id032
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1161,7 +1268,20 @@ species:
         verbatim: 0.04 × 10^-6 (two standard deviations)
         locator: *id030
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS18
+              column: Na2O (mol%)
+              note: "Table 6 row CMS18 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1182,11 +1302,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id032
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms19_na2o_wt_percent
@@ -1216,7 +1331,19 @@ species:
           row: CMS19
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS11 / CMS19 / Gl
+              note: "Table 5 row ACMS11 / CMS19 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1240,12 +1367,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id035
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1293,7 +1414,20 @@ species:
         verbatim: 0.22 × 10^-6 (two standard deviations)
         locator: *id033
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS19
+              column: Na2O (mol%)
+              note: "Table 6 row CMS19 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1314,11 +1448,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id035
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms20_na2o_wt_percent
@@ -1348,7 +1477,19 @@ species:
           row: CMS20
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS11 / CMS20 / Gl
+              note: "Table 5 row ACMS11 / CMS20 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1372,12 +1513,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id038
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1425,7 +1560,20 @@ species:
         verbatim: 0.08 × 10^-6 (two standard deviations)
         locator: *id036
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS20
+              column: Na2O (mol%)
+              note: "Table 6 row CMS20 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS11
@@ -1446,11 +1594,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id038
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms23_na2o_wt_percent
@@ -1480,7 +1623,19 @@ species:
           row: CMS23
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS21 / CMS23 / Gl
+              note: "Table 5 row ACMS21 / CMS23 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1504,12 +1659,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id041
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1557,7 +1706,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id039
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS23
+              column: Na2O (mol%)
+              note: "Table 6 row CMS23 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1578,11 +1740,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id041
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms24_na2o_wt_percent
@@ -1612,7 +1769,19 @@ species:
           row: CMS24
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS21 / CMS24 / Gl
+              note: "Table 5 row ACMS21 / CMS24 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1636,12 +1805,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id044
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1689,7 +1852,20 @@ species:
         verbatim: 0.03 × 10^-6 (two standard deviations)
         locator: *id042
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS24
+              column: Na2O (mol%)
+              note: "Table 6 row CMS24 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1710,11 +1886,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id044
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms25_na2o_wt_percent
@@ -1744,7 +1915,19 @@ species:
           row: CMS25
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS21 / CMS25 / Gl
+              note: "Table 5 row ACMS21 / CMS25 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1768,12 +1951,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id047
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1821,7 +1998,20 @@ species:
         verbatim: 0.03 × 10^-6 (two standard deviations)
         locator: *id045
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS25
+              column: Na2O (mol%)
+              note: "Table 6 row CMS25 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1842,11 +2032,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id047
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms26_na2o_wt_percent
@@ -1876,7 +2061,19 @@ species:
           row: CMS26
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMS21 / CMS26 / Gl
+              note: "Table 5 row ACMS21 / CMS26 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1900,12 +2097,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id050
         temperature_K: *id003
         fO2_Pa: *id004
@@ -1953,7 +2144,20 @@ species:
         verbatim: 0.03 × 10^-6 (two standard deviations)
         locator: *id048
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS26
+              column: Na2O (mol%)
+              note: "Table 6 row CMS26 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMS21
@@ -1974,11 +2178,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id050
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms11_na2o_wt_percent
@@ -2008,7 +2207,19 @@ species:
           row: CMS11
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS6 / CMS11 / Gl
+              note: "Table 5 row ACMAS6 / CMS11 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS6
@@ -2032,12 +2243,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id053
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2085,7 +2290,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id051
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS11
+              column: Na2O (mol%)
+              note: "Table 6 row CMS11 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS6
@@ -2106,11 +2324,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id053
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms15_na2o_wt_percent
@@ -2140,7 +2353,19 @@ species:
           row: CMS15
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS6 / CMS15 / Gl
+              note: "Table 5 row ACMAS6 / CMS15 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS6
@@ -2164,12 +2389,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id056
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2217,7 +2436,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id054
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS15
+              column: Na2O (mol%)
+              note: "Table 6 row CMS15 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS6
@@ -2238,11 +2470,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id056
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms5_na2o_wt_percent
@@ -2272,7 +2499,19 @@ species:
           row: CMS5
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS14 / CMS5 / Gl
+              note: "Table 5 row ACMAS14 / CMS5 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2296,12 +2535,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id059
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2349,7 +2582,20 @@ species:
         verbatim: 0.06 × 10^-6 (two standard deviations)
         locator: *id057
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS5
+              column: Na2O (mol%)
+              note: "Table 6 row CMS5 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2370,11 +2616,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id059
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms31_na2o_wt_percent
@@ -2404,7 +2645,19 @@ species:
           row: CMS31
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS14 / CMS31 / Gl
+              note: "Table 5 row ACMAS14 / CMS31 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2428,12 +2681,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id062
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2481,7 +2728,20 @@ species:
         verbatim: 0.08 × 10^-6 (two standard deviations)
         locator: *id060
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS31
+              column: Na2O (mol%)
+              note: "Table 6 row CMS31 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2502,11 +2762,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id062
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms32_na2o_wt_percent
@@ -2536,7 +2791,19 @@ species:
           row: CMS32
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS14 / CMS32 / Gl
+              note: "Table 5 row ACMAS14 / CMS32 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2560,12 +2827,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id065
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2613,7 +2874,20 @@ species:
         verbatim: 0.07 × 10^-6 (two standard deviations)
         locator: *id063
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS32
+              column: Na2O (mol%)
+              note: "Table 6 row CMS32 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2634,11 +2908,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id065
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms33_na2o_wt_percent
@@ -2668,7 +2937,19 @@ species:
           row: CMS33
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS14 / CMS33 / Gl
+              note: "Table 5 row ACMAS14 / CMS33 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2692,12 +2973,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id068
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2745,7 +3020,20 @@ species:
         verbatim: 0.06 × 10^-6 (two standard deviations)
         locator: *id066
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS33
+              column: Na2O (mol%)
+              note: "Table 6 row CMS33 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS14
@@ -2766,11 +3054,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id068
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms16_na2o_wt_percent
@@ -2800,7 +3083,19 @@ species:
           row: CMS16
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS15 / CMS16 / Gl
+              note: "Table 5 row ACMAS15 / CMS16 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS15
@@ -2824,12 +3119,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id071
         temperature_K: *id003
         fO2_Pa: *id004
@@ -2877,7 +3166,20 @@ species:
         verbatim: 0.07 × 10^-6 (two standard deviations)
         locator: *id069
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS16
+              column: Na2O (mol%)
+              note: "Table 6 row CMS16 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS15
@@ -2898,11 +3200,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id071
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms21_na2o_wt_percent
@@ -2932,7 +3229,19 @@ species:
           row: CMS21
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS16 / CMS21 / Gl
+              note: "Table 5 row ACMAS16 / CMS21 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS16
@@ -2956,12 +3265,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id074
         temperature_K: *id003
         fO2_Pa: *id004
@@ -3009,7 +3312,20 @@ species:
         verbatim: 0.07 × 10^-6 (two standard deviations)
         locator: *id072
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS21
+              column: Na2O (mol%)
+              note: "Table 6 row CMS21 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS16
@@ -3030,11 +3346,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id074
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms36_na2o_wt_percent
@@ -3064,7 +3375,19 @@ species:
           row: CMS36
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS41 / CMS36 / Gl
+              note: "Table 5 row ACMAS41 / CMS36 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS41
@@ -3088,12 +3411,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id077
         temperature_K: *id003
         fO2_Pa: *id004
@@ -3141,7 +3458,20 @@ species:
         verbatim: 0.05 × 10^-6 (two standard deviations)
         locator: *id075
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS36
+              column: Na2O (mol%)
+              note: "Table 6 row CMS36 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS41
@@ -3162,11 +3492,6 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id077
       quench_state: *id008
     - observation_id: mathieu_2011_table6_cms34_na2o_wt_percent
@@ -3196,7 +3521,19 @@ species:
           row: CMS34
           note: Table 6 normalized Na2O solubility and activity-coefficient row
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (9): the authors normalize the measured Table 5 Na2O wt% to the Na2O–2SiO2 reference composition using the EDiAn calibration values."
+          output_unit: '%'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 10
+              pdf_page_index: 9
+              published_page: 617
+              table: '5'
+              row: ACMAS41 / CMS34 / Gl
+              note: "Table 5 row ACMAS41 / CMS34 / Gl EPMA oxide analysis used by Eq. (9); Eq. (9) is on PDF page 8 and the EDiAn reference values are in Tables 3–4. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS41
@@ -3220,12 +3557,6 @@ species:
         standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
         measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
           composition, followed by the authors' Eq. (9) normalization.
-        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
-          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
-          here as separate observation rows; this is retained as the authors' reported result under the
-          quoted_attributed fallback.
-        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
-          using Eq. (9).
       point_conditions: &id080
         temperature_K: *id003
         fO2_Pa: *id004
@@ -3273,7 +3604,20 @@ species:
         verbatim: 0.02 × 10^-6 (two standard deviations)
         locator: *id078
       values:
-        method_class: quoted_attributed
+        method_class: measured_reduced
+        derivation:
+          relation: "Eq. (15): gamma_Na2O = a_Na2O(source) / x_Na2O(sample), using the Table 6 mol% and Table 4 Na2O–2SiO2 source activity."
+          output_unit: dimensionless
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 11
+              pdf_page_index: 10
+              published_page: 618
+              table: '6'
+              row: CMS34
+              column: Na2O (mol%)
+              note: "Table 6 row CMS34 Na2O mol% cell; the source aNa2O is in the Table 4 Na2O–2SiO2 row on PDF page 7, and Eq. (15) is on PDF page 10. These inputs are not parent observations."
         admission_status: admitted
         T_C: '1400'
         run: ACMAS41
@@ -3294,10 +3638,5 @@ species:
           the paper does not separately name a reference state in Table 6.
         calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
           and NS2 source activity using Eq. (15).
-        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
-          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
-          rows, so the reported coefficient is retained with quoted_attributed evidence.
-        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
-          Na2O–2SiO2 source activity by Eq. (15).
       point_conditions: *id080
       quench_state: *id008

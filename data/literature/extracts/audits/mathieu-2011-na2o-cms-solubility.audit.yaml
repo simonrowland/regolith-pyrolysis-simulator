@@ -6,10 +6,11 @@ scope:
   stored_observations: 48
   table5_printed_rows: 37
   table6_printed_rows: 33
-  row_accounting: 'Table 5: 29 CMS glass rows (5 repeat experiments excluded), 3 NCS glass rows (outside
-    CMS scope and repeated in the thesis), 2 crystal rows, and 3 sodium-source glass rows. Table 6: 29
-    CMS rows (24 unique plus 5 repeated), 3 repeated NCS rows, and one End-member-NS2 calibration row.
+  row_accounting: 'Table 5: 29 CMS glass rows (5 same runs as the thesis excluded), 3 NCS glass rows (outside
+    CMS scope; the same runs are also in the thesis), 2 crystal rows, and 3 sodium-source glass rows. Table 6: 29
+    CMS rows (24 unique plus 5 same runs excluded), 3 same-run NCS rows, and one End-member-NS2 calibration row.
     Thus the target is 24 unique CMS glasses.'
+  overlap_note: The eight excluded glasses are the same runs already held by the 2009 thesis extract and stay scored there; the 2011 Eq. (9)/(15) corrected values differ from the thesis values.
   unextracted_table6_columns: NBO/T, K, and KNa are structural/basicity descriptors, not Na2O solubility/activity;
     they are outside this sodium-priority extraction.
   figure_read_candidates: Figures 7, 8, 11, and 12 show plotted solubility/activity relations. No plotted
@@ -19,42 +20,42 @@ overlap_crosswalk:
   2011_table6_row: CMS27
   thesis_na2o_observation_id: mathieu_2009_t38_acmas6_cms27_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas6_cms27_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS8 CMS1
   2011_table6_row: CMS1
   thesis_na2o_observation_id: mathieu_2009_t38_acmas8_cms1_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas8_cms1_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS16 CMS22
   2011_table6_row: CMS22
   thesis_na2o_observation_id: mathieu_2009_t38_acmas16_cms22_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas16_cms22_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS16 CMS28
   2011_table6_row: CMS28
   thesis_na2o_observation_id: mathieu_2009_t39_acmas16_cms28_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t39_acmas16_cms28_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS17 NCS3
   2011_table6_row: NCS3
   thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs3_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs3_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS17 NCS4
   2011_table6_row: NCS4
   thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs4_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs4_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS17 NCS7
   2011_table6_row: NCS7
   thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs7_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs7_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 - 2011_table5_row: ACMAS40 CMS35
   2011_table6_row: CMS35
   thesis_na2o_observation_id: mathieu_2009_t38_acmas40_cms35_na2o_analysed
   thesis_gamma_observation_id: mathieu_2009_t38_acmas40_cms35_gamma_na2o
-  action: excluded from 2011 admitted rows; do not double-count thesis data
+  action: excluded from 2011 admitted rows; same run remains only in the 2009 thesis extract; 2011 corrected values differ
 calibration_and_condition_cells:
 - table: '4'
   page: 7
@@ -597,6 +598,7 @@ cell_audit:
 migration:
   path: isolated extract migration through simulator/battery/migrate.py::Migrator
   observations: 48
+  evidence_class: all 48 migrate as measured_reduced with located not_printed raw inputs
   hard_issues: 0
   unavailable_values: 0
   quantity_unknown: 0
@@ -633,12 +635,17 @@ migration:
   validation:
     yaml_flow_scalar_commas: 17 passed
     focused_extract_test: 1 passed
-    literature_extract_suite: 890 passed; 3 tests are UNVERIFIED-local
-    unverified_local_tests:
-    - test_repo_extracts_validate_green: UNVERIFIED-local; interrupted after the invocation exceeded the 300 second cap.
-    - test_coverage_pending_stubs_not_found: UNVERIFIED-local; interrupted at 278.21 seconds before completion.
-    - test_pilot_extract_count_exact_and_merge_smoke: UNVERIFIED-local; interrupted at 278.76 seconds before completion.
-  mutation_check: An on-disk mutation changed CMS31's pinned wt% text from 6.81 to 6.82; the focused test failed on the Table 6 render pin. The original extract was restored exactly before the final passing focused run.
+    literature_extract_suite: 893 passed across bounded local batches; the three long checks below were run separately.
+    literature_extract_mathieu_subset: 2 passed, 891 deselected in 42.29 seconds
+    long_suite_checks:
+    - test: test_repo_extracts_validate_green
+      result: 1 passed in 263.50 seconds
+    - test: test_coverage_pending_stubs_not_found
+      result: 1 passed in 281.96 seconds
+    - test: test_pilot_extract_count_exact_and_merge_smoke
+      result: 1 passed in 290.52 seconds
+    unverified_local_tests: []
+  mutation_check: On-disk mutation changed all 48 method_class values from measured_reduced to quoted_attributed; the focused test failed on the class pin. The separate CMS31 mutation from 6.81 to 6.82 also failed its Table 6 render pin. The extract was restored after each mutation.
 compare:
   tool: tools/mineru_table_draft.py compare
   status: completed_with_manual_cell_review
@@ -667,8 +674,7 @@ schema_and_identity:
   reference_state: The paper reports gamma Na2O and Eq. (15), but does not separately name a reference
     state in Table 6; none is inferred. The activity-coefficient identity therefore retains the source's
     printed reference state wording as a note and may be unavailable for comparison.
-  evidence_class: Table 6 solubility is normalized using Eq. (9); gamma is calculated using Eq. (15).
-    The supporting Table 3–4 calibration inputs are not separately stored as observation rows, so both
-    reported calculated outputs use quoted_attributed per the d-110 fallback. This does not reclassify
-    the authors' direct EPMA measurements.
+  evidence_class: All 48 rows are the authors' own measurement reductions. Solubility uses the Table 5 EPMA
+    result and Eq. (9); gamma uses Table 6 mol% and Table 4 source aNa2O in Eq. (15). Both are
+    measured_reduced with located not_printed raw inputs because those cells are not parent observations.
   schema_gaps: []
