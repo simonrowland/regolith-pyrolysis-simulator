@@ -15,13 +15,13 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 754
-- Extracts (`literature_extract.v1`): 752
+- Sources: 772
+- Extracts (`literature_extract.v1`): 770
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 752
-- Alias groups needing owner/controller resolution: 80
+- Extracts with no PDF: 770
+- Alias groups needing owner/controller resolution: 82
 - Extracts with private/non-public row locators: 78
 
 ## Sources
@@ -885,6 +885,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `cacciatore-zajacz-2026-v-sc-oxybarometer`
 - `cacciatore-zajacz-2026-v-sc-oxybarometer-supplement`
 - `cardiff-2007-vacuum-pyrolysis-gsfc`
+- `carrillo-sanchez-2020-phosphorus-ablation`
 - `centolanzi-1966-tektite-vapour-pressure`
 - `charles-1967-alkali-silicate-activities`
 - `charnoz-2023-hydrogen-magma-ocean`
@@ -892,6 +893,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `chaudary-1997-v-redox-binary-silicate`
 - `chen-2019-sioch-cp-entropy-gibbs`
 - `chen-2022-mgo-sio2-tio2-phase-equilibria`
+- `chen-2022-sio2-mno-slag-activities`
 - `cheng-2021-fe-ca-si-o-phase-equilibria`
 - `cho-suito-1994-cas-slag-activities`
 - `colson-colson-1995-chromium-dimer-lpsc`
@@ -907,6 +909,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `costa-jacobson-2015`
 - `cottrell-2009-iron-xanes`
 - `dachs-geiger-2006-pyrope-grossular`
+- `dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry`
 - `dans-loffler-1930-na-silicate-zirconia-phase-equilibria`
 - `darken-gurry-1946-iron-oxygen-ii`
 - `datz-1961-na2cl2`
@@ -921,6 +924,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `delgado-2015-mg-thermite-regolith`
 - `di-donato-granati-2000`
 - `distin-1971-ferrous-silicate-melts`
+- `dohmen-1998-olivine-fe-gas`
 - `dohmen-2003-coupled-kinetics`
 - `dong-2009-cr-v-slag-activities`
 - `doyle-1988-feo-activity-multicomponent-magma`
@@ -943,6 +947,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ferguson-nuth-2012-sio-vapor-pressure-mixture`
 - `ferkl-2026-waste-glass-thermal-redox`
 - `filiberto-lpsc2011-2064-volatiles`
+- `filsinger-1990-silica-silicon-carbothermic-kinetics`
 - `florin-2025-cu-silicate-evaporation`
 - `folstad-2024-metals-cao-dissolution-cas`
 - `fray-schmitt-2009-ch4-1`
@@ -953,6 +958,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `fujisawa-1990-cao-al2o3-activities`
 - `fujisawa-1994-na-sn-carbonate-thermodynamics`
 - `fuyuki-2007-sio-recombination`
+- `gail-2013-sio-nucleation-silicate-dust`
 - `gaillard-2003-hydrogen-iron-redox-rate`
 - `gaillard-2003-hydrous-silicic-melt-activity`
 - `gca-366-210-berry-2024`
@@ -971,6 +977,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `habermann-daane-1964`
 - `hamuyuni-2016-copper-oxide-solubility-thesis-summary`
 - `hanson-jones-1998-am-cr-partitioning-olivine-liquid`
+- `hashimoto-1990-forsterite-evaporation-kinetics`
 - `hashimoto-nakano-2021-bubbles-to-chondrites-ii`
 - `haskin-1990-lunar-molten-regolith-electrolysis-nasa-report`
 - `hayashi-2025-ca-fe-silicate-redox-activities`
@@ -999,6 +1006,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ivanova-2018-spinel-rich-cai-evaporation`
 - `ivtan-cro2-g`
 - `ivtan-mno-coo-thermo`
+- `iwahashi-2021-cr-oxide-solid-activities`
 - `jackson-2005-ferrous-glass-multispectroscopy`
 - `jacquet-2026-alkali-recondensation`
 - `jaggi-2021-mercury-atmosphere`
@@ -1017,6 +1025,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `jugo-2010-sulfur-xanes`
 - `kambayashi-kato-1984-mgo-sio2-1973k`
 - `kang-2007-sio2-activity-cas-low-silica`
+- `kassis-frischat-1981-mixed-alkali-vapor-pressures`
 - `kassis-frischat-1981-silicate-glass-vapour`
 - `kawashima-1984-soda-flux-chemical-sensors`
 - `kayahara-1981-liquid-cu-o`
@@ -1186,6 +1195,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `mamiya-2000-sio-disproportionation`
 - `masuda-tanaka-1979-vacuum-condensates`
 - `mathieu-2009-sodium-solubility-thesis`
+- `mathieu-2011-na2o-cms-solubility`
 - `matousek-1998-silicate-vaporization-reactions`
 - `matsumaru-1999-plasma-arc-silicate-evaporation`
 - `matsuzaki-1997-feo-tio2-sio2-activities`
@@ -1217,6 +1227,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `myers-jacobson-2015-volatile-metal-hydroxides-presentation`
 - `naess-2014-liquid-silicon-oxidation-fume-flux`
 - `nagabayashi-hino-banya-1989-phosphorus`
+- `nagahara-1993-sio2-evaporation-equilibrium-vacuum`
 - `nagahara-2000-metsoc63-5166`
 - `nagahara-ozawa-1996-forsterite-hydrogen-evaporation`
 - `nagahara-ozawa-1999-forsterite-surface-microstructures`
@@ -1334,6 +1345,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `schreiber-1996-fe-mn-cr-redox-interactions`
 - `schreiber-haskin-1976-plsc7-chromium-in-basalts`
 - `schumm-1981-alkali-aluminosilicate-thermochemical-tables`
+- `seetharaman-2013-cr-thin-film-volatilization`
 - `seki-2011-ca-o-solubility-fe-cao-al2o3`
 - `semkow-haskin-1984-redox-diopsidic-melt`
 - `senior-1991-solar-heating-jbis`
@@ -1344,6 +1356,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `sf04-magma-companion-workbook`
 - `shaw-2023-vacuum-thermal-sublimation-thesis`
 - `shi-2024-cr-activity-slag-polymerisation`
+- `shi-2025-mno-activity-eaf-spinel`
 - `shilov-1998-sno-zno-p2o5-vaporization`
 - `shilov-2025-sro-al2o3-sio2-kems-supplement`
 - `shilov-2026-sro-la2o3-kems`
@@ -1423,6 +1436,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `shornikov-2024-iron-phosphate-melts`
 - `shornikov-2024-sodium-phosphate-melts`
 - `shornikov-2024-wollastonite-evaporation`
+- `shornikov-2025-ca-al-inclusion-evaporation`
 - `shornikov-2025-ca-al-inclusion-kems`
 - `shornikov-2025-ca-al-inclusion-thermodynamics`
 - `shornikov-2025-calcium-oxide-evaporation`
@@ -1525,6 +1539,9 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `wang-2009-cr-slag-kems-original`
 - `wang-2017-cao-sio2-vox-tables-s1-s32`
 - `wang-2017-sodium-stannate-formation-emf`
+- `wang-seetharaman-2010-cr-oxidation-original`
+- `watne-1977-potassium-vapor-pressure-furnace`
+- `wetzel-2012-heidelberg-thesis`
 - `wetzel-gail-2013-sio-arrhenius`
 - `wilkerson-2021-jsc1a-tga-ms-poster`
 - `wilkerson-2023-jsc1a-outgassing`
@@ -1554,6 +1571,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `zaitsev-1999-na2o-sio2-pccp`
 - `zaitsev-2000-ms2000-045`
 - `zaitsev-2000-sodium-silicate-thermodynamics`
+- `zaitsev-2006-magnesium-silicate-thermodynamics`
 - `zhang-2011-boron-sodium-f-free-evaporation`
 - `zhang-2021-acsesc-si`
 - `zhang-2024-alkali-evaporation-ti-thesis`
@@ -1700,6 +1718,7 @@ The builder does not pick a winner.
 - source_id_alias `bischof-2023`: `kems-137-bischof-2023`, `kems-138-bischof-2023` — needs owner/controller resolution
 - source_id_alias `borisov-2004`: `borisov-2004-karrooite-liquidus-redox`, `borisov-2004-tio2-pd-ni-fe-solubilities` — needs owner/controller resolution
 - source_id_alias `cacciatore-2026`: `cacciatore-zajacz-2026-v-sc-oxybarometer`, `cacciatore-zajacz-2026-v-sc-oxybarometer-supplement` — needs owner/controller resolution
+- source_id_alias `chen-2022`: `chen-2022-mgo-sio2-tio2-phase-equilibria`, `chen-2022-sio2-mno-slag-activities` — needs owner/controller resolution
 - source_id_alias `colson-1998`: `colson-floden-1998-lpsc-co-nickel-activity`, `colson-nermoe-1998-al-stabilized-cr3-dimer-lpsc` — needs owner/controller resolution
 - source_id_alias `costa-2015`: `costa-2015-yb-silicate-silica-activity`, `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
 - source_id_alias `datz-1961`: `datz-1961-na2cl2`, `datz-and-smith-1961`, `datz-smith-taylor-1961-nacl-vapor` — needs owner/controller resolution
@@ -1711,6 +1730,7 @@ The builder does not pick a winner.
 - source_id_alias `ichise-1989`: `kems-112-ichise-1989`, `kems-198-ichise-ueshima-1989` — needs owner/controller resolution
 - source_id_alias `inoue-1982`: `inoue-suito-1982-na-silicate-sulfur-partitions`, `inoue-suito-1982-vanadium-mgo-saturated-slag` — needs owner/controller resolution
 - source_id_alias `jeon-2025`: `jeon-2025-metal-slag-refractory-thesis`, `jeon-lindberg-2025-mgo-refractory-slag-interface` — needs owner/controller resolution
+- source_id_alias `kassis-1981`: `kassis-frischat-1981-mixed-alkali-vapor-pressures`, `kassis-frischat-1981-silicate-glass-vapour` — needs owner/controller resolution
 - source_id_alias `khedim-2010`: `khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate`, `khedim-podor-panteix-2010-binary-soda-silicate-cr-solubility` — needs owner/controller resolution
 - source_id_alias `kirschen-1999`: `kirschen-1999-si-ti-al-miscibility`, `kirschen-decapitani-1999-liquid-miscibility` — needs owner/controller resolution
 - source_id_alias `lamoreaux-1987`: `lamoreaux-hildenbrand-hildenbrand-1987`, `lh87-al-o-gas-species`, `lh87-cao-g`, `lh87-mgo-g`, `lh87-pbo-g` — needs owner/controller resolution
@@ -1744,7 +1764,7 @@ The builder does not pick a winner.
 - source_id_alias `shornikov-2022`: `shornikov-2022-k2o-al2o3-melts`, `shornikov-2022-meteorite-redox-evaporation`, `shornikov-2022-na2o-al2o3-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2023`: `shornikov-2023-cai-melt-evaporation`, `shornikov-2023-calcium-phosphate`, `shornikov-2023-mgo-phosphate-melts`, `shornikov-2023-natural-cai-evaporation`, `shornikov-2023-silica-phosphate-melts` — needs owner/controller resolution
 - source_id_alias `shornikov-2024`: `shornikov-2024-alkali-phosphate`, `shornikov-2024-cai-silica-evaporation`, `shornikov-2024-iron-phosphate-melts`, `shornikov-2024-sodium-phosphate-melts`, `shornikov-2024-wollastonite-evaporation` — needs owner/controller resolution
-- source_id_alias `shornikov-2025`: `shornikov-2025-ca-al-inclusion-kems`, `shornikov-2025-ca-al-inclusion-thermodynamics`, `shornikov-2025-calcium-oxide-evaporation`, `shornikov-2025-lithium-phosphate-melts`, `shornikov-2025-lithium-silicate-melts`, `shornikov-2025-perovskite-condensation`, `shornikov-2025-saratov-alkali-evaporation` — needs owner/controller resolution
+- source_id_alias `shornikov-2025`: `shornikov-2025-ca-al-inclusion-evaporation`, `shornikov-2025-ca-al-inclusion-kems`, `shornikov-2025-ca-al-inclusion-thermodynamics`, `shornikov-2025-calcium-oxide-evaporation`, `shornikov-2025-lithium-phosphate-melts`, `shornikov-2025-lithium-silicate-melts`, `shornikov-2025-perovskite-condensation`, `shornikov-2025-saratov-alkali-evaporation` — needs owner/controller resolution
 - source_id_alias `shornikov-2026`: `shornikov-2026-hatrurite-evaporation`, `shornikov-2026-wollastonite-kems` — needs owner/controller resolution
 - source_id_alias `slag-1993`: `slag-001-banya-1993`, `slag-002-banya-hino-nagasaka-1993`, `slag-003-hino-kitagawa-banya-1993` — needs owner/controller resolution
 - source_id_alias `sossi-2018`: `kems-041-sossi-fegley-2018`, `kems-045-sossi-2018-pnas-cr` — needs owner/controller resolution
