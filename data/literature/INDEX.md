@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 750
-- Extracts (`literature_extract.v1`): 748
+- Sources: 751
+- Extracts (`literature_extract.v1`): 749
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 748
+- Extracts with no PDF: 749
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -461,6 +461,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `ntrs-19650014783` | Bowles, K. J. & Rosenblum, L. (1965), "Vapor Pressure of Sodium from 0.5 to 120 Atmospheres", NASA Technical Note D-2849, Lewis Research Center. | NTRS 19650014783 | ABSENT, `` | `raw/ntrs-19650014783/ntrs-19650014783.pdf` (present, f6f173b7); `text/ntrs-19650014783/` (21 files, exists); `tables/ntrs-19650014783/` (0 files, ABSENT) | `data/literature/extracts/ntrs-19650014783.yaml` (8 rows, draft) | `ledger/ntrs-19650014783.yaml`: decoded (2026-09-06) |
 | `ntrs-19730008085` | Manuel, O. K.; Srinivasan, B.; Hennecke, E. W.; Sinclair, D. E. (1972), "Noble Gases in the Moon", Annual Report to NASA, NASA-NGR-26-003-057, University of Missouri–Rolla, Department of Chemistry, September 1972. NASA NTRS 19730008085. | NTRS 19730008085 | ABSENT, `` | `raw/ntrs-19730008085/ntrs-19730008085.pdf` (ABSENT, ); `text/ntrs-19730008085/` (0 files, ABSENT); `tables/ntrs-19730008085/` (0 files, ABSENT) | `data/literature/extracts/ntrs-19730008085.yaml` (2 rows, draft) | `ledger/ntrs-19730008085.yaml`: — (—) |
 | `ntrs-20250004626` | Yu, Kevin; West, William; Stokes, Jamesa; Harder, Bryan; Reidy, Lorlyn; Dominguez, Jesus; Faber, Katherine T. (2025), "Improving molten regolith electrolysis with zirconia-based hollow anode technology", Acta Astronautica 235, 723–735. DOI 10.1016/j.actaastro.2025.06.028. NASA NTRS 20250004626 (accepted manuscript / NTRS copy). | 10.1016/j.actaastro.2025.06.028 | ABSENT, `` | `raw/ntrs-20250004626/ntrs-20250004626.pdf` (ABSENT, ); `text/ntrs-20250004626/` (0 files, ABSENT); `tables/ntrs-20250004626/` (0 files, ABSENT) | `data/literature/extracts/ntrs-20250004626.yaml` (5 rows, draft) | `ledger/ntrs-20250004626.yaml`: — (—) |
+| `oeltjen-1999-coal-slag-thermochemistry` | Oeltjen, Lars (1999). Vorhersage thermodynamischer Eigenschaften von Kohlenschlacken mittels Modellrechnungen. Berichte des Forschungszentrums Jülich, Jül-3688 (August 1999), RWTH Aachen dissertation D82. ISSN 0944-2952. |  | ABSENT, `` | `raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf` (present, c253ab79); `text/oeltjen-1999-coal-slag-thermochemistry/` (94 files, exists); `tables/oeltjen-1999-coal-slag-thermochemistry/` (0 files, ABSENT) | `data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml` (39 rows, draft) | `ledger/oeltjen-1999-coal-slag-thermochemistry.yaml`: — (—) |
 | `ohare-1972-na2o-formation-enthalpy` | O'Hare, P. A. G. (1972), Thermochemical and Theoretical Investigations of the Sodium-Oxygen System. I. The Standard Enthalpy of Formation of Sodium Oxide (Na2O), The Journal of Chemical Physics 56, 4513 (1972). | 10.1063/1.1677897 | ABSENT, `` | `raw/ohare-1972-na2o-formation-enthalpy/ohare-1972-na2o-formation-enthalpy.pdf` (present, 4d5be06d); `text/ohare-1972-na2o-formation-enthalpy/` (20 files, exists); `tables/ohare-1972-na2o-formation-enthalpy/` (0 files, ABSENT) | `data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml` (18 rows, draft) | `ledger/ohare-1972-na2o-formation-enthalpy.yaml`: — (—) |
 | `ohta-1996-cao-mgo-al2o3-activities` | H. Ohta and H. Suito, "Activities in CaO-MgO-Al2O3 Slags and Deoxidation Equilibria of Al, Mg, and Ca", ISIJ International 36(8) (1996) 983–990. | 10.2355/isijinternational.36.983 | ABSENT, `` | `raw/ohta-1996-cao-mgo-al2o3-activities/ohta-1996-cao-mgo-al2o3-activities.pdf` (present, bcc5467a); `text/ohta-1996-cao-mgo-al2o3-activities/` (48 files, exists); `tables/ohta-1996-cao-mgo-al2o3-activities/` (0 files, ABSENT) | `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` (140 rows, draft) | `ledger/ohta-1996-cao-mgo-al2o3-activities.yaml`: acquired (2026-10-04) |
 | `ohta-suito-1995-mno-activity-slags` | Ohta H. and Suito H. (1995). Activities of MnO in CaO–SiO2–Al2O3–MnO(<10Pct)–FetO(<3Pct) slags saturated with liquid iron. Metallurgical and Materials Transactions B26:295–303. | 10.1007/BF02660972 | ABSENT, `` | `raw/ohta-suito-1995-mno-activity-slags/ohta-suito-1995-mno-activity-slags.pdf` (present, b6c19829); `text/ohta-suito-1995-mno-activity-slags/` (61 files, exists); `tables/ohta-suito-1995-mno-activity-slags/` (0 files, ABSENT) | `data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml` (19 rows, draft) | `ledger/ohta-suito-1995-mno-activity-slags.yaml`: — (—) |
@@ -1217,6 +1218,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `ntrs-19650014783`
 - `ntrs-19730008085`
 - `ntrs-20250004626`
+- `oeltjen-1999-coal-slag-thermochemistry`
 - `ohare-1972-na2o-formation-enthalpy`
 - `ohta-1996-cao-mgo-al2o3-activities`
 - `ohta-suito-1995-mno-activity-slags`

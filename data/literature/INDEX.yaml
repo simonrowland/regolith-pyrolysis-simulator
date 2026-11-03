@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 750
-  extracts: 748
+  sources: 751
+  extracts: 749
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 748
+  extracts_without_pdf: 749
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -452,6 +452,7 @@ gaps:
   - ntrs-19650014783
   - ntrs-19730008085
   - ntrs-20250004626
+  - oeltjen-1999-coal-slag-thermochemistry
   - ohare-1972-na2o-formation-enthalpy
   - ohta-1996-cao-mgo-al2o3-activities
   - ohta-suito-1995-mno-activity-slags
@@ -26726,6 +26727,65 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: oeltjen-1999-coal-slag-thermochemistry
+  aliases: []
+  citation: Oeltjen, Lars (1999). Vorhersage thermodynamischer Eigenschaften von Kohlenschlacken mittels
+    Modellrechnungen. Berichte des Forschungszentrums Jülich, Jül-3688 (August 1999), RWTH Aachen dissertation
+    D82. ISSN 0944-2952.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml
+    review_status: draft
+    rows: 39
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf
+      present: true
+      sha256: c253ab795342c9397bbde04bb0df89dfcc9b98fa54fecd3dd7a114e936759d4d
+      matches_simulator: null
+    sidecar:
+      path: raw/oeltjen-1999-coal-slag-thermochemistry/sidecar.yaml
+      present: true
+    text:
+      path: text/oeltjen-1999-coal-slag-thermochemistry
+      exists: true
+      file_count: 94
+    tables:
+      path: tables/oeltjen-1999-coal-slag-thermochemistry
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/oeltjen-1999-coal-slag-thermochemistry.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/oeltjen-1999-coal-slag-thermochemistry.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: ohare-1972-na2o-formation-enthalpy
   aliases: []
   citation: O'Hare, P. A. G. (1972), Thermochemical and Theoretical Investigations of the Sodium-Oxygen
