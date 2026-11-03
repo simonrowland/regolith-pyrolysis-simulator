@@ -79,15 +79,6 @@ def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() ->
         "0.0004960317460317460317460317460"
     )
 
-    quoted = [
-        observation
-        for observation_id, observation in migrator.result.observations.items()
-        if observation_id.startswith("murchison-degassing-2023-springer::")
-        and observation.identity.quantity.is_unknown
-        and "specific_gas_yield conversion has no verified input basis"
-        in (observation.identity.quantity.reason or "")
-    ]
-
 
 def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
     migrator = migrate_one_extract(
@@ -143,6 +134,16 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.value == temperature_K
         assert migrator.result.experiments[observation.experiment_id].method.is_unknown
+
+    boudouard = migrator.result.observations[
+        "murchison-degassing-2023-springer::voropaev_2023_boudouard_kp_model_derived"
+    ]
+    assert boudouard.derivation is not None
+    assert boudouard.derivation.method is not None
+    assert boudouard.derivation.method.locator is not None
+    assert boudouard.derivation.method.locator.page == 6
+    assert boudouard.derivation.method.locator.published_page == 576
+    assert boudouard.derivation.method.locator.pdf_page_index == 6
 
 
 def test_specific_gas_yield_refuses_a_missing_printed_gas_species() -> None:
