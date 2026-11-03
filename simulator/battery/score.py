@@ -161,6 +161,7 @@ from simulator.melt_backend.base import (
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
+    _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON,
     OXYGEN_BALANCE_NOTICE_PREFIX,
     _cell_material_class,
     _cell_oxygen_class,
@@ -16318,6 +16319,13 @@ def write_headline_summary_json(
 def _short_refusal_token(detail_reason: object) -> str | None:
     if not isinstance(detail_reason, str) or not detail_reason:
         return None
+    # Group typed causes in census keys; preserve each cause in refusal details.
+    oxygen_bracket_suffix = f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
+    if (
+        detail_reason == _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
+        or detail_reason.startswith(oxygen_bracket_suffix)
+    ):
+        return _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
     # Machine tokens only. Long OCR/page sentences stay on the residual.
     if len(detail_reason) > 80:
         return None
