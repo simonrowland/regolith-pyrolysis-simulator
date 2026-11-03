@@ -1,5 +1,6 @@
 schema_version: literature_extract.v1
 source_id: wetzel-2012-heidelberg-thesis
+review_status: draft
 source:
   citation: >-
     Wetzel, S. (2012), Infrarotspektroskopische Untersuchung von Siliziumoxiden,
@@ -17,12 +18,18 @@ extraction:
   date: '2026-11-02'
   worker: w1103cw2-wz12
   overlap:
-    source_id: gail-2013-sio-nucleation-silicate-dust
+    source_id: wetzel-pucci-gail-2012-sio-evaporation-coefficient
     note: >-
-      Gail et al. 2013 reuses the Wetzel 2012 Heidelberg Knudsen-cell/QCM SiO
-      measurements, including the plotted alpha and vapor-pressure series.
-      This extract records the thesis fit equations and Table 2.2, not duplicate
-      graph points; count this as the same experiment.
+      The JCED paper is a reprint of the thesis measurements: thesis Equation
+      2.25 is JCED Equation 15; thesis Equation 2.26 is the ln form of JCED
+      Equation 16 at the central value, with thesis widths ±500 K and ±0.4
+      against the journal's log10 widths ±1000 and ±2. Table 2.2 reports ±4
+      against JCED Equation 21's ±20, and the thesis purity '99,99%' differs
+      from the journal's '99.9%'. JCED Table 2 contains the numeric series;
+      do not digitise it from thesis Figure 2.11. Gail et al. 2013 reports the
+      same experiment with a different published fit (Arrhenius alpha;
+      Tv = 49520 ± 1400 K, Sv = 32.52 ± 0.97, dyn cm^-2), not a reprint of
+      these coefficients. Keep all thesis digits and uncertainties as printed.
 schema_gaps:
 - observation_ids:
   - wetzel_2012_sio_sublimation_enthalpy_1400K
@@ -92,8 +99,8 @@ benches:
         tag: value
         value: Checked by observing copper melting in the calibrated range
       locator:
-        page: 28
-        published_page: 18
+        page: 27
+        published_page: 17
         section: '2.2.3'
   other_facts:
   - name: crucible_to_qcm_distance
@@ -273,6 +280,7 @@ benches:
   - name: SiO_alpha_mean_statistical_deviation
     unit: dimensionless
     printed_form: '0,02'
+    approximate: true
     note: Statistical deviation of the mean across series; confidence level not stated.
     value:
       state:
@@ -295,15 +303,6 @@ experiments:
     figure: '2.11'
   sample: &wetzel_sio_sample
     material: amorphous SiO powder
-    form:
-      state:
-        tag: value
-        value: condensed_solid
-      locator:
-        page: 34
-        published_page: 24
-        section: '2.3.2'
-        note: Amorphous SiO powder is retained as a solid, with no crystalline polymorph assigned.
     initial_composition:
       state:
         tag: value
@@ -317,7 +316,7 @@ experiments:
         page: 34
         published_page: 24
         section: '2.3.2'
-        note: Nominal SiO endmember for the P_SAT reservoir under the controller ruling; the printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
+        note: Nominal SiO endmember for composition bookkeeping; this does not assign a condensed phase or reservoir. The printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
     particle_size_as_printed: 325 mesh
     purity:
       value: 99.99
@@ -452,10 +451,6 @@ species:
         equation: '2.26'
         section: '2.3.2'
       phase: gas
-      condensed_form:
-        state: amorphous
-        basis: explicit_author
-        note: Source identifies amorphous SiO powder as the starting solid.
       standard_state: SiO(g) equilibrium vapor pressure above solid SiO
       units: Pa
       regime: knudsen_effusion
