@@ -349,10 +349,15 @@ species:
               pdf_page_index: 2
               equation: '6'
         derived_from:
+          - zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
           - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
         derivation:
-          relation: Equations 4 and 5 reduce the measured KEMS ion-current ratio fit to the partial Gibbs energy of MgO.
+          relation: >-
+            Equation 4 subtracts the MgO + Mg2SiO4 (prime) ratio fit from the MgSiO3 + Mg2SiO4
+            (double-prime) ratio fit to reduce the measured KEMS ion-current ratio to the partial Gibbs
+            energy of MgO.
           inputs:
+            - zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
             - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
           output_unit: J/mol
         values:
@@ -1224,10 +1229,15 @@ species:
               equation: '7'
         derived_from:
           - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+          - zaitsev_2006_table1_mgsio3_sio2_ratio_fit
         derivation:
-          relation: Equations 4 and 5 reduce the measured KEMS ion-current ratio fit to the partial Gibbs energy of SiO2.
+          relation: >-
+            Equation 5 subtracts the MgSiO3 + Mg2SiO4 (double-prime) ratio fit from the MgSiO3 + SiO2
+            (triple-prime) ratio fit to reduce the measured KEMS ion-current ratio to the partial Gibbs
+            energy of SiO2.
           inputs:
             - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+            - zaitsev_2006_table1_mgsio3_sio2_ratio_fit
           output_unit: J/mol
         values:
           quantity: partial_gibbs_energy_temperature_function_coefficients
@@ -1248,6 +1258,7 @@ species:
             intercept: '(1302 ± 332)'
             T: '2.01 ± 0.24'
           uncertainty_confidence_level: not stated
+          sign_consistency_note: "The printed +(2.01 ± 0.24)T slope has the opposite sign from the Table 1 fit and Eq. 5; Eq. 8's slope 0.14 = 2.15 − 2.01. Coefficients remain exactly as printed."
       - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p486
         type: activity_coefficient
         locator:

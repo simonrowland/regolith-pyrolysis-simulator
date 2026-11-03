@@ -95,6 +95,39 @@ def test_zaitsev_2006_printed_rows_render_pins_and_isolated_migration():
         row["values"]["quantity"] for row in table4
     } == {"delta_fG"}
 
+    partial_gibbs_parents = {
+        "zaitsev_2006_eq6_mgo_partial_gibbs_fit": (
+            "zaitsev_2006_table1_mgo_mg2sio4_ratio_fit",
+            "zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit",
+        ),
+        "zaitsev_2006_eq7_sio2_partial_gibbs_fit": (
+            "zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit",
+            "zaitsev_2006_table1_mgsio3_sio2_ratio_fit",
+        ),
+    }
+    for observation_id, expected_parents in partial_gibbs_parents.items():
+        observation = _source_observation(document, observation_id)
+        assert tuple(observation["derived_from"]) == expected_parents
+        assert tuple(observation["derivation"]["inputs"]) == expected_parents
+    assert _source_observation(
+        document, "zaitsev_2006_eq6_mgo_partial_gibbs_fit"
+    )["derivation"]["relation"] == (
+        "Equation 4 subtracts the MgO + Mg2SiO4 (prime) ratio fit from the "
+        "MgSiO3 + Mg2SiO4 (double-prime) ratio fit to reduce the measured "
+        "KEMS ion-current ratio to the partial Gibbs energy of MgO."
+    )
+    eq7 = _source_observation(document, "zaitsev_2006_eq7_sio2_partial_gibbs_fit")
+    assert eq7["derivation"]["relation"] == (
+        "Equation 5 subtracts the MgSiO3 + Mg2SiO4 (double-prime) ratio fit "
+        "from the MgSiO3 + SiO2 (triple-prime) ratio fit to reduce the measured "
+        "KEMS ion-current ratio to the partial Gibbs energy of SiO2."
+    )
+    assert eq7["values"]["sign_consistency_note"] == (
+        "The printed +(2.01 ± 0.24)T slope has the opposite sign from the "
+        "Table 1 fit and Eq. 5; Eq. 8's slope 0.14 = 2.15 − 2.01. "
+        "Coefficients remain exactly as printed."
+    )
+
     table2_mgo_inputs = tuple(
         f"zaitsev_2006_table2_mgo_x_sio2_0p{x}"
         for x in ("486", "498", "511", "528", "550", "563")
