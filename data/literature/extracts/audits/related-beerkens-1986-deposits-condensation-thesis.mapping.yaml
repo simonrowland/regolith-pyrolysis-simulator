@@ -1,0 +1,113 @@
+source_id: related-beerkens-1986-deposits-condensation-thesis
+source:
+  citation: Beerkens, R.G.C. (1986). Deposits and Condensation from Flue Gases in Glass Furnaces. Doctoral thesis, Technische Universiteit Eindhoven.
+extraction:
+  method: Hand-transcribed from MinerU table drafts and pdftotext-layout; render checks resolved flagged cells and table row/column assignment.
+  date: '2026-11-02'
+  worker: w1103cw1-be86
+  locator_basis: Absolute PDF page plus printed table number; table_index only selects the MinerU draft block.
+  rendered_pages: [28, 69, 70, 71, 73, 111, 112, 132, 133, 137, 138, 139, 155, 166, 167, 168, 169]
+  related_tables_reviewed:
+    - Table 1.6 is furnace-glass composition, not flue-gas composition.
+    - Table 2.2 is calculated vapour-pressure relations, not measured vapour pressure.
+    - Table 2.4 deposit chemistry rows are not Na2O or K2O activities.
+    - Table 3.8 gives simulated gas compositions; only gas I has an explicit measured dew point.
+    - Tables 4.5 and 4.6 are inputs to figure-only deposition curves.
+    - Table 4.4 gives common channel apparatus conditions; individual area and gas temperature are not printed.
+    - Tables 4.7 and 4.8 provide composition conditions for explicit measured prose results.
+    - No measured Na2O or K2O activity table was found.
+review_status: draft
+tables:
+  - page: 28
+    table_index: 5
+    type: concentration_series
+    quantity: elemental_flue_gas_volume_concentration
+    evidence_class: quoted_attributed
+    unit: volume ppm as printed
+    phase: gas
+    published_page: 19
+    values:
+      - {column: 3, species: S}
+      - {column: 5, species: Na}
+      - {column: 6, species: K}
+  - page: 73
+    table_index: 11
+    type: rate_series
+    quantity: water_cooled_paddle_carryover_mass_per_24h
+    evidence_class: quoted_attributed
+    unit: g/24 h as printed
+    phase: cr
+    published_page: 64
+    values:
+      - {column: 2, species: unknown}
+      - {column: 3, species: unknown}
+      - {column: 4, species: unknown}
+      - {column: 5, species: unknown}
+      - {column: 6, species: unknown}
+      - {column: 7, species: unknown}
+      - {column: 8, species: unknown}
+      - {column: 9, species: unknown}
+      - {column: 10, species: unknown}
+      - {column: 11, species: unknown}
+      - {column: 12, species: unknown}
+      - {column: 13, species: unknown}
+    render_verified:
+      - {row: 4, column: 2, text: '3·3'}
+      - {row: 4, column: 3, text: '4·0'}
+      - {row: 4, column: 4, text: '3·8'}
+      - {row: 4, column: 5, text: '2·7'}
+      - {row: 4, column: 6, text: '8·1'}
+      - {row: 4, column: 7, text: '3·8'}
+      - {row: 4, column: 8, text: '5·1'}
+      - {row: 4, column: 9, text: '8·9'}
+      - {row: 4, column: 10, text: '7·7'}
+      - {row: 4, column: 11, text: '12·6'}
+      - {row: 4, column: 12, text: '2·7'}
+      - {row: 4, column: 13, text: '7·1'}
+  - page: 73
+    table_index: 12
+    type: rate_series
+    quantity: water_cooled_paddle_carryover_mass_per_24h
+    evidence_class: quoted_attributed
+    unit: g/24 h as printed
+    phase: cr
+    published_page: 64
+    values:
+      - {column: 2, species: unknown}
+      - {column: 3, species: unknown}
+      - {column: 4, species: unknown}
+      - {column: 5, species: unknown}
+      - {column: 6, species: unknown}
+      - {column: 7, species: unknown}
+      - {column: 8, species: unknown}
+    render_verified:
+      - {row: 16, column: 2, text: '5·1'}
+      - {row: 16, column: 3, text: '4·5'}
+      - {row: 16, column: 4, text: '4·8'}
+      - {row: 16, column: 5, text: '8·9'}
+      - {row: 16, column: 6, text: '4·8'}
+      - {row: 16, column: 7, text: '4·0'}
+      - {row: 16, column: 8, text: '3·2'}
+  - page: 137
+    table_index: 23
+    type: rate_series
+    quantity: surface_deposition_areal_mass_rate
+    evidence_class: measured_direct
+    unit: mg/cm2·hr as printed
+    phase: cr
+    published_page: 128
+    values:
+      - {column: 2, species: Na2SO4, evidence_class: measured_direct}
+      - {column: 3, species: Na2SO4, evidence_class: quoted_attributed}
+  - page: 139
+    table_index: 24
+    type: transition_point
+    quantity: transition_temperature
+    evidence_class: measured_direct
+    unit: K
+    phase: gas
+    published_page: 130
+    values:
+      - {column: 5, species: Na2SO4, evidence_class: measured_direct}
+      - {column: 6, species: Na2SO4, evidence_class: quoted_attributed}
+      - {column: 7, species: Na2SO4, evidence_class: quoted_attributed}

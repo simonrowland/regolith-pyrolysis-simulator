@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 751
-- Extracts (`literature_extract.v1`): 749
+- Sources: 752
+- Extracts (`literature_extract.v1`): 750
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 749
+- Extracts with no PDF: 750
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -519,6 +519,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `rego-1985-na2o-sio2-transpiration` | Rego, D. N., Sigworth, G. K., and Philbrook, W. O. (1985). Thermodynamic Study of Na2O-SiO2 Melts at 1300° and 1400°C. Metallurgical Transactions B, 16B, 313–323. | 10.1007/BF02679722 | ABSENT, `` | `raw/rego-1985-na2o-sio2-transpiration/rego-1985-na2o-sio2-transpiration.pdf` (present, 9d5017c3); `text/rego-1985-na2o-sio2-transpiration/` (48 files, exists); `tables/rego-1985-na2o-sio2-transpiration/` (0 files, ABSENT) | `data/literature/extracts/rego-1985-na2o-sio2-transpiration.yaml` (93 rows, draft) | `ledger/rego-1985-na2o-sio2-transpiration.yaml`: — (—) |
 | `rego-1988-silicate-na2o-activities` | Rego, D. N., Sigworth, G. K., and Philbrook, W. O. (1988). "Thermodynamic activity of Na2O in Na2O-CaO-SiO2, Na2O-MgO-SiO2, and Na2O-CaO-SiO2-Al2O3 melts at 1400 C." Metallurgical Transactions B, 19(4), 655–661. | 10.1007/BF02659158 | ABSENT, `` | `raw/rego-1988-silicate-na2o-activities/rego-1988-silicate-na2o-activities.pdf` (present, c2ce80ee); `text/rego-1988-silicate-na2o-activities/` (32 files, exists); `tables/rego-1988-silicate-na2o-activities/` (0 files, ABSENT) | `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` (85 rows, draft) | `ledger/rego-1988-silicate-na2o-activities.yaml`: — (—) |
 | `reiss-2019-thermal-extraction-nulht2m` | Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar regolith simulant NU-LHT-2M: Preparations for in-situ analyses on the Moon", Planetary and Space Science, DOI 10.1016/j.pss.2019.05.001, accepted manuscript PII S0032-0633(18)30382-9, PSS 4666 | 10.1016/j.pss.2019.05.001 | ABSENT, `` | `raw/reiss-2019-thermal-extraction-nulht2m/reiss-2019-thermal-extraction-nulht2m.pdf` (present, 599403d1); `text/reiss-2019-thermal-extraction-nulht2m/` (43 files, exists); `tables/reiss-2019-thermal-extraction-nulht2m/` (0 files, ABSENT) | `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` (10 rows, draft) | `ledger/reiss-2019-thermal-extraction-nulht2m.yaml`: extracted (2026-09-12) |
+| `related-beerkens-1986-deposits-condensation-thesis` | Beerkens, R.G.C. (1986). Deposits and Condensation from Flue Gases in Glass Furnaces. Doctoral thesis, Technische Universiteit Eindhoven. |  | ABSENT, `` | `raw/related-beerkens-1986-deposits-condensation-thesis/related-beerkens-1986-deposits-condensation-thesis.pdf` (present, 230a8d87); `text/related-beerkens-1986-deposits-condensation-thesis/` (322 files, exists); `tables/related-beerkens-1986-deposits-condensation-thesis/` (0 files, ABSENT) | `data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml` (17 rows, draft) | `ledger/related-beerkens-1986-deposits-condensation-thesis.yaml`: — (—) |
 | `renggli-2022-te-evaporation` | Renggli, C. J., Hellmann, J. L., Burkhardt, C., Klemme, S., Berndt, J., Pangritz, P. et al. (2022). Tellurium isotope fractionation during evaporation from silicate melts. Geochimica et Cosmochimica Acta 339, 35–45. | 10.1016/j.gca.2022.10.032 | ABSENT, `` | `raw/renggli-2022-te-evaporation/renggli-2022-te-evaporation.pdf` (present, b15a8cf5); `text/renggli-2022-te-evaporation/` (1 files, exists); `tables/renggli-2022-te-evaporation/` (2 files, exists) | `data/literature/extracts/renggli-2022-te-evaporation.yaml` (1 rows, draft) | `ledger/renggli-2022-te-evaporation.yaml`: extracted (2026-10-05) |
 | `richet-bottinga-1986-silicate-thermochemistry` | Richet, P. & Bottinga, Y. (1986), "Thermochemical properties of silicate glasses and liquids: A review", Reviews of Geophysics, 24(1), 1-25. | 10.1029/rg024i001p00001 | ABSENT, `` | `raw/richet-bottinga-1986-silicate-thermochemistry/richet-bottinga-1986-silicate-thermochemistry.pdf` (present, 3261b358); `text/richet-bottinga-1986-silicate-thermochemistry/` (147 files, exists); `tables/richet-bottinga-1986-silicate-thermochemistry/` (0 files, ABSENT) | `data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml` (24 rows, draft) | `ledger/richet-bottinga-1986-silicate-thermochemistry.yaml`: — (—) |
 | `richter-2008-cai-like-liquids-lpsc-abstract` | Richter, F. M., Teng, F.-Z., Mendybaev, R. A., Davis, A. M. and Georg, R. B. (2008). Elemental and isotope fractionation of CAI-like liquids by evaporation in low pressure H2. Lunar and Planetary Science XXXIX, abstract 1385. |  | ABSENT, `` | `raw/richter-2008-cai-like-liquids-lpsc-abstract/richter-2008-cai-like-liquids-lpsc-abstract.pdf` (present, a6f67557); `text/richter-2008-cai-like-liquids-lpsc-abstract/` (12 files, exists); `tables/richter-2008-cai-like-liquids-lpsc-abstract/` (0 files, ABSENT) | `data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml` (0 rows, draft) | `ledger/richter-2008-cai-like-liquids-lpsc-abstract.yaml`: extracted (2026-10-05) |
@@ -1276,6 +1277,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `rego-1985-na2o-sio2-transpiration`
 - `rego-1988-silicate-na2o-activities`
 - `reiss-2019-thermal-extraction-nulht2m`
+- `related-beerkens-1986-deposits-condensation-thesis`
 - `renggli-2022-te-evaporation`
 - `richet-bottinga-1986-silicate-thermochemistry`
 - `richter-2008-cai-like-liquids-lpsc-abstract`
