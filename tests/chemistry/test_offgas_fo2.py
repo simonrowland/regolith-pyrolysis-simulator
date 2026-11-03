@@ -486,6 +486,20 @@ def test_single_couple_reports_q_over_k_as_none_not_zero(polys):
     assert r.log10_Q_over_K is None
 
 
+def test_direct_gas_couple_numeric_outputs_are_pinned_before_extension(polys):
+    """Golden values for existing CEA direct-couple inversions.
+
+    These pins keep the in-domain CO2/CO and H2O/H2 resolver output fixed while
+    the printed-atmosphere caller is added in a later change.
+    """
+
+    co = imposed_fo2({"CO2": 10200.0, "CO": 51.0}, 1682.15, polys)
+    h2 = imposed_fo2({"H2O": 2000.0, "H2": 10.0}, 1682.15, polys)
+
+    assert co.log10_fO2 == pytest.approx(-3.908000708059973, abs=1e-12)
+    assert h2.log10_fO2 == pytest.approx(-4.956493206418616, abs=1e-12)
+
+
 def test_non_finite_and_negative_amounts_are_not_treated_as_present(polys):
     """A NaN or negative mole count must not masquerade as a declared amount."""
 
