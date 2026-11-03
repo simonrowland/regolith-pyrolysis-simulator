@@ -304,6 +304,58 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
             _assert_ohta_suito_1995_review_pins(extract)
 
 
+def test_kume_2000_solid_reference_does_not_infer_unprinted_polymorph() -> None:
+    from simulator.battery.enums import Phase
+
+    source = EXTRACTS / "kume-2000-cao-activities.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    targets = [
+        row
+        for formula in ("CaO", "MgO")
+        for row in extract["species"][formula]["observations"]
+        if row.get("type") == "activity_coefficient"
+        and "activity" in (row.get("values") or {})
+        and row["values"].get("method_class") == "measured_reduced"
+        and row["values"]["activity"] > 0
+    ]
+    assert len(targets) == 126
+    for row in targets:
+        endmember = row["standard_state"]["state"]["value"]["endmember"]
+        assert endmember["phase"] == {"tag": "value", "value": "cr"}
+        assert endmember["polymorph"] == {
+            "tag": "unknown",
+            "reason": "polymorph_not_stated_in_paper",
+        }
+        assert "(s)" in row["locator"]["note"]
+
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT,
+        source,
+        index={
+            source.stem: {
+                **extract["source"],
+                "source_id": source.stem,
+            }
+        },
+        aliases={},
+    )
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+    }
+    for row in targets:
+        reference_state = migrated[row["observation_id"]].identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        endmember = reference_state.value.endmember
+        assert endmember.phase.is_value
+        assert endmember.phase.value is Phase.CR
+        assert endmember.polymorph.is_unknown
+        assert endmember.polymorph.reason == "polymorph_not_stated_in_paper"
+
+
 def _assert_sato_1973_table_pins(extract: dict) -> None:
     bench = extract["benches"][0]
     assert bench["temperature_measurement"]["increments"]["state"]["value"] == (
