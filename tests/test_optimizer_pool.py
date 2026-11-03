@@ -205,6 +205,9 @@ def test_tracked_popen_remains_subscriptable_and_logs_child_pid(
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+        # The installed name is the tracker. Callers use
+        # isinstance(proc, subprocess.Popen) against that name.
+        assert isinstance(proc, subprocess.Popen)
         assert isinstance(proc, original)
         recorded = log_path.read_text(encoding="utf-8").splitlines()[0].split("\t", 1)[0]
         assert recorded == str(proc.pid)

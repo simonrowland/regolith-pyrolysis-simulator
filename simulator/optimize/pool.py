@@ -1683,19 +1683,23 @@ def _append_child_pid(path: str, pid: int) -> None:
 def _install_child_pid_tracking() -> Callable[[], None]:
     previous_popen = subprocess.Popen
 
-    class _TrackedPopen:
+    class _TrackedPopen(previous_popen):
+        # Subclass the captured Popen, not the name after this function
+        # assigns over subprocess.Popen. While the subclass is installed,
+        # isinstance(proc, subprocess.Popen) has to hold for children started
+        # through it. A __new__ stand-in that returns a raw Popen makes that
+        # check false. Log the pid after super().__init__ so a constructor
+        # failure is not recorded.
+        #
         # Studio IPython 9.14 evaluates ``subprocess.Popen[bytes]`` at import
-        # (VapoRock → IPython, no ``from __future__ import annotations``). A
-        # function stand-in raises TypeError there and the analytical
-        # melt-redox gate aborts the worker. Forward the subscript to the real
-        # class so the annotation is the same GenericAlias. ``__new__`` returns
-        # that class's instance, so Python does not run ``__init__`` again.
-        def __new__(cls, *args: Any, **kwargs: Any) -> Any:
-            process = previous_popen(*args, **kwargs)
+        # (VapoRock → IPython, no ``from __future__ import annotations``).
+        # Forward the subscript to the captured class so the alias is that
+        # class's GenericAlias, not this subclass.
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
             log_path = os.environ.get(_CHILD_PID_LOG_ENV)
             if log_path:
-                _append_child_pid(log_path, int(process.pid))
-            return process
+                _append_child_pid(log_path, int(self.pid))
 
         def __class_getitem__(cls, item: Any) -> Any:
             return previous_popen[item]
