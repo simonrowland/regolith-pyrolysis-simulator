@@ -864,6 +864,17 @@ _ISOLATED_WORKER_STDERR_TAIL_CHARS = 4000
 _CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
 
 
+@pytest.fixture(autouse=True)
+def crash_input_root(tmp_path, monkeypatch):
+    """Keep retained .melts files inside this test's tmp_path."""
+    root = tmp_path / 'diagnostics-root'
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._regolith_diagnostics_root',
+        lambda: root,
+    )
+    return root
+
+
 def _aborting_stderr_backend(tmp_path: Path, stderr_text: str):
     """Fake alphaMELTS: record input.melts, write stderr, die with SIGABRT."""
     witness = tmp_path / 'witness.melts'
@@ -914,6 +925,7 @@ def _assert_subprocess_died_values(result, stub: Path) -> dict:
 def test_negative_returncode_keeps_stderr_tail_and_melts_input(
     tmp_path,
     monkeypatch,
+    crash_input_root,
 ):
     """A signal death keeps a 4000-character stderr tail and the .melts input."""
     stderr_text = 'prefix' + ('x' * 5000) + 'TAILMARK'
@@ -939,11 +951,14 @@ def test_negative_returncode_keeps_stderr_tail_and_melts_input(
         assert retained_path.read_bytes() == witness_bytes
         assert retained_path.name == f'{digest}.melts'
         assert retained_path.parent == (
+            crash_input_root / _CRASH_INPUT_DIR_NAME
+        )
+        real_store = (
             Path(tempfile.gettempdir())
             / 'regolith-pyrolysis-simulator'
             / _CRASH_INPUT_DIR_NAME
         )
-        assert not str(retained_path).startswith(str(tmp_path))
+        assert not str(retained_path).startswith(str(real_store))
     finally:
         if retained_path is not None:
             retained_path.unlink(missing_ok=True)
@@ -975,3 +990,67 @@ def test_melts_copy_failure_leaves_subprocess_died_refusal_unchanged(
     assert 'melts_sha256' not in failure
     assert 'melts_path' not in failure
     assert 'retention disabled' not in '\n'.join(result.warnings)
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
+def test_crash_input_store_keeps_the_two_newest_of_three(
+    tmp_path,
+    monkeypatch,
+    crash_input_root,
+):
+    """A count cap drops the oldest retained input and leaves the refusal."""
+    import simulator.melt_backend.alphamelts as alphamelts
+
+    monkeypatch.setattr(
+        alphamelts,
+        '_ALPHAMELTS_CRASH_INPUT_MAX_FILES',
+        2,
+        raising=False,
+    )
+    stderr_text = 'bounded store\n'
+    backend, stub, witness = _aborting_stderr_backend(tmp_path, stderr_text)
+    monkeypatch.setenv('ALPHAMELTS_TEST_MELTS_WITNESS', str(witness))
+    monkeypatch.setenv('ALPHAMELTS_TEST_STDERR', stderr_text)
+    compositions = (
+        _melt({
+            'SiO2': 1.0, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+        _melt({
+            'SiO2': 1.1, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+        _melt({
+            'SiO2': 1.2, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+    )
+    identities = []
+    digests = []
+    for index, composition in enumerate(compositions):
+        result = _run(backend, composition)
+        failure = _assert_subprocess_died_values(result, stub)
+        digest = failure['melts_sha256']
+        path = Path(failure['melts_path'])
+        assert path.is_file()
+        digests.append(digest)
+        identities.append((
+            result.status,
+            result.diagnostics['backend_status_reason'],
+            result.diagnostics['backend_failure_category'],
+            failure['stage'],
+            tuple(failure['command']),
+            failure['returncode'],
+            failure['signal'],
+            failure['stderr_tail'],
+        ))
+        if index < 2:
+            stamp = 1_700_000_000 + index
+            os.utime(path, (stamp, stamp))
+    assert identities[0] == identities[1] == identities[2]
+    assert len(set(digests)) == 3
+    remaining = {
+        path.name
+        for path in (crash_input_root / _CRASH_INPUT_DIR_NAME).glob('*.melts')
+    }
+    assert remaining == {f'{digests[1]}.melts', f'{digests[2]}.melts'}
