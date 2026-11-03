@@ -684,6 +684,7 @@ def _regolith_diagnostics_root() -> Path:
 
 
 _ALPHAMELTS_CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
+_ALPHAMELTS_CRASH_INPUT_MAX_FILES = 256
 
 
 def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
@@ -705,7 +706,42 @@ def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
             os.replace(temporary, destination)
         finally:
             temporary.unlink(missing_ok=True)
+    try:
+        _prune_crash_melt_inputs(directory, destination)
+    except OSError:
+        pass
     return digest, str(destination)
+
+
+def _prune_crash_melt_inputs(directory: Path, protected: Path) -> None:
+    """Delete the oldest retained inputs past the cap.
+
+    ``protected`` is the file just published and is never removed.
+    OSError is swallowed: pruning must not change the refusal.
+    """
+    try:
+        cap = int(_ALPHAMELTS_CRASH_INPUT_MAX_FILES)
+        entries = [
+            path for path in directory.glob('*.melts') if path.is_file()
+        ]
+        overflow = len(entries) - cap
+        if overflow <= 0:
+            return
+        protected_resolved = protected.resolve()
+        ordered = sorted(
+            entries,
+            key=lambda path: (path.stat().st_mtime_ns, path.name),
+        )
+        removed = 0
+        for path in ordered:
+            if removed >= overflow:
+                return
+            if path.resolve() == protected_resolved:
+                continue
+            path.unlink()
+            removed += 1
+    except OSError:
+        return
 
 
 def _subprocess_died_diagnostics(
@@ -3822,6 +3858,9 @@ class _MELTSBackendSupport(MeltBackend):
                     'returncode': result.returncode,
                     'signal': signal_name,
                 }
+                # PetThermoTools worker deaths (warm exit, cold start, cold
+                # EOF) stay unchanged: those paths have no .melts input
+                # and no alphaMELTS stderr.
                 failure.update(_subprocess_died_diagnostics(
                     melts_path,
                     result.stderr,
