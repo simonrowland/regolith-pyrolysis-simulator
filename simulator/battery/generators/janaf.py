@@ -80,6 +80,8 @@ from simulator.reference_data.janaf import (
 from simulator.reference_data.janaf_fusion import (
     _D144_SINGLE_POLYMORPH_TABLES,
     _FUSION_TABLES,
+    JANAF_R_J_PER_MOL_K,
+    _complete_fusion_overlap_nodes,
     _checked_fusion_table_rows,
     _fusion_gibbs_difference_from_points,
     _fusion_missing_gibbs_temperatures,
@@ -96,13 +98,6 @@ SOURCE_ID = "nist-janaf-4th"
 TABLE_SOURCE_PREFIX = "data/literature/compilations/janaf/tables"
 STANDARD_STATE = "p° = 0.1 MPa (as published by JANAF)"
 STANDARD_PRESSURE_PA = Decimal("100000")
-# Chase 1998, NIST-JANAF 4th ed., Monograph 9, printed p. 10 §3.4
-# "Fundamental constants" table: molar gas constant R = 8.314 41(26)
-# J mol^-1 K^-1 (Cohen & Taylor 1973 / CODATA 1973). The same page's
-# right-hand column notes that tables issued since the Third Edition
-# use 1986 CODATA; the printed constants table, and the log Kf column
-# identity against it, keep 8.31441. Do not substitute CODATA 2018.
-JANAF_R_J_PER_MOL_K = Decimal("8.31441")
 MERGED_FORMATION_REFUSAL_REASON = (
     "NIST's rendering drops minus signs in space-joined formation fields; "
     "a nonzero printed token is sign-ambiguous"
@@ -3103,24 +3098,14 @@ def _janaf_fusion_energy_for_pair(
     crystal_table = solid_table
     crystal, crystal_sha = _fusion_table_points(solid_table)
     liquid, liquid_sha = _fusion_table_points(liquid_table)
-    overlap = sorted(
-        {t for t, _ in crystal if liquid[0][0] <= t <= liquid[-1][0]}
-        | {t for t, _ in liquid if crystal[0][0] <= t <= crystal[-1][0]}
+    overlap, crystal_missing, liquid_missing = _complete_fusion_overlap_nodes(
+        oxide,
+        crystal_table,
+        liquid_table,
+        crystal,
+        liquid,
+        temperature_K,
     )
-    if len(overlap) < 2:
-        raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
-    crystal_missing = _fusion_missing_gibbs_temperatures(crystal_table)
-    liquid_missing = _fusion_missing_gibbs_temperatures(liquid_table)
-    overlap = [
-        temperature
-        for temperature in overlap
-        if _missing_node_for_interpolation(
-            crystal, crystal_missing, temperature
-        ) is None
-        and _missing_node_for_interpolation(liquid, liquid_missing, temperature) is None
-    ]
-    if len(overlap) < 2:
-        raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
 
     def difference(t: Decimal) -> Decimal:
         return _fusion_gibbs_difference_from_points(crystal, liquid, t)
@@ -3141,16 +3126,12 @@ def _janaf_fusion_energy_for_pair(
         (crystal_table, crystal, crystal_missing),
         (liquid_table, liquid, liquid_missing),
     ):
-        for interpolation_temperature in (temperature_K, tm):
-            missing_node = _missing_node_for_interpolation(
-                points, missing_nodes, interpolation_temperature
+        missing_node = _missing_node_for_interpolation(points, missing_nodes, tm)
+        if missing_node is not None:
+            raise ValueError(
+                f"{table_id}: needed JANAF formation Gibbs row missing at "
+                f"{missing_node} K for interpolation at {tm} K"
             )
-            if missing_node is not None:
-                raise ValueError(
-                    f"{table_id}: needed JANAF formation Gibbs row missing at "
-                    f"{missing_node} K for interpolation at "
-                    f"{interpolation_temperature} K"
-                )
     try:
         delta_g = difference(temperature_K)
     except ValueError as exc:
