@@ -577,17 +577,17 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # b-773 studio-3 same-hour headspace captures correspond to these
-    # regenerated fixtures; the residual is the measured cancellation output:
-    # fixtures/sio_yield/{lunar_mare_low_ti_c2a,mars_basalt_c2a}.json. This
-    # residual subtracts nearly equal Si inventories, so the route shift moves
-    # the reported percent by a larger relative factor.
+    # Studio-3 whole-tree gate at 6bf9bf116 measured these cancellation
+    # residuals. The fixtures are
+    # fixtures/sio_yield/{lunar_mare_low_ti_c2a,mars_basalt_c2a}.json.
+    # This residual subtracts nearly equal Si inventories, so a route shift
+    # moves the reported percent by a larger relative factor.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 2.0122809281462152e-7,
+        "lunar_mare_low_ti": 1.926169885615787e-07,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        "mars_basalt": 1.9518154584199505e-6,
+        "mars_basalt": 1.9472132840385714e-06,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
