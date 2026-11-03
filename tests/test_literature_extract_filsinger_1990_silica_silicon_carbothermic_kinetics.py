@@ -26,18 +26,18 @@ TABLE_II = (
     ("SiO/SiC (lid)", "1/1", "1500", "", "", "72", "92% β-SiC; 4% Si"),
     ("SiO/SiC (lid)", "2.8/1", "1500", "20% Si; 8% TaSi2; 4% β-SiC", "1800", "22", ">90% Si"),
     ("SiO/C", "1/1", "1470", "22% β-SiC; 3% SiC", "1720", "42", "70% β-SiC; 19% Si"),
-    ("SiO/C", "1/2", "1450", "", "", "40", "75% SiC; β:α = 3:1; 2% C"),
+    ("SiO/C", "1/2", "1450", "", "", "40", "75% SiC; β:α/3:1; 2% C"),
 )
 
 TABLE_III = (
-    ("SiO2 + 3C → SiC + 2CO", "Open", "1733–1933", "-4.68", "18.82", "390", "10^8"),
-    ("2SiO2 + SiC → 3SiO + CO", "Open", "1833–2033", "-4.18", "17.55", "348", "10^6"),
-    ("SiO + 2C → SiC + CO", "0.4 mm", "1733–1933", "-5.69", "23.76", "472", "10^10"),
-    ("(2.8)SiO + SiC → 2Si + CO", "0.4 mm", "1963–2073", "-6.10", "24.42", "505", "10^10"),
-    ("(2.8)SiO + SiC → 2Si + CO", "Loose lid", "1998–2073", "-6.99", "25.10", "505", "10^11"),
-    ("SiO(s) → SiO(g)", "0.4 mm", "1833–2033", "-4.06", "13.79", "340", "10^6"),
-    ("SiO(s) → SiO(g)", "Open", "1683–1833", "-3.68", "14.34", "305", "10^6"),
-    ("SiO2 + Si → 2SiO", "Open", "1683–1883", "-4.18", "16.95", "348", "10^7"),
+    ("SiO2 + 3C → SiC + 2CO", "Open", "1733–1933", "-4.68", "18.82", "390", "108"),
+    ("2SiO2 + SiC → 3SiO + CO", "Open", "1833–2033", "-4.18", "17.55", "348", "106"),
+    ("SiO + 2C → SiC + CO", "0.4 mm", "1733–1933", "-5.69", "23.76", "472", "1010"),
+    ("(2.8)SiO + SiC → 2Si + CO", "0.4 mm", "1963–2073", "-6.10", "24.42", "505", "1010"),
+    ("(2.8)SiO + SiC → 2Si + CO", "Loose lid", "1998–2073", "-6.99", "25.10", "505", "1011"),
+    ("SiO(s) → SiO(g)", "0.4 mm", "1833–2033", "-4.06", "13.79", "340", "106"),
+    ("SiO(s) → SiO(g)", "Open", "1683–1833", "-3.68", "14.34", "305", "106"),
+    ("SiO2 + Si → 2SiO", "Open", "1683–1883", "-4.18", "16.95", "348", "107"),
 )
 
 FIGURE_6_LEGEND = (
@@ -121,6 +121,10 @@ def test_tables_ii_and_iii_have_every_render_checked_row_and_cell() -> None:
         assert row["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
         raw_locator = row["values"]["derivation"]["raw_inputs"]["locator"]
         assert (raw_locator["page"], raw_locator["figure"]) == (6, "3, 4, 6")
+        printed_z = expected[6]
+        likely_power = f"10^{printed_z[2:]}"
+        assert values["preexponential_factor_as_printed"] == printed_z
+        assert f"likely {likely_power} with the exponent set on the baseline; not certain" in row["note"]
         assert row["point_conditions"]["total_pressure_Pa"]["state"]["tag"] == "unknown"
         assert row["T_range_K"] == [int(expected[2].split("–")[0]), int(expected[2].split("–")[1])]
 

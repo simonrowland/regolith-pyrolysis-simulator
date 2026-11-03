@@ -34,7 +34,7 @@ Each entry below gives the printed cell coordinates and the resolved reading. `(
 | 7 (9) | `1/1`; `1500`; blank; blank; `72`; `92% β-SiC; 4% Si` | (b) p4 render |
 | 8 (10) | `2.8/1`; `1500`; `20% Si; 8% TaSi2; 4% β-SiC`; `1800`; `22`; `>90% Si` | (b) p4 render |
 | 9 (11) | `1/1`; `1470`; `22% β-SiC; 3% SiC`; `1720`; `42`; `70% β-SiC; 19% Si` | (b) p4 render |
-| 10 (12) | `1/2`; `1450`; blank; blank; `40`; `75% SiC; β:α = 3:1; 2% C` | (b) p4 render; the β:α ratio is retained as printed |
+| 10 (12) | `1/2`; `1450`; blank; blank; `40`; `75% SiC; β:α/3:1; 2% C` | (b) p4 render; slash retained as printed |
 
 ### Page 3 prose rate — one measured point
 
@@ -44,16 +44,16 @@ The discussion of reaction (j) reports a rate constant of `49.2 × 10⁻⁴ s⁻
 
 | Printed row (draft row) | c1 reaction; c2 vent; c3 T (K); c4 A; c5 B; c6 E_s (kJ/mol); c7 Z (s^-1) | Audit |
 | --- | --- | --- |
-| 1 (3) | `SiO2 + 3C → SiC + 2CO`; `Open`; `1733–1933`; `-4.68`; `18.82`; `390`; `10^8` | (b) p7 render; superscript in Z restored |
-| 2 (4) | `2SiO2 + SiC → 3SiO + CO`; `Open`; `1833–2033`; `-4.18`; `17.55`; `348`; `10^6` | (b) p7 render; superscript in Z restored |
-| 3 (5) | `SiO + 2C → SiC + CO`; `0.4 mm`; `1733–1933`; `-5.69`; `23.76`; `472`; `10^10` | (b) p7 render; superscript in Z restored |
-| 4 (6) | `(2.8)SiO + SiC → 2Si + CO`; `0.4 mm`; `1963–2073`; `-6.10`; `24.42`; `505`; `10^10` | (b) p7 render; tesseract comma in A resolved as decimal point; superscript in Z restored |
-| 5 (7) | same reaction; `Loose lid`; `1998–2073`; `-6.99`; `25.10`; `505`; `10^11` | (b) p7 render; blank reaction cell carries the preceding reaction; superscript in Z restored |
-| 6 (8) | `SiO(s) → SiO(g)`; `0.4 mm`; `1833–2033`; `-4.06`; `13.79`; `340`; `10^6` | (b) p7 render; superscript in Z restored |
-| 7 (9) | same reaction; `Open`; `1683–1833`; `-3.68`; `14.34`; `305`; `10^6` | (b) p7 render; blank reaction cell carries the preceding reaction; superscript in Z restored |
-| 8 (10) | `SiO2 + Si → 2SiO`; `Open`; `1683–1883`; `-4.18`; `16.95`; `348`; `10^7` | (b) p7 render; superscript in Z restored |
+| 1 (3) | `SiO2 + 3C → SiC + 2CO`; `Open`; `1733–1933`; `-4.68`; `18.82`; `390`; `108` | (b) p7 render; baseline digits stored as printed; interpretation is uncertain |
+| 2 (4) | `2SiO2 + SiC → 3SiO + CO`; `Open`; `1833–2033`; `-4.18`; `17.55`; `348`; `106` | (b) p7 render; baseline digits stored as printed; interpretation is uncertain |
+| 3 (5) | `SiO + 2C → SiC + CO`; `0.4 mm`; `1733–1933`; `-5.69`; `23.76`; `472`; `1010` | (b) p7 render; baseline digits stored as printed; interpretation is uncertain |
+| 4 (6) | `(2.8)SiO + SiC → 2Si + CO`; `0.4 mm`; `1963–2073`; `-6.10`; `24.42`; `505`; `1010` | (b) p7 render; tesseract comma in A resolved as decimal point; baseline digits stored as printed |
+| 5 (7) | same reaction; `Loose lid`; `1998–2073`; `-6.99`; `25.10`; `505`; `1011` | (b) p7 render; blank reaction cell carries the preceding reaction; baseline digits stored as printed |
+| 6 (8) | `SiO(s) → SiO(g)`; `0.4 mm`; `1833–2033`; `-4.06`; `13.79`; `340`; `106` | (b) p7 render; baseline digits stored as printed; interpretation is uncertain |
+| 7 (9) | same reaction; `Open`; `1683–1833`; `-3.68`; `14.34`; `305`; `106` | (b) p7 render; blank reaction cell carries the preceding reaction; baseline digits stored as printed |
+| 8 (10) | `SiO2 + Si → 2SiO`; `Open`; `1683–1883`; `-4.18`; `16.95`; `348`; `107` | (b) p7 render; baseline digits stored as printed; interpretation is uncertain |
 
-All six reaction families are associated with their row equations. The ratios in Table III are the printed stoichiometric reactant proportions; Table II ratios are retained as printed. The Table II final-residue measurement is stored as residue wt%, not complemented into a mass-loss percentage.
+All six reaction families are associated with their row equations. The ratios in Table III are the printed stoichiometric reactant proportions; Table II ratios are retained as printed. The Table II final-residue measurement is stored as residue wt%, not complemented into a mass-loss percentage. The Z cells are baseline digit strings on the page. Each observation has a separate note that a `10^n` reading with n set on the baseline is likely but uncertain; that interpretation is not stored as printed data.
 
 ## Conditions and evidence
 
@@ -73,4 +73,4 @@ The focused test checks the 10 and 8 printed row counts, all Table II result cel
 
 The repository-wide extract suite is `UNVERIFIED-local` as a complete invocation: its bounded run excluding `test_repo_extracts_validate_green` ended with a keyboard interrupt after reporting 158 passed and 1 deselected. The excluded repository-wide validator then passed in a separate bounded run (1 passed); the full suite did not return cleanly as one invocation.
 
-The MinerU draft comparison CSV is committed beside this report: 17 numeric candidates matched, with no mismatch or locator error. The nonnumeric `<11` Table II value has no decimal candidate and was resolved directly against the 600 dpi render. The Table III draft concatenates printed superscript exponents in Z as plain digits; all eight Z cells were resolved against the page render. No changes were made to the migrator or tools.
+The MinerU draft comparison CSV is committed beside this report: 17 numeric candidates matched, with no mismatch or locator error. The nonnumeric `<11` Table II value has no decimal candidate and was resolved directly against the 600 dpi render. The Table III Z column was render-checked; its baseline digit strings are stored as printed, with the possible power-of-ten reading documented only as uncertain row notes. No changes were made to the migrator or tools.
