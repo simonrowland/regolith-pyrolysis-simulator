@@ -288,6 +288,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: Na2O
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: Na2O
@@ -301,18 +303,54 @@ species:
           value_as_published: '28.95'
           value: '28.95'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.97']
+                  - [B2O3, '16.27']
+                  - [SiO2, '46.81']
+                  - [Al2O3, '7.94']
+                  - [V2O5, '0']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 0V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -329,18 +367,66 @@ species:
           value_as_published: '28.14'
           value: '28.14'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.16']
+                  - [B2O3, '15.82']
+                  - [SiO2, '45.51']
+                  - [Al2O3, '7.72']
+                  - [V2O5, '2.78']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -357,18 +443,66 @@ species:
           value_as_published: '27.01'
           value: '27.01'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '27.00']
+                  - [B2O3, '15.17']
+                  - [SiO2, '43.62']
+                  - [Al2O3, '7.40']
+                  - [V2O5, '6.77']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -385,18 +519,66 @@ species:
           value_as_published: '25.20'
           value: '25.20'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.21']
+                  - [B2O3, '14.16']
+                  - [SiO2, '40.74']
+                  - [Al2O3, '6.91']
+                  - [V2O5, '12.98']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -413,18 +595,66 @@ species:
           value_as_published: '23.57'
           value: '23.57'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '23.56']
+                  - [B2O3, '13.23']
+                  - [SiO2, '38.07']
+                  - [Al2O3, '6.46']
+                  - [V2O5, '18.68']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -441,18 +671,66 @@ species:
           value_as_published: '22.64'
           value: '22.64'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.63']
+                  - [B2O3, '12.71']
+                  - [SiO2, '36.56']
+                  - [Al2O3, '6.20']
+                  - [V2O5, '21.89']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -469,18 +747,67 @@ species:
           value_as_published: '26.87'
           value: '26.87'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -497,18 +824,67 @@ species:
           value_as_published: '25.25'
           value: '25.25'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -525,18 +901,67 @@ species:
           value_as_published: '22.37'
           value: '22.37'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -553,18 +978,67 @@ species:
           value_as_published: '18.17'
           value: '18.17'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -581,18 +1055,67 @@ species:
           value_as_published: '16.95'
           value: '16.95'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: Na2O (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -619,6 +1142,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: B2O3
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: B2O3
@@ -632,18 +1157,54 @@ species:
           value_as_published: '16.26'
           value: '16.26'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.97']
+                  - [B2O3, '16.27']
+                  - [SiO2, '46.81']
+                  - [Al2O3, '7.94']
+                  - [V2O5, '0']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 0V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -660,18 +1221,66 @@ species:
           value_as_published: '15.83'
           value: '15.83'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.16']
+                  - [B2O3, '15.82']
+                  - [SiO2, '45.51']
+                  - [Al2O3, '7.72']
+                  - [V2O5, '2.78']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -688,18 +1297,66 @@ species:
           value_as_published: '15.16'
           value: '15.16'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '27.00']
+                  - [B2O3, '15.17']
+                  - [SiO2, '43.62']
+                  - [Al2O3, '7.40']
+                  - [V2O5, '6.77']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -716,18 +1373,66 @@ species:
           value_as_published: '14.16'
           value: '14.16'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.21']
+                  - [B2O3, '14.16']
+                  - [SiO2, '40.74']
+                  - [Al2O3, '6.91']
+                  - [V2O5, '12.98']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -744,18 +1449,66 @@ species:
           value_as_published: '13.24'
           value: '13.24'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '23.56']
+                  - [B2O3, '13.23']
+                  - [SiO2, '38.07']
+                  - [Al2O3, '6.46']
+                  - [V2O5, '18.68']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -772,18 +1525,66 @@ species:
           value_as_published: '12.71'
           value: '12.71'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.63']
+                  - [B2O3, '12.71']
+                  - [SiO2, '36.56']
+                  - [Al2O3, '6.20']
+                  - [V2O5, '21.89']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -800,18 +1601,67 @@ species:
           value_as_published: '15.77'
           value: '15.77'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -828,18 +1678,67 @@ species:
           value_as_published: '15.11'
           value: '15.11'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -856,18 +1755,67 @@ species:
           value_as_published: '14.06'
           value: '14.06'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -884,18 +1832,67 @@ species:
           value_as_published: '13.05'
           value: '13.05'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -912,18 +1909,67 @@ species:
           value_as_published: '12.51'
           value: '12.51'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: B2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -950,6 +1996,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: SiO2
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: SiO2
@@ -963,18 +2011,54 @@ species:
           value_as_published: '46.82'
           value: '46.82'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.97']
+                  - [B2O3, '16.27']
+                  - [SiO2, '46.81']
+                  - [Al2O3, '7.94']
+                  - [V2O5, '0']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 0V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -991,18 +2075,66 @@ species:
           value_as_published: '45.52'
           value: '45.52'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.16']
+                  - [B2O3, '15.82']
+                  - [SiO2, '45.51']
+                  - [Al2O3, '7.72']
+                  - [V2O5, '2.78']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1019,18 +2151,66 @@ species:
           value_as_published: '43.61'
           value: '43.61'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '27.00']
+                  - [B2O3, '15.17']
+                  - [SiO2, '43.62']
+                  - [Al2O3, '7.40']
+                  - [V2O5, '6.77']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1047,18 +2227,66 @@ species:
           value_as_published: '40.73'
           value: '40.73'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.21']
+                  - [B2O3, '14.16']
+                  - [SiO2, '40.74']
+                  - [Al2O3, '6.91']
+                  - [V2O5, '12.98']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1075,18 +2303,66 @@ species:
           value_as_published: '38.06'
           value: '38.06'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '23.56']
+                  - [B2O3, '13.23']
+                  - [SiO2, '38.07']
+                  - [Al2O3, '6.46']
+                  - [V2O5, '18.68']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1103,18 +2379,66 @@ species:
           value_as_published: '36.56'
           value: '36.56'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.63']
+                  - [B2O3, '12.71']
+                  - [SiO2, '36.56']
+                  - [Al2O3, '6.20']
+                  - [V2O5, '21.89']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1131,18 +2455,67 @@ species:
           value_as_published: '45.36'
           value: '45.36'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1159,18 +2532,67 @@ species:
           value_as_published: '43.45'
           value: '43.45'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1187,18 +2609,67 @@ species:
           value_as_published: '40.42'
           value: '40.42'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1215,18 +2686,67 @@ species:
           value_as_published: '37.52'
           value: '37.52'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1243,18 +2763,67 @@ species:
           value_as_published: '36.01'
           value: '36.01'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: SiO2 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1281,6 +2850,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: Al2O3
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: Al2O3
@@ -1294,18 +2865,54 @@ species:
           value_as_published: '7.94'
           value: '7.94'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.97']
+                  - [B2O3, '16.27']
+                  - [SiO2, '46.81']
+                  - [Al2O3, '7.94']
+                  - [V2O5, '0']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 0V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1322,18 +2929,66 @@ species:
           value_as_published: '7.73'
           value: '7.73'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.16']
+                  - [B2O3, '15.82']
+                  - [SiO2, '45.51']
+                  - [Al2O3, '7.72']
+                  - [V2O5, '2.78']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1350,18 +3005,66 @@ species:
           value_as_published: '7.40'
           value: '7.40'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '27.00']
+                  - [B2O3, '15.17']
+                  - [SiO2, '43.62']
+                  - [Al2O3, '7.40']
+                  - [V2O5, '6.77']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1378,18 +3081,66 @@ species:
           value_as_published: '6.92'
           value: '6.92'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.21']
+                  - [B2O3, '14.16']
+                  - [SiO2, '40.74']
+                  - [Al2O3, '6.91']
+                  - [V2O5, '12.98']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1406,18 +3157,66 @@ species:
           value_as_published: '6.46'
           value: '6.46'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '23.56']
+                  - [B2O3, '13.23']
+                  - [SiO2, '38.07']
+                  - [Al2O3, '6.46']
+                  - [V2O5, '18.68']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1434,18 +3233,66 @@ species:
           value_as_published: '6.20'
           value: '6.20'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.63']
+                  - [B2O3, '12.71']
+                  - [SiO2, '36.56']
+                  - [Al2O3, '6.20']
+                  - [V2O5, '21.89']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1462,18 +3309,67 @@ species:
           value_as_published: '7.71'
           value: '7.71'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1490,18 +3386,67 @@ species:
           value_as_published: '7.38'
           value: '7.38'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1518,18 +3463,67 @@ species:
           value_as_published: '6.86'
           value: '6.86'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1546,18 +3540,67 @@ species:
           value_as_published: '6.37'
           value: '6.37'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1574,18 +3617,67 @@ species:
           value_as_published: '6.12'
           value: '6.12'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: Al2O3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1612,6 +3704,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: V2O5
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: V2O5
@@ -1625,18 +3719,66 @@ species:
           value_as_published: '2.77'
           value: '2.77'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '28.16']
+                  - [B2O3, '15.82']
+                  - [SiO2, '45.51']
+                  - [Al2O3, '7.72']
+                  - [V2O5, '2.78']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1653,18 +3795,66 @@ species:
           value_as_published: '6.76'
           value: '6.76'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '27.00']
+                  - [B2O3, '15.17']
+                  - [SiO2, '43.62']
+                  - [Al2O3, '7.40']
+                  - [V2O5, '6.77']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1681,18 +3871,66 @@ species:
           value_as_published: '12.98'
           value: '12.98'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.21']
+                  - [B2O3, '14.16']
+                  - [SiO2, '40.74']
+                  - [Al2O3, '6.91']
+                  - [V2O5, '12.98']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1709,18 +3947,66 @@ species:
           value_as_published: '18.67'
           value: '18.67'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '23.56']
+                  - [B2O3, '13.23']
+                  - [SiO2, '38.07']
+                  - [Al2O3, '6.46']
+                  - [V2O5, '18.68']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1737,18 +4023,66 @@ species:
           value_as_published: '21.88'
           value: '21.88'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.63']
+                  - [B2O3, '12.71']
+                  - [SiO2, '36.56']
+                  - [Al2O3, '6.20']
+                  - [V2O5, '21.89']
+                  - [SO3, '0']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The calcined mixture was homogenously mixed with an appropriate amount of H3BO3 and Na2CO3 and melted in 90%Pt –10%Rh crucibles (loosely covered with a Pt lid) in an electric furnace at 1200 °C for 1 h.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.'
+              locator:
+                page: 5
+                published_page: 5
+                pdf_page_index: 4
+                section: '3.1 Redox chemistry of vanadium'
+                figure: '2'
+                panel: 'a'
+                note: Applies to the sulfur-free xV samples listed in Table 1.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses'
           T_C: '1200'
           locator:
             page: 3
@@ -1765,18 +4099,67 @@ species:
           value_as_published: '2.78'
           value: '2.78'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1793,18 +4176,67 @@ species:
           value_as_published: '6.75'
           value: '6.75'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1821,18 +4253,67 @@ species:
           value_as_published: '12.89'
           value: '12.89'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1849,18 +4330,67 @@ species:
           value_as_published: '18.41'
           value: '18.41'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1877,18 +4407,67 @@ species:
           value_as_published: '21.53'
           value: '21.53'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: V2O5 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1915,6 +4494,8 @@ species:
         note: No per-cell uncertainty conversion is made; any printed notation stays in value_as_published.
       values:
         quantity: equilibrium_phase_composition
+        phase_label: glass
+        basis: wt_percent
         formula: SO3
         basis_as_published: ICP-OES measured oxide wt.% as printed.
         component_as_published: SO3
@@ -1928,18 +4509,67 @@ species:
           value_as_published: '1.51'
           value: '1.51'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '26.89']
+                  - [B2O3, '15.76']
+                  - [SiO2, '45.35']
+                  - [Al2O3, '7.70']
+                  - [V2O5, '2.77']
+                  - [SO3, '1.53']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 1V-1.25S
-                column: SO3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1956,18 +4586,67 @@ species:
           value_as_published: '2.06'
           value: '2.06'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '25.27']
+                  - [B2O3, '15.10']
+                  - [SiO2, '43.44']
+                  - [Al2O3, '7.37']
+                  - [V2O5, '6.74']
+                  - [SO3, '2.08']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 2.5V-1.75S
-                column: SO3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -1984,18 +4663,67 @@ species:
           value_as_published: '3.39'
           value: '3.39'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '22.38']
+                  - [B2O3, '14.05']
+                  - [SiO2, '40.42']
+                  - [Al2O3, '6.86']
+                  - [V2O5, '12.88']
+                  - [SO3, '3.40']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 5V-3S
-                column: SO3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -2012,18 +4740,67 @@ species:
           value_as_published: '6.47'
           value: '6.47'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '18.19']
+                  - [B2O3, '13.04']
+                  - [SiO2, '37.51']
+                  - [Al2O3, '6.36']
+                  - [V2O5, '18.41']
+                  - [SO3, '6.48']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 7.5V-6S
-                column: SO3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
@@ -2040,18 +4817,67 @@ species:
           value_as_published: '6.83'
           value: '6.83'
           point_conditions:
-            T_C:
+            composition:
               state:
                 tag: value
-                value: '1200'
+                value:
+                  basis: oxide_weight_percent_as_published
+                  semantics: nominal_as_printed
+                  amount_basis: mass_percent
+                  components:
+                  - [Na2O, '16.97']
+                  - [B2O3, '12.51']
+                  - [SiO2, '36.00']
+                  - [Al2O3, '6.11']
+                  - [V2O5, '21.55']
+                  - [SO3, '6.81']
               locator:
                 page: 3
                 published_page: 3
                 pdf_page_index: 2
                 table: '1'
                 row: 9V-6.5S
-                column: SO3 (wt.%)
-                note: Table 1 measured value in parentheses; batch value is retained in context.
+                note: Table 1 unparenthesized values are the batched run composition.
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No oxygen fugacity or synthesis atmosphere is reported.
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            method_detail_as_printed:
+              state:
+                tag: value
+                value: 'The Pt–Rh crucible was loaded in the furnace and covered with a Pt lid. The mixture was melted at the same temperature (as the sulfur-free glass) for another hour, followed by quenching of the melt by pouring it on a copper plate kept at room temperature.'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.2 Synthesis of sulfur-containing glasses'
+            phase_assemblage:
+              state:
+                tag: value
+                value: 'All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.'
+              locator:
+                page: 9
+                published_page: 9
+                pdf_page_index: 8
+                section: '3.3.1 Sulfur solubility in glasses'
+                figure: '8'
+                panel: 'a'
+                note: Figure 8(a) labels the Table 1 xV-yS compositions as within solubility limit.
+            T_C:
+              state:
+                tag: value
+                value: '1200'
+              locator:
+                page: 2
+                published_page: 2
+                pdf_page_index: 1
+                section: '2.1 Synthesis of sulfur-free glasses; 2.2 Synthesis of sulfur-containing glasses'
+                note: 'Section 2.1 prints 1200 °C; Section 2.2 says the sulfur-containing remelt used the same temperature.'
           T_C: '1200'
           locator:
             page: 3
