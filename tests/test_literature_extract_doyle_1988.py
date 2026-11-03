@@ -36,17 +36,57 @@ def _assert_every_table1a_cell(document):
     assert len(rows) == 129 == len(EXPECTED_TABLE1A)
     assert [row["values"]["activity"] for row in rows] == [expected[2] for expected in EXPECTED_TABLE1A]
     assert [row["locator"]["panel"] for row in rows] == [f"Fig. {expected[0]}" for expected in EXPECTED_TABLE1A]
+    experiment = document["experiments"][0]
+    assert experiment["method"] == MethodToken.QUENCH_EQUILIBRATION.value
+    assert experiment["locator"]["page"] == 2
+    assert experiment["locator"]["published_page"] == 1828
+    assert experiment["locator"]["pdf_page_index"] == 1
+    assert experiment["locator"]["section"] == "Experimental and Analytical Methods"
+    assert experiment["method_as_printed"] == (
+        "each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas "
+        "at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace."
+    )
     for row, expected in zip(rows, EXPECTED_TABLE1A):
         panel, printed_row, activity, sio2, al2o3, feo, cao, k2o, sm, marker = expected
         raw = row["values"]["oxide_wt_pct_as_printed"]
         method_details = row["derivation"]["method_detail_as_printed"]
         assert method_details == document["experiments"][0]["method_detail_as_printed"]
-        assert method_details["fO2_control"]["status"].startswith("controlled by the gas mixture")
-        assert "Fugacities of the gaseous species" in method_details["fO2_control"]["fugacity_calculation_as_printed"]
-        assert "99.94%" in method_details["metal_phase"]["phase_as_printed"]
+        control_details = method_details["fO2_control"]
+        for detail_name, section in (
+            ("control", "Control of the Activity of FeO"),
+            ("gas_mixing", "Experimental and Analytical Methods"),
+            ("fugacity_calculation", "Experimental and Analytical Methods"),
+        ):
+            locator = control_details[detail_name]["locator"]
+            assert locator["page"] == 2 and locator["published_page"] == 1828
+            assert locator["pdf_page_index"] == 1 and locator["section"] == section
+        assert control_details["fugacity_calculation"]["as_printed"] == (
+            "Fugacities of the gaseous species in the hot zone are calculated by BRINKLEY's "
+            "(1946) method using the algorithm of VAN ZEGGEREN and STOREY (1970)."
+        )
+        assert control_details["control"]["as_printed"] == (
+            "aluminosilicate liquids are equilibrated with reagent-grade (99.94%) metallic iron-wire "
+            "under controlled oxygen fugacity at 1600 K."
+        )
+        assert control_details["gas_mixing"]["as_printed"] == experiment["method_as_printed"]
+        assert control_details["gas_flow_locator"]["published_page"] == 1831
+        assert control_details["gas_flow_locator"]["table"] == "1B"
+        assert control_details["gas_flow_locator"]["note"] == (
+            "Table 1B. Compositions of input gases (c.c./min) used in the experiments "
+            "to determine aFeO at 1600±2K in [SiO₂-KAlO₂-CaAl₂Si₂O₈]-FeO liquids."
+        )
+        assert method_details["metal_phase"]["phase_as_printed"] == "reagent-grade (99.94%) metallic iron-wire"
+        assert method_details["metal_phase"]["phase_locator"]["published_page"] == 1828
         assert "activity_as_printed" in method_details["metal_phase"]
-        assert "almost pure" in method_details["metal_phase"]["activity_as_printed"]
-        assert "Fe $_{0.947}$ O" in method_details["FeO_standard_state"]["standard_state_as_printed"]
+        assert method_details["metal_phase"]["activity_as_printed"] == (
+            r"Because the metallic iron is almost pure ( $a_{\mathrm{Fe}}^{\mathrm{metal}} = 1$ )"
+        )
+        assert method_details["metal_phase"]["activity_locator"]["published_page"] == 1828
+        standard_state = method_details["FeO_standard_state"]
+        assert standard_state["standard_state_as_printed"] == (
+            "The standard state is molten Fe $_{0.947}$ O (COUGHLIN, 1954)."
+        )
+        assert standard_state["locator"]["published_page"] == 1828
         assert row["values"]["activity_as_printed"] == activity
         assert row["values"]["T_K"] == "1600"
         assert row["values"]["temperature_as_printed"] == "1600±2 K"
@@ -138,6 +178,23 @@ def test_doyle_1988_method_detail_pin_rejects_deleted_metal_activity():
     del mutated["experiments"][0]["method_detail_as_printed"]["metal_phase"]["activity_as_printed"]
     with pytest.raises(AssertionError):
         _assert_every_table1a_cell(mutated)
+
+
+def test_doyle_1988_method_detail_pin_rejects_calculation_and_activity_mutations():
+    original = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    measured = deepcopy(original)
+    calculation = measured["experiments"][0]["method_detail_as_printed"]["fO2_control"]["fugacity_calculation"]
+    calculation["as_printed"] = calculation["as_printed"].replace("calculated", "measured")
+    with pytest.raises(AssertionError):
+        _assert_every_table1a_cell(measured)
+
+    collapsed_activity = deepcopy(original)
+    metal_phase = collapsed_activity["experiments"][0]["method_detail_as_printed"]["metal_phase"]
+    metal_phase["activity_as_printed"] = metal_phase["activity_as_printed"].replace(
+        r"$a_{\mathrm{Fe}}^{\mathrm{metal}}", "a_Fe"
+    )
+    with pytest.raises(AssertionError):
+        _assert_every_table1a_cell(collapsed_activity)
 
 
 def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
