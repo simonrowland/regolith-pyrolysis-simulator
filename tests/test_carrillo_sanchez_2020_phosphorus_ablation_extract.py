@@ -15,6 +15,8 @@ from tools.validate_literature_extracts import check_all_fidelity_samples_match
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml"
 SOURCE_ID = "carrillo-sanchez-2020-phosphorus-ablation"
+EFFICIENCIES_ID = "carrillo_sanchez_2020_table3_phosphorus_ablation_efficiencies"
+BULK_DUST_ID = "carrillo_sanchez_2020_table3_bulk_cosmic_dust_mass_rates"
 
 
 def _observations(document: dict) -> dict[str, dict]:
@@ -22,6 +24,14 @@ def _observations(document: dict) -> dict[str, dict]:
         row["observation_id"]: row
         for block in document["species"].values()
         for row in block.get("observations", [])
+    }
+
+
+def _contexts(document: dict) -> dict[str, dict]:
+    return {
+        row["observation_id"]: row
+        for block in document["species"].values()
+        for row in block.get("context", [])
     }
 
 
@@ -70,9 +80,83 @@ def _assert_render_pins(document: dict) -> None:
     assert measured["values"]["particle_radius_as_printed"] == ">19 μm"
 
 
-def _table3_census(document: dict) -> tuple[int, int, set[int]]:
+def _assert_model_efficiency_context(document: dict) -> None:
+    context = _contexts(document)[EFFICIENCIES_ID]
+    values = context["values"]
+    assert values["method_class"] == "model_derived"
+    assert values["evidence_class"] == "model_derived"
+    assert values["method"]["name"] == "CABMOD-ZoDy"
+    assert values["method"]["method_locator"]["page"] == 11
+    assert values["method"]["method_locator"]["section"] == 3.4
+    assert values["method"]["result_locator"] == {"page": 13, "table": "3"}
+    assert values["admission_status"] == "context_only"
+    assert "not a furnace pyrolysis yield" in values["reason"]
+
+    expected = (
+        ("Earth", "JFC-Planck", "(25%)", 6, 3),
+        ("Earth", "AST", "(57%)", 6, 4),
+        ("Earth", "HTC", "(96%)", 6, 5),
+        ("Earth", "Total P", "(41%)", 5, 6),
+        ("Mars", "JFC-Planck", "(11%)", 11, 3),
+        ("Mars", "AST", "(3%)", 11, 4),
+        ("Mars", "HTC", "(93%)", 11, 5),
+        ("Mars", "Total P", "(38%)", 11, 6),
+        ("Venus", "JFC-Planck", "(36%)", 15, 3),
+        ("Venus", "AST", "(67%)", 16, 4),
+        ("Venus", "HTC", "(98%)", 15, 5),
+        ("Venus", "Total P", "(53%)", 15, 6),
+    )
+    percentages = values["percentages"]
+    assert len(percentages) == 12
+    for cell, (planet, source, value, table_row, table_column) in zip(
+        percentages, expected, strict=True
+    ):
+        assert cell["planet_as_printed"] == planet
+        assert cell["dust_source_as_printed"] == source
+        assert cell["value_as_printed"] == value
+        assert cell["table_row_number"] == table_row
+        assert cell["table_column_number"] == table_column
+        assert cell["locator"]["page"] == 13
+        assert cell["locator"]["table"] == "3"
+
+
+def _assert_bulk_dust_context_pins(document: dict) -> None:
+    context = _contexts(document)[BULK_DUST_ID]
+    assert context["units"] == "t d-1"
+    values = context["values"]
+    assert values["species_as_printed"] == "bulk cosmic dust, not elemental phosphorus"
+    assert values["method_class"] == "model_derived"
+    assert values["evidence_class"] == "model_derived"
+    assert values["method"]["name"] == "CABMOD-ZoDy"
+    assert values["method"]["method_locator"]["page"] == 11
+    assert values["method"]["method_locator"]["section"] == 3.4
+
+    expected = (
+        ("Earth", 2, "8.2", "28.0 ± 8.1", 7, 8, "± 8.1"),
+        ("Mars", 7, "0.65", "2.1 ± 1.2", 7, 8, "± 1.2"),
+        ("Venus", 12, "12.7", "31.0 ± 17.7", 7, 8, "± 17.7"),
+    )
+    rates = values["rates"]
+    assert len(rates) == 3
+    for row, (planet, table_row, ablated, influx, ablated_column, influx_column, uncertainty) in zip(
+        rates, expected, strict=True
+    ):
+        assert row["planet_as_printed"] == planet
+        assert row["table_row_number"] == table_row
+        assert row["total_ablated"]["value_as_printed"] == ablated
+        assert row["total_influx"]["value_as_printed"] == influx
+        assert row["total_influx"]["uncertainty_as_printed"] == uncertainty
+        assert row["total_influx"]["confidence_level"] == "not stated"
+        for field, column in (("total_ablated", ablated_column), ("total_influx", influx_column)):
+            cell = row[field]
+            assert cell["table_column_number"] == column
+            assert cell["locator"]["page"] == 13
+            assert cell["locator"]["table"] == "3"
+            assert cell["locator"]["row"] == f"{planet} P"
+
+
+def _table3_census(document: dict) -> tuple[int, int, int, set[int]]:
     flux_points = 0
-    ablation_percentages = 0
     rows: set[int] = set()
     for row in _observations(document).values():
         values = row.get("values", {})
@@ -82,10 +166,17 @@ def _table3_census(document: dict) -> tuple[int, int, set[int]]:
             for point in values.get("points", []):
                 flux_points += 1
                 rows.add(int(point["table_row_number"]))
-        elif values.get("quantity") == "yield_fraction":
-            ablation_percentages += 1
-            rows.add(int(values["table_row_number"]))
-    return flux_points, ablation_percentages, rows
+
+    contexts = _contexts(document)
+    percentages = contexts[EFFICIENCIES_ID]["values"]["percentages"]
+    for cell in percentages:
+        rows.add(int(cell["table_row_number"]))
+    bulk_rates = contexts[BULK_DUST_ID]["values"]["rates"]
+    bulk_cells = 0
+    for row in bulk_rates:
+        rows.add(int(row["table_row_number"]))
+        bulk_cells += 2
+    return flux_points, len(percentages), bulk_cells, rows
 
 
 def _local_observation_id(observation) -> str:
@@ -98,15 +189,24 @@ def _axis_is_unknown(axis) -> bool:
     return axis is None or axis.is_unknown
 
 
-def test_table3_full_cell_count_and_render_pins_reject_mutation() -> None:
+def test_table3_context_bindings_and_render_pins_reject_mutations() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
     _assert_render_pins(document)
+    _assert_model_efficiency_context(document)
+    _assert_bulk_dust_context_pins(document)
 
-    flux_points, percentages, table_rows = _table3_census(document)
-    assert flux_points == 54
+    flux_points, percentages, bulk_cells, table_rows = _table3_census(document)
+    assert flux_points == 48
     assert percentages == 12
+    assert bulk_cells == 6
+    assert flux_points + percentages + bulk_cells == 66
     assert table_rows == set(range(2, 17))
+
+    for row in _observations(document).values():
+        if row.get("type") != "gas_speciation" or row.get("locator", {}).get("table") != "3":
+            continue
+        assert all(point["table_column_number"] in {3, 4, 5, 6} for point in row["values"]["points"])
 
     mutated = deepcopy(document)
     earth_p = _observations(mutated)["carrillo_sanchez_2020_table3_earth_p_mass_influx"]
@@ -114,9 +214,20 @@ def test_table3_full_cell_count_and_render_pins_reject_mutation() -> None:
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
 
+    mutated = deepcopy(document)
+    bulk = _contexts(mutated)[BULK_DUST_ID]
+    bulk["values"]["rates"][0]["total_influx"]["value_as_printed"] = "99.0 ± 8.1"
+    with pytest.raises(AssertionError):
+        _assert_bulk_dust_context_pins(mutated)
 
-def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
-) -> None:
+    mutated = deepcopy(document)
+    efficiencies = _contexts(mutated)[EFFICIENCIES_ID]
+    efficiencies["values"]["percentages"][10]["value_as_printed"] = "(99%)"
+    with pytest.raises(AssertionError):
+        _assert_model_efficiency_context(mutated)
+
+
+def test_isolated_migration_keeps_only_refused_phosphorus_flux_and_measured_peak() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -126,9 +237,9 @@ def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
     for observation in observations:
         by_source_id.setdefault(_local_observation_id(observation), []).append(observation)
 
-    assert len(observations) == 67
+    assert len(observations) == 49
     assert result.validation.hard_issues == ()
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 55
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 49
     assert all(row.identity.species.phase.is_value for row in observations)
     assert all(row.identity.species.phase.value is Phase.G for row in observations)
 
@@ -136,14 +247,16 @@ def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
         row
         for row in observations
         if _local_observation_id(row).startswith("carrillo_sanchez_2020_table3_")
-        and "ablation_fraction" not in _local_observation_id(row)
     ]
-    percent_rows = [
-        row
-        for row in observations
-        if row.identity.quantity.is_value
+    assert len(table3_flux_rows) == 48
+    assert not any("ablation_fraction" in _local_observation_id(row) for row in observations)
+    assert not any("bulk_cosmic_dust" in _local_observation_id(row) for row in observations)
+    assert not any(
+        row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.YIELD_FRACTION
-    ]
+        for row in observations
+    )
+
     measured_id = (
         "carrillo_sanchez_2020_allende_po_ablation_peak_temperature_radius_gt19um"
     )
@@ -163,39 +276,10 @@ def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
         row.observation_id for row in observations if row.identity.quantity.is_unknown
     }
     assert actual_quantity_unknown == expected_quantity_unknown
-    assert len(actual_quantity_unknown) == 55
-    assert len(table3_flux_rows) == 54
-    assert len(percent_rows) == 12
-
-    expected_yields = {
-        "carrillo_sanchez_2020_table3_earth_jfc_p_ablation_fraction": Decimal("0.25"),
-        "carrillo_sanchez_2020_table3_earth_ast_p_ablation_fraction": Decimal("0.57"),
-        "carrillo_sanchez_2020_table3_earth_htc_p_ablation_fraction": Decimal("0.96"),
-        "carrillo_sanchez_2020_table3_earth_total_p_ablation_fraction": Decimal("0.41"),
-        "carrillo_sanchez_2020_table3_mars_jfc_p_ablation_fraction": Decimal("0.11"),
-        "carrillo_sanchez_2020_table3_mars_ast_p_ablation_fraction": Decimal("0.03"),
-        "carrillo_sanchez_2020_table3_mars_htc_p_ablation_fraction": Decimal("0.93"),
-        "carrillo_sanchez_2020_table3_mars_total_p_ablation_fraction": Decimal("0.38"),
-        "carrillo_sanchez_2020_table3_venus_jfc_p_ablation_fraction": Decimal("0.36"),
-        "carrillo_sanchez_2020_table3_venus_ast_p_ablation_fraction": Decimal("0.67"),
-        "carrillo_sanchez_2020_table3_venus_htc_p_ablation_fraction": Decimal("0.98"),
-        "carrillo_sanchez_2020_table3_venus_total_p_ablation_fraction": Decimal("0.53"),
-    }
-    migrated_yields = {
-        _local_observation_id(row): row for row in percent_rows
-    }
-    assert set(migrated_yields) == set(expected_yields)
-    for observation_id, expected in expected_yields.items():
-        observation = migrated_yields[observation_id]
-        assert observation.value.kind is ValueKind.POINT
-        assert observation.value.point == expected
-        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert observation.identity.species.phase.value is Phase.G
-        assert observation.locator.page == 13
-        assert observation.locator.table == "3"
+    assert len(actual_quantity_unknown) == 49
+    assert all(row.identity.quantity.is_unknown for row in table3_flux_rows)
 
     for observation in table3_flux_rows:
-        assert observation.identity.quantity.is_unknown
         assert observation.value.kind is ValueKind.UNAVAILABLE
         assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         conditions = observation.point_conditions
@@ -208,19 +292,8 @@ def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
             assert condition.locator.table == "3"
         assert "total_pressure_Pa" not in conditions
 
-    for observation in percent_rows:
-        conditions = observation.point_conditions
-        assert conditions is not None
-        for key in ("temperature_K", "fO2_log", "composition"):
-            condition = conditions[key]
-            assert condition.state.tag is StateTag.UNKNOWN
-            assert condition.locator is not None
-            assert condition.locator.page == 13
-            assert condition.locator.table == "3"
-        assert "total_pressure_Pa" not in conditions
-
     identity_pins = {
-        "carrillo_sanchez_2020_table3_earth_p_mass_influx": 6,
+        "carrillo_sanchez_2020_table3_earth_p_mass_influx": 4,
         "carrillo_sanchez_2020_table3_mars_po2_mass_influx": 4,
         "carrillo_sanchez_2020_table3_venus_total_p_mass_influx": 4,
     }
@@ -257,5 +330,3 @@ def test_isolated_migration_preserves_conditions_schema_gaps_and_percent_units(
     assert conditions["fO2_control"].locator.page == 3
     assert conditions["heating_rate_K_s"].state.is_unknown
     assert conditions["heating_rate_K_s"].locator.page == 7
-
-    assert len(source_rows) == 25
