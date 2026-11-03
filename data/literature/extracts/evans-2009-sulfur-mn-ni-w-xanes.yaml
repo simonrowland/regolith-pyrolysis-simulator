@@ -2103,6 +2103,80 @@ species:
           B030806 | Ni | 0–1 | -7.18 | -1.85 | -0.61 | -0.7
           B140906 | Ni | 0–1 | -9.60 | -1.91 | -3.06 | -3.2
           B190906 | Ni | 1–10 | -3.09 | -11.88 | -1.52 | 3.3
+        run_phase_evidence:
+          run_product_description:
+            as_printed: "After 24 h the runs were quenched by release of the melt beads into water so quench was close to instantaneous."
+            locator:
+              page: 3
+              published_page: 6849
+              pdf_page_index: 2
+              section: 2.1. Preparation of synthetic glasses
+            applies_to_runs:
+              - run_as_printed: B030106
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B030106}
+              - run_as_printed: B310706
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B310706}
+              - run_as_printed: B020806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B020806}
+              - run_as_printed: B111006
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B111006}
+              - run_as_printed: B151106
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B151106}
+              - run_as_printed: B301205
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B301205}
+              - run_as_printed: B240306
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B240306}
+              - run_as_printed: B220806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B220806}
+              - run_as_printed: B230806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B230806}
+              - run_as_printed: B150906
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B150906}
+              - run_as_printed: B200906
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B200906}
+              - run_as_printed: B141106
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B141106}
+              - run_as_printed: B231205
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B231205}
+              - run_as_printed: B220306
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B220306}
+              - run_as_printed: B070406
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B070406}
+              - run_as_printed: B120406
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B120406}
+              - run_as_printed: B010806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B010806}
+              - run_as_printed: B030806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B030806}
+              - run_as_printed: B140906
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B140906}
+              - run_as_printed: B190906
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B190906}
+          sulfide_phase:
+            as_printed: "Values for the Ni-bearing glasses were meaningless, because the loss of the immiscible sulphide phase led to a drop in S content to below the CMAS value."
+            locator:
+              page: 19
+              published_page: 6865
+              pdf_page_index: 18
+              section: 4.6. Evidence for formation of metal–S melt species from metal XAS
+            condition_scope_as_printed: "the experiments performed at a log10 fO2 of −9.6 and log10 fS2 of −1.91"
+            condition_scope_locator:
+              page: 18
+              published_page: 6864
+              pdf_page_index: 17
+              section: 4.6. Evidence for formation of metal–S melt species from metal XAS
+              note: This sentence continues onto physical page 19.
+            applies_to_runs:
+              - run_as_printed: B231205
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B231205}
+              - run_as_printed: B220306
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B220306}
+              - run_as_printed: B070406
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B070406}
+              - run_as_printed: B010806
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B010806}
+              - run_as_printed: B140906
+                locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B140906}
     - observation_id: evans_2009_table_2a_mn_glass_compositions
       type: measured_table_context
       locator: {page: 7, published_page: 6853, pdf_page_index: 6, table: '2a'}
