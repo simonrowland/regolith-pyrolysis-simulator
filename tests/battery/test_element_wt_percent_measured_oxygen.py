@@ -635,6 +635,27 @@ def _with_elements(observation, elements, *, sigma: Decimal | None = SIGMA, fe3=
     return replace(observation, point_conditions=point)
 
 
+def _record_call(
+    calls: list[dict],
+    engine,
+    temperature_C,
+    composition_kg,
+    fO2_log,
+    pressure_bar,
+    redox_mode,
+):
+    calls.append(
+        {
+            "engine": engine,
+            "temperature_C": temperature_C,
+            "composition_kg": dict(composition_kg),
+            "fO2_log": fO2_log,
+            "pressure_bar": pressure_bar,
+            "redox_mode": redox_mode,
+        }
+    )
+
+
 def _hook(calls: list[dict]):
     def equilibrate(
         engine,
@@ -646,15 +667,14 @@ def _hook(calls: list[dict]):
         handles=None,
         redox_mode=None,
     ):
-        calls.append(
-            {
-                "engine": engine,
-                "temperature_C": temperature_C,
-                "composition_kg": dict(composition_kg),
-                "fO2_log": fO2_log,
-                "pressure_bar": pressure_bar,
-                "redox_mode": redox_mode,
-            }
+        _record_call(
+            calls,
+            engine,
+            temperature_C,
+            composition_kg,
+            fO2_log,
+            pressure_bar,
+            redox_mode,
         )
         return EquilibriumResult(
             liquid_fraction=1.0,
@@ -664,18 +684,55 @@ def _hook(calls: list[dict]):
     return equilibrate
 
 
+def _echo(calls: list[dict]):
+    """Return the engine charge renormalized to 100 wt%."""
+
+    def equilibrate(
+        engine,
+        *,
+        temperature_C,
+        composition_kg,
+        fO2_log,
+        pressure_bar,
+        handles=None,
+        redox_mode=None,
+    ):
+        _record_call(
+            calls,
+            engine,
+            temperature_C,
+            composition_kg,
+            fO2_log,
+            pressure_bar,
+            redox_mode,
+        )
+        total = sum(composition_kg.values())
+        phase = {
+            name: 100.0 * amount / total
+            for name, amount in composition_kg.items()
+            if amount
+        }
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": phase},
+        )
+
+    return equilibrate
+
+
 def test_in_range_score_sends_the_ferric_split_and_not_fo2(monkeypatch) -> None:
     calls: list[dict] = []
     monkeypatch.setattr(
-        "simulator.battery.score._equilibrate_phase_assemblage", _hook(calls)
+        "simulator.battery.score._equilibrate_phase_assemblage", _echo(calls)
     )
     identity = _phase_identity("Si")
+    printed_si = Decimal("28.085")
     observation = _with_elements(
         F.observation(
             "si-score",
             "run-1400",
             identity,
-            Decimal("28.085"),
+            printed_si,
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id="fixture-source",
         ),
@@ -683,12 +740,10 @@ def test_in_range_score_sends_the_ferric_split_and_not_fo2(monkeypatch) -> None:
     )
     prediction = predict_with_engine(Engine.ALPHAMELTS, observation)
     assert prediction.execution.state is ExecutionState.PRODUCED
-    # The fake phase is pure SiO2. Printed-basis Si is that phase's Si
-    # scaled by the FeO_T oxide mass of the printed analysis (1 mol SiO2
-    # + 1 mol FeO). Pt and Cl are already out of that mass.
-    oxide_mass = M_SIO2 + M_FEO
-    phase_si = Decimal("100") * M_SI / M_SIO2
-    assert prediction.value == phase_si * oxide_mass / Decimal("100")
+    # Echo of the ferric charge (SiO2 + FeO + Fe2O3), not a pure-SiO2 phase
+    # scaled by the FeO_T mass. Printed Si is the hand vector's 1 mol.
+    assert prediction.value is not None
+    assert abs(prediction.value - printed_si) < Decimal("1e-9")
     assert len(calls) == 1
     call = calls[0]
     assert call["fO2_log"] is None
@@ -832,31 +887,8 @@ def test_platinum_exclusion_echo_matches_the_printed_silicon(monkeypatch) -> Non
         "Pt": "1",
     }
     calls: list[dict] = []
-
-    def echo(
-        engine,
-        *,
-        temperature_C,
-        composition_kg,
-        fO2_log,
-        pressure_bar,
-        handles=None,
-        redox_mode=None,
-    ):
-        calls.append({"composition_kg": dict(composition_kg)})
-        total = sum(composition_kg.values())
-        phase = {
-            name: 100.0 * amount / total
-            for name, amount in composition_kg.items()
-            if amount
-        }
-        return EquilibriumResult(
-            liquid_fraction=1.0,
-            phase_compositions={"liquid": phase},
-        )
-
     monkeypatch.setattr(
-        "simulator.battery.score._equilibrate_phase_assemblage", echo
+        "simulator.battery.score._equilibrate_phase_assemblage", _echo(calls)
     )
     observation = _with_elements(
         F.observation(
@@ -880,6 +912,97 @@ def test_platinum_exclusion_echo_matches_the_printed_silicon(monkeypatch) -> Non
     assert "element_wt_percent_comparison_denominator_is_oxide_phase" not in {
         notice.reason for notice in prediction.notices
     }
+
+
+def _ferric_oxide_elements(sio2_g: Decimal, fe2o3_g: Decimal, pt_g: Decimal = Decimal(0)):
+    """Printed element wt% of an oxide mixture. Grams, not the excess formula."""
+
+    w_si = sio2_g * M_SI / M_SIO2
+    w_fe = fe2o3_g * (Decimal(2) * M_FE) / M_FE2O3
+    w_o = sio2_g * (Decimal(2) * M_O) / M_SIO2 + fe2o3_g * (Decimal(3) * M_O) / M_FE2O3
+    elements = {
+        "Si": format(w_si, "f"),
+        "Fe": format(w_fe, "f"),
+        "O": format(w_o, "f"),
+    }
+    if pt_g:
+        elements["Pt"] = format(pt_g, "f")
+    return elements, w_si
+
+
+def _echo_silicon(monkeypatch, elements, printed_si: Decimal, *, oxygen_excess: bool):
+    calls: list[dict] = []
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", _echo(calls)
+    )
+    identity = _phase_identity(
+        "Si", fO2_Pa=Decimal("10") if oxygen_excess else None
+    )
+    observation = _with_elements(
+        F.observation(
+            "si-ferric-echo",
+            "run-echo",
+            identity,
+            printed_si,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="fixture-source",
+        ),
+        elements,
+        fe3=None,
+    )
+    if oxygen_excess:
+        observation = replace(
+            observation,
+            derivation=Derivation(
+                relation="oxygen_excess",
+                inputs=("pdf-1",),
+                parameters=(),
+                output_unit="mol/100g",
+            ),
+        )
+    prediction = predict_with_engine(Engine.THERMOENGINE, observation)
+    return prediction, calls
+
+
+def test_all_ferric_echo_matches_the_printed_silicon(monkeypatch) -> None:
+    """50 g SiO2 + 50 g Fe2O3. The ferric charge, not the FeO_T mass."""
+
+    elements, w_si = _ferric_oxide_elements(Decimal(50), Decimal(50))
+    prediction, calls = _echo_silicon(monkeypatch, elements, w_si, oxygen_excess=False)
+    assert len(calls) == 1
+    assert "Fe2O3" in calls[0]["composition_kg"]
+    assert calls[0]["fO2_log"] is None
+    assert prediction.value is not None
+    assert abs(prediction.value - w_si) < Decimal("1e-9")
+
+
+def test_all_ferric_echo_with_platinum_matches_the_printed_silicon(monkeypatch) -> None:
+    """50 g SiO2 + 49 g Fe2O3 + 1 g Pt. Pt is out; the ferric oxide mass is in."""
+
+    elements, w_si = _ferric_oxide_elements(Decimal(50), Decimal(49), Decimal(1))
+    prediction, calls = _echo_silicon(monkeypatch, elements, w_si, oxygen_excess=False)
+    assert len(calls) == 1
+    assert "Fe2O3" in calls[0]["composition_kg"]
+    assert "Pt" not in calls[0]["composition_kg"]
+    assert prediction.value is not None
+    assert abs(prediction.value - w_si) < Decimal("1e-9")
+
+
+def test_oxygen_excess_echo_of_all_ferric_stays_on_feo_t(monkeypatch) -> None:
+    """The same 50 g + 50 g analysis, when the observable is the excess.
+
+    The charge is SiO2 + FeO. Scaling that echo by the FeO_T mass returns
+    the printed silicon. Scaling it by the ferric mass would not.
+    """
+
+    elements, w_si = _ferric_oxide_elements(Decimal(50), Decimal(50))
+    prediction, calls = _echo_silicon(monkeypatch, elements, w_si, oxygen_excess=True)
+    assert len(calls) == 1
+    assert calls[0]["fO2_log"] == -4.0
+    assert "Fe2O3" not in calls[0]["composition_kg"]
+    assert set(calls[0]["composition_kg"]) == {"SiO2", "FeO"}
+    assert prediction.value is not None
+    assert abs(prediction.value - w_si) < Decimal("1e-9")
 
 
 def test_platinum_and_chlorine_rows_are_refused_before_the_engine(monkeypatch) -> None:

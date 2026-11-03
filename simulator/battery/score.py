@@ -8587,15 +8587,15 @@ def _predict_element_mass_fraction_phase(
             },
             notices=notices,
         )
-    oxide_mass = decision.oxide_mass_g_per_100g
-    if oxide_mass is None:
+    charge_mass = decision.charge_mass_g_per_100g
+    if charge_mass is None:
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "oxide_mass"},
+            {"reason": "missing_input", "input": "charge_mass"},
             notices=notices,
         )
     amount = _element_amount_in_phase(
-        symbol, phase_map, oxide_mass_g_per_100g=oxide_mass
+        symbol, phase_map, charge_mass_g_per_100g=charge_mass
     )
     if amount is None or not amount.is_finite() or amount <= 0:
         return refused(
@@ -8667,7 +8667,7 @@ def _element_amount_in_phase(
     symbol: str,
     phase_map: Mapping[str, float],
     *,
-    oxide_mass_g_per_100g: Decimal,
+    charge_mass_g_per_100g: Decimal,
 ) -> Decimal | None:
     if symbol == "Cl":
         for name, amount in phase_map.items():
@@ -8677,7 +8677,7 @@ def _element_amount_in_phase(
     return element_wt_percent_on_printed_analysis(
         phase_map,
         symbol,
-        oxide_mass_g_per_100g=oxide_mass_g_per_100g,
+        charge_mass_g_per_100g=charge_mass_g_per_100g,
     )
 
 
