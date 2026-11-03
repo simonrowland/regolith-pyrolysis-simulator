@@ -22,14 +22,22 @@ from simulator.battery.enums import (
     AmountBasis,
     Engine,
     EvidenceClass,
+    Quantity,
     Rail,
     RefusalReason,
     ResidualStatus,
 )
 from simulator.battery.fo2_ladder import _weight_percent
 from simulator.battery.records import Composition, State
-from simulator.battery.score import ScoreContext, compile_residual, score_store
+from simulator.battery.score import (
+    ScoreContext,
+    _oxide_element_inventory,
+    _predict_fe_redox,
+    compile_residual,
+    score_store,
+)
 from simulator.battery.validate import _term_composition
+from simulator.diagnostic_helpers.binary_pot_battery import composition_kg_and_mol
 from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
 from tests.battery.factories import (
     activity_identity,
@@ -46,6 +54,58 @@ def _moles(*pairs: tuple[str, str]) -> Composition:
         tuple((name, Decimal(amount)) for name, amount in pairs),
         AmountBasis.MOLE_FRACTION,
     )
+
+
+# Independent CIAAW pins. FeO1.5 is Fe + 1.5 O; SiO2 is the tabulated mass.
+_FEO15_G_MOL = 79.8435
+_SIO2_G_MOL = 60.083
+_PARSER_EXCEPTION_NAMES = frozenset({"AccountingError", "UnknownSpeciesError"})
+
+
+def _assert_not_parser_engine_exception(detail: dict) -> None:
+    """A residual may refuse for a domain reason. The formula parser must not."""
+
+    if detail.get("reason") != "engine_call_exception":
+        return
+    exception = str(detail.get("exception", ""))
+    text = str(detail.get("detail", ""))
+    assert exception not in _PARSER_EXCEPTION_NAMES, detail
+    assert "formula segment" not in text, detail
+    assert "formula multiplier must be positive" not in text, detail
+
+
+def _activity_residual(observation_id: str, composition: Composition):
+    identity = activity_identity(
+        formula="SiO2",
+        component_basis="SiO2",
+        composition=composition,
+    )
+    experiment = tabulation_experiment()
+    row = observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="eliezer-howald-1978-potassium-silicate-vapor-pressure",
+    )
+    context = ScoreContext(
+        works={experiment.work_id: work()},
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row},
+        hostname="test",
+    )
+    try:
+        residual, _candidate = compile_residual(row, Engine.OPENIMCC, context=context)
+    except AccountingError as exc:
+        raise AssertionError(
+            f"{observation_id} composition parse escaped compile_residual: {exc}"
+        ) from exc
+    assert residual is not None
+    detail = {} if residual.refusal is None else dict(residual.refusal.detail)
+    assert detail.get("reason") != "unparseable_composition_component"
+    _assert_not_parser_engine_exception(detail)
+    return detail
 
 
 def test_equal_mole_feo15_sio2_weight_percent() -> None:
@@ -94,37 +154,82 @@ def test_successful_parse_formula_wins_over_janaf_atoms() -> None:
     assert weights["MgO"] == pytest.approx(40.148624821939094, abs=1e-12)
 
 
+def test_decimal_subscript_batch_moles_use_the_mass_owner() -> None:
+    weights = composition_wt_pct(_moles(("FeO1.5", "1"), ("SiO2", "1")))
+    assert weights is not None
+    _kg, mol = composition_kg_and_mol(weights)
+    n_each = 1000.0 / (_FEO15_G_MOL + _SIO2_G_MOL)
+    assert mol["FeO1.5"] == pytest.approx(n_each, rel=1e-12)
+    assert mol["SiO2"] == pytest.approx(n_each, rel=1e-12)
+
+    # Printed Eliezer amounts are mole fractions. The weight owner converts
+    # them; the 1 kg batch then returns moles from those masses.
+    x_ko = 0.21537
+    x_si = 0.78463
+    ko_mass = ATOMIC_WEIGHTS_G_PER_MOL["K"] + 0.5 * ATOMIC_WEIGHTS_G_PER_MOL["O"]
+    ko_weights = composition_wt_pct(_moles(("KO0.5", "0.21537"), ("SiO2", "0.78463")))
+    assert ko_weights is not None
+    _kg, ko_mol = composition_kg_and_mol(ko_weights)
+    denom = x_ko * ko_mass + x_si * _SIO2_G_MOL
+    assert ko_mol["KO0.5"] == pytest.approx(1000.0 * x_ko / denom, rel=1e-12)
+    assert ko_mol["SiO2"] == pytest.approx(1000.0 * x_si / denom, rel=1e-12)
+
+
+def test_oxide_element_inventory_accepts_decimal_subscript() -> None:
+    inventory = _oxide_element_inventory(
+        {"FeO1.5": _FEO15_G_MOL, "SiO2": _SIO2_G_MOL},
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    assert inventory["Fe"] == pytest.approx(1.0)
+    assert inventory["Si"] == pytest.approx(1.0)
+    assert inventory["O"] == pytest.approx(3.5)
+
+    moles = _oxide_element_inventory(
+        {"FeO1.5": 2.0},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    assert moles["Fe"] == pytest.approx(2.0)
+    assert moles["O"] == pytest.approx(3.0)
+
+
+def test_composition_kg_and_mol_refuses_both_fail_name() -> None:
+    with pytest.raises(UnparseableCompositionComponent) as raised:
+        composition_kg_and_mol({"foobar": 100.0})
+    assert raised.value.component == "foobar"
+
+
+def test_mass_percent_both_fail_stays_unparseable_on_the_redox_inventory() -> None:
+    identity = replace(
+        activity_identity(),
+        quantity=Quantity.FE3_FE2_RATIO,
+        composition=State.of(
+            Composition(
+                "oxides",
+                (("foobar", Decimal("50")), ("FeO", Decimal("50"))),
+                AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    row = observation("foobar-redox", "exp-foobar-redox", identity, Decimal("1"))
+    with pytest.raises(UnparseableCompositionComponent) as raised:
+        _predict_fe_redox(Engine.OPENIMCC, row, identity, "fe-redox")
+    assert raised.value.component == "foobar"
+
+
 def test_openimcc_printed_ko05_compile_residual_does_not_raise() -> None:
-    identity = activity_identity(
-        formula="SiO2",
-        component_basis="SiO2",
-        composition=_moles(("KO0.5", "0.21537"), ("SiO2", "0.78463")),
-    )
-    experiment = tabulation_experiment()
-    row = observation(
+    detail = _activity_residual(
         "eliezer-ko05",
-        experiment.experiment_id,
-        identity,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_REDUCED,
-        source_id="eliezer-howald-1978-potassium-silicate-vapor-pressure",
+        _moles(("KO0.5", "0.21537"), ("SiO2", "0.78463")),
     )
-    context = ScoreContext(
-        works={experiment.work_id: work()},
-        experiments={experiment.experiment_id: experiment},
-        observations={row.observation_id: row},
-        hostname="test",
-    )
-    try:
-        residual, _candidate = compile_residual(row, Engine.OPENIMCC, context=context)
-    except AccountingError as exc:
-        raise AssertionError(
-            f"KO0.5 composition parse escaped compile_residual: {exc}"
-        ) from exc
-    assert residual is not None
-    detail = {} if residual.refusal is None else residual.refusal.detail
-    assert detail.get("reason") != "unparseable_composition_component"
     assert detail.get("component") != "KO0.5"
+
+
+def test_openimcc_feo15_compile_residual_is_not_a_parser_exception() -> None:
+    detail = _activity_residual(
+        "feo15-sio2",
+        _moles(("FeO1.5", "1"), ("SiO2", "1")),
+    )
+    assert detail.get("component") != "FeO1.5"
 
 
 def test_score_store_refuses_one_unparseable_name_and_scores_the_other_row() -> None:

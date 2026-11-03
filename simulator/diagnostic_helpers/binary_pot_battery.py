@@ -726,25 +726,22 @@ def composition_kg_and_mol(
 
     Premise: catalog weights are oxide wt% on a 100 g basis.
     Algebra: m_kg,i = w_i / 100; n_mol,i = m_kg,i * 1000 / M_i
-    with M_i in g/mol. Unit check: g / (g/mol) = mol.
-    Sanity: 50 wt% SiO2 on 1 kg → 0.5 kg → 8.315 mol (M=60.084).
+    with M_i in g/mol from oxide_molar_mass_g_mol for every component,
+    including names absent from MOLAR_MASS.
+    Unit check: g / (g/mol) = mol.
+    Sanity: 50 wt% SiO2 on 1 kg → 0.5 kg → 8.322 mol (M=60.083).
     """
 
-    from simulator.accounting.formulas import parse_formula
-    from simulator.state import MOLAR_MASS
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        oxide_molar_mass_g_mol,
+    )
 
     kg: dict[str, float] = {}
     mol: dict[str, float] = {}
     for oxide, wt in composition_wt_pct.items():
         mass_kg = float(wt) / 100.0
         kg[oxide] = mass_kg
-        if oxide in MOLAR_MASS:
-            molar_mass = float(MOLAR_MASS[oxide])
-        else:
-            # Scoring-arm PbO-P2O5 pots: PbO is not an OXIDE_SPECIES.
-            # CIAAW formula mass lets the 1 kg batch convert; domain gates
-            # still refuse PbO. Do not add PbO to the runtime melt basis.
-            molar_mass = float(parse_formula(oxide, species=oxide).molar_mass_g_mol)
+        molar_mass = oxide_molar_mass_g_mol(str(oxide))
         if not math.isfinite(molar_mass) or molar_mass <= 0.0:
             raise BinaryPotBatteryError(f"{oxide} molar mass is not usable")
         mol[oxide] = mass_kg * 1000.0 / molar_mass

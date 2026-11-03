@@ -11,7 +11,7 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_ARTIFACT_SCHEMA_VERSION,
     ComparisonRecord,
@@ -561,19 +561,27 @@ def _feed_oxygen_kg(
         feedstock.get("composition_wt_pct"),
         f"feedstocks.{feedstock_id}.composition_wt_pct",
     )
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+    from simulator.diagnostic_helpers.binary_pot_scoring import (
+        oxide_molar_mass_g_mol,
+    )
+
     oxygen_fraction = 0.0
     for species, raw_wt_pct in composition.items():
         wt_pct = _required_finite_float(
             raw_wt_pct,
             f"feedstocks.{feedstock_id}.composition_wt_pct.{species}",
         )
-        formula = parse_formula(str(species))
-        oxygen_atoms = float(formula.elements.get("O", 0.0))
+        name = str(species)
+        atoms = atoms_parse_formula_else_janaf(name)
+        if not atoms:
+            raise UnparseableCompositionComponent(name)
+        oxygen_atoms = float(dict(atoms).get("O", 0.0))
         if oxygen_atoms <= 0.0:
             continue
         oxygen_mass_fraction = (
-            oxygen_atoms * ATOMIC_WEIGHTS_G_PER_MOL["O"]
-            / float(formula.molar_mass_g_mol)
+            oxygen_atoms * ATOMIC_WEIGHTS_G_PER_MOL["O"] / oxide_molar_mass_g_mol(name)
         )
         oxygen_fraction += wt_pct / 100.0 * oxygen_mass_fraction
     return _runtime_mass_kg(runtime) * oxygen_fraction
