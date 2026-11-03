@@ -2205,7 +2205,7 @@ species:
         phase_assemblage:
           state:
             tag: value
-            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+            value: Na2O(s) + FeO(s) = Na2FeO2(s)
           locator: *id040
         fO2_Pa:
           state:
@@ -2236,20 +2236,31 @@ species:
         uncertainty_as_printed: ±3730 J/mol
         confidence_level: not_stated
         T_C: '40'
-        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        reaction_number_as_printed: '(21)'
+        reaction_as_printed: Na2O(s) + FeO(s) = Na2FeO2(s)
       uncertainty: ±3730 J/mol; confidence level not stated
       derived_from:
       - dai_1984_table2_na2feo2_heat_evolution_average
       - dai_1984_table2_feo_heat_evolution_average
       - dai_1984_table2_na2o_heat_evolution_average
       derivation:
-        relation: Enthalpy of mixing calculated from the calorimetric solution reactions
-          (17)-(20), as reported in Table II.
+        relation: >-
+          Reaction (21) enthalpy of mixing from the Table II calorimetric averages:
+          -(347159 + 79638 - 307691) = -119106 J/mol.
         inputs:
         - dai_1984_table2_na2feo2_heat_evolution_average
         - dai_1984_table2_feo_heat_evolution_average
         - dai_1984_table2_na2o_heat_evolution_average
         output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Calorimetric enthalpy balance for component-oxide reaction (21).
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 35
+            equation: '21'
     - observation_id: dai_1984_table3_na2feo2_gibbs_from_oxides
       type: gibbs_table
       locator: &id041
@@ -2452,13 +2463,17 @@ species:
         temperature_variable_as_printed: T in K
       derived_from:
       - dai_1984_table4_na2feo2_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table IV row 2 + Table I row 4 - Table I row 6: (-805316 + 311.84T)
+          + (-616240 + 305.27T) - (-417010 + 135.86T)
+          = -1004546 + 481.25T.
         inputs:
         - dai_1984_table4_na2feo2_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -2515,16 +2530,24 @@ species:
         equation_as_printed: -496650 + 471.19T
         temperature_variable_as_printed: T in K
       derived_from:
-      - dai_1984_table4_na2fe2o4_gibbs_from_elements
       - dai_1984_table4_na2feo2_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          2 × Table IV row 2 - (Table III row 1, using equation (16)'s -86002
+          coefficient, + Table I rows 1 and 6) + (Table I row 4 - row 6):
+          2(-805316 + 311.84T) - [(-86002 - 61.89T) + (-810200 + 247.93T)
+          + (-417010 + 135.86T)] + [(-616240 + 305.27T) - (-417010 + 135.86T)]
+          = -496650 + 471.19T.
         inputs:
-        - dai_1984_table4_na2fe2o4_gibbs_from_elements
         - dai_1984_table4_na2feo2_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -2765,7 +2788,7 @@ species:
         phase_assemblage:
           state:
             tag: value
-            value: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+            value: 2Na2O(s) + FeO(s) = Na4FeO3(s)
           locator: *id050
         fO2_Pa:
           state:
@@ -2796,20 +2819,31 @@ species:
         uncertainty_as_printed: ±8210 J/mol
         confidence_level: not_stated
         T_C: '40'
-        reaction_as_printed: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+        reaction_number_as_printed: '(22)'
+        reaction_as_printed: 2Na2O(s) + FeO(s) = Na4FeO3(s)
       uncertainty: ±8210 J/mol; confidence level not stated
       derived_from:
       - dai_1984_table2_na4feo3_heat_evolution_average
       - dai_1984_table2_feo_heat_evolution_average
       - dai_1984_table2_na2o_heat_evolution_average
       derivation:
-        relation: Enthalpy of mixing calculated from the calorimetric solution reactions
-          (17)-(20), as reported in Table II.
+        relation: >-
+          Reaction (22) enthalpy of mixing from the Table II calorimetric averages;
+          the Na2O average enters twice: -(2×347159 + 79638 - 625968) = -147988 J/mol.
         inputs:
         - dai_1984_table2_na4feo3_heat_evolution_average
         - dai_1984_table2_feo_heat_evolution_average
         - dai_1984_table2_na2o_heat_evolution_average
         output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Calorimetric enthalpy balance for component-oxide reaction (22).
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 35
+            equation: '22'
     - observation_id: dai_1984_table3_na4feo3_gibbs_from_oxides
       type: gibbs_table
       locator: &id051
@@ -3027,13 +3061,17 @@ species:
         temperature_variable_as_printed: T in K
       derived_from:
       - dai_1984_table4_na4feo3_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table IV row 3 + 2 × (Table I row 4 - row 6):
+          (-1251208 + 498.76T) + 2[(-616240 + 305.27T) - (-417010 + 135.86T)]
+          = -1649668 + 837.58T.
         inputs:
         - dai_1984_table4_na4feo3_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -3092,14 +3130,19 @@ species:
       derived_from:
       - dai_1984_table4_na4feo3_gibbs_from_elements
       - dai_1984_table4_na2feo2_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table IV row 3 - row 2 + (Table I row 4 - row 6):
+          (-1251208 + 498.76T) - (-805316 + 311.84T)
+          + [(-616240 + 305.27T) - (-417010 + 135.86T)]
+          = -645122 + 356.33T.
         inputs:
         - dai_1984_table4_na4feo3_gibbs_from_elements
         - dai_1984_table4_na2feo2_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -3157,15 +3200,23 @@ species:
         temperature_variable_as_printed: T in K
       derived_from:
       - dai_1984_table4_na4feo3_gibbs_from_elements
-      - dai_1984_table4_na2fe2o4_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          2 × Table IV row 3 - (Table III row 1 table cell + Table I rows 1 and 6)
+          + 3 × (Table I row 4 - row 6):
+          2(-1251208 + 498.76T) - [(-86000 - 61.89T) + (-810200 + 247.93T)
+          + (-417010 + 135.86T)] + 3[(-616240 + 305.27T) - (-417010 + 135.86T)]
+          = -1786896 + 1183.85T.
         inputs:
         - dai_1984_table4_na4feo3_gibbs_from_elements
-        - dai_1984_table4_na2fe2o4_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -3223,17 +3274,25 @@ species:
         temperature_variable_as_printed: T in K
       derived_from:
       - dai_1984_table4_na4feo3_gibbs_from_elements
-      - dai_1984_table4_na2fe2o4_gibbs_from_elements
       - dai_1984_table4_na2feo2_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r4_na2o
+      - dai_1984_table1_r6_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table IV rows 3 + 2 - (Table III row 1 table cell + Table I rows 1 and 6)
+          + 2 × (Table I row 4 - row 6):
+          (-1251208 + 498.76T) + (-805316 + 311.84T)
+          - [(-86000 - 61.89T) + (-810200 + 247.93T) + (-417010 + 135.86T)]
+          + 2[(-616240 + 305.27T) - (-417010 + 135.86T)] = -1141774 + 827.52T.
         inputs:
         - dai_1984_table4_na4feo3_gibbs_from_elements
-        - dai_1984_table4_na2fe2o4_gibbs_from_elements
         - dai_1984_table4_na2feo2_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r4_na2o
+        - dai_1984_table1_r6_na2o
         output_unit: J/mol
         method:
           state:
@@ -3367,6 +3426,10 @@ species:
         reaction_as_printed: 2Na(l) + 2Fe(s) + 2O2(g) = Na2Fe2O4(s)
         equation_as_printed: -1323130 + 321.90T
         temperature_variable_as_printed: T in K
+        source_consistency_note: >-
+          These stored parents sum to -1313210 + 321.90T, while the rendered Table IV
+          cell is -1323130 + 321.90T: a 9920 J/mol constant-term gap. The printed
+          coefficient function is retained unchanged; no correction is inferred.
       derived_from:
       - dai_1984_table3_na2fe2o4_gibbs_from_oxides
       - dai_1984_table1_r1_fe2o3
@@ -3424,14 +3487,18 @@ species:
         equation_as_printed: -1512440 + 491.31T
         temperature_variable_as_printed: T in K
       derived_from:
-      - dai_1984_table4_na2fe2o4_gibbs_from_elements
-      - dai_1984_table1_r10_na
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r4_na2o
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table III row 1 + Table I rows 1 and 4:
+          (-86000 - 61.89T) + (-810200 + 247.93T) + (-616240 + 305.27T)
+          = -1512440 + 491.31T.
         inputs:
-        - dai_1984_table4_na2fe2o4_gibbs_from_elements
-        - dai_1984_table1_r10_na
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r4_na2o
         output_unit: J/mol
     - observation_id: dai_1984_table5_r4_reaction_gibbs
       type: gibbs_table
@@ -3478,14 +3545,21 @@ species:
         equation_as_printed: -507896 + 10.06T
         temperature_variable_as_printed: T in K
       derived_from:
-      - dai_1984_table4_na2fe2o4_gibbs_from_elements
-      - dai_1984_table4_na2feo2_gibbs_from_elements
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table3_na2feo2_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r2_feo
       derivation:
-        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
-          functions.
+        relation: >-
+          Table III row 1 equation (16) - row 2 + Table I row 1 - row 2:
+          (-86002 - 61.89T) - (-119106 + 113.74T)
+          + (-810200 + 247.93T) - (-269200 + 62.24T)
+          = -507896 + 10.06T.
         inputs:
-        - dai_1984_table4_na2fe2o4_gibbs_from_elements
-        - dai_1984_table4_na2feo2_gibbs_from_elements
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table3_na2feo2_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r2_feo
         output_unit: J/mol
         method:
           state:
@@ -3765,7 +3839,8 @@ species:
           locator: *id064
       values:
         quantity: combined_log_partial_pressure_relation
-        method_class: model_derived
+        method_class: quoted_attributed
+        attribution: Dai, Seetharaman & Staffansson (1984), Table VI, row 10.
         status: typed_refused_schema_gap
         schema_gap: A combined logarithmic pressure relation is not a single-species
           pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
@@ -3774,24 +3849,8 @@ species:
         relation_as_printed: log(P_O2) = -19385/T - 3.07
         phase_assemblage_as_printed: Gas, Na2Fe2O4(s), wüstite
         temperature_variable_as_printed: T; no bounded interval printed
-      derived_from:
-      - dai_1984_table1_r2_feo
-      derivation:
-        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
-          reaction functions.
-        inputs:
-        - dai_1984_table1_r2_feo
-        output_unit: log(P) relation as printed
-        method:
-          state:
-            tag: value
-            value: Equilibrium Gibbs-energy relation printed in Table VI.
-          locator:
-            page: 6
-            pdf_page_index: 5
-            published_page: 37
-            table: VI
-            row: '10'
+        derivation_input_note: Table VI row 10 gives no reaction or other derivation
+          input; no reaction or parent is assigned.
     - observation_id: dai_1984_table7_r1_873_o2_log_pressure
       type: partial_pressure
       locator: &id065

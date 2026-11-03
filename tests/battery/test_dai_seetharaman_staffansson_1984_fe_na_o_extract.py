@@ -8,7 +8,7 @@ from unittest.mock import patch
 import yaml
 
 import simulator.battery.migrate as migrate_module
-from simulator.battery.enums import Phase, ValueKind
+from simulator.battery.enums import EvidenceClass, Phase, ValueKind
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -59,7 +59,9 @@ def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
         if observation.source_id == _SOURCE_ID
     ]
     assert len(observations) == 67
-    assert len(result.validation.hard_issues) == 0
+    assert not result.validation.hard_issues, "\n".join(
+        str(issue) for issue in result.validation.hard_issues
+    )
     assert sum(
         observation.value.kind is ValueKind.UNAVAILABLE
         for observation in observations
@@ -259,6 +261,122 @@ def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
     assert "dai_1984_table1_r6_na2o" in table4_na4feo3["derivation"]["inputs"]
     assert "dai_1984_table1_r5_na2o" not in table4_na2feo2["derivation"]["inputs"]
     assert "dai_1984_table1_r5_na2o" not in table4_na4feo3["derivation"]["inputs"]
+
+    expected_table_v_inputs = {
+        "dai_1984_table5_r1_reaction_gibbs": [
+            "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+            "dai_1984_table1_r1_fe2o3",
+            "dai_1984_table1_r4_na2o",
+        ],
+        "dai_1984_table5_r2_reaction_gibbs": [
+            "dai_1984_table4_na2feo2_gibbs_from_elements",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+        "dai_1984_table5_r3_reaction_gibbs": [
+            "dai_1984_table4_na4feo3_gibbs_from_elements",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+        "dai_1984_table5_r4_reaction_gibbs": [
+            "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+            "dai_1984_table3_na2feo2_gibbs_from_oxides",
+            "dai_1984_table1_r1_fe2o3",
+            "dai_1984_table1_r2_feo",
+        ],
+        "dai_1984_table5_r5_reaction_gibbs": [
+            "dai_1984_table4_na2feo2_gibbs_from_elements",
+            "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+            "dai_1984_table1_r1_fe2o3",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+        "dai_1984_table5_r7_reaction_gibbs": [
+            "dai_1984_table4_na4feo3_gibbs_from_elements",
+            "dai_1984_table4_na2feo2_gibbs_from_elements",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+        "dai_1984_table5_r8_reaction_gibbs": [
+            "dai_1984_table4_na4feo3_gibbs_from_elements",
+            "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+            "dai_1984_table1_r1_fe2o3",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+        "dai_1984_table5_r9_reaction_gibbs": [
+            "dai_1984_table4_na4feo3_gibbs_from_elements",
+            "dai_1984_table4_na2feo2_gibbs_from_elements",
+            "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+            "dai_1984_table1_r1_fe2o3",
+            "dai_1984_table1_r4_na2o",
+            "dai_1984_table1_r6_na2o",
+        ],
+    }
+    expected_table_v_equations = {
+        "dai_1984_table5_r1_reaction_gibbs": "-1512440 + 491.31T",
+        "dai_1984_table5_r2_reaction_gibbs": "-1004546 + 481.25T",
+        "dai_1984_table5_r3_reaction_gibbs": "-1649668 + 837.58T",
+        "dai_1984_table5_r4_reaction_gibbs": "-507896 + 10.06T",
+        "dai_1984_table5_r5_reaction_gibbs": "-496650 + 471.19T",
+        "dai_1984_table5_r7_reaction_gibbs": "-645122 + 356.33T",
+        "dai_1984_table5_r8_reaction_gibbs": "-1786896 + 1183.85T",
+        "dai_1984_table5_r9_reaction_gibbs": "-1141774 + 827.52T",
+    }
+    for observation_id, expected_inputs in expected_table_v_inputs.items():
+        row = raw_rows[observation_id]
+        assert row["derived_from"] == expected_inputs
+        assert row["derivation"]["inputs"] == expected_inputs
+        assert row["values"]["equation_as_printed"] == expected_table_v_equations[
+            observation_id
+        ]
+    assert "dai_1984_table4_na2fe2o4_gibbs_from_elements" not in (
+        raw_rows["dai_1984_table5_r1_reaction_gibbs"]["derived_from"]
+    )
+
+    table2_na2feo2_mixing = _raw_row(
+        extract, "Na2FeO2", "dai_1984_table2_na2feo2_enthalpy_of_mixing"
+    )
+    table2_na4feo3_mixing = _raw_row(
+        extract, "Na4FeO3", "dai_1984_table2_na4feo3_enthalpy_of_mixing"
+    )
+    assert table2_na2feo2_mixing["values"]["value_as_printed"] == "-119106"
+    assert table2_na2feo2_mixing["values"]["uncertainty_as_printed"] == "±3730 J/mol"
+    assert table2_na2feo2_mixing["values"]["reaction_number_as_printed"] == "(21)"
+    assert table2_na2feo2_mixing["values"]["reaction_as_printed"] == (
+        "Na2O(s) + FeO(s) = Na2FeO2(s)"
+    )
+    assert table2_na2feo2_mixing["point_conditions"]["phase_assemblage"]["state"]["value"] == (
+        "Na2O(s) + FeO(s) = Na2FeO2(s)"
+    )
+    assert table2_na2feo2_mixing["derivation"]["method"]["locator"]["page"] == 4
+    assert table2_na2feo2_mixing["derivation"]["method"]["locator"]["equation"] == "21"
+    assert table2_na4feo3_mixing["values"]["value_as_printed"] == "-147988"
+    assert table2_na4feo3_mixing["values"]["uncertainty_as_printed"] == "±8210 J/mol"
+    assert table2_na4feo3_mixing["values"]["reaction_number_as_printed"] == "(22)"
+    assert table2_na4feo3_mixing["values"]["reaction_as_printed"] == (
+        "2Na2O(s) + FeO(s) = Na4FeO3(s)"
+    )
+    assert table2_na4feo3_mixing["point_conditions"]["phase_assemblage"]["state"]["value"] == (
+        "2Na2O(s) + FeO(s) = Na4FeO3(s)"
+    )
+    assert table2_na4feo3_mixing["derivation"]["method"]["locator"]["page"] == 4
+    assert table2_na4feo3_mixing["derivation"]["method"]["locator"]["equation"] == "22"
+    assert "Na2O average enters twice" in table2_na4feo3_mixing["derivation"]["relation"]
+
+    table4_na2fe2o4 = raw_rows["dai_1984_table4_na2fe2o4_gibbs_from_elements"]
+    assert table4_na2fe2o4["values"]["equation_as_printed"] == "-1323130 + 321.90T"
+    assert "9920 J/mol constant-term gap" in table4_na2fe2o4["values"]["source_consistency_note"]
+    table6_r10 = raw_rows["dai_1984_table6_r10_log_pressure_relation"]
+    assert "derived_from" not in table6_r10
+    assert "derivation" not in table6_r10
+    assert table6_r10["values"]["method_class"] == "quoted_attributed"
+    assert table6_r10["values"]["relation_as_printed"] == "log(P_O2) = -19385/T - 3.07"
+    assert "no reaction or other derivation input" in table6_r10["values"]["derivation_input_note"]
+    migrated_table6_r10 = _find(
+        observations, "dai_1984_table6_r10_log_pressure_relation"
+    )
+    assert migrated_table6_r10.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
 
     emf_context = extract["species"]["Na2Fe2O4"]["context"]
     assert len(emf_context) == 1
