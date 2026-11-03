@@ -5,6 +5,7 @@ import math
 import pytest
 
 from simulator import condensation
+from simulator.condensation_routing import NA_COLLECTOR_STAGE_KEY
 from simulator.state import EvaporationFlux, MeltState
 from tests.test_condensation_input_refusals import _configured_model
 
@@ -491,7 +492,7 @@ def test_stage_diffusivity_uses_film_temperature(monkeypatch):
     )
     stage = next(
         item for item in model.train.stages
-        if getattr(item, "stage_key", "") == condensation.NA_COLLECTOR_STAGE_KEY
+        if getattr(item, "stage_key", "") == NA_COLLECTOR_STAGE_KEY
     )
     seen: list[tuple[str, float, float, float]] = []
     original = condensation._chapman_enskog_d_ab_m2_s

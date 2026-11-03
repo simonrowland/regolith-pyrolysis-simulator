@@ -5274,30 +5274,16 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        from simulator.condensation_routing import collection_stage_index
+        from simulator.condensation_routing import (
+            collection_stage_index,
+            species_accepted_on_stage,
+            stage_index_for_visit_identity,
+        )
 
-        for stage_number, stage_species in (
-            route_result.condensed_by_stage_species.items()
-        ):
-            projected_kg = stage_species.get(species, 0.0) * scale
-            stage_products = (dict(reaction.get('committed_products_kg', {}))
-                              if stage_number == 3 and reaction.get('uptake_mol', 0.0) > 0.0
-                              else {product: projected_kg * fraction
-                                    for product, fraction in product_scale.items()})
-            if not any(kg > 1e-12 for kg in stage_products.values()):
-                continue
-            stage_idx = collection_stage_index(
-                self.train, int(stage_number), species,
-            )
+        def book(stage_idx, stage_products, is_impurity):
             if stage_idx is None:
-                continue
+                return
             stage = self.train.stages[stage_idx]
-            is_impurity = (
-                route_result.impurity_by_stage_species
-                .get(stage_number, {})
-                .get(species, 0.0)
-                > 0.0
-            )
             for product, stage_product_kg in stage_products.items():
                 if stage_product_kg <= 1e-12:
                     continue
@@ -5319,6 +5305,96 @@ class EvaporationMixin:
                     product,
                     stage_product_kg,
                 )
+
+        def scaled_products(projected_kg):
+            return {
+                product: projected_kg * fraction
+                for product, fraction in product_scale.items()
+            }
+
+        identity_map = getattr(
+            route_result, 'capture_kg_by_stage_identity', None,
+        ) or {}
+        if identity_map:
+            # Visit identity splits two surfaces that share a stage number.
+            # Stage 4 and the K trap both are number 4. Off-design mass on
+            # one surface is that surface's impurity; the other surface's
+            # designated mass stays product. A stage-number boolean cannot
+            # say which.
+            reactive_booked = False
+            for identity, species_kg in identity_map.items():
+                stage_number = int(identity[0])
+                sub_order = int(identity[1])
+                vapor_kg = float(species_kg.get(species, 0.0))
+                reactive_here = (
+                    stage_number == 3
+                    and reaction.get('uptake_mol', 0.0) > 0.0
+                    and vapor_kg > 1e-15
+                    and not reactive_booked
+                )
+                if reactive_here:
+                    reactive_booked = True
+                    stage_products = dict(
+                        reaction.get('committed_products_kg', {}),
+                    )
+                else:
+                    stage_products = scaled_products(vapor_kg * scale)
+                if not any(kg > 1e-12 for kg in stage_products.values()):
+                    continue
+                stage_idx = stage_index_for_visit_identity(
+                    self.train, stage_number, sub_order,
+                )
+                if stage_idx is None:
+                    continue
+                stage = self.train.stages[stage_idx]
+                book(
+                    stage_idx,
+                    stage_products,
+                    not species_accepted_on_stage(stage, species),
+                )
+            if (
+                not reactive_booked
+                and reaction.get('uptake_mol', 0.0) > 0.0
+                and 3 in route_result.condensed_by_stage_species
+            ):
+                # A stage-3 bucket opened by another species still carries
+                # this species' oxide sink when its own vapor kg was not
+                # stored. Same condition as the stage-number path.
+                stage_idx = collection_stage_index(self.train, 3, species)
+                is_impurity = (
+                    route_result.impurity_by_stage_species
+                    .get(3, {})
+                    .get(species, 0.0)
+                    > 0.0
+                )
+                book(
+                    stage_idx,
+                    dict(reaction.get('committed_products_kg', {})),
+                    is_impurity,
+                )
+            return
+
+        for stage_number, stage_species in (
+            route_result.condensed_by_stage_species.items()
+        ):
+            projected_kg = stage_species.get(species, 0.0) * scale
+            stage_products = (dict(reaction.get('committed_products_kg', {}))
+                              if stage_number == 3 and reaction.get('uptake_mol', 0.0) > 0.0
+                              else scaled_products(projected_kg))
+            if not any(kg > 1e-12 for kg in stage_products.values()):
+                continue
+            stage_idx = collection_stage_index(
+                self.train, int(stage_number), species,
+            )
+            if stage_idx is None:
+                continue
+            is_impurity = (
+                route_result.impurity_by_stage_species
+                .get(stage_number, {})
+                .get(species, 0.0)
+                > 0.0
+            )
+            book(stage_idx, stage_products, is_impurity)
 
     def _update_melt_composition(self, evap_flux: EvaporationFlux):
         """Project the cleaned-melt account onto MeltState kg fields."""

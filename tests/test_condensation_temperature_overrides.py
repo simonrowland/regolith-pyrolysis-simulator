@@ -1033,8 +1033,8 @@ def test_yaml_only_collector_band_reaches_all_consumers(
         assert model.train.stages[4].temp_range_C == band
         for calls in seen.values():
             calls.clear()
-        # K is isolated off the Na collector, and the band spy only records
-        # sub_order 0. Na is what still walks stage 4's capture law.
+        # The band spy records sub_order 0 only. Na and K both walk that
+        # collector. The trap is a later visit and is not this band.
         model.configure_operating_conditions(
             overhead_pressure_mbar=2.0,
             species_partial_pressures_mbar={'K': 1.0, 'Na': 1.0},
