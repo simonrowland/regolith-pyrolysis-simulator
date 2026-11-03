@@ -1,0 +1,514 @@
+schema_version: literature_extract.v1
+source_id: tatsumi-2004-iron-condensation
+source:
+  citation: >-
+    Tatsumi, K., Nagahara, H., Ozawa, K., and Tachibana, S. (2004). Condensation
+    kinetics of metallic iron: an experimental study. Lunar and Planetary Science
+    XXXV, abstract 2013.
+  year: 2004
+  doi: null
+  corpus_asset: raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf
+  corpus_sha256: 74399ab05f65432d12eeeac919ad1bb12cdfc1d27f6183c5946d190aae462cae
+extraction:
+  method: >-
+    Born-digital pdftotext-layout plus the MinerU markdown, checked against the
+    PDF. Printed numbers are copied as printed. Figure 1 and Figure 3 marker
+    centres were read from 200 dpi page renders after tick calibration on both
+    axes. Figure 2 is a micrograph with no data axes. MinerU approximate tables
+    were not copied.
+  date: '2026-11-02'
+  worker: w1103ta-tats04
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[tatsumi_2004_fe_condensation_coefficient_1020c].values.value_as_printed
+  value: '0.5~0.6'
+  note: Discussion condensation coefficient at 1020°C as printed
+  locator:
+    page: 2
+    published_page: 2013
+    pdf_page_index: 1
+    section: Discussion
+- path: species.Fe.observations[tatsumi_2004_fe_condensation_coefficient_415c].values.value_as_printed
+  value: '~0.8'
+  note: Discussion condensation coefficient at 415°C as printed
+  locator:
+    page: 2
+    published_page: 2013
+    pdf_page_index: 1
+    section: Discussion
+experiments:
+- experiment_id: tatsumi-2004-fe-mo-1020c
+  method:
+    state:
+      tag: unknown
+      reason: >-
+        Vacuum evaporation of an iron plate onto a molybdenum substrate has no
+        matching experiment-method token. It is not Langmuir free evaporation
+        and not vacuum-chamber pyrolysis.
+    locator:
+      page: 1
+      published_page: 2013
+      pdf_page_index: 0
+      section: Method
+  method_as_printed: >-
+    A metallic iron plate at the centre of a tungsten mesh heater was evaporated
+    in a vacuum chamber evacuated by a turbo molecular pump. Iron condensed on a
+    molybdenum substrate 54 mm from the source. The substrate temperature is not
+    independently controlled.
+  locator:
+    page: 1
+    published_page: 2013
+    pdf_page_index: 0
+    section: Method
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.0001'
+          approximate: true
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+        note: 'Printed 10^-5~10^-4 Pa. Decade bounds stored in pascal with no unit conversion.'
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+        note: Chamber evacuated by a turbo molecular pump. No sweep gas is printed.
+    regime:
+      regime_class: {tag: value, value: molecular}
+- experiment_id: tatsumi-2004-fe-mo-415c
+  method:
+    state:
+      tag: unknown
+      reason: >-
+        Vacuum evaporation of an iron plate onto a molybdenum substrate has no
+        matching experiment-method token. It is not Langmuir free evaporation
+        and not vacuum-chamber pyrolysis.
+    locator:
+      page: 1
+      published_page: 2013
+      pdf_page_index: 0
+      section: Method
+  method_as_printed: >-
+    A metallic iron plate at the centre of a tungsten mesh heater was evaporated
+    in a vacuum chamber evacuated by a turbo molecular pump. Iron condensed on a
+    molybdenum substrate 88 mm from the source. The substrate temperature is not
+    independently controlled.
+  locator:
+    page: 1
+    published_page: 2013
+    pdf_page_index: 0
+    section: Method
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.0001'
+          approximate: true
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+        note: 'Printed 10^-5~10^-4 Pa. Decade bounds stored in pascal with no unit conversion.'
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+        note: Chamber evacuated by a turbo molecular pump. No sweep gas is printed.
+    regime:
+      regime_class: {tag: value, value: molecular}
+species:
+  Fe:
+    observations:
+    - observation_id: tatsumi_2004_fe_condensation_coefficient_1020c
+      experiment: tatsumi-2004-fe-mo-1020c
+      type: alpha
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      phase: cr
+      T_C: 1020
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        value_as_printed: '0.5~0.6'
+        method_class: author_estimate
+        printed_term: condensation coefficient
+        schema_gap: >-
+          No condensation-coefficient quantity exists. evaporation_coefficient_alpha
+          is refused when the source names condensation. wall_deposit_mass is a
+          process-wall mass in kilograms and is not this printed coefficient.
+          The printed range is stored as text. No midpoint is invented.
+      point_conditions:
+        T_C:
+          state: {tag: value, value: 1020}
+          locator:
+            page: 2
+            published_page: 2013
+            pdf_page_index: 1
+            section: Discussion
+        substrate_distance_mm:
+          state: {tag: value, value: 54}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        chamber_pressure_as_printed:
+          state: {tag: value, value: '10^-5~10^-4 Pa'}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        duration_as_printed:
+          state: {tag: value, value: 1 to 48 hours}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        substrate:
+          state: {tag: value, value: molybdenum}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        source_temperature_C:
+          state: {tag: value, value: 1170}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        condensation_area_mm2:
+          state: {tag: value, value: 178}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        source_size_as_printed:
+          state: {tag: value, value: 12x12mm}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+    - observation_id: tatsumi_2004_fe_condensation_coefficient_415c
+      experiment: tatsumi-2004-fe-mo-415c
+      type: alpha
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      phase: cr
+      T_C: 415
+      units: dimensionless
+      values:
+        quantity: condensation_coefficient
+        value_as_printed: '~0.8'
+        method_class: author_estimate
+        printed_term: condensation coefficient
+        schema_gap: >-
+          No condensation-coefficient quantity exists. evaporation_coefficient_alpha
+          is refused when the source names condensation. wall_deposit_mass is a
+          process-wall mass in kilograms and is not this printed coefficient.
+          The printed approximate value is stored as text. No midpoint is invented.
+      point_conditions:
+        T_C:
+          state: {tag: value, value: 415}
+          locator:
+            page: 2
+            published_page: 2013
+            pdf_page_index: 1
+            section: Discussion
+        substrate_distance_mm:
+          state: {tag: value, value: 88}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        chamber_pressure_as_printed:
+          state: {tag: value, value: '10^-5~10^-4 Pa'}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        duration_as_printed:
+          state: {tag: value, value: 6 to 144 hours}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        substrate:
+          state: {tag: value, value: molybdenum}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        source_temperature_C:
+          state: {tag: value, value: 1170}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        condensation_area_mm2:
+          state: {tag: value, value: 178}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+        source_size_as_printed:
+          state: {tag: value, value: 12x12mm}
+          locator:
+            page: 1
+            published_page: 2013
+            pdf_page_index: 0
+            section: Method
+    context:
+    - observation_id: tatsumi_2004_printed_apparatus_numbers
+      type: printed_apparatus
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+      units: as printed
+      values:
+        quantity: apparatus_and_printed_numbers
+        source_heating_temperature_C: 1170
+        source_size_as_printed: 12x12mm
+        substrate: molybdenum
+        substrate_distances_mm:
+        - 54
+        - 88
+        substrate_temperature_C_at_54_mm: 1020
+        substrate_temperature_C_at_88_mm: 415
+        condensation_surface_area_as_printed: 178 mm2
+        chamber_pressure_as_printed: '10^-5~10^-4 Pa'
+        duration_at_415C_as_printed: 6 to 144 hours
+        duration_at_1020C_as_printed: 1 to 48 hours
+        heater: tungsten mesh heater
+        pump: turbo molecular pump
+        fe_atom_velocity_as_printed: '~800 m/s'
+        mean_free_path_as_printed: greater than 100 m
+        chamber_outer_diameter_as_printed: 30 cm
+        flow_regime_as_printed: molecular condition is fulfilled
+        phase_as_printed: >-
+          Metallic iron by EDS and EBSD regardless of the experimental conditions.
+          Any other phases were not observed.
+        morphology_as_printed: >-
+          Loosely grown dendritic Fe at 415°C. Compactly packed Fe at 1020°C.
+          Crystal size increases with time at 415°C. Size cannot be determined
+          at 1020°C because the surface is compact.
+        text_has_no_numeric:
+        - supersaturation
+        - deposited mass
+        - condensation rate
+        - evaporation rate
+        qualitative_mass_statements: >-
+          Source weight loss increased linearly with time and the calculated
+          evaporation rate is consistent with reference [5]. Condensate weight
+          increased linearly with time and the condensation rate is larger at
+          high condensation temperature. No numeric mass or rate is printed.
+        supersaturation_as_printed: >-
+          The introduction says a high supersaturation state is required to
+          nucleate from gas. No numeric supersaturation is printed.
+    - observation_id: tatsumi_2004_flux_fraction_and_shielded_run
+      type: derivation_inputs
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      units: as printed
+      values:
+        quantity: incident_flux_derivation_inputs
+        direct_flux_fraction_as_printed: 1.8% of total evaporation flux
+        direct_flux_assumption: Fe plate treated as a point source
+        direct_flux_distance_mm: 54
+        direct_flux_substrate_temperature_C: 1020
+        shielded_run_as_printed: >-
+          The wait gain of this experimental configuration results in reduction
+          by 80%.
+        shielded_run_spelling: >-
+          The abstract prints "wait gain". That spelling is kept.
+        shielded_run_substrate_temperature: >-
+          Not printed. 1020°C is not assigned to the shielded run.
+        role: >-
+          These sentences are inputs to the authors' condensation-coefficient
+          estimate. They are not a closed mass or flux observation.
+    - observation_id: tatsumi_2004_cited_coefficient_comparisons
+      type: quoted_comparison
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      units: as printed
+      values:
+        quantity: cited_coefficient_statements
+        models_treated_coefficient_as: unity
+        model_citations:
+        - '[3] Burke and Hollenbach 1983 ApJ 265 223-234'
+        - '[4] Kozasa and Hasegawa 1987 Prog Theor Phys 77 1402-1410'
+        evaporation_coefficient_comparison_as_printed: >-
+          The evaporation coefficient is larger at higher temperatures over
+          1074-1445°C in Tachibana et al. 2001 LPS XXXII abstract 1767 [5].
+          This abstract prints no numeric evaporation coefficient of its own.
+        other_citations:
+        - '[1] Larimer 1967 GCA 31 1215-1238'
+        - '[2] Molster et al. 2001 A&A 366 923-929'
+    - observation_id: tatsumi_2004_figure_1_weight_change
+      type: figure_record
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        figure: '1'
+      units: 'Change (×10^-3 g) versus Duration (hours)'
+      values:
+        quantity: substrate_condensate_weight_change
+        axes_as_printed:
+          x: Duration (hours)
+          y: 'Change (×10^-3 g)'
+          x_ticks: [0, 50, 100, 150]
+          y_ticks: [0, 2, 4, 6]
+        caption_as_printed: >-
+          Fig. 1. Weight changes of the substrate (weight of condensates) plotted
+          against experimental duration for substrate temperatures of 415°C and
+          1020°C.
+        series_as_printed:
+        - filled circles at 1020°C
+        - triangles at 415°C
+        calibration: >-
+          Page 1 rendered with pdftoppm -png -r 200. Crop-local pixels are the
+          render minus origin (900, 1350). Both axes are linear. X: left spine
+          x=71 is 0 h, x=233 is 50 h, x=395 is 100 h, right spine x=557 is 150 h.
+          hours = (x_px - 71) / 3.24 with 3.24 = (395 - 233) / 50. Y: top spine
+          y=81.5 is 6, y=181 is 4, y=280 is 2, bottom spine y=379.5 is 0, in
+          units of 10^-3 g. change = (379.5 - y_px) / (298 / 6). Markers are
+          grayscale at or below 70. The legend box (cx 320-500 and cy 130-250)
+          is excluded. Circles are the 1020°C series. Triangles are the 415°C
+          series. Reads are rounded to 0.1 h and 0.01 ×10^-3 g. Half-extent of
+          a marker is about 4 px, so the read uncertainty is ±1.5 h and
+          ±0.10 ×10^-3 g. One circle intersects the axis frame and is flagged
+          frame_contact with ±3 h and ±0.20 ×10^-3 g. No unsegmented origin
+          marker is invented. MinerU approximate tables were not copied.
+        series:
+        - series_as_printed: filled circles at 1020°C
+          substrate_temperature_C: 1020
+          points:
+          - {reading: figure_digitised, duration_h: 47.9, change_1em3_g: 5.56, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [226.3, 103.2]}
+          - {reading: figure_digitised, duration_h: 23.9, change_1em3_g: 2.61, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [148.3, 250.1]}
+          - {reading: figure_digitised, duration_h: 11.9, change_1em3_g: 1.24, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [109.7, 317.9]}
+          - {reading: figure_digitised, duration_h: 6.0, change_1em3_g: 0.53, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [90.6, 353.0]}
+          - {reading: figure_digitised, duration_h: 3.0, change_1em3_g: 0.27, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [80.7, 365.9]}
+          - {reading: figure_digitised, duration_h: 1.5, change_1em3_g: 0.11, duration_read_uncertainty_h: 3.0, change_read_uncertainty_1em3_g: 0.20, marker_px: [75.8, 374.2], frame_contact: true}
+        - series_as_printed: triangles at 415°C
+          substrate_temperature_C: 415
+          points:
+          - {reading: figure_digitised, duration_h: 143.8, change_1em3_g: 2.86, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [537.0, 237.7]}
+          - {reading: figure_digitised, duration_h: 96.0, change_1em3_g: 1.57, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [382.1, 301.6]}
+          - {reading: figure_digitised, duration_h: 48.1, change_1em3_g: 0.87, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [226.7, 336.5]}
+          - {reading: figure_digitised, duration_h: 23.9, change_1em3_g: 0.34, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [148.5, 362.6]}
+          - {reading: figure_digitised, duration_h: 12.0, change_1em3_g: 0.14, duration_read_uncertainty_h: 1.5, change_read_uncertainty_1em3_g: 0.10, marker_px: [109.8, 372.4]}
+    - observation_id: tatsumi_2004_figure_2_sem
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        figure: '2'
+      units: as printed in the caption; no data axes
+      values:
+        quantity: condensate_morphology_micrographs
+        axes_as_printed: none
+        caption_numbers_as_printed:
+          upper_panels: 415°C for 96 hours; scale 3µm
+          lower_panels: 1020°C for 24 hours
+          lower_left_scale: 6µm
+          lower_right_scale: 5µm
+        caption_as_printed: >-
+          Fig. 2. FE-SEM images of surface of condensates (left panels) and those
+          of cross sections (right panels) obtained in experiments at 415°C for
+          96 hours (upper panels) and at 1020°C for 24 hours (bottom panels). In
+          the cross section images, solid lower part in the upper right panel and
+          lower 2/3 below fracture in the lower right are molybdenum substrate.
+          The scales for upper panels are both 3µm, for lower left panel 6µm, and
+          for lower right panel 5µm.
+        digitisation: >-
+          Not digitised. The figure is four micrograph panels and has no data axes.
+    - observation_id: tatsumi_2004_figure_3_grain_size
+      type: figure_record
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        figure: '3'
+      units: Average grain size (µm) versus Duration (hours)
+      values:
+        quantity: average_grain_size_versus_duration
+        axes_as_printed:
+          x: Duration (hours)
+          y: Average grain size (µm)
+          x_ticks: [0, 50, 100, 150]
+          y_ticks: [0.0, 0.4, 0.8, 1.2, 1.6]
+        caption_as_printed: >-
+          Fig. 3. Change of average crystal size condensed at 415°C. Vertical bars
+          represent mean standard deviations.
+        series_as_printed:
+        - filled circles at 415°C
+        temperature_note: >-
+          The text says crystal size at 1020°C cannot be determined because the
+          surface is compact. Figure 3 has one series.
+        error_bars: >-
+          The caption says the vertical bars are mean standard deviations. Bar
+          lengths were not read. Dotted gridlines were not separable from caps.
+        calibration: >-
+          Page 2 rendered with pdftoppm -png -r 200. Crop-local pixels are the
+          render minus origin (80, 900). Both axes are linear. X: left spine
+          x=234.5 is 0 h, x=388.5 is 50 h, right spine x=697 is 150 h.
+          hours = (x_px - 234.5) / 3.08 with 3.08 = (388.5 - 234.5) / 50. Y: top
+          spine y=241.5 is 1.6 µm, bottom spine y=504.5 is 0.
+          micrometres = (504.5 - y_px) / 164.375 with 164.375 = (504.5 - 241.5) / 1.6.
+          Markers are grayscale at or below 80. Reads are rounded to 0.1 h and
+          0.01 µm. Read uncertainty is ±1.5 h and ±0.03 µm. Horizontal dotted
+          lines are gridlines, not data.
+        series:
+        - series_as_printed: filled circles at 415°C
+          substrate_temperature_C: 415
+          points:
+          - {reading: figure_digitised, duration_h: 144.2, average_grain_size_um: 0.95, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [678.5, 348.0]}
+          - {reading: figure_digitised, duration_h: 96.0, average_grain_size_um: 0.67, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [530.3, 393.7]}
+          - {reading: figure_digitised, duration_h: 47.9, average_grain_size_um: 0.48, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [382.1, 424.8]}
+          - {reading: figure_digitised, duration_h: 23.7, average_grain_size_um: 0.46, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [307.6, 428.1]}
+          - {reading: figure_digitised, duration_h: 11.7, average_grain_size_um: 0.40, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [270.6, 438.9]}
+          - {reading: figure_digitised, duration_h: 5.8, average_grain_size_um: 0.18, duration_read_uncertainty_h: 1.5, grain_size_read_uncertainty_um: 0.03, marker_px: [252.3, 475.0]}

@@ -11,8 +11,8 @@ counts:
   sources: 2290
   by_stage:
     located: 209
-    inbox: 1267
-    in_progress: 224
+    inbox: 1266
+    in_progress: 225
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -35078,12 +35078,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tatsumi-2004-iron-condensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/tatsumi-2004-iron-condensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
