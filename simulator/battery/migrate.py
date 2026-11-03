@@ -82,6 +82,7 @@ from simulator.battery.input_provenance import (
 )
 from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
+    SLAG_METAL_CHARGE_BASIS,
     ElementMassFractionRedox,
     canonical_element_symbol,
     element_mass_fraction_redox,
@@ -92,6 +93,7 @@ from simulator.battery.composition import (
     parse_species_formula,
     printed_component_identified,
     printed_oxygen_sigma_from_row,
+    slag_metal_charge_from_mapping,
     unidentified_component_refusal,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
@@ -1712,7 +1714,37 @@ def _mass_percent_printed_from_plain(
     return located_value(_printed_map_payload(wt), locator)
 
 
+def _slag_metal_charge_located(payload: object) -> Located[Composition] | None:
+    """A slag-metal charge body, or None when this payload is not one.
+
+    An incomplete or illegal charge is an unknown state. It is not handed
+    to the oxide wt% converter.
+    """
+
+    if not isinstance(payload, Mapping):
+        return None
+    locator = _locator_from_plain(payload.get("locator")) if "state" in payload else None
+    body: object = payload
+    if "state" in payload:
+        state = payload.get("state")
+        if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+            return None
+        body = state.get("value")
+    if not isinstance(body, Mapping):
+        return None
+    try:
+        composition = slag_metal_charge_from_mapping(body)
+    except ValueError as exc:
+        return Located(State.unknown(str(exc)), locator=locator)
+    if composition is None:
+        return None
+    return Located(State.of(composition), locator=locator)
+
+
 def _composition_located_from_plain(payload: object) -> Located[Composition]:
+    charge = _slag_metal_charge_located(payload)
+    if charge is not None:
+        return charge
     body: object = payload
     if isinstance(payload, Mapping) and "state" in payload:
         state = payload.get("state")
@@ -5909,6 +5941,7 @@ def _apply_equilibrium_starting_bulk(
     point_conditions: Mapping[str, Located[Any]] | None,
     *,
     origin: str,
+    only_basis: str | None = None,
 ) -> tuple[Mapping[str, Located[Any]] | None, list[Notice]]:
     """Hand the printed starting bulk to an equilibrium phase row.
 
@@ -5936,6 +5969,8 @@ def _apply_equilibrium_starting_bulk(
     ):
         return point_conditions, []
     composition = initial.state.value
+    if only_basis is not None and composition.basis != only_basis:
+        return point_conditions, []
     if composition.amount_basis not in {
         AmountBasis.MOLE_FRACTION,
         AmountBasis.MOL_INVENTORY,
@@ -21919,6 +21954,19 @@ class Migrator:
                     ident_kwargs,
                     point_conditions,
                     origin=obs_id,
+                )
+            )
+        elif q_token is Quantity.DISTRIBUTION_RATIO:
+            # Slag-steel L_S rows score against the same charge. Other
+            # starting bulks stay on equilibrium phase rows only.
+            experiment = self.result.experiments.get(experiment_id)
+            point_conditions, starting_bulk_notices = (
+                _apply_equilibrium_starting_bulk(
+                    experiment,
+                    ident_kwargs,
+                    point_conditions,
+                    origin=obs_id,
+                    only_basis=SLAG_METAL_CHARGE_BASIS,
                 )
             )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(

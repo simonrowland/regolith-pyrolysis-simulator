@@ -216,6 +216,10 @@ class RefusalReason(StrEnum):
     )
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
+    # t-1625. The charge kept elemental metals. This engine's accepted
+    # inputs do not include those metals. The metal is not dropped and
+    # not rewritten as an oxide.
+    ENGINE_CANNOT_ACCEPT_METAL = "engine_cannot_accept_metal"
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
     # Measured oxygen lies outside the Fe2+–Fe3+ oxide span. The observation
     # stays stored; this is the engine-input refusal, not a clip.

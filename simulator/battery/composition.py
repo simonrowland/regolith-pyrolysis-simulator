@@ -15,9 +15,11 @@ from decimal import Decimal
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.enums import (
     ELEMENT_WT_PERCENT_BASIS,
+    AmountBasis,
     NoticeKind,
     RefusalReason,
 )
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.records import Composition
 from simulator.reference_data.janaf import formula_composition
 
@@ -136,6 +138,163 @@ def mass_weighted_mixture_wt_pct(
                 continue
             mixed[name] = mixed.get(name, Decimal("0")) + contribution
     return mixed
+
+
+# Printed slag oxide wt% + printed alloy elements + the mass of each phase.
+# One mol inventory. See reports/t1625-design.md.
+SLAG_METAL_CHARGE_BASIS = "slag_metal_charge"
+SLAG_METAL_CHARGE_FIELDS = (
+    "slag_oxide_wt_pct",
+    "metal_element_wt_pct",
+    "slag_mass_g",
+    "metal_mass_g",
+)
+
+
+def elemental_charge_symbol(name: str) -> str | None:
+    """Element symbol printed as itself.
+
+    One element, count 1, formula equal to the symbol, with an atomic
+    weight. MnO is not an element. S is. ``migrate._metallic_element_symbol``
+    is the narrower t-1593 rule: it also excludes ``_COMPOSITION_COMPONENTS``,
+    so a bulk sulfur component is not a reductant metal. Alloy sulfur uses
+    this function and stays elemental.
+    """
+
+    token = str(name).strip()
+    parsed = parse_species_formula(token)
+    if parsed is None or len(parsed) != 1:
+        return None
+    element, count = parsed[0]
+    if count != 1 or element != token:
+        return None
+    if element not in ATOMIC_WEIGHTS_G_PER_MOL:
+        return None
+    return element
+
+
+def _charge_amount(value: object) -> Decimal:
+    if isinstance(value, bool) or value is None or value == "":
+        raise ValueError("slag_metal_charge_amount_not_numeric")
+    try:
+        amount = Decimal(str(value))
+    except (ArithmeticError, ValueError) as exc:
+        raise ValueError("slag_metal_charge_amount_not_numeric") from exc
+    if not amount.is_finite():
+        raise ValueError("slag_metal_charge_amount_not_numeric")
+    return amount
+
+
+def _charge_phase_mass_g(value: object, phase: str) -> Decimal:
+    mass = _charge_amount(value)
+    if mass <= 0:
+        raise ValueError(f"slag_metal_charge_mass_not_positive:{phase}")
+    return mass
+
+
+def _charge_weight_map(raw: object, *, phase: str) -> dict[str, Decimal]:
+    if not isinstance(raw, Mapping):
+        raise ValueError(f"slag_metal_charge_{phase}_not_a_map")
+    weights: dict[str, Decimal] = {}
+    for name, value in raw.items():
+        key = str(name).strip()
+        if key in weights:
+            raise ValueError(f"slag_metal_charge_duplicate:{key}")
+        amount = _charge_amount(value)
+        if amount < 0:
+            raise ValueError(f"slag_metal_charge_negative:{key}")
+        if amount == 0:
+            continue
+        weights[key] = amount
+    if not weights:
+        raise ValueError(f"slag_metal_charge_{phase}_empty")
+    return weights
+
+
+def slag_metal_charge_moles(
+    slag_oxide_wt_pct: object,
+    metal_element_wt_pct: object,
+    slag_mass_g: object,
+    metal_mass_g: object,
+) -> Composition:
+    """Moles of one slag phase plus one metal phase. Does not oxidize.
+
+    Premise: the paper prints a slag oxide mix, an alloy elemental mix,
+    and the mass of each phase. Those are one engine input. A metallic
+    element stays that element. No oxidation state is assigned. The
+    unprinted balance (Van Ende Fe) is not filled. A formula printed in
+    both phases is refused rather than summed.
+
+    Algebra: n_i = m_phase_g * w_i / (100 * M_i). Slag M_i is
+    ``oxide_molar_mass`` (CrO1.5 uses M(Cr2O3), the existing canonical,
+    because M(Cr2O3) = 2 M(CrO1.5)). Metal M_i is the same owner on the
+    element symbol.
+
+    Units: g * (g/100 g) / (g/mol) = mol.
+
+    Sanity, Van Ende 2008 run 1-1. Table 3 SiO2 is 28.0 mass% of 15 g
+    slag, so the printed SiO2 mass is 4.200 g. Table 2 Mn is 11.8 mass%
+    of 25 g steel, so the printed Mn mass is 2.950 g. oxide_molar_mass
+    gives M(SiO2) = 60.083 g/mol and M(Mn) = 54.938044 g/mol, so
+    n(SiO2) = 4.200/60.083 mol and n(Mn) = 2.950/54.938044 mol, and n*M
+    returns those printed masses. Table 3 CrO1.5 at 10 mass% of 15 g is
+    stored as Cr2O3; n*M(Cr2O3) = 1.500 g. Fe is not in Table 2 and is
+    not in the inventory.
+    """
+
+    from simulator.battery.migrate import _COMPOSITION_COMPONENTS, oxide_molar_mass
+
+    slag_mass = _charge_phase_mass_g(slag_mass_g, "slag")
+    metal_mass = _charge_phase_mass_g(metal_mass_g, "metal")
+    slag = _charge_weight_map(slag_oxide_wt_pct, phase="slag")
+    metal = _charge_weight_map(metal_element_wt_pct, phase="metal")
+    hundred = Decimal(100)
+    moles: dict[str, Decimal] = {}
+
+    def add(key: str, amount: Decimal) -> None:
+        if key in moles:
+            raise ValueError(f"slag_metal_charge_key_collision:{key}")
+        moles[key] = amount
+
+    for name, weight in slag.items():
+        component = _COMPOSITION_COMPONENTS.get(name)
+        if component is None:
+            raise ValueError(f"slag_metal_charge_slag_not_oxide:{name}")
+        canonical = component[1]
+        add(canonical, slag_mass * weight / (hundred * oxide_molar_mass(name)))
+    for name, weight in metal.items():
+        if elemental_charge_symbol(name) is None:
+            raise ValueError(f"slag_metal_charge_metal_not_element:{name}")
+        add(name, metal_mass * weight / (hundred * oxide_molar_mass(name)))
+    return Composition(
+        basis=SLAG_METAL_CHARGE_BASIS,
+        components=tuple(moles.items()),
+        amount_basis=AmountBasis.MOL_INVENTORY,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+
+
+def slag_metal_charge_from_mapping(body: Mapping[str, object]) -> Composition | None:
+    """The charge, or None when this mapping is not one.
+
+    A mapping that carries some of the four fields and not the others is
+    refused. It is not parsed as an oxide wt% map.
+    """
+
+    present = [name for name in SLAG_METAL_CHARGE_FIELDS if name in body]
+    if not present:
+        return None
+    missing = [name for name in SLAG_METAL_CHARGE_FIELDS if name not in body]
+    if missing:
+        raise ValueError(
+            "slag_metal_charge_incomplete: missing " + ", ".join(missing)
+        )
+    return slag_metal_charge_moles(
+        body["slag_oxide_wt_pct"],
+        body["metal_element_wt_pct"],
+        body["slag_mass_g"],
+        body["metal_mass_g"],
+    )
 
 
 def mole_percent_to_mole_fraction(percent: Decimal) -> Decimal:
