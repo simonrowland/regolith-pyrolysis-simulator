@@ -1863,8 +1863,10 @@ def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     assert any("10000 K" in w for w in result.warnings)
 
 
-def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch):
-    """HI-8: 10000 K is refused by the T gate before any engine call.
+def test_10000K_finite_fabrication_regression_refuses_at_sum_pressure_ceiling(
+    monkeypatch,
+):
+    """HI-8: 10000 K reaches the engine but the finite sum still refuses.
 
     The 2026-07-31 probe stored sum_P_bar ≈ 8.3e5 as a fixture. Tests
     replay that literal through a fake System; they do not recompute it
@@ -1880,7 +1882,7 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
 
         def eval_gas_abundances(self, temperature, log_fO2):
             engine_calls["n"] += 1
-            # Would return probe-scale garbage if reached.
+            # Replays the probe-scale finite total through the existing guard.
             return {"SiO(g)": math.log10(VAPOROCK_PROBE_10000K_SUM_P_BAR)}
 
     fake_module = types.SimpleNamespace(System=FakeSystem)
@@ -1894,12 +1896,15 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
         fO2_log=3.025,  # probe IW-at-10000K-ish
         pressure_bar=1e-6,
     )
-    assert engine_calls["n"] == 0
+    assert engine_calls["n"] == 2
     assert result.status == "out_of_domain"
     assert result.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
     )
     assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(
+        VAPOROCK_PROBE_10000K_SUM_P_BAR
+    )
     # Stored 2026-07-31 fixture identity, not a live-engine recompute.
     assert VAPOROCK_PROBE_10000K_SUM_P_BAR == pytest.approx(8.323344495585738e5)
 
@@ -2420,16 +2425,17 @@ def test_warm_pool_owns_system_lifecycle_live():
         sum_bar = float(result.diagnostics.get("sum_pressure_bar") or 0.0)
         assert sum_bar < 10.0
 
-        # 10000 K still refused by the parent-side domain gate (no worker call).
-        refused = backend.equilibrate(
-            10000.0 - 273.15,
+        # Finite cold extrapolation reaches the warm worker and is flagged.
+        extrapolated = backend.equilibrate(
+            1200.0 - 273.15,
             composition_kg=_MARE_PROBE_WT_PCT,
-            fO2_log=3.0,
+            fO2_log=-9.94,
             pressure_bar=1e-6,
         )
-        assert refused.status == "out_of_domain"
-        assert refused.diagnostics["backend_status_reason"] == (
-            OutOfDomainReason.TEMPERATURE_RANGE.value
+        assert extrapolated.status == "non_authoritative"
+        assert extrapolated.diagnostics["temperature_K"] == pytest.approx(1200.0)
+        assert extrapolated.diagnostics["vaporock_temperature_notice"]["reason"] == (
+            "temperature_range"
         )
     finally:
         backend.close()
