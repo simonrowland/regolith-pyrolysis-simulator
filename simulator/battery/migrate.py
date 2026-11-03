@@ -1117,6 +1117,8 @@ def _bare_log_notice(
         affected_quantities=(quantity,),
         reason=decision.notice_reason,
         origin=origin,
+        band=decision.notice_band,
+        authority=decision.notice_authority,
     )
 
 
@@ -16223,6 +16225,8 @@ class PrintedOxygenDecision:
     state: State
     notice_reason: str | None = None
     notice_kind: NoticeKind = NoticeKind.INPUT_OMITTED
+    notice_band: str | None = None
+    notice_authority: Authority | None = None
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
@@ -16242,6 +16246,7 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
 
 
 _ATM_BAR = Decimal("1.01325")
+_ATM_PA = Decimal("101325")
 _AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
@@ -16286,6 +16291,53 @@ def _row_printed_atmospheres(
             if isinstance(value, str) and value.strip():
                 return (value.strip(),)
     return tuple(experiment_atmospheres)
+
+
+def _printed_direct_gas_couple(
+    as_printed: str,
+) -> tuple[dict[str, Decimal], dict[str, float]] | None:
+    """Parse a two-species SCCM couple and its last-digit relative precision."""
+
+    normalized = as_printed.replace("₂", "2").replace("₀", "0")
+    pieces = normalized.split("+")
+    species_mol: dict[str, Decimal] = {}
+    relative_precision: dict[str, float] = {}
+    component = re.compile(
+        r"^\s*(CO2|CO|H2O|H2)\s+(\d+(?:\.\d+)?)\s*[×x]\s*"
+        r"(\d+(?:\.\d+)?)\s*SCCM\s*$",
+        re.IGNORECASE,
+    )
+    for piece in pieces:
+        match = component.fullmatch(piece)
+        if match is None:
+            return None
+        species = match.group(1).upper()
+        fraction = Decimal(match.group(2))
+        flow = Decimal(match.group(3))
+        if species in species_mol or fraction <= 0 or flow <= 0:
+            return None
+        species_mol[species] = fraction * flow
+        # The printed percent and SCCM value both contribute to this component
+        # flow's absolute last-digit uncertainty.
+        relative_precision[species] = float(
+            _last_printed_digit(fraction) / fraction
+            + _last_printed_digit(flow) / flow
+        )
+    if set(species_mol) not in ({"CO2", "CO"}, {"H2O", "H2"}):
+        return None
+    return species_mol, relative_precision
+
+
+def _is_wgs_dependent_gas_mix(as_printed: str) -> bool:
+    normalized = as_printed.replace("₂", "2").replace("₀", "0").upper()
+    compact = re.sub(r"\s+", "", normalized)
+    species = set(re.findall(r"CO2|H2O|CO|H2", compact))
+    return (
+        "WGS" in compact
+        or {"CO2", "H2"}.issubset(species)
+        or {"CO", "H2O"}.issubset(species)
+        or {"CO", "CO2", "H2", "H2O"}.issubset(species)
+    )
 
 
 def _bare_log_frame_decision(
@@ -16336,21 +16388,141 @@ def _bare_log_frame_decision(
         return PrintedOxygenDecision("log", state, notice_reason=notice)
 
     tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
-    checked: list[tuple[str, Decimal]] = []
+    checked: list[tuple[str, Decimal, Decimal]] = []
     unsupported: list[str] = []
     for atmosphere in candidates:
         kind = _atmosphere_kind(atmosphere)
         if kind is None:
+            parsed_couple = _printed_direct_gas_couple(atmosphere)
+            if parsed_couple is not None and temperature_K is not None:
+                species_mol, relative_precision = parsed_couple
+                formation_gibbs: dict[str, Decimal] | None = {}
+                thermo_missing_reason = ""
+                try:
+                    from simulator.battery.generators.janaf import (
+                        JANAF_R_J_PER_MOL_K,
+                        _janaf_gas_formation_gibbs_J_per_mol,
+                    )
+
+                    for formula in (*species_mol, "O2"):
+                        formation_gibbs[formula] = (
+                            _janaf_gas_formation_gibbs_J_per_mol(
+                                formula, temperature_K
+                            )
+                        )
+                except (
+                    FileNotFoundError,
+                    OSError,
+                    KeyError,
+                    TypeError,
+                    ValueError,
+                ) as exc:
+                    formation_gibbs = None
+                    thermo_missing_reason = str(exc)
+                from simulator.chemistry.offgas_fo2 import (
+                    OffgasFO2Unavailable,
+                    _direct_gas_couple_fo2,
+                )
+
+                try:
+                    resolution = _direct_gas_couple_fo2(
+                        {name: float(amount) for name, amount in species_mol.items()},
+                        relative_precision,
+                        float(temperature_K),
+                        formation_gibbs_J_per_mol=(
+                            {
+                                name: float(value)
+                                for name, value in formation_gibbs.items()
+                            }
+                            if formation_gibbs is not None
+                            else None
+                        ),
+                        gas_constant_J_per_mol_K=(
+                            float(JANAF_R_J_PER_MOL_K)
+                            if formation_gibbs is not None
+                            else None
+                        ),
+                    )
+                except (
+                    ArithmeticError,
+                    OffgasFO2Unavailable,
+                    TypeError,
+                    ValueError,
+                ) as exc:
+                    unsupported.append(
+                        f"{atmosphere!r} (gas_mix_fo2_band_unavailable: {exc})"
+                    )
+                    continue
+                expected = Decimal(str(resolution.log10_fO2))
+                gas_band = Decimal(str(resolution.band_dex))
+                checked.append((atmosphere, expected, gas_band))
+                authority = (
+                    Authority.EXTRAPOLATED
+                    if resolution.authority == "extrapolated"
+                    else Authority.CERTIFIED
+                )
+                spread = (
+                    f"{resolution.thermo_spread_dex:.4f} dex"
+                    if resolution.thermo_spread_dex is not None
+                    else "unsized"
+                )
+                band_text = (
+                    f"tolerance={_dec_str(tolerance)} dex; "
+                    f"mix_precision={resolution.mix_precision_band_dex:.4f} dex; "
+                    f"thermo_spread={spread}; combined_band={_dec_str(gas_band)} dex"
+                )
+                if abs(log10_fO2 - expected) <= tolerance + gas_band:
+                    reason = (
+                        "bare fO2 frame matched printed atmosphere "
+                        f"{atmosphere!r}; expected CEA log10(fO2/bar)="
+                        f"{_display_fo2_dex(expected)}; {band_text}"
+                    )
+                    notices = (
+                        (
+                            PrintedOxygenNotice(
+                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                                reason=(
+                                    "gas_couple_thermo_spread_unsized: JANAF "
+                                    "species data are unavailable; using the "
+                                    "printed-flow mix band alone"
+                                    + (
+                                        f" ({thermo_missing_reason})"
+                                        if thermo_missing_reason
+                                        else ""
+                                    )
+                                ),
+                                band=band_text,
+                                authority=authority,
+                            ),
+                        )
+                        if resolution.thermo_spread_dex is None
+                        else ()
+                    )
+                    return PrintedOxygenDecision(
+                        "log",
+                        State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+                        notice_reason=reason,
+                        notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
+                        notice_band=band_text,
+                        notice_authority=authority,
+                        notices=notices,
+                    )
+                continue
+            if _is_wgs_dependent_gas_mix(atmosphere):
+                unsupported.append(
+                    f"{atmosphere!r} (gas_mix_fo2_band_unavailable: WGS-dependent mix)"
+                )
+                continue
             unsupported.append(atmosphere)
             continue
-        label, mole_fraction = kind
+        _label, mole_fraction = kind
         expected_bar = (mole_fraction * pressure_bar).ln() / Decimal(10).ln()
         expected_atm = expected_bar - _ATM_BAR.ln() / Decimal(10).ln()
         frames = (("bar", expected_bar), ("atm", expected_atm))
         matched_frame, matched_expected = min(
             frames, key=lambda item: abs(log10_fO2 - item[1])
         )
-        checked.append((atmosphere, expected_bar))
+        checked.append((atmosphere, expected_bar, Decimal(0)))
         if abs(log10_fO2 - matched_expected) <= tolerance:
             message = (
                 "bare fO2 frame matched printed atmosphere "
@@ -16361,19 +16533,26 @@ def _bare_log_frame_decision(
             )
             return PrintedOxygenDecision(
                 "log",
-                State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+                State.of(
+                    _log_fO2_to_pa(
+                        log10_fO2,
+                        _BAR_PA if matched_frame == "bar" else _ATM_PA,
+                    )
+                ),
                 notice_reason=message,
                 notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
             )
 
     if checked:
         expected = "; ".join(
-            f"{name!r}: log10(fO2/bar)={_display_fo2_dex(value)}"
-            for name, value in checked
+            f"{name!r}: log10(fO2/bar)={_display_fo2_dex(value)} "
+            f"± {_dec_str(tolerance + band)} dex"
+            for name, value, band in checked
         )
         reason = (
-            "bare log fO2 does not match any printed atmosphere within "
-            f"{_dec_str(tolerance)} dex; printed={_dec_str(log10_fO2)}; "
+            "bare log fO2 does not match any printed atmosphere; "
+            f"printed tolerance={_dec_str(tolerance)} dex; "
+            f"printed={_dec_str(log10_fO2)}; "
             f"expected {expected}"
         )
         notices = (
