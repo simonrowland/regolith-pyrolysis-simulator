@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 
 import pytest
 
@@ -16,6 +17,7 @@ from simulator.chemistry.melt_activity import (
     single_cation_mole_fractions,
     table_gamma_effective,
 )
+from simulator.battery.generators.janaf import janaf_fusion_energy
 
 
 # Sossi & Fegley 2018 Table 2 printed envelopes, as transcribed in
@@ -60,13 +62,71 @@ def test_na_and_k_remain_cited_point_anchors_with_domains() -> None:
     assert P2O5_ACTIVITY_COEFFICIENT.valid_range_K == (1823.0, 1923.0)
 
 
-def test_lunar_ca_mid_range_activity_is_unchanged() -> None:
+@pytest.mark.parametrize(
+    ("parent", "temperature_K"),
+    [
+        ("CaO", 1873.0),
+        ("CaO", 1973.0),
+        ("MgO", 1873.0),
+        ("MgO", 1973.0),
+    ],
+)
+def test_solid_reference_gamma_converts_to_liquid_janaf_reference(
+    parent: str, temperature_K: float
+) -> None:
+    gamma_s = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].gamma
+    delta_g_fus_kJ_per_mol = float(
+        janaf_fusion_energy(parent, Decimal(str(temperature_K))).delta_g_fus_kJ_per_mol
+    )
+    expected_gamma_l = gamma_s * math.exp(
+        -delta_g_fus_kJ_per_mol / (8.31446261815324e-3 * temperature_K)
+    )
     activity = melt_oxide_activity(
-        "CaO", {}, cation_mol_fraction={"CaO": 0.1156}
+        parent,
+        {parent: 1.0, "SiO2": 4.0},
+        temperature_K=temperature_K,
     )
     assert activity is not None
-    assert activity.effective_gamma == pytest.approx(0.012)
-    assert activity.activity == pytest.approx(0.012 * 0.1156)
+    assert activity.gamma == pytest.approx(expected_gamma_l)
+    assert activity.effective_gamma == pytest.approx(expected_gamma_l)
+    assert activity.activity == pytest.approx(expected_gamma_l * 0.2)
+
+
+@pytest.mark.parametrize("parent", ["CaO", "MgO"])
+def test_solid_reference_oxide_activity_requires_temperature(parent: str) -> None:
+    with pytest.raises(ValueError, match="temperature_K required"):
+        melt_oxide_activity(parent, {parent: 1.0, "SiO2": 4.0})
+
+
+@pytest.mark.parametrize("parent", ["Al2O3", "SiO2", "TiO2"])
+def test_liquid_reference_oxide_gammas_are_unchanged(parent: str) -> None:
+    gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].gamma
+    activity = melt_oxide_activity(
+        parent,
+        {parent: 1.0, "SiO2": 4.0},
+        temperature_K=1873.0,
+    )
+    assert activity is not None
+    assert activity.gamma == pytest.approx(gamma)
+    assert activity.effective_gamma == pytest.approx(gamma)
+
+
+@pytest.mark.parametrize("parent", ["MnO", "Cr2O3"])
+def test_solid_reference_uncertainty_is_visible_without_changing_gamma(
+    parent: str,
+) -> None:
+    gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].gamma
+    activity = melt_oxide_activity(
+        parent,
+        {parent: 1.0, "SiO2": 4.0},
+        temperature_K=1873.0,
+    )
+    assert activity is not None
+    assert activity.gamma == pytest.approx(gamma)
+    assert activity.warning == "gamma_reference_state_unverified"
+    assert activity.provenance()["melt_oxide_activity_warning"] == (
+        "gamma_reference_state_unverified"
+    )
 
 
 @pytest.mark.parametrize("temperature_K", [float("nan"), float("inf"), 0.0, -1.0])

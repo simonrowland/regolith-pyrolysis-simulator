@@ -158,7 +158,7 @@ def _assert_internal_activity_residual_matches_production(
     *,
     source_id: str,
     observation_id: str,
-) -> None:
+):
     from simulator.battery.generators.bench import activity_request_for_engine
 
     root = Path(__file__).resolve().parents[2]
@@ -206,6 +206,7 @@ def _assert_internal_activity_residual_matches_production(
     )
     assert fallback.authority is Authority.BRIDGE
     assert fallback.reason == "melt_oxide_activity has no certified evidence tier"
+    return residual
 
 
 def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
@@ -238,6 +239,42 @@ def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
     _assert_internal_activity_residual_matches_production(
         source_id=source_id,
         observation_id=observation.observation_id,
+    )
+
+
+def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> None:
+    source_id = "kume-2000-cao-activities"
+    observation_id = (
+        "kume-2000-cao-activities::kume_2000_table3_sample_207_mgo_activity"
+    )
+    residual = _assert_internal_activity_residual_matches_production(
+        source_id=source_id,
+        observation_id=observation_id,
+    )
+    assert residual.numeric is not None
+    assert abs(float(residual.numeric.value)) < 0.1
+
+
+@pytest.mark.parametrize("formula", ["MnO", "Cr2O3"])
+def test_internal_analytical_row_notices_unverified_gamma_reference(
+    formula: str,
+) -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "0.5"), (formula, "0.5")),
+        formula=formula,
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert any(
+        notice.reason == "gamma_reference_state_unverified"
+        for notice in prediction.notices
     )
 
 
