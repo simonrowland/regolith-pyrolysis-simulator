@@ -437,8 +437,12 @@ def melt_account_mol_from_kg(
 def mre_oxide_activity(
     oxide: str,
     account_mol: Mapping[str, float],
+    *,
+    temperature_K: float | None = None,
 ) -> float:
-    activity = melt_oxide_activity(oxide, account_mol)
+    activity = melt_oxide_activity(
+        oxide, account_mol, temperature_K=temperature_K
+    )
     if activity is None:
         return 0.0
     return max(0.0, float(activity.activity))
@@ -897,7 +901,11 @@ class ElectrolysisModel:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
 
-            activity = mre_oxide_activity(oxide, melt_account_mol)
+            activity = mre_oxide_activity(
+                oxide,
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
             reference = mre_decomposition_voltage_reference(
                 oxide,
                 temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
@@ -1008,8 +1016,16 @@ class ElectrolysisModel:
                 ))
 
         if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
-            activity = mre_oxide_activity('Fe2O3', melt_account_mol)
-            feo_activity = mre_oxide_activity('FeO', melt_account_mol)
+            activity = mre_oxide_activity(
+                'Fe2O3',
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
+            feo_activity = mre_oxide_activity(
+                'FeO',
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
             E_ferric = self.ferric_to_ferrous_voltage(
                 T_C,
                 activity,
@@ -1199,7 +1215,11 @@ class ElectrolysisModel:
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
-            activity = mre_oxide_activity(oxide, melt_account_mol)
+            activity = mre_oxide_activity(
+                oxide,
+                melt_account_mol,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
             metal = OXIDE_TO_METAL.get(oxide, ('', 1, 0))[0]
             E = self.nernst_voltage(
                 oxide,

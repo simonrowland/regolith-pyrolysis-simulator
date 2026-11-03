@@ -1213,7 +1213,11 @@ class ExtractionMixin:
         species_rows: dict[str, Any] = {}
         for static_declared_V, species in ladder_steps:
             for oxide in species:
-                activity_reference = melt_oxide_activity(oxide, cleaned_melt_mol)
+                activity_reference = melt_oxide_activity(
+                    oxide,
+                    cleaned_melt_mol,
+                    temperature_K=temperature_K,
+                )
                 activity = (
                     0.0
                     if activity_reference is None

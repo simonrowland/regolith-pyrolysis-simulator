@@ -531,7 +531,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 continue
             if composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
-            activity_reference = melt_oxide_activity(oxide, melt_mol)
+            activity_reference = melt_oxide_activity(
+                oxide, melt_mol, temperature_K=T_K
+            )
             activity = (
                 0.0
                 if activity_reference is None
