@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 747
-- Extracts (`literature_extract.v1`): 745
+- Sources: 748
+- Extracts (`literature_extract.v1`): 746
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 745
+- Extracts with no PDF: 746
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -702,6 +702,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `takeda-1986-liquid-copper-soda-slag` | Takeda, Y., Riveros, G., Park, Y.-J., and Yazawa, A. (1986). Equilibria between Liquid Copper and Soda Slag. Transactions of the Japan Institute of Metals, 27(8), 608–615. | 10.2320/matertrans1960.27.608 | ABSENT, `` | `raw/takeda-1986-liquid-copper-soda-slag/takeda-1986-liquid-copper-soda-slag.pdf` (present, e3923119); `text/takeda-1986-liquid-copper-soda-slag/` (17 files, exists); `tables/takeda-1986-liquid-copper-soda-slag/` (0 files, ABSENT) | `data/literature/extracts/takeda-1986-liquid-copper-soda-slag.yaml` (1 rows, draft) | `ledger/takeda-1986-liquid-copper-soda-slag.yaml`: — (—) |
 | `takeda-1990-sn-slag-matertrans` | Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and FeOx-CaO-SiO2 slag”, Materials Transactions JIM 31(9), 793–801. | 10.2320/matertrans1989.31.793 | ABSENT, `` | `raw/takeda-1990-sn-slag-matertrans/takeda-1990-sn-slag-matertrans.pdf` (ABSENT, ); `text/takeda-1990-sn-slag-matertrans/` (40 files, exists); `tables/takeda-1990-sn-slag-matertrans/` (8 files, exists) | `data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml` (13 rows, draft) | `ledger/takeda-1990-sn-slag-matertrans.yaml`: extracted (2026-10-05) |
 | `taniguchi-1997-feo-cas` | Taniguchi, Y., Morita, K. and Sano, N. (1997). Activities of FeO in CaO-Al2O3-SiO2-FeO and CaO-Al2O3-CaF2-FeO slags. ISIJ International, 37(10), 956-961. |  | ABSENT, `` | `raw/taniguchi-1997-feo-cas/taniguchi-1997-feo-cas.pdf` (present, 1c844938); `text/taniguchi-1997-feo-cas/` (44 files, exists); `tables/taniguchi-1997-feo-cas/` (6 files, exists) | `data/literature/extracts/taniguchi-1997-feo-cas.yaml` (141 rows, draft) | `ledger/taniguchi-1997-feo-cas.yaml`: acquired (2026-10-04) |
+| `tatsumi-2004-iron-condensation` | Tatsumi, K., Nagahara, H., Ozawa, K., and Tachibana, S. (2004). Condensation kinetics of metallic iron: an experimental study. Lunar and Planetary Science XXXV, abstract 2013. |  | ABSENT, `` | `raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf` (present, 74399ab0); `text/tatsumi-2004-iron-condensation/` (13 files, exists); `tables/tatsumi-2004-iron-condensation/` (0 files, ABSENT) | `data/literature/extracts/tatsumi-2004-iron-condensation.yaml` (2 rows, draft) | `ledger/tatsumi-2004-iron-condensation.yaml`: — (—) |
 | `terashima-2026-sro-slag-activity-preprint` | Terashima, D., Urata, K., Kobayashi, Y., Irisawa, E., Amano, M., and Kikuchi, T. (2026), “Measurement of the Activity Coefficient of SrO in Molten CaO-SiO2-Al2O3-MgO-MnO Slag at 1873 K,” SSRN preprint 7065037 (not peer reviewed). | 10.2139/ssrn.7065037 | ABSENT, `` | `raw/terashima-2026-sro-slag-activity-preprint/terashima-2026-sro-slag-activity-preprint.pdf` (present, 746aec3a); `text/terashima-2026-sro-slag-activity-preprint/` (49 files, exists); `tables/terashima-2026-sro-slag-activity-preprint/` (0 files, ABSENT) | `data/literature/extracts/terashima-2026-sro-slag-activity-preprint.yaml` (119 rows, draft) | `ledger/terashima-2026-sro-slag-activity-preprint.yaml`: — (—) |
 | `thomas-2022-chlorine-bonding-silicate-melts` | Thomas, R. W., Wade, J. & Wood, B. J. (2023), "The bonding environment of chlorine in silicate melts", Chemical Geology 617:121269, DOI 10.1016/j.chemgeo.2022.121269 | 10.1016/j.chemgeo.2022.121269 | ABSENT, `` | `raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf` (present, 50e804ac); `text/thomas-2022-chlorine-bonding-silicate-melts/` (27 files, exists); `tables/thomas-2022-chlorine-bonding-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/thomas-2022-chlorine-bonding-silicate-melts.yaml` (3 rows, draft, private_path) | `ledger/thomas-2022-chlorine-bonding-silicate-melts.yaml`: decoded (2026-09-06) |
 | `thomas-wood-2021-chlorine-silicate-melts` | Thomas, Richard W. & Wood, Bernard J. (2021), "The chemical behaviour of chlorine in silicate melts", Geochimica et Cosmochimica Acta. | 10.1016/j.gca.2020.11.018 | ABSENT, `` | `raw/thomas-wood-2021-chlorine-silicate-melts/thomas-wood-2021-chlorine-silicate-melts.pdf` (present, f190a321); `text/thomas-wood-2021-chlorine-silicate-melts/` (54 files, exists); `tables/thomas-wood-2021-chlorine-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/thomas-wood-2021-chlorine-silicate-melts.yaml` (11 rows, draft) | `ledger/thomas-wood-2021-chlorine-silicate-melts.yaml`: decoded (2026-09-06) |
@@ -1455,6 +1456,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `takeda-1986-liquid-copper-soda-slag`
 - `takeda-1990-sn-slag-matertrans`
 - `taniguchi-1997-feo-cas`
+- `tatsumi-2004-iron-condensation`
 - `terashima-2026-sro-slag-activity-preprint`
 - `thomas-2022-chlorine-bonding-silicate-melts`
 - `thomas-wood-2021-chlorine-silicate-melts`
