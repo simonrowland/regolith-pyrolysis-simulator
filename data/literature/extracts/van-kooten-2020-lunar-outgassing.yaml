@@ -153,6 +153,7 @@ species:
         table: '1'
         note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
       quote: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference column.
+      attribution: "Day et al. (2020b) and Kato & Moynier (2017), as named by Table 1 reference keys Day20 and Kato17."
       T_range_K: null
       phase: lunar_rock_samples
       condensed_form:
@@ -178,6 +179,7 @@ species:
           Zn_ppm: 0.8
           n: 2
           reference: Day20
+          attribution: Day et al. (2020b)
           evidence_class: quoted_attributed
         - sample: '15455'
           section: '391'
@@ -189,6 +191,7 @@ species:
           Zn_ppm: 2.0
           n: 2
           reference: Day20
+          attribution: Day et al. (2020b)
           evidence_class: quoted_attributed
         - sample: '72415'
           section: null
@@ -200,6 +203,7 @@ species:
           Zn_ppm: 2.6
           n: 1
           reference: Kato17
+          attribution: Kato & Moynier (2017)
           evidence_class: quoted_attributed
         - sample: '76535'
           section: '186'
@@ -211,6 +215,7 @@ species:
           Zn_ppm: 1.5
           n: 1
           reference: Day20
+          attribution: Day et al. (2020b)
           evidence_class: quoted_attributed
         - sample: '77215'
           section: null
@@ -222,6 +227,7 @@ species:
           Zn_ppm: 3.6
           n: 1
           reference: Kato17
+          attribution: Kato & Moynier (2017)
           evidence_class: quoted_attributed
         - sample: '78235'
           section: '156'
@@ -233,6 +239,7 @@ species:
           Zn_ppm: 2.0
           n: 2
           reference: Day20
+          attribution: Day et al. (2020b)
           evidence_class: quoted_attributed
         - sample: '78235'
           section: '172'
@@ -244,10 +251,12 @@ species:
           Zn_ppm: 2.0
           n: 1
           reference: Day20
+          attribution: Day et al. (2020b)
           evidence_class: quoted_attributed
       uncertainty:
         convention: 2SD
         note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements here.
+
     - observation_id: van_kooten_2020_zinc_printed_aggregate_comparisons
       type: rate_series
       locator:
