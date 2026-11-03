@@ -7074,11 +7074,22 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
 
 
 _SC456_SOURCE_IDS = (
+    "shornikov-2011-cao-mgo-alumina-melts",
     "banya-hino-takezoe-1985-na-fe-silicate-redox",
+    "liu-2023-chromium-oxide-activity",
+    "visscher-fegley-2013-debris-disks",
     "gca-366-210-berry-2024",
+    "shornikov-2023-cai-melt-evaporation",
     "yakovlev-2024-cai-vaporization",
+    "matsuzaki-1997-feo-tio2-sio2-activities",
     "yamaguchi-1984-na2o-activity-sodium-beta-alumina",
+    "no27-fegley-cameron-1987-epsl",
     "johnston-1965-sodium-disilicate-redox",
+    "charnoz-2023-hydrogen-magma-ocean",
+    "shornikov-2023-mgo-phosphate-melts",
+    "mogul-2023-pioneer-venus-co2-icarus",
+    "kems-050-gorokhov-1977",
+    "centolanzi-1966-tektite-vapour-pressure",
 )
 
 
