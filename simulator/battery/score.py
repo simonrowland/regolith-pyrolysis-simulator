@@ -191,11 +191,13 @@ from simulator.battery.oxygen_balance import (
     has_own_engine_solved_oxygen_balance,
 )
 from simulator.battery.composition import (
+    SLAG_METAL_CHARGE_BASIS,
     canonical_element_symbol,
     chloride_component_symbol,
     composition_wt_pct,
     element_mass_fraction_redox,
     element_wt_percent_on_printed_analysis,
+    elemental_charge_symbol,
     excluded_component_notice_reason,
     partition_engine_components,
     phase_ppm_mass_as_wt_percent,
@@ -8726,6 +8728,62 @@ def _stored_element_wt_percent(
     return dict(located.state.value.components), sigma
 
 
+# Listed on an adapter basis, and not a metal phase. MAGEMin O is excess
+# redox oxygen. MAGEMin S is bulk sulfur. Neither is the alloy element.
+_BASIS_TOKENS_THAT_ARE_NOT_METAL = frozenset(
+    {"O", "S", "H2O", "CO2", "FeOt", "FeO_total", "FeOT"}
+)
+
+
+def _engine_accepts_metal_component(engine: Engine, symbol: str) -> bool:
+    """True when the adapter lists this element as a metal component.
+
+    No current adapter does. A name that is only excess oxygen or bulk
+    sulfur is not accepted as the metal.
+    """
+
+    if elemental_charge_symbol(symbol) is None:
+        return False
+    if symbol in _BASIS_TOKENS_THAT_ARE_NOT_METAL:
+        return False
+    return symbol in _engine_bulk_component_names(engine)
+
+
+def _unaccepted_metal_charge(
+    engine: Engine, composition: Composition
+) -> tuple[RefusalReason, dict[str, object]] | None:
+    """Refuse a slag-metal charge this engine cannot take as metal.
+
+    Ordinary oxide maps, including a bulk sulfur component, are not this
+    charge and stay on the omit path.
+    """
+
+    if composition.basis != SLAG_METAL_CHARGE_BASIS:
+        return None
+    metals = [
+        name
+        for name, amount in composition.components
+        if amount > 0
+        and elemental_charge_symbol(name) is not None
+        and not _engine_accepts_metal_component(engine, name)
+    ]
+    if not metals:
+        return None
+    return (
+        RefusalReason.ENGINE_CANNOT_ACCEPT_METAL,
+        {
+            "reason": RefusalReason.ENGINE_CANNOT_ACCEPT_METAL.value,
+            "engine": engine.value,
+            "metal_components": tuple(metals),
+            "detail": (
+                "engine input keeps metallic elements as metals; "
+                "this engine accepts no metal component; "
+                "the metal is not dropped or converted"
+            ),
+        },
+    )
+
+
 def _engine_bulk_component_names(engine: Engine) -> tuple[str, ...]:
     """Declared bulk components. Chlorine is included only from this set."""
 
@@ -9222,6 +9280,10 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    metal_charge = _unaccepted_metal_charge(engine, composition_state.value)
+    if metal_charge is not None:
+        reason, detail = metal_charge
+        return refused(reason, detail)
     if (
         quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
