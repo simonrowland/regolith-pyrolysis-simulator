@@ -3085,6 +3085,10 @@ def fusion_comparison_reference(
     #     = 0.00002451128698546067397078399944.
     # At or above T_fus the identity does not apply: the unprinted solid
     # still refuses under d-165, and non-positive points never reach here.
+    # MAGEMin does not take this liquid shift. Its comparison basis is the
+    # native crystal in MAGEMIN_NATIVE_MELT_ACTIVITIES. Resolved periclase
+    # is that basis, so printed MgO(s) stays on the crystal at a_s. CaO is
+    # not a native MAGEMin activity, so that printed solid stays too.
     d144_notice: Notice | None = None
     resolved_polymorph: Polymorph | None = None
     if (
@@ -3135,20 +3139,49 @@ def fusion_comparison_reference(
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
-    # d-144 already named the crystal. Do not take MAGEMin's native solid
-    # basis or infer a crystal from the stability set; the liquid shift
-    # below is the same t1263e3 path as every other melt-activity engine.
-    if engine is Engine.MAGEMIN and resolved_polymorph is None:
+    # MAGEMin's native basis is the crystal in MAGEMIN_NATIVE_MELT_ACTIVITIES.
+    # A resolved d-144 polymorph is the source crystal for that path: MgO
+    # periclase already matches, and CaO has no native activity. Do not infer
+    # a crystal from the stability set, and do not shift either oxide to liquid.
+    if engine is Engine.MAGEMIN:
         from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
         native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(formula)
         if native is None:
-            return reference
+            if d144_notice is None:
+                return reference
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (d144_notice,)),
+            )
         magemin_target_polymorph = Polymorph(native[1])
-        magemin_source_polymorph = polymorph_token(standard_state.endmember)
+        magemin_source_polymorph = (
+            resolved_polymorph
+            if resolved_polymorph is not None
+            else polymorph_token(standard_state.endmember)
+        )
         if magemin_source_polymorph is magemin_target_polymorph:
-            # Guo's MgO measurement is already on the periclase standard.
-            return reference
+            # Stated periclase is already the native basis and returns as-is.
+            # d-144 names that same crystal on an unprinted '(s)'. Write the
+            # polymorph onto the printed solid so the native-basis match sees
+            # it, and keep the printed activity.
+            if d144_notice is None:
+                return reference
+            named_endmember = replace(
+                standard_state.endmember,
+                polymorph=State.of(magemin_target_polymorph),
+            )
+            named_identity = replace(
+                identity,
+                reference_state=State.of(
+                    replace(standard_state, endmember=named_endmember)
+                ),
+            )
+            return replace(
+                reference,
+                identity=named_identity,
+                notices=union_notices(reference.notices, (d144_notice,)),
+            )
 
     def fusion_missing_input_notice(reason: str) -> Notice | None:
         if not any(
@@ -3181,7 +3214,7 @@ def fusion_comparison_reference(
 
     inferred_reference_notice: Notice | None = None
     try:
-        if engine is Engine.MAGEMIN and resolved_polymorph is None:
+        if engine is Engine.MAGEMIN:
             # The MAGEMin adapter resolves the source and target crystal
             # tables itself and reads only this oxide's liquid table. A liquid
             # reference names no crystal polymorph, so the source-named lookup
@@ -3216,7 +3249,7 @@ def fusion_comparison_reference(
         extra = (notice,) if d144_notice is None else (d144_notice, notice)
         return replace(reference, notices=union_notices(reference.notices, extra))
 
-    if engine is Engine.MAGEMIN and resolved_polymorph is None:
+    if engine is Engine.MAGEMIN:
         assert magemin_target_polymorph is not None
         source_polymorph = magemin_source_polymorph
         target_polymorph = magemin_target_polymorph
