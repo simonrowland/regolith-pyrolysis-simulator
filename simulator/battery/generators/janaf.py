@@ -2598,8 +2598,20 @@ _FUSION_TABLES = {
     "SiO2": ("O-035", "O-038"),
 }
 
+# d-144 closed single-polymorph identity (ruling 2026-11-03). At 1 bar,
+# CaO and MgO each have exactly one crystal structure up to melting
+# (rock-salt lime / periclase), so a printed '(s)' below T_fus is that
+# structure. This is not "JANAF lists one crystal table": Al2O3 has
+# untabulated metastable gamma/delta/theta forms. Only these two table
+# ids are that identity. `_JANAF_POLYMORPH_BY_TABLE` spreads this dict;
+# do not copy the pairs.
+_D144_SINGLE_POLYMORPH_TABLES: dict[str, Polymorph] = {
+    "Ca-027": Polymorph.LIME,
+    "Mg-008": Polymorph.PERICLASE,
+}
+
 _JANAF_POLYMORPH_BY_TABLE = {
-    **{"Ca-027": Polymorph.LIME, "Mg-008": Polymorph.PERICLASE},
+    **_D144_SINGLE_POLYMORPH_TABLES,
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
