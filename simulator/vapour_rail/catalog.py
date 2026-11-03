@@ -95,7 +95,13 @@ _THERMO_EXTRACT_DIR = (
     Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 )
 _THERMO_EXTRACT_PARSE_CACHE: dict[
-    str, tuple[tuple[int, int, int, int, int], str, Mapping[str, Any]]
+    str,
+    tuple[
+        tuple[int, int, int, int, int],
+        str,
+        Mapping[str, Any],
+        Mapping[str, tuple[Mapping[str, Any], ...]] | None,
+    ],
 ] = {}
 _THERMO_OBSERVATION_CACHE: dict[
     tuple[str, str], tuple[Mapping[str, Any], Mapping[str, Any]]
@@ -144,7 +150,12 @@ def _load_thermo_extract(source_id: str, *, field: str) -> Mapping[str, Any]:
         ) from exc
     digest = hashlib.sha256(raw).hexdigest()
     if cached is not None and cached[1] == digest:
-        _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, cached[2])
+        _THERMO_EXTRACT_PARSE_CACHE[source_id] = (
+            signature,
+            digest,
+            cached[2],
+            cached[3],
+        )
         return cached[2]
     try:
         parsed = load_cached_safe_yaml(
@@ -156,8 +167,41 @@ def _load_thermo_extract(source_id: str, *, field: str) -> Mapping[str, Any]:
             f"{field}: cannot parse thermo extract {source_id!r}"
         ) from exc
     extract = _mapping(parsed, f"thermo extract {source_id}")
-    _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, extract)
+    _THERMO_EXTRACT_PARSE_CACHE[source_id] = (signature, digest, extract, None)
     return extract
+
+
+def _thermo_extract_observation_index(
+    source_id: str, extract: Mapping[str, Any]
+) -> Mapping[str, tuple[Mapping[str, Any], ...]]:
+    """Build and retain one observation-id index for a parsed extract."""
+
+    cached = _THERMO_EXTRACT_PARSE_CACHE.get(source_id)
+    if cached is not None and cached[2] is extract and cached[3] is not None:
+        return cached[3]
+    species = _mapping(extract.get("species"), f"thermo extract {source_id}.species")
+    indexed: dict[str, list[Mapping[str, Any]]] = {}
+    for species_row in species.values():
+        if not isinstance(species_row, Mapping):
+            continue
+        observations = species_row.get("observations")
+        if not isinstance(observations, list):
+            continue
+        for observation in observations:
+            if not isinstance(observation, Mapping):
+                continue
+            observation_id = observation.get("observation_id")
+            if isinstance(observation_id, str):
+                indexed.setdefault(observation_id, []).append(observation)
+    index = {key: tuple(rows) for key, rows in indexed.items()}
+    if cached is not None and cached[2] is extract:
+        _THERMO_EXTRACT_PARSE_CACHE[source_id] = (
+            cached[0],
+            cached[1],
+            extract,
+            index,
+        )
+    return index
 
 
 def _thermo_extract_observation(
@@ -190,20 +234,8 @@ def _thermo_extract_observation(
     cached_observation = _THERMO_OBSERVATION_CACHE.get(observation_cache_key)
     if cached_observation is not None and cached_observation[0] is extract:
         return deepcopy(dict(cached_observation[1]))
-    species = _mapping(extract.get("species"), f"thermo extract {source_id}.species")
-    matches: list[Mapping[str, Any]] = []
-    for species_row in species.values():
-        if not isinstance(species_row, Mapping):
-            continue
-        observations = species_row.get("observations")
-        if not isinstance(observations, list):
-            continue
-        matches.extend(
-            observation
-            for observation in observations
-            if isinstance(observation, Mapping)
-            and observation.get("observation_id") == observation_id
-        )
+    observation_index = _thermo_extract_observation_index(source_id, extract)
+    matches = observation_index.get(observation_id, ())
     if len(matches) != 1:
         raise CatalogCompileError(
             f"{field}: observation {observation_id!r} must resolve exactly once "
