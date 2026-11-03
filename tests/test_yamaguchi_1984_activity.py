@@ -30,6 +30,7 @@ def test_abstract_activity_migrates_with_printed_conditions() -> None:
     assert point["evidence_class"] == "measured_reduced"
     assert row["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
     assert row["values"]["derivation"]["raw_inputs"]["locator"]["figure"] == "2"
+    assert "Nernst relation" in row["values"]["derivation"]["relation"]
     assert row["values"]["derivation"]["method"]["locator"] == {
         "page": 2,
         "published_page": 44,
