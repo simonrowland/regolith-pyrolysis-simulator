@@ -653,6 +653,12 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_1_slag_wt_pct
+            Fe: '42.5'
+            Ni: '4.50'
+            MgO: '21.8'
+            SiO2: '11.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -703,6 +709,10 @@ species:
         locator: *f37_1
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_1_metal_wt_pct
+            Fe: '11.2'
+            Ni: '91.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -741,6 +751,12 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_2_slag_wt_pct
+            Fe: '49.7'
+            Ni: '3.01'
+            MgO: '17.0'
+            SiO2: '11.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -791,6 +807,10 @@ species:
         locator: *f37_4
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_2_metal_wt_pct
+            Fe: '10.6'
+            Ni: '93.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -829,6 +849,12 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_3_slag_wt_pct
+            Fe: '48.8'
+            Ni: '1.21'
+            MgO: '18.0'
+            SiO2: '13.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -879,6 +905,10 @@ species:
         locator: *f37_7
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_3_metal_wt_pct
+            Fe: '15.6'
+            Ni: '86.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -917,6 +947,12 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_4_slag_wt_pct
+            Fe: '49.7'
+            Ni: '0.63'
+            MgO: '17.8'
+            SiO2: '18.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -967,6 +1003,10 @@ species:
         locator: *f37_10
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_4_metal_wt_pct
+            Fe: '24.2'
+            Ni: '76.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1005,6 +1045,13 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_5_slag_wt_pct
+            Fe: '41.4'
+            Ni: '3.02'
+            Cr: '2.30'
+            MgO: '23.0'
+            SiO2: '13.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1055,6 +1102,11 @@ species:
         locator: *f37_13
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_5_metal_wt_pct
+            Fe: '13.4'
+            Ni: '87.9'
+            Cr: '0.0007'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1093,6 +1145,13 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_6_slag_wt_pct
+            Fe: '38.9'
+            Ni: '2.15'
+            Cr: '2.85'
+            MgO: '22.9'
+            SiO2: '17.5'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1143,6 +1202,11 @@ species:
         locator: *f37_16
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_6_metal_wt_pct
+            Fe: '14.8'
+            Ni: '88.4'
+            Cr: '0.0007'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1181,6 +1245,13 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_7_slag_wt_pct
+            Fe: '37.4'
+            Ni: '0.97'
+            Cr: '2.19'
+            MgO: '24.8'
+            SiO2: '18.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1231,6 +1302,11 @@ species:
         locator: *f37_19
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_7_metal_wt_pct
+            Fe: '19.5'
+            Ni: '84.3'
+            Cr: '0.0053'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1269,6 +1345,13 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_8_slag_wt_pct
+            Fe: '35.6'
+            Ni: '1.20'
+            Cr: '2.75'
+            MgO: '28.4'
+            SiO2: '20.0'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1319,6 +1402,11 @@ species:
         locator: *f37_22
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_8_metal_wt_pct
+            Fe: '16.8'
+            Ni: '82.8'
+            Cr: '0.0010'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1357,6 +1445,13 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_9_slag_wt_pct
+            Fe: '31.9'
+            Ni: '0.81'
+            Cr: '1.24'
+            MgO: '29.9'
+            SiO2: '25.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1407,6 +1502,11 @@ species:
         locator: *f37_25
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_9_metal_wt_pct
+            Fe: '24.6'
+            Ni: '77.7'
+            Cr: '0.0010'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1445,6 +1545,13 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_10_slag_wt_pct
+            Fe: '38.5'
+            Ni: '0.63'
+            Cr: '2.29'
+            MgO: '21.8'
+            SiO2: '23.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1495,6 +1602,11 @@ species:
         locator: *f37_28
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_10_metal_wt_pct
+            Fe: '30.0'
+            Ni: '72.0'
+            Cr: '0.0013'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1533,6 +1645,13 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_11_slag_wt_pct
+            Fe: '28.7'
+            Ni: '0.16'
+            Cr: '0.66'
+            MgO: '30.8'
+            SiO2: '31.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1583,6 +1702,11 @@ species:
         locator: *f37_31
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_11_metal_wt_pct
+            Fe: '39.9'
+            Ni: '63.4'
+            Cr: '0.0019'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1621,6 +1745,13 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_12_slag_wt_pct
+            Fe: '25.8'
+            Ni: '0.36'
+            Cr: '2.33'
+            MgO: '29.0'
+            SiO2: '32.0'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1671,6 +1802,11 @@ species:
         locator: *f37_34
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_12_metal_wt_pct
+            Fe: '43.6'
+            Ni: '60.8'
+            Cr: '0.0015'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1709,6 +1845,13 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_13_slag_wt_pct
+            Fe: '27.9'
+            Ni: '0.12'
+            Cr: '1.59'
+            MgO: '27.2'
+            SiO2: '32.2'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1759,6 +1902,11 @@ species:
         locator: *f37_37
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_13_metal_wt_pct
+            Fe: '49.2'
+            Ni: '48.3'
+            Cr: '0.0029'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1797,6 +1945,13 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_14_slag_wt_pct
+            Fe: '21.7'
+            Ni: '0.03'
+            Cr: '2.58'
+            MgO: '29.2'
+            SiO2: '38.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1847,6 +2002,11 @@ species:
         locator: *f37_40
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_14_metal_wt_pct
+            Fe: '50.8'
+            Ni: '48.0'
+            Cr: '0.0350'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1885,6 +2045,13 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_15_slag_wt_pct
+            Fe: '36.9'
+            Ni: '0.21'
+            Mn: '3.15'
+            MgO: '21.9'
+            SiO2: '27.5'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -1935,6 +2102,11 @@ species:
         locator: *f37_43
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_15_metal_wt_pct
+            Fe: '35.3'
+            Ni: '69.2'
+            Mn: '0.0026'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -1973,6 +2145,13 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_16_slag_wt_pct
+            Fe: '33.2'
+            Ni: '0.12'
+            Mn: '3.62'
+            MgO: '24.2'
+            SiO2: '28.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2023,6 +2202,11 @@ species:
         locator: *f37_46
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_16_metal_wt_pct
+            Fe: '40.6'
+            Ni: '65.2'
+            Mn: '0.0036'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2061,6 +2245,13 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_17_slag_wt_pct
+            Fe: '30.4'
+            Ni: '0.06'
+            Mn: '3.97'
+            MgO: '25.0'
+            SiO2: '33.8'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2111,6 +2302,11 @@ species:
         locator: *f37_49
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_1_A_17_metal_wt_pct
+            Fe: '44.3'
+            Ni: '61.2'
+            Mn: '0.0049'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2149,6 +2345,14 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_1_slag_wt_pct
+            Fe: '24.9'
+            Ni: '0.94'
+            Cr: '3.95'
+            MgO: '20.3'
+            SiO2: '19.4'
+            CaO: '18.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2199,6 +2403,11 @@ species:
         locator: *f37_52
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_1_metal_wt_pct
+            Fe: '11.3'
+            Ni: '92.1'
+            Cr: '0.0013'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2237,6 +2446,14 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_2_slag_wt_pct
+            Fe: '30.6'
+            Ni: '0.40'
+            Cr: '3.37'
+            MgO: '17.6'
+            SiO2: '17.7'
+            CaO: '16.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2287,6 +2504,11 @@ species:
         locator: *f37_55
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_2_metal_wt_pct
+            Fe: '30.8'
+            Ni: '73.8'
+            Cr: '0.0017'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2325,6 +2547,14 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_3_slag_wt_pct
+            Fe: '25.5'
+            Ni: '0.21'
+            Cr: '0.98'
+            MgO: '15.8'
+            SiO2: '25.2'
+            CaO: '22.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2375,6 +2605,11 @@ species:
         locator: *f37_58
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_3_metal_wt_pct
+            Fe: '40.9'
+            Ni: '63.6'
+            Cr: '0.0045'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2413,6 +2648,14 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_4_slag_wt_pct
+            Fe: '23.9'
+            Ni: '0.06'
+            Cr: '1.16'
+            MgO: '17.0'
+            SiO2: '24.0'
+            CaO: '23.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2463,6 +2706,11 @@ species:
         locator: *f37_61
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_4_metal_wt_pct
+            Fe: '55.9'
+            Ni: '48.3'
+            Cr: '0.0065'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2501,6 +2749,11 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_5_metal_wt_pct
+            Fe: '67.1'
+            Ni: '36.5'
+            Cr: '0.0110'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2556,6 +2809,14 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_6_slag_wt_pct
+            Fe: '24.5'
+            Ni: '4.02'
+            Mn: '1.59'
+            MgO: '15.1'
+            SiO2: '22.3'
+            CaO: '20.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2606,6 +2867,11 @@ species:
         locator: *f37_65
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_6_metal_wt_pct
+            Fe: '9.3'
+            Ni: '95.0'
+            Mn: '0.0032'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2644,6 +2910,14 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_7_slag_wt_pct
+            Fe: '22.7'
+            Ni: '0.35'
+            Mn: '1.80'
+            MgO: '15.9'
+            SiO2: '26.7'
+            CaO: '23.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2694,6 +2968,11 @@ species:
         locator: *f37_68
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_7_metal_wt_pct
+            Fe: '18.9'
+            Ni: '86.1'
+            Mn: '0.0044'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2732,6 +3011,14 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_8_slag_wt_pct
+            Fe: '18.3'
+            Ni: '0.15'
+            Mn: '2.03'
+            MgO: '16.1'
+            SiO2: '28.6'
+            CaO: '26.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2782,6 +3069,11 @@ species:
         locator: *f37_71
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_8_metal_wt_pct
+            Fe: '30.9'
+            Ni: '74.5'
+            Mn: '0.0100'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2820,6 +3112,14 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_9_slag_wt_pct
+            Fe: '14.6'
+            Ni: '0.13'
+            Mn: '2.52'
+            MgO: '18.5'
+            SiO2: '30.5'
+            CaO: '27.2'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2870,6 +3170,11 @@ species:
         locator: *f37_74
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_9_metal_wt_pct
+            Fe: '34.3'
+            Ni: '71.5'
+            Mn: '0.0160'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2908,6 +3213,14 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_10_slag_wt_pct
+            Fe: '12.3'
+            Ni: '0.09'
+            Mn: '2.28'
+            MgO: '19.3'
+            SiO2: '30.1'
+            CaO: '28.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -2958,6 +3271,11 @@ species:
         locator: *f37_77
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_10_metal_wt_pct
+            Fe: '35.8'
+            Ni: '69.1'
+            Mn: '0.0220'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -2996,6 +3314,13 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_1_slag_wt_pct
+            Fe: '25.8'
+            Ni: '0.88'
+            MgO: '31.6'
+            SiO2: '23.0'
+            Al2O3: '11.5'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3051,6 +3376,13 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_2_slag_wt_pct
+            Fe: '27.8'
+            Ni: '0.32'
+            MgO: '24.3'
+            SiO2: '21.2'
+            Al2O3: '15.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3106,6 +3438,13 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_3_slag_wt_pct
+            Fe: '25.1'
+            Ni: '0.17'
+            MgO: '23.4'
+            SiO2: '25.1'
+            Al2O3: '14.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3161,6 +3500,13 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_4_slag_wt_pct
+            Fe: '21.7'
+            Ni: '0.09'
+            MgO: '18.7'
+            SiO2: '25.4'
+            Al2O3: '16.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3216,6 +3562,13 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_5_slag_wt_pct
+            Fe: '30.4'
+            Ni: '0.07'
+            MgO: '24.3'
+            SiO2: '19.7'
+            Al2O3: '15.8'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3271,6 +3624,14 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_8_slag_wt_pct
+            Fe: '26.9'
+            Ni: '0.89'
+            Cr: '7.30'
+            MgO: '16.0'
+            SiO2: '20.1'
+            Al2O3: '15.3'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3326,6 +3687,14 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_9_slag_wt_pct
+            Fe: '27.6'
+            Ni: '0.95'
+            Cr: '1.85'
+            MgO: '23.7'
+            SiO2: '20.0'
+            Al2O3: '14.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3381,6 +3750,14 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_10_slag_wt_pct
+            Fe: '31.1'
+            Ni: '0.12'
+            Cr: '0.73'
+            MgO: '19.2'
+            SiO2: '19.5'
+            Al2O3: '12.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3436,6 +3813,14 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_11_slag_wt_pct
+            Fe: '26.4'
+            Ni: '0.43'
+            Cr: '6.66'
+            MgO: '16.8'
+            SiO2: '24.3'
+            Al2O3: '15.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3491,6 +3876,14 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_12_slag_wt_pct
+            Fe: '27.6'
+            Ni: '0.14'
+            Cr: '5.16'
+            MgO: '17.4'
+            SiO2: '24.7'
+            Al2O3: '13.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3546,6 +3939,14 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_13_slag_wt_pct
+            Fe: '30.9'
+            Ni: '0.38'
+            Cr: '1.07'
+            MgO: '19.8'
+            SiO2: '25.5'
+            Al2O3: '15.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3601,6 +4002,14 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_14_slag_wt_pct
+            Fe: '27.0'
+            Ni: '0.32'
+            Cr: '1.14'
+            MgO: '24.2'
+            SiO2: '24.7'
+            Al2O3: '12.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3656,6 +4065,14 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_15_slag_wt_pct
+            Fe: '27.3'
+            Ni: '0.33'
+            Cr: '0.95'
+            MgO: '22.3'
+            SiO2: '23.9'
+            Al2O3: '13.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3711,6 +4128,14 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_16_slag_wt_pct
+            Fe: '23.0'
+            Ni: '0.23'
+            Cr: '1.52'
+            MgO: '28.0'
+            SiO2: '24.2'
+            Al2O3: '14.8'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3766,6 +4191,14 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_18_slag_wt_pct
+            Fe: '32.2'
+            Ni: '0.77'
+            Cu: '0.066'
+            MgO: '21.5'
+            SiO2: '21.0'
+            Al2O3: '12.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3821,6 +4254,14 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_19_slag_wt_pct
+            Fe: '30.4'
+            Ni: '0.19'
+            Cu: '0.045'
+            MgO: '19.9'
+            SiO2: '24.8'
+            Al2O3: '13.2'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3876,6 +4317,14 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_20_slag_wt_pct
+            Fe: '27.4'
+            Ni: '0.07'
+            Cu: '0.033'
+            MgO: '20.9'
+            SiO2: '28.5'
+            Al2O3: '14.0'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3931,6 +4380,14 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_21_slag_wt_pct
+            Fe: '23.2'
+            Ni: '0.10'
+            Cu: '0.030'
+            MgO: '25.8'
+            SiO2: '31.8'
+            Al2O3: '14.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -3986,6 +4443,14 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_22_slag_wt_pct
+            Fe: '22.5'
+            Ni: '0.05'
+            Cu: '0.017'
+            MgO: '24.6'
+            SiO2: '30.6'
+            Al2O3: '14.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4041,6 +4506,14 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_23_slag_wt_pct
+            Fe: '21.3'
+            Ni: '0.05'
+            Cu: '0.013'
+            MgO: '27.7'
+            SiO2: '29.5'
+            Al2O3: '11.5'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4096,6 +4569,14 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_24_slag_wt_pct
+            Fe: '16.1'
+            Ni: '0.46'
+            Co: '0.0800'
+            MgO: '31.9'
+            SiO2: '22.2'
+            Al2O3: '15.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4151,6 +4632,14 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_25_slag_wt_pct
+            Fe: '17.0'
+            Ni: '0.18'
+            Co: '0.0400'
+            MgO: '33.1'
+            SiO2: '27.5'
+            Al2O3: '13.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4206,6 +4695,14 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_26_slag_wt_pct
+            Fe: '27.6'
+            Ni: '0.09'
+            Co: '0.0210'
+            MgO: '22.9'
+            SiO2: '26.7'
+            Al2O3: '11.8'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4261,6 +4758,14 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_27_slag_wt_pct
+            Fe: '17.8'
+            Ni: '0.04'
+            Co: '0.0048'
+            MgO: '31.3'
+            SiO2: '29.0'
+            Al2O3: '12.6'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4316,6 +4821,14 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_28_slag_wt_pct
+            Fe: '18.3'
+            Ni: '0.03'
+            Co: '0.0035'
+            MgO: '32.7'
+            SiO2: '29.5'
+            Al2O3: '10.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: slag
@@ -4372,6 +4885,10 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_1_metal_wt_pct
+            Fe: '8.8'
+            Ni: '91.2'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4427,6 +4944,10 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_2_metal_wt_pct
+            Fe: '12.7'
+            Ni: '87.2'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4482,6 +5003,10 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_3_metal_wt_pct
+            Fe: '20.4'
+            Ni: '81.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4537,6 +5062,10 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_4_metal_wt_pct
+            Fe: '17.0'
+            Ni: '79.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4592,6 +5121,10 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_5_metal_wt_pct
+            Fe: '15.9'
+            Ni: '86.9'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4647,6 +5180,10 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_6_metal_wt_pct
+            Fe: '19.6'
+            Ni: '77.5'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4702,6 +5239,10 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_7_metal_wt_pct
+            Fe: '25.2'
+            Ni: '78.8'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4757,6 +5298,11 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_8_metal_wt_pct
+            Fe: '9.1'
+            Ni: '86.5'
+            Cr: '0.0003'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4812,6 +5358,11 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_9_metal_wt_pct
+            Fe: '12.4'
+            Ni: '89.3'
+            Cr: '0.0001'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4867,6 +5418,11 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_10_metal_wt_pct
+            Fe: '10.9'
+            Ni: '80.4'
+            Cr: '0.0002'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4922,6 +5478,11 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_11_metal_wt_pct
+            Fe: '11.5'
+            Ni: '86.5'
+            Cr: '0.0004'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -4977,6 +5538,11 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_12_metal_wt_pct
+            Fe: '16.2'
+            Ni: '79.5'
+            Cr: '0.0008'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5032,6 +5598,11 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_13_metal_wt_pct
+            Fe: '18.9'
+            Ni: '75.0'
+            Cr: '0.0001'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5087,6 +5658,11 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_14_metal_wt_pct
+            Fe: '13.9'
+            Ni: '88.7'
+            Cr: '0.0006'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5142,6 +5718,11 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_15_metal_wt_pct
+            Fe: '18.2'
+            Ni: '74.9'
+            Cr: '0.0009'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5197,6 +5778,11 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_16_metal_wt_pct
+            Fe: '11.3'
+            Ni: '89.9'
+            Cr: '0.0019'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5252,6 +5838,11 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_17_metal_wt_pct
+            Fe: '29.4'
+            Ni: '69.1'
+            Cr: '0.0018'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5307,6 +5898,11 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_18_metal_wt_pct
+            Fe: '12.4'
+            Ni: '90.3'
+            Co: '3.68'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5362,6 +5958,11 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_19_metal_wt_pct
+            Fe: '16.9'
+            Ni: '84.8'
+            Co: '3.50'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5417,6 +6018,11 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_20_metal_wt_pct
+            Fe: '20.0'
+            Ni: '75.4'
+            Co: '3.30'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5472,6 +6078,11 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_21_metal_wt_pct
+            Fe: '19.0'
+            Ni: '80.2'
+            Co: '3.23'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5527,6 +6138,11 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_22_metal_wt_pct
+            Fe: '26.9'
+            Ni: '73.0'
+            Co: '2.98'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5582,6 +6198,11 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_23_metal_wt_pct
+            Fe: '21.0'
+            Ni: '75.9'
+            Co: '2.65'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5637,6 +6258,11 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_24_metal_wt_pct
+            Fe: '9.9'
+            Ni: '85.8'
+            Co: '1.63'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5692,6 +6318,11 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_25_metal_wt_pct
+            Fe: '18.8'
+            Ni: '77.4'
+            Co: '1.74'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5747,6 +6378,11 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_26_metal_wt_pct
+            Fe: '18.4'
+            Ni: '75.6'
+            Co: '1.79'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5802,6 +6438,11 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_27_metal_wt_pct
+            Fe: '23.7'
+            Ni: '71.1'
+            Co: '1.58'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5857,6 +6498,11 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_28_metal_wt_pct
+            Fe: '22.3'
+            Ni: '72.6'
+            Co: '1.63'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Ni
           phase_label: metal
@@ -5946,6 +6592,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -5996,6 +6644,8 @@ species:
         locator: *f37_105
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6034,6 +6684,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6084,6 +6736,8 @@ species:
         locator: *f37_108
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6122,6 +6776,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6172,6 +6828,8 @@ species:
         locator: *f37_111
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6210,6 +6868,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6260,6 +6920,8 @@ species:
         locator: *f37_114
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6298,6 +6960,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6348,6 +7012,8 @@ species:
         locator: *f37_117
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6386,6 +7052,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6436,6 +7104,8 @@ species:
         locator: *f37_120
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6474,6 +7144,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6524,6 +7196,8 @@ species:
         locator: *f37_123
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6562,6 +7236,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6612,6 +7288,8 @@ species:
         locator: *f37_126
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6650,6 +7328,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6700,6 +7380,8 @@ species:
         locator: *f37_129
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6738,6 +7420,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6788,6 +7472,8 @@ species:
         locator: *f37_132
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6826,6 +7512,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6876,6 +7564,8 @@ species:
         locator: *f37_135
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -6914,6 +7604,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -6964,6 +7656,8 @@ species:
         locator: *f37_138
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -7002,6 +7696,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7052,6 +7748,8 @@ species:
         locator: *f37_141
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -7090,6 +7788,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7140,6 +7840,8 @@ species:
         locator: *f37_144
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -7178,6 +7880,14 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_2_B_5_slag_wt_pct
+            Fe: '23.6'
+            Ni: '< 0.03'
+            Cr: '0.64'
+            MgO: '15.4'
+            SiO2: '27.0'
+            CaO: '25.1'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7228,6 +7938,8 @@ species:
         locator: *f37_147
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -7266,6 +7978,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7321,6 +8035,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7376,6 +8092,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7431,6 +8149,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7486,6 +8206,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7541,6 +8263,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7596,6 +8320,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7651,6 +8377,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7706,6 +8434,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7761,6 +8491,14 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_17_slag_wt_pct
+            Fe: '17.5'
+            Ni: '< 0.03'
+            Cr: '0.74'
+            MgO: '28.1'
+            SiO2: '32.3'
+            Al2O3: '15.4'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: slag
@@ -7876,6 +8614,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -7926,6 +8666,8 @@ species:
         locator: *f37_160
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -7964,6 +8706,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8014,6 +8758,8 @@ species:
         locator: *f37_163
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8052,6 +8798,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8102,6 +8850,8 @@ species:
         locator: *f37_166
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8140,6 +8890,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8190,6 +8942,8 @@ species:
         locator: *f37_169
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8228,6 +8982,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8278,6 +9034,8 @@ species:
         locator: *f37_172
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8316,6 +9074,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8366,6 +9126,8 @@ species:
         locator: *f37_175
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8404,6 +9166,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8454,6 +9218,8 @@ species:
         locator: *f37_178
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8492,6 +9258,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: slag
@@ -8542,6 +9310,8 @@ species:
         locator: *f37_181
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -8612,6 +9382,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Co
           phase_label: slag
@@ -8667,6 +9439,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Co
           phase_label: slag
@@ -8722,6 +9496,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Co
           phase_label: slag
@@ -8777,6 +9553,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Co
           phase_label: slag
@@ -8832,6 +9610,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Co
           phase_label: slag
@@ -8922,6 +9702,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -8977,6 +9759,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -9032,6 +9816,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -9087,6 +9873,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -9142,6 +9930,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -9197,6 +9987,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Cu
           phase_label: slag
@@ -9355,6 +10147,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9405,6 +10199,8 @@ species:
         locator: *f37_262
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_1_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9443,6 +10239,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9493,6 +10291,8 @@ species:
         locator: *f37_265
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_2_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9531,6 +10331,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9581,6 +10383,8 @@ species:
         locator: *f37_268
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_3_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9619,6 +10423,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9669,6 +10475,8 @@ species:
         locator: *f37_271
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_4_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9707,6 +10515,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9757,6 +10567,8 @@ species:
         locator: *f37_274
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9795,6 +10607,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9845,6 +10659,8 @@ species:
         locator: *f37_277
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9883,6 +10699,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -9933,6 +10751,8 @@ species:
         locator: *f37_280
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -9971,6 +10791,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10021,6 +10843,8 @@ species:
         locator: *f37_283
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10059,6 +10883,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10109,6 +10935,8 @@ species:
         locator: *f37_286
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10147,6 +10975,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10197,6 +11027,8 @@ species:
         locator: *f37_289
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10235,6 +11067,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10285,6 +11119,8 @@ species:
         locator: *f37_292
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10323,6 +11159,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10373,6 +11211,8 @@ species:
         locator: *f37_295
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10411,6 +11251,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10461,6 +11303,8 @@ species:
         locator: *f37_298
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10499,6 +11343,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10549,6 +11395,8 @@ species:
         locator: *f37_301
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10587,6 +11435,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10637,6 +11487,8 @@ species:
         locator: *f37_304
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10675,6 +11527,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10725,6 +11579,8 @@ species:
         locator: *f37_307
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10763,6 +11619,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10813,6 +11671,8 @@ species:
         locator: *f37_310
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10851,6 +11711,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10901,6 +11763,8 @@ species:
         locator: *f37_313
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -10939,6 +11803,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -10989,6 +11855,8 @@ species:
         locator: *f37_316
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11027,6 +11895,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11077,6 +11947,8 @@ species:
         locator: *f37_319
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11115,6 +11987,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11165,6 +12039,8 @@ species:
         locator: *f37_322
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11203,6 +12079,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11253,6 +12131,8 @@ species:
         locator: *f37_325
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11291,6 +12171,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11341,6 +12223,8 @@ species:
         locator: *f37_328
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11379,6 +12263,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11429,6 +12315,8 @@ species:
         locator: *f37_331
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11467,6 +12355,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11517,6 +12407,8 @@ species:
         locator: *f37_334
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11555,6 +12447,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11605,6 +12499,8 @@ species:
         locator: *f37_337
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11643,6 +12539,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11693,6 +12591,8 @@ species:
         locator: *f37_340
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -11731,6 +12631,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11786,6 +12688,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11841,6 +12745,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11896,6 +12802,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -11951,6 +12859,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12006,6 +12916,13 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_6_slag_wt_pct
+            Fe: '21.1'
+            Ni: '< 0.03'
+            MgO: '20.1'
+            SiO2: '25.6'
+            Al2O3: '15.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12061,6 +12978,13 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: &henao_composition_3_C_7_slag_wt_pct
+            Fe: '30.4'
+            Ni: '< 0.03'
+            MgO: '23.6'
+            SiO2: '22.1'
+            Al2O3: '12.7'
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12116,6 +13040,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12171,6 +13097,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12226,6 +13154,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12281,6 +13211,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12336,6 +13268,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12391,6 +13325,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12446,6 +13382,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12501,6 +13439,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12556,6 +13496,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12611,6 +13553,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12666,6 +13610,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12721,6 +13667,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12776,6 +13724,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12831,6 +13781,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12886,6 +13838,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12941,6 +13895,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -12996,6 +13952,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -13051,6 +14009,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -13106,6 +14066,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -13161,6 +14123,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -13216,6 +14180,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: slag
@@ -13271,6 +14237,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_1_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13326,6 +14294,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_2_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13381,6 +14351,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_3_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13436,6 +14408,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_4_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13491,6 +14465,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_5_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13546,6 +14522,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_6_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13601,6 +14579,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_7_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13656,6 +14636,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13711,6 +14693,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13766,6 +14750,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13821,6 +14807,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13876,6 +14864,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13931,6 +14921,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -13986,6 +14978,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14041,6 +15035,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14096,6 +15092,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14151,6 +15149,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_17_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14206,6 +15206,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14261,6 +15263,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14316,6 +15320,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14371,6 +15377,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14426,6 +15434,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14481,6 +15491,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14536,6 +15548,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14591,6 +15605,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14646,6 +15662,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14701,6 +15719,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14756,6 +15776,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_metal_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Fe
           phase_label: metal
@@ -14813,6 +15835,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -14868,6 +15892,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -14923,6 +15949,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -14978,6 +16006,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15033,6 +16063,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15088,6 +16120,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15143,6 +16177,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15198,6 +16234,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15253,6 +16291,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15308,6 +16348,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15363,6 +16405,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15418,6 +16462,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15473,6 +16519,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15528,6 +16576,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15583,6 +16633,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15638,6 +16690,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15693,6 +16747,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15748,6 +16804,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15803,6 +16861,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15858,6 +16918,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15913,6 +16975,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -15968,6 +17032,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16023,6 +17089,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16078,6 +17146,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16133,6 +17203,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16188,6 +17260,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16243,6 +17317,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16298,6 +17374,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16353,6 +17431,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16408,6 +17488,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16463,6 +17545,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16518,6 +17602,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16573,6 +17659,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16628,6 +17716,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16683,6 +17773,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16738,6 +17830,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16793,6 +17887,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16848,6 +17944,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16903,6 +18001,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -16958,6 +18058,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17013,6 +18115,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17068,6 +18172,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17123,6 +18229,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17178,6 +18286,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17233,6 +18343,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17288,6 +18400,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17343,6 +18457,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17398,6 +18514,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17453,6 +18571,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17508,6 +18628,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17563,6 +18685,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17618,6 +18742,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17673,6 +18799,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17728,6 +18856,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17783,6 +18913,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -17840,6 +18972,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -17895,6 +19029,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -17950,6 +19086,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18005,6 +19143,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18060,6 +19200,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18115,6 +19257,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18170,6 +19314,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18225,6 +19371,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18280,6 +19428,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18335,6 +19485,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18390,6 +19542,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18445,6 +19599,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18500,6 +19656,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18555,6 +19713,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18610,6 +19770,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18665,6 +19827,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18720,6 +19884,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_1_A_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18775,6 +19941,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18830,6 +19998,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18885,6 +20055,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18940,6 +20112,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -18995,6 +20169,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19050,6 +20226,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19105,6 +20283,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19160,6 +20340,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19215,6 +20397,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19270,6 +20454,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19325,6 +20511,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19380,6 +20568,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19435,6 +20625,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19490,6 +20682,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19545,6 +20739,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19600,6 +20796,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19655,6 +20853,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19710,6 +20910,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19765,6 +20967,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19820,6 +21024,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19875,6 +21081,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19930,6 +21138,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -19985,6 +21195,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20040,6 +21252,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20095,6 +21309,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20150,6 +21366,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20205,6 +21423,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20260,6 +21480,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20315,6 +21537,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20370,6 +21594,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20425,6 +21651,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20480,6 +21708,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20535,6 +21765,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20590,6 +21822,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20645,6 +21879,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20700,6 +21936,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20755,6 +21993,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20810,6 +22050,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -20867,6 +22109,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -20922,6 +22166,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -20977,6 +22223,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21032,6 +22280,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21087,6 +22337,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21142,6 +22394,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21197,6 +22451,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21252,6 +22508,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21307,6 +22565,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21362,6 +22622,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_2_B_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -21419,6 +22681,8 @@ species:
           row: '4'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_1_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21474,6 +22738,8 @@ species:
           row: '5'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_2_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21529,6 +22795,8 @@ species:
           row: '6'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_3_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21584,6 +22852,8 @@ species:
           row: '7'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_4_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21639,6 +22909,8 @@ species:
           row: '8'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_5_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21694,6 +22966,8 @@ species:
           row: '9'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_6_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21749,6 +23023,8 @@ species:
           row: '10'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_7_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21804,6 +23080,8 @@ species:
           row: '11'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_8_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21859,6 +23137,8 @@ species:
           row: '12'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_9_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21914,6 +23194,8 @@ species:
           row: '13'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_10_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -21969,6 +23251,8 @@ species:
           row: '14'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_11_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22024,6 +23308,8 @@ species:
           row: '15'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_12_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22079,6 +23365,8 @@ species:
           row: '16'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_13_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22134,6 +23422,8 @@ species:
           row: '17'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_14_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22189,6 +23479,8 @@ species:
           row: '18'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_15_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22244,6 +23536,8 @@ species:
           row: '19'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_16_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22299,6 +23593,8 @@ species:
           row: '20'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_17_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22354,6 +23650,8 @@ species:
           row: '21'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_18_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22409,6 +23707,8 @@ species:
           row: '22'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_19_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22464,6 +23764,8 @@ species:
           row: '23'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_20_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22519,6 +23821,8 @@ species:
           row: '24'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_21_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22574,6 +23878,8 @@ species:
           row: '25'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_22_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22629,6 +23935,8 @@ species:
           row: '26'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_23_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22684,6 +23992,8 @@ species:
           row: '27'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_24_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22739,6 +24049,8 @@ species:
           row: '28'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_25_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22794,6 +24106,8 @@ species:
           row: '29'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_26_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22849,6 +24163,8 @@ species:
           row: '30'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_27_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag
@@ -22904,6 +24220,8 @@ species:
           row: '31'
         units: mass_percent
         values:
+          composition_wt_pct: *henao_composition_3_C_28_slag_wt_pct
+          composition_basis: wt_percent
           quantity: equilibrium_phase_composition
           formula: Al2O3
           phase_label: slag

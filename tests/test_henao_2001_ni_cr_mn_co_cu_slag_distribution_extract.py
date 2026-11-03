@@ -46,6 +46,29 @@ TABLE3_ALLOY_FE_NI = {
     "C-27": ("23.7", "71.1"),
     "C-28": ("22.3", "72.6"),
 }
+TABLE3_ALLOY_TRACES = {
+    "C-8": ("Cr", "0.0003", 21),
+    "C-9": ("Cr", "0.0001", 21),
+    "C-10": ("Cr", "0.0002", 21),
+    "C-11": ("Cr", "0.0004", 21),
+    "C-12": ("Cr", "0.0008", 21),
+    "C-13": ("Cr", "0.0001", 21),
+    "C-14": ("Cr", "0.0006", 21),
+    "C-15": ("Cr", "0.0009", 21),
+    "C-16": ("Cr", "0.0019", 21),
+    "C-17": ("Cr", "0.0018", 21),
+    "C-18": ("Co", "3.68", 22),
+    "C-19": ("Co", "3.50", 22),
+    "C-20": ("Co", "3.30", 22),
+    "C-21": ("Co", "3.23", 22),
+    "C-22": ("Co", "2.98", 22),
+    "C-23": ("Co", "2.65", 22),
+    "C-24": ("Co", "1.63", 23),
+    "C-25": ("Co", "1.74", 23),
+    "C-26": ("Co", "1.79", 23),
+    "C-27": ("Co", "1.58", 23),
+    "C-28": ("Co", "1.63", 23),
+}
 
 
 def _document() -> dict:
@@ -118,6 +141,45 @@ def _assert_render_pins(document: dict) -> None:
         if cell.replace(" ", "") == "<0.03"
     ]
     assert len(bounds) == 4
+    table3_rows = {row[1]: row for row in _table_rows(document, "3")[1:]}
+    for sample, (_component, amount, column) in TABLE3_ALLOY_TRACES.items():
+        assert table3_rows[sample][column] == amount
+
+
+def _assert_composition_bindings(document: dict) -> None:
+    observations = _observations(document)
+    assert len(observations) == 431
+    by_group: dict[tuple[str, str], dict[str, str]] = {}
+    for observation in observations:
+        values = observation["values"]
+        assert values["composition_basis"] == "wt_percent"
+        assert "composition_wt_pct" in values
+        composition = values["composition_wt_pct"]
+        component = values["component_as_published"]
+        assert composition[component] == values["component_amount"]
+        assert observation["locator"]["table"] in {"1", "2", "3"}
+        key = (observation["experiment"], values["phase_label"])
+        if key in by_group:
+            assert composition == by_group[key]
+        else:
+            by_group[key] = composition
+
+    assert len(by_group) == 110
+    assert by_group[("henao:A-1", "slag")] == {
+        "Fe": "42.5", "Ni": "4.50", "MgO": "21.8", "SiO2": "11.3"
+    }
+    assert by_group[("henao:A-1", "metal")] == {"Fe": "11.2", "Ni": "91.7"}
+    assert by_group[("henao:B-5", "slag")]["Ni"] == "< 0.03"
+    assert by_group[("henao:C-6", "slag")]["Ni"] == "< 0.03"
+    assert by_group[("henao:C-10", "metal")] == {
+        "Fe": "10.9", "Ni": "80.4", "Cr": "0.0002"
+    }
+    assert by_group[("henao:C-18", "metal")]["Co"] == "3.68"
+    assert by_group[("henao:C-28", "metal")]["Co"] == "1.63"
+
+
+def test_printed_phase_assays_are_bound_without_oxide_conversion() -> None:
+    _assert_composition_bindings(_document())
 
 
 def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
@@ -145,6 +207,10 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
+    assert all(
+        row.identity.composition is not None and row.identity.composition.is_unknown
+        for row in observations
+    )
     assert all(row.locator and row.locator.page and row.locator.published_page for row in observations)
     migrated_contexts = [
         context
@@ -183,3 +249,13 @@ def test_typed_cell_mutation_is_detected_by_independent_pdf_pins() -> None:
     table["values"]["printed_rows_csv"] = "\n".join(",".join(value for value in row) for row in rows)
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+    mutated = deepcopy(_document())
+    bound = next(
+        observation
+        for observation in _observations(mutated)
+        if observation["observation_id"] == "henao_2001_t1_A-1_slag_Fe"
+    )
+    bound["values"].pop("composition_wt_pct")
+    with pytest.raises(AssertionError):
+        _assert_composition_bindings(mutated)
