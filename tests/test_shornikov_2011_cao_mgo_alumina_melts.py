@@ -125,6 +125,19 @@ def _render_pins(document: dict) -> None:
         "O3",
         "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06",
     )["values"]["value"] == "271.522"
+    model_result = _observation(
+        document,
+        "Al2O3",
+        "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
+    )
+    assert model_result["values"]["method_class"] == "model_derived"
+    assert model_result["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert model_result["values"]["derivation"]["method"]["locator"]["page"] == 1
+    assert model_result["values"]["derivation"]["references"] == [
+        "Glushko et al. (1978–1982)",
+        "Allibert et al. (1979)",
+        "Shornikov et al. (1997)",
+    ]
 
     marker_pins = (
         ("CaO", "a", "0.497", "(1401.5, 3435.5)", "(1401.76, 3436.61)", "0.303870", "0.000961"),
@@ -228,7 +241,7 @@ def test_render_pins_fail_when_migrated_evidence_class_is_mutated() -> None:
     row = _observation(
         document,
         "Al2O3",
-        "shornikov_2011_fig1_c_allibert_marker_01",
+        "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
     )
     row["values"]["method_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):
