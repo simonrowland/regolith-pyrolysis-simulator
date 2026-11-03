@@ -46,6 +46,42 @@ ANNEX_III_ION_PROBE_SAMPLE = {
     "K2O": "0.19",
     "CaO": "46.00",
 }
+ANNEX_III_NON_CS_SAMPLE = {
+    "MgO": "9.57",
+    "Al2O3": "0.01",
+    "SiO2": "54.16",
+    "K2O": "5.75",
+    "CaO": "28.85",
+}
+ANNEX_III_THRESHOLD_SAMPLE = {
+    "MgO": "5.29",
+    "Al2O3": "10.62",
+    "SiO2": "35.50",
+    "K2O": "0.30",
+    "CaO": "45.73",
+}
+ANNEX_III_ION_SELECTION_RULE = (
+    "K2O uses the printed ion-probe mean because the electron-probe value "
+    "was below 0.3 wt%."
+)
+# r117's ion mean equals its electron mean numerically, but the table prints both.
+ANNEX_III_ION_SELECTION_ROWS = {
+    "r013",
+    "r021",
+    "r025",
+    "r045",
+    "r055",
+    "r063",
+    "r077",
+    "r085",
+    "r095",
+    "r117",
+    "r135",
+    "r145",
+    "r155",
+    "r199",
+    "r209",
+}
 
 
 def _annex_iii_grid(document: dict) -> dict[str, dict[str, str]]:
@@ -175,18 +211,51 @@ def test_georges_measurements_migrate_with_values_species_temperature_and_condit
             ],
             ANNEX_III_ION_PROBE_SAMPLE,
         ),
+        (
+            [
+                f"{SID}::georges_2000_annex_iii_r033_{formula.casefold()}"
+                for formula in COMPONENTS
+            ],
+            ANNEX_III_NON_CS_SAMPLE,
+        ),
+        (
+            [
+                f"{SID}::georges_2000_annex_iii_r071_{formula.casefold()}"
+                for formula in COMPONENTS
+            ],
+            ANNEX_III_THRESHOLD_SAMPLE,
+        ),
     ):
         expected_composition = wt_pct_to_mole_fraction(
             {formula: Decimal(amount) for formula, amount in expected_wt_pct.items()}
         )
         for observation_id in row_ids:
             row = migrated_by_id[observation_id]
-            assert row.identity.composition.value == expected_composition
+            actual_composition = row.identity.composition.value
+            assert actual_composition.as_map() == expected_composition.as_map()
+            assert actual_composition.basis == expected_composition.basis
+            assert actual_composition.amount_basis == expected_composition.amount_basis
+            if "_r013_" in observation_id:
+                assert (
+                    actual_composition.analysis_selection_rule
+                    == ANNEX_III_ION_SELECTION_RULE
+                )
+            else:
+                assert actual_composition.analysis_selection_rule is None
             composition_condition = row.point_conditions["composition"]
             assert composition_condition.state.is_value
             assert composition_condition.locator is not None
-            assert composition_condition.locator.page == 209
+            expected_page = 210 if "_r071_" in observation_id else 209
+            assert composition_condition.locator.page == expected_page
             assert composition_condition.locator.table == "Annexe III"
+
+    ion_selection_rows = {
+        row.observation_id.rsplit("::", 1)[1].split("_")[4]
+        for row in composition_rows
+        if row.identity.composition.value.analysis_selection_rule
+        == ANNEX_III_ION_SELECTION_RULE
+    }
+    assert ion_selection_rows == ANNEX_III_ION_SELECTION_ROWS
 
     migrated = Counter()
     for observation in observations:
