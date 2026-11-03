@@ -116,21 +116,64 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         )
         assert converted.identity.reference_state is not None
         assert converted.identity.reference_state.is_value
-        # d-165: the paper specifies CaO(s), but not its polymorph. The former
-        # inferred-liquid pin was 0.00002451128698546067397078399944 from
-        # 0.000228; the comparison now keeps the printed value and refuses.
-        assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
-        assert converted.value.point == observation.value.point == Decimal("0.000228")
-        assert any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
-            for notice in converted.notices
+        # d-144: CaO(s) below T_fus is lime. Printed Ca-027/Ca-028 nodes:
+        # 1800 K solid -440.375, liquid -406.017 kJ/mol;
+        # 1900 K solid -420.996, liquid -389.048 kJ/mol.
+        # 1823 K is 23/100 of that span, so
+        # G_s = -440.375 + 0.23*19.379 = -435.91783
+        # G_l = -406.017 + 0.23*16.969 = -402.11413
+        # ΔG_fus = 33.80370 kJ/mol
+        # a_l = 0.000228 * exp(-33803.70 / (8.31441 * 1823))
+        from tests.battery.test_t1616_d144_single_polymorph import (
+            printed_formation_gibbs_kJ,
         )
+
+        assert printed_formation_gibbs_kJ("Ca-027", Decimal("1800")) == Decimal(
+            "-440.375"
+        )
+        assert printed_formation_gibbs_kJ("Ca-027", Decimal("1900")) == Decimal(
+            "-420.996"
+        )
+        assert printed_formation_gibbs_kJ("Ca-028", Decimal("1800")) == Decimal(
+            "-406.017"
+        )
+        assert printed_formation_gibbs_kJ("Ca-028", Decimal("1900")) == Decimal(
+            "-389.048"
+        )
+        g_solid = Decimal("-440.375") + (
+            Decimal("-420.996") - Decimal("-440.375")
+        ) * Decimal(23) / Decimal(100)
+        g_liquid = Decimal("-406.017") + (
+            Decimal("-389.048") - Decimal("-406.017")
+        ) * Decimal(23) / Decimal(100)
+        delta_g_kJ = g_liquid - g_solid
+        assert delta_g_kJ == Decimal("33.80370")
+        hand = Decimal("0.000228") * (
+            -delta_g_kJ * Decimal(1000) / (Decimal("8.31441") * Decimal("1823"))
+        ).exp()
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert observation.value.point == Decimal("0.000228")
+        assert converted.value.point == hand
+        identity_notice = next(
+            notice
+            for notice in converted.notices
+            if notice.reason == "single_polymorph_identity_d144"
+        )
+        assert "Ca-027" in identity_notice.band
+        assert "lime" in identity_notice.band
+        assert identity_notice.authority is not None
+        assert identity_notice.authority.value == "certified"
         own_row = scored[observation.observation_id]
-        assert own_row.numeric is None
-        assert own_row.refusal is not None
-        assert own_row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-        assert own_row.refusal.detail["reason"] == (
-            "fusion_source_reference_phase_unprinted"
+        assert own_row.numeric is not None
+        assert abs(own_row.numeric.value - Decimal("1.281")) <= Decimal("0.001")
+        assert own_row.score_eligible is False
+        assert not any(
+            notice.reason == "fusion_source_reference_phase_unprinted"
+            for notice in own_row.notices
+        )
+        assert any(
+            notice.reason == "single_polymorph_identity_d144"
+            for notice in own_row.notices
         )
 
 

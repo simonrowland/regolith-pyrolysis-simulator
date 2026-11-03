@@ -2415,8 +2415,14 @@ def _fusion_energy_when_polymorph_absent(
 def _janaf_fusion_energy_for_reference(
     reference: Observation,
     temperature_K: Decimal,
+    polymorph: Polymorph | None = None,
 ):
-    """Resolve the JANAF pair for the phase named by the source reference."""
+    """Resolve the JANAF pair for the phase named by the source reference.
+
+    ``polymorph`` overrides the printed token. d-144 passes the closed
+    lime or periclase identity; an omitted token with no override still
+    raises.
+    """
 
     from simulator.battery.generators.janaf import (
         _fusion_table_pair,
@@ -2430,7 +2436,8 @@ def _janaf_fusion_energy_for_reference(
             "source reference polymorph is not stated"
         )
     standard_state = identity.reference_state.value
-    polymorph = polymorph_token(standard_state.endmember)
+    if polymorph is None:
+        polymorph = polymorph_token(standard_state.endmember)
     if polymorph is None:
         raise JANAFFusionPolymorphUnavailable(
             "source reference polymorph is not stated"
@@ -3243,6 +3250,7 @@ def fusion_comparison_reference(
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
+        _d144_single_polymorph,
         _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
@@ -3253,23 +3261,81 @@ def fusion_comparison_reference(
     # printed number. polymorph is None is not that record — the melt-activity
     # benchmark's pure-solid identity never set the axis, and the stable JANAF
     # crystal still converts it onto the liquid basis.
+    #
+    # d-144 is the closed exception, and it is not an inference from JANAF
+    # coverage. `_D144_SINGLE_POLYMORPH_TABLES` names the only oxides with one
+    # crystal structure up to melting at 1 bar (CaO lime, MgO periclase;
+    # ruling 2026-11-03). Al2O3 has untabulated metastable forms, so "the
+    # fusion pair has one crystal table" is not this identity.
+    #
+    # Premise: below that oxide's T_fus, printed '(s)' is the structure in
+    # the constant, so the solid standard is that JANAF crystal.
+    # Algebra: the existing t1263e3 shift then applies,
+    # a_l = a_s*exp(-ΔG_fus/RT), ΔG_fus = G_liquid - G_crystal of that pair.
+    # Units: ΔG_fus is kJ/mol; multiplying by 1000 and dividing by
+    # R[J/(mol*K)]*T[K] makes the exponent dimensionless.
+    # Sanity: Kume sample 101 prints a_s(CaO) = 0.000228 at 1823 K. The
+    # Ca-027/Ca-028 chords on the 1800 K and 1900 K nodes (fraction 0.23)
+    # give G_s = -435.91783 kJ/mol and G_l = -402.11413 kJ/mol, so
+    # ΔG_fus = 33.80370 kJ/mol and
+    # a_l = 0.000228*exp(-33803.70/(8.31441*1823))
+    #     = 0.00002451128698546067397078399944.
+    # At or above T_fus the identity does not apply: the unprinted solid
+    # still refuses under d-165, and non-positive points never reach here.
+    d144_notice: Notice | None = None
+    resolved_polymorph: Polymorph | None = None
     if (
         observed_reference_phase is Phase.CR
         and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
     ):
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason="fusion_source_reference_phase_unprinted",
-            origin=reference.observation_id,
-            band="JANAF fusion conversion requires the source-named solid polymorph",
-        )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+        identity_pair = _d144_single_polymorph(formula)
+        fusion_gate = None
+        if identity_pair is not None:
+            try:
+                fusion_gate = janaf_fusion_energy(formula, temperature_K)
+            except ValueError:
+                fusion_gate = None
+        if (
+            identity_pair is not None
+            and fusion_gate is not None
+            and fusion_gate.crystal_table == identity_pair[0]
+            and temperature_K < fusion_gate.melting_temperature_K
+        ):
+            table_id, resolved_polymorph = identity_pair
+            d144_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason="single_polymorph_identity_d144",
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF {table_id} {resolved_polymorph.value} "
+                    f"T={temperature_K} K < "
+                    f"T_fus={fusion_gate.melting_temperature_K} K"
+                ),
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "d-144 closed single-polymorph identity; ruling 2026-11-03"
+                ),
+            )
+        else:
+            notice = Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason="fusion_source_reference_phase_unprinted",
+                origin=reference.observation_id,
+                band="JANAF fusion conversion requires the source-named solid polymorph",
+            )
+            return replace(
+                reference, notices=union_notices(reference.notices, (notice,))
+            )
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
-    if engine is Engine.MAGEMIN:
+    # d-144 already named the crystal. Do not take MAGEMin's native solid
+    # basis or infer a crystal from the stability set; the liquid shift
+    # below is the same t1263e3 path as every other melt-activity engine.
+    if engine is Engine.MAGEMIN and resolved_polymorph is None:
         from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
         native = MAGEMIN_NATIVE_MELT_ACTIVITIES.get(formula)
@@ -3312,7 +3378,7 @@ def fusion_comparison_reference(
 
     inferred_reference_notice: Notice | None = None
     try:
-        if engine is Engine.MAGEMIN:
+        if engine is Engine.MAGEMIN and resolved_polymorph is None:
             # The MAGEMin adapter resolves the source and target crystal
             # tables itself and reads only this oxide's liquid table. A liquid
             # reference names no crystal polymorph, so the source-named lookup
@@ -3336,15 +3402,18 @@ def fusion_comparison_reference(
                     notices=union_notices(reference.notices, extra),
                 )
         else:
-            fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
+            fusion = _janaf_fusion_energy_for_reference(
+                reference, temperature_K, polymorph=resolved_polymorph
+            )
     except ValueError as exc:
         reason = str(exc)
         notice = fusion_missing_input_notice(reason)
         if notice is None:
             raise
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+        extra = (notice,) if d144_notice is None else (d144_notice, notice)
+        return replace(reference, notices=union_notices(reference.notices, extra))
 
-    if engine is Engine.MAGEMIN:
+    if engine is Engine.MAGEMIN and resolved_polymorph is None:
         assert magemin_target_polymorph is not None
         source_polymorph = magemin_source_polymorph
         target_polymorph = magemin_target_polymorph
@@ -3462,7 +3531,11 @@ def fusion_comparison_reference(
             notices=union_notices(reference.notices, (conversion_notice,)),
         )
 
-    if engine is not Engine.MAGEMIN and magemin_native_reference:
+    if (
+        engine is not Engine.MAGEMIN
+        and magemin_native_reference
+        and resolved_polymorph is None
+    ):
         # The prior MAGEMin conversion explicitly established a quartz solid
         # basis. Resolve that same JANAF table when the next owner request is
         # for a liquid-reference engine; the generic stable-solid choice can
@@ -3684,6 +3757,8 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
+    if d144_notice is not None:
+        notices = (d144_notice,) + notices
     if inferred_reference_notice is not None:
         notices = (inferred_reference_notice,) + notices
     if magemin_above_crossing_notice is not None:
@@ -12775,7 +12850,23 @@ def compile_residual(
             }
         elif fusion_conversion:
             assert T is not None
-            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            # The comparison reference is already liquid, so its polymorph
+            # token is empty. The source row still carries the printed
+            # crystal. d-144 did not print one; pass the constant's
+            # polymorph into the same JANAF lookup the conversion used.
+            resolved_polymorph = None
+            if any(
+                notice.reason == "single_polymorph_identity_d144"
+                for notice in reference.notices
+            ):
+                from simulator.battery.generators.janaf import _d144_single_polymorph
+
+                identity_pair = _d144_single_polymorph(formula)
+                if identity_pair is not None:
+                    resolved_polymorph = identity_pair[1]
+            fusion_energy = _janaf_fusion_energy_for_reference(
+                source_reference, T, polymorph=resolved_polymorph
+            )
             if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
                 fusion_band_refusal = {
                     "reason": "conversion_uncertainty_unprinted",
