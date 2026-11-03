@@ -19,6 +19,8 @@ from simulator.battery.identity import (
     log10K_from_delta_fG_kJ_mol,
 )
 from simulator.physical_constants import AVOGADRO, BOLTZMANN, GAS_CONSTANT
+from simulator.reference_data import janaf as janaf_reference_data
+from simulator.reference_data import janaf_fusion as janaf_fusion_reference_data
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
     R_J_MOL_K as B1544_LOADER_R_J_MOL_K,
 )
@@ -29,6 +31,10 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 
 def test_per_source_transcription_constants_are_the_printed_values() -> None:
     assert janaf_generator.JANAF_R_J_PER_MOL_K == Decimal("8.31441")
+    assert (
+        janaf_fusion_reference_data.JANAF_R_J_PER_MOL_K
+        is janaf_reference_data.JANAF_R_J_MOL_K
+    )
     assert b1544_generator.B1544_R_J_PER_MOL_K == Decimal("8.3143")
     assert B1544_LOADER_R_J_MOL_K == Decimal("8.3143")
     assert b1544_generator.B1544_R_J_PER_MOL_K == B1544_LOADER_R_J_MOL_K
