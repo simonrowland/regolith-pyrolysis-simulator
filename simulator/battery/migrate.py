@@ -45,6 +45,7 @@ import fnmatch
 import hashlib
 import inspect
 import json
+import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
@@ -11409,6 +11410,221 @@ def _printed_unit_for_field(payload: Mapping[str, Any], key: str) -> str | None:
     return None
 
 
+def _phase_component_percent_selection(
+    amount: Decimal,
+    key: str,
+    units: str | None,
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    """Apply the existing component-percent scale only on its matching basis."""
+
+    unit_candidate = _printed_unit_for_field(payload, key)
+    printed_unit = next(
+        (
+            str(payload[unit_key])
+            for unit_key in (
+                "component_amount_printed_unit",
+                "component_amount_units_as_published",
+                "value_units_as_published",
+            )
+            if payload.get(unit_key) not in (None, "")
+        ),
+        None,
+    )
+    if printed_unit is None and unit_candidate is not None:
+        normalized_candidate = " ".join(
+            unit_candidate.casefold().strip().replace("_", " ").split()
+        )
+        if (
+            "%" in normalized_candidate
+            or re.search(r"\b(?:percent|pct)\b", normalized_candidate)
+            or re.search(r"\bmole fraction\b", normalized_candidate)
+        ):
+            printed_unit = unit_candidate
+    if printed_unit is None and units is not None:
+        normalized_units = " ".join(
+            units.casefold().strip().replace("_", " ").split()
+        )
+        if (
+            "%" in normalized_units
+            or re.search(r"\b(?:percent|pct)\b", normalized_units)
+            or re.search(r"\bmole fraction\b", normalized_units)
+        ):
+            printed_unit = units
+    if printed_unit is None:
+        for printed_key in (
+            "component_amount_as_published",
+            "value_as_printed",
+            "value_as_published",
+        ):
+            raw_printed = payload.get(printed_key)
+            if isinstance(raw_printed, Mapping):
+                raw_printed = raw_printed.get("as_printed") or raw_printed.get("value")
+            if isinstance(raw_printed, str) and (
+                "%" in raw_printed
+                or re.search(r"\b(?:percent|pct)\b", raw_printed, re.IGNORECASE)
+            ):
+                printed_unit = raw_printed
+                break
+    if printed_unit is None:
+        printed_unit = unit_candidate or units
+    if printed_unit is None:
+        return None
+
+    normalized_unit = " ".join(
+        printed_unit.casefold().strip().replace("_", " ").split()
+    )
+    unit_kind = None
+    if re.search(r"\bmole fraction\b", normalized_unit):
+        unit_kind = "mole_fraction"
+    elif (
+        "%" in normalized_unit
+        or re.search(r"\b(?:percent|pct)\b", normalized_unit)
+    ):
+        compact_unit = re.sub(r"[^a-z%]", "", normalized_unit)
+        if any(
+            token in compact_unit
+            for token in (
+                "at%",
+                "atom%",
+                "atomic%",
+                "atpercent",
+                "atompercent",
+                "atomicpercent",
+                "atpct",
+                "atompct",
+                "atomicpct",
+            )
+        ):
+            unit_kind = "atom_percent"
+        elif any(
+            token in compact_unit
+            for token in (
+                "mol%",
+                "mole%",
+                "molar%",
+                "molpercent",
+                "molepercent",
+                "molarpercent",
+                "molpct",
+                "molepct",
+                "molarpct",
+            )
+        ):
+            unit_kind = "mole_percent"
+        elif any(
+            token in compact_unit
+            for token in (
+                "wt%",
+                "weight%",
+                "mass%",
+                "wtpercent",
+                "weightpercent",
+                "masspercent",
+                "wtpct",
+                "weightpct",
+                "masspct",
+            )
+        ):
+            unit_kind = "mass_percent"
+        else:
+            unit_kind = "unknown_percent"
+    if unit_kind is None:
+        return None
+    basis = str(payload.get("basis") or "").strip()
+    if unit_kind == "mole_fraction":
+        if basis != "mole_fraction":
+            return _unavailable_selection(
+                f"{printed_unit!r} requires the mole_fraction basis; "
+                f"source basis is {basis or 'missing'}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        return _point_selection(
+            amount, key, "identity:mole_fraction", payload, condition_ranges
+        )
+    if unit_kind == "atom_percent":
+        return _unavailable_selection(
+            "at.% requires the missing atom_fraction basis; it cannot be stored as mole_fraction",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    if unit_kind == "unknown_percent":
+        return _unavailable_selection(
+            f"unrecognized percent unit {printed_unit!r} for {key}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    if unit_kind == "mass_percent":
+        if basis != "wt_percent":
+            return _unavailable_selection(
+                f"{printed_unit!r} requires the wt_percent basis; "
+                f"source basis is {basis or 'missing'}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        return _point_selection(
+            amount, key, "identity:wt_percent", payload, condition_ranges
+        )
+    if basis != "mole_fraction":
+        return _unavailable_selection(
+            f"{printed_unit!r} requires the mole_fraction basis; "
+            f"source basis is {basis or 'missing'}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    for printed_key in (
+        "component_amount_as_published",
+        "value_as_printed",
+        "value_as_published",
+    ):
+        raw_printed = payload.get(printed_key)
+        if isinstance(raw_printed, Mapping):
+            raw_printed = raw_printed.get("as_printed") or raw_printed.get("value")
+        if not isinstance(raw_printed, str):
+            continue
+        match = re.search(
+            r"(?<![\w.])[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)(?:[eE][+-]?\d+)?",
+            raw_printed,
+        )
+        if match is None:
+            continue
+        printed_amount = _as_dec_or_none(match.group().replace(",", "."))
+        if printed_amount is None:
+            continue
+        printed_fraction = _percent_to_fraction(printed_amount)
+        raw_amount = payload.get(key)
+        is_same_float_fraction = False
+        if isinstance(raw_amount, float) and math.isfinite(raw_amount):
+            float_percent = float(printed_amount)
+            if math.isfinite(float_percent):
+                is_same_float_fraction = raw_amount == float_percent / 100.0
+        if amount == printed_fraction or is_same_float_fraction:
+            return _point_selection(
+                amount, key, "identity:mole_fraction", payload, condition_ranges
+            )
+    # Premise: component_amount is a composition percentage, so its value stays
+    # on the declared composition basis. Unit check: only mol% with basis
+    # mole_fraction reaches this branch; wt% remains on wt_percent and at.% is
+    # refused above because atom_fraction is absent. Scale by exactly /100,
+    # with no rounding: 51.93 mol% -> 0.5193 mole fraction. A float amount
+    # already equal to its printed percent divided by 100 is retained verbatim,
+    # as in the existing Abdeyazdan extract.
+    return _point_selection(
+        _percent_to_fraction(amount),
+        key,
+        "percent_to_fraction",
+        payload,
+        condition_ranges,
+    )
+
+
 # Keep source-specific calorie conventions distinct from the thermochemical
 # calorie owned by identity.py. An unqualified ``cal`` remains thermochemical.
 INTERNATIONAL_TABLE_CALORIE_J = Decimal("4.1868")
@@ -12752,6 +12968,15 @@ def _selection_from_named_field(
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2_s", payload, condition_ranges
             )
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and key == "component_amount"
+        ):
+            phase_percent = _phase_component_percent_selection(
+                amount, key, units, payload, condition_ranges
+            )
+            if phase_percent is not None:
+                return phase_percent
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )

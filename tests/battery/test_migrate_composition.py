@@ -1875,6 +1875,104 @@ def test_existing_percent_fraction_conversion_outputs_are_pinned() -> None:
     assert selection.unit_trail == "percent_to_fraction"
 
 
+def test_phase_component_mol_percent_scales_exactly_and_preserves_printed() -> None:
+    printed = "51.93 mol%"
+    payload = {
+        "basis": "mole_fraction",
+        "component_amount": "51.93",
+        "component_amount_as_published": printed,
+        "value_units_as_published": "mol%",
+    }
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mole fraction",
+        payload,
+    )
+
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "percent_to_fraction"
+    assert payload["component_amount_as_published"] == "51.93 mol%"
+
+
+def test_phase_component_wt_percent_keeps_mass_basis_scale() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "wt%",
+        {
+            "basis": "wt_percent",
+            "component_amount": "51.93",
+            "value_units_as_published": "wt%",
+        },
+    )
+
+    assert selection.amount == Decimal("51.93")
+    assert selection.unit_trail == "identity:wt_percent"
+
+
+def test_phase_component_at_percent_refuses_missing_atom_fraction_basis() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mole_fraction",
+        {
+            "basis": "mole_fraction",
+            "component_amount": "0.27",
+            "value_as_published": "0.27 at.%",
+            "value_units_as_published": "at.%",
+        },
+    )
+
+    assert not selection.available
+    assert selection.reason is not None
+    assert "atom_fraction" in selection.reason
+
+
+def test_phase_component_unrecognized_percent_unit_is_typed_refusal() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "vol%",
+        {
+            "basis": "mole_fraction",
+            "component_amount": "51.93",
+            "value_units_as_published": "vol%",
+        },
+    )
+
+    assert not selection.available
+    assert selection.reason is not None
+    assert "unrecognized percent unit" in selection.reason
+
+
+def test_phase_component_already_fractional_mol_percent_is_not_rescaled() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        None,
+        {
+            "basis": "mole_fraction",
+            "component_amount": "0.5193",
+            "component_amount_as_published": "51.93 mol%",
+            "component_amount_printed_unit": "mol%",
+        },
+    )
+
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "identity:mole_fraction"
+
+
+def test_phase_component_float_fraction_artifact_is_retained_verbatim() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mol.% as printed",
+        {
+            "basis": "mole_fraction",
+            "component_amount": 0.6459999999999999,
+            "component_amount_as_published": "64.6 ± 0.90 mol.%",
+        },
+    )
+
+    assert selection.amount == Decimal("0.6459999999999999")
+    assert selection.unit_trail == "identity:mole_fraction"
+
+
 @pytest.mark.parametrize("wrapped", [False, True])
 @pytest.mark.parametrize(
     "components",
